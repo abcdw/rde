@@ -29,7 +29,9 @@ fi
 xset +fp /usr/share/fonts/local &
 xset fp rehash &
 xrdb -merge ~/.Xdefaults &
-#   xxkb &
+
+xcape &
+sleep 1s && xxkb &
 
 xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 1
 xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 2
@@ -43,5 +45,4 @@ urxvtd -q -f -o &
 #~/work/repos/dzen2-notify/dzen2_notify_daemon.py &
 #   pulsar &
 
-xcape &
-exec i3
+exec /usr/bin/ssh-agent i3
