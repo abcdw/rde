@@ -1,0 +1,14 @@
+!Swap win and Right Alt
+remove mod1 = Alt_R
+remove mod4 = Super_L
+add mod1 = Super_L
+add mod4 = Alt_R
+
+!swap Caps and Control
+remove Lock = Caps_Lock
+remove Control = Control_L
+keysym Control_L = Caps_Lock
+keysym Caps_Lock = Control_L
+add Lock = Caps_Lock
+add Control = Control_L
+
