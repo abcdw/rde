@@ -31,7 +31,6 @@ xset fp rehash &
 xrdb -merge ~/.Xdefaults &
 
 xcape &
-sleep 1s && xxkb &
 
 xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 1
 xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 2
