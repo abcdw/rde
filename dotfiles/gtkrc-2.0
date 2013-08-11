@@ -1,6 +1,11 @@
-# Zenburn theme, based on Murrina333
+# SolarizedLight, based on Solarizetheme, based on Murrina333
+# Solarized by Ethan Schoonver http://ethanschoonover.com/solarized
+# ~/usr/share/themes/SolarizedLight/gtk-2.0/gtkrc
 
-gtk_color_scheme = "fg_color:#B3B3A1\nbg_color:#333333\nbase_color:#3f3f3f\ntext_color:#B3B3A1\nselected_bg_color:#1E2320\nselected_fg_color:#A3CACC"
+gtk-icon-theme-name = "GNOME"
+gtk-theme-name = "SolarizedLight"
+
+gtk_color_scheme = "fg_color:#002b36\nbg_color:#fdf6e3\nbase_color:#eee8d5\ntext_color:#002b36\nselected_bg_color:#93a1a1\nselected_fg_color:#002b36"
 
 gtk-button-images = 1
 gtk-icon-sizes = "panel-menu=16,16:panel=16,16:gtk-button=16,16:gtk-large-toolbar=16,16"
@@ -10,7 +15,7 @@ style "theme-default"
   GtkButton      ::default_border    = { 0, 0, 0, 0 }
   GtkRange       ::trough_border     = 0
   GtkPaned       ::handle_size       = 6
-  GtkRange       ::slider_width      = 7
+  GtkRange       ::slider_width      = 16
   GtkRange       ::stepper_size      = 0
 
   GtkScrollbar   ::min_slider_length = 30
@@ -30,7 +35,7 @@ style "theme-default"
   fg[PRELIGHT]      = @selected_fg_color
   fg[SELECTED]      = @selected_fg_color
   fg[ACTIVE]        = darker (@fg_color)
-  fg[INSENSITIVE]   = lighter (@bg_color)
+  fg[INSENSITIVE]   = @fg_color
 
   bg[NORMAL]        = @bg_color
   bg[PRELIGHT]      = @selected_bg_color
@@ -47,14 +52,14 @@ style "theme-default"
   text[NORMAL]     	=  @text_color
   text[ACTIVE]      	=  @text_color
   text[PRELIGHT]   	=  @text_color
-  text[SELECTED]   	=  @selected_fg_color
-  text[INSENSITIVE]	=  mix (0.675,shade (0.95,@bg_color),@fg_color)
+  text[SELECTED]   	=  darker (@selected_fg_color)
+  text[INSENSITIVE]	=  @fg_color
 
   engine "murrine" 
   {
 	menuitemstyle	 	= 2
-	scrollbar_color	 	= "#B3A98F"
-	scrollbarstyle	 	= 3
+	scrollbar_color	 	= "#cb4b16"
+	scrollbarstyle	 	= 0
 	contrast		 	= 1.0
 	menustyle 		 	= 0
 	glazestyle 		 	= 0
@@ -63,10 +68,8 @@ style "theme-default"
 	menuitemstyle 	 	= 0
 	listviewheaderstyle = 0
 	listviewstyle 		= 1
-	gradients			= FALSE
 	roundness 			= 0
         animation 			= TRUE
-    hilight_ratio 		= 0.909090
   }
 }
 
@@ -92,10 +95,10 @@ style "theme-button" = "theme-wider"
 {
   	xthickness 		= 0
   	ythickness 		= 0
-  	bg[NORMAL]      = @bg_color
-  	bg[INSENSITIVE] = @bg_color
-  	#bg[PRELIGHT]   	= @bg_color
-  	bg[ACTIVE]		= @bg_color
+  #bg[NORMAL]      = @bg_color
+  #bg[INSENSITIVE] = @bg_color
+  #bg[PRELIGHT]   	= @bg_color
+  #bg[ACTIVE]		= @bg_color
   	text[PRELIGHT]  = @selected_fg_color 
  
 }
@@ -103,9 +106,9 @@ style "theme-button" = "theme-wider"
 
 style "theme-notebook" = "theme-wide"
 {
-  	bg[NORMAL]      = @bg_color
-  	bg[INSENSITIVE] = @bg_color
-  	bg[SELECTED]    = "#505050"
+  #bg[NORMAL]      = @bg_color
+  #bg[INSENSITIVE] = @bg_color
+  	bg[SELECTED]    = @selected_bg_color
 }
 
 style "theme-tasklist" = "theme-default"
@@ -124,10 +127,10 @@ style "theme-menu" = "theme-default"
 style "theme-menu-item" = "theme-default"
 {
   ythickness = 3
-  	#fg[NORMAL]		= @fg_color 
-  	#fg[PRELIGHT] 		= @selected_fg_color
-  	#fg[INSENSITIVE]	= @selected_fg_color
-  	#bg[SELECTED]	    = "#777777"
+  	fg[NORMAL]		= @fg_color 
+  	fg[PRELIGHT] 		= @selected_fg_color
+  	fg[INSENSITIVE]	= @selected_fg_color
+  	bg[SELECTED]	    = @selected_bg_color
 }
   
 
@@ -168,7 +171,7 @@ style "theme-progressbar" = "theme-wide"
   	ythickness 	= 2
   	#fg[PRELIGHT]  = "#ff0000" # @bg_color
   	bg[NORMAL]    = @bg_color # outline of progressbar
-  	  bg[SELECTED]	    = "#B3A98F" #@selected_bg_color # progressbar color
+  	  bg[SELECTED]	    = @selected_bg_color # progressbar color
 }
 
 style "theme-scrollbar" = "theme-default"
@@ -206,7 +209,7 @@ style "panel"
   	xthickness   = 2
   	ythickness   = 2
 	bg[NORMAL]   = @bg_color
-	fg[NORMAL]   = @bg_color 
+	fg[NORMAL]   = @fg_color 
 	text[NORMAL] = @fg_color 
 }
 
@@ -223,6 +226,15 @@ style "panelbuttons"
     fg[ACTIVE]		= @selected_fg_color 
     fg[PRELIGHT]	= @selected_fg_color
 }
+
+style "chrome-gtk-frame"
+{
+    ChromeGtkFrame::frame-color = @bg_color
+    ChromeGtkFrame::inactive-frame-color = darker(@bg_color)
+
+}
+
+class "ChromeGtkFrame" style "chrome-gtk-frame"
 
 class "*Panel*" 						style "panel"
 widget_class "*Panel*GtkToggleButton"   style "panelbuttons"

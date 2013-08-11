@@ -167,21 +167,51 @@ bindsym $mod+p mode "resize"
 # Colors
 # zenburn
 # class border backgr. text
-client.focused #525252 #1E1E1E #F5DEB3
-client.focused_inactive #333333 #0F0F0F #E3CCA1
-client.unfocused #333333 #010101 #85753A
-client.urgent #856E23 #900000 #F5DEB3
+#client.focused #525252 #1E1E1E #F5DEB3
+#client.focused_inactive #333333 #0F0F0F #E3CCA1
+#client.unfocused #333333 #010101 #85753A
+#client.urgent #856E23 #900000 #F5DEB3
 
+#bar {
+#        status_command i3status
+#    #mode hide
+#        colors {
+#        	background #0F0F0F
+#        	statusline #F5DEB3
+         
+#        	 focused_workspace #F5DEB3 #666666
+#        	 active_workspace #F5DEB3 #0F0F0F
+#        	 inactive_workspace #F5DEB3 #1E1E1E
+#        	 urgent_workspace #ffffff #900000
+#        }
+# }
+
+#client.focused          #cb4b16 #fdf6e3 #657b83 #ffffff
+#client.focused_inactive #586e75 #fdf6e3 #657b83 #ffffff
+#client.unfocused        #586e75 #fdf6e3 #657b83 #ffffff
+#client.urgent           #586e75 #fdf6e3 #657b83 #ffffff
+client.focused #cb4b16 #cb4b16 #fdf6e3
+client.focused_inactive #657b83 #657b83 #fdf6e3
+client.unfocused #586e75 #586e75 #eee8d5
+client.urgent #dc322f #dc322f #fdf6e3
 bar {
         status_command i3status
-	#mode hide
+        mode dock
+        position bottom
+        tray_output primary
+        workspace_buttons yes
         colors {
-        	background #0F0F0F
-        	statusline #F5DEB3
-         
-        	 focused_workspace #F5DEB3 #666666
-        	 active_workspace #F5DEB3 #0F0F0F
-        	 inactive_workspace #F5DEB3 #1E1E1E
-        	 urgent_workspace #ffffff #900000
+                #background      #fdf6e3
+                #statusline      #839496
+                #focused_workspace       #cb4b1g #fdf6e3 #839496
+                #inactive_workspace      #859900 #fdf6e3 #839496
+                #urgent_workspace        #2aa198 #d33682 #dc322f
+
+                #background #0e0e0e
+                #statusline #839496
+                #focused_workspace #b58900 #111111
+                #inactive_workspace #586e75 #111111
+                #urgent_workspace #839496 #dc322f
+# active_workspace #839496 #111111  
         }
- }
+}
