@@ -1,0 +1,15 @@
+" vim: foldmethod=marker
+" ==============================================================================
+" "Appearence" Внешний вид {{{1
+" ==============================================================================
+
+set guioptions-=T
+set guioptions-=r
+set guioptions-=R
+set guioptions-=l
+set guioptions-=L
+set guioptions+=c
+set guifont=PragmataPro\ 12
+"set gfn=PragmataPro\ 14
+"DejaVu\ Sans\ Mono\ 12
+
