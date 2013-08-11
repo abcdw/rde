@@ -31,7 +31,7 @@ let g:mapleader = ","
 
 "call togglebg#map("<leader>b")
 nnoremap <leader>\ :call ToggleNERDTreeAndTagbar()<CR>
-map <leader>v :e $MYVIMRC<CR>
+map <leader>v :e! $MYVIMRC<CR>
 nnoremap <silent> <leader>h :set invhlsearch<CR>
 comm! W exec 'w !sudo tee % > /dev/null' | e!
 
@@ -89,16 +89,19 @@ if executable("git")
 
     Bundle 'colorizer'
     Bundle 'gmarik/vundle'
-    Bundle 'majutsushi/tagbar' "{{{3
+    Bundle 'majutsushi/tagbar' 
+    "{{{3
         nmap <leader>tb :TagbarToggle<CR>
         let g:tagbar_autofocus = 1
         let g:tagbar_autoclose = 1
     " }}}
-    Bundle 'mattn/gist-vim' "{{{3
+    Bundle 'mattn/gist-vim' 
+    "{{{3
         let g:gist_update_on_write = 2
     " }}}
     Bundle 'mattn/webapi-vim'
-    "Bundle 'nathanaelkane/vim-indent-guides.git' "{{{3
+    "Bundle 'nathanaelkane/vim-indent-guides.git' 
+    "{{{3
         "let g:indent_guides_auto_colors = 1
         "let g:indent_guides_guide_size=1
         "let g:indent_guides_start_level=2
@@ -108,21 +111,24 @@ if executable("git")
     " }}}
     Bundle 'Raimondi/delimitMate'
     Bundle 'scrooloose/nerdcommenter.git'
-    Bundle 'SingleCompile' "{{{3
+    Bundle 'SingleCompile' 
+    "{{{3
         nmap <leader>sc :SCCompile<CR>
         nmap <leader>scr :SCCompileRun<CR>
     " }}}
     " >> new
     "Bundle 'Visual-Mark'
     "Bundle 'Yggdroot/indentLine'
-    Bundle 'bling/vim-airline' "{{{3
+    Bundle 'bling/vim-airline' 
+    "{{{3
         let g:airline_theme='solarized'
         let g:airline_left_sep=''
         let g:airline_right_sep=''
     " }}}
     Bundle 'bling/vim-bufferline'
     Bundle 'buddhavs/vim-tasklist'
-    Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex' "{{{3
+    Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex' 
+    "{{{3
         set grepprg=grep\ -nH\ $*
         let g:tex_flavor='latex'
         let g:Tex_DefaultTargetFormat='pdf'
@@ -132,7 +138,8 @@ if executable("git")
     Bundle 'Gundo'
     Bundle 'dbakker/vim-lint'
     Bundle 'Lokaltog/vim-easymotion'
-    Bundle 'lyokha/vim-xkbswitch' " {{{3
+    Bundle 'lyokha/vim-xkbswitch' 
+    " {{{3
         let g:XkbSwitchIMappingsSkipFt = ['tex'] " need for latex-suite
         let g:XkbSwitchEnabled = 1
         "let g:XkbSwitchLib = '~/.vim/bundle/vim-xkbswitch/xkb-switch/libxkbswitch.so'
@@ -144,7 +151,8 @@ if executable("git")
     Bundle 'a.vim'
     Bundle 'kien/ctrlp.vim'
     Bundle 'scrooloose/nerdtree'
-    Bundle 'scrooloose/syntastic' "{{{3
+    Bundle 'scrooloose/syntastic' 
+    "{{{3
         let g:syntastic_python_python_exe = 'python2'
         let g:syntastic_error_symbol='✗'
         let g:syntastic_warning_symbol='⚠'
@@ -153,7 +161,8 @@ if executable("git")
     Bundle 'TaskList.vim'
     Bundle 'tpope/vim-fugitive.git'
     Bundle 'tpope/vim-surround'
-    Bundle 'Valloric/YouCompleteMe' "{{{3
+    Bundle 'Valloric/YouCompleteMe' 
+    "{{{3
         let g:ycm_add_preview_to_completeopt = 1
         let g:ycm_autoclose_preview_window_after_completion = 1
         let g:ycm_global_ycm_extra_conf = '/home/abcdw/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
@@ -273,15 +282,6 @@ set cursorline
 if has("autocmd")
   autocmd VimEnter * nested call SetupCtrlP()
 endif
-
-" ==============================================================================
-" "Appearence" Внешний вид {{{1
-" ==============================================================================
-
-
-set guifont=PragmataPro\ 12
-"set gfn=PragmataPro\ 14
-"DejaVu\ Sans\ Mono\ 12
 
 " ==============================================================================
 " "Files" Настройки для файлов {{{1
