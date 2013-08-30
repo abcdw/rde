@@ -11,6 +11,9 @@
 
 exec /usr/sbin/loloswitcher
 exec nohup /usr/bin/xxkb &
+exec feh --bg-scale ~/media/pics/wallpaper
+exec --no-startup-id i3-msg "workspace c"
+exec urxtc -e tmux
 
 set $mod Mod4
 
@@ -34,8 +37,9 @@ bindsym XF86AudioLowerVolume exec amixer -c 0 set Master 2-
 bindsym XF86AudioNext exec mpris2.py next
 bindsym XF86AudioPlay exec mpris2.py toggleplay
 bindsym XF86AudioPrev exec mpris2.py prev
-bindsym XF86ScreenSaver exec i3lock -c 333333
-bindsym $mod+x exec i3lock -c 333333
+bindsym XF86ScreenSaver exec i3lock-blur
+bindsym XF86Sleep exec i3lock-blur
+bindsym $mod+x exec i3lock-blur
 bindsym $mod+Return exec i3-sensible-terminal
 
 # kill focused window
@@ -111,6 +115,7 @@ bindsym $mod+bracketright workspace 10
 bindsym $mod+v workspace v
 bindsym $mod+w workspace w
 bindsym $mod+m workspace m
+bindsym $mod+c workspace c
 
 # move focused container to workspace
 bindsym $mod+Shift+ampersand move container to workspace 1
@@ -126,6 +131,7 @@ bindsym $mod+Shift+bracketright move container to workspace 10
 bindsym $mod+Shift+v move container to workspace v
 bindsym $mod+Shift+w move container to workspace w
 bindsym $mod+Shift+m move container to workspace m
+bindsym $mod+Shift+c move container to workspace c
 
 # reload the configuration file
 bindsym $mod+Shift+j reload
@@ -178,7 +184,6 @@ bindsym $mod+p mode "resize"
 #        colors {
 #        	background #0F0F0F
 #        	statusline #F5DEB3
-         
 #        	 focused_workspace #F5DEB3 #666666
 #        	 active_workspace #F5DEB3 #0F0F0F
 #        	 inactive_workspace #F5DEB3 #1E1E1E
@@ -212,6 +217,7 @@ bar {
                 #focused_workspace #b58900 #111111
                 #inactive_workspace #586e75 #111111
                 #urgent_workspace #839496 #dc322f
-# active_workspace #839496 #111111  
+# active_workspace #839496 #111111
         }
 }
+# vim:filetype=i3
