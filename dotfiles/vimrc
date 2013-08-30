@@ -5,14 +5,14 @@
 
 " TODO: fugitiv
 " TODO: fuzzyfinder
-" TODO: vim-gitgutter 
+" TODO: vim-gitgutter
 " TODO: spell checking, autocomplete and synonyms
 
 " TODO: session managment
 " SessionMan
 
 " TODO: project managment
-" exvim MyProject 
+" exvim MyProject
 
 " TODO: prepare and cleanup configs
 " write README about install and add screenshots
@@ -35,12 +35,13 @@ map <leader>v :e! $MYVIMRC<CR>
 nnoremap <silent> <leader>h :set invhlsearch<CR>
 comm! W exec 'w !sudo tee % > /dev/null' | e!
 
-"nnoremap <Space> @q 
+"nnoremap <Space> @q
 nnoremap ; :
 map! ii <Esc>
 map! jj <Esc>o<Esc>
 map! kk <Esc>k
 map! ;; ;<Esc>o
+"nmap! ;; A;<Esc>o
 "inoremap <CR> <Esc>
 
 nnoremap <F2> :set invpaste paste?<CR>
@@ -59,6 +60,8 @@ map <right> <nop>
 map <up> <nop>
 map <down> <nop>
 
+vmap < <gv
+vmap > >gv
 " ==============================================================================
 " "Vundle" Package manager {{{1
 " ==============================================================================
@@ -68,131 +71,141 @@ map <down> <nop>
 filetype off
 
 if executable("git")
-    if !isdirectory(expand("~/.vim/bundle/vundle"))
-        echomsg "******************************"
-        echomsg "Installing Vundler..."
-        echomsg "******************************"
-        !mkdir -p ~/.vim/bundle && git clone git://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-        let s:bootstrap=1
-    endif
+if !isdirectory(expand("~/.vim/bundle/vundle"))
+    echomsg "******************************"
+    echomsg "Installing Vundler..."
+    echomsg "******************************"
+    !mkdir -p ~/.vim/bundle && git clone git://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
+    let s:bootstrap=1
+endif
 
-    set rtp+=~/.vim/bundle/vundle/
-    call vundle#rc()
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
 
-    if exists("s:bootstrap") && s:bootstrap
-        unlet s:bootstrap
-        BundleInstall
-        quit
-    endif
+if exists("s:bootstrap") && s:bootstrap
+    unlet s:bootstrap
+    BundleInstall
+    quit
+endif
 " }}}
 " >> "Bundles and configs" {{{2
 
-    Bundle 'colorizer'
-    Bundle 'gmarik/vundle'
-    Bundle 'majutsushi/tagbar' 
-    "{{{3
-        nmap <leader>tb :TagbarToggle<CR>
-        let g:tagbar_autofocus = 1
-        let g:tagbar_autoclose = 1
-    " }}}
-    Bundle 'mattn/gist-vim' 
-    "{{{3
-        let g:gist_update_on_write = 2
-    " }}}
-    Bundle 'mattn/webapi-vim'
-    "Bundle 'nathanaelkane/vim-indent-guides.git' 
-    "{{{3
-        "let g:indent_guides_auto_colors = 1
-        "let g:indent_guides_guide_size=1
-        "let g:indent_guides_start_level=2
-        "let g:indent_guides_enable_on_vim_startup=1
-        ""hi IndentGuidesOdd  ctermbg=black
-        ""hi IndentGuidesEven ctermbg=darkgrey
-    " }}}
-    Bundle 'Raimondi/delimitMate'
-    Bundle 'scrooloose/nerdcommenter.git'
-    Bundle 'SingleCompile' 
-    "{{{3
-        nmap <leader>sc :SCCompile<CR>
-        nmap <leader>scr :SCCompileRun<CR>
-    " }}}
-    " >> new
-    "Bundle 'Visual-Mark'
-    "Bundle 'Yggdroot/indentLine'
-    Bundle 'bling/vim-airline' 
-    "{{{3
-        let g:airline_theme='solarized'
-        let g:airline_left_sep=''
-        let g:airline_right_sep=''
-    " }}}
-    Bundle 'bling/vim-bufferline'
-    Bundle 'buddhavs/vim-tasklist'
-    Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex' 
-    "{{{3
-        set grepprg=grep\ -nH\ $*
-        let g:tex_flavor='latex'
-        let g:Tex_DefaultTargetFormat='pdf'
-    " }}}
-    Bundle 'godlygeek/tabular'
-    Bundle 'gregsexton/gitv'
-    Bundle 'Gundo'
-    Bundle 'dbakker/vim-lint'
-    Bundle 'Lokaltog/vim-easymotion'
-    Bundle 'lyokha/vim-xkbswitch' 
-    " {{{3
-        let g:XkbSwitchIMappingsSkipFt = ['tex'] " need for latex-suite
-        let g:XkbSwitchEnabled = 1
-        "let g:XkbSwitchLib = '~/.vim/bundle/vim-xkbswitch/xkb-switch/libxkbswitch.so'
-        let g:XkbSwitchIMappings = ['ru']
-    " }}}
-    Bundle 'Mark'
-    Bundle 'tsaleh/vim-matchit'
-    Bundle 'tpope/vim-repeat'
-    Bundle 'a.vim'
-    Bundle 'kien/ctrlp.vim'
-    Bundle 'scrooloose/nerdtree'
-    Bundle 'scrooloose/syntastic' 
-    "{{{3
-        let g:syntastic_python_python_exe = 'python2'
-        let g:syntastic_error_symbol='✗'
-        let g:syntastic_warning_symbol='⚠'
-    "}}}
-    Bundle 'SirVer/ultisnips'
-    Bundle 'TaskList.vim'
-    Bundle 'tpope/vim-fugitive.git'
-    Bundle 'tpope/vim-surround'
-    Bundle 'Valloric/YouCompleteMe' 
-    "{{{3
-        let g:ycm_add_preview_to_completeopt = 1
-        let g:ycm_autoclose_preview_window_after_completion = 1
-        let g:ycm_global_ycm_extra_conf = '/home/abcdw/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
-        let g:ycm_key_list_select_completion = []
-        let g:ycm_key_list_previous_completion = []
-    " }}}
-    Bundle 'vimwiki/vimwiki'
-
-    " "Colorschemes"  {{{3
-        Bundle 'altercation/vim-colors-solarized.git'
-        Bundle 'cschlueter/vim-wombat'
-        Bundle 'jnurmine/Zenburn'
-        Bundle 'tomasr/molokai'
-        Bundle 'chriskempson/base16-vim'
-
-        "set term=xterm-256color
-        let g:solarized_termcolors=256
-        let g:solarized_visibility="low"
-        let g:base16colorspace=256
-        set t_Co=256
-        set background=light
-        colors solarized
-        " colorscheme zenburn
-        " colorscheme mustang
-        " colorscheme molokai
-        set colorcolumn=80
-
-    " }}}
+Bundle 'colorizer'
+Bundle 'gmarik/vundle'
+Bundle 'majutsushi/tagbar'
+"{{{3
+    nmap <leader>tb :TagbarToggle<CR>
+    let g:tagbar_autofocus = 1
+    let g:tagbar_autoclose = 1
 " }}}
-    filetype plugin indent on
+Bundle 'mattn/gist-vim'
+"{{{3
+    let g:gist_update_on_write = 2
+" }}}
+Bundle 'mattn/webapi-vim'
+"Bundle 'nathanaelkane/vim-indent-guides.git'
+"{{{3
+    "let g:indent_guides_auto_colors = 1
+    "let g:indent_guides_guide_size=1
+    "let g:indent_guides_start_level=2
+    "let g:indent_guides_enable_on_vim_startup=1
+    ""hi IndentGuidesOdd  ctermbg=black
+    ""hi IndentGuidesEven ctermbg=darkgrey
+" }}}
+Bundle 'Raimondi/delimitMate'
+Bundle 'scrooloose/nerdcommenter.git'
+Bundle 'SingleCompile'
+"{{{3
+    nmap <leader>sc :SCCompile<CR>
+    nmap <leader>scr :SCCompileRun<CR>
+" }}}
+" >> new
+"Bundle 'Visual-Mark'
+"Bundle 'Yggdroot/indentLine'
+
+Bundle 'PotatoesMaster/i3-vim-syntax'
+Bundle 'bling/vim-airline'
+"{{{3
+    let g:airline_theme='solarized'
+    let g:airline_left_sep=''
+    let g:airline_right_sep=''
+" }}}
+Bundle 'bling/vim-bufferline'
+Bundle 'buddhavs/vim-tasklist'
+Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
+"{{{3
+    set grepprg=grep\ -nH\ $*
+    let g:tex_flavor='latex'
+    let g:Tex_DefaultTargetFormat='pdf'
+" }}}
+Bundle 'godlygeek/tabular'
+Bundle 'gregsexton/gitv'
+Bundle 'Gundo'
+"{{{3
+    map <leader>gt :GundoToggle<CR>
+" }}}
+Bundle 'dbakker/vim-lint'
+Bundle 'Lokaltog/vim-easymotion'
+Bundle 'lyokha/vim-xkbswitch'
+" {{{3
+    let g:XkbSwitchIMappingsSkipFt = ['tex'] " need for latex-suite
+    let g:XkbSwitchEnabled = 1
+    "let g:XkbSwitchLib = '~/.vim/bundle/vim-xkbswitch/xkb-switch/libxkbswitch.so'
+    let g:XkbSwitchIMappings = ['ru']
+    let g:XkbSwitchNLayout = 'us(dvp)'
+" }}}
+Bundle 'Mark'
+Bundle 'tsaleh/vim-matchit'
+Bundle 'tpope/vim-repeat'
+Bundle 'a.vim'
+Bundle 'kien/ctrlp.vim'
+Bundle 'scrooloose/nerdtree'
+"{{{3
+    map <leader>nt :NERDTreeToggle<CR>
+" }}}
+Bundle 'scrooloose/syntastic'
+"{{{3
+    let g:syntastic_python_python_exe = 'python2'
+    let g:syntastic_error_symbol='✗'
+    let g:syntastic_warning_symbol='⚠'
+"}}}
+Bundle 'SirVer/ultisnips'
+Bundle 'TaskList.vim'
+Bundle 'tpope/vim-fugitive.git'
+Bundle 'tpope/vim-surround'
+Bundle 'Valloric/YouCompleteMe'
+"{{{3
+    let g:ycm_add_preview_to_completeopt = 1
+    let g:ycm_autoclose_preview_window_after_completion = 1
+    let g:ycm_global_ycm_extra_conf = '/home/abcdw/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
+    let g:ycm_key_list_select_completion = []
+    let g:ycm_key_list_previous_completion = []
+" }}}
+Bundle 'vimwiki/vimwiki'
+
+" "Colorschemes"  {{{3
+    Bundle 'altercation/vim-colors-solarized.git'
+    Bundle 'cschlueter/vim-wombat'
+    Bundle 'jnurmine/Zenburn'
+    Bundle 'tomasr/molokai'
+    Bundle 'chriskempson/base16-vim'
+    Bundle 'HubbaBubbaFett/mustang'
+
+    "set term=xterm-256color
+    let g:solarized_termcolors=256
+    let g:solarized_visibility="low"
+    let g:base16colorspace=256
+    set t_Co=256
+    set background=light
+    colors solarized
+    " colorscheme zenburn
+    " colorscheme mustang
+    " colorscheme molokai
+    set colorcolumn=80
+
+" }}}
+" }}}
+filetype plugin indent on
 endif
 
 " ==============================================================================
@@ -227,9 +240,9 @@ set cindent
 set nowrap " Soft (without changing text) wrapping.
 set linebreak " Only wrap on characters in `breakat`
 if has('multi_byte')
-    let &showbreak = '↳ '
+let &showbreak = '↳ '
 else
-    let &showbreak = '> '
+let &showbreak = '> '
 endif
 
 set showmatch
@@ -241,6 +254,7 @@ set nolazyredraw
 set number
 set ruler
 set autoread
+set autowrite
 "set autochdir
 
 "
@@ -280,8 +294,12 @@ set cursorline
 "set imdisable
 
 if has("autocmd")
-  autocmd VimEnter * nested call SetupCtrlP()
+autocmd VimEnter * nested call SetupCtrlP()
 endif
+augroup helpfiles
+  au!
+  au BufRead,BufEnter */doc/* wincmd L
+augroup END
 
 " ==============================================================================
 " "Files" Настройки для файлов {{{1
