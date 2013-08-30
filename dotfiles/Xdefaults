@@ -4,6 +4,8 @@ Xft*antialias:        True
 Xft*hinting:          Full
 Xft*rgba: rgb
 Xft*hintstyle: hintslight
+Emacs.FontBackend: xft
+Emacs.Font: Inconsolata
 URxvt*letterSpace: -1
 !-*-}
 
@@ -11,6 +13,7 @@ URxvt*letterSpace: -1
 *.boldItalicFont: xft:PragmataPro:style=Bold Italic
 *.boldFont: xft:PragmataPro:style=Bold
 *.italicFont: xft:PragmataPro:style=Italic
+xterm*faceName: xft:PragmataPro:size=12
 
 ! scroll
 URxvt*saveLines: 5000
@@ -19,6 +22,7 @@ URxvt*scrollTtyOutput: false
 URxvt*scrollTtyKeypress: true
 URxvt*scrollWithBuffer: true
 
+URxvt.intensityStyles: false
 urxvt*depth:32
 URxvt*shading: 85
 URxvt*internalBorder: 3
@@ -101,14 +105,14 @@ Xautolock*time: 1
 
 ! Dark
 
-! #define S_base03 #002b36
-! #define S_base02 #073642
-! #define S_base01 #586e75
-! #define S_base00 #657b83
-! #define S_base0 #839496
-! #define S_base1 #93a1a1
-! #define S_base2 #eee8d5
-! #define S_base3 #fdf6e3
+!#define S_base03 #002b36
+!#define S_base02 #073642
+!#define S_base01 #586e75
+!#define S_base00 #657b83
+!#define S_base0 #839496
+!#define S_base1 #93a1a1
+!#define S_base2 #eee8d5
+!#define S_base3 #fdf6e3
 
 
 ! Light
@@ -153,7 +157,6 @@ Xautolock*time: 1
 *color14: S_base1
 *color15: S_base3
 
- 
 !dzen2
 dzen2*font:       xft:PragmataPro:size=10
 dzen2*foreground: #dcdccc
