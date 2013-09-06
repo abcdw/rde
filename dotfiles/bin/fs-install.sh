@@ -34,5 +34,6 @@ sudo make all install cd-sounds-install cd-moh-install
 
 sudo sed -i '/Codec/a\    <load module="mod_codec2"/>' \
     $prefix/conf/autoload_configs/modules.conf.xml
+sudo sed -i 's/GSM/GSM,CODEC2/' $prefix/conf/vars.xml
 
 # /usr/local/freeswitch/bin/freeswitch
