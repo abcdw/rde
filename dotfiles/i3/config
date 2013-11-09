@@ -17,7 +17,6 @@ exec urxtc -e tmux
 
 set $mod Mod4
 
-# Font for window titles. Will also be used by the bar unless a different font
 # is used in the bar {} block below. ISO 10646 = Unicode
 font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 # The font above is very space-efficient, that is, it looks good, sharp and
@@ -48,6 +47,7 @@ bindsym $mod+Shift+colon kill
 # start dmenu (a program launcher)
 # yeganesh is wrapper around dmenu
 bindsym $mod+e exec yeganesh -x -- -fn PragmataPro -b | sh
+bindsym $mod+y exec dmenu-translate
 #/usr/bin/yeganesh
 # bindsym $mod+d exec --no-startup-id i3-dmenu-desktop
 
