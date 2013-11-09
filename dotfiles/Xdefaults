@@ -1,4 +1,5 @@
 !-*-{ Xft settings
+Xft.lcdfilter:        lcddefault
 Xft*dpi:              96
 Xft*antialias:        True
 Xft*hinting:          Full
@@ -21,6 +22,7 @@ URxvt*scrollBar: false
 URxvt*scrollTtyOutput: false
 URxvt*scrollTtyKeypress: true
 URxvt*scrollWithBuffer: true
+URxvt*secondaryWheel: true
 
 URxvt.intensityStyles: false
 urxvt*depth:32
