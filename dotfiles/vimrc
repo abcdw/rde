@@ -1,411 +1,613 @@
-" vim: foldmethod=marker
-" ==============================================================================
-" "Todo" Добавить {{{1
-" ==============================================================================
+" vim: set foldmarker={,} foldlevel=3 foldmethod=marker spell:
+" Notes {{{
+"   ***********************************************************************   "
+"   This is the personal .vimrc file of Andrew Tropin.                        "
+"   You can find me at http://github.com/abcdw                                "
+"   While much of it is beneficial for general use, I would                   "
+"   recommend picking out the parts you want and understand.                  "
+"   ***********************************************************************   "
 
-" TODO: fugitiv
-" TODO: fuzzyfinder
-" TODO: vim-gitgutter
-" TODO: spell checking, autocomplete and synonyms
+    " Tips {
+        " Hotkeys {
+        " gx - go url under cursor
+        " }
+    " }
+    " Todo {
+        " TODO: fix ; and : problem
+        " TODO: add google function
+        " TODO: spell checking and synonyms
+        " TODO: project managment exvim MyProject
+        " TODO: prepare and cleanup configs {
+        " write comments
+        " write README about install and add screenshots
+        " }
+    " }
+" }}}
 
-" TODO: session managment
-" SessionMan
+" "General settings" {
+    " Basic {{
+        " Various stuff {
+            syntax on
+            set nocompatible
+            set mouse=a
+            set langmenu=en
+            set helplang=ru
+            set fileencodings=utf-8
+            set linespace=1 " add some line space for easy reading
+            set cursorline
+            set ttyfast
+            let g:EclimCompletionMethod = 'omnifunc'
+        " }
+        " Files {
+            set encoding=utf-8
+            set fileencoding=utf-8
+            set fileencodings=utf-8,ucs-bom,cp1251
+            set fileformat=unix
+            set fileformats=unix,dos,mac
+        " }
+        " Behavior {
+            set backspace=indent,eol,start " Set for maximum backspace smartness"
+            set scrolloff=3 " don't scroll any closer to top/bottom
+            set sidescrolloff=5 " don't scroll any closer to left/right
+            set listchars=tab:▸\ ,trail:·,nbsp:+,eol:¶,nbsp:&,extends:>,precedes:>,conceal:~
+            set list
+            set display+=uhex " Show unprintables as <xx>
+            set display+=lastline
+            set nolazyredraw
+            set number
+            set autoread
+            set autowrite
+            set autochdir
+            set gdefault
+            set keywordprg=:help
 
-" TODO: project managment
-" exvim MyProject
+            autocmd FileType * setlocal formatoptions-=o
+            autocmd VimEnter * nested call SetupCtrlP()
+            au FocusLost * :wa
+            "augroup reload_vimrc " {
+                "autocmd!
+                "autocmd BufWritePost $MYVIMRC source $MYVIMRC
+            "augroup END " }
 
-" TODO: prepare and cleanup configs
-" write README about install and add screenshots
+            "augroup helpfiles
+            "  au!
+            "  "au BufRead,BufEnter */doc/* wincmd L
+            "  au BufRead */doc/* wincmd L
+            "augroup END
+        "}
+        " Tab and indent {
+            set tabstop=4
+            set shiftwidth=4
+            set softtabstop=4
+            set expandtab
+            set smarttab
+            set autoindent
+            set smartindent
+            set cindent
+        " }
+        " Line wraping {
+            set textwidth=79
+            set wrap
+            set linebreak " Only wrap on characters in `breakat`
+            if has('multi_byte')
+                let &showbreak = '↳ '
+            else
+                let &showbreak = '> '
+            endif
+        " }
+        " Search {
+            set showmatch
+            set hlsearch
+            set incsearch
+            set ignorecase
+            set smartcase
+        " }
+        " Status bar and command line settings {
+            set cmdheight=1         " Less Hit Return messages
+            set laststatus=2        " Always show status bar
+            "set report=0            " Always report line changes for : commands
+            "set ruler               " Show cursor location
+            set shortmess=aoOtT     " Abbreviate the status messages
+            "set showmode            " Show mode I'm in
+            set showcmd             " Show command I'm typing
+            "set statusline=%<%f%h%m%r%=format=%{&fileformat}\ file=%{&fileencoding}\ enc=%{&encoding}\ %b\ 0x%B\ %l,%c%V\ %P
+            set timeoutlen=500
+        " }
+        " Command line completion {
+            set wildchar=<TAB>      " Character to start command line completion
+            set wildmenu            " Enhanced command line completion mode
+            set wildmode=longest:full,full
 
-" ==============================================================================
-" "Tips" Заметки {{{1
-" ==============================================================================
+            set wildignore+=*/.git/*,*/.hg/*,*/.svn/*
+            set wildignore+=*.o,*.obj,*.pyc,*.pyo,*.pyd,*.class,*.lock
+            set wildignore+=*.png,*.gif,*.jpg,*.ico
+            set wildignore+=.git,.svn,.hg
+        " }
+        " Backup,Undo,Swap {
+            if isdirectory($HOME . '/.vim/backup') == 0
+                silent !mkdir -p ~/.vim/backup >/dev/null 2>&1
+            endif
+            set backupdir-=.
+            set backupdir+=.
+            set backupdir-=~/
+            set backupdir^=~/.vim/backup/
+            set backupdir^=./.vim-backup/
+            set backup
+            " Prevent backups from overwriting each other. The naming is weird,
+            " since I'm using the 'backupext' variable to append the path.
+            " So the file '/home/docwhat/.vimrc' becomes '.vimrc%home%docwhat~'
+            autocmd BufWritePre * nested let &backupext = substitute(expand('%:p:h'), '/', '%', 'g') . '~'
 
-" set guifont=Consolas:h11:cDEFAULT
+            if isdirectory($HOME . '/.vim/swap') == 0
+                silent !mkdir -p ~/.vim/swap >/dev/null 2>&1
+            endif
+            set directory=./.vim-swap//
+            set directory+=~/.vim/swap//
+            set directory+=~/tmp//
+            set directory+=.
 
-" ==============================================================================
-" "Keybindings" Настройки хоткеев {{{1
-" ==============================================================================
+            set viminfo+=n~/.vim/viminfo
 
-let g:mapleader = ","
+            if exists("+undofile")
+                " undofile - This allows you to use undos after exiting and restarting
+                " This, like swap and backups, uses .vim-undo first, then ~/.vim/undo
+                " :help undo-persistence
+                if isdirectory($HOME . '/.vim/undo') == 0
+                    silent !mkdir -p ~/.vim/undo > /dev/null 2>&1
+                endif
+                set undodir=./.vim-undo//
+                set undodir+=~/.vim/undo//
+                set undofile
+                set undolevels=1000 " maximum number of changes that can be undone
+                set undoreload=10000 " maximum number lines to save for undo on a buffer reload
+            endif
+        " }
+    " }}
+    " (re)Maps {{
+        let g:mapleader = ","
+            " Some useful maps {
+                "imap ii <Esc>
+                "nnoremap / /\v
+                "vnoremap / /\v " allows use perl regexp in search patterns
+                nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
+                " strip trailing whitespaces
+                nnoremap <leader>v V`] " select pasted test
+                nnoremap <tab> %
+                vnoremap <tab> %
+                nnoremap ; :
+                imap jj <Esc>o<Esc>
+                imap kk <Esc>k
+                imap ;; <Esc>A;<Esc>o
 
-"call togglebg#map("<leader>b")
-nnoremap <leader>\ :call ToggleNERDTreeAndTagbar()<CR>
-map <leader>v :e! $MYVIMRC<CR>
-nnoremap <silent> <leader>h :set invhlsearch<CR>
-comm! W exec 'w !sudo tee % > /dev/null' | e!
 
-"nnoremap <Space> @q
-nnoremap ; :
-map! ii <Esc>
-map! jj <Esc>o<Esc>
-map! kk <Esc>k
-map! ;; ;<Esc>o
-"nmap! ;; A;<Esc>o
-"inoremap <CR> <Esc>
+                nnoremap <leader>\ :call ToggleNERDTreeAndTagbar()<CR>
+                map <leader>ev <C-w><C-v><C-l>:e! $MYVIMRC<CR>
+                map <leader>bd :bdelete<CR>
 
-nnoremap <F2> :set invpaste paste?<CR>
-set pastetoggle=<F2>
+                nnoremap <F2> :set invpaste paste?<CR>
+                set pastetoggle=<F2>
+                " <F2> setting paste mode
 
-imap <left> <nop>
-imap <right> <nop>
-imap <up> <nop>
-imap <down> <nop>
-nmap <left> <nop>
-nmap <right> <nop>
-nmap <up> <nop>
-nmap <down> <nop>
-map <left> <nop>
-map <right> <nop>
-map <up> <nop>
-map <down> <nop>
+                nnoremap <silent> <leader>h :set invhlsearch<CR>
+                " disable search highlight
+                comm! W exec 'w !sudo tee % > /dev/null' | e!
+                " sudo write
+                vmap < <gv
+                vmap > >gv
+                " prevents leaving visual mode after indenting
+            " }
+        " Disabling arrows {
+            imap <left> <nop>
+            imap <right> <nop>
+            imap <up> <nop>
+            imap <down> <nop>
+            nmap <left> <nop>
+            nmap <right> <nop>
+            nmap <up> <nop>
+            nmap <down> <nop>
+            map <left> <nop>
+            map <right> <nop>
+            map <up> <nop>
+            map <down> <nop>
+        " }
+        " Splits navigation {
+            "nnoremap <leader>v <C-w>v<C-w>l
+            "nnoremap <leader>s <C-w>s
+            nnoremap <C-h> <C-w>h
+            nnoremap <C-j> <C-w>j
+            nnoremap <C-k> <C-w>k
+            nnoremap <C-l> <C-w>l
+        " }
+    " }}
+    " Functions {{
+        function! SetupCtrlP() "{
+          if exists("g:loaded_ctrlp") && g:loaded_ctrlp
+            augroup CtrlPExtension
+              autocmd!
+              autocmd FocusGained * nested CtrlPClearCache
+              autocmd BufWritePost * nested CtrlPClearCache
+            augroup END
+          endif
+      endfunction "}
+        function! ToggleNERDTreeAndTagbar() "{
+            let w:jumpbacktohere = 1
+            " Detect which plugins are open
+            if exists('t:NERDTreeBufName')
+                let nerdtree_open = bufwinnr(t:NERDTreeBufName) != -1
+            else
+                let nerdtree_open = 0
+            endif
+            let tagbar_open = bufwinnr('__Tagbar__') != -1
 
-vmap < <gv
-vmap > >gv
-" ==============================================================================
-" "Vundle" Package manager {{{1
-" ==============================================================================
+            " Perform the appropriate action
+            if nerdtree_open && tagbar_open
+                NERDTreeClose
+                TagbarClose
+            elseif nerdtree_open
+                TagbarOpen
+            elseif tagbar_open
+                NERDTree
+            else
+                NERDTree
+                TagbarOpen
+            endif
 
-" >> "Installing"  "{{{2
+            " Jump back to the original window
+            for window in range(1, winnr('$'))
+                execute window . 'wincmd w'
+                if exists('w:jumpbacktohere')
+                    unlet w:jumpbacktohere
+                    break
+                endif
+            endfor
+        endfunction "}
+    " }}
+" }
+
+" "Vundle" Package manager {
 
 filetype off
 
 if executable("git")
-if !isdirectory(expand("~/.vim/bundle/vundle"))
-    echomsg "******************************"
-    echomsg "Installing Vundler..."
-    echomsg "******************************"
-    !mkdir -p ~/.vim/bundle && git clone git://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
-    let s:bootstrap=1
-endif
 
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+    " "Installing"  "{{{
 
-if exists("s:bootstrap") && s:bootstrap
-    unlet s:bootstrap
-    BundleInstall
-    quit
-endif
-" }}}
-" >> "Bundles and configs" {{{2
-
-Bundle 'colorizer'
-Bundle 'gmarik/vundle'
-Bundle 'majutsushi/tagbar'
-"{{{3
-    nmap <leader>tb :TagbarToggle<CR>
-    let g:tagbar_autofocus = 1
-    let g:tagbar_autoclose = 1
-" }}}
-Bundle 'mattn/gist-vim'
-"{{{3
-    let g:gist_update_on_write = 2
-" }}}
-Bundle 'mattn/webapi-vim'
-"Bundle 'nathanaelkane/vim-indent-guides.git'
-"{{{3
-    "let g:indent_guides_auto_colors = 1
-    "let g:indent_guides_guide_size=1
-    "let g:indent_guides_start_level=2
-    "let g:indent_guides_enable_on_vim_startup=1
-    ""hi IndentGuidesOdd  ctermbg=black
-    ""hi IndentGuidesEven ctermbg=darkgrey
-" }}}
-Bundle 'Raimondi/delimitMate'
-Bundle 'scrooloose/nerdcommenter.git'
-Bundle 'SingleCompile'
-"{{{3
-    nmap <leader>sc :SCCompile<CR>
-    nmap <leader>scr :SCCompileRun<CR>
-" }}}
-" >> new
-"Bundle 'Visual-Mark'
-"Bundle 'Yggdroot/indentLine'
-
-Bundle 'PotatoesMaster/i3-vim-syntax'
-Bundle 'bling/vim-airline'
-"{{{3
-    let g:airline_theme='solarized'
-    let g:airline_left_sep=''
-    let g:airline_right_sep=''
-" }}}
-Bundle 'bling/vim-bufferline'
-Bundle 'buddhavs/vim-tasklist'
-Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
-"{{{3
-    set grepprg=grep\ -nH\ $*
-    let g:tex_flavor='latex'
-    let g:Tex_DefaultTargetFormat='pdf'
-" }}}
-Bundle 'godlygeek/tabular'
-Bundle 'gregsexton/gitv'
-Bundle 'Gundo'
-"{{{3
-    map <leader>gt :GundoToggle<CR>
-" }}}
-Bundle 'dbakker/vim-lint'
-Bundle 'Lokaltog/vim-easymotion'
-Bundle 'lyokha/vim-xkbswitch'
-" {{{3
-    let g:XkbSwitchIMappingsSkipFt = ['tex'] " need for latex-suite
-    let g:XkbSwitchEnabled = 1
-    "let g:XkbSwitchLib = '~/.vim/bundle/vim-xkbswitch/xkb-switch/libxkbswitch.so'
-    let g:XkbSwitchIMappings = ['ru']
-    let g:XkbSwitchNLayout = 'us(dvp)'
-" }}}
-Bundle 'Mark'
-Bundle 'tsaleh/vim-matchit'
-Bundle 'tpope/vim-repeat'
-Bundle 'a.vim'
-Bundle 'kien/ctrlp.vim'
-Bundle 'scrooloose/nerdtree'
-"{{{3
-    map <leader>nt :NERDTreeToggle<CR>
-" }}}
-Bundle 'scrooloose/syntastic'
-"{{{3
-    let g:syntastic_python_python_exe = 'python2'
-    let g:syntastic_error_symbol='✗'
-    let g:syntastic_warning_symbol='⚠'
-"}}}
-Bundle 'SirVer/ultisnips'
-Bundle 'TaskList.vim'
-Bundle 'tpope/vim-fugitive.git'
-Bundle 'tpope/vim-surround'
-Bundle 'Valloric/YouCompleteMe'
-"{{{3
-    let g:ycm_add_preview_to_completeopt = 1
-    let g:ycm_autoclose_preview_window_after_completion = 1
-    let g:ycm_global_ycm_extra_conf = '/home/abcdw/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
-    let g:ycm_key_list_select_completion = []
-    let g:ycm_key_list_previous_completion = []
-" }}}
-Bundle 'vimwiki/vimwiki'
-
-" "Colorschemes"  {{{3
-    Bundle 'altercation/vim-colors-solarized.git'
-    Bundle 'cschlueter/vim-wombat'
-    Bundle 'jnurmine/Zenburn'
-    Bundle 'tomasr/molokai'
-    Bundle 'chriskempson/base16-vim'
-    Bundle 'HubbaBubbaFett/mustang'
-
-    "set term=xterm-256color
-    let g:solarized_termcolors=256
-    let g:solarized_visibility="low"
-    let g:base16colorspace=256
-    set t_Co=256
-    set background=light
-    colors solarized
-    " colorscheme zenburn
-    " colorscheme mustang
-    " colorscheme molokai
-    set colorcolumn=80
-
-" }}}
-" }}}
-filetype plugin indent on
-endif
-
-" ==============================================================================
-" "General" Основные настройки {{{1
-" ==============================================================================
-
-syntax on
-
-set mouse=a
-set langmenu=ru
-set helplang=ru
-set backspace=indent,eol,start " Set for maximum backspace smartness"
-set nocompatible
-set fileencodings=utf-8
-set tabstop=4
-set shiftwidth=4
-set softtabstop=4
-set expandtab
-set autoindent
-set smartindent
-set smarttab
-
-set scrolloff=3 " don't scroll any closer to top/bottom
-set sidescrolloff=5 " don't scroll any closer to left/right
-set listchars=tab:»·,trail:·,nbsp:+,eol:¶,nbsp:&,extends:>,precedes:>,conceal:~
-set list
-set display+=uhex " Show unprintables as <xx>
-set display+=lastline
-
-set cindent
-
-set nowrap " Soft (without changing text) wrapping.
-set linebreak " Only wrap on characters in `breakat`
-if has('multi_byte')
-let &showbreak = '↳ '
-else
-let &showbreak = '> '
-endif
-
-set showmatch
-set hlsearch
-set incsearch
-set ignorecase
-set smartcase
-set nolazyredraw
-set number
-set ruler
-set autoread
-set autowrite
-"set autochdir
-
-"
-" Status bar and command line settings
-"
-set cmdheight=1         " Less Hit Return messages
-set laststatus=2        " Always show status bar
-set report=0            " Always report line changes for : commands
-set ruler               " Show cursor location
-set shortmess=aoOtT     " Abbreviate the status messages
-set showmode            " Show mode I'm in
-set showcmd             " Show command I'm typing
-set statusline=%<%f%h%m%r%=format=%{&fileformat}\ file=%{&fileencoding}\ enc=%{&encoding}\ %b\ 0x%B\ %l,%c%V\ %P
-set timeoutlen=500
-
-set foldenable
-set foldnestmax=3
-
-" Command line completion:
-set wildchar=<TAB>      " Character to start command line completion
-set wildmenu            " Enhanced command line completion mode
-set wildmode=longest:full,full
-
-set wildignore+=*.o,*.obj,*.pyc,*.pyo,*.pyd,*.class,*.lock
-set wildignore+=*.png,*.gif,*.jpg,*.ico
-set wildignore+=.git,.svn,.hg
-
-set formatoptions-=o    " dont continue comments when pushing o/O
-set linespace=1 " add some line space for easy reading
-set cursorline
-
-" exec 'autocmd VimLeavePre * silent mksession!' . s:lastsession_file
-"set spelllang=ru_yo,en_us
-"set langmap=ёйцукенгшщзхъфывапролджэячсмитьбюЁЙЦУКЕHГШЩЗХЪФЫВАПРОЛДЖЭЯЧСМИТЬБЮ;`qwertyuiop[]asdfghjkl\\;'zxcvbnm\\,.~QWERTYUIOP{}ASDFGHJKL:\\"ZXCVBNM<>
-"set iminsert=0
-"set imsearch=0
-"set imdisable
-
-if has("autocmd")
-autocmd VimEnter * nested call SetupCtrlP()
-endif
-augroup helpfiles
-  au!
-  au BufRead,BufEnter */doc/* wincmd L
-augroup END
-
-" ==============================================================================
-" "Files" Настройки для файлов {{{1
-" ==============================================================================
-
-" Кодировка по умолчанию
-set encoding=utf-8
-set fileencoding=utf-8
-set fileencodings=utf-8,ucs-bom,cp1251
-set fileformat=unix " Формат файла по умолчанию
-set fileformats=unix,dos,mac " Порядок определения формата файла
-
-" ==============================================================================
-" "Backup,Undo,Swap" Резервное копирование {{{1
-" ==============================================================================
-
-if isdirectory($HOME . '/.vim/backup') == 0
-    silent !mkdir -p ~/.vim/backup >/dev/null 2>&1
-endif
-set backupdir-=.
-set backupdir+=.
-set backupdir-=~/
-set backupdir^=~/.vim/backup/
-set backupdir^=./.vim-backup/
-set backup
-" Prevent backups from overwriting each other. The naming is weird,
-" since I'm using the 'backupext' variable to append the path.
-" So the file '/home/docwhat/.vimrc' becomes '.vimrc%home%docwhat~'
-if has("autocmd")
-    autocmd BufWritePre * nested let &backupext = substitute(expand('%:p:h'), '/', '%', 'g') . '~'
-endif
-
-" Save your swp files to a less annoying place than the current directory.
-" If you have .vim-swap in the current directory, it'll use that.
-" Otherwise it saves it to ~/.vim/swap, ~/tmp or .
-if isdirectory($HOME . '/.vim/swap') == 0
-    silent !mkdir -p ~/.vim/swap >/dev/null 2>&1
-endif
-set directory=./.vim-swap//
-set directory+=~/.vim/swap//
-set directory+=~/tmp//
-set directory+=.
-
-" viminfo stores the state of your previous editing session
-set viminfo+=n~/.vim/viminfo
-
-if exists("+undofile")
-    " undofile - This allows you to use undos after exiting and restarting
-    " This, like swap and backups, uses .vim-undo first, then ~/.vim/undo
-    " :help undo-persistence
-    " This is only present in 7.3+
-    if isdirectory($HOME . '/.vim/undo') == 0
-        silent !mkdir -p ~/.vim/undo > /dev/null 2>&1
-    endif
-    set undodir=./.vim-undo//
-    set undodir+=~/.vim/undo//
-    set undofile
-    set undolevels=1000 " maximum number of changes that can be undone
-    set undoreload=10000 " maximum number lines to save for undo on a buffer reload
-endif
-
-" ==============================================================================
-" "Functions" Пользовательские функции {{{1
-" ==============================================================================
-
-function! SetupCtrlP()
-  if exists("g:loaded_ctrlp") && g:loaded_ctrlp
-    augroup CtrlPExtension
-      autocmd!
-      autocmd FocusGained * nested CtrlPClearCache
-      autocmd BufWritePost * nested CtrlPClearCache
-    augroup END
-  endif
-endfunction
-
-function! ToggleNERDTreeAndTagbar()
-    let w:jumpbacktohere = 1
-    " Detect which plugins are open
-    if exists('t:NERDTreeBufName')
-        let nerdtree_open = bufwinnr(t:NERDTreeBufName) != -1
-    else
-        let nerdtree_open = 0
-    endif
-    let tagbar_open = bufwinnr('__Tagbar__') != -1
-
-    " Perform the appropriate action
-    if nerdtree_open && tagbar_open
-        NERDTreeClose
-        TagbarClose
-    elseif nerdtree_open
-        TagbarOpen
-    elseif tagbar_open
-        NERDTree
-    else
-        NERDTree
-        TagbarOpen
-    endif
-
-    " Jump back to the original window
-    for window in range(1, winnr('$'))
-        execute window . 'wincmd w'
-        if exists('w:jumpbacktohere')
-            unlet w:jumpbacktohere
-            break
+        if !isdirectory(expand("~/.vim/bundle/vundle"))
+            echomsg "******************************"
+            echomsg "Installing Vundler..."
+            echomsg "******************************"
+            !mkdir -p ~/.vim/bundle && git clone git://github.com/gmarik/vundle.git ~/.vim/bundle/vundle
+            let s:bootstrap=1
         endif
-    endfor
-endfunction
+
+        set rtp+=~/.vim/bundle/vundle/
+        call vundle#rc()
+
+        if exists("s:bootstrap") && s:bootstrap
+            unlet s:bootstrap
+            BundleInstall
+            quit
+        endif
+
+    " }}}
+    " "Bundles and configs" {2
+
+        " General {
+            Bundle 'gmarik/vundle'
+            " < Vundle - vim package manager > {
+            " }
+            Bundle 'lilydjwg/colorizer'
+            " < Colorize all text in form #rrggbb & #rgb > {
+                 "nmap <leader>tc <Plug>Colorizer
+            " }
+            Bundle 'mtth/scratch.vim'
+            " < Unobtrusive scratch window > {
+                "gs gS hotkeys
+                nnoremap <leader>c :Scratch<CR>
+            "}
+            Bundle 'Raimondi/delimitMate'
+            " < Automatic closing of quotes, brackets, etc > {
+                let g:delimitMate_expand_cr = 2
+                let g:delimitMate_expand_space = 1
+                let g:delimitMate_expand_inside_quotes = 1
+                let g:delimitMate_balance_matchpairs = 1
+                let g:delimitMate_jump_expansion = 1
+                au FileType python let b:delimitMate_nesting_quotes = ['"']
+            " }
+            Bundle 'mattn/gist-vim'
+            " < Vimscript for creating gists (http://gist.github.com) > {
+                let g:gist_update_on_write = 2
+                let g:gist_clip_command = 'xclip -selection clipboard'
+                let g:gist_detect_filetype = 1
+                let g:gist_open_browser_after_post = 1
+                let g:gist_update_on_write = 2
+                " Only :w! updates a gist
+            " }
+            Bundle 'mattn/webapi-vim'
+            " < Auxiliary library > {
+            " }
+            Bundle 'buddhavs/vim-tasklist'
+            " < TO DO-finder > {
+                map! <Leader>tl <Plug>TaskList
+            "}
+            Bundle 'Gundo'
+            " < Undo tree >{
+                map <leader>gt :GundoToggle<CR>
+            " }
+            Bundle 'lyokha/vim-xkbswitch'
+            " < Automatic layout switcher > {
+                "let g:XkbSwitchIMappingsSkipFt = ['tex'] " need for latex-suite
+                "let g:XkbSwitchLib = '~/.vim/bundle/vim-xkbswitch/xkb-switch/libxkbswitch.so'
+                "let g:XkbSwitchIMappings = ['ru(typewriter)']
+                let g:XkbSwitchEnabled = 1
+                let g:XkbSwitchNLayout = 'us(dvp)'
+                let g:XkbSwitchILayout = 'us(dvp)'
+            " }
+            Bundle 'scrooloose/nerdtree'
+            " < File system explerer >{
+                map <leader>nt :NERDTreeToggle<CR>
+            " }
+            Bundle 'godlygeek/tabular'
+            " < Alignment plugin > {
+            " }
+            Bundle 'SirVer/ultisnips'
+            " < Snippets engine > {
+                let g:UltiSnipsExpandTrigger="<tab>"
+                let g:UltiSnipsJumpForwardTrigger="<tab>"
+                let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+                let g:UltiSnipsEditSplit="horizontal"
+            " }
+            Bundle 'honza/vim-snippets'
+            " < Snippets for ultisnips > {
+            " }
+            Bundle 'luochen1990/rainbow'
+            " < Rainbow Parentheses > {
+                let g:rainbow_active = 1
+                map <leader>rt :RainbowToggle<CR>
+            " }
+            Bundle 'matchit.zip'
+            " < Extended matching with "%" > {
+            " }
+            Bundle 'kien/ctrlp.vim'
+            " < Fuzzy file, buffer, tag finder > {
+                let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:10,results:100'
+                let g:ctrlp_switch_buffer = 'Et'
+                let g:ctrlp_working_path_mode = 'ra'
+                let g:ctrlp_arg_map = 1
+                let g:ctrlp_extensions = ['mixed', 'buffertag']
+                let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
+                " TODO: task-list
+            " }
+        " }
+        " Developing {
+            Bundle 'majutsushi/tagbar'
+            " < Browsing the tags of source code files > {
+                nmap <leader>tb :TagbarToggle<CR>
+                let g:tagbar_autofocus = 1
+                "let g:tagbar_left=1
+                "let g:tagbar_autoclose = 1
+            " }
+            Bundle 'scrooloose/nerdcommenter.git'
+            " < Just commenter utility > {
+            " TODO: see alternative https://github.com/tomtom/tcomment_vim
+            " }
+            Bundle 'xuhdev/SingleCompile'
+            " < Comile or run a single source file > {
+                nmap <leader>ll :SCCompile<CR>
+                nmap <leader>lv :SCCompileRun<CR>
+                autocmd Filetype cpp nmap <buffer> <leader>ll :SCCompileAF -std=c++0x <CR>
+                autocmd Filetype cpp nmap <buffer> <leader>lv :SCCompileRunAF -std=c++0x <CR>
+                autocmd Filetype java nmap <buffer> <leader>ll :ProjectBuild <CR>
+                autocmd Filetype java nmap <buffer> <leader>lv :Java <CR>
+                autocmd Filetype cs nmap <buffer> <leader>ll :OmniSharpBuildAsync <CR>
+                "autocmd Filetype cs nmap <buffer> <leader>lv :SCCompileRunAF -pkg:dotnet <CR>
+                "autocmd Filetype tex nmap <buffer> <leader>ll :SCCompileAF -shell-escape <CR>
+            " }
+            "Bundle 'mhinz/vim-signify'
+            " < Show added, deleted and modified lines > {
+            " }
+            Bundle 'scrooloose/syntastic'
+            " < Syntax checker > {
+                "let g:syntastic_python_python_exe = 'python2'
+                let g:syntastic_error_symbol='✗'
+                let g:syntastic_warning_symbol='⚠'
+            " }
+            Bundle 'Valloric/YouCompleteMe'
+            " < Fast, fuzzy-search code completion engine > {
+                let g:ycm_add_preview_to_completeopt = 1
+                let g:ycm_autoclose_preview_window_after_completion = 1
+                let g:ycm_global_ycm_extra_conf = '/home/abcdw/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
+                let g:ycm_key_list_select_completion = []
+                let g:ycm_key_list_previous_completion = []
+                let g:ycm_auto_start_csharp_server = 1
+                let g:ycm_auto_stop_csharp_server = 1
+            " }
+            Bundle 'plasticboy/vim-markdown'
+            " < Markdown mode > {
+            " }
+            " *** Syntax files *** {
+                Bundle 'PotatoesMaster/i3-vim-syntax'
+                Bundle 'python.vim'
+                Bundle 'django.vim'
+                au BufNewFile,BufRead *.html setlocal filetype=htmldjango
+                au BufNewFile,BufRead admin.py     setlocal filetype=python.django
+                au BufNewFile,BufRead urls.py      setlocal filetype=python.django
+                au BufNewFile,BufRead models.py    setlocal filetype=python.django
+                au BufNewFile,BufRead views.py     setlocal filetype=python.django
+                au BufNewFile,BufRead settings.py  setlocal filetype=python.django
+                au BufNewFile,BufRead forms.py     setlocal filetype=python.django
+
+            " }
+
+            Bundle 'nosami/Omnisharp'
+            " < Omnicompletion (intellisense) and more for C# > {
+            " }
+            Bundle "mattn/emmet-vim"
+            " < High-speed HTML, XML, XSL coding and edition > {
+                let g:user_emmet_leader_key = '<c-e>'
+                let g:use_emmet_complete_tag = 1
+            " }
+            Bundle 'jmcantrell/vim-virtualenv'
+            " < Vim python virtualenv manager > {
+            " }
+            Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
+            " < Latex-suite > {
+                set grepprg=grep\ -nH\ $*
+                let g:tex_flavor='latex'
+                let g:Tex_DefaultTargetFormat='pdf'
+                imap <C-g> <Plug>IMAP_JumpForward
+                nmap <C-g> <Plug>IMAP_JumpForward
+                " TODO: try dvi format
+            " }
+
+        " }
+        " Appearance {
+            Bundle 'bling/vim-airline'
+            " < Pretty status line > {
+                let g:airline_theme='solarized'
+                "let g:airline_theme='zenburn'
+
+                let g:airline_powerline_fonts = 1
+                let g:airline_enable_fugitive=1
+                let g:airline#extensions#bufferline#enabled = 1
+                let g:airline#extensions#tabline#enabled = 1
+                let g:airline#extensions#eclim#enabled = 1
+                let g:airline#extensions#branch#enabled = 1
+                let g:airline#extensions#branch#empty_message = 'no scm'
+                let g:airline#extensions#syntastic#enabled = 1
+                let g:airline#extensions#tagbar#enabled = 1
+                let g:airline#extensions#tagbar#flags = 'f'
+
+                let g:airline#extensions#virtualenv#enabled = 1
+                let g:airline#extensions#hunks#enabled = 1
+                let g:airline#extensions#hunks#hunk_symbols = ['+', '~', '-']
+                let g:airline#extensions#ctrlp#color_template = 'normal'
+                "let g:airline#extensions#ctrlp#show_adjacent_modes = 1
+            " }
+            Bundle 'bling/vim-bufferline'
+            " < Bufferline for airline integration > {
+            " }
+            " *** Colorschemes *** {
+                Bundle 'baskerville/bubblegum'
+                Bundle 'hickop/vim-hickop-colors'
+                Bundle 'altercation/vim-colors-solarized.git'
+                Bundle 'cschlueter/vim-wombat'
+                Bundle 'jnurmine/Zenburn'
+                Bundle 'tomasr/molokai'
+                Bundle 'chriskempson/base16-vim'
+                Bundle 'HubbaBubbaFett/mustang'
+                "set term=xterm-256color
+                let g:solarized_termcolors=256
+                let g:solarized_visibility="low"
+                let g:base16colorspace=256
+                set t_Co=256
+                set background=light
+                colorscheme solarized
+                " colorscheme zenburn
+                " colorscheme mustang
+                " colorscheme molokai
+                set colorcolumn=80
+            " }
+        " }
+
+        "Bundle 'Yggdroot/indentLine'
+        "Bundle 'nathanaelkane/vim-indent-guides.git'
+        "{
+            "let g:indent_guides_auto_colors = 1
+            "let g:indent_guides_guide_size=1
+            "let g:indent_guides_start_level=2
+            "let g:indent_guides_enable_on_vim_startup=1
+            ""hi IndentGuidesOdd  ctermbg=black
+            ""hi IndentGuidesEven ctermbg=darkgrey
+        " }
+
+
+        "Bundle 'dbakker/vim-lint'
+        Bundle 'gregsexton/gitv'
+        Bundle 'Lokaltog/vim-easymotion'
+        " < EasyMotion >{
+            map <Leader> <Plug>(easymotion-prefix)
+            nmap <Leader>ss <Plug>(easymotion-s2)
+            vmap j <Plug>(easymotion-sol-j)
+            vmap k <Plug>(easymotion-sol-k)
+            nmap j <Plug>(easymotion-sol-j)
+            nmap k <Plug>(easymotion-sol-k)
+            "nmap n <Plug>(easymotion-sn)
+            let g:EasyMotion_smartcase = 1
+            let g:EasyMotion_keys = 'JOEUTIDPYVWMFQKXBGLRH'
+            let g:EasyMotion_enter_jump_first = 1
+            let g:EasyMotion_space_jump_first = 1
+            let g:EasyMotion_prompt = '{n}>>> '
+            let g:EasyMotion_use_upper = 1
+            let g:EasyMotion_do_shade = 0
+            let g:EasyMotion_skipfoldedline = 0
+        " }
+        "Bundle 'Mark'
+        Bundle 't9md/vim-quickhl'
+        Bundle 'a.vim'
+        Bundle 'vimwiki/vimwiki'
+        " {
+            "let g:vimwiki_ext2syntax = {}
+            "let s:vimwiki = {}
+            "let s:vimwiki.path = '~/work/repos/48inches/client-wiki/'
+            "let s:vimwiki.ext = '.md'
+            "let s:vimwiki.syntax = 'markdown'
+            "let s:vimwiki.diary_rel_path = 'journal/'
+            "let s:vimwiki.diary_index = 'index'
+            "let s:vimwiki.diary_header = 'Journal'
+            "let s:vimwiki.diary_sort = 'asc'
+            "let s:vimwiki.ext2syntax = {'.md': 'markdown'}
+            "let g:vimwiki_list = [s:vimwiki]
+        " }
+
+
+        "Bundle 'VimClojure'
+        "Bundle 'matrix.vim--Yang'
+        Bundle 'tpope/vim-repeat'
+        Bundle 'tpope/vim-fugitive.git'
+        Bundle 'tpope/vim-surround'
+        Bundle 'tpope/vim-dispatch'
+        Bundle 'tpope/vim-abolish'
+        Bundle 'cwood/vim-django'
+
+        Bundle 'klen/python-mode'
+        " {
+            let g:pymode_lint_on_write = 1
+            let g:pymode_folding = 0
+            let g:pymode_rope_completion = 0
+        "
+
+        " < Wrappers for django utils > {
+        "
+            let g:django_projects = '~/yd/work/repos/django/' "Sets all projects under project
+            let g:django_activate_virtualenv = 1 "Try to activate the associated virtualenv
+            let g:django_activate_nerdtree = 1 "Try to open nerdtree at the project root.
+        " }
+        Bundle 'sessionman.vim'
+        " < Session manager plugin >{
+            set viminfo='100,<500,s10,h,!
+            "autocmd VimEnter * SessionList
+            "autocmd VimEnter * if !argc() | SessionList | endif
+        " }
+
+        Bundle 'tpope/vim-fireplace'
+        Bundle 'tpope/vim-classpath'
+        Bundle 'guns/vim-clojure-static'
+        Bundle 'bkad/CamelCaseMotion'
+        " < CamelCaseMotion > {
+            map <silent> w <Plug>CamelCaseMotion_w
+            map <silent> b <Plug>CamelCaseMotion_b
+            map <silent> e <Plug>CamelCaseMotion_e
+            sunmap w
+            sunmap b
+            sunmap e
+        " }
+        "Bundle 'YankRing.vim'
+        "Bundle 'mhinz/vim-startify'
+
+        filetype plugin indent on
+    " }
+endif
+" }
 
 set secure
