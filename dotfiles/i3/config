@@ -11,9 +11,14 @@
 
 exec /usr/sbin/loloswitcher
 exec nohup /usr/bin/xxkb &
-exec feh --bg-scale ~/media/pics/wallpaper
+exec feh --bg-scale ~/yd/media/pics/wallpapers/wallpaper.jpg
+exec urxtc -e tmux &
 exec --no-startup-id i3-msg "workspace c"
-exec urxtc -e tmux
+
+bindsym $mod+Shift+minus move scratchpad
+bindsym $mod+minus scratchpad show
+for_window [class="^Gvim$" instance="^scratchpad$"] border 1pixel; move scratchpad
+# exec gvim -name scratchpad
 
 set $mod Mod4
 
