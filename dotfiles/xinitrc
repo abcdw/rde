@@ -1,12 +1,11 @@
 #!/bin/sh
 export LANG="ru_RU.utf8"
-
 userresources=$HOME/.Xdefaults
 usermodmap=$HOME/.Xmodmap
 sysresources=/etc/X11/xinit/Xresources
 sysmodmap=/etc/X11/xinit/Xmodmap
 
-setxkbmap -layout us,ru -variant dvp,typewriter -option grp:shift_toggle,grp:caps_toggle,grp_led:caps,compose:rctrl,grp:lwin
+setxkbmap -layout us,ru,us -variant dvp,typewriter, -option grp:shift_toggle,grp:caps_toggle,grp_led:caps,compose:rctrl,grp:lwin
 
 # merge in defaults and keymaps
 
