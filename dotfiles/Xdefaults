@@ -6,15 +6,21 @@ Xft*hinting:          Full
 Xft*rgba: rgb
 Xft*hintstyle: hintslight
 Emacs.FontBackend: xft
-Emacs.Font: Inconsolata
+Emacs.Font: Anonymice Powerline:size=17
+
 URxvt*letterSpace: -1
 !-*-}
 
-*.font: xft:PragmataPro
-*.boldItalicFont: xft:PragmataPro:style=Bold Italic
-*.boldFont: xft:PragmataPro:style=Bold
-*.italicFont: xft:PragmataPro:style=Italic
-xterm*faceName: xft:PragmataPro:size=12
+*.font: xft:Anonymice Powerline:size=13
+*.boldItalicFont: xft:Anonymice Powerline:style=Bold Italic:size=13
+*.boldFont: xft:Anonymice Powerline:style=Bold:size=13
+*.italicFont: xft:Anonymice Powerline:style=Italic:size=13
+xterm*faceName: xft:Anonymice Powerline:size=13
+!*.font: xft:PragmataPro:size=13
+!*.boldItalicFont: xft:PragmataPro:style=Bold Italic:size=13
+!*.boldFont: xft:PragmataPro:style=Bold:size=13
+!*.italicFont: xft:PragmataPro:style=Italic:size=13
+!xterm*faceName: xft:PragmataPro:size=13
 
 ! scroll
 URxvt*saveLines: 5000
