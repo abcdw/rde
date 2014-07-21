@@ -63,7 +63,7 @@
 
             autocmd FileType * setlocal formatoptions-=o
             autocmd VimEnter * nested call SetupCtrlP()
-            au FocusLost * :wa
+            "au FocusLost * :wa
             "augroup reload_vimrc " {
                 "autocmd!
                 "autocmd BufWritePost $MYVIMRC source $MYVIMRC
@@ -411,6 +411,8 @@ if executable("git")
                 "let g:syntastic_python_python_exe = 'python2'
                 let g:syntastic_error_symbol='✗'
                 let g:syntastic_warning_symbol='⚠'
+                "let g:syntastic_cpp_compiler = 'clang++'
+                let g:syntastic_cpp_compiler_options = ' -std=c++0x'
             " }
             Bundle 'Valloric/YouCompleteMe'
             " < Fast, fuzzy-search code completion engine > {
@@ -429,6 +431,7 @@ if executable("git")
                 Bundle 'PotatoesMaster/i3-vim-syntax'
                 Bundle 'python.vim'
                 Bundle 'django.vim'
+                Bundle 'OrangeT/vim-csharp.git'
                 au BufNewFile,BufRead *.html setlocal filetype=htmldjango
                 au BufNewFile,BufRead admin.py     setlocal filetype=python.django
                 au BufNewFile,BufRead urls.py      setlocal filetype=python.django
@@ -488,6 +491,7 @@ if executable("git")
             " < Bufferline for airline integration > {
             " }
             " *** Colorschemes *** {
+                Bundle 'w0ng/vim-hybrid'
                 Bundle 'baskerville/bubblegum'
                 Bundle 'hickop/vim-hickop-colors'
                 Bundle 'altercation/vim-colors-solarized.git'
@@ -502,6 +506,7 @@ if executable("git")
                 let g:base16colorspace=256
                 set t_Co=256
                 set background=light
+                " colorscheme hybrid
                 colorscheme solarized
                 " colorscheme zenburn
                 " colorscheme mustang
