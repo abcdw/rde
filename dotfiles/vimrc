@@ -63,6 +63,12 @@
 
             autocmd FileType * setlocal formatoptions-=o
             autocmd VimEnter * nested call SetupCtrlP()
+            if has("autocmd")
+              au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+                    \| exe "normal! g'\"" | endif
+            endif
+            "au BufWinLeave * mkview
+            "au BufWinEnter * silent loadview
             "au FocusLost * :wa
             "augroup reload_vimrc " {
                 "autocmd!
@@ -169,11 +175,39 @@
                 "imap ii <Esc>
                 "nnoremap / /\v
                 "vnoremap / /\v " allows use perl regexp in search patterns
-                nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
                 " strip trailing whitespaces
-                nnoremap <leader>v V`] " select pasted test
+                nnoremap <leader>W :%s/\s\+$//<cr>:let @/=''<CR>
+                " select pasted test
+                nnoremap <leader>v V`]
+                " Keep the cursor in place while joining lines
+                nnoremap J mzJ`z
                 nnoremap <tab> %
                 vnoremap <tab> %
+
+                " Heresy
+                inoremap <c-a> <esc>I
+                inoremap <c-e> <esc>A
+                cnoremap <c-a> <home>
+                cnoremap <c-e> <end>
+                " Keep search matches in the middle of the window.
+                nnoremap n nzzzv
+                nnoremap N Nzzzv
+
+                " Same when jumping around
+                nnoremap g; g;zz
+                nnoremap g, g,zz
+                nnoremap <c-o> <c-o>zz
+
+                " Easier to type, and I never use the default behavior.
+                noremap H ^
+                noremap L $
+                vnoremap L g_
+
+                noremap j gj
+                noremap k gk
+                noremap gj j
+                noremap gk k
+
                 nnoremap ; :
                 imap jj <Esc>o<Esc>
                 imap kk <Esc>k
@@ -261,6 +295,26 @@
                 endif
             endfor
         endfunction "}
+        function! FindDjangoSettings2() "{
+            if strlen($VIRTUAL_ENV) && has('python')
+                let django_check = system("pip freeze | grep -q Django")
+                if v:shell_error
+                    " echo 'django not installed.'
+                else
+                    " echo 'django is installed.'
+                    let output = system("find $VIRTUAL_ENV \\( -wholename '*/lib/*' -or -wholename '*/install/' \\) -or \\( -name 'settings.py' -print0 \\) | tr '\n' ' '")
+                    let outarray= split(output, '[\/]\+')
+                    let module = outarray[-2] . '.' . 'settings'
+                    let syspath = system("python -c 'import sys; print sys.path' | tr '\n' ' ' ")
+                    " let curpath = '/' . join(outarray[:-2], '/')
+                    execute 'python import sys, os'
+                    " execute 'python sys.path.append("' . curpath . '")'
+                    " execute 'python sys.path.append("' . syspath . '")'
+                    execute 'python sys.path = ' . syspath
+                    execute 'python os.environ.setdefault("DJANGO_SETTINGS_MODULE", "' . module . '")'
+                endif
+            endif
+        endfunction "}
     " }}
 " }
 
@@ -346,6 +400,7 @@ if executable("git")
             Bundle 'scrooloose/nerdtree'
             " < File system explerer >{
                 map <leader>nt :NERDTreeToggle<CR>
+                let NERDTreeIgnore=['\.pyc$', '\~$']
             " }
             Bundle 'godlygeek/tabular'
             " < Alignment plugin > {
@@ -362,7 +417,7 @@ if executable("git")
             " }
             Bundle 'luochen1990/rainbow'
             " < Rainbow Parentheses > {
-                let g:rainbow_active = 1
+                " let g:rainbow_active = 1
                 map <leader>rt :RainbowToggle<CR>
             " }
             Bundle 'matchit.zip'
@@ -370,14 +425,31 @@ if executable("git")
             " }
             Bundle 'kien/ctrlp.vim'
             " < Fuzzy file, buffer, tag finder > {
+                let g:ctrlp_cmd = 'CtrlPMRUFiles'
                 let g:ctrlp_match_window = 'bottom,order:btt,min:1,max:10,results:100'
                 let g:ctrlp_switch_buffer = 'Et'
                 let g:ctrlp_working_path_mode = 'ra'
                 let g:ctrlp_arg_map = 1
                 let g:ctrlp_extensions = ['mixed', 'buffertag']
                 let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
+                
                 " TODO: task-list
             " }
+
+            Bundle 'wesQ3/vim-windowswap'
+            " < Easy window swapping > {
+                let g:windowswap_map_keys = 0 "prevent default bindings
+                nnoremap <silent> <leader>yw :call WindowSwap#MarkWindowSwap()<CR>
+                nnoremap <silent> <leader>pw :call WindowSwap#DoWindowSwap()<CR>
+                nnoremap <silent> <leader>sw :call WindowSwap#EasyWindowSwap()<CR>
+            " }
+
+            Bundle 'xolox/vim-misc'
+            Bundle 'xolox/vim-notes'
+            " < Easy notes plugin > {
+                let g:notes_directories = ['~/Documents/notes']
+            " }
+
         " }
         " Developing {
             Bundle 'majutsushi/tagbar'
@@ -387,9 +459,14 @@ if executable("git")
                 "let g:tagbar_left=1
                 "let g:tagbar_autoclose = 1
             " }
-            Bundle 'scrooloose/nerdcommenter.git'
+            Bundle 'scrooloose/nerdcommenter'
             " < Just commenter utility > {
             " TODO: see alternative https://github.com/tomtom/tcomment_vim
+                let g:NERDSpaceDelims = 1
+                let g:NERDRemoveExtraSpaces = 1
+                let g:NERDCustomDelimiters = {
+                      \ 'htmldjango': { 'left': '{#', 'right': '#}' }
+                      \ }
             " }
             Bundle 'xuhdev/SingleCompile'
             " < Comile or run a single source file > {
@@ -423,6 +500,12 @@ if executable("git")
                 let g:ycm_key_list_previous_completion = []
                 let g:ycm_auto_start_csharp_server = 1
                 let g:ycm_auto_stop_csharp_server = 1
+                let g:ycm_collect_identifiers_from_tags_files = 1 " Let YCM read tags from Ctags file
+                let g:ycm_use_ultisnips_completer = 1 " Default 1, just ensure
+                let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming language's keyword
+                let g:ycm_complete_in_comments = 1 " Completion in comments
+                let g:ycm_complete_in_strings = 1 " Completion in string
+                nnoremap <leader>g :YcmCompleter GoToDeclaration<CR>
             " }
             Bundle 'plasticboy/vim-markdown'
             " < Markdown mode > {
@@ -432,16 +515,23 @@ if executable("git")
                 Bundle 'python.vim'
                 Bundle 'django.vim'
                 Bundle 'OrangeT/vim-csharp.git'
-                au BufNewFile,BufRead *.html setlocal filetype=htmldjango
+                au BufNewFile,BufRead *.html       setlocal filetype=htmldjango
                 au BufNewFile,BufRead admin.py     setlocal filetype=python.django
                 au BufNewFile,BufRead urls.py      setlocal filetype=python.django
                 au BufNewFile,BufRead models.py    setlocal filetype=python.django
                 au BufNewFile,BufRead views.py     setlocal filetype=python.django
                 au BufNewFile,BufRead settings.py  setlocal filetype=python.django
                 au BufNewFile,BufRead forms.py     setlocal filetype=python.django
+                au FileType htmldjango set sw=2
 
             " }
 
+	
+
+            "Bundle 'marijnh/tern_for_vim'
+            " < code-analysis engine for js > {
+            " }
+            "
             Bundle 'nosami/Omnisharp'
             " < Omnicompletion (intellisense) and more for C# > {
             " }
@@ -452,6 +542,7 @@ if executable("git")
             " }
             Bundle 'jmcantrell/vim-virtualenv'
             " < Vim python virtualenv manager > {
+                let g:virtualenv_directory = '~/work/'
             " }
             Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
             " < Latex-suite > {
@@ -472,13 +563,13 @@ if executable("git")
 
                 let g:airline_powerline_fonts = 1
                 let g:airline_enable_fugitive=1
-                let g:airline#extensions#bufferline#enabled = 1
+                "let g:airline#extensions#bufferline#enabled = 1
                 let g:airline#extensions#tabline#enabled = 1
                 let g:airline#extensions#eclim#enabled = 1
                 let g:airline#extensions#branch#enabled = 1
                 let g:airline#extensions#branch#empty_message = 'no scm'
                 let g:airline#extensions#syntastic#enabled = 1
-                let g:airline#extensions#tagbar#enabled = 1
+                "let g:airline#extensions#tagbar#enabled = 1
                 let g:airline#extensions#tagbar#flags = 'f'
 
                 let g:airline#extensions#virtualenv#enabled = 1
@@ -487,10 +578,11 @@ if executable("git")
                 let g:airline#extensions#ctrlp#color_template = 'normal'
                 "let g:airline#extensions#ctrlp#show_adjacent_modes = 1
             " }
-            Bundle 'bling/vim-bufferline'
+            "Bundle 'bling/vim-bufferline'
             " < Bufferline for airline integration > {
             " }
             " *** Colorschemes *** {
+                Bundle 'sjl/badwolf'
                 Bundle 'w0ng/vim-hybrid'
                 Bundle 'baskerville/bubblegum'
                 Bundle 'hickop/vim-hickop-colors'
@@ -531,21 +623,24 @@ if executable("git")
         Bundle 'gregsexton/gitv'
         Bundle 'Lokaltog/vim-easymotion'
         " < EasyMotion >{
-            map <Leader> <Plug>(easymotion-prefix)
-            nmap <Leader>ss <Plug>(easymotion-s2)
-            vmap j <Plug>(easymotion-sol-j)
-            vmap k <Plug>(easymotion-sol-k)
-            nmap j <Plug>(easymotion-sol-j)
-            nmap k <Plug>(easymotion-sol-k)
-            "nmap n <Plug>(easymotion-sn)
             let g:EasyMotion_smartcase = 1
             let g:EasyMotion_keys = 'JOEUTIDPYVWMFQKXBGLRH'
             let g:EasyMotion_enter_jump_first = 1
             let g:EasyMotion_space_jump_first = 1
             let g:EasyMotion_prompt = '{n}>>> '
             let g:EasyMotion_use_upper = 1
-            let g:EasyMotion_do_shade = 0
+            let g:EasyMotion_do_shade = 1
             let g:EasyMotion_skipfoldedline = 0
+            let g:EasyMotion_startofline = 0
+
+            map <Leader> <Plug>(easymotion-prefix)
+            nmap <Leader>ss <Plug>(easymotion-s2)
+
+            "vmap jj <Plug>(easymotion-j)
+            "vmap kk <Plug>(easymotion-k)
+            "nmap jj <Plug>(easymotion-j)
+            "nmap kk <Plug>(easymotion-k)
+            "nmap n <Plug>(easymotion-sn)
         " }
         "Bundle 'Mark'
         Bundle 't9md/vim-quickhl'
@@ -554,7 +649,7 @@ if executable("git")
         " {
             "let g:vimwiki_ext2syntax = {}
             "let s:vimwiki = {}
-            "let s:vimwiki.path = '~/work/repos/48inches/client-wiki/'
+            "let g:vimwiki.path = '~/yd/Documents/wiki'
             "let s:vimwiki.ext = '.md'
             "let s:vimwiki.syntax = 'markdown'
             "let s:vimwiki.diary_rel_path = 'journal/'
@@ -574,20 +669,23 @@ if executable("git")
         Bundle 'tpope/vim-dispatch'
         Bundle 'tpope/vim-abolish'
         Bundle 'cwood/vim-django'
-
-        Bundle 'klen/python-mode'
-        " {
-            let g:pymode_lint_on_write = 1
-            let g:pymode_folding = 0
-            let g:pymode_rope_completion = 0
-        "
-
         " < Wrappers for django utils > {
         "
-            let g:django_projects = '~/yd/work/repos/django/' "Sets all projects under project
+            let g:django_projects = '~/work/anytask/' "Sets all projects under project
             let g:django_activate_virtualenv = 1 "Try to activate the associated virtualenv
             let g:django_activate_nerdtree = 1 "Try to open nerdtree at the project root.
         " }
+
+        Bundle 'klen/python-mode'
+        " {
+            let g:pymode_lint_on_write = 0
+            let g:pymode_folding = 0
+            let g:pymode_rope_completion = 0
+        "
+        "
+        Bundle 'mjbrownie/vim-htmldjango_omnicomplete'
+
+
         Bundle 'sessionman.vim'
         " < Session manager plugin >{
             set viminfo='100,<500,s10,h,!
@@ -610,7 +708,8 @@ if executable("git")
         "Bundle 'YankRing.vim'
         "Bundle 'mhinz/vim-startify'
 
-        filetype plugin indent on
+        filetype indent on
+        filetype plugin on
     " }
 endif
 " }
