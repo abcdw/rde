@@ -23,13 +23,14 @@ for_window [class="^Gvim$" instance="^scratchpad$"] border 1pixel; move scratchp
 set $mod Mod4
 
 # is used in the bar {} block below. ISO 10646 = Unicode
-font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
+# font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
 # The font above is very space-efficient, that is, it looks good, sharp and
 # clear in small sizes. However, if you need a lot of unicode glyphs or
 # right-to-left text rendering, you should instead use pango for rendering and
 # chose a FreeType font, such as:
 # font pango:DejaVu Sans Mono 10
-# font pango:Pragmata Pro
+font pango:Anonymous Pro 10
+# font pango:Pragmata Pro 10
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 
@@ -211,11 +212,13 @@ bar {
         tray_output primary
         workspace_buttons yes
         colors {
-                #background      #fdf6e3
-                #statusline      #839496
-                #focused_workspace       #cb4b1g #fdf6e3 #839496
-                #inactive_workspace      #859900 #fdf6e3 #839496
-                #urgent_workspace        #2aa198 #d33682 #dc322f
+                #background      #657b83
+                background      #586e75
+                statusline      #fdf6e3
+                #focused_workspace #b58900 #111111
+                focused_workspace       #cb4b16 #f5deb3 #839496
+                inactive_workspace      #859900 #fdf6e3 #839496
+                urgent_workspace        #2aa198 #d33682 #dc322f
 
                 #background #0e0e0e
                 #statusline #839496
