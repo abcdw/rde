@@ -43,8 +43,9 @@ bindsym XF86AudioNext exec mpris2.py next
 bindsym XF86AudioPlay exec mpris2.py toggleplay
 bindsym XF86AudioPrev exec mpris2.py prev
 bindsym XF86ScreenSaver exec i3lock-blur
-bindsym XF86Sleep exec i3lock-blur
-bindsym $mod+x exec i3lock-blur
+bindsym XF86Sleep exec slimlock
+bindsym XF86Launch1 exec slimlock
+bindsym $mod+x exec slimlock
 bindsym $mod+Return exec i3-sensible-terminal
 
 # kill focused window
