@@ -62,7 +62,7 @@ URxvt*colorULMode:       on
 URxvt*colorUL:           #86a2be
 URxvt*underLine:         off
 URxvt*colorBDMode:       on
-URxvt*colorBD:           cyan
+URxvt*colorBD:           #268bd2
 
 Xautolock*time: 1
 
@@ -107,7 +107,7 @@ Xautolock*time: 1
 #define S_magenta #d33682
 #define S_violet #6c71c4
 #define S_blue #268bd2
-#define S_cyan #2aa198
+#define S_cyan #00CCFF
 #define S_green #859900
 
 
@@ -154,9 +154,9 @@ Xautolock*time: 1
 *color3: S_yellow
 *color4: S_blue
 *color5: S_magenta
-*color6: S_cyan
+*color6: S_orange
 *color7: S_base2
-*color9: S_orange
+*color9: S_cyan
 *color8: S_base03
 *color10: S_base01
 *color11: S_base00
