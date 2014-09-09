@@ -57,7 +57,7 @@
             set number
             set autoread
             set autowrite
-            set autochdir
+            " set autochdir
             set gdefault
             set keywordprg=:help
 
@@ -124,7 +124,7 @@
             set wildmenu            " Enhanced command line completion mode
             set wildmode=longest:full,full
 
-            set wildignore+=*/.git/*,*/.hg/*,*/.svn/*
+            " set wildignore+=*/.git/*,*/.hg/*,*/.svn/*
             set wildignore+=*.o,*.obj,*.pyc,*.pyo,*.pyd,*.class,*.lock
             set wildignore+=*.png,*.gif,*.jpg,*.ico
             set wildignore+=.git,.svn,.hg
@@ -170,7 +170,7 @@
         " }
     " }}
     " (re)Maps {{
-        let g:mapleader = ","
+        let g:mapleader = ' '
             " Some useful maps {
                 "imap ii <Esc>
                 "nnoremap / /\v
@@ -462,6 +462,7 @@ if executable("git")
             Bundle 'scrooloose/nerdcommenter'
             " < Just commenter utility > {
             " TODO: see alternative https://github.com/tomtom/tcomment_vim
+
                 let g:NERDSpaceDelims = 1
                 let g:NERDRemoveExtraSpaces = 1
                 let g:NERDCustomDelimiters = {
@@ -483,7 +484,7 @@ if executable("git")
             "Bundle 'mhinz/vim-signify'
             " < Show added, deleted and modified lines > {
             " }
-            Bundle 'scrooloose/syntastic'
+            " Bundle 'scrooloose/syntastic'
             " < Syntax checker > {
                 "let g:syntastic_python_python_exe = 'python2'
                 let g:syntastic_error_symbol='✗'
@@ -498,8 +499,6 @@ if executable("git")
                 let g:ycm_global_ycm_extra_conf = '/home/abcdw/.vim/bundle/YouCompleteMe/cpp/ycm/.ycm_extra_conf.py'
                 let g:ycm_key_list_select_completion = []
                 let g:ycm_key_list_previous_completion = []
-                let g:ycm_auto_start_csharp_server = 1
-                let g:ycm_auto_stop_csharp_server = 1
                 let g:ycm_collect_identifiers_from_tags_files = 1 " Let YCM read tags from Ctags file
                 let g:ycm_use_ultisnips_completer = 1 " Default 1, just ensure
                 let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming language's keyword
@@ -542,13 +541,14 @@ if executable("git")
             " }
             Bundle 'jmcantrell/vim-virtualenv'
             " < Vim python virtualenv manager > {
-                let g:virtualenv_directory = '~/work/'
+                let g:virtualenv_directory = '~/.virtualenvs'
             " }
             Bundle 'git://vim-latex.git.sourceforge.net/gitroot/vim-latex/vim-latex'
             " < Latex-suite > {
                 set grepprg=grep\ -nH\ $*
                 let g:tex_flavor='latex'
                 let g:Tex_DefaultTargetFormat='pdf'
+                let g:Tex_ViewRule_pdf='zathura'
                 imap <C-g> <Plug>IMAP_JumpForward
                 nmap <C-g> <Plug>IMAP_JumpForward
                 " TODO: try dvi format
@@ -668,12 +668,12 @@ if executable("git")
         Bundle 'tpope/vim-surround'
         Bundle 'tpope/vim-dispatch'
         Bundle 'tpope/vim-abolish'
-        Bundle 'cwood/vim-django'
+        " Bundle 'cwood/vim-django'
         " < Wrappers for django utils > {
         "
-            let g:django_projects = '~/work/anytask/' "Sets all projects under project
-            let g:django_activate_virtualenv = 1 "Try to activate the associated virtualenv
-            let g:django_activate_nerdtree = 1 "Try to open nerdtree at the project root.
+            " let g:django_projects = '~/work/anytask/' "Sets all projects under project
+            " let g:django_activate_virtualenv = 1 "Try to activate the associated virtualenv
+            " let g:django_activate_nerdtree = 1 "Try to open nerdtree at the project root.
         " }
 
         Bundle 'klen/python-mode'
@@ -707,6 +707,20 @@ if executable("git")
         " }
         "Bundle 'YankRing.vim'
         "Bundle 'mhinz/vim-startify'
+        Bundle 'Shougo/unite.vim'
+        Bundle 'edkolev/tmuxline.vim'
+        Bundle 'parkr/vim-jekyll'
+        Bundle 'tsukkee/unite-help'
+        " { < awesome Unite plugin >
+            autocmd FileType unite call s:unite_settings()
+            function! s:unite_settings()
+                " Play nice with supertab
+                " let b:SuperTabDisabled=1
+                " Enable navigation with control-j and control-k in insert mode
+                imap <buffer> <C-j>   <Plug>(unite_select_next_line)
+                imap <buffer> <C-k> <Plug>(unite_select_previous_line)
+            endfunction
+        " }
 
         filetype indent on
         filetype plugin on
