@@ -8,12 +8,13 @@ set guioptions-=r
 set guioptions-=R
 set guioptions-=l
 set guioptions-=L
+set guioptions-=m
 set guioptions+=c
 set guioptions+=e
 set showtabline=2
 
 "set guifont=Inconsolata\ for\ Powerline\ 15
-set guifont=Anonymice\ Powerline\ 14
+set guifont=Anonymice\ Powerline\ 13
 "set guifont=PragmataPro\ 13
 "set guifont=Inconsolata\ 12
 

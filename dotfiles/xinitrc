@@ -36,6 +36,7 @@ xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 2
 xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Timeout" 200
 
 urxvtd -q -f -o &
+yandex-disk start
 
 #feh --bg-scale ~/media/pics/wallpaper &
 #xcompmgr &
@@ -43,4 +44,4 @@ urxvtd -q -f -o &
 #~/work/repos/dzen2-notify/dzen2_notify_daemon.py &
 #   pulsar &
 
-exec /usr/bin/ssh-agent i3
+exec i3
