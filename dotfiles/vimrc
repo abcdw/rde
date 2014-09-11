@@ -53,7 +53,7 @@
             set list
             set display+=uhex " Show unprintables as <xx>
             set display+=lastline
-            set nolazyredraw
+            " set nolazyredraw
             set number
             set autoread
             set autowrite
@@ -192,11 +192,17 @@
                 " Keep search matches in the middle of the window.
                 nnoremap n nzzzv
                 nnoremap N Nzzzv
+                nnoremap <esc><esc> :<c-u>set nohlsearch<cr>
+                nnoremap / :<C-u>set hlsearch<cr>/
+                nnoremap ? :<C-u>set hlsearch<cr>?
+                nnoremap * :<C-u>set hlsearch<cr>*
+                nnoremap # :<C-u>set hlsearch<cr>#
 
                 " Same when jumping around
                 nnoremap g; g;zz
                 nnoremap g, g,zz
                 nnoremap <c-o> <c-o>zz
+                nnoremap <c-i> <c-i>zz
 
                 " Easier to type, and I never use the default behavior.
                 noremap H ^
