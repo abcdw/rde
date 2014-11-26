@@ -438,7 +438,7 @@ if executable("git")
                 let g:ctrlp_arg_map = 1
                 let g:ctrlp_extensions = ['mixed', 'buffertag']
                 let g:ctrlp_reuse_window = 'netrw\|help\|quickfix'
-                
+
                 " TODO: task-list
             " }
 
@@ -512,7 +512,7 @@ if executable("git")
                 let g:ycm_complete_in_strings = 1 " Completion in string
                 nnoremap <leader>g :YcmCompleter GoToDeclaration<CR>
             " }
-            Bundle 'plasticboy/vim-markdown'
+            Bundle 'tpope/vim-markdown'
             " < Markdown mode > {
             " }
             " *** Syntax files *** {
@@ -531,7 +531,6 @@ if executable("git")
 
             " }
 
-	
 
             "Bundle 'marijnh/tern_for_vim'
             " < code-analysis engine for js > {
@@ -565,24 +564,24 @@ if executable("git")
             Bundle 'bling/vim-airline'
             " < Pretty status line > {
                 let g:airline_theme='solarized'
-                "let g:airline_theme='zenburn'
+                " let g:airline_theme='zenburn'
 
                 let g:airline_powerline_fonts = 1
                 let g:airline_enable_fugitive=1
-                "let g:airline#extensions#bufferline#enabled = 1
+                " let g:airline#extensions#bufferline#enabled = 1
                 let g:airline#extensions#tabline#enabled = 1
                 let g:airline#extensions#eclim#enabled = 1
                 let g:airline#extensions#branch#enabled = 1
                 let g:airline#extensions#branch#empty_message = 'no scm'
                 let g:airline#extensions#syntastic#enabled = 1
-                "let g:airline#extensions#tagbar#enabled = 1
+                " let g:airline#extensions#tagbar#enabled = 1
                 let g:airline#extensions#tagbar#flags = 'f'
 
                 let g:airline#extensions#virtualenv#enabled = 1
                 let g:airline#extensions#hunks#enabled = 1
                 let g:airline#extensions#hunks#hunk_symbols = ['+', '~', '-']
                 let g:airline#extensions#ctrlp#color_template = 'normal'
-                "let g:airline#extensions#ctrlp#show_adjacent_modes = 1
+                " let g:airline#extensions#ctrlp#show_adjacent_modes = 1
             " }
             "Bundle 'bling/vim-bufferline'
             " < Bufferline for airline integration > {
@@ -674,12 +673,11 @@ if executable("git")
         Bundle 'tpope/vim-surround'
         Bundle 'tpope/vim-dispatch'
         Bundle 'tpope/vim-abolish'
-        " Bundle 'cwood/vim-django'
+        Bundle 'cwood/vim-django'
         " < Wrappers for django utils > {
-        "
-            " let g:django_projects = '~/work/anytask/' "Sets all projects under project
-            " let g:django_activate_virtualenv = 1 "Try to activate the associated virtualenv
-            " let g:django_activate_nerdtree = 1 "Try to open nerdtree at the project root.
+            let g:django_projects = '~/work/repos/' "Sets all projects under project
+            let g:django_activate_virtualenv = 1 "Try to activate the associated virtualenv
+            let g:django_activate_nerdtree = 1 "Try to open nerdtree at the project root.
         " }
 
         Bundle 'klen/python-mode'
@@ -727,7 +725,7 @@ if executable("git")
                 imap <buffer> <C-k> <Plug>(unite_select_previous_line)
             endfunction
         " }
-
+        Bundle 'elzr/vim-json'
         filetype indent on
         filetype plugin on
     " }
