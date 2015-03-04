@@ -1,4 +1,5 @@
 " vim: set foldmarker={,} foldlevel=3 foldmethod=marker spell:
+autocmd VimEnter * echo "abcdw's vimrc version: 61"
 " Notes {{{
 "   ***********************************************************************   "
 "   This is the personal .vimrc file of Andrew Tropin.                        "
@@ -223,6 +224,7 @@
                 nnoremap <leader>\ :call ToggleNERDTreeAndTagbar()<CR>
                 map <leader>ev <C-w><C-v><C-l>:e! $MYVIMRC<CR>
                 map <leader>bd :bdelete<CR>
+                map <leader>cd :cd %:p:h<CR>:pwd<CR>
 
                 nnoremap <F2> :set invpaste paste?<CR>
                 set pastetoggle=<F2>
@@ -363,7 +365,7 @@ if executable("git")
             Bundle 'mtth/scratch.vim'
             " < Unobtrusive scratch window > {
                 "gs gS hotkeys
-                nnoremap <leader>c :Scratch<CR>
+                nnoremap <leader>S :Scratch<CR>
             "}
             Bundle 'Raimondi/delimitMate'
             " < Automatic closing of quotes, brackets, etc > {
@@ -673,7 +675,7 @@ if executable("git")
         Bundle 'tpope/vim-surround'
         Bundle 'tpope/vim-dispatch'
         Bundle 'tpope/vim-abolish'
-        Bundle 'cwood/vim-django'
+        " Bundle 'cwood/vim-django'
         " < Wrappers for django utils > {
             let g:django_projects = '~/work/repos/' "Sets all projects under project
             let g:django_activate_virtualenv = 1 "Try to activate the associated virtualenv
