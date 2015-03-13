@@ -1,0 +1,135 @@
+# Path to your oh-my-zsh installation.
+export ZSH=$HOME/.oh-my-zsh
+
+# Set name of the theme to load.
+# Look in ~/.oh-my-zsh/themes/
+# Optionally, if you set this to "random", it'll load a random theme each
+# time that oh-my-zsh is loaded.
+ZSH_THEME="steeef"
+
+# Uncomment the following line to use case-sensitive completion.
+# CASE_SENSITIVE="true"
+
+# Uncomment the following line to disable bi-weekly auto-update checks.
+DISABLE_AUTO_UPDATE="true"
+
+# Uncomment the following line to change how often to auto-update (in days).
+# export UPDATE_ZSH_DAYS=13
+
+# Uncomment the following line to disable colors in ls.
+# DISABLE_LS_COLORS="true"
+
+# Uncomment the following line to disable auto-setting terminal title.
+# DISABLE_AUTO_TITLE="true"
+
+# Uncomment the following line to enable command auto-correction.
+ENABLE_CORRECTION="true"
+
+# Uncomment the following line to display red dots whilst waiting for completion.
+# COMPLETION_WAITING_DOTS="true"
+
+# Uncomment the following line if you want to disable marking untracked files
+# under VCS as dirty. This makes repository status check for large repositories
+# much, much faster.
+# DISABLE_UNTRACKED_FILES_DIRTY="true"
+
+# Uncomment the following line if you want to change the command execution time
+# stamp shown in the history command output.
+# The optional three formats: "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
+# HIST_STAMPS="mm/dd/yyyy"
+
+# Would you like to use another custom folder than $ZSH/custom?
+# ZSH_CUSTOM=/path/to/new-custom-folder
+
+# Which plugins would you like to load? (plugins can be found in ~/.oh-my-zsh/plugins/*)
+# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
+# Example format: plugins=(rails git textmate ruby lighthouse)
+# Add wisely, as too many plugins slow down shell startup.
+plugins=(git)
+
+# User configuration
+
+export PATH="/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/munki"
+# export MANPATH="/usr/local/man:$MANPATH"
+
+source $ZSH/oh-my-zsh.sh
+
+# You may need to manually set your language environment
+# export LANG=en_US.UTF-8
+
+# Preferred editor for local and remote sessions
+# if [[ -n $SSH_CONNECTION ]]; then
+#   export EDITOR='vim'
+# else
+#   export EDITOR='mvim'
+# fi
+
+# Compilation flags
+# export ARCHFLAGS="-arch x86_64"
+
+# ssh
+# export SSH_KEY_PATH="~/.ssh/dsa_id"
+
+# Set personal aliases, overriding those provided by oh-my-zsh libs,
+# plugins, and themes. Aliases can be placed here, though oh-my-zsh
+# users are encouraged to define aliases within the ZSH_CUSTOM folder.
+# For a full list of active aliases, run `alias`.
+#
+# Example aliases
+# alias zshconfig="mate ~/.zshrc"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
+
+
+if [[ -n $SSH_CONNECTION ]]; then
+    tmux at default
+fi
+
+bindkey -v
+# VI MODE KEYBINDINGS (ins mode)
+bindkey -M viins '^a'    beginning-of-line
+bindkey -M viins '^e'    end-of-line
+bindkey -M viins '^k'    kill-line
+bindkey -M viins '^r'    history-incremental-pattern-search-backward
+bindkey -M viins '^s'    history-incremental-pattern-search-forward
+bindkey -M viins '^p'    up-line-or-history
+bindkey -M viins '^n'    down-line-or-history
+bindkey -M viins '^y'    yank
+bindkey -M viins '^w'    backward-kill-word
+bindkey -M viins '^u'    backward-kill-line
+bindkey -M viins '^h'    backward-delete-char
+bindkey -M viins '^?'    backward-delete-char
+bindkey -M viins '^_'    undo
+bindkey -M viins '^x^r'  redisplay
+bindkey -M viins '\eOH'  beginning-of-line # Home
+bindkey -M viins '\eOF'  end-of-line       # End
+bindkey -M viins '\e[2~' overwrite-mode    # Insert
+bindkey -M viins '\ef'   forward-word      # Alt-f
+bindkey -M viins '\eb'   backward-word     # Alt-b
+bindkey -M viins '\ed'   kill-word         # Alt-d                    
+
+# VI MODE KEYBINDINGS (cmd mode)
+bindkey -M vicmd '^a'    beginning-of-line
+bindkey -M vicmd '^e'    end-of-line
+bindkey -M vicmd '^k'    kill-line
+bindkey -M vicmd '^r'    history-incremental-pattern-search-backward
+bindkey -M vicmd '^s'    history-incremental-pattern-search-forward
+bindkey -M vicmd '^p'    up-line-or-history
+bindkey -M vicmd '^n'    down-line-or-history
+bindkey -M vicmd '^y'    yank
+bindkey -M vicmd '^w'    backward-kill-word
+bindkey -M vicmd '^u'    backward-kill-line
+bindkey -M vicmd '/'     vi-history-search-forward
+bindkey -M vicmd '?'     vi-history-search-backward
+bindkey -M vicmd '^_'    undo
+bindkey -M vicmd '\ef'   forward-word                      # Alt-f
+bindkey -M vicmd '\eb'   backward-word                     # Alt-b
+bindkey -M vicmd '\ed'   kill-word                         # Alt-d
+bindkey -M vicmd '\e[5~' history-beginning-search-backward # PageUp
+bindkey -M vicmd '\e[6~' history-beginning-search-forward  # 
+
+
+# bindkey '^R' history-incremental-search-backward
+autoload edit-command-line
+zle -N edit-command-line
+bindkey -M vicmd v edit-command-line
+alias tm='tmux attach || tmux new'
