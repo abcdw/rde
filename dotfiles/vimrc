@@ -398,12 +398,16 @@ if executable("git")
             " }
             Bundle 'lyokha/vim-xkbswitch'
             " < Automatic layout switcher > {
+                let g:XkbSwitchEnabled = 1
                 "let g:XkbSwitchIMappingsSkipFt = ['tex'] " need for latex-suite
                 "let g:XkbSwitchLib = '~/.vim/bundle/vim-xkbswitch/xkb-switch/libxkbswitch.so'
+                if has("unix")
+                    let s:uname = system("uname -s")
+                    if s:uname == "Darwin"
+                        let g:XkbSwitchLib = '/usr/local/lib/libxkbswitch.dylib'
+                    endif
+                endif
                 "let g:XkbSwitchIMappings = ['ru(typewriter)']
-                let g:XkbSwitchEnabled = 1
-                let g:XkbSwitchNLayout = 'us(dvp)'
-                let g:XkbSwitchILayout = 'us(dvp)'
             " }
             Bundle 'scrooloose/nerdtree'
             " < File system explerer >{
@@ -473,9 +477,9 @@ if executable("git")
 
                 let g:NERDSpaceDelims = 1
                 let g:NERDRemoveExtraSpaces = 1
-                let g:NERDCustomDelimiters = {
-                      \ 'htmldjango': { 'left': '{#', 'right': '#}' }
-                      \ }
+                " let g:NERDCustomDelimiters = {
+                      " \ 'htmldjango': { 'left': '{#', 'right': '#}' }
+                      " \ }
             " }
             Bundle 'xuhdev/SingleCompile'
             " < Comile or run a single source file > {
@@ -529,7 +533,7 @@ if executable("git")
                 au BufNewFile,BufRead views.py     setlocal filetype=python.django
                 au BufNewFile,BufRead settings.py  setlocal filetype=python.django
                 au BufNewFile,BufRead forms.py     setlocal filetype=python.django
-                au FileType htmldjango set sw=2
+                au FileType html,xml,liquid set sw=2
 
             " }
 
@@ -672,6 +676,12 @@ if executable("git")
         "Bundle 'matrix.vim--Yang'
         Bundle 'tpope/vim-repeat'
         Bundle 'tpope/vim-fugitive.git'
+        " < Git addon > {
+            map <leader>gis :Gstatus<cr>
+            map <leader>gia :Gcommit --amend<cr>
+            map <leader>gid :Gdiff<cr>
+        " }
+
         Bundle 'tpope/vim-surround'
         Bundle 'tpope/vim-dispatch'
         Bundle 'tpope/vim-abolish'
