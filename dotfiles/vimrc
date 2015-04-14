@@ -237,6 +237,7 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
                 vmap < <gv
                 vmap > >gv
                 " prevents leaving visual mode after indenting
+                map <leader>os :FollowSymlink<CR>
             " }
         " Disabling arrows {
             imap <left> <nop>
@@ -262,6 +263,19 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
         " }
     " }}
     " Functions {{
+        function! s:MyFollowSymlink() "{
+            silent! let s:fname = resolve(expand('%:p'))
+            silent! bwipeout
+            silent! exec "edit " .s:fname
+        endfunction
+        command! FollowSymlink call s:MyFollowSymlink()
+
+        " augroup followsymlink
+            " autocmd!
+            " autocmd BufReadPost * FollowSymlink
+        " augroup END 
+        "}
+
         function! SetupCtrlP() "{
           if exists("g:loaded_ctrlp") && g:loaded_ctrlp
             augroup CtrlPExtension
@@ -608,7 +622,7 @@ if executable("git")
                 let g:solarized_visibility="low"
                 let g:base16colorspace=256
                 set t_Co=256
-                set background=light
+                set background=dark
                 " colorscheme hybrid
                 colorscheme solarized
                 " colorscheme zenburn
