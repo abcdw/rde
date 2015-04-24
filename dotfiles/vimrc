@@ -61,6 +61,8 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
             " set autochdir
             set gdefault
             set keywordprg=:help
+            set spelllang=ru,en
+            set spell
 
             autocmd FileType * setlocal formatoptions-=o
             autocmd VimEnter * nested call SetupCtrlP()
@@ -76,11 +78,11 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
                 "autocmd BufWritePost $MYVIMRC source $MYVIMRC
             "augroup END " }
 
-            "augroup helpfiles
-            "  au!
-            "  "au BufRead,BufEnter */doc/* wincmd L
-            "  au BufRead */doc/* wincmd L
-            "augroup END
+            augroup helpfiles
+             au!
+             "au BufRead,BufEnter */doc/* wincmd L
+             au BufRead */doc/* wincmd L
+            augroup END
         "}
         " Tab and indent {
             set tabstop=4
@@ -93,7 +95,7 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
             set cindent
         " }
         " Line wraping {
-            set textwidth=79
+            " set textwidth=79
             set wrap
             set linebreak " Only wrap on characters in `breakat`
             if has('multi_byte')
@@ -238,6 +240,7 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
                 vmap > >gv
                 " prevents leaving visual mode after indenting
                 map <leader>os :FollowSymlink<CR>
+                map <leader>, :w<CR>
             " }
         " Disabling arrows {
             imap <left> <nop>
@@ -266,7 +269,8 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
         function! s:MyFollowSymlink() "{
             silent! let s:fname = resolve(expand('%:p'))
             silent! bwipeout
-            silent! exec "edit " .s:fname
+            silent! exec "edit " .s:fname 
+            " TODO: prevent windows closing
         endfunction
         command! FollowSymlink call s:MyFollowSymlink()
 
@@ -417,7 +421,7 @@ if executable("git")
                 "let g:XkbSwitchLib = '~/.vim/bundle/vim-xkbswitch/xkb-switch/libxkbswitch.so'
                 if has("unix")
                     let s:uname = system("uname -s")
-                    if s:uname == "Darwin"
+                    if s:uname == "Darwin\n"
                         let g:XkbSwitchLib = '/usr/local/lib/libxkbswitch.dylib'
                     endif
                 endif
@@ -481,8 +485,11 @@ if executable("git")
             Bundle 'majutsushi/tagbar'
             " < Browsing the tags of source code files > {
                 nmap <leader>tb :TagbarToggle<CR>
-                let g:tagbar_autofocus = 1
-                "let g:tagbar_left=1
+                " let g:tagbar_autofocus = 1
+                " let g:tagbar_iconchars = ['▸', '▾']
+                let g:tagbar_iconchars = ['+', '-']
+                let g:tagbar_sort = 0
+                " let g:tagbar_left=1
                 "let g:tagbar_autoclose = 1
             " }
             Bundle 'scrooloose/nerdcommenter'
@@ -581,13 +588,38 @@ if executable("git")
 
         " }
         " Appearance {
+            " *** Colorschemes *** {
+                Bundle 'sjl/badwolf'
+                Bundle 'w0ng/vim-hybrid'
+                Bundle 'baskerville/bubblegum'
+                Bundle 'hickop/vim-hickop-colors'
+                Bundle 'altercation/vim-colors-solarized.git'
+                Bundle 'cschlueter/vim-wombat'
+                Bundle 'jnurmine/Zenburn'
+                Bundle 'tomasr/molokai'
+                Bundle 'chriskempson/base16-vim'
+                Bundle 'HubbaBubbaFett/mustang'
+                " set term=xterm-256color
+                " let g:solarized_termcolors=256
+                " let g:solarized_visibility="low"
+                " let g:base16colorspace=256
+                set t_Co=256
+                set background=dark
+                " colorscheme hybrid
+                " colorscheme solarized
+                colorscheme zenburn
+                " colorscheme mustang
+                " colorscheme molokai
+                set colorcolumn=80
+                " echo g:colors_name
+            " }
             Bundle 'bling/vim-airline'
             " < Pretty status line > {
-                let g:airline_theme='solarized'
-                " let g:airline_theme='zenburn'
+                " let g:airline_theme='solarized'
+                let g:airline_theme=g:colors_name
 
                 let g:airline_powerline_fonts = 1
-                let g:airline_enable_fugitive=1
+                let g:airline_enable_fugitive = 1
                 " let g:airline#extensions#bufferline#enabled = 1
                 let g:airline#extensions#tabline#enabled = 1
                 let g:airline#extensions#eclim#enabled = 1
@@ -606,34 +638,10 @@ if executable("git")
             "Bundle 'bling/vim-bufferline'
             " < Bufferline for airline integration > {
             " }
-            " *** Colorschemes *** {
-                Bundle 'sjl/badwolf'
-                Bundle 'w0ng/vim-hybrid'
-                Bundle 'baskerville/bubblegum'
-                Bundle 'hickop/vim-hickop-colors'
-                Bundle 'altercation/vim-colors-solarized.git'
-                Bundle 'cschlueter/vim-wombat'
-                Bundle 'jnurmine/Zenburn'
-                Bundle 'tomasr/molokai'
-                Bundle 'chriskempson/base16-vim'
-                Bundle 'HubbaBubbaFett/mustang'
-                "set term=xterm-256color
-                let g:solarized_termcolors=256
-                let g:solarized_visibility="low"
-                let g:base16colorspace=256
-                set t_Co=256
-                set background=dark
-                " colorscheme hybrid
-                colorscheme solarized
-                " colorscheme zenburn
-                " colorscheme mustang
-                " colorscheme molokai
-                set colorcolumn=80
-            " }
         " }
 
-        "Bundle 'Yggdroot/indentLine'
-        "Bundle 'nathanaelkane/vim-indent-guides.git'
+        Bundle 'Yggdroot/indentLine'
+        " Bundle 'nathanaelkane/vim-indent-guides.git'
         "{
             "let g:indent_guides_auto_colors = 1
             "let g:indent_guides_guide_size=1
@@ -687,7 +695,7 @@ if executable("git")
 
 
         "Bundle 'VimClojure'
-        "Bundle 'matrix.vim--Yang'
+        Bundle 'matrix.vim--Yang'
         Bundle 'tpope/vim-repeat'
         Bundle 'tpope/vim-fugitive.git'
         " < Git addon > {
@@ -707,12 +715,13 @@ if executable("git")
         " }
 
         Bundle 'klen/python-mode'
-        " {
+        " < Ultimate python plugin > {
             let g:pymode_lint_on_write = 0
             let g:pymode_folding = 0
-            let g:pymode_rope_completion = 0
-        "
-        "
+            let g:pymode_rope = 0
+
+        " }
+
         Bundle 'mjbrownie/vim-htmldjango_omnicomplete'
 
 
@@ -735,12 +744,10 @@ if executable("git")
             sunmap b
             sunmap e
         " }
+
         "Bundle 'YankRing.vim'
         "Bundle 'mhinz/vim-startify'
         Bundle 'Shougo/unite.vim'
-        Bundle 'edkolev/tmuxline.vim'
-        Bundle 'parkr/vim-jekyll'
-        Bundle 'tsukkee/unite-help'
         " { < awesome Unite plugin >
             autocmd FileType unite call s:unite_settings()
             function! s:unite_settings()
@@ -751,7 +758,17 @@ if executable("git")
                 imap <buffer> <C-k> <Plug>(unite_select_previous_line)
             endfunction
         " }
+        Bundle 'tsukkee/unite-help'
+
+        Bundle 'edkolev/tmuxline.vim'
+        Bundle 'parkr/vim-jekyll'
         Bundle 'elzr/vim-json'
+        Bundle 'rking/ag.vim'
+        Bundle 'diffchar.vim'
+        Bundle 'stefandtw/quickfix-reflector.vim'
+        Bundle 'christoomey/vim-tmux-navigator'
+        Bundle 'benmills/vimux'
+
         filetype indent on
         filetype plugin on
     " }
