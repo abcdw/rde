@@ -1,5 +1,6 @@
-" vim: set foldmarker={,} foldlevel=3 foldmethod=marker spell:
-autocmd VimEnter * echo "abcdw's vimrc version: 61"
+" vim: set foldmarker={,} foldlevel=3 foldmethod=marker:
+
+autocmd VimEnter * echo "abcdw's vimrc version: 0.3-r1"
 " Notes {{{
 "   ***********************************************************************   "
 "   This is the personal .vimrc file of Andrew Tropin.                        "
@@ -49,7 +50,8 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
         " Behavior {
             set backspace=indent,eol,start " Set for maximum backspace smartness"
             set scrolloff=3 " don't scroll any closer to top/bottom
-            set sidescrolloff=5 " don't scroll any closer to left/right
+            " set sidescrolloff=999 " don't scroll any closer to left/right
+            set sidescrolloff=15 " don't scroll any closer to left/right
             set listchars=tab:▸\ ,trail:·,nbsp:+,eol:¶,nbsp:&,extends:>,precedes:>,conceal:~
             set list
             set display+=uhex " Show unprintables as <xx>
@@ -59,11 +61,16 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
             set autoread
             set autowrite
             " set autochdir
+            set virtualedit=block
+            set splitbelow
+            set splitright
             set gdefault
             set keywordprg=:help
-            set spelllang=ru,en
+            set spelllang=ru_yo,en
             set spell
+            set nojoinspaces
 
+            autocmd FilterWritePre * if &diff | setlocal wrap< | endif
             autocmd FileType * setlocal formatoptions-=o
             autocmd VimEnter * nested call SetupCtrlP()
             if has("autocmd")
@@ -87,6 +94,7 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
         " Tab and indent {
             set tabstop=4
             set shiftwidth=4
+            set shiftround
             set softtabstop=4
             set expandtab
             set smarttab
@@ -174,6 +182,10 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
     " }}
     " (re)Maps {{
         let g:mapleader = ' '
+        " map <space> <leader>
+        " vmap <space> <leader>
+        " map <space><space> :
+        " vmap <space><space> :
             " Some useful maps {
                 "imap ii <Esc>
                 "nnoremap / /\v
@@ -188,10 +200,10 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
                 vnoremap <tab> %
 
                 " Heresy
-                inoremap <c-a> <esc>I
-                inoremap <c-e> <esc>A
-                cnoremap <c-a> <home>
-                cnoremap <c-e> <end>
+                " inoremap <c-a> <esc>I
+                " inoremap <c-e> <esc>A
+                " cnoremap <c-a> <home>
+                " cnoremap <c-e> <end>
                 " Keep search matches in the middle of the window.
                 nnoremap n nzzzv
                 nnoremap N Nzzzv
@@ -225,7 +237,6 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
 
                 nnoremap <leader>\ :call ToggleNERDTreeAndTagbar()<CR>
                 map <leader>ev <C-w><C-v><C-l>:e! $MYVIMRC<CR>
-                map <leader>bd :bdelete<CR>
                 map <leader>cd :cd %:p:h<CR>:pwd<CR>
 
                 nnoremap <F2> :set invpaste paste?<CR>
@@ -241,6 +252,8 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
                 " prevents leaving visual mode after indenting
                 map <leader>os :FollowSymlink<CR>
                 map <leader>, :w<CR>
+                map <leader>bd :bdelete<CR>
+                map <leader>q :bdelete<CR>
             " }
         " Disabling arrows {
             imap <left> <nop>
@@ -264,12 +277,15 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
             nnoremap <C-k> <C-w>k
             nnoremap <C-l> <C-w>l
         " }
+        " Abbreviations {
+            iab UD <BS>Update <C-R>=strftime("%F")<CR>:<CR><Tab>
+        " }
     " }}
     " Functions {{
         function! s:MyFollowSymlink() "{
             silent! let s:fname = resolve(expand('%:p'))
             silent! bwipeout
-            silent! exec "edit " .s:fname 
+            silent! exec "edit " .s:fname
             " TODO: prevent windows closing
         endfunction
         command! FollowSymlink call s:MyFollowSymlink()
@@ -277,7 +293,7 @@ autocmd VimEnter * echo "abcdw's vimrc version: 61"
         " augroup followsymlink
             " autocmd!
             " autocmd BufReadPost * FollowSymlink
-        " augroup END 
+        " augroup END
         "}
 
         function! SetupCtrlP() "{
@@ -498,14 +514,14 @@ if executable("git")
 
                 let g:NERDSpaceDelims = 1
                 let g:NERDRemoveExtraSpaces = 1
-                " let g:NERDCustomDelimiters = {
-                      " \ 'htmldjango': { 'left': '{#', 'right': '#}' }
-                      " \ }
+                let g:NERDCustomDelimiters = {
+                      \ 'htmldjango': { 'left': '{#', 'right': '#}' }
+                      \ }
             " }
             Bundle 'xuhdev/SingleCompile'
             " < Comile or run a single source file > {
-                nmap <leader>ll :SCCompile<CR>
-                nmap <leader>lv :SCCompileRun<CR>
+                " nmap <leader>ll :SCCompile<CR>
+                " nmap <leader>lv :SCCompileRun<CR>
                 autocmd Filetype cpp nmap <buffer> <leader>ll :SCCompileAF -std=c++0x <CR>
                 autocmd Filetype cpp nmap <buffer> <leader>lv :SCCompileRunAF -std=c++0x <CR>
                 autocmd Filetype java nmap <buffer> <leader>ll :ProjectBuild <CR>
@@ -513,6 +529,7 @@ if executable("git")
                 autocmd Filetype cs nmap <buffer> <leader>ll :OmniSharpBuildAsync <CR>
                 "autocmd Filetype cs nmap <buffer> <leader>lv :SCCompileRunAF -pkg:dotnet <CR>
                 "autocmd Filetype tex nmap <buffer> <leader>ll :SCCompileAF -shell-escape <CR>
+                au Filetype tex setlocal sw=2
             " }
             "Bundle 'mhinz/vim-signify'
             " < Show added, deleted and modified lines > {
@@ -547,7 +564,7 @@ if executable("git")
                 Bundle 'python.vim'
                 Bundle 'django.vim'
                 Bundle 'OrangeT/vim-csharp.git'
-                au BufNewFile,BufRead *.html       setlocal filetype=htmldjango
+                au BufNewFile,BufRead *.html       setlocal filetype=htmldjango sw=2
                 au BufNewFile,BufRead admin.py     setlocal filetype=python.django
                 au BufNewFile,BufRead urls.py      setlocal filetype=python.django
                 au BufNewFile,BufRead models.py    setlocal filetype=python.django
@@ -568,7 +585,7 @@ if executable("git")
             " }
             Bundle "mattn/emmet-vim"
             " < High-speed HTML, XML, XSL coding and edition > {
-                let g:user_emmet_leader_key = '<c-e>'
+                let g:user_emmet_leader_key = '<C-g>'
                 let g:use_emmet_complete_tag = 1
             " }
             Bundle 'jmcantrell/vim-virtualenv'
@@ -580,7 +597,7 @@ if executable("git")
                 set grepprg=grep\ -nH\ $*
                 let g:tex_flavor='latex'
                 let g:Tex_DefaultTargetFormat='pdf'
-                let g:Tex_ViewRule_pdf='zathura'
+                " let g:Tex_ViewRule_pdf='zathura'
                 imap <C-g> <Plug>IMAP_JumpForward
                 nmap <C-g> <Plug>IMAP_JumpForward
                 " TODO: try dvi format
@@ -589,6 +606,9 @@ if executable("git")
         " }
         " Appearance {
             " *** Colorschemes *** {
+                Bundle 'xolox/vim-colorscheme-switcher'
+                " <Cicrle through colorsechemes> {
+                " }
                 Bundle 'sjl/badwolf'
                 Bundle 'w0ng/vim-hybrid'
                 Bundle 'baskerville/bubblegum'
@@ -599,15 +619,18 @@ if executable("git")
                 Bundle 'tomasr/molokai'
                 Bundle 'chriskempson/base16-vim'
                 Bundle 'HubbaBubbaFett/mustang'
+                Bundle 'endel/vim-github-colorscheme'
+                Bundle 'morhetz/gruvbox'
                 " set term=xterm-256color
                 " let g:solarized_termcolors=256
                 " let g:solarized_visibility="low"
                 " let g:base16colorspace=256
-                set t_Co=256
+                " set t_Co=256
                 set background=dark
                 " colorscheme hybrid
                 " colorscheme solarized
                 colorscheme zenburn
+                " colorscheme github
                 " colorscheme mustang
                 " colorscheme molokai
                 set colorcolumn=80
@@ -640,7 +663,8 @@ if executable("git")
             " }
         " }
 
-        Bundle 'Yggdroot/indentLine'
+        " Bundle 'Yggdroot/indentLine'
+        " < Such slow plugin >
         " Bundle 'nathanaelkane/vim-indent-guides.git'
         "{
             "let g:indent_guides_auto_colors = 1
@@ -764,10 +788,43 @@ if executable("git")
         Bundle 'parkr/vim-jekyll'
         Bundle 'elzr/vim-json'
         Bundle 'rking/ag.vim'
-        Bundle 'diffchar.vim'
+        " Bundle 'diffchar.vim'
         Bundle 'stefandtw/quickfix-reflector.vim'
         Bundle 'christoomey/vim-tmux-navigator'
         Bundle 'benmills/vimux'
+        " <Plugin for interact with tmux> {
+            let VimuxUseNearest = 1
+            function! VimuxSlime(visual)
+                let @v=substitute(@v,'\(.*\)\n\%$','\1','g')
+                " remove last \n in register
+                if a:visual == 0
+                    let @v = ""
+                endif
+                if @v == ""
+                   let @v = getline(".")
+                endif
+
+                call VimuxSendText(@v)
+                call VimuxSendKeys("Enter")
+            endfunction
+
+            nmap <Leader>vr :call VimuxRunCommand("")<CR>
+            nmap <Leader>vv :call VimuxRunLastCommand()<CR>
+            vmap <Leader>e "vy:call VimuxSlime(1)<CR>
+            nmap <Leader>e :call VimuxSlime(0)<CR>
+        " }
+
+        Bundle 'tpope/vim-rsi'
+        " <Readline style insertions (c-a, c-e, ...) > {
+        " }
+        Bundle 'wellle/tmux-complete.vim'
+        " <completion from tmux> {
+            let g:tmuxcomplete#trigger = 'omnifunc'
+            " :Unite tmuxcomplete/lines
+        " }
+        Bundle 'tmux-plugins/vim-tmux'
+        " <Syntax highlight and help> {
+        " }
 
         filetype indent on
         filetype plugin on
