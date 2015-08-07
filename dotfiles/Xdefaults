@@ -9,21 +9,17 @@ Emacs.FontBackend: xft
 Emacs.Font: Anonymice Powerline:size=17
 
 URxvt*letterSpace: -1
+URxvt.termName: xterm-256color
 !-*-}
 
-*.font: xft:Anonymice Powerline:size=13
-*.boldItalicFont: xft:Anonymice Powerline:style=Bold Italic:size=13
-*.boldFont: xft:Anonymice Powerline:style=Bold:size=13
-*.italicFont: xft:Anonymice Powerline:style=Italic:size=13
-xterm*faceName: xft:Anonymice Powerline:size=13
-!*.font: xft:PragmataPro:size=13
-!*.boldItalicFont: xft:PragmataPro:style=Bold Italic:size=13
-!*.boldFont: xft:PragmataPro:style=Bold:size=13
-!*.italicFont: xft:PragmataPro:style=Italic:size=13
-!xterm*faceName: xft:PragmataPro:size=13
+*.font: xft:Ubuntu Mono derivative Powerline:size=13
+*.boldItalicFont: xft:Ubuntu Mono derivative Powerline:style=Bold Italic:size=13
+*.boldFont: xft:Ubuntu Mono derivative Powerline:style=Bold:size=13
+*.italicFont: xft:Ubuntu Mono derivative Powerline:style=Italic:size=13
+xterm*faceName: xft:Ubuntu Mono derivative Powerline:size=13
 
 ! scroll
-URxvt*saveLines: 5000
+URxvt*saveLines: 50000
 URxvt*scrollBar: false
 URxvt*scrollTtyOutput: false
 URxvt*scrollTtyKeypress: true
@@ -43,14 +39,19 @@ URxvt*keysym.End: \033[4~
 URxvt*perl-lib: /usr/lib64/urxvt/perl
 
 !clickable urls
-URxvt*perl-ext-common:  default,matcher,url-select,keyboard-select
+URxvt*perl-ext-common:  default,matcher,url-select,keyboard-select,font-size
 URxvt*matcher.button:	1
 
-URxvt*keysym.M-Escape: perl:keyboard-select:activate
-URxvt*keysym.M-f: perl:keyboard-select:search
+URxvt*keysym.C-Up:     font-size:increase
+URxvt*keysym.C-Down:   font-size:decrease
+URxvt*keysym.C-S-Up:   font-size:incglobal
+URxvt*keysym.C-S-Down: font-size:decglobal
+
+URxvt*keysym.M-Escape:  perl:keyboard-select:activate
+URxvt*keysym.M-f:       perl:keyboard-select:search
 
 !url-select without mouse
-URxvt*url-select.launcher:     /usr/bin/firefox -new-tab
+URxvt*url-select.launcher:     /usr/bin/firefox-bin -new-tab
 URxvt*url-select.underline:    true
 URxvt*keysym.C-u:      	       perl:url-select:select_next
 
@@ -164,9 +165,3 @@ Xautolock*time: 1
 *color13: S_violet
 *color14: S_base1
 *color15: S_base3
-
-!dzen2
-dzen2*font:       xft:PragmataPro:size=10
-dzen2*foreground: #dcdccc
-!dzen2*background: #3f3f3f
-
