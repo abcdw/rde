@@ -1,0 +1,4 @@
+#!/bin/bash
+
+question=`xclip -o`
+xdg-open "https://duckduckgo.com/?q=$question"
