@@ -12,10 +12,10 @@ URxvt*letterSpace: -1
 URxvt.termName: xterm-256color
 !-*-}
 
-*.font: xft:Ubuntu Mono derivative Powerline:size=13
-*.boldItalicFont: xft:Ubuntu Mono derivative Powerline:style=Bold Italic:size=13
-*.boldFont: xft:Ubuntu Mono derivative Powerline:style=Bold:size=13
-*.italicFont: xft:Ubuntu Mono derivative Powerline:style=Italic:size=13
+*.font: xft:Ubuntu Mono derivative Powerline:size=12
+*.boldItalicFont: xft:Ubuntu Mono derivative Powerline:style=Bold Italic:size=12
+*.boldFont: xft:Ubuntu Mono derivative Powerline:style=Bold:size=12
+*.italicFont: xft:Ubuntu Mono derivative Powerline:style=Italic:size=12
 xterm*faceName: xft:Ubuntu Mono derivative Powerline:size=13
 
 ! scroll
@@ -42,10 +42,11 @@ URxvt*perl-lib: /usr/lib64/urxvt/perl
 URxvt*perl-ext-common:  default,matcher,url-select,keyboard-select,font-size
 URxvt*matcher.button:	1
 
-URxvt*keysym.C-Up:     font-size:increase
-URxvt*keysym.C-Down:   font-size:decrease
-URxvt*keysym.C-S-Up:   font-size:incglobal
-URxvt*keysym.C-S-Down: font-size:decglobal
+URxvt*keysym.C-plus:    perl:font-size:increase
+URxvt*keysym.C-minus:   perl:font-size:decrease
+URxvt*keysym.C-S-plus:  perl:font-size:incglobal
+URxvt*keysym.C-S-minus: perl:font-size:decglobal
+URxvt.font-size.step:   3
 
 URxvt*keysym.M-Escape:  perl:keyboard-select:activate
 URxvt*keysym.M-f:       perl:keyboard-select:search
