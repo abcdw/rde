@@ -16,10 +16,10 @@ URxvt.termName: xterm-256color
 *.boldItalicFont: xft:Ubuntu Mono derivative Powerline:style=Bold Italic:size=12
 *.boldFont: xft:Ubuntu Mono derivative Powerline:style=Bold:size=12
 *.italicFont: xft:Ubuntu Mono derivative Powerline:style=Italic:size=12
-xterm*faceName: xft:Ubuntu Mono derivative Powerline:size=13
+xterm*faceName: xft:Ubuntu Mono derivative Powerline:size=12
 
 ! scroll
-URxvt*saveLines: 50000
+URxvt*saveLines: 1000
 URxvt*scrollBar: false
 URxvt*scrollTtyOutput: false
 URxvt*scrollTtyKeypress: true
@@ -27,7 +27,7 @@ URxvt*scrollWithBuffer: true
 URxvt*secondaryWheel: true
 
 URxvt.intensityStyles: false
-urxvt*depth:32
+! urxvt*depth:32
 URxvt*shading: 85
 URxvt*internalBorder: 3
 URxvt*lineSpace: 0
@@ -46,7 +46,7 @@ URxvt*keysym.C-plus:    perl:font-size:increase
 URxvt*keysym.C-minus:   perl:font-size:decrease
 URxvt*keysym.C-S-plus:  perl:font-size:incglobal
 URxvt*keysym.C-S-minus: perl:font-size:decglobal
-URxvt.font-size.step:   3
+! URxvt.font-size.step:   3
 
 URxvt*keysym.M-Escape:  perl:keyboard-select:activate
 URxvt*keysym.M-f:       perl:keyboard-select:search
