@@ -1,11 +1,41 @@
+" vim: set foldmarker={,} foldlevel=3 foldmethod=marker:
+
+let g:mapleader = ' '
 map ; :
-map ,p "*p
+
+map <C-c> <C-[>
+map <leader>p "*p
+
+map <leader>, :w<CR>
+map <leader>q :bdelete<CR>
+nnoremap <silent> <leader>h :set invhlsearch<CR>
+
+" if has('nvim')
+"     nmap <bs> :<c-u>TmuxNavigateLeft<cr>
+" endif
+nnoremap <BS> <C-w>h
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+vmap < <gv
+vmap > >gv
+
+set keywordprg=:help
 set sw=4
 set si
 
 set wildchar=<TAB>      " Character to start command line completion
 set wildmenu            " Enhanced command line completion mode
 set wildmode=longest:full,full
+
+if has("autocmd")
+  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+	\| exe "normal! g'\"" | endif
+endif
+" loads previous editing position
+
 syntax on
 
 set nocompatible
@@ -27,9 +57,26 @@ endif
 call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundle 'Shougo/neobundle.vim'
 NeoBundle 'Shougo/unite.vim'
+let g:unite_prompt='>'
+let g:unite_split_rule='botright'
+map <C-p> :Unite -start-insert buffer file_rec/async<CR>
+
+NeoBundle 'tsukkee/unite-help'
 NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': 'make'}}
+NeoBundle 'altercation/vim-colors-solarized.git'
+NeoBundle 'bling/vim-airline'
+" < Pretty status line > {
+    let g:airline_powerline_fonts = 1
+" }
+
+" NeoBundle '
 " NeoBundle 'Shougo/vimfiler'
 
 call neobundle#end()
 filetype plugin indent on
 NeoBundleCheck
+
+set background=dark
+colorscheme solarized
+
+autocmd FileType * set formatoptions-=o
