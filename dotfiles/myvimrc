@@ -1,45 +1,99 @@
 " vim: set foldmarker={,} foldlevel=3 foldmethod=marker:
+" Notes {{{
+"   ***********************************************************************   "
+"   This is the personal .vimrc file of Andrew Tropin.                        "
+"   You can find me at http://github.com/abcdw                                "
+"   While much of it is beneficial for general use, I would                   "
+"   recommend picking out the parts you want and understand.                  "
+"   ***********************************************************************   "
 
-let g:mapleader = ' '
-map ; :
+    " Tips {
+        " Hotkeys {
+        " gx - go url under cursor
+        " }
+    " }
+    " Todo {
+        " TODO: spell checking and synonyms
+        " TODO: prepare and cleanup configs {
+        " write comments
+        " write README about install and add screenshots
+        " }
+    " }
+" }}}
 
-map <C-c> <C-[>
-map <leader>p "*p
+" # General settings # {{{
+    " Behavior {
+	set nocompatible
 
-map <leader>, :w<CR>
-map <leader>q :bdelete<CR>
-nnoremap <silent> <leader>h :set invhlsearch<CR>
+	set keywordprg=:help
+	set sw=4
+	set si
 
-" if has('nvim')
-"     nmap <bs> :<c-u>TmuxNavigateLeft<cr>
-" endif
-nnoremap <BS> <C-w>h
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
+	set wildchar=<TAB>      " Character to start command line completion
+	set wildmenu            " Enhanced command line completion mode
+	set wildmode=longest:full,full
 
-vmap < <gv
-vmap > >gv
 
-set keywordprg=:help
-set sw=4
-set si
+	if has("autocmd") " loads previous editing position {
+	  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
+		\| exe "normal! g'\"" | endif
+	endif " }
+    " }
+    " Search {
+	set showmatch
+	set hlsearch
+	set incsearch
+	set ignorecase
+	set smartcase
+    " }
+    " Folding configuration {
+    " http://vim.wikia.com/wiki/Customize_text_for_closed_folds
+	function! MyFoldText() " {{{
+	    let line = getline(v:foldstart)
 
-set wildchar=<TAB>      " Character to start command line completion
-set wildmenu            " Enhanced command line completion mode
-set wildmode=longest:full,full
+	    let nucolwidth = &fdc + &number * &numberwidth
+	    let windowwidth = winwidth(0) - nucolwidth - 3
+	    let foldedlinecount = v:foldend - v:foldstart
 
-if has("autocmd")
-  au BufReadPost * if line("'\"") > 0 && line("'\"") <= line("$")
-	\| exe "normal! g'\"" | endif
-endif
-" loads previous editing position
+	    " expand tabs into spaces
+	    let onetab = strpart('          ', 0, &tabstop)
+	    let line = substitute(line, '\t', onetab, 'g')
+
+	    let line = strpart(line, 0, windowwidth - 2 -len(foldedlinecount))
+	    let fillcharcount = windowwidth - len(line) - len(foldedlinecount)
+	    return line . '…' . repeat(" ",fillcharcount) . foldedlinecount . ' '
+	endfunction " }}}
+	set foldtext=MyFoldText()
+    " }
+    " re(Maps) {
+	let g:mapleader = ' '
+	map ; :
+
+	map <C-c> <C-[>
+	map <leader>p "*p
+
+	map <leader>, :w<CR>
+	map <leader>q :bdelete<CR>
+
+	nnoremap <silent> <leader>h :set invhlsearch<CR>
+
+	" if has('nvim')
+	"     nmap <bs> :<c-u>TmuxNavigateLeft<cr>
+	" endif
+	nnoremap <BS> <C-w>h
+	nnoremap <C-h> <C-w>h
+	nnoremap <C-j> <C-w>j
+	nnoremap <C-k> <C-w>k
+	nnoremap <C-l> <C-w>l
+
+	vmap < <gv
+	vmap > >gv
+    " }
+" }}}
 
 syntax on
 
-set nocompatible
-
+" # NeoBundle initialization # {{{{
 let iCanHazNeoBundle=1
 let neobundle_readme=expand($HOME.'/.vim/bundle/neobundle.vim/README.md')
 if !filereadable(neobundle_readme)
@@ -53,28 +107,34 @@ endif
 if has('vim_starting')
     set rtp+=$HOME/.vim/bundle/neobundle.vim/
 endif
+" }}}}
 
-call neobundle#begin(expand('~/.vim/bundle/'))
-NeoBundle 'Shougo/neobundle.vim'
-NeoBundle 'Shougo/unite.vim'
-let g:unite_prompt='>'
-let g:unite_split_rule='botright'
-map <C-p> :Unite -start-insert buffer file_rec/async<CR>
+" # Bundles # {
+    call neobundle#begin(expand('~/.vim/bundle/'))
 
-NeoBundle 'tsukkee/unite-help'
-NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': 'make'}}
-NeoBundle 'altercation/vim-colors-solarized.git'
-NeoBundle 'bling/vim-airline'
-" < Pretty status line > {
-    let g:airline_powerline_fonts = 1
+    NeoBundle 'Shougo/neobundle.vim'
+    NeoBundle 'Shougo/unite.vim' " < Ultimate super plugin > {
+	let g:unite_prompt='>'
+	let g:unite_split_rule='botright'
+	map <C-p> :Unite -start-insert buffer file_mru file/async file_rec/async<CR>
+    " }
+
+    NeoBundle 'Shougo/neomru.vim'
+    NeoBundle 'tsukkee/unite-help'
+
+    NeoBundle 'Shougo/vimproc.vim', {'build': {'unix': 'make'}}
+    NeoBundle 'altercation/vim-colors-solarized.git' " < solarized colors > { 
+    " }
+    NeoBundle 'bling/vim-airline' " < Pretty status line > {
+	let g:airline_powerline_fonts = 1
+    " }
+
+    " NeoBundle 'Shougo/vimfiler'
+
+    call neobundle#end()
+    filetype plugin indent on
+    NeoBundleCheck
 " }
-
-" NeoBundle '
-" NeoBundle 'Shougo/vimfiler'
-
-call neobundle#end()
-filetype plugin indent on
-NeoBundleCheck
 
 set background=dark
 colorscheme solarized
