@@ -4,6 +4,11 @@ usermodmap=$HOME/.Xmodmap
 sysresources=/etc/X11/xinit/Xresources
 sysmodmap=/etc/X11/xinit/Xmodmap
 
+# eval $(ssh-agent)
+keychain ~/.ssh/id_rsa
+[ -f ~/.keychain/$HOSTNAME-sh ] && . ~/.keychain/$HOSTNAME-sh 2>/dev/null
+[ -f ~/.keychain/$HOSTNAME-sh-gpg ] && . ~/.keychain/$HOSTNAME-sh-gpg 2>/dev/null
+
 # setxkbmap -layout us,ru -variant dvp,typewriter -option grp:shift_toggle,grp:caps_toggle,grp_led:caps,compose:rctrl,grp:lwin
 
 # merge in defaults and keymaps
@@ -33,9 +38,10 @@ xcape &
 # xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 1
 # xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 2
 # xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Timeout" 200
-xset r rate 200 40
+# xset r rate 200 40
 xbacklight -set 20 &
 redshift &
+xwrits +lock +mouse +mono +breakclock password=password &
 
 dbus-launch nm-applet &
 
