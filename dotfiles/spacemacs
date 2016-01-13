@@ -23,31 +23,50 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     ;; auto-completion
      (auto-completion :variables
                       auto-completion-return-key-behavior 'complete
-                      auto-completion-tab-key-behavior 'cycle
+                      auto-completion-tab-key-behavior 'complete
                       auto-completion-complete-with-key-sequence nil
                       auto-completion-enable-help-tooltip t
+                      auto-completion-complete-with-key-sequence "C-m"
                       )
-     ;; company-mode
-     ;; better-defaults
-     emacs-lisp
-     python
-     clojure
-     c-c++
-     ycmd
-     git
-     markdown
-     lua
-     latex
-     ;; org
+
+     (clojure :variables
+              clojure-enable-fancify-symbols t
+              cider-repl-history-size 1000
+              cider-repl-history-file "~/.cider_history")
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom)
+
+     ;; better-defaults
+
+     c-c++
+     django
+     emacs-lisp
+     git
+     html
+     java
+     latex
+     lua
+     markdown
+     python
+     scala
      spell-checking
-     ;; syntax-checking
-     ;; version-control
+     sql
+     yaml
+     ycmd
+     ranger
+
+     ipython-notebook
+     eyebrowse
+     emoji
+     themes-megapack
+     org
+     syntax-checking
+     version-control
+     gnus
+
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -74,7 +93,7 @@ values."
    ;; variable is `emacs' then the `holy-mode' is enabled at startup. `hybrid'
    ;; uses emacs key bindings for vim's insert mode, but otherwise leaves evil
    ;; unchanged. (default 'vim)
-   dotspacemacs-editing-style 'hybrid
+   dotspacemacs-editing-style 'vim
    ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading t
    ;; Specify the startup banner. Default value is `official', it displays
@@ -91,13 +110,16 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(solarized-light
+   dotspacemacs-themes '(
+                         zenburn
+                         solarized-light
                          solarized-dark
                          spacemacs-dark
                          spacemacs-light
+                         ;; toa-yin
                          leuven
                          monokai
-                         zenburn)
+                         )
    ;; If non nil the cursor color matches the state color.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
@@ -204,9 +226,25 @@ values."
 (defun dotspacemacs/user-init ()
   "Initialization function for user code.
 It is called immediately after `dotspacemacs/init'.  You are free to put any
-user code."
-  ;; (add-to-list 'exec-path "/Applications/Racket/bin/")
+user code.
+"
+
+  ;; * clojure spacemacs cheatsheet:
+  ;; https://gist.github.com/niquola/665a8bf93a72f7d871a1
+
+  ;; * python+emacs + jupyter:
+  ;; https://realpython.com/blog/python/emacs-the-best-python-editor/?utm_source=Python+Weekly+Newsletter&utm_campaign=c3a5d1d4a8-Python_Weekly_Issue_220_December_3_2015&utm_medium=email&utm_term=0_9e26887fc5-c3a5d1d4a8-312684401
+
+  ;; (add-to-list 'exec-path "~/bin/")
+  ;; (ac-set-trigger-key "C-SPC")
+  ;; (setq ac-auto-start nil)
   (set-variable 'ycmd-server-command '("python" "/home/abcdw/work/ycmd/ycmd"))
+  (setq browse-url-browser-function 'browse-url-generic
+        browse-url-generic-program "firefox-bin")
+  (custom-set-variables
+   '(eclim-eclipse-dirs '("/opt/eclipse"))
+   '(eclim-executable "/opt/eclipse/eclim"))
+  ;; (setq org-latex-pdf-process '("latexmk -pdflatex='latex -synctex=1 --shell-escape' -pdf %f"))
 )
 
 (defun dotspacemacs/user-config ()
@@ -215,7 +253,20 @@ user code."
 layers configuration. You are free to put any user code."
   (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
   (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
-  (define-key evil-insert-state-map (kbd "C-c") 'evil-normal-state)
+  (define-key evil-visual-state-map (kbd "j") 'evil-next-visual-line)
+  (define-key evil-visual-state-map (kbd "k") 'evil-previous-visual-line)
+
+  ;; (setq evil-escape-key-sequence (kbd "C-g"))
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-lisp-state-map (kbd "C-g") 'evil-normal-state)
+  (define-key evil-visual-state-map (kbd "C-g") 'evil-normal-state)
+
+  (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line-text)
+  (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
+  (set-face-attribute 'region nil :background "#666")
+  ;; (evil-define-key 'insert (kbd "C-c") 'evil-normal-state)
+  ;; (define-key evil-insert-state-map (kbd "k") 'evil-previous-visual-line)
   (evil-leader/set-key "," 'save-buffer)
 )
 
@@ -239,3 +290,5 @@ layers configuration. You are free to put any user code."
  ;; '(default ((t (:family "Ubuntu Mono derivative Powerline" :foundry "unknown" :slant normal :weight normal :height 120 :width normal))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))
+
+
