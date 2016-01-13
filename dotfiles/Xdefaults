@@ -5,8 +5,6 @@ Xft*antialias:        True
 Xft*hinting:          Full
 Xft*rgba: rgb
 Xft*hintstyle: hintslight
-Emacs.FontBackend: xft
-Emacs.Font: Anonymice Powerline:size=17
 
 URxvt*letterSpace: -1
 URxvt.termName: xterm-256color
@@ -17,6 +15,9 @@ URxvt.termName: xterm-256color
 *.boldFont: xft:Ubuntu Mono derivative Powerline:style=Bold:size=12
 *.italicFont: xft:Ubuntu Mono derivative Powerline:style=Italic:size=12
 xterm*faceName: xft:Ubuntu Mono derivative Powerline:size=12
+
+Emacs.FontBackend: xft
+Emacs.Font: Anonymice Powerline:size=17
 
 ! scroll
 URxvt*saveLines: 1000
@@ -48,8 +49,8 @@ URxvt*keysym.C-S-plus:  perl:font-size:incglobal
 URxvt*keysym.C-S-minus: perl:font-size:decglobal
 ! URxvt.font-size.step:   3
 
-URxvt*keysym.M-Escape:  perl:keyboard-select:activate
-URxvt*keysym.M-f:       perl:keyboard-select:search
+! URxvt*keysym.M-Escape:  perl:keyboard-select:activate
+! URxvt*keysym.M-f:       perl:keyboard-select:search
 
 !url-select without mouse
 URxvt*url-select.launcher:     /usr/bin/firefox-bin -new-tab
@@ -67,34 +68,35 @@ URxvt*colorBDMode:       on
 URxvt*colorBD:           #268bd2
 
 Xautolock*time: 1
+*fading: 20
 
 ! General colors
 !URxvt*pointerBlank: true
-!URxvt*fadeColor: #002b36
-!URxvt*cursorColor: #93a1a1
-!URxvt*pointerColorBackground: #586e75
-!URxvt*pointerColorForeground: #93a1a1
+! URxvt*fadeColor: #002b36
+! URxvt*cursorColor: #93a1a1
+! URxvt*pointerColorBackground: #586e75
+! URxvt*pointerColorForeground: #93a1a1
 
-!*background:  #3f3f3f
-!!!urxvt*background:rgba:3f00/3f00/3f00/cccc
-!*foreground:  #dcdccc
+! *background:  #3f3f3f
+!!urxvt*background:rgba:3f00/3f00/3f00/cccc
+! *foreground:  #dcdccc
 
-!*color0:  #0F0F0F
-!*color1:  #9e1828
-!*color2:  #aece92
-!*color3:  #968a38
-!*color4:  #506070
-!*color5:  #963c59
-!*color6:  #418179
-!*color7:  #bebebe
-!*color8:  #666666
-!*color9:  #cf6171
-!*color10: #c5f779
-!*color11: #fff796
-!*color12: #94bff3
-!*color13: #ec93d3
-!*color14: #71bebe
-!*color15: #efefef
+! *color0:  #0F0F0F
+! *color1:  #9e1828
+! *color2:  #aece92
+! *color3:  #968a38
+! *color4:  #506070
+! *color5:  #963c59
+! *color6:  #418179
+! *color7:  #bebebe
+! *color8:  #666666
+! *color9:  #cf6171
+! *color10: #c5f779
+! *color11: #fff796
+! *color12: #94bff3
+! *color13: #ec93d3
+! *color14: #71bebe
+! *color15: #efefef
 
 ! Solarized color scheme for the X Window System
 ! !
@@ -140,11 +142,11 @@ Xautolock*time: 1
 ! To only apply colors to your terminal, for example, prefix
 ! the color assignment statement with its name. Example:
 !
-! URxvt*background: S_base03
+URxvt*background: S_base03
 
 *background: S_base03
 *foreground: S_base0
-*fading: 40
+! *fading: 20
 *fadeColor: S_base03
 *cursorColor: S_base1
 *pointerColorBackground: S_base01
@@ -166,3 +168,23 @@ Xautolock*time: 1
 *color13: S_violet
 *color14: S_base1
 *color15: S_base3
+
+
+! ! alternative zenburn colors
+! *color0:  #1E2320
+! *color1:  #705050
+! *color2:  #60b48a
+! *color3:  #dfaf8f
+! *color4:  #506070
+! *color5:  #dc8cc3
+! *color6:  #8cd0d3
+! *color7:  #dcdccc
+! *color8:  #709080
+! *color9:  #dca3a3
+! *color10: #c3bf9f
+! *color11: #f0dfaf
+! *color12: #94bff3
+! *color13: #ec93d3
+! *color14: #93e0e3
+! *color15: #ffffff
+
