@@ -25,6 +25,9 @@
 
 
 # Tab-completion
+
+PATH=$PATH:~/bin:~/.gem/ruby/2.1.0/bin
+
 autoload -U compinit
 compinit
 zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
@@ -36,6 +39,7 @@ zstyle ':completion:*' menu select
 autoload -U promptinit
 promptinit; prompt adam2
 
+# http://stackoverflow.com/questions/1128496/to-get-a-prompt-which-indicates-git-branch-in-zsh
 setopt prompt_subst
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' actionformats \
@@ -76,9 +80,18 @@ alias -g T='| tail -n 1000'
 alias -g G='| grep'
 alias -g S='| sed'
 alias -g ts='date +%s'
+
+alias glg='git log --oneline --graph'
+alias gpl='git pull --rebase'
+alias gm='git merge --no-ff'
+alias gis='git status -s'
+alias ga='git add'
+alias gc='git commit'
+
 alias tm='tmux attach || tmux new'
 alias mvim='open -a MacVim'
-alias vim='nvim'
+alias vim='nvim -u ~/.myvimrc'
+alias vc='nvim -u ~/.myvimrc -O ~/.myvimrc ~/.vimrc'
 alias is='cd ~/work/InnoShop/ && va && cd innoshop'
 
 
