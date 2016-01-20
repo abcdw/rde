@@ -74,11 +74,11 @@ setopt hist_ignore_space
 setopt autocd
 # setopt extendedglob # Extended regular expressions cp ^*.(tar.
 
-alias -g L='| less'
-alias -g H='| head'
-alias -g T='| tail -n 1000'
-alias -g G='| grep'
-alias -g S='| sed'
+alias -g L='| less '
+alias -g H='| head '
+alias -g T='| tail -n 1000 '
+alias -g G='| grep '
+alias -g S='| sed '
 alias -g ts='date +%s'
 
 alias glg='git log --oneline --graph'
@@ -87,12 +87,13 @@ alias gm='git merge --no-ff'
 alias gis='git status -s'
 alias ga='git add'
 alias gc='git commit'
+alias gd='git diff'
 
 alias tm='tmux attach || tmux new'
 alias mvim='open -a MacVim'
-alias vim='nvim -u ~/.myvimrc'
+alias vim='~/bin/ec'
+alias vi='emacsclient -a ""'
 alias vc='nvim -u ~/.myvimrc -O ~/.myvimrc ~/.vimrc'
-alias is='cd ~/work/InnoShop/ && va && cd innoshop'
 
 
 # export EDITOR=vim
