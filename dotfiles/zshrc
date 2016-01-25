@@ -37,7 +37,13 @@ zstyle ':completion:*' menu select
 
 # Simple gentoo prompt
 autoload -U promptinit
-promptinit; prompt adam2
+promptinit
+
+if [[ -n $SSH_CONNECTION ]]; then
+  prompt bart
+else
+  prompt adam2
+fi
 
 # http://stackoverflow.com/questions/1128496/to-get-a-prompt-which-indicates-git-branch-in-zsh
 setopt prompt_subst
