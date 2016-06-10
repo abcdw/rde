@@ -102,8 +102,11 @@ alias vi='emacsclient -a ""'
 alias vc='nvim -u ~/.myvimrc -O ~/.myvimrc ~/.vimrc'
 
 
-# export EDITOR=vim
+export EDITOR="vim"
 
 function va() {
     source ~/.virtualenvs/$(basename `pwd`)/bin/activate
 }
+
+### Added by the Heroku Toolbelt
+export PATH="/usr/local/heroku/bin:/usr/lib/postgresql/9.5/bin:$PATH"

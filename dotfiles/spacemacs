@@ -28,32 +28,39 @@ values."
      (auto-completion :variables
                       auto-completion-return-key-behavior 'complete
                       auto-completion-tab-key-behavior 'complete
-                      auto-completion-complete-with-key-sequence nil
                       auto-completion-enable-help-tooltip t
                       auto-completion-complete-with-key-sequence "C-m"
                       )
 
      ;; languages
      c-c++
-     clojure
+     (clojure :variables
+              ;; clojure-enable-fancify-symbols t
+              cider-repl-history-size 1000
+              cider-repl-history-file "~/.cider_history")
      emacs-lisp
      java
      python
+     ipython-notebook
 
      ;; markup
      html
      latex
      markdown
      org
+     yaml
 
      ;; vcs
      version-control
      git
 
+     ;; other
+     ycmd
+     spell-checking
+
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
-     ;; spell-checking
      ;; syntax-checking
      )
    ;; List of additional packages that will be installed without being
@@ -115,21 +122,21 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(zenburn
-                         tao-yin
+   dotspacemacs-themes '(monokai
                          leuven
-                         wombat
                          solarized-light
                          solarized-dark
-                         spacemacs-dark
+                         zenburn
+                         tao-yin
+                         wombat
                          spacemacs-light
-                         monokai)
+                         spacemacs-dark)
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
    dotspacemacs-default-font '("Ubuntu Mono"
-                               :size 16
+                               :size 18
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -261,8 +268,11 @@ It is called immediately after `dotspacemacs/init'.  You are free to put almost
 any user code here.  The exception is org related code, which should be placed
 in `dotspacemacs/user-config'."
   (set-variable 'ycmd-server-command '("python" "/home/abcdw/work/ycmd/ycmd"))
+  (set-variable 'ycmd-global-config "/home/abcdw/work/.ycm_conf_c.py")
+  ;; (add-hook 'c-mode-hook 'ycmd-mode)
   (setq browse-url-browser-function 'browse-url-generic
-        browse-url-generic-program "firefox-bin")
+        browse-url-generic-program "chromium-browser")
+  (setq ispell-dictionary "english")
   (custom-set-variables
    '(eclim-eclipse-dirs '("/opt/eclipse"))
    '(eclim-executable "/opt/eclipse/eclim"))
@@ -277,9 +287,33 @@ layers configuration. You are free to put any user code."
   (define-key evil-visual-state-map (kbd "j") 'evil-next-visual-line)
   (define-key evil-visual-state-map (kbd "k") 'evil-previous-visual-line)
 
-  (define-key evil-insert-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-lisp-state-map (kbd "C-g") 'evil-normal-state)
-  (define-key evil-visual-state-map (kbd "C-g") 'evil-normal-state)
+  (add-hook 'java-mode-hook (lambda ()
+                              (setq c-basic-offset 2)))
+  (setq-default evil-escape-key-sequence "cg")
+  ;; (define-key evil-insert-state-map (kbd "C-g") (kbd "C-c"))
+  ;; (define-key evil-lisp-state-map (kbd "C-g") 'evil-force-normal-state)
+  ;; (define-key evil-visual-state-map (kbd "C-g") 'evil-force-normal-state)
+   ;;; C-c as general purpose escape key sequence.
+   ;;;
+   (defun my-esc (prompt)
+     "Functionality for escaping generally.  Includes exiting Evil insert state and C-g binding. "
+     (cond
+      ;; If we're in one of the Evil states that defines [escape] key, return [escape] so as
+      ;; Key Lookup will use it.
+      ((or (evil-insert-state-p) (evil-normal-state-p) (evil-replace-state-p) (evil-visual-state-p)) [escape])
+      ;; This is the best way I could infer for now to have C-c work during evil-read-key.
+      ;; Note: As long as I return [escape] in normal-state, I don't need this.
+      ;;((eq overriding-terminal-local-map evil-read-key-map) (keyboard-quit) (kbd ""))
+      (t (kbd "C-g"))))
+   ;; (define-key key-translation-map (kbd "C-c") 'my-esc)
+   ;; Works around the fact that Evil uses read-event directly when in operator state, which
+   ;; doesn't use the key-translation-map.
+   ;; (define-key evil-operator-state-map (kbd "C-c") 'keyboard-quit)
+   ;; Not sure what behavior this changes, but might as well set it, seeing the Elisp manual's
+   ;; documentation of it.
+   ;; (set-quit-char "C-c")
+
+  (global-set-key (kbd "C-c C-g") 'evil-escape)
 
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
   (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line-text)
@@ -289,7 +323,30 @@ layers configuration. You are free to put any user code."
   ;; (evil-define-key 'insert (kbd "C-c") 'evil-normal-state)
   ;; (define-key evil-insert-state-map (kbd "k") 'evil-previous-visual-line)
   (evil-leader/set-key "," 'save-buffer)
+
+  ;; (global-auto-complete-mode +1)
+  (add-hook 'ein:connect-mode-hook 'smartparens-mode)
+  ;; (ac-set-trigger-key "TAB")
+  ;; (setq-default dotspacemacs-configuration-layers
+  ;;               '((auto-completion :variables
+  ;;                                  auto-completion-enable-snippets-in-popup t)))
+  ;; (ispell-change-dictionary "english")
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(eclim-eclipse-dirs (quote ("/opt/eclipse")))
+ '(eclim-executable "/opt/eclipse/eclim")
+ '(paradox-github-token t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
+ '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil)))))

@@ -1,0 +1,11 @@
+set surround
+
+vnoremap < <gv
+vnoremap > >gv
+
+imap <c-e> <esc>:action EditorLineEnd<cr>i
+imap <c-a> <esc>:action EditorLineStart<cr>i
+imap <c-f> <esc>:action EditorRight<cr>a
+imap <c-b> <esc>:action EditorLeft<cr>i
+nmap <space>, :action SaveAll<cr>
+nmap <space>. :action Run<cr>

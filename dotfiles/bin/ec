@@ -1,3 +1,4 @@
 #!/bin/bash
 
-/usr/bin/emacsclient -c -a "" -F "((fullscreen . maximized))" $@
+/usr/bin/emacsclient -c -a "" "$@" &
+#-F "((fullscreen . maximized))" $@
