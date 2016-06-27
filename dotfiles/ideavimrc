@@ -1,4 +1,5 @@
 set surround
+set incsearch
 
 vnoremap < <gv
 vnoremap > >gv
@@ -7,5 +8,8 @@ imap <c-e> <esc>:action EditorLineEnd<cr>i
 imap <c-a> <esc>:action EditorLineStart<cr>i
 imap <c-f> <esc>:action EditorRight<cr>a
 imap <c-b> <esc>:action EditorLeft<cr>i
+imap <c-i> <esc>:action ImplementMethods<cr>
 nmap <space>, :action SaveAll<cr>
-nmap <space>. :action Run<cr>
+nmap <space>. :action Rerun<cr>
+nmap <space>bb :action RecentFiles<cr>
+nmap <space>v :source ~/.ideavimrc<cr>
