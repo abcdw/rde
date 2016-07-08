@@ -1,0 +1,1 @@
+chromium-browser --disable-gpu-driver-bug-workarounds --enable-native-gpu-memory-buffers &
