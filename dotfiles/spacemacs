@@ -32,7 +32,10 @@ values."
                       auto-completion-complete-with-key-sequence "C-m"
                       )
 
+     (ranger :variables
+              ranger-show-preview t)
      ;; languages
+     lua
      c-c++
      (clojure :variables
               ;; clojure-enable-fancify-symbols t
@@ -136,7 +139,7 @@ values."
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
    dotspacemacs-default-font '("Ubuntu Mono"
-                               :size 18
+                               :size 38
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
