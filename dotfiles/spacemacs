@@ -295,10 +295,13 @@ in `dotspacemacs/user-config'."
   "Configuration function for user code.
 This function is called at the very end of Spacemacs initialization after
 layers configuration. You are free to put any user code."
-  (define-key evil-normal-state-map (kbd "j") 'evil-next-visual-line)
-  (define-key evil-normal-state-map (kbd "k") 'evil-previous-visual-line)
-  (define-key evil-visual-state-map (kbd "j") 'evil-next-visual-line)
-  (define-key evil-visual-state-map (kbd "k") 'evil-previous-visual-line)
+  (setq undo-tree-auto-save-history t
+        undo-tree-history-directory-alist
+        `(("." . ,(concat spacemacs-cache-directory "undo"))))
+  (unless (file-exists-p (concat spacemacs-cache-directory "undo"))
+    (make-directory (concat spacemacs-cache-directory "undo")))
+
+  (spacemacs/toggle-visual-line-navigation-on)
 
   (add-hook 'java-mode-hook (lambda ()
                               (setq c-basic-offset 4)))
