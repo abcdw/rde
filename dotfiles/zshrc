@@ -26,7 +26,6 @@
 
 # Tab-completion
 
-PATH=$PATH:~/bin:~/.gem/ruby/2.1.0/bin
 
 autoload -U compinit
 compinit
@@ -42,17 +41,21 @@ promptinit
 if [[ -n $SSH_CONNECTION ]]; then
   prompt bart
 else
-  prompt adam2
+  prompt off
 fi
 
 # http://stackoverflow.com/questions/1128496/to-get-a-prompt-which-indicates-git-branch-in-zsh
 setopt prompt_subst
 autoload -Uz vcs_info
-zstyle ':vcs_info:*' actionformats \
-    '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
+# zstyle ':vcs_info:*' actionformats \
+#     '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
+# zstyle ':vcs_info:*' formats       \
+#     '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{5}]%f '
+# zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+# zstyle ':vcs_info:git*' formats "%{$fg[blue]%}%b%{$reset_color%} "
 zstyle ':vcs_info:*' formats       \
-    '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{5}]%f '
-zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
+    '%F{5}[%F{2}%b%F{5}]%f'
+
 zstyle ':vcs_info:*' enable git cvs svn
 
 vcs_info_wrapper() {
@@ -62,7 +65,7 @@ vcs_info_wrapper() {
   fi
 }
 
-RPROMPT=$'$(vcs_info_wrapper)'
+# RPROMPT=$'$(vcs_info_wrapper) ${PWD/$HOME/\~}'
 
 bindkey -e
 
@@ -83,8 +86,6 @@ export HISTFILE="$HOME/.history"
 export SAVEHIST=$HISTSIZE
 setopt hist_ignore_all_dups
 setopt hist_ignore_space
-
-
 setopt autocd
 # setopt extendedglob # Extended regular expressions cp ^*.(tar.
 
@@ -106,7 +107,7 @@ alias gd='git diff'
 alias tm='tmux attach || tmux new'
 alias mvim='open -a MacVim'
 alias vim='~/bin/ec'
-alias vi='emacsclient -a ""'
+alias vi='emacsclient -n -a ""'
 alias vc='nvim -u ~/.myvimrc -O ~/.myvimrc ~/.vimrc'
 
 
@@ -117,7 +118,27 @@ function va() {
 }
 
 ### Added by the Heroku Toolbelt
-export PATH="/usr/local/heroku/bin:/usr/lib/postgresql/9.5/bin:$PATH"
+# PATH=$PATH:~/bin:~/.gem/ruby/2.1.0/bin
+# export PATH="/usr/local/heroku/bin:/usr/lib/postgresql/9.5/bin:$PATH"
+
+### fzf settings
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 export FZF_DEFAULT_COMMAND='ag -g ""'
+
+fzf-history-widget() {
+  local selected num
+  setopt localoptions noglobsubst pipefail 2> /dev/null
+  selected=( $(fc -l 1 | eval "$(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}") )
+  local ret=$?
+  if [ -n "$selected" ]; then
+    num=$selected[1]
+    if [ -n "$num" ]; then
+      zle vi-fetch-history -n $num
+      zle accept-line
+    fi
+  fi
+  zle redisplay
+  typeset -f zle-line-init >/dev/null && zle zle-line-init
+  return $ret
+}

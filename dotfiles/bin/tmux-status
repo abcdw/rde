@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ "$1" == "zsh" ]; then
+  basename $2
+else
+  echo $1
+fi
