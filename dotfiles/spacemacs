@@ -325,19 +325,53 @@ layers configuration. You are free to put any user code."
   (global-set-key (kbd "M-r") 'reload-page)
   (global-set-key (kbd "M-o") 'ace-link-addr)
   (global-set-key (kbd "M-e") 'spacemacs/alternate-buffer)
-  ;; (define-key evil-insert-state-map (kbd "TAB") 'yas-expand)
-  (set-face-attribute 'region nil :background "#666")
-  ;; (evil-define-key 'insert (kbd "C-c") 'evil-normal-state)
-  ;; (define-key evil-insert-state-map (kbd "k") 'evil-previous-visual-line)
-  (evil-leader/set-key "," 'save-buffer)
 
-  ;; (global-auto-complete-mode +1)
+  ;; (global-set-key (kbd "M-;") 'spacemacs/comment-or-uncomment-lines-inverse)
+  ;; (global-set-key (kbd "M-;") 'evilnc-toggle-invert-comment-line-by-line)
+
+  ;; workaround for company-auto-complete
+  ;; (evil-define-key 'insert company-quickhelp-mode-map (kbd "C-k") 'company-select-previous)
+
+  (setq vc-follow-symlinks t)
+  (setq aw-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s ?y ?g ?f ?j ?k ?x ?b ?c))
+  (setq avy-keys aw-keys)
+  (setq powerline-default-separator nil)
+  (spaceline-compile)
+  (spacemacs/toggle-mode-line-minor-modes-off)
+
+  ;; camelCaseWords
+  (global-subword-mode)
+
+  (setq c-default-style "linux")
+  (setq neo-theme 'arrow)
+
+  ;; (custom-theme-set-faces
+  ;;  'zenburn
+  ;;  '(region ((t (:background "#666")))))
+
+
+  ;; helm configuration
+  ;; C-c C-i insert in current buffer
+  ;; C-SPC M-a select (all)
+  ;; C-w M-n yank word symbol from current buffer
+  ;; C-s find @entries in moccur
+  (when (executable-find "curl")
+    (setq helm-google-suggest-use-curl-p t))
+
+  ;; (define-key helm-map (kbd "C-;") 'helm-execute-persistent-action)
+  ;; (global-set-key (kbd "M-:") 'helm-eval-expression-with-eldoc)
+
   (add-hook 'ein:connect-mode-hook 'smartparens-mode)
-  ;; (ac-set-trigger-key "TAB")
-  ;; (setq-default dotspacemacs-configuration-layers
-  ;;               '((auto-completion :variables
-  ;;                                  auto-completion-enable-snippets-in-popup t)))
   ;; (ispell-change-dictionary "english")
+
+
+  (global-vi-tilde-fringe-mode)
+
+  ;; Workaround to force fci-mode on globally.
+  (define-globalized-minor-mode global-fci-mode fci-mode
+    (lambda () (fci-mode 1)))
+  ;; (global-fci-mode 1)
+  (evil-leader/set-key "," 'save-buffer)
   )
 
 ;; Do not write anything past this comment. This is where Emacs will
