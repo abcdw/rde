@@ -326,6 +326,90 @@ layers configuration. You are free to put any user code."
   (global-set-key (kbd "M-o") 'ace-link-addr)
   (global-set-key (kbd "M-e") 'spacemacs/alternate-buffer)
 
+  (with-eval-after-load 'org
+    (setq system-time-locale "C") ;; For english timestamps
+    (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+                              (sequence "WAITING(w)" "|")
+                              (sequence "|" "CANCELED(c)")))
+
+    (setq org-todo-keyword-faces
+          '(("NEXT" . (:background "#CCE7FF" :foreground "SteelBlue" :weight bold :box (:line-width 1 :color "SteelBlue")))))
+    ;; Make agenda fonts smaller
+    (set-face-attribute 'org-agenda-date nil :height 90)
+    (set-face-attribute 'org-agenda-date-today nil :height 90)
+    (set-face-attribute 'org-agenda-date-weekend nil :height 90)
+    (set-face-attribute 'org-agenda-structure nil :height 90)
+
+    (setq org-todo-state-tags-triggers
+          (quote (("CANCELLED" ("CANCELLED" . t))
+                  ("WAITING" ("WAITING" . t))
+                  ("HOLD" ("WAITING") ("HOLD" . t))
+                  (done ("WAITING") ("HOLD"))
+                  ("TODO" ("WAITING") ("CANCELLED") ("HOLD"))
+                  ("NEXT" ("WAITING") ("CANCELLED") ("HOLD"))
+                  ("DONE" ("WAITING") ("CANCELLED") ("HOLD")))))
+
+    (setq org-priority-faces '((?A . (:foreground "dark orange" :weight bold))
+                               (?B . (:foreground "gold"))
+                               (?C . (:foreground "forest green"))))
+
+    (setq org-directory "~/org")
+    (setq org-agenda-files '("~/org"))
+    (setq org-default-notes-file "~/org/refile.org")
+
+    ;; Resume clocking task when emacs is restarted
+    (org-clock-persistence-insinuate)
+    (setq org-clock-persist t)
+    (setq org-clock-in-resume t)
+    ;; (setq org-clock-out-remove-zero-time-clocks t)
+    (setq org-clock-out-when-done t)
+    (setq org-clock-report-include-clocking-task t)
+
+    (setq org-refile-targets (quote ((nil :maxlevel . 9)
+                                     (org-agenda-files :maxlevel . 9))))
+    (setq org-refile-use-outline-path t)
+    (setq org-outline-path-complete-in-steps nil)
+    (setq org-refile-allow-creating-parent-nodes (quote confirm))
+    (defun my/verify-refile-target ()
+      "Exclude todo keywords with a done state from refile targets"
+      (not (member (nth 2 (org-heading-components)) org-done-keywords)))
+    (setq org-refile-target-verify-function 'my/verify-refile-target)
+
+    (setq org-capture-templates
+          (quote (("t" "todo" entry (file "~/org/refile.org")
+                   "* TODO %?\n%U\n%a\n" :clock-in t :clock-resume t)
+                  ("r" "todo from email" entry (file "~/org/refile.org")
+                   "* TODO %?\n%U\n [[mailto:%:fromaddress][%:fromname]] on %a\n")
+                  ("R" "respond to important email" entry (file "~/org/refile.org")
+                   "* NEXT Reply to [[mailto:%:fromaddress][%:fromname]] on %a\nDEADLINE: %(org-insert-time-stamp (org-read-date nil t \"+1d\"))\n%U\n" :immediate-finish t :prepend t)
+                  ("n" "note" entry (file "~/org/refile.org")
+                   "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
+                  ("j" "Journal" entry (file+datetree "~/org/diary.org")
+                   "* %?\n%U\n" :clock-in t :clock-resume t)
+                  ("w" "org-protocol" entry (file "~/org/refile.org")
+                   "* TODO Review %c\n%U\n" :immediate-finish t)
+                  ("m" "Meeting" entry (file "~/org/refile.org")
+                   "* Meeting with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+                  ("c" "Class" entry (file "~/org/refile.org")
+                   "* %? :class:\n%U" :clock-in t :clock-resume t)
+                  ("p" "Phone call" entry (file "~/org/refile.org")
+                   "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t))))
+
+    (setq org-agenda-custom-commands
+          '(("h" "Personal agenda"
+             ((agenda "" ((org-agenda-ndays 2)
+                          (org-agenda-show-log t)))
+              (todo "NEXT")
+              (tags-todo "+PRIORITY=\"A\"")
+              (tags-todo "REFILE"))
+             ((org-agenda-sorting-strategy '(time-up priority-up todo-state-up))
+              (org-agenda-compact-blocks t)))
+
+            ("N" "Notes" tags "NOTE"
+             ((org-agenda-overriding-header "Notes")
+              (org-tags-match-list-sublevels t))))))
+
+
   (with-eval-after-load 'mu4e
     (define-key mu4e-headers-mode-map (kbd "r") 'mu4e-headers-mark-for-read)
     (define-key mu4e-view-mode-map (kbd "r") 'mu4e-view-mark-for-read)
