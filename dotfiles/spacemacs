@@ -30,13 +30,16 @@ values."
                       auto-completion-tab-key-behavior 'complete
                       auto-completion-enable-help-tooltip t
                       auto-completion-complete-with-key-sequence "C-m"
+                      auto-completion-enable-snippets-in-popup t
                       )
 
      (ranger :variables
               ranger-show-preview t)
-     ;; languages
+
+     ;; language layers
      lua
-     c-c++
+     (c-c++ :variables
+            c-c++-enable-clang-support t)
      (clojure :variables
               ;; clojure-enable-fancify-symbols t
               cider-repl-history-size 1000
@@ -46,25 +49,29 @@ values."
      python
      ipython-notebook
 
-     ;; markup
+     ;; markup layers
      html
      latex
      markdown
-     org
      yaml
+     (org :variables org-enable-github-support t)
 
-     ;; vcs
+     ;; vcs layers
      version-control
      git
 
-     ;; other
-     ycmd
+     ;; other layers
+     mu4e
+     semantic
+     syntax-checking
      spell-checking
+     (colors :variables
+             colors-enable-rainbow-identifiers nil)
+     spacemacs-layouts
 
      ;; (shell :variables
      ;;        shell-default-height 30
      ;;        shell-default-position 'bottom)
-     ;; syntax-checking
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -116,7 +123,7 @@ values."
    ;; List of items to show in the startup buffer. If nil it is disabled.
    ;; Possible values are: `recents' `bookmarks' `projects'.
    ;; (default '(recents projects))
-   dotspacemacs-startup-lists '(recents projects)
+   dotspacemacs-startup-lists '(bookmarks recents projects)
    ;; Number of recent files to show in the startup buffer. Ignored if
    ;; `dotspacemacs-startup-lists' doesn't include `recents'. (default 5)
    dotspacemacs-startup-recent-list-size 5
@@ -125,8 +132,8 @@ values."
    ;; List of themes, the first of the list is loaded when spacemacs starts.
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
-   dotspacemacs-themes '(monokai
-                         leuven
+   dotspacemacs-themes '(leuven
+                         monokai
                          solarized-light
                          solarized-dark
                          zenburn
@@ -139,7 +146,7 @@ values."
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
    dotspacemacs-default-font '("Ubuntu Mono"
-                               :size 48
+                               :size 18
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -220,7 +227,7 @@ values."
    ;; If non nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
    ;; (default nil) (Emacs 24.4+ only)
-   dotspacemacs-maximized-at-startup nil
+   dotspacemacs-maximized-at-startup t
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
@@ -241,7 +248,7 @@ values."
    dotspacemacs-line-numbers nil
    ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
    ;; (default nil)
-   dotspacemacs-smartparens-strict-mode nil
+   dotspacemacs-smartparens-strict-mode t
    ;; Select a scope to highlight delimiters. Possible values are `any',
    ;; `current', `all' or `nil'. Default is `all' (highlight any scope and
    ;; emphasis the current one). (default 'all)
@@ -262,7 +269,7 @@ values."
    ;; `trailing' to delete only the whitespace at end of lines, `changed'to
    ;; delete only whitespace for changed lines or `nil' to disable cleanup.
    ;; (default nil)
-   dotspacemacs-whitespace-cleanup nil
+   dotspacemacs-whitespace-cleanup 'trailing
    ))
 
 (defun dotspacemacs/user-init ()
@@ -276,6 +283,9 @@ in `dotspacemacs/user-config'."
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "chromium-browser")
   (setq ispell-dictionary "english")
+
+  (setq system-time-locale "C")
+
   (custom-set-variables
    '(eclim-eclipse-dirs '("/opt/eclipse"))
    '(eclim-executable "/opt/eclipse/eclim"))
