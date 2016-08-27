@@ -305,16 +305,16 @@ layers configuration. You are free to put any user code."
 
   (add-hook 'java-mode-hook (lambda ()
                               (setq c-basic-offset 4)))
-  ;; (setq-default evil-escape-key-sequence "C-c")
-  ;; (define-key evil-insert-state-map (kbd "C-g") (kbd "C-c"))
-  ;; (define-key evil-lisp-state-map (kbd "C-g") 'evil-force-normal-state)
-  ;; (define-key evil-visual-state-map (kbd "C-g") 'evil-force-normal-state)
 
-
-  (define-key evil-insert-state-map (kbd "C-c") 'evil-escape)
+  (define-key evil-insert-state-map (kbd "C-t") 'evil-escape)
+  (define-key evil-insert-state-map (kbd "C-g") 'evil-escape)
+  (define-key evil-lisp-state-map (kbd "C-t") 'evil-escape)
+  (define-key evil-lisp-state-map (kbd "C-g") 'evil-escape)
+  (define-key evil-visual-state-map (kbd "C-t") 'evil-escape)
+  (define-key evil-visual-state-map (kbd "C-g") 'evil-escape)
   (define-key evil-insert-state-map (kbd "C-e") 'end-of-line)
+  (define-key evil-normal-state-map (kbd "C-e") 'end-of-line)
   (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line-text)
-  (define-key evil-insert-state-map (kbd "C-h") 'delete-backward-char)
   ;; (define-key evil-insert-state-map (kbd "TAB") 'yas-expand)
   (set-face-attribute 'region nil :background "#666")
   ;; (evil-define-key 'insert (kbd "C-c") 'evil-normal-state)
