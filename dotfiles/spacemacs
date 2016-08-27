@@ -326,6 +326,56 @@ layers configuration. You are free to put any user code."
   (global-set-key (kbd "M-o") 'ace-link-addr)
   (global-set-key (kbd "M-e") 'spacemacs/alternate-buffer)
 
+  (with-eval-after-load 'mu4e
+    (define-key mu4e-headers-mode-map (kbd "r") 'mu4e-headers-mark-for-read)
+    (define-key mu4e-view-mode-map (kbd "r") 'mu4e-view-mark-for-read)
+    (define-key mu4e-headers-mode-map (kbd "c") 'org-mu4e-store-and-capture)
+    (define-key mu4e-view-mode-map (kbd "c") 'org-mu4e-store-and-capture))
+
+  (setq mu4e-sent-messages-behavior 'delete)
+  (setq mu4e-view-auto-mark-as-read nil)
+  (setq message-kill-buffer-on-exit t)
+  (setq mu4e-get-mail-command "offlineimap")
+  (setq mu4e-update-interval 600)
+  (setq mu4e-maildir (expand-file-name "~/.maildir"))
+  (setq smtpmail-queue-mail nil
+        smtpmail-queue-dir   "~/.mail/queue/cur")
+  ;; (mu4e-attachment-dir  "~/Downloads/mu4e")
+  (when (fboundp 'imagemagick-register-types)
+    (imagemagick-register-types))
+  (setq mu4e-view-show-images t)
+
+
+  (setq mu4e-drafts-folder "/[Gmail].Drafts")
+  (setq mu4e-sent-folder   "/[Gmail].Sent Mail")
+  (setq mu4e-trash-folder  "/[Gmail].Trash")
+  (setq mu4e-refile-folder "/[Gmail].All Mail")
+  (setq mu4e-maildir-shortcuts
+        '(("/INBOX"               . ?i)
+          ("/[Gmail].Sent Mail"   . ?s)
+          ("/[Gmail].Trash"       . ?t)
+          ("/[Gmail].All Mail"    . ?a)))
+
+  (setq mu4e-bookmarks
+        '(("maildir:\"/[Gmail].All Mail\" flag:unread" "INBOX" ?b)))
+
+  (setq
+   user-mail-address "andrewtropin@gmail.com"
+   user-full-name  "Andrew Tropin"
+   mu4e-compose-signature
+   (concat
+    "Best regards,\n"
+    "Andrew Tropin"))
+
+  (setq message-send-mail-function 'smtpmail-send-it
+        starttls-use-gnutls t
+        smtpmail-starttls-credentials '(("smtp.gmail.com" 587 nil nil))
+        smtpmail-auth-credentials
+        '(("smtp.gmail.com" 587 "andrewtropin@gmail.com" nil))
+        smtpmail-default-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-server "smtp.gmail.com"
+        smtpmail-smtp-service 587)
+
   ;; (global-set-key (kbd "M-;") 'spacemacs/comment-or-uncomment-lines-inverse)
   ;; (global-set-key (kbd "M-;") 'evilnc-toggle-invert-comment-line-by-line)
 
