@@ -41,7 +41,7 @@ values."
      (c-c++ :variables
             c-c++-enable-clang-support t)
      (clojure :variables
-              ;; clojure-enable-fancify-symbols t
+              clojure-enable-fancify-symbols t
               cider-repl-history-size 1000
               cider-repl-history-file "~/.cider_history")
      emacs-lisp
@@ -59,19 +59,27 @@ values."
      ;; vcs layers
      version-control
      git
+     github
 
      ;; other layers
+     ;; deft
+     eyebrowse
+     restclient
+     command-log
+     ;; evil-cleverparens
+     ;; vim-empty-lines
      mu4e
      semantic
      syntax-checking
      spell-checking
      (colors :variables
              colors-enable-rainbow-identifiers nil)
+     ;; vim-powerline
      spacemacs-layouts
 
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
+     (shell :variables
+            shell-default-height 30
+            shell-default-position 'bottom)
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -134,10 +142,13 @@ values."
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(leuven
                          monokai
+                         monochrome
+                         django
+                         dichromacy
                          solarized-light
                          solarized-dark
                          zenburn
-                         tao-yin
+                         ;; tao-yin
                          wombat
                          spacemacs-light
                          spacemacs-dark)
