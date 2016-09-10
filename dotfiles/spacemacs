@@ -402,7 +402,7 @@ layers configuration. You are free to put any user code."
                   ("w" "org-protocol" entry (file "~/org/refile.org")
                    "* TODO Review %c\n%U\n" :immediate-finish t)
                   ("m" "Meeting" entry (file "~/org/refile.org")
-                   "* Meeting with %? :MEETING:\n%U" :clock-in t :clock-resume t)
+                   "* TODO Discuss %? :MEETING:\nParticipants:\nAgenda [/]:\n- [ ]\n\nResults:\n\n%U")
                   ("c" "Class" entry (file "~/org/refile.org")
                    "* %? :class:\n%U" :clock-in t :clock-resume t)
                   ("p" "Phone call" entry (file "~/org/refile.org")
@@ -482,7 +482,7 @@ layers configuration. You are free to put any user code."
   (setq vc-follow-symlinks t)
   (setq aw-keys '(?a ?o ?e ?u ?i ?d ?h ?t ?n ?s ?y ?g ?f ?j ?k ?x ?b ?c))
   (setq avy-keys aw-keys)
-  (setq powerline-default-separator nil)
+  (setq powerline-default-separator 'bar)
   (spaceline-compile)
   (spacemacs/toggle-mode-line-minor-modes-off)
 
@@ -512,7 +512,7 @@ layers configuration. You are free to put any user code."
   ;; (ispell-change-dictionary "english")
 
 
-  (global-vi-tilde-fringe-mode)
+  ;; (global-vi-tilde-fringe-mode)
 
   ;; Workaround to force fci-mode on globally.
   (define-globalized-minor-mode global-fci-mode fci-mode
