@@ -559,8 +559,8 @@ layers configuration. You are free to put any user code."
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#073642" 0.2))
  '(sp-show-pair-delay 0.0)
  '(sp-show-pair-from-inside nil)
- '(term-default-bg-color "#002b36")
- '(term-default-fg-color "#839496")
+ ;; '(term-default-bg-color "#002b36")
+ ;; '(term-default-fg-color "#839496")
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
@@ -585,10 +585,11 @@ layers configuration. You are free to put any user code."
  '(vc-annotate-very-old-color nil)
  '(weechat-color-list
    (unspecified "#272822" "#49483E" "#F70057" "#F92672" "#86C30D" "#A6E22E" "#BEB244" "#E6DB74" "#40CAE4" "#66D9EF" "#FB35EA" "#FD5FF0" "#74DBCD" "#A1EFE4" "#F8F8F2" "#F8F8F0"))
- '(xterm-color-names
-   ["#073642" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#eee8d5"])
- '(xterm-color-names-bright
-   ["#002b36" "#cb4b16" "#586e75" "#657b83" "#839496" "#6c71c4" "#93a1a1" "#fdf6e3"]))
+ ;; '(xterm-color-names
+ ;;   ["#073642" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#eee8d5"])
+ ;; '(xterm-color-names-bright
+ ;;   ["#002b36" "#cb4b16" "#586e75" "#657b83" "#839496" "#6c71c4" "#93a1a1" "#fdf6e3"]))
+ )
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
