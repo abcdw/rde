@@ -157,10 +157,10 @@ values."
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
    dotspacemacs-default-font '("Ubuntu Mono"
-                               :size 18
-                               :weight normal
-                               :width normal
-                               :powerline-scale 1.1)
+                              ;; :size 17
+                              :weight normal
+                              :width normal
+                              :powerline-scale 1.1)
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The leader key accessible in `emacs state' and `insert state'
@@ -317,6 +317,8 @@ layers configuration. You are free to put any user code."
   (add-hook 'java-mode-hook (lambda ()
                               (setq c-basic-offset 4)))
 
+  (define-key evil-motion-state-map (kbd "C-i") 'evil-jump-forward)
+  (define-key evil-normal-state-map (kbd "C-t") 'evil-escape)
   (define-key evil-insert-state-map (kbd "C-t") 'evil-escape)
   (define-key evil-insert-state-map (kbd "C-g") 'evil-escape)
   (define-key evil-lisp-state-map (kbd "C-t") 'evil-escape)
