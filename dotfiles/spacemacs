@@ -63,9 +63,11 @@ values."
 
      ;; other layers
      ;; deft
-     eyebrowse
+     sql
+     ;; eyebrowse
      restclient
      command-log
+     docker
      ;; evil-cleverparens
      ;; vim-empty-lines
      mu4e
@@ -76,16 +78,18 @@ values."
              colors-enable-rainbow-identifiers nil)
      ;; vim-powerline
      spacemacs-layouts
+     themes-megapack
 
      (shell :variables
             shell-default-height 30
-            shell-default-position 'bottom)
+            shell-default-position 'bottom
+            shell-default-shell 'eshell)
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(org-trello sqlup-mode)
    ;; A list of packages and/or extensions that will not be install and loaded.
    dotspacemacs-excluded-packages '()
    ;; If non-nil spacemacs will delete any orphan packages, i.e. packages that
@@ -141,6 +145,8 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(leuven
+                         sanityinc-tomorrow-day
+                         default
                          monokai
                          monochrome
                          django
@@ -156,7 +162,9 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font. `powerline-scale' allows to quickly tweak the mode-line
    ;; size to make separators look not too crappy.
-   dotspacemacs-default-font '("Ubuntu Mono"
+   dotspacemacs-default-font '(;;"Inconsolata"
+                               "Ubuntu Mono"
+                               ;; "PragmataPro"
                               ;; :size 17
                               :weight normal
                               :width normal
@@ -184,7 +192,7 @@ values."
    ;; Emacs commands (M-x).
    ;; By default the command key is `:' so ex-commands are executed like in Vim
    ;; with `:' and Emacs commands are executed with `<leader> :'.
-   dotspacemacs-command-key ";"
+   dotspacemacs-command-key ":"
    ;; If non nil `Y' is remapped to `y$'. (default t)
    dotspacemacs-remap-Y-to-y$ t
    ;; Name of the default layout (default "Default")
@@ -314,9 +322,18 @@ layers configuration. You are free to put any user code."
 
   (spacemacs/toggle-visual-line-navigation-on)
 
+  ;; nice behavior of deleted parentheses
+  ;; (add-hook 'lisp-mode-hook #'evil-cleverparens-mode)
+  ;; (add-hook 'clojure-mode-hook #'evil-cleverparens-mode)
+
   (add-hook 'java-mode-hook (lambda ()
                               (setq c-basic-offset 4)))
 
+  ;; (setq ansi-term-color-vector
+  ;;   [unspecified "#151718" "#CE4045" "#9FCA56" "#DCCD69" "#55B5DB" "#A074C4" "#55B5DB" "#D4D7D6"])
+  ;; (custom-set-variables
+  ;;  '(evil-want-C-i-jump t))
+  ;; (global-set-key (kbd "<C-i>") 'evil-jumper/forward)
   (define-key evil-motion-state-map (kbd "C-i") 'evil-jump-forward)
   (define-key evil-normal-state-map (kbd "C-t") 'evil-escape)
   (define-key evil-insert-state-map (kbd "C-t") 'evil-escape)
@@ -330,7 +347,7 @@ layers configuration. You are free to put any user code."
   (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line-text)
   (define-key evil-lisp-state-map (kbd "SPC") 'spacemacs-cmds)
 
-  (spacemacs/set-leader-keys "wd" 'kill-buffer-and-window)
+  ;; (spacemacs/set-leader-keys "wd" 'kill-buffer-and-window)
 
   (defun reload-page ()
     (interactive)
@@ -339,6 +356,7 @@ layers configuration. You are free to put any user code."
   (global-set-key (kbd "M-o") 'ace-link-addr)
   (global-set-key (kbd "M-e") 'spacemacs/alternate-buffer)
 
+  (setq deft-directory "~/org")
   (with-eval-after-load 'org
     (setq system-time-locale "C") ;; For english timestamps
     (setq org-todo-keywords '((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
@@ -399,7 +417,9 @@ layers configuration. You are free to put any user code."
                    "* %? :NOTE:\n%U\n%a\n" :clock-in t :clock-resume t)
                   ("j" "Journal" entry (file+datetree "~/org/diary.org")
                    "* %?\n%U\n" :clock-in t :clock-resume t)
-                  ("w" "org-protocol" entry (file "~/org/refile.org")
+                  ("w" "Waydm" entry (file+datetree "~/org/waydm.org")
+                   "* %?\n%U\n" :clock-in t :clock-resume t)
+                  ("W" "org-protocol" entry (file "~/org/refile.org")
                    "* TODO Review %c\n%U\n" :immediate-finish t)
                   ("m" "Meeting" entry (file "~/org/refile.org")
                    "* TODO Discuss %? :MEETING:\nParticipants:\nAgenda [/]:\n- [ ]\n\nResults:\n\n%U")
@@ -408,13 +428,25 @@ layers configuration. You are free to put any user code."
                   ("p" "Phone call" entry (file "~/org/refile.org")
                    "* PHONE %? :PHONE:\n%U" :clock-in t :clock-resume t))))
 
+    (defadvice org-capture
+        (after make-full-window-frame activate)
+      "Advise capture to be the only window when used as a popup"
+      (if (equal "emacs-capture" (frame-parameter nil 'name))
+          (delete-other-windows)))
+
+    (defadvice org-capture-finalize
+        (after delete-capture-frame activate)
+      "Advise capture-finalize to close the frame"
+      (if (equal "emacs-capture" (frame-parameter nil 'name))
+          (delete-frame)))
+
     (setq org-agenda-custom-commands
           '(("h" "Personal agenda"
              ((agenda "" ((org-agenda-ndays 2)
                           (org-agenda-show-log t)))
-              (todo "NEXT")
+              (tags-todo "REFILE")
               (tags-todo "+PRIORITY=\"A\"")
-              (tags-todo "REFILE"))
+              (todo "NEXT"))
              ((org-agenda-sorting-strategy '(time-up priority-up todo-state-up))
               (org-agenda-compact-blocks t)))
 
@@ -473,6 +505,30 @@ layers configuration. You are free to put any user code."
         smtpmail-smtp-server "smtp.gmail.com"
         smtpmail-smtp-service 587)
 
+
+  ;; sql related stuff
+  ;; https://truongtx.me/2014/08/23/setup-emacs-as-an-sql-database-client
+
+  (with-eval-after-load 'sql
+    (add-hook 'sql-mode-hook 'sqlup-mode)
+    (add-hook 'sql-interactive-mode-hook 'sqlup-mode)
+    ;; (add-to-list 'sqlup-blacklist "date")
+    (define-key sql-mode-map (kbd "C-c C-u") 'sqlup-capitalize-keywords-in-region)
+
+    (setq sql-connection-alist
+          '((server1 (sql-product 'postgres)
+                     (sql-port 5432)
+                     (sql-server "localhost")
+                     (sql-user "postgres")
+                     (sql-password "secret")
+                     (sql-database "postgres"))))
+
+    (setq sql-postgres-login-params
+          '((user :default "postgres")
+            (database :default "postgres")
+            (server :default "localhost")
+            (port :default 5432))))
+
   ;; (global-set-key (kbd "M-;") 'spacemacs/comment-or-uncomment-lines-inverse)
   ;; (global-set-key (kbd "M-;") 'evilnc-toggle-invert-comment-line-by-line)
 
@@ -517,6 +573,7 @@ layers configuration. You are free to put any user code."
   ;; Workaround to force fci-mode on globally.
   (define-globalized-minor-mode global-fci-mode fci-mode
     (lambda () (fci-mode 1)))
+
   ;; (global-fci-mode 1)
   (evil-leader/set-key "," 'save-buffer)
   )
@@ -530,7 +587,6 @@ layers configuration. You are free to put any user code."
  ;; If there is more than one, they won't work right.
  '(ansi-color-faces-vector
    [default default default italic underline success warning error])
- ;; '(avy-background nil)
  '(compilation-message-face (quote default))
  '(cua-global-mark-cursor-color "#2aa198")
  '(cua-normal-cursor-color "#839496")
@@ -572,8 +628,6 @@ layers configuration. You are free to put any user code."
  '(smartrep-mode-line-active-bg (solarized-color-blend "#859900" "#073642" 0.2))
  '(sp-show-pair-delay 0.0)
  '(sp-show-pair-from-inside nil)
- ;; '(term-default-bg-color "#002b36")
- ;; '(term-default-fg-color "#839496")
  '(vc-annotate-background nil)
  '(vc-annotate-color-map
    (quote
@@ -597,18 +651,14 @@ layers configuration. You are free to put any user code."
      (360 . "#66D9EF"))))
  '(vc-annotate-very-old-color nil)
  '(weechat-color-list
-   (unspecified "#272822" "#49483E" "#F70057" "#F92672" "#86C30D" "#A6E22E" "#BEB244" "#E6DB74" "#40CAE4" "#66D9EF" "#FB35EA" "#FD5FF0" "#74DBCD" "#A1EFE4" "#F8F8F2" "#F8F8F0"))
- ;; '(xterm-color-names
- ;;   ["#073642" "#dc322f" "#859900" "#b58900" "#268bd2" "#d33682" "#2aa198" "#eee8d5"])
- ;; '(xterm-color-names-bright
- ;;   ["#002b36" "#cb4b16" "#586e75" "#657b83" "#839496" "#6c71c4" "#93a1a1" "#fdf6e3"]))
- )
+   (unspecified "#272822" "#49483E" "#F70057" "#F92672" "#86C30D" "#A6E22E" "#BEB244" "#E6DB74" "#40CAE4" "#66D9EF" "#FB35EA" "#FD5FF0" "#74DBCD" "#A1EFE4" "#F8F8F2" "#F8F8F0")))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(rainbow-delimiters-depth-1-face ((t (:foreground "cyan"))))
+ '(default ((t (:background nil))))
  '(company-tooltip-common ((t (:inherit company-tooltip :weight bold :underline nil))))
  '(company-tooltip-common-selection ((t (:inherit company-tooltip-selection :weight bold :underline nil))))
+ '(rainbow-delimiters-depth-1-face ((t (:foreground "cyan"))))
  '(sp-show-pair-match-face ((t (:background "black" :foreground "yellow" :inverse-video t :weight normal)))))
