@@ -1,0 +1,3 @@
+#!/bin/sh
+emacsclient -c -F "((name . \"emacs-capture\") (height . 12) (width . 80))" "$@"
+# emacs-capture --eval '(org-capture nil "t")'
