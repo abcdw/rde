@@ -96,6 +96,13 @@ alias -g G='| grep '
 alias -g S='| sed '
 alias -g ts='date +%s'
 
+# docker
+alias drm='docker rm $(docker ps -a -q)'
+alias drmi='docker rmi $(docker images -q --filter "dangling=true")'
+alias di='docker images'
+alias dps='docker ps'
+
+# git
 alias glg='git log --oneline --graph'
 alias gpl='git pull --rebase'
 alias gm='git merge --no-ff'
@@ -106,7 +113,7 @@ alias gd='git diff'
 
 alias tm='tmux attach || tmux new'
 alias mvim='open -a MacVim'
-alias vim='~/bin/ec'
+alias vim='~/.bin/ec'
 alias vi='emacsclient -n -a ""'
 alias vc='nvim -u ~/.myvimrc -O ~/.myvimrc ~/.vimrc'
 
@@ -118,7 +125,7 @@ function va() {
 }
 
 ### Added by the Heroku Toolbelt
-# PATH=$PATH:~/bin:~/.gem/ruby/2.1.0/bin
+# PATH=$PATH:~/.bin:~/.gem/ruby/2.1.0/bin
 # export PATH="/usr/local/heroku/bin:/usr/lib/postgresql/9.5/bin:$PATH"
 
 ### fzf settings
