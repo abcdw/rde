@@ -1,5 +1,5 @@
 gsettings set org.gnome.desktop.interface scaling-factor 2
 gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <2>}]"
-killall -HUP gnome-shell
+# killall -HUP gnome-shell
 # xrandr --output eDP1 --auto
 # xrandr --output DP2-1 --off
