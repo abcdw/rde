@@ -1,0 +1,1 @@
+QT_SCREEN_SCALE_FACTORS=`gsettings get org.gnome.desktop.interface scaling-factor | awk '{print $2}'` qutebrowser --backend webengine
