@@ -427,8 +427,13 @@ the (^:fold ...) expressions."
   (global-subword-mode)
   (global-wakatime-mode)
 
+
+  (setq vc-follow-symlinks t)
+  (spacemacs/toggle-mode-line-minor-modes-off)
+
   (keyfreq-mode 1) ;; TODO: revisit and read stats
   (keyfreq-autosave-mode 1)
+
   (spacemacs/set-leader-keys "." 'save-buffer))
 
 ;; Do not write anything past this comment. This is where Emacs will
