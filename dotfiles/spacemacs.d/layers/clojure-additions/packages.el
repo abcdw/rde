@@ -13,15 +13,26 @@
 
 (defconst clojure-additions-packages
   '((lispy :location (recipe :fetcher github :repo "abo-abo/lispy"))
-    (evil-lispy :location (recipe :fetcher github
-                                  :repo "sp3ctum/evil-lispy"
-                                  :branch "master"))
+    (clojure-semantic
+     :location (recipe
+                :fetcher github
+                :repo "abo-abo/clojure-semantic"))
+    (evil-lispy
+     :location (recipe
+                :fetcher github
+                :repo "sp3ctum/evil-lispy"
+                :branch "master"))
+
     ;; parinfer
-    (sayid :location (recipe :fetcher github :repo "bpiel/sayid"))))
+    ;; (sayid :location (recipe :fetcher github :repo "bpiel/sayid"))
+    ))
 
 
-(defun clojure-additions/init-sayid ()
-  (use-package sayid :defer t))
+;; (defun clojure-additions/init-sayid ()
+;;   (use-package sayid :defer t))
+
+(defun clojure-additions/init-clojure-semantic ()
+  (use-package clojure-semantic))
 
 (defun clojure-additions/init-lispy ()
   (use-package lispy
@@ -44,13 +55,37 @@
     :config
     (progn
       (spacemacs|diminish evil-lispy-mode " Ⓛ" " L")
-      (add-to-list 'lispy-compat 'cider)
-      (setq lispy-eval-display-style 'overlay)
-      (define-key evil-lispy-state-map (kbd "C-t") 'evil-escape)
+
+      (when (configuration-layer/package-usedp 'cider)
+        ;; todo better mechanism of loading cider
+        (require 'cider)
+        ;; show eval results in a cider overlay, next to point
+        (add-to-list 'lispy-compat 'cider)
+        (setq lispy-eval-display-style 'overlay))
+
+      (evil-define-key 'insert clojure-mode-map (kbd "C-,") 'lispy-forward-slurp-sexp)
+      (evil-define-key 'insert evil-lispy-mode-map (kbd "[") nil)
+      (evil-define-key 'normal evil-lispy-mode-map (kbd "K") nil)
+
+      (define-key evil-lispy-state-map (kbd "[") 'lispy-brackets)
+      ;; (evil-define-key 'insert evil-lispy-mode-map (kbd "]") nil)
+
+      (define-key evil-insert-state-map (kbd "C-e") 'lispy-move-end-of-line)
+      (define-key evil-normal-state-map (kbd "C-e") 'lispy-move-end-of-line)
+      (define-key evil-insert-state-map (kbd "C-a") 'beginning-of-line-text)
+      (define-key evil-normal-state-map (kbd "C-a") 'beginning-of-line-text)
+
+      (define-key evil-lispy-state-map (kbd "v") 'evil-visual-char)
+
+      (define-key evil-lispy-state-map (kbd "C-,") 'lispy-forward-slurp-sexp)
+      (define-key evil-lispy-state-map (kbd "C-,") 'lispy-forward-slurp-sexp)
+      (define-key evil-lispy-state-map (kbd "C-t") 'evil-insert)
       (define-key evil-lispy-state-map (kbd "C-g") 'evil-escape)
-      (define-key evil-lispy-state-map (kbd "SPC") 'spacemacs-cmds)
-      (define-key evil-normal-state-map (kbd "C-.") 'evil-lispy/enter-state-right)
-      (define-key evil-insert-state-map (kbd "C-.") 'evil-lispy/enter-state-right))))
+      ;; (define-key evil-lispy-state-map (kbd "SPC") 'spacemacs-cmds)
+
+      (define-key evil-lispy-state-map (kbd "C-.") 'evil-lispy/enter-state-left)
+      (define-key evil-normal-state-map (kbd "C-.") 'evil-lispy/enter-state-left)
+      (define-key evil-insert-state-map (kbd "C-.") 'evil-lispy/enter-state-left))))
 
 (defun evil-lispy-layer-configure-colorization ()
   ;; this will be displayed in the modeline
