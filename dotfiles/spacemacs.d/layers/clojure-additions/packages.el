@@ -22,9 +22,18 @@
                 :fetcher github
                 :repo "sp3ctum/evil-lispy"
                 :branch "master"))
+    ;; (all-the-icons
+    ;;  :location (recipe
+    ;;             :fetcher github-browse-commit
+    ;;             :repo "domtronn/all-the-icons.el"
+    ;;             :branch "master"))
 
     ;; parinfer
-    ;; (sayid :location (recipe :fetcher github :repo "bpiel/sayid"))
+    ;; (sayid
+    ;;  :location (recipe
+    ;;             :fetcher github
+    ;;             :repo "bpiel/sayid"
+    ;;             :branch "master"))
     ))
 
 
@@ -32,7 +41,13 @@
 ;;   (use-package sayid :defer t))
 
 (defun clojure-additions/init-clojure-semantic ()
-  (use-package clojure-semantic))
+  ;; (use-package clojure-semantic :defer t)
+  ;; (require 'clojure-semantic-autoloads)
+  (load "clojure.el")
+  )
+
+;; (defun clojure-additions/init-all-the-icons ()
+;;   (use-package all-the-icons))
 
 (defun clojure-additions/init-lispy ()
   (use-package lispy
@@ -78,8 +93,8 @@
       (define-key evil-lispy-state-map (kbd "v") 'evil-visual-char)
 
       (define-key evil-lispy-state-map (kbd "C-,") 'lispy-forward-slurp-sexp)
-      (define-key evil-lispy-state-map (kbd "C-,") 'lispy-forward-slurp-sexp)
-      (define-key evil-lispy-state-map (kbd "C-t") 'evil-insert)
+      (define-key evil-normal-state-map (kbd "C-,") 'sp-forward-slurp-sexp)
+      (define-key evil-lispy-state-map (kbd "C-t") 'evil-escape)
       (define-key evil-lispy-state-map (kbd "C-g") 'evil-escape)
       ;; (define-key evil-lispy-state-map (kbd "SPC") 'spacemacs-cmds)
 
@@ -101,7 +116,7 @@
 
     (setq evil-lispy-state-cursor
           (list (when dotspacemacs-colorize-cursor-according-to-state mode-color)
-                'box))))
+                'bar))))
 
 ;; (defun clojure-additions/init-parinfer ()
 ;;   ;; https://github.com/DogLooksGood/parinfer-mode
