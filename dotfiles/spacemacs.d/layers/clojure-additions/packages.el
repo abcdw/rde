@@ -29,6 +29,7 @@
     ;;             :branch "master"))
 
     ;; parinfer
+    sayid
     ;; (sayid
     ;;  :location (recipe
     ;;             :fetcher github
@@ -37,14 +38,14 @@
     ))
 
 
-;; (defun clojure-additions/init-sayid ()
-;;   (use-package sayid :defer t))
+(defun clojure-additions/init-sayid ()
+  (use-package sayid :defer t
+    :config (eval-after-load 'clojure-mode
+              '(sayid-setup-package))))
 
 (defun clojure-additions/init-clojure-semantic ()
   ;; (use-package clojure-semantic :defer t)
-  ;; (require 'clojure-semantic-autoloads)
-  (load "clojure.el")
-  )
+  (load "clojure.el"))
 
 ;; (defun clojure-additions/init-all-the-icons ()
 ;;   (use-package all-the-icons))
@@ -56,10 +57,8 @@
 
 (defun clojure-additions/init-evil-lispy ()
   (use-package evil-lispy
-    :defer t
     :init
     (progn
-     ;; (require 'evil-lispy)
      (evil-lispy-layer-configure-colorization)
      (add-hook 'clojure-mode-hook #'evil-lispy-mode)
      (add-hook 'common-lisp-mode-hook #'evil-lispy-mode)
