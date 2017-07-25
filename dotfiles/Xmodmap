@@ -1,8 +1,13 @@
 !Swap win and Right Alt
-remove mod5 = ISO_Level3_Shift
-remove mod4 = Super_L
-add mod5 = Super_L
-add mod4 = ISO_Level3_Shift
+! remove mod5 = ISO_Level3_Shift
+! remove mod4 = Super_L
+! add mod5 = Super_L
+! add mod4 = ISO_Level3_Shift
+
+! remove mod5 = Alt_L
+! remove mod4 = Super_R
+! add mod5 = Super_R
+! add mod4 = Alt_L
 
 !swap Caps and Control
 remove Lock = Caps_Lock
@@ -11,4 +16,3 @@ keysym Control_L = Caps_Lock
 keysym Caps_Lock = Control_L
 add Lock = Caps_Lock
 add Control = Control_L
-
