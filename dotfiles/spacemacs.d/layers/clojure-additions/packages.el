@@ -29,7 +29,7 @@
     ;;             :branch "master"))
 
     ;; parinfer
-    sayid
+    ;; sayid
     ;; (sayid
     ;;  :location (recipe
     ;;             :fetcher github
@@ -38,14 +38,15 @@
     ))
 
 
-(defun clojure-additions/init-sayid ()
-  (use-package sayid :defer t
-    :config (eval-after-load 'clojure-mode
-              '(sayid-setup-package))))
+;; (defun clojure-additions/init-sayid ()
+;;   (use-package sayid :defer t
+;;     :config (eval-after-load 'clojure-mode
+;;               '(sayid-setup-package))))
 
 (defun clojure-additions/init-clojure-semantic ()
   ;; (use-package clojure-semantic :defer t)
-  (load "clojure.el"))
+  ;; (load "clojure.el")
+  )
 
 ;; (defun clojure-additions/init-all-the-icons ()
 ;;   (use-package all-the-icons))
@@ -77,7 +78,7 @@
         (add-to-list 'lispy-compat 'cider)
         (setq lispy-eval-display-style 'overlay))
 
-      (evil-define-key 'insert clojure-mode-map (kbd "C-,") 'lispy-forward-slurp-sexp)
+      (evil-define-key 'insert clojure-mode-map (kbd "C-.") 'sp-forward-slurp-sexp)
       (evil-define-key 'insert evil-lispy-mode-map (kbd "[") nil)
       (evil-define-key 'normal evil-lispy-mode-map (kbd "K") nil)
 
@@ -91,15 +92,15 @@
 
       (define-key evil-lispy-state-map (kbd "v") 'evil-visual-char)
 
-      (define-key evil-lispy-state-map (kbd "C-,") 'lispy-forward-slurp-sexp)
-      (define-key evil-normal-state-map (kbd "C-,") 'sp-forward-slurp-sexp)
+      (define-key evil-lispy-state-map (kbd "C-.") 'lispy-forward-slurp-sexp)
+      (define-key evil-normal-state-map (kbd "C-.") 'sp-forward-slurp-sexp)
       (define-key evil-lispy-state-map (kbd "C-t") 'evil-escape)
       (define-key evil-lispy-state-map (kbd "C-g") 'evil-escape)
       ;; (define-key evil-lispy-state-map (kbd "SPC") 'spacemacs-cmds)
 
-      (define-key evil-lispy-state-map (kbd "C-.") 'evil-lispy/enter-state-left)
-      (define-key evil-normal-state-map (kbd "C-.") 'evil-lispy/enter-state-left)
-      (define-key evil-insert-state-map (kbd "C-.") 'evil-lispy/enter-state-left))))
+      (define-key evil-lispy-state-map (kbd "C-,") 'evil-lispy/enter-state-left)
+      (define-key evil-normal-state-map (kbd "C-,") 'evil-lispy/enter-state-left)
+      (define-key evil-insert-state-map (kbd "C-,") 'evil-lispy/enter-state-left))))
 
 (defun evil-lispy-layer-configure-colorization ()
   ;; this will be displayed in the modeline
