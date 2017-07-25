@@ -1,6 +1,6 @@
 !-*-{ Xft settings
 Xft.lcdfilter:        lcddefault
-Xft*dpi:              96
+! Xft*dpi:              96
 Xft*antialias:        True
 Xft*hinting:          Full
 Xft*rgba: rgb
@@ -10,14 +10,14 @@ URxvt*letterSpace: -1
 URxvt.termName: xterm-256color
 !-*-}
 
-*.font: xft:Ubuntu Mono derivative Powerline:size=12
-*.boldItalicFont: xft:Ubuntu Mono derivative Powerline:style=Bold Italic:size=12
-*.boldFont: xft:Ubuntu Mono derivative Powerline:style=Bold:size=12
-*.italicFont: xft:Ubuntu Mono derivative Powerline:style=Italic:size=12
-xterm*faceName: xft:Ubuntu Mono derivative Powerline:size=12
+*.font: xft:Iosevka:size=16
+*.boldItalicFont: xft:Iosevka:size=16
+*.boldFont: xft:Iosevka:size=16
+*.italicFont: xft:Iosevka:size=16
+xterm*faceName: xft:Iosevka:size=16
 
-Emacs.FontBackend: xft
-Emacs.Font: Anonymice Powerline:size=17
+! Emacs.FontBackend: xft
+! Emacs.Font: Anonymice Powerline:size=17
 
 ! scroll
 URxvt*saveLines: 1000
@@ -37,25 +37,25 @@ URxvt*keysym.Home: \033[1~
 URxvt*keysym.End: \033[4~
 
 !urxvt будет искать скрипты сначала в этой директории, потом в /usr/lib/urxvt/perl
-URxvt*perl-lib: /usr/lib64/urxvt/perl
+! URxvt*perl-lib: /usr/lib64/urxvt/perl
 
 !clickable urls
-URxvt*perl-ext-common:  default,matcher,url-select,keyboard-select,font-size
-URxvt*matcher.button:	1
+! URxvt*perl-ext-common:  default,matcher,url-select,keyboard-select,font-size
+! URxvt*matcher.button:	1
 
-URxvt*keysym.C-plus:    perl:font-size:increase
-URxvt*keysym.C-minus:   perl:font-size:decrease
-URxvt*keysym.C-S-plus:  perl:font-size:incglobal
-URxvt*keysym.C-S-minus: perl:font-size:decglobal
-! URxvt.font-size.step:   3
+! URxvt*keysym.C-plus:    perl:font-size:increase
+! URxvt*keysym.C-minus:   perl:font-size:decrease
+! URxvt*keysym.C-S-plus:  perl:font-size:incglobal
+! URxvt*keysym.C-S-minus: perl:font-size:decglobal
+! ! URxvt.font-size.step:   3
 
-! URxvt*keysym.M-Escape:  perl:keyboard-select:activate
-! URxvt*keysym.M-f:       perl:keyboard-select:search
+! ! URxvt*keysym.M-Escape:  perl:keyboard-select:activate
+! ! URxvt*keysym.M-f:       perl:keyboard-select:search
 
-!url-select without mouse
-URxvt*url-select.launcher:     /usr/bin/firefox-bin -new-tab
-URxvt*url-select.underline:    true
-URxvt*keysym.C-u:      	       perl:url-select:select_next
+! !url-select without mouse
+! URxvt*url-select.launcher:     /usr/bin/firefox-bin -new-tab
+! URxvt*url-select.underline:    true
+! URxvt*keysym.C-u:      	       perl:url-select:select_next
 
 !color man stuff
 URxvt*colorMode:         on
@@ -142,32 +142,32 @@ Xautolock*time: 1
 ! To only apply colors to your terminal, for example, prefix
 ! the color assignment statement with its name. Example:
 !
-URxvt*background: S_base03
-
-*background: S_base03
-*foreground: S_base0
-! *fading: 20
-*fadeColor: S_base03
-*cursorColor: S_base1
-*pointerColorBackground: S_base01
-*pointerColorForeground: S_base1
-
-*color0: S_base02
-*color1: S_red
-*color2: S_green
-*color3: S_yellow
-*color4: S_blue
-*color5: S_magenta
-*color6: S_orange
-*color7: S_base2
-*color9: S_cyan
-*color8: S_base03
-*color10: S_base01
-*color11: S_base00
-*color12: S_base0
-*color13: S_violet
-*color14: S_base1
-*color15: S_base3
+! URxvt*background: S_base03
+!
+! *background: S_base03
+! *foreground: S_base0
+! ! *fading: 20
+! *fadeColor: S_base03
+! *cursorColor: S_base1
+! *pointerColorBackground: S_base01
+! *pointerColorForeground: S_base1
+!
+! *color0: S_base02
+! *color1: S_red
+! *color2: S_green
+! *color3: S_yellow
+! *color4: S_blue
+! *color5: S_magenta
+! *color6: S_orange
+! *color7: S_base2
+! *color9: S_cyan
+! *color8: S_base03
+! *color10: S_base01
+! *color11: S_base00
+! *color12: S_base0
+! *color13: S_violet
+! *color14: S_base1
+! *color15: S_base3
 
 
 ! ! alternative zenburn colors
@@ -187,4 +187,3 @@ URxvt*background: S_base03
 ! *color13: #ec93d3
 ! *color14: #93e0e3
 ! *color15: #ffffff
-
