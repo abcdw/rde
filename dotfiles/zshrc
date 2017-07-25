@@ -104,6 +104,8 @@ alias dps='docker ps'
 
 # git
 alias glg='git log --oneline --graph'
+# remove local tags which not presented in remote repo
+alias gpt='git fetch --prune origin "+refs/tags/*:refs/tags/*"'
 alias gpl='git pull --rebase'
 alias gm='git merge --no-ff'
 alias gis='git status -s'
