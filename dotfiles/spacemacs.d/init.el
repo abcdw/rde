@@ -379,13 +379,21 @@ you should place your code here."
   (define-key evil-visual-state-map (kbd "C-g") 'evil-escape)
   (define-key evil-insert-state-map (kbd "C-h") 'backward-delete-char)
   (define-key evil-lisp-state-map (kbd "SPC") 'spacemacs-cmds)
-  (define-key evil-insert-state-map (kbd "M-n") 'company-complete)
-  (define-key evil-insert-state-map (kbd "M-p") 'company-complete)
-  (define-key evil-insert-state-map (kbd "C-k") nil) ;; Fixes company autocomplete
-  (define-key evil-insert-state-map (kbd "C-j") nil)
-  (define-key evil-insert-state-map (kbd "C-n") 'company-select-next)
-  (define-key evil-insert-state-map (kbd "C-p") 'company-select-previous)
+  ;; (define-key evil-insert-state-map (kbd "M-n") 'company-complete)
+  ;; (define-key evil-insert-state-map (kbd "M-p") 'company-complete)
+  ;; (define-key evil-insert-state-map (kbd "C-k") nil) ;; Fixes company autocomplete
+  ;; (define-key evil-insert-state-map (kbd "C-j") nil)
+  ;; (define-key evil-insert-state-map (kbd "C-n") 'company-select-next)
+  ;; (define-key evil-insert-state-map (kbd "C-p") 'company-select-previous)
   ;; (define-key evil-insert-state-map (kbd "TAB") 'company-complete)
+  (add-hook
+   'company-completion-started-hook
+   (lambda (&rest ignore)
+     (when evil-mode
+       (when (evil-insert-state-p)
+         (define-key evil-insert-state-map (kbd "C-k") nil)))))
+  (global-set-key (kbd "s-;") 'other-window) ; s is for super
+
 
   (with-eval-after-load 'python
     (defun python-shell-completion-native-try ()
