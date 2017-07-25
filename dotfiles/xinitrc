@@ -9,7 +9,7 @@ keychain ~/.ssh/id_rsa
 [ -f ~/.keychain/$HOSTNAME-sh ] && . ~/.keychain/$HOSTNAME-sh 2>/dev/null
 [ -f ~/.keychain/$HOSTNAME-sh-gpg ] && . ~/.keychain/$HOSTNAME-sh-gpg 2>/dev/null
 
-# setxkbmap -layout us,ru -variant dvp,typewriter -option grp:shift_toggle,grp:caps_toggle,grp_led:caps,compose:rctrl,grp:lwin
+setxkbmap -layout us,ru -variant dvp,typewriter -option grp:shift_toggle,grp:caps_toggle,grp_led:caps,compose:rctrl,grp:lwin
 
 # merge in defaults and keymaps
 
@@ -29,11 +29,11 @@ if [ -f "$usermodmap" ]; then
     xmodmap "$usermodmap"
 fi
 
-xset +fp /usr/share/fonts/local &
-xset fp rehash &
+# xset +fp /usr/share/fonts/local &
+# xset fp rehash &
 
-xcape &
-~/bin/loloswitcher > /dev/null &
+# xcape &
+# ~/bin/loloswitcher > /dev/null &
 
 # xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation" 1
 # xinput set-prop "TPPS/2 IBM TrackPoint" "Evdev Wheel Emulation Button" 2
@@ -41,17 +41,17 @@ xcape &
 # xset r rate 200 40
 xbacklight -set 20 &
 redshift &
-xwrits +lock +mouse +mono +breakclock password=password &
+# xwrits +lock +mouse +mono +breakclock password=password &
 
 dbus-launch nm-applet &
 
 urxvtd -q -f -o &
-yandex-disk start &
+# yandex-disk start &
 
 #feh --bg-scale ~/media/pics/wallpaper &
 #xcompmgr &
 #   xautolock -locker lock.sh -detectsleep -secure &
 #~/work/repos/dzen2-notify/dzen2_notify_daemon.py &
 #   pulsar &
-
+# xrandr -s 1920x1080
 exec awesome
