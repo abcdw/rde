@@ -10,6 +10,57 @@ Features to implement
 |                        |             |      |
 Model: 20HRX004US i7-7600u, 16gb ram, 512gb ssd
 
+** Prepare bootable usb stick
+- Download NixOS [[https://nixos.org/nixos/download.html][iso]] image
+- Write it on usb stick using [[https://unetbootin.github.io/][unetbootin]]
+- Change label of your usb stick to ~NIXOS_ISO~, without it you can occur some
+  issues when booting from usb
+- Reboot to BIOS setup: disable secure boot, enable CSM
+- Boot your live operating system
+- ~systemctl start display-manager~
+  
+** Setup encrypted root
+Take a look at [[https://en.wikipedia.org/wiki/Write_amplification][article]] about SSDs.
+
+Resize or remove unnecessary partitions using gdisk or gparted, but keep in
+mind that EFI system partition is required, create it or keep existing one. 
+#+BEGIN_SRC bash
+$ gdisk /dev/sda
+#+END_SRC
+
+- o (create new empty partition table if necessary)
+- n (add partition if necessary, 500M, type ef00 EFI)
+- n (add partition, as big as you want, 300G, type 8300 Linux LVM)
+- w (write partition table and exit)
+  
+Suppose your big partition is /dev/sda2, your EFI system partition is /dev/sda1.
+
+#+BEGIN_SRC bash
+man cryptsetup lvm
+cryptsetup luksFormat /dev/sda2
+cryptsetup luksOpen /dev/sda2 lvmroot
+# Init as lvm partition
+pvcreate /dev/mapper/lvmroot
+# Add volume group and root/swap partitions
+vgcreate vg /dev/mapper/lvmroot
+lvcreate -L 16G -n swap vg
+lvcreate -l '100%FREE' -n root vg
+# Init filesystems on partitions
+mkfs.fat /dev/sda1
+mkfs.ext4 -L root /dev/vg/root
+mkswap -L swap /dev/vg/swap
+#+END_SRC
+
+** Install NixOS
+Mount all things.
+#+BEGIN_SRC bash
+mount /dev/vg/root /mnt
+mkdir /mnt/boot
+mount /dev/sda1 /mnt/boot
+swapon /dev/vg/swap
+#+END_SRC
+
+Connect to wifi somehow. It's pretty easy if you use image mentioned below.
 ** Configuration
 *** Battery life
 **** TLP
