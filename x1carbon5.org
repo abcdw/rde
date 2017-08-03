@@ -1,0 +1,20 @@
+* Description of NixOS setup x1 carbon 5th 2017
+
+Features to implement
+| feature                | implemented | link |
+|------------------------+-------------+------|
+| Encrypted root         |             |      |
+| Power saving           |             |      |
+| Custom keyboard layout |             |      |
+| WWAN                   |             |      |
+|                        |             |      |
+Model: 20HRX004US i7-7600u, 16gb ram, 512gb ssd
+
+** Configuration
+*** Battery life
+**** TLP
+- http://linrunner.de/en/tlp/docs/tlp-configuration.html
+- http://linrunner.de/en/tlp/docs/tlp-linux-advanced-power-management.html
+**** PowerTOP
+- powertop --calibrate
+- powertop --autoblablabla
