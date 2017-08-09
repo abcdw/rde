@@ -241,7 +241,7 @@ globalkeys = gears.table.join(
               {description = "view previous", group = "tag"}),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
               {description = "view next", group = "tag"}),
-    awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
+    awful.key({ modkey,           }, "Tab", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
 
     awful.key({ modkey,           }, "j",
@@ -271,7 +271,7 @@ globalkeys = gears.table.join(
               {description = "focus the previous screen", group = "screen"}),
     awful.key({ modkey,           }, "u", awful.client.urgent.jumpto,
               {description = "jump to urgent client", group = "client"}),
-    awful.key({ modkey,           }, "Tab",
+    awful.key({ modkey,           }, "Escape",
         function ()
             awful.client.focus.history.previous()
             if client.focus then
@@ -283,7 +283,15 @@ globalkeys = gears.table.join(
     -- Standard program
     -- awful.key({ }, "Print", function () awful.util.spawn("scrot -s -e 'mv $f ~/pics/shots/ 2>/dev/null'") end),
 
-    awful.key({ modkey }, "l",
+    -- TODO: Run or raise
+    -- awful.key({ modkey, }, 'semicolon', function ()
+    --     local matcher = function (c)
+    --       return awful.rules.match(c, {class = 'URxvt'})
+    --     end
+    --     awful.client.run_or_raise('urxvtc', matcher)
+    -- end),
+
+    awful.key({ modkey }, "q",
       function ()
         awful.util.spawn("alock -b none")
       end,
@@ -307,6 +315,18 @@ globalkeys = gears.table.join(
     -- awful.key({ "Alt" }, "Print", function () awful.util.spawn("scrot -u -e 'mv $f ~/pics/shots/ 2>/dev/null'", false) end),
     awful.key({ }, "XF86MonBrightnessUp", function () awful.util.spawn("xbacklight -inc 10", false) end),
     awful.key({ }, "XF86MonBrightnessDown", function () awful.util.spawn("xbacklight -dec 10", false) end),
+
+    awful.key({ }, "XF86AudioMute", function () awful.util.spawn("pactl set-sink-mute @DEFAULT_SINK@ toggle", false) end),
+    awful.key({ }, "XF86AudioMicMute", function () awful.util.spawn("pactl set-source-mute 1 toggle", false) end),
+    awful.key({ }, "XF86AudioRaiseVolume", function ()
+        awful.util.spawn_with_shell("pactl set-sink-volume @DEFAULT_SINK@ +5%", false)
+    end),
+    awful.key({ }, "XF86AudioLowerVolume", function ()
+        awful.util.spawn_with_shell("pactl set-sink-volume @DEFAULT_SINK@ -5%", false)
+    end),
+
+    awful.key({ }, "F11", function () awful.util.spawn("mpc toggle", false) end),
+    awful.key({ }, "F12", function () awful.util.spawn("mpc next", false) end),
 
     awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
               {description = "open a terminal", group = "launcher"}),
