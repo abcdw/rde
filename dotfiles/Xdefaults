@@ -1,6 +1,6 @@
 !-*-{ Xft settings
 Xft.lcdfilter:        lcddefault
-! Xft*dpi:              96
+! Xft*dpi:              180
 Xft*antialias:        True
 Xft*hinting:          Full
 Xft*rgba: rgb
@@ -10,14 +10,16 @@ URxvt*letterSpace: -1
 URxvt.termName: xterm-256color
 !-*-}
 
-*.font: xft:Iosevka:size=16
-*.boldItalicFont: xft:Iosevka:size=16
-*.boldFont: xft:Iosevka:size=16
-*.italicFont: xft:Iosevka:size=16
+Xcursor.theme: Hackneyed
+! ALock.Background.None: True
+URxvt.font: xft:Iosevka:size=16
+URxvt.boldItalicFont: xft:Iosevka:size=16
+URxvt.boldFont: xft:Iosevka:size=16
+URxvt.italicFont: xft:Iosevka:size=16
 xterm*faceName: xft:Iosevka:size=16
 
-! Emacs.FontBackend: xft
-! Emacs.Font: Anonymice Powerline:size=17
+Emacs.FontBackend: xft
+Emacs.Font: Iosevka:size=18
 
 ! scroll
 URxvt*saveLines: 1000
@@ -40,22 +42,22 @@ URxvt*keysym.End: \033[4~
 ! URxvt*perl-lib: /usr/lib64/urxvt/perl
 
 !clickable urls
-! URxvt*perl-ext-common:  default,matcher,url-select,keyboard-select,font-size
+URxvt*perl-ext-common:  default,matcher,url-select,keyboard-select,font-size
 ! URxvt*matcher.button:	1
 
-! URxvt*keysym.C-plus:    perl:font-size:increase
-! URxvt*keysym.C-minus:   perl:font-size:decrease
-! URxvt*keysym.C-S-plus:  perl:font-size:incglobal
-! URxvt*keysym.C-S-minus: perl:font-size:decglobal
+URxvt*keysym.C-plus:    perl:font-size:increase
+URxvt*keysym.C-minus:   perl:font-size:decrease
+URxvt*keysym.C-S-plus:  perl:font-size:incglobal
+URxvt*keysym.C-S-minus: perl:font-size:decglobal
 ! ! URxvt.font-size.step:   3
 
 ! ! URxvt*keysym.M-Escape:  perl:keyboard-select:activate
 ! ! URxvt*keysym.M-f:       perl:keyboard-select:search
 
 ! !url-select without mouse
-! URxvt*url-select.launcher:     /usr/bin/firefox-bin -new-tab
-! URxvt*url-select.underline:    true
-! URxvt*keysym.C-u:      	       perl:url-select:select_next
+URxvt*url-select.launcher:     xdg-open
+URxvt*url-select.underline:    true
+URxvt*keysym.C-M-u:      	     perl:url-select:select_next
 
 !color man stuff
 URxvt*colorMode:         on
