@@ -1,4 +1,4 @@
 PATH=$PATH:~/.bin:~/.gem/ruby/2.1.0/bin
 PATH="/usr/local/heroku/bin:/usr/lib/postgresql/9.5/bin:$PATH"
 GOPATH=$HOME/.gopath
-BROWSER="/home/abcdw/.bin/qbrowser"
+# BROWSER="/home/abcdw/.bin/qbrowser"

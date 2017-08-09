@@ -120,7 +120,7 @@ alias vi='emacsclient -n -a ""'
 alias vc='nvim -u ~/.myvimrc -O ~/.myvimrc ~/.vimrc'
 
 
-export EDITOR="~/.bin/ec"
+# export EDITOR="~/.bin/ec"
 
 VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 export WORKON_HOME=$HOME/.virtualenvs
@@ -148,7 +148,7 @@ if [ $commands[fasd] ]; then # check if fasd is installed
   bindkey '^X^D' fasd-complete-d  # C-x C-d to do fasd-complete-d (only directories)
 fi
 
-eval "$(thefuck --alias)"
+# eval "$(thefuck --alias)"
 
 ### fzf settings
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
