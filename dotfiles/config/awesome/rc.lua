@@ -9,7 +9,10 @@ local beautiful = require("beautiful")
 -- Notification library
 local naughty = require("naughty")
 local menubar = require("menubar")
+local utils = require("utils")
 local hotkeys_popup = require("awful.hotkeys_popup").widget
+
+local layout_indicator = require("keyboard-layout-indicator")
 -- Enable VIM help for hotkeys widget when client with matching name is opened:
 require("awful.hotkeys_popup.keys.vim")
 
@@ -42,11 +45,13 @@ end
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(gears.filesystem.get_dir("config") .. "themes/doom/theme.lua")
 -- beautiful.init(awful.util.get_themes_dir() .. "default/theme.lua")
+local battw = require("battery")
 
 -- This is used later as the default terminal and editor to run.
 terminal = "urxvtc"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
+browser = os.getenv("BROWSER") or "chromium"
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -58,22 +63,32 @@ modkey = "Mod4"
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
     awful.layout.suit.floating,
-    awful.layout.suit.tile,
-    awful.layout.suit.tile.left,
-    awful.layout.suit.tile.bottom,
-    awful.layout.suit.tile.top,
-    awful.layout.suit.fair,
-    awful.layout.suit.fair.horizontal,
-    awful.layout.suit.spiral,
-    awful.layout.suit.spiral.dwindle,
     awful.layout.suit.max,
-    awful.layout.suit.max.fullscreen,
-    awful.layout.suit.magnifier,
-    awful.layout.suit.corner.nw,
+    awful.layout.suit.fair,
+    awful.layout.suit.tile,
+    -- awful.layout.suit.tile.left,
+    -- awful.layout.suit.tile.bottom,
+    -- awful.layout.suit.tile.top,
+    -- awful.layout.suit.fair.horizontal,
+    -- awful.layout.suit.spiral,
+    -- awful.layout.suit.spiral.dwindle,
+    -- awful.layout.suit.max.fullscreen,
+    -- awful.layout.suit.magnifier,
+    -- awful.layout.suit.corner.nw,
     -- awful.layout.suit.corner.ne,
     -- awful.layout.suit.corner.sw,
     -- awful.layout.suit.corner.se,
 }
+-- }}}
+
+-- Autostart {{{
+-- utils.run_once("kbdd")
+utils.run_once("nm-applet")
+-- utils.run_once("wicd-client", "wicd-client -t")
+-- utils.run("wmname LG3D")
+-- utils.run("synclient TapButton1=1 TapButton2=3 TapButton3=2 VertEdgeScroll=1")
+-- utils.rerun("syndaemon", "syndaemon -i 0.75 -K -t -d")
+-- utils.run("xss-lock -- slock")
 -- }}}
 
 -- {{{ Helper functions
@@ -114,7 +129,17 @@ menubar.utils.terminal = terminal -- Set the terminal for applications that requ
 -- }}}
 
 -- Keyboard map indicator and switcher
-mykeyboardlayout = awful.widget.keyboardlayout()
+
+mykeyboardlayout =
+  -- trim(string.match(, "layout:([^\n]*)"))
+ -- awful.widget.keyboardlayout()
+
+  layout_indicator({
+    layouts = {
+      {name="dv",  layout="us",  variant="dvorak"},
+      {name="ru",  layout="ru",  variant="typewriter"}
+    }
+})
 
 -- {{{ Wibar
 -- Create a textclock widget
@@ -178,12 +203,25 @@ end
 -- Re-set wallpaper when a screen's geometry changes (e.g. different resolution)
 screen.connect_signal("property::geometry", set_wallpaper)
 
+
 awful.screen.connect_for_each_screen(function(s)
     -- Wallpaper
     set_wallpaper(s)
 
     -- Each screen has its own tag table.
-    awful.tag({ "1", "2", "3", "4", "5", "6", "7", "8", "9" }, s, awful.layout.layouts[1])
+    -- { "ƀ", "Ƅ", "Ɗ", "ƈ", "ƙ" }
+    -- awful.tag({ "", "2", "3", "4", "5", "6", "", "8", "9" }, s, awful.layout.layouts[1])
+    -- awful.tag({ " ", " ", " ", " ", " ", " ", " ", " ", " " }, s, awful.layout.layouts[1])
+    layouts = awful.layout.layouts
+    tags = {
+      settings = {
+        { names  = { "  ", "  ", "  ", "  ", "  ", "  "},
+          layout = { layouts[2], layouts[2], layouts[2], layouts[1], layouts[3] }
+        },
+        { names  = { "rss",  6, 7,  "media" },
+          layout = { layouts[3], layouts[2], layouts[2], layouts[5] }
+    }}}
+    tags[s] = awful.tag(tags.settings[s.index].names, s, tags.settings[s.index].layout)
 
     -- Create a promptbox for each screen
     s.mypromptbox = awful.widget.prompt()
@@ -209,13 +247,14 @@ awful.screen.connect_for_each_screen(function(s)
         layout = wibox.layout.align.horizontal,
         { -- Left widgets
             layout = wibox.layout.fixed.horizontal,
-            mylauncher,
+            -- mylauncher,
             s.mytaglist,
             s.mypromptbox,
         },
         s.mytasklist, -- Middle widget
         { -- Right widgets
             layout = wibox.layout.fixed.horizontal,
+            battw,
             mykeyboardlayout,
             wibox.widget.systray(),
             mytextclock,
@@ -235,6 +274,22 @@ root.buttons(gears.table.join(
 
 -- {{{ Key bindings
 globalkeys = gears.table.join(
+    awful.key({ "Mod1" }, "Escape", function ()
+        -- If you want to always position the menu on the same place set coordinates
+        awful.menu.menu_keys.down = { "Down",  "Escape", "j" }
+        awful.menu.menu_keys.up = { "Up", "k" }
+        awful.menu.menu_keys.enter = { "Alt_L", "m" }
+        awful.menu.menu_keys.close = { "g" }
+        awful.menu.clients({theme = { width = 250 }}, { keygrabber=true, coords={x=525, y=330} })
+    end),
+    -- awful.key({ modkey, "Shift" }, "t", awful.titlebar.toggle),
+    -- awful.key({"Shift_L"}, "",
+    --   awful.util.spawn("xkb-switch -s us(dvp)")
+    -- ),
+
+
+
+
     awful.key({ modkey,           }, "s",      hotkeys_popup.show_help,
               {description="show help", group="awesome"}),
     awful.key({ modkey,           }, "Left",   awful.tag.viewprev,
@@ -282,22 +337,34 @@ globalkeys = gears.table.join(
 
     -- Standard program
     -- awful.key({ }, "Print", function () awful.util.spawn("scrot -s -e 'mv $f ~/pics/shots/ 2>/dev/null'") end),
+    -- mybindings
 
-    -- TODO: Run or raise
-    -- awful.key({ modkey, }, 'semicolon', function ()
-    --     local matcher = function (c)
-    --       return awful.rules.match(c, {class = 'URxvt'})
-    --     end
-    --     awful.client.run_or_raise('urxvtc', matcher)
-    -- end),
+    -- awful.key({ modkey }, ";",
+    --   function ()
+    --     naughty.notify({title="test", text = serializeTable(awful.widget.keyboardlayout())})
+    --   end,
+    --   {description = "test keybinding", group = "my"}),
+    awful.key({ modkey, }, "b", function ()
+        local matcher = function (c)
+          return awful.rules.match(c, {class = 'qutebrowser'})
+        end
+        awful.client.run_or_raise(browser, matcher)
+    end),
+
+    awful.key({ modkey, }, "e", function ()
+        local matcher = function (c)
+          return awful.rules.match(c, {class = 'Emacs'})
+        end
+        awful.client.run_or_raise('emacsclient -c', matcher)
+    end),
 
     awful.key({ modkey }, "q",
       function ()
-        awful.util.spawn("alock -b none")
+        awful.util.spawn("alock -b shade:mono")
       end,
       {description = "lock the screen", group = "my"}),
 
-    awful.key({ }, "Print",
+    awful.key({ modkey }, "Print",
       function ()
         awful.util.spawn("scrot -e 'mv $f ~/pics/shots/ 2>/dev/null'")
         naughty.notify({title="scrot", text="took a screenshot"})
@@ -310,6 +377,17 @@ globalkeys = gears.table.join(
         -- naughty.notify({title="scrot", text="took a screenshot"})
       end,
       {description = "make a screenshot with select", group = "my"}),
+
+    awful.key({ modkey, "Control" }, "Return", function () awful.spawn(terminal) end,
+      {description = "open a terminal", group = "launcher"}),
+    awful.key({ modkey }, "Return", function ()
+
+        local matcher = function (c)
+          return awful.rules.match(c, {class = 'URxvt'})
+        end
+        awful.client.run_or_raise(terminal, matcher)
+    end,
+      {description = "open a terminal", group = "launcher"}),
 
     -- awful.key({ "Shift" }, "Print", function () awful.util.spawn("nohup scrot -s -e 'mv $f ~/pics/shots/ 2>/dev/null'", false) end),
     -- awful.key({ "Alt" }, "Print", function () awful.util.spawn("scrot -u -e 'mv $f ~/pics/shots/ 2>/dev/null'", false) end),
@@ -328,8 +406,6 @@ globalkeys = gears.table.join(
     awful.key({ }, "F11", function () awful.util.spawn("mpc toggle", false) end),
     awful.key({ }, "F12", function () awful.util.spawn("mpc next", false) end),
 
-    awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
-              {description = "open a terminal", group = "launcher"}),
     awful.key({ modkey, "Control" }, "r", awesome.restart,
               {description = "reload awesome", group = "awesome"}),
     awful.key({ modkey, "Shift"   }, "q", awesome.quit,
@@ -529,12 +605,35 @@ awful.rules.rules = {
 
     -- Add titlebars to normal clients and dialogs
     { rule_any = {type = { "normal", "dialog" }
-      }, properties = { titlebars_enabled = true }
+      }, properties = { titlebars_enabled = false }
     },
 
     -- Set Firefox to always map on the tag named "2" on screen 1.
-    -- { rule = { class = "Firefox" },
-    --   properties = { screen = 1, tag = "2" } },
+    { rule = { class = "Emacs" },
+      properties = { screen = 1,
+                     tag = awful.screen.focused().tags[1],
+                     placement = awful.placement.no_overlap + awful.placement.no_offscreen,
+                     maximized_vertical = true,
+                     maximized_horizontal = true } },
+    { rule = { class = "qutebrowser" },
+      properties = { screen = 1,
+                     tag = awful.screen.focused().tags[2],
+                     maximized_vertical = true,
+                     maximized_horizontal = true } },
+    { rule = { class = "Chromium-browser" },
+      properties = { screen = 1,
+                     tag = awful.screen.focused().tags[3] } },
+    { rule = { class = "TelegramDesktop" },
+      properties = { screen = 1,
+                     tag = awful.screen.focused().tags[4] } },
+    { rule = { class = "Slack" },
+      properties = { screen = 1,
+                     tag = awful.screen.focused().tags[4] } },
+    { rule = { class = "URxvt" },
+      properties = { screen = 1,
+                     tag = awful.screen.focused().tags[5],
+                     maximized_vertical = true,
+                     maximized_horizontal = true } },
 }
 -- }}}
 
