@@ -1,6 +1,14 @@
-gsettings set org.gnome.desktop.interface scaling-factor 1
-gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <1>}]"
+# gsettings set org.gnome.desktop.interface scaling-factor 1
+# gsettings set org.gnome.settings-daemon.plugins.xsettings overrides "[{'Gdk/WindowScalingFactor', <1>}]"
 # killall -HUP gnome-shell
 # xrandr \
 # --output DP-1-2 --scale 2x2 --panning 3840x2400+3840+0 --pos 3840x0 \
 # --output DP-1-1 --scale 2x2 --panning 3840x2400 --pos 0x0 --primary
+
+xrandr \
+--output DP1-1 --mode 1920x1200 --primary
+
+xrandr \
+--output DP1-1 --mode 1920x1200 --primary \
+--output DP1-2 --mode 1920x1200 --right-of DP1-1 \
+--output eDP1 --off
