@@ -66,6 +66,9 @@ vcs_info_wrapper() {
 }
 
 # RPROMPT=$'$(vcs_info_wrapper) ${PWD/$HOME/\~}'
+# PROMPT='%F{blue}❯%f%F{yellow}❯%f%F{magenta}❯%f '
+PROMPT='%F{red}❯%f%F{yellow}❯%f%F{green}❯%f '
+echo -en "\033[6 q" # Make a cursor to be a vertical bar
 
 bindkey -e
 
