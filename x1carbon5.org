@@ -21,15 +21,13 @@ has extremly awful coil whine and in compare with it, x1 carbon is silent).
 
 In case I find any other issues will try to update this section.
 ** Goals
-| Features to implement  | Implemented  |
-|------------------------+--------------|
-| Encrypted root         | +            |
-| Power saving           | +            |
-| USB-C dockstation      | +            |
-| WWAN                   | to be done   |
-| Fingerprint reader     | - for now    |
-| Custom keyboard layout | later        |
-| Awesome window manager | another file |
+| Features to implement | Implemented |
+|-----------------------+-------------|
+| Encrypted root        | +           |
+| Power saving          | +           |
+| USB-C dockstation     | +           |
+| WWAN                  | +           |
+| Fingerprint reader    | - for now   |
 ** Prepare bootable usb stick
 - Download NixOS [[https://nixos.org/nixos/download.html][iso]] image
 - Write it on usb stick using [[https://unetbootin.github.io/][unetbootin]]
@@ -93,31 +91,6 @@ configuration-hardware.nix here
 nixos-install
 #+END_SRC
 
-* Tasks
-** DONE Fix Spacemacs C-g
-CLOSED: [2017-08-05 Sat 08:42]
-** DONE C-g in qutebrowser
-CLOSED: [2017-08-05 Sat 09:59]
-** DONE Default font in qutebrowser
-CLOSED: [2017-08-05 Sat 09:59]
-** DONE Save qutebrowser config
-CLOSED: [2017-08-05 Sat 14:38]
-** DONE Move default.pa in configuration.nix
-CLOSED: [2017-08-07 Mon 16:35]
-** DONE Add gnupg key
-CLOSED: [2017-08-08 Tue 10:11]
-** DONE Configure mpd
-CLOSED: [2017-08-08 Tue 10:17]
-** TODO Remove double dots ivy find-file
-** TODO Awesome battery status
-** TODO Awesome translate notification script
-** TODO Add translate script
-** DONE Set default terminal
-CLOSED: [2017-08-11 Fri 16:44]
-** DONE Commit awesome config
-CLOSED: [2017-08-11 Fri 16:44]
-** TODO Add keyring daemon
-** TODO Move configuration.nix to configs
 * WWAN
 
 My carbon doesn't have a WWAN module inside, but it's possible to buy and
@@ -136,6 +109,7 @@ out of the box.
 |----------------------------------------+---------|
 | WWAN: Sierra Wireless AirPrime® EM7455 | 00JT547 |
 | Antennas for thinkpad x1 carbon        | 01LV467 |
+
   Topic about WWANs in russian on [[http://forum.ixbt.com/topic.cgi?id=17:45949-190][ixbt]].
 
 You can't boot with modem, which has firmware different from original, cause
