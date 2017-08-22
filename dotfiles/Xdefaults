@@ -22,17 +22,19 @@ Emacs.FontBackend: xft
 Emacs.Font: Iosevka:size=18
 
 ! scroll
-URxvt*saveLines: 1000
+urxvt.loginShell: true
+URxvt*saveLines: 65535
 URxvt*scrollBar: false
 URxvt*scrollTtyOutput: false
 URxvt*scrollTtyKeypress: true
 URxvt*scrollWithBuffer: true
 URxvt*secondaryWheel: true
+urxvt.iso14755: False ! for disabling message on ctrl+shift press
 
 URxvt.intensityStyles: false
 ! urxvt*depth:32
 URxvt*shading: 85
-URxvt*internalBorder: 3
+URxvt*internalBorder: 4
 URxvt*lineSpace: 0
 
 URxvt*keysym.Home: \033[1~
@@ -72,6 +74,64 @@ URxvt*colorBD:           #268bd2
 Xautolock*time: 1
 *fading: 20
 
+! OneDark colors:
+! #include "/home/lg/.colors/star_trail.jpg.xres" ! include colors from other file
+
+! *.foreground:   #abb2bf
+! *.background:   #1e2127
+! *.cursorColor:  #abb2bf
+! ! URxvt*fadeColor: #002b36
+! URxvt*cursorColor: #98c379
+! ! URxvt*pointerColorBackground: #586e75
+! ! URxvt*pointerColorForeground: #93a1a1
+! ! black
+! *.color0:       #1e2127
+! *.color8:       #5c6370
+! ! red
+! *.color1:       #e06c75
+! *.color9:       #e06c75
+! ! green
+! *.color2:       #98c379
+! *.color10:      #98c379
+! ! yellow
+! *.color3:       #d19a66
+! *.color11:      #d19a66
+! ! blue
+! *.color4:       #61afef
+! *.color12:      #61afef
+! ! magenta
+! *.color5:       #c678dd
+! *.color13:      #c678dd
+! ! cyan
+! *.color6:       #56b6c2
+! *.color14:      #56b6c2
+! ! white
+! *.color7:       #abb2bf
+! *.color15:      #ffffff
+
+
+! *color0:  #19191a
+! *color1:  #cd807c
+! *color2:  #9dbc73
+! *color3:  #efd092
+! *color4:  #7fa8eb
+! *color5:  #98b1c7
+! ! *color6:  #d8d7d4
+! ! *color6: #27282c
+! *color6:  #98b1c7
+! *color7:  #98b1c7
+! *color8:  #686868
+! *color9:  #c07970
+! *color10: #b9d08b
+! *color11: #dbc393
+! *color12: #809ecd
+! *color13: #b29ec0
+! *color14: #27282c
+! *color15: #8ba7c2
+
+! Cyan #98b1c7 and #8ba7c2
+
+
 ! General colors
 !URxvt*pointerBlank: true
 ! URxvt*fadeColor: #002b36
@@ -79,7 +139,7 @@ Xautolock*time: 1
 ! URxvt*pointerColorBackground: #586e75
 ! URxvt*pointerColorForeground: #93a1a1
 
-! *background:  #3f3f3f
+! *background:  #000000
 !!urxvt*background:rgba:3f00/3f00/3f00/cccc
 ! *foreground:  #dcdccc
 
