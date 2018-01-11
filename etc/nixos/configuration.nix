@@ -20,6 +20,7 @@
       exfat
       # upower
       acpi
+      jdk
       curl
       git
       sudo
@@ -30,10 +31,19 @@
       xclip
       scrot
       psmisc
+      unetbootin
+      ntfs3g
+      ffmpeg
+      alacritty
+      gimp
+
+      tigervnc
+      x11vnc
 
       alock
       networkmanagerapplet
       pavucontrol
+      ranger
 
       tdesktop
       slack
@@ -45,10 +55,12 @@
       workrave
 
       zathura
+      libreoffice
 
       mpv
       gmpc
       mpc_cli
+      youtube-dl
 
       clojure
       leiningen
@@ -63,12 +75,14 @@
       # blueman # bluetoothctl is enough for me
       # bluedevil
 
+      arandr
       xorg.xev
       xorg.xbacklight
       xkb_switch
       unzip
       p7zip
       unrar
+      fasd
 
       postgresql
       gparted
@@ -77,14 +91,22 @@
       wakatime
       # emacs
       powertop
+      rpPPPoE
 
       # teensy-loader-cli
       avrdude
-      avrgcclibc
+      # avrgcclibc
+      avrbinutils
+      avrgcc
+      avrlibc
       dfu-util
       dfu-programmer
       # gcc
       gnumake
+      gcc
+      gdb
+      nodejs-8_x
+      awscli
     ];
     # variables.EDITOR="emacs";
     variables.BROWSER="qutebrowser --backend webengine";
@@ -96,10 +118,11 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   boot.kernel.sysctl = { "vm.swappiness" = 1; };
-
   networking = {
     hostName = "tox1c";
     networkmanager.enable = true;
+    # firewall.enable = false;
+    firewall.allowedTCPPorts = [3000 5900 5901];
   };
 
   # systemd.services.ModemManager.enable = true; # doesn't work
@@ -115,7 +138,7 @@
 
   i18n = {
     # consoleFont = "Lat2-Terminus16";
-    consoleKeyMap = "dvorak-programmer";
+    consoleKeyMap = "dvorak";
     defaultLocale = "en_US.UTF-8";
   };
 
@@ -160,15 +183,17 @@
   # Enable CUPS to print documents.
   # services.printing.enable = true;
 
+  environment.variables._JAVA_OPTIONS = "-Dswing.defaultlaf=javax.swing.plaf.metal.MetalLookAndFeel -Dswing.aatext=true -Dawt.useSystemAAFontSettings=on";
   services = {
+    printing.enable = true;
     xserver = {
       enable = true;
       videoDrivers = [ "intel" ];
       resolutions = [{x = 1600; y = 900;}];
 
       layout = "us,ru";
-      xkbVariant = "dvp,typewriter";
-      xkbOptions = "caps:ctrl_modifier, grp:shift_toggle";
+      xkbVariant = "dvorak,";
+      xkbOptions = "caps:ctrl_modifier, grp:win_space_toggle, grp:rctrl_switch, grp:alt_shift_toggle";
       synaptics = {
         enable = true;
         twoFingerScroll = true;
@@ -250,9 +275,10 @@
   security.pam.enableSSHAgentAuth = true;
   virtualisation.docker.enable = true;
   # The NixOS release to be compatible with for stateful data such as databases.
-#  system.stateVersion = "17.03";
+  system.stateVersion = "17.09";
   system.autoUpgrade.enable = true;
-  system.autoUpgrade.channel = https://nixos.org/channels/nixos-unstable;
+  # https://nixos.org/channels/nixos-17.03
+  # system.autoUpgrade.channel = https://nixos.org/channels/nixos-unstable;
   system.copySystemConfiguration = true;
 
 }
