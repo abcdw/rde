@@ -9,6 +9,6 @@ xrandr \
 --output DP1-1 --mode 1920x1200 --primary
 
 xrandr \
---output DP1-1 --mode 1920x1200 --primary \
---output DP1-2 --mode 1920x1200 --right-of DP1-1 \
+--output DP1-2 --mode 1920x1200 --primary \
+--output DP1-1 --mode 1920x1200 --left-of DP1-2 \
 --output eDP1 --off
