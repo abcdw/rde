@@ -7,7 +7,7 @@
 {
   nixpkgs.config.allowUnfree = true; # TODO: remove it
   imports = [ ./hardware-configuration.nix ];
-
+  nixpkgs.overlays = [ (import /home/abcdw/.config/nixpkgs/overlays/rust-overlay.nix) ];
   # acpi_call is required for tlp to work properly on x1 carbon
   boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
 
@@ -33,9 +33,14 @@
       psmisc
       unetbootin
       ntfs3g
+      exfat
+      exfat-utils
       ffmpeg
       alacritty
       gimp
+      firefox
+      python3
+      rustracer
 
       tigervnc
       x11vnc
@@ -184,6 +189,7 @@
   # services.printing.enable = true;
 
   environment.variables._JAVA_OPTIONS = "-Dswing.defaultlaf=javax.swing.plaf.metal.MetalLookAndFeel -Dswing.aatext=true -Dawt.useSystemAAFontSettings=on";
+  environment.variables.RUST_SRC_PATH = "${pkgs.latest.rustChannels.stable.rust-src}/lib/rustlib/src/rust/src";
   services = {
     printing.enable = true;
     xserver = {
