@@ -85,16 +85,16 @@ local function update()
 
   if status <= 10 then
     color = "#FF0000"
-    note.title = note.title:format("critical!")
-    if battw.status > 10 then
-      shouldINotify = true
-    end
+    -- note.title = note.title:format("critical!")
+    -- if battw.status > 10 then
+    --   shouldINotify = true
+    -- end
   elseif status <= 25 then
     color = "#FF8800"
-    note.title = note.title:format("low.")
-    if battw.status > 25 then
-      shouldINotify = true
-    end
+    -- note.title = note.title:format("low.")
+    -- if battw.status > 25 then
+    --   shouldINotify = true
+    -- end
   elseif status <= 40 then
     color = "#FFFF00"
   elseif status > 95 then
