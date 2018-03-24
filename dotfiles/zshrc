@@ -117,10 +117,8 @@ alias gc='git commit'
 alias gd='git diff'
 
 alias tm='tmux attach || tmux new'
-alias mvim='open -a MacVim'
-alias vim='~/.bin/ec'
+alias vim='emacsclient'
 alias vi='emacsclient -n -a ""'
-alias vc='nvim -u ~/.myvimrc -O ~/.myvimrc ~/.vimrc'
 
 
 # export EDITOR="~/.bin/ec"
