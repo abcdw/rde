@@ -48,7 +48,7 @@ beautiful.init(gears.filesystem.get_dir("config") .. "themes/doom/theme.lua")
 local battw = require("battery")
 
 -- This is used later as the default terminal and editor to run.
-terminal = "urxvtc"
+terminal = "urxvt"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
 browser = os.getenv("BROWSER") or "chromium"
@@ -216,9 +216,9 @@ awful.screen.connect_for_each_screen(function(s)
     tags = {
       settings = {
         { names  = { "  ", "  ", "  ", "  ", "  ", "  "},
-          layout = { layouts[2], layouts[2], layouts[2], layouts[1], layouts[3] }
+          layout = { layouts[2], layouts[2], layouts[2], layouts[3], layouts[3] }
         },
-        { names  = { "rss",  6, 7,  "media" },
+        { names  = { " 😎 ", " 😱 ", " ⛄ "  },
           layout = { layouts[3], layouts[2], layouts[2], layouts[5] }
     }}}
     tags[s] = awful.tag(tags.settings[s.index].names, s, tags.settings[s.index].layout)
@@ -296,8 +296,12 @@ globalkeys = gears.table.join(
               {description = "view previous", group = "tag"}),
     awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
               {description = "view next", group = "tag"}),
-    awful.key({ modkey,           }, "Tab", awful.tag.history.restore,
+    awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
               {description = "go back", group = "tag"}),
+    awful.key({ modkey,           }, "'", awful.tag.history.restore,
+      {description = "go back", group = "tag"}),
+    awful.key({ modkey,           }, "o", awful.tag.history.restore,
+      {description = "go back", group = "tag"}),
 
     awful.key({ modkey,           }, "j",
         function ()
@@ -320,13 +324,24 @@ globalkeys = gears.table.join(
               {description = "swap with next client by index", group = "client"}),
     awful.key({ modkey, "Shift"   }, "k", function () awful.client.swap.byidx( -1)    end,
               {description = "swap with previous client by index", group = "client"}),
+
+    awful.key({ modkey }, "a", function () awful.screen.focus_relative( 1) end,
+              {description = "focus the next screen", group = "screen"}),
     awful.key({ modkey, "Control" }, "j", function () awful.screen.focus_relative( 1) end,
               {description = "focus the next screen", group = "screen"}),
     awful.key({ modkey, "Control" }, "k", function () awful.screen.focus_relative(-1) end,
               {description = "focus the previous screen", group = "screen"}),
     awful.key({ modkey,           }, "u", awful.client.urgent.jumpto,
               {description = "jump to urgent client", group = "client"}),
-    awful.key({ modkey,           }, "Escape",
+    awful.key({ modkey,           }, ";",
+      function ()
+        awful.client.focus.history.previous()
+        if client.focus then
+          client.focus:raise()
+        end
+      end,
+      {description = "go back", group = "client"}),
+    awful.key({ modkey,           }, "Tab",
         function ()
             awful.client.focus.history.previous()
             if client.focus then
@@ -350,6 +365,20 @@ globalkeys = gears.table.join(
         end
         awful.client.run_or_raise(browser, matcher)
     end),
+
+    awful.key({ modkey, }, "c", function ()
+        local matcher = function (c)
+          return awful.rules.match(c, {class = 'Chromium-browser'})
+        end
+        awful.client.run_or_raise('chromium', matcher)
+    end),
+
+    -- awful.key({ modkey, }, "t", function ()
+    --     local matcher = function (c)
+    --       return awful.rules.match(c, {class = 'TelegramDesktop'})
+    --     end
+    --     awful.client.run_or_raise('telegram-desktop', matcher)
+    -- end),
 
     awful.key({ modkey, }, "e", function ()
         local matcher = function (c)
@@ -423,8 +452,8 @@ globalkeys = gears.table.join(
               {description = "increase the number of columns", group = "layout"}),
     awful.key({ modkey, "Control" }, "l",     function () awful.tag.incncol(-1, nil, true)    end,
               {description = "decrease the number of columns", group = "layout"}),
-    awful.key({ modkey,           }, "space", function () awful.layout.inc( 1)                end,
-              {description = "select next", group = "layout"}),
+    -- awful.key({ modkey,           }, "space", function () awful.layout.inc( 1)                end,
+    --           {description = "select next", group = "layout"}),
     awful.key({ modkey, "Shift"   }, "space", function () awful.layout.inc(-1)                end,
               {description = "select previous", group = "layout"}),
 
@@ -440,7 +469,7 @@ globalkeys = gears.table.join(
               {description = "restore minimized", group = "client"}),
 
     -- Prompt
-    awful.key({ modkey },            "r",     function () awful.screen.focused().mypromptbox:run() end,
+    awful.key({ modkey },            "p",     function () awful.screen.focused().mypromptbox:run() end,
               {description = "run prompt", group = "launcher"}),
 
     awful.key({ modkey }, "x",
@@ -454,7 +483,7 @@ globalkeys = gears.table.join(
               end,
               {description = "lua execute prompt", group = "awesome"}),
     -- Menubar
-    awful.key({ modkey }, "p", function() menubar.show() end,
+    awful.key({ modkey }, "r", function() menubar.show() end,
               {description = "show the menubar", group = "launcher"})
 )
 
@@ -471,7 +500,7 @@ clientkeys = gears.table.join(
               {description = "toggle floating", group = "client"}),
     awful.key({ modkey, "Control" }, "Return", function (c) c:swap(awful.client.getmaster()) end,
               {description = "move to master", group = "client"}),
-    awful.key({ modkey,           }, "o",      function (c) c:move_to_screen()               end,
+    awful.key({ modkey,           }, ",",      function (c) c:move_to_screen()               end,
               {description = "move to screen", group = "client"}),
     awful.key({ modkey,           }, "t",      function (c) c.ontop = not c.ontop            end,
               {description = "toggle keep on top", group = "client"}),
