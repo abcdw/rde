@@ -11,7 +11,7 @@ My current setup
 | Layouts:             | us,ru ([dvorak](http://www.dvzine.org/zine/01-toc.html),)  |
 
 My current hardware setup:
-- [x1 carbon 5th generation](./x1carbon5.org)
+- ThinkPad [X1 Carbon](./x1carbon5.org) 5th generation
 - [atreus keyboard](https://atreus.technomancy.us/)
 
 Also, some legacy configs (vimrc/i3/etc) can be found in
