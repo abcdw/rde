@@ -1,6 +1,8 @@
 My current setup
 =======
 
+| Tool type            | Tool                                                       |
+| ---:                 | :---                                                       |
 | Operating system:    | [NixOS](https://nixos.org/)                                |
 | Window manager:      | [awesomewm](https://awesomewm.org/)                        |
 | Editor/secondary OS: | [spacemacs](http://spacemacs.org/)                         |
