@@ -4,6 +4,13 @@
 
 { config, pkgs, ... }:
 
+let
+  # Import unstable channel.
+  # sudo nix-channel --add http://nixos.org/channels/nixpkgs-unstable nixpkgs-unstable
+  # sudo nix-channel --update nixpkgs-unstable
+  unstable = import <nixpkgs-unstable> {};
+in
+
 {
   nixpkgs.config.allowUnfree = true; # TODO: remove it
   imports = [ ./hardware-configuration.nix ];
@@ -39,8 +46,11 @@
       alacritty
       gimp
       firefox
+      python2
       python3
       rustracer
+      ion
+      unstable.neovim
 
       tigervnc
       x11vnc
@@ -65,7 +75,7 @@
       mpv
       gmpc
       mpc_cli
-      youtube-dl
+      unstable.youtube-dl
 
       clojure
       leiningen
@@ -83,6 +93,8 @@
       arandr
       xorg.xev
       xorg.xbacklight
+      xorg.libxkbfile
+      xorg.libX11
       xkb_switch
       unzip
       p7zip
@@ -283,8 +295,7 @@
   # The NixOS release to be compatible with for stateful data such as databases.
   system.stateVersion = "17.09";
   system.autoUpgrade.enable = true;
-  # https://nixos.org/channels/nixos-17.03
-  # system.autoUpgrade.channel = https://nixos.org/channels/nixos-unstable;
+  system.autoUpgrade.channel = https://nixos.org/channels/nixos-unstable;
   system.copySystemConfiguration = true;
 
 }
