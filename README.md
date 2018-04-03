@@ -1,10 +1,15 @@
-My linux configs
+My current setup
 =======
 
-My current software setup: NixOS, awesomewm, spacemacs, urvxt, zsh.
+| Operating system:    | [NixOS](https://nixos.org/)                                |
+| Window manager:      | [awesomewm](https://awesomewm.org/)                        |
+| Editor/secondary OS: | [spacemacs](http://spacemacs.org/)                         |
+| Terminal:            | [urxvt](https://wiki.archlinux.org/index.php/rxvt-unicode) |
+| Shell:               | [zsh](https://wiki.archlinux.org/index.php/zsh)            |
+| Layouts:             | us,ru ([dvorak](http://www.dvzine.org/zine/01-toc.html),)  |
 
 My current hardware setup:
-- [x1 carbon 5th generation](./x1carbon5.org).
+- [x1 carbon 5th generation](./x1carbon5.org)
 - [atreus keyboard](https://atreus.technomancy.us/)
 
 Also, some legacy configs (vimrc/i3/etc) can be found in
