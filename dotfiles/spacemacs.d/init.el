@@ -426,6 +426,7 @@ you should place your code here."
   (setq browse-url-browser-function 'browse-url-generic
         browse-url-generic-program "xdg-open")
 
+  (spaceline-toggle-hud-off)
   (setq evil-normal-state-cursor '("#51afef" box))
 
   ;; private.el contains some tokens and other credentials
