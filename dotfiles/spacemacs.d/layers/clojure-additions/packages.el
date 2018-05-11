@@ -12,7 +12,8 @@
 ;;; Code:
 
 (defconst clojure-additions-packages
-  '((lispy :location (recipe :fetcher github :repo "abo-abo/lispy"))
+  '((lispy ;; :location (recipe :fetcher github :repo "abo-abo/lispy")
+     )
     (clojure-semantic
      :location (recipe
                 :fetcher github
@@ -54,6 +55,7 @@
 (defun clojure-additions/init-lispy ()
   (use-package lispy
     :defer t
+    :pin melpa
     :config (spacemacs|diminish lispy-mode "" "")))
 
 (defun clojure-additions/init-evil-lispy ()
@@ -71,6 +73,8 @@
     (progn
       (spacemacs|diminish evil-lispy-mode " Ⓛ" " L")
 
+      ;; C-SPC to mark current sexp
+      ;; goto function name
       (when (configuration-layer/package-usedp 'cider)
         ;; todo better mechanism of loading cider
         (require 'cider)
