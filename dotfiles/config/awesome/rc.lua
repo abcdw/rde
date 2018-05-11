@@ -1,4 +1,5 @@
 -- Standard awesome library
+-- require("awful.autofocus")
 local gears = require("gears")
 local awful = require("awful")
 require("awful.autofocus")
@@ -51,7 +52,7 @@ local battw = require("battery")
 terminal = "urxvt"
 editor = os.getenv("EDITOR") or "nano"
 editor_cmd = terminal .. " -e " .. editor
-browser = os.getenv("BROWSER") or "chromium"
+browser = os.getenv("BROWSER") or "firefox"
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
@@ -215,7 +216,7 @@ awful.screen.connect_for_each_screen(function(s)
     layouts = awful.layout.layouts
     tags = {
       settings = {
-        { names  = { "  ", "  ", "  ", "  ", "  ", "  "},
+        { names  = { "  ", "  ", "  ", "  ", "  ", "  "},
           layout = { layouts[2], layouts[2], layouts[2], layouts[3], layouts[3] }
         },
         { names  = { " 😎 ", " 😱 ", " ⛄ "  },
@@ -368,17 +369,17 @@ globalkeys = gears.table.join(
 
     awful.key({ modkey, }, "c", function ()
         local matcher = function (c)
-          return awful.rules.match(c, {class = 'Chromium-browser'})
+          return awful.rules.match(c, {class = 'Firefox'})
         end
-        awful.client.run_or_raise('chromium', matcher)
+        awful.client.run_or_raise('firefox', matcher)
     end),
 
-    -- awful.key({ modkey, }, "t", function ()
-    --     local matcher = function (c)
-    --       return awful.rules.match(c, {class = 'TelegramDesktop'})
-    --     end
-    --     awful.client.run_or_raise('telegram-desktop', matcher)
-    -- end),
+    awful.key({ modkey, }, "t", function ()
+        -- local matcher = function (c)
+        --   return awful.rules.match(c, {class = 'TelegramDesktop'})
+        -- end
+        awful.util.spawn('rofi -show combi')
+    end),
 
     awful.key({ modkey, }, "e", function ()
         local matcher = function (c)
@@ -411,10 +412,10 @@ globalkeys = gears.table.join(
       {description = "open a terminal", group = "launcher"}),
     awful.key({ modkey }, "Return", function ()
 
-        local matcher = function (c)
-          return awful.rules.match(c, {class = 'URxvt'})
-        end
-        awful.client.run_or_raise(terminal, matcher)
+        -- local matcher = function (c)
+        --   return awful.rules.match(c, {class = 'URxvt'})
+        -- end
+        awful.util.spawn("rofi -show combi")
     end,
       {description = "open a terminal", group = "launcher"}),
 
@@ -469,7 +470,7 @@ globalkeys = gears.table.join(
               {description = "restore minimized", group = "client"}),
 
     -- Prompt
-    awful.key({ modkey },            "p",     function () awful.screen.focused().mypromptbox:run() end,
+    awful.key({ modkey },            "p",     function () awful.util.spawn('rofi -show combi') end,
               {description = "run prompt", group = "launcher"}),
 
     awful.key({ modkey }, "x",
@@ -660,7 +661,7 @@ awful.rules.rules = {
                      tag = awful.screen.focused().tags[4] } },
     { rule = { class = "URxvt" },
       properties = { screen = 1,
-                     tag = awful.screen.focused().tags[5],
+                     tag = awful.screen.focused().tags[2],
                      maximized_vertical = true,
                      maximized_horizontal = true } },
 }
