@@ -12,14 +12,14 @@ URxvt.termName: xterm-256color
 
 Xcursor.theme: Hackneyed
 ! ALock.Background.None: True
-URxvt.font: xft:Iosevka:size=16
-URxvt.boldItalicFont: xft:Iosevka:size=16
-URxvt.boldFont: xft:Iosevka:size=16
-URxvt.italicFont: xft:Iosevka:size=16
-xterm*faceName: xft:Iosevka:size=16
+URxvt.font: xft:Iosevka Nerd Font:size=16
+URxvt.boldItalicFont: xft:Iosevka Nerd Font:size=16
+URxvt.boldFont: xft:Iosevka Nerd Font:size=16
+URxvt.italicFont: xft:Iosevka Nerd Font:size=16
+xterm*faceName: xft:Iosevka Nerd Font:size=16
 
 Emacs.FontBackend: xft
-Emacs.Font: Iosevka:size=18
+Emacs.Font: Iosevka Nerd Font:size=18
 
 ! scroll
 urxvt.loginShell: true
@@ -32,10 +32,13 @@ URxvt*secondaryWheel: true
 urxvt.iso14755: False ! for disabling message on ctrl+shift press
 
 URxvt.intensityStyles: false
-! urxvt*depth:32
-URxvt*shading: 85
 URxvt*internalBorder: 4
 URxvt*lineSpace: 0
+! URxvt.transparent:   true
+! URxvt.shading:       20
+URxvt.foreground: #eeeeee
+urxvt*depth: 32
+urxvt*background: rgba:0000/0000/0200/c800
 
 URxvt*keysym.Home: \033[1~
 URxvt*keysym.End: \033[4~
@@ -249,3 +252,35 @@ Xautolock*time: 1
 ! *color13: #ec93d3
 ! *color14: #93e0e3
 ! *color15: #ffffff
+
+
+
+*foreground:   #4d4d4c
+*background:   #fafafa
+! CursorColor (Selection)
+*cursorColor:  #d6d6d6
+
+! Black + Grey (Comment)
+*color0:       #000000
+*color8:       #8e908c
+! Red + Bright Red
+*color1:       #c82829
+*color9:       #ff3334
+! Green + Bright Green
+*color2:       #718c00
+*color10:      #9ec400
+! Yellow (Orange) + Bright Yellow (Yellow)
+*color3:       #f5871f
+*color11:      #eab700
+! Blue + Bright Blue
+*color4:       #4271ae
+*color12:      #5795e6
+! Magenta (Purple) + Bright Magenta
+*color5:       #8959a8
+*color13:      #b777e0
+! Cyan (Aqua) + Bright Cyan
+*color6:       #3e999f
+*color14:      #54ced6
+! Light Grey (Selection) + White (Current Line)
+*color7:       #d6d6d6
+*color15: #efefef
