@@ -24,109 +24,88 @@ in
 
   environment = {
     systemPackages = with pkgs; [
-      exfat
-      # upower
-      acpi
-      jdk
-      curl
-      git
-      sudo
-      htop
-      rxvt_unicode-with-plugins
-      tmux
-      tmate
-      xclip
-      scrot
-      psmisc
-      unetbootin
-      ntfs3g
-      exfat
-      exfat-utils
-      ffmpeg
-      alacritty
-      gimp
-      firefox
-      python2
-      python3
-      rustracer
-      ion
-      unstable.neovim
+      # < utility apps >
+      ## terminal
+      acpi curl sudo xclip psmisc gnupg
+      rxvt_unicode-with-plugins alacritty
+      tmux tmate
+      htop powertop
+      xkb_switch
+      ranger fasd
+      unzip p7zip unrar
+      ag ripgrep
+      ion rlwrap
+      nix-index
 
-      tigervnc
-      x11vnc
-
-      alock
-      networkmanagerapplet
-      pavucontrol
-      ranger
-
-      tdesktop
-      slack
-
-      qutebrowser
-      chromium
-      torbrowser
-
-      workrave
-
-      zathura
-      libreoffice
-
-      mpv
-      gmpc
-      mpc_cli
       unstable.youtube-dl
 
-      clojure
-      leiningen
-      ag
-      ripgrep
-      gnupg
-      # xxkb
-      kbdd
-      libqmi
-      libmbim
-      modemmanager
-      # blueman # bluetoothctl is enough for me
-      # bluedevil
+      exfat ntfs3g exfat exfat-utils
 
-      arandr
+      ## network
+      rpPPPoE
+      libqmi libmbim modemmanager
+      # blueman # bluetoothctl
+      # bluedevil
+      tigervnc x11vnc autossh
+
+      ## desktop
+      zathura libreoffice gimp
+      gparted transmission
+
+      tdesktop slack unstable.qtox unstable.utox
+      firefox qutebrowser chromium torbrowser
+      wakatime workrave
+      unstable.neovim
+
+      ## media
+      pavucontrol
+      ffmpeg mpv gmpc mpc_cli ncmpcpp
+
+      # < dev, langs, apps and libs >
+
+      unstable.clojure clojure python2 python3
+      rustracer leiningen
+      postgresql git jdk
+      # graalvm
+      libxkbcommon xorg.libxkbfile xorg.libX11 xorg.libXt xorg.libXtst
+
+      ## < qmk >
+      avrdude avrbinutils avrgcc avrlibc
+      dfu-util dfu-programmer gnumake
+      gcc gdb
+
+      ## cluster/virtualization
+      minikube kubernetes kvm
+      docker_compose unstable.kompose
+
+      # < wm >
+      rofi surfraw
+      libnotify
+      arandr alock scrot
       xorg.xev
       xorg.xbacklight
-      xorg.libxkbfile
-      xorg.libX11
-      xkb_switch
-      unzip
-      p7zip
-      unrar
-      fasd
+      networkmanagerapplet
 
-      postgresql
-      gparted
-      transmission
-      libnotify
-      wakatime
-      # emacs
-      powertop
-      rpPPPoE
+      compton feh
+      unstable.i3blocks-gaps xtitle bc
+      unstable.pywal lxappearance
 
-      # teensy-loader-cli
-      avrdude
-      # avrgcclibc
-      avrbinutils
-      avrgcc
-      avrlibc
-      dfu-util
-      dfu-programmer
-      # gcc
-      gnumake
-      gcc
-      gdb
-      nodejs-8_x
-      awscli
+
+      # < unused stuff >
+      # unetbootin
+      # kbdd
+      # nodejs-8_x
+      # awscli
+      # (polybar.override {
+      # i3GapsSupport = true;
+      # iwSupport = true;
+      # alsaSupport = true;
+      # mpdSupport = true;
+      # githubSupport = true;})
     ];
     # variables.EDITOR="emacs";
-    variables.BROWSER="qutebrowser --backend webengine";
+    # variables.BROWSER="qutebrowser --backend webengine";
+    variables.BROWSER="firefox";
   };
 
   # Use the systemd-boot EFI boot loader.
@@ -178,7 +157,7 @@ in
     enableGhostscriptFonts = false;
     fonts = with pkgs; [
       dejavu_fonts
-      iosevka
+      # iosevka
       source-code-pro
       source-sans-pro
       source-serif-pro
@@ -211,7 +190,7 @@ in
 
       layout = "us,ru";
       xkbVariant = "dvorak,";
-      xkbOptions = "caps:ctrl_modifier, grp:win_space_toggle, grp:rctrl_switch, grp:alt_shift_toggle";
+      xkbOptions = "caps:ctrl_modifier, grp:win_space_toggle, grp:rctrl_switch";
       synaptics = {
         enable = true;
         twoFingerScroll = true;
