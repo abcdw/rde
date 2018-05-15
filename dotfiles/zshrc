@@ -175,3 +175,17 @@ fzf-history-widget() {
   typeset -f zle-line-init >/dev/null && zle zle-line-init
   return $ret
 }
+
+case $TERM in
+  (*xterm* | rxvt)
+
+    function precmd {
+      print -Pn "\e]0;zsh%L %(1j,%j job%(2j|s|); ,)%~\a"
+    }
+
+    function preexec {
+      printf "\033]0;%s\a" "$1"
+    }
+
+  ;;
+esac
