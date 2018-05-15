@@ -223,7 +223,11 @@ in
         autoLogin.user = "abcdw";
       };
       desktopManager.default = "none";
-      windowManager.default = "awesome";
+      windowManager.default = "i3";
+      windowManager.i3 = {
+        enable = true;
+        package=unstable.i3-gaps;
+      };
       windowManager.awesome = {
         enable = true;
         luaModules = [ pkgs.luaPackages.luafilesystem pkgs.luaPackages.cjson ];
