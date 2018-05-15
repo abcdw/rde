@@ -4,7 +4,7 @@ My current setup
 | Tool type            | Tool                                                       |
 | ---:                 | :---                                                       |
 | Operating system:    | [NixOS](https://nixos.org/)                                |
-| Window manager:      | [i3](https://i3wm.org/)/[awesomewm](https://awesomewm.org/)                   |
+| Window manager:      | [i3](https://i3wm.org/)/[awesome](https://awesomewm.org/)                   |
 | Editor/secondary OS: | [spacemacs](http://spacemacs.org/)                         |
 | Terminal:            | [urxvt](https://wiki.archlinux.org/index.php/rxvt-unicode) |
 | Shell:               | [zsh](https://wiki.archlinux.org/index.php/zsh)            |
