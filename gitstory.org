@@ -1,0 +1,278 @@
+#+TAGS: git, workflow, github, circleci
+#+TITLE: Suitable git story
+* Introduction
+This is a story about a small team and their approach for developing
+web-services in clojure using [[https://git-scm.com/][Git]], [[https://github.com/][GitHub]], [[https://circleci.com][CircleCi]], [[https://www.jetbrains.com/youtrack/][YouTrack]], [[https://www.docker.com/][Docker]], [[https://aws.amazon.com/ecs/][Amazon
+ECS]]. Most of the tools are easily exchangeable, where the focus will be on git
+workflow for continuous delivery and a type of agile process with project
+management tool.
+
+Agile sounds like a marketing stunt in most cases, yet we try to implement some
+useful and helpful process, which do not slows us much and allows to keep things
+organized and structured.
+
+If you are new to git or not familiar with interactive rebasing or other nifty
+things, checkout this [[https://jwiegley.github.io/git-from-the-bottom-up/][book]]. Also, it will be good to have a view of possible git
+[[https://www.atlassian.com/git/tutorials/comparing-workflows][workflows]].
+
+* Project management
+Currently our team uses youtrack for PM needs, but feel free to use what you
+want. Description of the approach is abstract enough.
+
+** Definitions
+Issue can have following type:
+1) Task - technical problem with low-level details
+2) Bug - report of probably incorrect behavior
+3) User story - high-level (business language) description of requirements
+4) Epic - collection of related user stories
+
+~BK-32~ is an example id for an issue from backend project.
+
+Issue may have parent or subtask. Epic -> user stories -> tasks/bugs.
+
+** Naming conventions
+Preferable title for the issue is a phrase in imperative mood:
+
+#+BEGIN_SRC markdown
+  Add `send-notification` implementation
+#+END_SRC
+
+** Estimation and time tracking
+For such needs we use hours, days or weeks (1w=5d=40h) and only following
+values: 1h, 2h, 4h, 1d, 2d, 3d, 1w, 2w. Everything between goes to larger time
+bucket.
+
+After some amount of work done it can be recorded using ~BK-32 add work
+development 1h20m~ command on appropriate issue via git commit body. It will add
+record in YouTrack as if ~add work development 1h20m~ command executed from
+issue tracker web interface.
+
+Time tracking and estimation helps to keep track of progress, plot burndown
+chart and understand when we are behind the schedule.
+
+** Agile boards and sprints
+Agile board represents the sprint state and consists of swim lanes and columns.
+A column is a task status: ~Open~, ~In progress~, ~On review~, ~In
+pre-production~ or ~Done~. A swim lane is an epic or user story and can contain
+tasks. Also, there is a swim lane for tasks unrelated to existing user stories
+or epics.
+
+At the beginning of the week we have a remote meeting and decide which user
+stories will be on our next sprint. We try to keep swim lanes (user stories)
+during the sprint unchanged, but can easily add/create additional tasks.
+
+* Workflow
+** Git workflows
+It hard to keep you repository clean and manageable if you don't define some
+workflow. There are already a plenty of workflows and they can be adopted:
+- [[http://nvie.com/posts/a-successful-git-branching-model/][Git flow]]
+- [[https://guides.github.com/introduction/flow/][Github]] workflow
+- [[https://docs.gitlab.com/ee/workflow/gitlab_flow.html][Gitlab]] workflow
+- [[https://www.atlassian.com/blog/archives/simple-git-workflow-simple][Atlassian]] simple git workflow
+
+We use our own workflow similar to atlassian, which combines some of ideas
+above and have more details. It is presented below.
+
+** Conventions
+*** Coding style
+- [[https://github.com/bbatsov/clojure-style-guide][The clojure style guide]]
+*** Git rules
+- Never push to master!
+- Don't make any changes on master
+- Master is always production-like and deployable
+- Rebasing during feature development
+- Don't rebase during review
+- Explicit merge (~--no-ff~)
+
+*** Commit message
+It is handy to have some common rules for the whole project and strictly follow
+them. More detailed explanations about these rules and why they exist can be
+found in [[https://chris.beams.io/posts/git-commit/][article]] by Chris Beams.
+
+1) Separate subject from body with a blank line
+2) Limit the subject line to 50 characters
+3) Capitalize the subject line
+4) Do not end the subject line with a period
+5) Use the imperative mood in the subject line
+6) Wrap the body at 72 characters
+7) Use the body to explain what and why vs. how
+
+*** Branch naming
+Our team uses a project management tool, which has the following issue format:
+~BK-3~, where ~BK~ is a shorthand for backend and ~3~ is an issue id. We try to
+create branches related to issues - that is why branch names have the following
+format: ~BK-3/title-of-the-issue~. It is pretty clean and looks good in my
+[[http://spacemacs.org][spacemacs]] [[https://github.com/abcdw/configs/tree/master/dotfiles/spacemacs.d][setup]].
+
+** Suitable Workflow
+Workflow extensively uses ~git rebase -i~. Read [[https://jwiegley.github.io/git-from-the-bottom-up/1-Repository/8-interactive-rebasing.html][the book]] if you are not very
+familiar with it. [[https://help.github.com/articles/set-up-git/][Setup]] your git environment correctly before start.
+
+*** Take a task and prepare changes
+**** Choose a task
+Take a task from current sprint or ask someone to give you one, also, it can be
+a small user story. Let us assume you get a task ~BK-32~ and it says that you
+have to add email template system.
+
+**** Pull latest changes
+Checkout master branch and get latest changes.
+
+#+BEGIN_SRC bash
+  git checkout master
+  git pull origin master
+#+END_SRC
+
+**** Create a branch for the task
+Take a good [[Branch naming][branch name]] and create one.
+
+#+BEGIN_SRC bash
+  git checkout -b BK-32/add-email-template-system
+#+END_SRC
+
+**** Work on a feature branch
+Make few commits to your code. Use good [[Commit message][commit messages]].
+
+#+BEGIN_SRC bash
+  echo "something" >> README.md
+  git add README.md
+  git commit -m "Add something to readme"
+#+END_SRC
+
+*** Check your code with automatic tools
+
+**** Run code analyzer
+
+#+BEGIN_SRC bash
+  lein kibit
+#+END_SRC
+
+The list of some useful advices will be displayed, like that:
+
+#+BEGIN_SRC bash
+  At /home/a-backend/src/clj/urbest/api/pagination.clj:65:
+  Consider using:
+  (pos? page)
+  instead of:
+  (> page 0)
+#+END_SRC
+
+Look briefly at lines, where you source code files are mentioned and consider making reasonable changes.
+Remember, btw, that it's just a program output, not a sort of holy writing.
+
+**** Run linter
+
+#+BEGIN_SRC bash
+  lein eastwood
+#+END_SRC
+
+Look at the code you've written or modified and make sure it don't cause
+any reasonable warnings. If it does, fix the code someway.
+It will be good idea to make the code in the namespace you've visited as much clean,
+as it's possible, even if it is someone's else code.
+
+**** If you were requeted for a review:
+
+Results of code checking with above plugins will be placed to 'artifacts' dir in CircleCI, so you don't need to download the branch
+and run these checks locally to be sure they are made properly.
+
+*** Init review process and handle feedback
+**** Clean up your commit history
+Pay careful attention to this step as it is much easier for reviewer to
+understand changes introduced by a branch with clean commit history. Poorly
+looking commit history is a bad sign. Move, squash, rename your commits using
+[[https://jwiegley.github.io/git-from-the-bottom-up/1-Repository/8-interactive-rebasing.html][interactive rebase]].
+
+#+BEGIN_SRC bash
+  git fetch origin
+  git rebase -i origin/master
+#+END_SRC
+
+**** Push your changes
+
+#+BEGIN_SRC bash
+  git push -u origin BK-32/add-email-template-system
+#+END_SRC
+
+Actually you can start pushing to remote branch much earlier for backup needs,
+but keep in mind that rebasing changes commit hashes and it will be necessary
+to use ~--force~ push after you cleaned up your commit history.
+
+When you setup upstream branch you can simply send new changes via ~git push~.
+
+**** Open a pull request
+Push latest changes to remote branch and open PR (pull request) via github.
+
+Add reviewers if you know who should handle this PR.
+
+Don't rebase you commits after you requested a review. It will make iterative
+review process much harder (necessary to view all changes not only new one) and
+it will create troubles if someone else commits into your branch.
+
+**** Handle feedback
+Make some changes according to review results, cleanup them, push to remote.
+
+#+BEGIN_SRC bash
+  vim README.md
+  git add README.md
+  git commit -m "Change README.md content"
+#+END_SRC
+
+Cleanup *only* (!) local changes using
+~git rebase -i origin/BK-32/add-email-template-system~ or
+~git commit --amend~ if you have only one new commit or want to prettify only
+last one.
+
+Push changes to remote branch ~git push~.
+
+Request one more review. Repeat this process until PR is accepted or closed.
+
+**** Update after approve
+After PR was approved it is necessary to update branch with latest changes from
+master. For these needs rebase must be used. It also possible to do interactive
+rebase (`-i`) on this step to cleanup and prettify your commit history.
+
+#+BEGIN_SRC bash
+  git fetch origin
+  git rebase -i origin/master
+  git push
+#+END_SRC
+
+At this point code should be up-to-date, must pass tests and probably ready for
+deploy.
+
+*** Deploy your changes
+**** Deploy to stage (optional)
+To test your changes in stage environment you can deploy them using ~rc~-tags.
+
+#+BEGIN_SRC bash
+  git tag -a v0.4.13-rc1
+  git push origin v0.4.13-rc1
+#+END_SRC
+
+It will launch a separate process in CI, which will prepare docker container and
+deploy it to aws.
+
+**** Deploy to production
+To release you changes after PR is accepted and merged into ~master~. You have
+two options: ask your colleague to do it or do it yourself if you have access.
+
+#+BEGIN_SRC bash
+  git checkout master
+  git pull origin
+  git tag -a v0.4.13
+  git push origin v0.4.13
+#+END_SRC
+
+This will ship your code to stage and production environment. Deployment scripts
+also applies migrations if necessary.
+
+**** Rollback changes
+It is a rare case, but sometimes it is necessary to rollback some changes. Ask
+an operating team to do it.
+
+* Conclusion
+In this document provided information about current state of Suitable workflow.
+It is mostly focused on git and github usage, but also include some tips about
+PM tools, naming conventions and so on. This should help newcomers in our team
+to adapt faster and can give some ideas about how to setup a workflow for new or
+modify for existing project.
