@@ -116,6 +116,8 @@ alias ga='git add'
 alias gc='git commit'
 alias gd='git diff'
 
+alias ku='kubectl'
+
 alias tm='tmux attach || tmux new'
 alias vim='emacsclient'
 alias vi='emacsclient -n -a ""'
@@ -128,10 +130,6 @@ export WORKON_HOME=$HOME/.virtualenvs
 function va() {
     source ~/.virtualenvs/$(basename `pwd`)/bin/activate
 }
-
-### Added by the Heroku Toolbelt
-# PATH=$PATH:~/.bin:~/.gem/ruby/2.1.0/bin
-# export PATH="/usr/local/heroku/bin:/usr/lib/postgresql/9.5/bin:$PATH"
 
 if [ $commands[fasd] ]; then # check if fasd is installed
   fasd_cache="$HOME/.fasd-init-cache"
