@@ -1,1 +1,3 @@
 /dotfiles/spacemacs.d/private.el
+.cpcache
+lein
