@@ -15,7 +15,7 @@ My current hardware setup:
 - [atreus keyboard](https://atreus.technomancy.us/)
 
 Also, some legacy configs (vimrc/i3/etc) can be found in
-[old-configs directory](./dotfiles/old-configs).
+[old-configs directory](./stale/old-configs).
 
 
 ### i3wm
@@ -29,11 +29,12 @@ Usage
 
 Get:
 ```
-$ git clone https://github.com/abcdw/configs.git ~/configs
+cd ~
+git clone https://github.com/abcdw/configs.git
 ```
 
 Install
 ```
-cd ~
-ln -s path/to/configs/dotfiles/zshrc .zshrc
+cd configs
+make dotfiles-install
 ```
