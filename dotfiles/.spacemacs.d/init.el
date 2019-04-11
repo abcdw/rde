@@ -37,6 +37,7 @@ This function should only modify configuration layer settings."
      ;; Uncomment some layer names and press `SPC f e R' (Vim style) or
      ;; `M-m f e R' (Emacs style) to install them.
      ;; ----------------------------------------------------------------
+     scheme
      (auto-completion :variables
                       auto-completion-return-key-behavior 'complete
                       auto-completion-tab-key-behavior 'complete
@@ -89,7 +90,10 @@ This function should only modify configuration layer settings."
      fasd
      docker
      speed-reading
-     wakatime
+     (
+      wakatime :variables
+               wakatime-api-key  "f00cd238-1f89-47cc-b825-d26c0483edbb" )
+
      ;; :variables wakatime-cli-path "/usr/local/lib/python2.7/dist-packages/wakatime/cli.py"
 
      semantic
@@ -213,8 +217,10 @@ It should only modify the values of Spacemacs settings."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Iosevka Nerd Font"
-                               ;; :size 28
+   dotspacemacs-default-font '(
+                                "Iosevka Nerd Font"
+                               ;; "Fura Code Medium Nerd Font"
+                               :size 38
                                :weight normal
                                :width normal
                                :powerline-scale 1)
@@ -446,7 +452,7 @@ you should place your code here."
 
   ;; private.el contains some tokens and other credentials
   ;; https://github.com/yuya373/emacs-slack/blob/master/README.md
-  (load-file "~/.spacemacs.d/private.el")
+  ;; (load-file "~/.spacemacs.d/private.el")
   (setq alert-default-style 'libnotify)
 
   ;; (spaceline-compile)
@@ -589,3 +595,17 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  )
 )
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (geiser zenburn-theme zen-and-art-theme yapfify yaml-mode xterm-color ws-butler winum white-sand-theme wgrep web-mode wakatime-mode volatile-highlights vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twittering-mode twilight-theme twilight-bright-theme twilight-anti-bright-theme try transmission toxi-theme toml-mode toc-org tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit sunny-day-theme sublime-themes subatomic256-theme subatomic-theme stickyfunc-enhance srefactor spray spaceline-all-the-icons spaceline powerline spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode slack emojify circe oauth2 shell-pop seti-theme scss-mode sass-mode reverse-theme restart-emacs rebecca-theme ranger rainbow-identifiers rainbow-delimiters railscasts-theme racer pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme popwin planet-theme pip-requirements phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode pdf-tools pcre2el paradox orgit organic-green-theme org-projectile org-category-capture org-present org-pomodoro org-mime org-download org-bullets open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme ob-restclient ob-http noctilux-theme nix-mode nginx-mode neotree naquadah-theme mustang-theme multi-term move-text monokai-theme monochrome-theme molokai-theme moe-theme minimal-theme material-theme markdown-toc majapahit-theme magit-gitflow magit-gh-pulls madhat2r-theme macrostep lush-theme lua-mode lorem-ipsum live-py-mode lispyville linum-relative link-hint light-soap-theme leuven-theme keyfreq jbeans-theme jazz-theme ivy-hydra ir-black-theme intero inkpot-theme indent-guide hy-mode dash-functional hungry-delete htmlize hlint-refactor hl-todo hindent highlight-parentheses highlight-numbers parent-mode highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme haskell-snippets haml-mode gruvbox-theme gruber-darker-theme grandshell-theme gotham-theme google-translate golden-ratio gnuplot gitignore-mode github-search github-clone github-browse-file gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe+ git-gutter-fringe fringe-helper git-gutter+ git-gutter gist gh marshal logito pcache ht gh-md gandalf-theme fuzzy flycheck-rust flycheck-pos-tip flycheck-haskell flycheck flx-ido flx flatui-theme flatland-theme fill-column-indicator fasd farmhouse-theme fancy-battery eyebrowse expand-region exotica-theme exec-path-from-shell evil-visualstar evil-visual-mark-mode evil-tutor evil-surround evil-search-highlight-persist highlight evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit magit transient git-commit with-editor evil-lispy evil-lisp-state smartparens evil-indent-plus evil-iedit-state evil-exchange evil-escape evil-ediff evil-args evil-anzu anzu evil goto-chg espresso-theme eshell-z eshell-prompt-extras esh-help emmet-mode elisp-slime-nav ein skewer-mode deferred request websocket js2-mode simple-httpd dumb-jump dracula-theme doom-themes dockerfile-mode docker json-mode tablist magit-popup docker-tramp json-snatcher json-reformat django-theme disaster diminish define-word darktooth-theme autothemer darkokai-theme darkmine-theme darkburn-theme dakrone-theme cython-mode cyberpunk-theme counsel-projectile projectile counsel company-web web-completion-data company-restclient restclient know-your-http-well company-quickhelp pos-tip company-nixos-options nixos-options company-ghci company-ghc ghc haskell-mode company-cabal company-c-headers company-auctex company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode cmm-mode cmake-mode clues-theme clojure-snippets clj-refactor inflections edn multiple-cursors paredit peg clean-aindent-mode clang-format cider-eval-sexp-fu eval-sexp-fu cider sesman spinner queue pkg-info epl cherry-blossom-theme cargo markdown-mode rust-mode busybee-theme bubbleberry-theme birds-of-paradise-plus-theme bind-map bind-key badwolf-theme auto-yasnippet auto-highlight-symbol auto-compile packed apropospriate-theme anti-zenburn-theme anaconda-mode pythonic ample-zen-theme ample-theme all-the-icons memoize align-cljlet clojure-mode alert log4e gntp alect-themes afternoon-theme adoc-mode markup-faces ace-link ac-ispell auto-complete popup yasnippet which-key undo-tree sql-indent rainbow-mode ox-gfm org-plus-contrib mmm-mode evil-unimpaired f s dash lispy zoutline hydra swiper ivy iedit diff-hl csv-mode company-statistics company command-log-mode clojure-semantic auctex async aggressive-indent adaptive-wrap ace-window avy base16-theme))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
