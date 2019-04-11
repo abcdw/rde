@@ -1,8 +1,6 @@
 
 dotfiles-install:
-	cd dotfiles && \
-	stow -t ~/.config config -v 2
+	stow dotfiles -v 2
 
 dotfiles-uninstall:
-	cd dotfiles && \
-	stow -t ~/.config -D config -v 2
+	stow -D dotfiles -v 2
