@@ -7,5 +7,5 @@ dotfiles-install:
 dotfiles-uninstall:
 	stow -D dotfiles -v 2
 
-install: dotfiles-install spacemacs-install
+install: dotfiles-install
 	echo "yay!"
