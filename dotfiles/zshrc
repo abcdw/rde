@@ -1,38 +1,10 @@
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# ssh
-# export SSH_KEY_PATH="~/.ssh/dsa_id"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-
-# if [[ -n $SSH_CONNECTION ]]; then
-    # tmux at default
-# fi
-
-
 # Tab-completion
-
 
 autoload -U compinit
 compinit
 zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
 setopt completealiases
 zstyle ':completion:*' menu select
-# zstyle ':completion::complete:*' use-cache 1
 
 # Simple gentoo prompt
 autoload -U promptinit
@@ -47,12 +19,6 @@ fi
 # http://stackoverflow.com/questions/1128496/to-get-a-prompt-which-indicates-git-branch-in-zsh
 setopt prompt_subst
 autoload -Uz vcs_info
-# zstyle ':vcs_info:*' actionformats \
-#     '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{3}|%F{1}%a%F{5}]%f '
-# zstyle ':vcs_info:*' formats       \
-#     '%F{5}(%f%s%F{5})%F{3}-%F{5}[%F{2}%b%F{5}]%f '
-# zstyle ':vcs_info:(sv[nk]|bzr):*' branchformat '%b%F{1}:%F{3}%r'
-# zstyle ':vcs_info:git*' formats "%{$fg[blue]%}%b%{$reset_color%} "
 zstyle ':vcs_info:*' formats       \
     '%F{5}[%F{2}%b%F{5}]%f'
 
@@ -65,8 +31,6 @@ vcs_info_wrapper() {
   fi
 }
 
-# RPROMPT=$'$(vcs_info_wrapper) ${PWD/$HOME/\~}'
-# PROMPT='%F{blue}❯%f%F{yellow}❯%f%F{magenta}❯%f '
 PROMPT='%F{red}❯%f%F{yellow}❯%f%F{green}❯%f '
 echo -en "\033[6 q" # Make a cursor to be a vertical bar
 
@@ -122,57 +86,11 @@ alias tm='tmux attach || tmux new'
 alias vim='emacsclient'
 alias vi='emacsclient -n -a ""'
 
-
 # export EDITOR="~/.bin/ec"
-
-VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
-export WORKON_HOME=$HOME/.virtualenvs
-function va() {
-    source ~/.virtualenvs/$(basename `pwd`)/bin/activate
-}
-
-if [ $commands[fasd] ]; then # check if fasd is installed
-  fasd_cache="$HOME/.fasd-init-cache"
-  if [ "$(command -v fasd)" -nt "$fasd_cache" -o ! -s "$fasd_cache" ]; then
-    # fasd --init posix-alias zsh-hook zsh-ccomp zsh-ccomp-install zsh-wcomp zsh-wcomp-install
-    fasd --init auto >| "$fasd_cache"
-  fi
-  source "$fasd_cache"
-  unset fasd_cache
-
-  alias v="f -e $EDITOR"
-  alias o='a -e xdg-open'
-  bindkey '^X^A' fasd-complete    # C-x C-a to do fasd-complete (files and directories)
-  bindkey '^X^F' fasd-complete-f  # C-x C-f to do fasd-complete-f (only files)
-  bindkey '^X^D' fasd-complete-d  # C-x C-d to do fasd-complete-d (only directories)
-fi
-
-# eval "$(thefuck --alias)"
-
-### fzf settings
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-export FZF_DEFAULT_COMMAND='ag -g ""'
 
 if [[ -z "$TMUX" && -n "$SSH_CONNECTION" ]]; then
     tmux -2 attach -d
 fi
-
-fzf-history-widget() {
-  local selected num
-  setopt localoptions noglobsubst pipefail 2> /dev/null
-  selected=( $(fc -l 1 | eval "$(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}") )
-  local ret=$?
-  if [ -n "$selected" ]; then
-    num=$selected[1]
-    if [ -n "$num" ]; then
-      zle vi-fetch-history -n $num
-      zle accept-line
-    fi
-  fi
-  zle redisplay
-  typeset -f zle-line-init >/dev/null && zle zle-line-init
-  return $ret
-}
 
 case $TERM in
   (*xterm* | rxvt)
