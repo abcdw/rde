@@ -1,8 +1,11 @@
-(use-modules (guix packages)
-             (guix git-download)
-             (guix download)
-             (guix build-system cargo)
-             (guix licenses))
+(use-modules
+ (gnu packages python)
+ (gnu packages ruby)
+ (guix packages)
+ (guix git-download)
+ (guix download)
+ (guix build-system cargo)
+ (guix licenses))
 
 (define-public
   alacritty
@@ -22,6 +25,9 @@
    (description "A cross-platform, GPU-accelerated terminal emulator ")
    (home-page "https://github.com/qwilm/alacritty")
    (license asl2.0)
+   (inputs
+    `(("python" ,python)
+      ("ruby") ,ruby))
    ;; (arguments
    ;;  `(#:phases
    ;;    (modify-phases %standard-phases
