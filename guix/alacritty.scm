@@ -21,7 +21,19 @@
    (description "A cross-platform, GPU-accelerated terminal emulator ")
    (home-page "https://github.com/qwilm/alacritty")
    (license asl2.0)
-   ))
+   (arguments
+    `(#:phases
+      (modify-phases %standard-phases
+                     (replace 'configure
+                              (lambda* (#:key outputs inputs #:allow-other-keys)
+                                ;; add write for user, to prevent a failure in the install phase
+                                (for-each
+                                 (lambda (file)
+                                   (let ((stat (stat file)))
+                                     (chmod file (+ #o200 (stat:mode stat)))))
+                                 (find-files "." "."))
+                                ))
+                     )))))
 
 
 
