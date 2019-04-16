@@ -5,7 +5,7 @@
  (guix git-download)
  (guix download)
  (guix build-system cargo)
- (guix licenses))
+ ((guix licenses) #:prefix license:))
 
 (define-public
   alacritty
@@ -24,7 +24,7 @@
    (synopsis "A cross-platform, GPU-accelerated terminal emulator ")
    (description "A cross-platform, GPU-accelerated terminal emulator ")
    (home-page "https://github.com/qwilm/alacritty")
-   (license asl2.0)
+   (license license:asl2.0)
    (inputs
     `(("python" ,python)
       ("ruby") ,ruby))
