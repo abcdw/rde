@@ -7,7 +7,7 @@
 
 ** Credits
 
-Thank you for inpiration to [[https://github.com/mitrx][Dmitry Alexeev]]
+Thanks for inpiration to [[https://github.com/mitrx][Dmitry Alexeev]].
 
 ** Configuration
 
@@ -80,11 +80,9 @@ tangled, and the tangled file is compiled."
 	  (mapc 'package-install packages)))))
 #+END_SRC
 
-*** Other stuff
+*** Modes
 
-#+BEGIN_SRC emacs-lisp
-(set-language-environment "UTF-8")
-#+END_SRC
+Disable/enable some modes.
 
 #+BEGIN_SRC emacs-lisp
 (dolist (mode
@@ -93,14 +91,7 @@ tangled, and the tangled file is compiled."
            scroll-bar-mode
            blink-cursor-mode))
   (funcall mode 0))
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-;  (setq whitespace-line-column 80) ;; limit line length
-  (setq whitespace-style '(face lines-tail))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
 (dolist (mode
          '(projectile-global-mode
 	   global-company-mode
@@ -113,31 +104,6 @@ tangled, and the tangled file is compiled."
 	   which-key-mode
 	   global-whitespace-mode))
   (funcall mode 1))
-#+END_SRC
-
-
-*** Look and feel
-
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-;(load-theme 'nord t)
-(load-theme 'base16-tomorrow t)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(set-face-attribute 'default nil :font "Iosevka 15")
-
-;; blink modeline instead of beep
-(setq visible-bell nil
-      ring-bell-function 'flash-mode-line)
-(defun flash-mode-line ()
-  (invert-face 'mode-line)
-  (run-with-timer 0.1 nil #'invert-face 'mode-line))
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -156,21 +122,64 @@ tangled, and the tangled file is compiled."
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-;") 'avy-goto-char)
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
 #+END_SRC
 
+*** Look and feel
+
 #+BEGIN_SRC emacs-lisp
-(setq projectile-completion-system 'ivy)
-(setq projectile-create-missing-test-files t)
-(global-set-key (kbd "C-s") 'swiper)
-(global-set-key (kbd "C-c g") 'counsel-rg)
-(global-set-key (kbd "C-h") 'delete-backward-char)
-(global-set-key (kbd "C-?") 'help-command)
+(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
+;(load-theme 'nord t)
+(load-theme 'base16-tomorrow t)
+
+(set-face-attribute 'default nil :font "Iosevka 15")
+
+;; blink modeline instead of beep
+(setq visible-bell nil
+      ring-bell-function 'flash-mode-line)
+(defun flash-mode-line ()
+  (invert-face 'mode-line)
+  (run-with-timer 0.1 nil #'invert-face 'mode-line))
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+END_SRC
+
+*** Keybindings
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
 (define-key projectile-mode-map (kbd "s-e") 'projectile-command-map)
 #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-;") 'avy-goto-char)
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-c g") 'counsel-rg)
+(global-set-key (kbd "C-h") 'delete-backward-char)
+(global-set-key (kbd "C-?") 'help-command)
+(global-set-key (kbd "C-x g") 'magit-status)
+#+END_SRC
+
+*** Whitespaces
+Show trailing whitespaces and cleanup them on save.
+
+#+BEGIN_SRC emacs-lisp
+(setq whitespace-style '(face trailing spaces space-mark))
+(setq-default show-trailing-whitespace t)
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+*** Projectile
+
+#+BEGIN_SRC emacs-lisp
+(setq projectile-completion-system 'ivy)
+(setq projectile-create-missing-test-files t)
+#+END_SRC
+
+*** Other stuff
 
 #+BEGIN_SRC emacs-lisp
 (setq ivy-initial-inputs-alist nil)
@@ -187,14 +196,5 @@ tangled, and the tangled file is compiled."
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'before-save-hook 'delete-trailing-whitespace)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-x g") 'magit-status)
-#+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+(set-language-environment "UTF-8")
 #+END_SRC
