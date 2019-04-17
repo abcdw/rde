@@ -1,4 +1,4 @@
-#+TITLE: Emacs configuration file
+#+TITLE: Simple emacs literate config
 #+BABEL: :cache yes
 #+LATEX_HEADER: \usepackage{parskip}
 #+LATEX_HEADER: \usepackage{inconsolata}
@@ -6,20 +6,16 @@
 #+PROPERTY: header-args :tangle yes
 
 ** Credits
+
 Thank you for inpiration to [[https://github.com/mitrx][Dmitry Alexeev]]
 
-#+BEGIN_SRC emacs-lisp :tangle no
-;; We can't tangle without org!
-(require 'org)
-;; Open the configuration
-(find-file (concat user-emacs-directory "init.org"))
-;; tangle it
-(org-babel-tangle)
-;; load it
-(load-file (concat user-emacs-directory "init.el"))
-;; finally byte-compile it
-(byte-compile-file (concat user-emacs-directory "init.el"))
-#+END_SRC
+** Configuration
+
+Configuration from [[./init.org][init.org]] will be loaded by [[./init.el][init.el]].
+
+*** Org tangle-mangle
+
+Some magic with tangling org config.
 
 #+BEGIN_SRC emacs-lisp
 ;;; -*- lexical-binding: t -*-
@@ -38,6 +34,8 @@ tangled, and the tangled file is compiled."
 
 (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
+
+*** Packages
 
 #+BEGIN_SRC emacs-lisp
 (require 'cl-lib)
@@ -82,6 +80,8 @@ tangled, and the tangled file is compiled."
 	  (mapc 'package-install packages)))))
 #+END_SRC
 
+*** Other stuff
+
 #+BEGIN_SRC emacs-lisp
 (set-language-environment "UTF-8")
 #+END_SRC
@@ -114,6 +114,9 @@ tangled, and the tangled file is compiled."
 	   global-whitespace-mode))
   (funcall mode 1))
 #+END_SRC
+
+
+*** Look and feel
 
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
