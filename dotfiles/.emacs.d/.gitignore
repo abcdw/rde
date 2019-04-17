@@ -1,0 +1,11 @@
+url/**
+auto-save-list/**
+*~
+elpa/**
+*.elc
+projectile-bookmarks.eld
+transient/**
+recentf
+viper
+init.el
+eshell/**

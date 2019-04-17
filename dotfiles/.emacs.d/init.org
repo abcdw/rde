@@ -1,0 +1,197 @@
+#+TITLE: Emacs configuration file
+#+BABEL: :cache yes
+#+LATEX_HEADER: \usepackage{parskip}
+#+LATEX_HEADER: \usepackage{inconsolata}
+#+LATEX_HEADER: \usepackage[utf8]{inputenc}
+#+PROPERTY: header-args :tangle yes
+
+** Credits
+Thank you for inpiration to [[https://github.com/mitrx][Dmitry Alexeev]]
+
+#+BEGIN_SRC emacs-lisp :tangle no
+;; We can't tangle without org!
+(require 'org)
+;; Open the configuration
+(find-file (concat user-emacs-directory "init.org"))
+;; tangle it
+(org-babel-tangle)
+;; load it
+(load-file (concat user-emacs-directory "init.el"))
+;; finally byte-compile it
+(byte-compile-file (concat user-emacs-directory "init.el"))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+;;; -*- lexical-binding: t -*-
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(defun tangle-init ()
+  "If the current buffer is 'init.org' the code-blocks are
+tangled, and the tangled file is compiled."
+  (when (equal (buffer-file-name)
+               (expand-file-name (concat user-emacs-directory "init.org")))
+    ;; Avoid running hooks when tangling.
+    (let ((prog-mode-hook nil))
+      (org-babel-tangle)
+      (byte-compile-file (concat user-emacs-directory "init.el")))))
+
+(add-hook 'after-save-hook 'tangle-init)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(require 'cl-lib)
+(require 'package)
+(package-initialize)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
+
+(add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (let* ((package--builtins nil)
+	 (packages
+	  '(auto-compile         ; automatically compile Emacs Lisp libraries
+	    org
+	    beacon
+	    cider                ; Clojure Interactive Development Environment
+	    clj-refactor         ; A collection of clojure refactoring functions
+	    company              ; Modular text completion framework
+	    ivy
+	    swiper
+	    counsel
+	    avy                  ; jump to visible characters
+	    magit                ; control Git from Emacs
+	    rainbow-delimiters
+	    base16-theme
+	    nord-theme
+	    paredit              ; minor mode for editing parentheses
+	    projectile           ; Manage and navigate projects in Emacs easily
+	    yaml-mode
+	    markdown-mode
+	    which-key)))         ; Display available keybindings in popup
+    (ignore-errors
+      (let ((packages (cl-remove-if 'package-installed-p packages)))
+	(when packages
+	  ;; Install uninstalled packages
+	  (package-refresh-contents)
+	  (mapc 'package-install packages)))))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(set-language-environment "UTF-8")
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(dolist (mode
+         '(menu-bar-mode
+           tool-bar-mode
+           scroll-bar-mode
+           blink-cursor-mode))
+  (funcall mode 0))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+;  (setq whitespace-line-column 80) ;; limit line length
+  (setq whitespace-style '(face lines-tail))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(dolist (mode
+         '(projectile-global-mode
+	   global-company-mode
+	   column-number-mode
+	   beacon-mode
+	   yas-global-mode
+	   show-paren-mode
+	   ivy-mode
+	   counsel-mode
+	   which-key-mode
+	   global-whitespace-mode))
+  (funcall mode 1))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
+;(load-theme 'nord t)
+(load-theme 'base16-tomorrow t)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(set-face-attribute 'default nil :font "Iosevka 15")
+
+;; blink modeline instead of beep
+(setq visible-bell nil
+      ring-bell-function 'flash-mode-line)
+(defun flash-mode-line ()
+  (invert-face 'mode-line)
+  (run-with-timer 0.1 nil #'invert-face 'mode-line))
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(dolist (mode '(cider-repl-mode
+                clojure-mode
+                lisp-mode
+                emacs-lisp-mode
+                lisp-interaction-mode
+		rainbow-delimiters-mode))
+  ;; add paredit-mode to all mode-hooks
+  (add-hook (intern (concat (symbol-name mode) "-hook")) 'paredit-mode))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-;") 'avy-goto-char)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq projectile-completion-system 'ivy)
+(setq projectile-create-missing-test-files t)
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-c g") 'counsel-rg)
+(global-set-key (kbd "C-h") 'delete-backward-char)
+(global-set-key (kbd "C-?") 'help-command)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(define-key projectile-mode-map (kbd "s-e") 'projectile-command-map)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq ivy-initial-inputs-alist nil)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
+  backup-by-copying t    ; Don't delink hardlinks
+  version-control t      ; Use version numbers on backups
+  delete-old-versions t  ; Automatically delete excess backups
+  kept-new-versions 20   ; how many of the newest versions to keep
+  kept-old-versions 5    ; and how many of the old
+  )
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-hook 'before-save-hook 'delete-trailing-whitespace)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(global-set-key (kbd "C-x g") 'magit-status)
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+#+END_SRC
