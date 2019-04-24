@@ -55,6 +55,7 @@ tangled, and the tangled file is compiled."
 	 (packages
 	  '(auto-compile         ; automatically compile Emacs Lisp libraries
 	    org
+	    treemacs
 	    beacon
 	    cider                ; Clojure Interactive Development Environment
 	    clj-refactor         ; A collection of clojure refactoring functions
@@ -64,6 +65,7 @@ tangled, and the tangled file is compiled."
 	    counsel
 	    avy                  ; jump to visible characters
 	    magit                ; control Git from Emacs
+	    git-link
 	    rainbow-delimiters
 	    base16-theme
 	    nord-theme
@@ -102,7 +104,8 @@ Disable/enable some modes.
 	   ivy-mode
 	   counsel-mode
 	   which-key-mode
-	   global-whitespace-mode))
+	   ;; global-whitespace-mode
+))
   (funcall mode 1))
 #+END_SRC
 
@@ -133,7 +136,7 @@ Disable/enable some modes.
 ;(load-theme 'nord t)
 (load-theme 'base16-tomorrow t)
 
-(set-face-attribute 'default nil :font "Iosevka 15")
+(set-face-attribute 'default nil :font "Iosevka 14")
 
 ;; blink modeline instead of beep
 (setq visible-bell nil
