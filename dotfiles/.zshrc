@@ -85,6 +85,7 @@ alias ku='kubectl'
 alias tm='tmux attach || tmux new'
 alias vim='emacsclient'
 alias vi='emacsclient -n -a ""'
+alias ls='ls --color'
 
 # export EDITOR="~/.bin/ec"
 
