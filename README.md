@@ -3,9 +3,9 @@ My current setup
 
 | Tool type            | Tool                                                       |
 | ---:                 | :---                                                       |
-| Operating system:    | [NixOS](https://nixos.org/)                                |
-| Window manager:      | [i3](https://i3wm.org/)/[awesome](https://awesomewm.org/)                   |
-| Editor/secondary OS: | [spacemacs](http://spacemacs.org/)                         |
+| Operating system:    | [Manjaro](https://manjaro.org/)/[NixOS](https://nixos.org/)                                |
+| Window manager:      | [gnome](https://www.gnome.org/)/[i3](https://i3wm.org/)                   |
+| Editor/secondary OS: | [emacs](https://www.gnu.org/s/emacs/)                         |
 | Terminal:            | [alacritty](https://github.com/jwilm/alacritty)/[urxvt](https://wiki.archlinux.org/index.php/rxvt-unicode)  |
 | Shell:               | [zsh](https://wiki.archlinux.org/index.php/zsh)            |
 | Layouts:             | us,ru ([dvorak](http://www.dvzine.org/zine/01-toc.html),)  |
