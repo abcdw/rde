@@ -71,6 +71,7 @@ tangled, and the tangled file is compiled."
 	    nord-theme
 	    paredit              ; minor mode for editing parentheses
 	    projectile           ; Manage and navigate projects in Emacs easily
+	    rust-mode
 	    yaml-mode
 	    markdown-mode
 	    which-key)))         ; Display available keybindings in popup
