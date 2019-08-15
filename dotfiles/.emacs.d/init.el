@@ -10,3 +10,4 @@
 (load-file (concat user-emacs-directory "init.el"))
 ;; finally byte-compile it
 (byte-compile-file (concat user-emacs-directory "init.el"))
+
