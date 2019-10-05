@@ -74,6 +74,7 @@ tangled, and the tangled file is compiled."
 	    projectile           ; Manage and navigate projects in Emacs easily
 	    rust-mode
 	    yaml-mode
+	    nix-mode
 	    markdown-mode
 	    which-key)))         ; Display available keybindings in popup
     (ignore-errors
@@ -129,6 +130,7 @@ Disable/enable some modes.
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
+(add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
 #+END_SRC
 
 *** Look and feel
@@ -138,7 +140,7 @@ Disable/enable some modes.
 ;(load-theme 'nord t)
 (load-theme 'base16-tomorrow t)
 
-(set-face-attribute 'default nil :font "Iosevka 14")
+(set-face-attribute 'default nil :font "Iosevka 10")
 
 ;; blink modeline instead of beep
 (setq visible-bell nil
