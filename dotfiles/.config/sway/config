@@ -14,21 +14,15 @@ set $down j
 set $up k
 set $right l
 # Your preferred terminal emulator
-set $term urxvt
+set $term alacritty
 # Your preferred application launcher
 # Note: it's recommended that you pass the final command to sway
 set $menu dmenu_path | dmenu | xargs swaymsg exec
 
-input "1:1:AT_Translated_Set_2_keyboard" {
-	xkb_layout us,ru
-	xkb_variant dvorak,
-	xkb_options ctrl:nocaps,grp:win_space_toggle
-}
-
 ### Output configuration
 #
-# Default wallpaper (more resolutions are available in /gnu/store/3vlvpbxsbkfqlls1ikam8w1j2bb7vh1r-sway-1.0/share/backgrounds/sway/)
-output * bg /gnu/store/3vlvpbxsbkfqlls1ikam8w1j2bb7vh1r-sway-1.0/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+# Default wallpaper
+#output * bg ~/.config/sway/backgrounds/Sway_Wallpaper_Blue_1920x1080.png fill
 #
 # Example configuration:
 #
@@ -36,15 +30,17 @@ output * bg /gnu/store/3vlvpbxsbkfqlls1ikam8w1j2bb7vh1r-sway-1.0/share/backgroun
 #
 # You can get the names of your outputs by running: swaymsg -t get_outputs
 
+output eDP-1 scale 2
+
 ### Idle configuration
 #
 # Example configuration:
 #
-# exec swayidle -w \
+exec swayidle -w \
+          before-sleep 'swaylock -f -c 000000'
 #          timeout 300 'swaylock -f -c 000000' \
 #          timeout 600 'swaymsg "output * dpms off"' \
 #               resume 'swaymsg "output * dpms on"' \
-#          before-sleep 'swaylock -f -c 000000'
 #
 # This will lock your screen after 300 seconds of inactivity, then turn off
 # your displays after another 300 seconds, and turn your screens back on when
@@ -63,6 +59,12 @@ output * bg /gnu/store/3vlvpbxsbkfqlls1ikam8w1j2bb7vh1r-sway-1.0/share/backgroun
 #
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
+
+input * {
+      xkb_layout "us,ru"
+      xkb_variant "dvorak,"
+      xkb_options "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
+}
 
 ### Key bindings
 #
@@ -211,13 +213,11 @@ bar {
 
     # When the status_command prints a new line to stdout, swaybar updates.
     # The default just shows the current date and time.
-    status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
-
+#    status_command while date +'%Y-%m-%d %l:%M:%S %p'; do sleep 1; done
+    status_command i3status
     colors {
         statusline #ffffff
         background #323232
         inactive_workspace #32323200 #32323200 #5c5c5c
     }
 }
-
-include /gnu/store/3vlvpbxsbkfqlls1ikam8w1j2bb7vh1r-sway-1.0/etc/sway/config.d/*
