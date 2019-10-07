@@ -93,6 +93,10 @@ if [[ -z "$TMUX" && -n "$SSH_CONNECTION" ]]; then
     tmux -2 attach -d
 fi
 
+if [ "$(tty)" = "/dev/tty1" ]; then
+    exec sway
+fi
+
 case $TERM in
   (*xterm* | rxvt)
 
