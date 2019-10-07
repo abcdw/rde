@@ -16,7 +16,7 @@ in
   imports =
 
     [ # Include the results of the hardware scan.
-      ./hardware-configuration.nix
+      ./hardware-configuration.ixy.nix
     ];
   nixpkgs.config.allowUnfree = true;
   powerManagement.enable = true;
@@ -56,8 +56,8 @@ in
   services.actkbd = {
     enable = true;
     bindings = [
-      { keys = [ 224 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/light -U 10"; }
-      { keys = [ 225 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/light -A 10"; }
+      { keys = [ 224 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/light -U 5"; }
+      { keys = [ 225 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/light -A 5"; }
     ];
   };
 
@@ -93,7 +93,18 @@ in
       allowDiscards = true;
     }
   ];
-  boot.kernel.sysctl = { "vm.swappiness" = 1; };
+  boot.extraModprobeConfig = ''
+    options snd_hda_intel power_save=1
+    options iwlwifi power_save=1 d0i3_disable=0 uapsd_disable=0
+    options iwldvm force_cam=0
+  '';
+  boot.kernel.sysctl = {
+    "kernel.nmi_watchdog" = 0;
+    "vm.dirty_writeback_centisecs" = 6000;
+    "vm.laptop_mode" = 5;
+    "swappiness" = 1;
+  };
+
   boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
 
 
@@ -103,6 +114,7 @@ in
     MOZ_ENABLE_WAYLAND="1";
     QT_QPA_PLATFORM="wayland";
     QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
+    _JAVA_AWT_WM_NONREPARENTING="1";
   };
 
   networking = {
@@ -135,13 +147,27 @@ in
 
   time.timeZone = "Europe/Moscow";
 
-  sound.enable = true;
-  hardware.pulseaudio.enable = true;
+  hardware.pulseaudio = {
+    enable = true;
+    tcp.enable = true; # need for mpd
+    package = pkgs.pulseaudioFull;
+  };
+
+  systemd.services.thinkpad-fix-sound = {
+    description = "Fix the sound on X1 Yoga";
+    path = [ pkgs.alsaTools ];
+    script = ''
+      hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0
+    '';
+  };
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     wget vim htop
-    pamixer
+    pamixer alsaTools
+    powertop
+    okular
     xorg.xeyes
     qutebrowser
     nixos-unstable.next
@@ -185,9 +211,10 @@ in
     sway = {
       enable = true;
       extraPackages = with pkgs; [
-        swaylock swayidle
+        nixos-unstable.swaylock swayidle
 	      xwayland
-	      wl-clipboard
+        grim slurp
+	      wl-clipboard nixpkgs-unstable.clipman
 	      alacritty rxvt_unicode
         rofi dmenu
         i3status i3status-rust
