@@ -1,0 +1,13 @@
+{
+ ;; :mvn/repos {"sonatype" {:url "https://oss.sonatype.org/content/repositories/snapshots/"}}
+ :aliases
+ {:nrepl {:extra-deps {nrepl             {:mvn/version "RELEASE"}
+                       refactor-nrepl    {:mvn/version "2.5.0-SNAPSHOT"}
+                       cider/cider-nrepl {:mvn/version "RELEASE"}}
+          :main-opts
+          ["-m"
+           "nrepl.cmdline"
+           "--middleware"
+           "[refactor-nrepl.middleware/wrap-refactor,cider.nrepl/cider-middleware]"
+           ]}
+  }}
