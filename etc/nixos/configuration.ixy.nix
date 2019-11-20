@@ -56,10 +56,27 @@ in
   services.actkbd = {
     enable = true;
     bindings = [
-      { keys = [ 224 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/light -U 5"; }
-      { keys = [ 225 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/light -A 5"; }
+      # { keys = [ 224 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/light -U 4"; }
+      # { keys = [ 225 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/light -A 4"; }
+      # { keys = [ 113 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q set Master toggle'"; }
+      # { keys = [ 114 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q -c 0 set Master 4- unmute'"; }
+      # { keys = [ 115 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q -c 0 set Master 4+ unmute'"; }
     ];
   };
+
+  # services.acpid.enable = true;
+  # services.acpid.handlers.cdPlay = {
+  #   event = "cd/play.*";
+  #   action = "${pkgs.mpc_cli}/bin/mpc toggle";
+  # };
+  # services.acpid.handlers.cdNext = {
+  #   event = "cd/next.*";
+  #   action = "${pkgs.mpc_cli}/bin/mpc next";
+  # };
+  # services.acpid.handlers.cdPrev = {
+  #   event = "cd/prev.*";
+  #   action = "${pkgs.mpc_cli}/bin/mpc prev";
+  # };
 
   #boot.initrd.availableKernelModules = [
   #  "aes_x86_64"
@@ -82,7 +99,12 @@ in
        enableCryptodisk = true;
        gfxmodeEfi = "1024x768";
 #       useOSProber = true;
-     };
+       extraEntries = ''
+           menuentry "NixOS experimental" {
+           chainloader (hd0,2)+1
+           }
+       '';
+    };
   };
 
   boot.initrd.luks.devices = [
@@ -98,23 +120,26 @@ in
     options iwlwifi power_save=1 d0i3_disable=0 uapsd_disable=0
     options iwldvm force_cam=0
   '';
+
   boot.kernel.sysctl = {
     "kernel.nmi_watchdog" = 0;
     "vm.dirty_writeback_centisecs" = 6000;
     "vm.laptop_mode" = 5;
     "swappiness" = 1;
+    "net.ipv4.ip_default_ttl" = 65;
   };
 
-  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
+#  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
 
 
   environment.variables = {
-    BROWSER="qutebrowser";
+    #    BROWSER="qutebrowser";
+    BROWSER="chromium";
 #    EDITOR="emacs";
-    MOZ_ENABLE_WAYLAND="1";
-    QT_QPA_PLATFORM="wayland";
-    QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
-    _JAVA_AWT_WM_NONREPARENTING="1";
+    # MOZ_ENABLE_WAYLAND="1";
+    # QT_QPA_PLATFORM="wayland";
+    # QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
+    # _JAVA_AWT_WM_NONREPARENTING="1";
   };
 
   networking = {
@@ -131,16 +156,15 @@ in
 
   hardware.bluetooth.enable = true;
 
-
   services.xserver =
   {
     layout = "us,ru";
     xkbVariant = "dvorak,";
     xkbOptions = "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
-    synaptics = {
-      enable = true;
-      twoFingerScroll = true;
-    };
+    # synaptics = {
+    #   enable = true;
+    #   twoFingerScroll = true;
+    # };
   };
   i18n.consoleUseXkbConfig = true;
   i18n.consoleFont = "sun12x22";
@@ -152,30 +176,46 @@ in
     tcp.enable = true; # need for mpd
     package = pkgs.pulseaudioFull;
   };
+#  sound.mediaKeys.enable = true;
 
   systemd.services.thinkpad-fix-sound = {
     description = "Fix the sound on X1 Yoga";
     path = [ pkgs.alsaTools ];
+    wantedBy = [ "default.target" ];
+    after = [ "sound.target" "alsa-store.service" ];
     script = ''
       hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0
     '';
   };
 
+  powerManagement.powerUpCommands = "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    wget vim htop
-    pamixer alsaTools
+    nixos-unstable.libmtp
+    mtpfs
+    gnome3.gvfs
+    jmtpfs
+    zeal
+    gnomeExtensions.caffeine
+    wget vim sublime3 htop
+    direnv
+    pamixer alsaTools alsaUtils
+    imagemagick gimp nixos-unstable.krita
+    ffmpeg
     powertop
-    okular
+    nixos-unstable.okular
+    libreoffice
     xorg.xeyes
     qutebrowser
+    zoom-us
+    youtube-dl
     nixos-unstable.next
     gnumake
     pavucontrol
     qt5.qtwayland
     unzip p7zip unrar
-    nixos-unstable.tdesktop
+    nixos-unstable.tdesktop discord
     firefox
     chromium
     git
@@ -206,20 +246,30 @@ in
 
   users.defaultUserShell = pkgs.zsh;
 
+  services.xserver.enable = true;
+  services.xserver.displayManager.gdm.enable = true;
+  services.xserver.displayManager.gdm.wayland = false;
+  services.xserver.desktopManager.gnome3.enable = true;
+
   programs = {
     light.enable = true;
     sway = {
       enable = true;
+
       extraPackages = with pkgs; [
+
         nixos-unstable.swaylock swayidle
 	      xwayland
-        grim slurp
+        nixos-unstable.grim nixos-unstable.slurp
+        nixos-unstable.mako
+        libnotify
 	      wl-clipboard nixpkgs-unstable.clipman
 	      alacritty rxvt_unicode
         rofi dmenu
         i3status i3status-rust
       ];
     };
+
     ssh.startAgent = true;
 
     tmux = {
@@ -245,31 +295,6 @@ in
     defaultEditor = true;
   };
 
-  services.acpid.enable = true;
-  services.acpid.handlers.volumeDown = {
-    event = "button/volumedown";
-    action = "${pkgs.pamixer}/bin/pamixer -d 3";
-  };
-  services.acpid.handlers.volumeUp = {
-    event = "button/volumeup";
-    action = "${pkgs.pamixer}/bin/pamixer -i 3";
-  };
-  services.acpid.handlers.mute = {
-    event = "button/mute";
-    action = "${pkgs.pamixer}/bin/pamixer -t";
-  };
-  services.acpid.handlers.cdPlay = {
-    event = "cd/play.*";
-    action = "${pkgs.mpc_cli}/bin/mpc toggle";
-  };
-  services.acpid.handlers.cdNext = {
-    event = "cd/next.*";
-    action = "${pkgs.mpc_cli}/bin/mpc next";
-  };
-  services.acpid.handlers.cdPrev = {
-    event = "cd/prev.*";
-    action = "${pkgs.mpc_cli}/bin/mpc prev";
-  };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
