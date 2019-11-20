@@ -110,3 +110,5 @@ case $TERM in
 
   ;;
 esac
+
+eval "$(direnv hook zsh)"
