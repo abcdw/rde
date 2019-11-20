@@ -7,5 +7,11 @@ dotfiles-install:
 dotfiles-uninstall:
 	stow -D dotfiles -v 2
 
-install: dotfiles-install
+etc-install:
+	sudo stow -t /etc/ etc
+
+etc-uninstall:
+	sudo stow -t /etc/ etc -D
+
+install: etc-install dotfiles-install
 	echo "yay!"
