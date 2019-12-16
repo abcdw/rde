@@ -139,19 +139,36 @@ Disable/enable some modes.
 *** Look and feel
 
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-;(load-theme 'nord t)
-(load-theme 'base16-tomorrow t)
+  (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
+  (load-theme 'nord t)
+  ;;(load-theme 'base16-tomorrow t)
 
-(set-face-attribute 'default nil :font "Iosevka 10")
+  (set-face-attribute 'default nil :font "Iosevka 10")
 
-;; blink modeline instead of beep
-(setq visible-bell nil
-      ring-bell-function 'flash-mode-line)
-(defun flash-mode-line ()
-  (invert-face 'mode-line)
-  (run-with-timer 0.1 nil #'invert-face 'mode-line))
-(add-to-list 'default-frame-alist '(fullscreen . maximized))
+  ;; blink modeline instead of beep
+  (setq visible-bell nil
+	ring-bell-function 'flash-mode-line)
+  (defun flash-mode-line ()
+    (invert-face 'mode-line)
+    (run-with-timer 0.1 nil #'invert-face 'mode-line))
+  (add-to-list 'default-frame-alist '(fullscreen . maximized))
+  (setq vc-follow-symlinks t)
+
+  (recentf-mode 1)
+  (run-at-time nil (* 5 60) 'recentf-save-list)
+
+  (save-place-mode 1)
+  (setq save-interprogram-paste-before-kill t
+	apropos-do-all t
+	mouse-yank-at-point t
+	require-final-newline t
+	load-prefer-newer t
+	ediff-window-setup-function 'ediff-setup-windows-plain
+	save-place-file (concat user-emacs-directory "places")
+	backup-directory-alist `(("." . ,(concat user-emacs-directory
+						   "backups"))))
+
+    (global-set-key [remap list-buffers] 'ibuffer)
 #+END_SRC
 
 *** Keybindings
