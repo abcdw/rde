@@ -78,6 +78,7 @@ Some magic with tangling org config.
 	    yaml-mode
 	    nix-mode
 	    markdown-mode
+	    writeroom-mode
 	    which-key)))         ; Display available keybindings in popup
     (ignore-errors
       (let ((packages (cl-remove-if 'package-installed-p packages)))
