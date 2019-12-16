@@ -137,7 +137,7 @@ Disable/enable some modes.
 #+END_SRC
 
 *** Look and feel
-
+**** Better defaults
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
   (load-theme 'nord t)
@@ -182,12 +182,22 @@ Disable/enable some modes.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "C-;") 'avy-goto-char)
-(global-set-key (kbd "C-s") 'swiper)
-(global-set-key (kbd "C-c g") 'counsel-rg)
-(global-set-key (kbd "C-h") 'delete-backward-char)
-(global-set-key (kbd "C-?") 'help-command)
-(global-set-key (kbd "C-x g") 'magit-status)
+  (defun prev-window ()
+    (interactive)
+    (other-window -1))
+  (global-set-key (kbd "C-.") #'other-window)
+  (global-set-key (kbd "C-,") #'prev-window)
+  (global-set-key (kbd "s-.") 'ace-window)
+  (global-set-key (kbd "M-/") 'hippie-expand)
+  (global-set-key (kbd "M-z") 'zap-up-to-char)
+
+  (global-set-key (kbd "C-;") 'avy-goto-char)
+  (global-set-key (kbd "C-s") 'swiper)
+  (global-set-key (kbd "C-c g") 'counsel-rg)
+  (global-set-key (kbd "C-h") 'delete-backward-char)
+  (global-set-key (kbd "C-?") 'help-command)
+  (global-set-key (kbd "C-x g") 'magit-status)
+
 #+END_SRC
 
 *** Whitespaces
