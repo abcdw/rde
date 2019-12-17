@@ -38,7 +38,7 @@ Some magic with tangling org config.
 #+END_SRC
 
 *** Packages
-
+**** Init package system
 #+BEGIN_SRC emacs-lisp
 (require 'cl-lib)
 (require 'package)
@@ -49,10 +49,10 @@ Some magic with tangling org config.
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
-
 (add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
 #+END_SRC
 
+**** Package list
 #+BEGIN_SRC emacs-lisp
   (let* ((package--builtins nil)
 	 (packages
@@ -72,6 +72,7 @@ Some magic with tangling org config.
 	    rainbow-delimiters
 	    base16-theme
 	    nord-theme
+	    doom-themes
 	    paredit              ; minor mode for editing parentheses
 	    projectile           ; Manage and navigate projects in Emacs easily
 	    rust-mode
@@ -79,6 +80,7 @@ Some magic with tangling org config.
 	    nix-mode
 	    markdown-mode
 	    writeroom-mode
+	    org-super-agenda
 	    which-key)))         ; Display available keybindings in popup
     (ignore-errors
       (let ((packages (cl-remove-if 'package-installed-p packages)))
@@ -90,29 +92,30 @@ Some magic with tangling org config.
 
 *** Modes
 
-Disable/enable some modes.
+**** Basic modes
 
 #+BEGIN_SRC emacs-lisp
-(dolist (mode
-         '(menu-bar-mode
-           tool-bar-mode
-           scroll-bar-mode
-           blink-cursor-mode))
-  (funcall mode 0))
+  (dolist (mode
+	   '(menu-bar-mode
+	     tool-bar-mode
+	     scroll-bar-mode
+	     blink-cursor-mode))
+    (funcall mode 0))
 
-(dolist (mode
-         '(projectile-global-mode
-	   global-company-mode
-	   column-number-mode
-	   beacon-mode
-	   yas-global-mode
-	   show-paren-mode
-	   ivy-mode
-	   counsel-mode
-	   which-key-mode
-	   ;; global-whitespace-mode
-))
-  (funcall mode 1))
+  (dolist (mode
+	   '(projectile-global-mode
+	     global-company-mode
+	     column-number-mode
+	     beacon-mode
+	     yas-global-mode
+	     show-paren-mode
+	     ivy-mode
+	     counsel-mode
+	     which-key-mode
+	     org-super-agenda-mode
+	     ;; global-whitespace-mode
+	     ))
+    (funcall mode 1))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
@@ -136,12 +139,19 @@ Disable/enable some modes.
 (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
 #+END_SRC
 
+**** org mode
+#+BEGIN_SRC emacs-lisp
+  (setq org-directory "~/org")
+  (setq org-archive-location (concat org-directory "/archived.org::"))
+  ()
+#+END_SRC-
 *** Look and feel
 **** Better defaults
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
   (load-theme 'nord t)
-  ;;(load-theme 'base16-tomorrow t)
+  ;; (load-theme 'doom-tomorrow-day t)
+  ;; (load-theme 'base16-tomorrow t)
 
   (set-face-attribute 'default nil :font "Iosevka 10")
 
@@ -167,21 +177,65 @@ Disable/enable some modes.
 	save-place-file (concat user-emacs-directory "places")
 	backup-directory-alist `(("." . ,(concat user-emacs-directory
 						   "backups"))))
+  (setq create-lockfiles nil)
 
-    (global-set-key [remap list-buffers] 'ibuffer)
+  (global-set-key [remap list-buffers] 'ibuffer)
 #+END_SRC
 
+**** Buffer appearance rules
+
+#+BEGIN_SRC emacs-lisp
+  ;;  (set-frame-parameter nil 'unsplittable t)
+
+    ;; (defun my-display-buffer-function (buf not-this-window)
+    ;;   (if (and (not pop-up-frames)
+    ;; 	  (one-window-p)
+    ;; 	  (or not-this-window
+    ;; 	      (not (eq (window-buffer (selected-window)) buf)))
+    ;; 	  (> (frame-width) 162))
+    ;;       (split-window-horizontally))
+    ;;   ;; Note: Some modules sets `pop-up-windows' to t before calling
+    ;;   ;; `display-buffer' -- Why, oh, why!
+    ;;   (let ((display-buffer-function nil)
+    ;; 	(pop-up-windows nil))
+    ;;     (display-buffer buf not-this-window)))
+
+    ;; (setq display-buffer-function 'my-display-buffer-function)
+
+
+#+END_SRC
 *** Keybindings
 
 #+BEGIN_SRC emacs-lisp
-(add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
+
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-(define-key projectile-mode-map (kbd "s-e") 'projectile-command-map)
-#+END_SRC
 
+#+END_SRC
+**** Global hydra
 #+BEGIN_SRC emacs-lisp
+  (global-set-key
+   (kbd "s-e")
+   (defhydra hydra-global-menu
+     (:color pink :hint nil)
+     ("p f" projectile-find-file "project find file" :color blue :column "project")
+     ("p t" treemacs-select-window "project tree" :color blue)
+     ("t t" treemacs "toggle tree" :color blue :column "toggle")
+     ("f r" counsel-recentf "recentf" :color blue :column "files")
+     ("s s" counsel-rg "ripgrep" :color blue)
+     ("w w" other-window "other window" :column "windows")
+     ("n w" widen "widen" :column "narrow")
+     ("n s" org-narrow-to-subtree "subtree")
+     ("n e" org-narrow-to-element "element")
+     ))
+  ;; (global-set-key (kbd "s-e") 'hydra-global-menu/body)
+
+#+END_SRC
+**** Misc
+#+BEGIN_SRC emacs-lisp
+  (add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
+
   (defun prev-window ()
     (interactive)
     (other-window -1))
