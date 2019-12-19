@@ -216,20 +216,46 @@ Some magic with tangling org config.
 #+END_SRC
 **** Global hydra
 #+BEGIN_SRC emacs-lisp
+  (defun kill-other-window-buffer ()
+    "Kill buffer in other window"
+    (interactive)
+    (other-window 1)
+    (kill-this-buffer)
+    (other-window 1))
+
+  (defhydra hydra-window-menu
+    (:color pink :hint nil)
+    ("o" other-window "other window" :column "windows" :color blue)
+    ("O" other-window "other window" :column "windows")
+    ("w" kill-other-window-buffer "kill other window buffer" :column "buffers")
+    ("W" kill-other-window-buffer "kill other window buffer" :color blue)
+    ("n" switch-to-next-buffer "next buffer other window")
+    ("p" switch-to-prev-buffer "prev buffer other window")
+    ("M-n" (switch-to-next-buffer (next-window)) "next buffer other window")
+    ("M-p" (switch-to-prev-buffer (next-window)) "prev buffer other window")
+    ("q" nil "quit" :column "quit"))
+
   (global-set-key
    (kbd "s-e")
    (defhydra hydra-global-menu
-     (:color pink :hint nil)
+     (:color blue :hint nil)
      ("p f" projectile-find-file "project find file" :color blue :column "project")
      ("p t" treemacs-select-window "project tree" :color blue)
      ("t t" treemacs "toggle tree" :color blue :column "toggle")
      ("f r" counsel-recentf "recentf" :color blue :column "files")
+     ("f i" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
+     ("f t" (lambda () (interactive) (find-file "~/org/todo.org")) "todo.org")
      ("s s" counsel-rg "ripgrep" :color blue)
-     ("w w" other-window "other window" :column "windows")
      ("n w" widen "widen" :column "narrow")
      ("n s" org-narrow-to-subtree "subtree")
      ("n e" org-narrow-to-element "element")
+     ("o t" org-todo-list "todo" :column "org" :color blue)
+     ("o a" org-agenda-list "agenda")
+     ("o c" org-capture "capture")
+     ("w" hydra-window-menu/body "window/buffer menu" :column "hydras")
      ))
+
+
   ;; (global-set-key (kbd "s-e") 'hydra-global-menu/body)
 
 #+END_SRC
