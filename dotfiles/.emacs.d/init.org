@@ -83,6 +83,9 @@ Some magic with tangling org config.
 	    writeroom-mode
 	    org-super-agenda
 	    major-mode-hydra
+	    posframe
+;;	    hydra-posframe
+	    ivy-posframe
 	    which-key)))         ; Display available keybindings in popup
     (ignore-errors
       (let ((packages (cl-remove-if 'package-installed-p packages)))
@@ -144,43 +147,79 @@ Some magic with tangling org config.
 **** org mode
 #+BEGIN_SRC emacs-lisp
   (setq org-directory "~/org")
+  (setq org-default-notes-file (concat org-directory "/todo.org"))
   (setq org-archive-location (concat org-directory "/archived.org::"))
-  ()
-#+END_SRC-
+  (setq org-agenda-files (list "~/org/todo.org"))
+  (setq org-default-notes-file "~/org/todo.org")
+  (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
+  (setq org-hide-leading-stars t)
+  (setq org-todo-keywords
+      '((sequence "TODO" "NEXT" "|" "DONE" "DELEGATED")))
+  (setq org-super-agenda-groups
+	'((:name "Today"
+		 :tag "Today")
+	  (:name "Week plan"
+		 :tag "Week")
+	  (:name "Backlog"
+		 :todo "TODO")))
+  (setq org-src-window-setup 'current-window)
+  (setq org-capture-templates
+	`(("t" "Task" entry
+	   (file+headline "~/org/todo.org" "Inbox")
+	   "* TODO %?\n")
+	  ("T" "Task" entry
+	   (file+headline "~/org/todo.org" "Today")
+	   "* TODO %?\n")
+	  ("q" "Quick note" entry
+	   (file+headline "~/org/todo.org" "Notes")
+	   "* %? :Note:\n")
+	  ))
+
+#+END_SRC
 *** Look and feel
 **** Better defaults
 #+BEGIN_SRC emacs-lisp
-  (set-face-attribute 'default nil :font "Iosevka 10")
-
-  ;; blink modeline instead of beep
-  (setq visible-bell nil
-	ring-bell-function 'flash-mode-line)
-  (defun flash-mode-line ()
-    (invert-face 'mode-line)
-    (run-with-timer 0.1 nil #'invert-face 'mode-line))
-  (add-to-list 'default-frame-alist '(fullscreen . maximized))
-  (setq vc-follow-symlinks t)
-
-  (recentf-mode 1)
-  (run-at-time nil (* 5 60) 'recentf-save-list)
-
-  (save-place-mode 1)
-  (setq save-interprogram-paste-before-kill t
-	apropos-do-all t
-	mouse-yank-at-point t
-	require-final-newline t
-	load-prefer-newer t
-	ediff-window-setup-function 'ediff-setup-windows-plain
-	save-place-file (concat user-emacs-directory "places")
-	backup-directory-alist `(("." . ,(concat user-emacs-directory
-						   "backups"))))
-  (setq create-lockfiles nil)
-
-  (global-set-key [remap list-buffers] 'ibuffer)
     (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
   ;;  (load-theme 'nord t)
     (load-theme 'leuven t)
     (setq org-fontify-whole-heading-line t)
+  ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
+    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+    (setq ivy-posframe-border-width 10)
+  ;;  (setq ivy-posframe-display-functions-alist '((t . nil)))
+  ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-point)))
+    (ivy-posframe-mode 1)
+
+    ;; (load-theme 'doom-tomorrow-day t)
+    ;; (load-theme 'base16-tomorrow t)
+
+    (set-face-attribute 'default nil :font "Iosevka 10")
+
+    ;; blink modeline instead of beep
+    (setq visible-bell nil
+	  ring-bell-function 'flash-mode-line)
+    (defun flash-mode-line ()
+      (invert-face 'mode-line)
+      (run-with-timer 0.1 nil #'invert-face 'mode-line))
+    (add-to-list 'default-frame-alist '(fullscreen . maximized))
+    (setq vc-follow-symlinks t)
+
+    (recentf-mode 1)
+    (run-at-time nil (* 5 60) 'recentf-save-list)
+
+    (save-place-mode 1)
+    (setq save-interprogram-paste-before-kill t
+	  apropos-do-all t
+	  mouse-yank-at-point t
+	  require-final-newline t
+	  load-prefer-newer t
+	  ediff-window-setup-function 'ediff-setup-windows-plain
+	  save-place-file (concat user-emacs-directory "places")
+	  backup-directory-alist `(("." . ,(concat user-emacs-directory
+						     "backups"))))
+    (setq create-lockfiles nil)
+
+    (global-set-key [remap list-buffers] 'ibuffer)
 #+END_SRC
 
 **** Buffer appearance rules
@@ -208,12 +247,9 @@ Some magic with tangling org config.
 *** Keybindings
 
 #+BEGIN_SRC emacs-lisp
-
+;; (hydra-posframe-enable)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-
-#+END_SRC
 **** Global hydra
 #+BEGIN_SRC emacs-lisp
   (defun kill-other-window-buffer ()
