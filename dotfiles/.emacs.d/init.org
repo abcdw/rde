@@ -72,7 +72,8 @@ Some magic with tangling org config.
 	    rainbow-delimiters
 	    base16-theme
 	    nord-theme
-	    doom-themes
+	    leuven-theme
+	    ;; doom-themes
 	    paredit              ; minor mode for editing parentheses
 	    projectile           ; Manage and navigate projects in Emacs easily
 	    rust-mode
@@ -149,11 +150,6 @@ Some magic with tangling org config.
 *** Look and feel
 **** Better defaults
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-  (load-theme 'nord t)
-  ;; (load-theme 'doom-tomorrow-day t)
-  ;; (load-theme 'base16-tomorrow t)
-
   (set-face-attribute 'default nil :font "Iosevka 10")
 
   ;; blink modeline instead of beep
@@ -181,6 +177,10 @@ Some magic with tangling org config.
   (setq create-lockfiles nil)
 
   (global-set-key [remap list-buffers] 'ibuffer)
+    (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
+  ;;  (load-theme 'nord t)
+    (load-theme 'leuven t)
+    (setq org-fontify-whole-heading-line t)
 #+END_SRC
 
 **** Buffer appearance rules
