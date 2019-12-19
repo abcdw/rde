@@ -81,6 +81,7 @@ Some magic with tangling org config.
 	    markdown-mode
 	    writeroom-mode
 	    org-super-agenda
+	    major-mode-hydra
 	    which-key)))         ; Display available keybindings in popup
     (ignore-errors
       (let ((packages (cl-remove-if 'package-installed-p packages)))
@@ -231,6 +232,21 @@ Some magic with tangling org config.
      ))
   ;; (global-set-key (kbd "s-e") 'hydra-global-menu/body)
 
+#+END_SRC
+**** Major hydra
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "M-o") #'major-mode-hydra)
+
+  (major-mode-hydra-define org-mode nil
+    ("Refile"
+     (("r" org-refile "refile"))))
+
+  (major-mode-hydra-define clojure-mode nil
+    ("Eval"
+     (("e e" 'cider-eval-last-sexp "eval last sexp")
+      ("e f" 'cider-eval-defun-at-point "eval form")
+      ("e p" 'cider-pprint-eval-defun-at-point "eval form with pprint")
+      )))
 #+END_SRC
 **** Misc
 #+BEGIN_SRC emacs-lisp
