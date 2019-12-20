@@ -10,6 +10,7 @@ let
   # sudo nix-channel --update nixpkgs-unstable
   nixpkgs-unstable = import <nixpkgs-unstable> {};
   nixos-unstable = import <nixos-unstable> {};
+
 in
 
 {
@@ -18,7 +19,9 @@ in
     [ # Include the results of the hardware scan.
       ./hardware-configuration.ixy.nix
     ];
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config = {
+    allowUnfree = true;
+  };
   powerManagement.enable = true;
   powerManagement.powertop.enable = true;
 
@@ -130,6 +133,7 @@ in
   };
 
 #  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
+#  boot.extraModulePackages = [ config.boot.kernelPackages.exfat-nofuse ];
 
 
   environment.variables = {
@@ -174,8 +178,20 @@ in
   hardware.pulseaudio = {
     enable = true;
     tcp.enable = true; # need for mpd
+    support32Bit = true; # need for steam
     package = pkgs.pulseaudioFull;
   };
+
+  # nixpkgs.config.packageOverrides = pkgs: {
+  #   vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+  # };
+  hardware.opengl = {
+    enable = true;
+    driSupport32Bit = true;
+    extraPackages32 = with pkgs.pkgsi686Linux; [ libva ];
+  };
+  hardware.steam-hardware.enable = true;
+
 #  sound.mediaKeys.enable = true;
 
   systemd.services.thinkpad-fix-sound = {
@@ -187,12 +203,18 @@ in
       hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0
     '';
   };
-
   powerManagement.powerUpCommands = "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    nixos-unstable.cura
+    nixos-unstable.freecad
+    nixos-unstable.brave
     nixos-unstable.libmtp
+    exfat-utils
+    fuse_exfat
+    steam
+    python3
     mtpfs
     gnome3.gvfs
     jmtpfs
