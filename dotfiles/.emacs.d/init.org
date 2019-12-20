@@ -154,26 +154,49 @@ Some magic with tangling org config.
   (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
   (setq org-hide-leading-stars t)
   (setq org-todo-keywords
-      '((sequence "TODO" "NEXT" "|" "DONE" "DELEGATED")))
+	'((sequence "TODO" "NEXT" "|" "DONE" "DELEGATED")))
+  (setq org-todo-keywords
+	(quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+		(sequence "WAITING(w@/!)" "HOLD(h@/!)" "DELEGATED(D@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+
+  (setq org-todo-keyword-faces
+	(quote (("NEXT" :foreground "forest green" :weight bold :background "light green"
+		 :box (:line-width 1 :color "forest green"))
+		("WAITING" :foreground "orange" :weight bold :background "light organe"
+		 :box (:line-width 1 :color "orange"))
+		("HOLD" :foreground "blue" :weight bold :background "light blue"
+		 :box (:line-width 1 :color "blue"))
+		)))
+
+  (setq org-agenda-skip-scheduled-if-done nil)
+
   (setq org-super-agenda-groups
-	'((:name "Today"
+	'((:name "Currently working"
+		 :todo "NEXT")
+	  (:name "Today TODO"
+		 :and (:tag "Today"
+			    :todo "TODO"))
+	  (:name "Today"
 		 :tag "Today")
 	  (:name "Week plan"
 		 :tag "Week")
 	  (:name "Backlog"
-		 :todo "TODO")))
-  (setq org-src-window-setup 'current-window)
-  (setq org-capture-templates
-	`(("t" "Task" entry
-	   (file+headline "~/org/todo.org" "Inbox")
-	   "* TODO %?\n")
-	  ("T" "Task" entry
-	   (file+headline "~/org/todo.org" "Today")
-	   "* TODO %?\n")
-	  ("q" "Quick note" entry
-	   (file+headline "~/org/todo.org" "Notes")
-	   "* %? :Note:\n")
+		 :todo "TODO")
+	  (:name "DONE"
+		 )
 	  ))
+    (setq org-src-window-setup 'current-window)
+    (setq org-capture-templates
+	  `(("t" "Task" entry
+	     (file+headline "~/org/todo.org" "Inbox")
+	     "* TODO %?\n")
+	    ("c" "Today task" entry
+	     (file+headline "~/org/todo.org" "Today")
+	     "* TODO %?\n")
+	    ("q" "Quick note" entry
+	     (file+headline "~/org/todo.org" "Notes")
+	     "* %? :Note:\n")
+	    ))
 
 #+END_SRC
 *** Look and feel
