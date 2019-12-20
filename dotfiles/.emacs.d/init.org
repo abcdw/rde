@@ -261,8 +261,10 @@ Some magic with tangling org config.
 
   (defhydra hydra-window-menu
     (:color pink :hint nil)
-    ("o" other-window "other window" :column "windows" :color blue)
-    ("O" other-window "other window" :column "windows")
+    ("o" other-window "other window" :column "windows")
+    ("O" other-window "other window" :color blue)
+    ("s" split-window-right "split right")
+    ("S" split-window-right "split right" :color blue)
     ("w" kill-other-window-buffer "kill other window buffer" :column "buffers")
     ("W" kill-other-window-buffer "kill other window buffer" :color blue)
     ("n" switch-to-next-buffer "next buffer other window")
@@ -285,6 +287,7 @@ Some magic with tangling org config.
      ("n w" widen "widen" :column "narrow")
      ("n s" org-narrow-to-subtree "subtree")
      ("n e" org-narrow-to-element "element")
+     ("n z" writeroom-mode "zen mode")
      ("o t" org-todo-list "todo" :column "org" :color blue)
      ("o a" org-agenda-list "agenda")
      ("o c" org-capture "capture")
