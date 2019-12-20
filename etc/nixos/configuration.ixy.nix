@@ -9,7 +9,9 @@ let
   # sudo nix-channel --add http://nixos.org/channels/nixpkgs-unstable nixpkgs-unstable
   # sudo nix-channel --update nixpkgs-unstable
   nixpkgs-unstable = import <nixpkgs-unstable> {};
-  nixos-unstable = import <nixos-unstable> {};
+  nixos-unstable = import <nixos-unstable> {
+    config = config.nixpkgs.config;
+  };
 
 in
 
@@ -209,11 +211,12 @@ in
   environment.systemPackages = with pkgs; [
     nixos-unstable.cura
     nixos-unstable.freecad
+    nixos-unstable.openscad
     nixos-unstable.brave
     nixos-unstable.libmtp
     exfat-utils
     fuse_exfat
-    steam
+    nixos-unstable.steam
     python3
     mtpfs
     gnome3.gvfs
