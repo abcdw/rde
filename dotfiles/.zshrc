@@ -5,6 +5,9 @@ compinit
 zstyle ':completion:*:descriptions' format '%U%B%d%b%u'
 setopt completealiases
 zstyle ':completion:*' menu select
+zstyle ':completion:*:*:kill:*' menu yes select
+zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#)*=0=01;31'
+zstyle ':completion:*:*:kill:*:processes' command 'ps xo pid,user:10,cmd | grep -v "sshd:|-zsh$"'
 
 # Simple gentoo prompt
 autoload -U promptinit
