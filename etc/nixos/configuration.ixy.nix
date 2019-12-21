@@ -212,37 +212,48 @@ in
     nixos-unstable.cura
     nixos-unstable.freecad
     nixos-unstable.openscad
+
     nixos-unstable.brave
+    nixos-unstable.firefox
+    nixos-unstable.chromium
+    nixos-unstable.next
+    qutebrowser
+
+    nixos-unstable.okular
+    libreoffice
+    nixos-unstable.zoom-us
+    nixos-unstable.steam
+    gimp nixos-unstable.krita
+    nixos-unstable.tdesktop discord
+    lxappearance
+
+    imagemagick
+    ffmpeg
+    youtube-dl
+
+    pamixer alsaTools alsaUtils
+    pavucontrol
+
     nixos-unstable.libmtp
+    feh
     exfat-utils
     fuse_exfat
-    nixos-unstable.steam
-    python3
     mtpfs
     gnome3.gvfs
     jmtpfs
+
+    python3
     zeal
-    gnomeExtensions.caffeine
-    wget vim sublime3 htop
+    wget vim htop
     direnv
-    pamixer alsaTools alsaUtils
-    imagemagick gimp nixos-unstable.krita
-    ffmpeg
+    killall
     powertop
-    nixos-unstable.okular
-    libreoffice
     xorg.xeyes
-    qutebrowser
-    zoom-us
-    youtube-dl
-    nixos-unstable.next
+
     gnumake
-    pavucontrol
+
     qt5.qtwayland
     unzip p7zip unrar
-    nixos-unstable.tdesktop discord
-    firefox
-    chromium
     git
     gnupg
     ranger
