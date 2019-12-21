@@ -134,7 +134,7 @@ in
     "net.ipv4.ip_default_ttl" = 65;
   };
 
-#  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
+  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
 #  boot.extraModulePackages = [ config.boot.kernelPackages.exfat-nofuse ];
 
 
@@ -161,17 +161,6 @@ in
   # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
 
   hardware.bluetooth.enable = true;
-
-  services.xserver =
-  {
-    layout = "us,ru";
-    xkbVariant = "dvorak,";
-    xkbOptions = "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
-    # synaptics = {
-    #   enable = true;
-    #   twoFingerScroll = true;
-    # };
-  };
   i18n.consoleUseXkbConfig = true;
   i18n.consoleFont = "sun12x22";
 
@@ -266,6 +255,7 @@ in
 
   fonts.enableFontDir = true;
   fonts.enableGhostscriptFonts = true;
+  fonts.fontconfig.dpi = 192;
   fonts.fonts = with pkgs; [
     corefonts  # Micrsoft free fonts
     nixos-unstable.font-awesome
@@ -282,10 +272,35 @@ in
 
   users.defaultUserShell = pkgs.zsh;
 
-  services.xserver.enable = true;
-  services.xserver.displayManager.gdm.enable = true;
-  services.xserver.displayManager.gdm.wayland = false;
-  services.xserver.desktopManager.gnome3.enable = true;
+  services.xserver = {
+    dpi = 192;
+    enable = true;
+    layout = "us,ru";
+    xkbVariant = "dvorak,";
+    xkbOptions = "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
+
+#    hardware.opengl.extraPackages = [ pkgs.vaapiIntel pkgs.vaapiVdpau ];
+    videoDrivers = ["intel"];
+
+    windowManager.bspwm = {
+      enable = true;
+      package = nixos-unstable.bspwm;
+      sxhkd.package = nixos-unstable.sxhkd;
+    };
+
+    displayManager.lightdm = {
+      enable = true;
+      autoLogin.enable = true;
+      autoLogin.user = "abcdw";
+    };
+    desktopManager = {
+      default = "none";
+    };
+    synaptics = {
+      enable = true;
+      twoFingerScroll = true;
+    };
+  };
 
   programs = {
     light.enable = true;
