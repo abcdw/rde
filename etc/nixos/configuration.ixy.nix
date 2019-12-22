@@ -137,15 +137,19 @@ in
   boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
 #  boot.extraModulePackages = [ config.boot.kernelPackages.exfat-nofuse ];
 
-
   environment.variables = {
-    #    BROWSER="qutebrowser";
+    # BROWSER="qutebrowser";
+    # EDITOR="emacs";
     BROWSER="chromium";
-#    EDITOR="emacs";
+    GDK_SCALE = "2";
+    GDK_DPI_SCALE = "0.5";
+    QT_AUTO_SCREEN_SCALE_FACTOR = "1";
+    XCURSOR_SIZE = "32";
+    # _JAVA_AWT_WM_NONREPARENTING="1";
     # MOZ_ENABLE_WAYLAND="1";
     # QT_QPA_PLATFORM="wayland";
     # QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
-    # _JAVA_AWT_WM_NONREPARENTING="1";
+
   };
 
   networking = {
@@ -215,6 +219,7 @@ in
     gimp nixos-unstable.krita
     nixos-unstable.tdesktop discord
     lxappearance
+    i3lock
 
     imagemagick
     ffmpeg
@@ -280,28 +285,47 @@ in
     xkbOptions = "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
 
 #    hardware.opengl.extraPackages = [ pkgs.vaapiIntel pkgs.vaapiVdpau ];
-    videoDrivers = ["intel"];
+#    videoDrivers = ["intel"];
 
     windowManager.bspwm = {
       enable = true;
       package = nixos-unstable.bspwm;
       sxhkd.package = nixos-unstable.sxhkd;
     };
+#    windowManager.default = "bspwm";
 
     displayManager.lightdm = {
       enable = true;
-      autoLogin.enable = true;
-      autoLogin.user = "abcdw";
+#      autoLogin.enable = true;
+#      autoLogin.user = "abcdw";
     };
     desktopManager = {
       default = "none";
+#      gnome3.enable = true;
     };
     synaptics = {
       enable = true;
       twoFingerScroll = true;
     };
   };
+  services.compton = {
+    enable = true;
+    # inactiveOpacity = "0.8";
+    backend = "glx";
+    # vSync = "opengl";
+    extraOptions = ''
+      paint-on-overlay = true;
+      glx-no-stencil = true;
+      glx-no-rebind-pixmap = true;
+    #   glx-swap-method = "buffer-age";
+    #   sw-opti = true;
+    #   xrender-sync-fence = true;
+    '';
+## glx-copy-from-front = true;
+## glx-swap-method = 2;
+## xrender-sync = true;
 
+  };
   programs = {
     light.enable = true;
     sway = {
