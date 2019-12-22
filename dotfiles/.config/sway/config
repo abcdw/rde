@@ -33,7 +33,7 @@ set $menu dmenu_path | dmenu | xargs swaymsg exec
 #output eDP-1 enable mode 1920x1080@59.998001Hz position 0,0
 #output eDP-1 enable mode 1600x900@59.998001Hz position 0,0
 #output eDP-1 resolution 1600x900 scale 2
-output eDP-1 mode 1920x1080@60Hz scale 2
+output eDP-1
 
 ### Idle configuration
 #
