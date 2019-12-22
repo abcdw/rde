@@ -192,7 +192,7 @@ Some magic with tangling org config.
 	     "* TODO %?\n")
 	    ("c" "Today task" entry
 	     (file+headline "~/org/todo.org" "Today")
-	     "* TODO %?\n")
+	     "* TODO %?\nSCHEDULED: %t\n")
 	    ("q" "Quick note" entry
 	     (file+headline "~/org/todo.org" "Notes")
 	     "* %? :Note:\n")
@@ -200,6 +200,7 @@ Some magic with tangling org config.
 
 #+END_SRC
 *** Look and feel
+**** TODO Add amx and ivy rich plugins for better ivy experience
 **** Better defaults
 #+BEGIN_SRC emacs-lisp
     (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
@@ -304,9 +305,13 @@ Some magic with tangling org config.
      ("p t" treemacs-select-window "project tree" :color blue)
      ("t t" treemacs "toggle tree" :color blue :column "toggle")
      ("f r" counsel-recentf "recentf" :color blue :column "files")
-     ("f i" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
+     ("f e" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
+     ("f i" (lambda () (interactive) (find-file "~/configs/etc/nixos/configuration.ixy.nix")) "ixy.nix")
      ("f t" (lambda () (interactive) (find-file "~/org/todo.org")) "todo.org")
-     ("s s" counsel-rg "ripgrep" :color blue)
+     ("f b" (lambda () (interactive) (find-file "~/.config/bspwm/bspwmrc")) "bspwmrc")
+     ("f s" (lambda () (interactive) (find-file "~/.config/sxhkd/sxhkdrc")) "sxhkdrc")
+     ("h o" org-info "org mode info" :column "help" :color blue)
+     ("s s" counsel-rg "ripgrep" :color blue :column "search")
      ("n w" widen "widen" :column "narrow")
      ("n s" org-narrow-to-subtree "subtree")
      ("n e" org-narrow-to-element "element")
