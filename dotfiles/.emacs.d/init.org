@@ -8,7 +8,7 @@
 
 ** Credits
 
-Thanks for inpiration to [[https://github.com/mitrx][Dmitry Alexeev]].
+Thanks for inspiration to [[https://github.com/mitrx][Dmitry Alexeev]].
 
 ** Configuration
 
@@ -19,20 +19,18 @@ Configuration from [[./init.org][init.org]] will be loaded by [[./init.el][init.
 Some magic with tangling org config.
 
 #+BEGIN_SRC emacs-lisp
-;;; -*- lexical-binding: t -*-
-#+END_SRC
+  ;;; -*- lexical-binding: t -*-
 
-#+BEGIN_SRC emacs-lisp
   (setq user-emacs-directory (file-truename "~/.emacs.d/"))
   (defun tangle-init ()
     "If the current buffer is 'init.org' the code-blocks are
-  tangled, and the tangled file is compiled."
+    tangled, and the tangled file is compiled."
     (when (equal (buffer-file-name)
-		 (expand-file-name (concat user-emacs-directory "init.org")))
+                 (expand-file-name (concat user-emacs-directory "init.org")))
       ;; Avoid running hooks when tangling.
       (let ((prog-mode-hook nil))
-	(org-babel-tangle)
-	(byte-compile-file (concat user-emacs-directory "init.el")))))
+        (org-babel-tangle)
+        (byte-compile-file (concat user-emacs-directory "init.el")))))
 
   (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
@@ -99,6 +97,8 @@ Some magic with tangling org config.
 
 **** Basic modes
 
+Global modes.
+
 #+BEGIN_SRC emacs-lisp
   (dolist (mode
 	   '(menu-bar-mode
@@ -124,6 +124,8 @@ Some magic with tangling org config.
     (funcall mode 1))
 #+END_SRC
 
+Per language modes.
+
 #+BEGIN_SRC emacs-lisp
 (dolist (mode '(cider-repl-mode
                 clojure-mode
@@ -133,13 +135,9 @@ Some magic with tangling org config.
 		rainbow-delimiters-mode))
   ;; add paredit-mode to all mode-hooks
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'paredit-mode))
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
 (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
 (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
@@ -147,65 +145,71 @@ Some magic with tangling org config.
 
 **** org mode
 #+BEGIN_SRC emacs-lisp
-  (setq org-directory "~/org")
-  (setq org-default-notes-file (concat org-directory "/todo.org"))
-  (setq org-archive-location (concat org-directory "/archived.org::"))
-  (setq org-agenda-files (list "~/org/todo.org"))
-  (setq org-default-notes-file "~/org/todo.org")
-  (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
-  (setq org-hide-leading-stars t)
-  (setq org-todo-keywords
-	'((sequence "TODO" "NEXT" "|" "DONE" "DELEGATED")))
-  (setq org-todo-keywords
-	(quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
-		(sequence "WAITING(w@/!)" "HOLD(h@/!)" "DELEGATED(D@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+(setq org-directory "~/org")
+(setq org-default-notes-file (concat org-directory "/todo.org"))
+(setq org-archive-location (concat org-directory "/archived.org::"))
+(setq org-agenda-files (list "~/org/todo.org"))
+(setq org-default-notes-file "~/org/todo.org")
+(setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
+(setq org-hide-leading-stars t)
+(setq org-edit-src-content-indentation 0
+    org-src-tab-acts-natively t
+    org-src-preserve-indentation t)
+(setq org-src-window-setup 'current-window)
 
-  (setq org-todo-keyword-faces
-	(quote (("NEXT" :foreground "forest green" :weight bold :background "light green"
-		 :box (:line-width 1 :color "forest green"))
-		("WAITING" :foreground "orange" :weight bold :background "light organe"
-		 :box (:line-width 1 :color "orange"))
-		("HOLD" :foreground "blue" :weight bold :background "light blue"
-		 :box (:line-width 1 :color "blue"))
-		)))
+(setq org-todo-keywords
+      '((sequence "TODO" "NEXT" "|" "DONE" "DELEGATED")))
+(setq org-todo-keywords
+      (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "DELEGATED(D@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
 
-  (setq org-agenda-skip-scheduled-if-done nil)
+(setq org-todo-keyword-faces
+      (quote (("NEXT" :foreground "forest green" :weight bold :background "light green"
+               :box (:line-width 1 :color "forest green"))
+              ("WAITING" :foreground "orange" :weight bold :background "light organe"
+               :box (:line-width 1 :color "orange"))
+              ("HOLD" :foreground "blue" :weight bold :background "light blue"
+               :box (:line-width 1 :color "blue"))
+              )))
 
-  (setq org-super-agenda-groups
-	'((:name "Currently working"
-		 :todo "NEXT")
-	  (:name "Today WAITING/HOLD"
-		 :and (:scheduled today
-				  :todo ("WAITING" "HOLD")))
-	  (:name "Today TODO"
-		 :and (:scheduled today
-				  :todo "TODO"))
+(setq org-agenda-skip-scheduled-if-done nil)
 
-	  (:name "Scheduled"
-		 :scheduled future)
+(setq org-super-agenda-groups
+      '((:name "Currently working"
+               :todo "NEXT")
+        (:name "Today WAITING/HOLD"
+               :and (:scheduled today
+                                :todo ("WAITING" "HOLD")))
+        (:name "Today TODO"
+               :and (:scheduled today
+                                :todo "TODO"))
 
-	  (:name "Week plan"
-		 :tag "Week")
+        (:name "Scheduled"
+               :scheduled future)
 
-	  (:name "To Refile"
-		 :category "inbox")
+        (:name "Week plan"
+               :tag "Week")
 
-	  (:name "Backlog"
-		 :todo "TODO")
-	  (:name "DONE"
-		 )))
-    (setq org-src-window-setup 'current-window)
-    (setq org-capture-templates
-	  `(("t" "Task" entry
-	     (file+headline "~/org/todo.org" "Inbox")
-	     "* TODO %?\n")
-	    ("c" "Today task" entry
-	     (file+headline "~/org/todo.org" "Today")
-	     "* TODO %?\nSCHEDULED: %t\n")
-	    ("q" "Quick note" entry
-	     (file+headline "~/org/todo.org" "Notes")
-	     "* %? :Note:\n")
-	    ))
+        (:name "To Refile"
+               :category "inbox")
+
+        (:name "Backlog"
+               :todo "TODO")
+        (:name "DONE"
+               )))
+
+
+(setq org-capture-templates
+      `(("t" "Task" entry
+         (file+headline "~/org/todo.org" "Inbox")
+         "* TODO %?\n")
+        ("c" "Today task" entry
+         (file+headline "~/org/todo.org" "Today")
+         "* TODO %?\nSCHEDULED: %t\n")
+        ("q" "Quick note" entry
+         (file+headline "~/org/todo.org" "Notes")
+         "* %? :Note:\n")
+        ))
 
 #+END_SRC
 *** Look and feel
