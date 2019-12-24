@@ -19,20 +19,20 @@ Configuration from [[./init.org][init.org]] will be loaded by [[./init.el][init.
 Some magic with tangling org config.
 
 #+BEGIN_SRC emacs-lisp
-  ;;; -*- lexical-binding: t -*-
+;;; -*- lexical-binding: t -*-
 
-  (setq user-emacs-directory (file-truename "~/.emacs.d/"))
-  (defun tangle-init ()
-    "If the current buffer is 'init.org' the code-blocks are
+(setq user-emacs-directory (file-truename "~/.emacs.d/"))
+(defun tangle-init ()
+  "If the current buffer is 'init.org' the code-blocks are
     tangled, and the tangled file is compiled."
-    (when (equal (buffer-file-name)
-                 (expand-file-name (concat user-emacs-directory "init.org")))
-      ;; Avoid running hooks when tangling.
-      (let ((prog-mode-hook nil))
-        (org-babel-tangle)
-        (byte-compile-file (concat user-emacs-directory "init.el")))))
+  (when (equal (buffer-file-name)
+               (expand-file-name (concat user-emacs-directory "init.org")))
+    ;; Avoid running hooks when tangling.
+    (let ((prog-mode-hook nil))
+      (org-babel-tangle)
+      (byte-compile-file (concat user-emacs-directory "init.el")))))
 
-  (add-hook 'after-save-hook 'tangle-init)
+(add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 
 *** Packages
@@ -216,71 +216,49 @@ Per language modes.
 **** TODO Add amx and ivy rich plugins for better ivy experience
 **** Better defaults
 #+BEGIN_SRC emacs-lisp
-    (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-  ;;  (load-theme 'nord t)
-    (load-theme 'leuven t)
-    (setq org-fontify-whole-heading-line t)
-  ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
-    (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
-    (setq ivy-posframe-border-width 10)
-  ;;  (setq ivy-posframe-display-functions-alist '((t . nil)))
-  ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-point)))
-    (ivy-posframe-mode 1)
+(add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
+;;  (load-theme 'nord t)
+(load-theme 'leuven t)
+(setq org-fontify-whole-heading-line t)
+;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
+(setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+(setq ivy-posframe-border-width 10)
+;;  (setq ivy-posframe-display-functions-alist '((t . nil)))
+;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-point)))
+(ivy-posframe-mode 1)
 
-    ;; (load-theme 'doom-tomorrow-day t)
-    ;; (load-theme 'base16-tomorrow t)
+;; (load-theme 'doom-tomorrow-day t)
+;; (load-theme 'base16-tomorrow t)
 
-    (set-face-attribute 'default nil :font "Iosevka 10")
+(set-face-attribute 'default nil :font "Iosevka 10")
 
-    ;; blink modeline instead of beep
-    (setq visible-bell nil
-	  ring-bell-function 'flash-mode-line)
-    (defun flash-mode-line ()
-      (invert-face 'mode-line)
-      (run-with-timer 0.1 nil #'invert-face 'mode-line))
-    (add-to-list 'default-frame-alist '(fullscreen . maximized))
-    (setq vc-follow-symlinks t)
+;; blink modeline instead of beep
+(setq visible-bell nil
+      ring-bell-function 'flash-mode-line)
+(defun flash-mode-line ()
+  (invert-face 'mode-line)
+  (run-with-timer 0.1 nil #'invert-face 'mode-line))
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(setq vc-follow-symlinks t)
 
-    (recentf-mode 1)
-    (run-at-time nil (* 5 60) 'recentf-save-list)
+(recentf-mode 1)
+(run-at-time nil (* 5 60) 'recentf-save-list)
 
-    (save-place-mode 1)
-    (setq save-interprogram-paste-before-kill t
-	  apropos-do-all t
-	  mouse-yank-at-point t
-	  require-final-newline t
-	  load-prefer-newer t
-	  ediff-window-setup-function 'ediff-setup-windows-plain
-	  save-place-file (concat user-emacs-directory "places")
-	  backup-directory-alist `(("." . ,(concat user-emacs-directory
-						     "backups"))))
-    (setq create-lockfiles nil)
+(save-place-mode 1)
+(setq save-interprogram-paste-before-kill t
+      apropos-do-all t
+      mouse-yank-at-point t
+      require-final-newline t
+      load-prefer-newer t
+      ediff-window-setup-function 'ediff-setup-windows-plain
+      save-place-file (concat user-emacs-directory "places")
+      backup-directory-alist `(("." . ,(concat user-emacs-directory
+					       "backups"))))
+(setq create-lockfiles nil)
 
-    (global-set-key [remap list-buffers] 'ibuffer)
+(global-set-key [remap list-buffers] 'ibuffer)
 #+END_SRC
 
-**** Buffer appearance rules
-
-#+BEGIN_SRC emacs-lisp
-  ;;  (set-frame-parameter nil 'unsplittable t)
-
-    ;; (defun my-display-buffer-function (buf not-this-window)
-    ;;   (if (and (not pop-up-frames)
-    ;; 	  (one-window-p)
-    ;; 	  (or not-this-window
-    ;; 	      (not (eq (window-buffer (selected-window)) buf)))
-    ;; 	  (> (frame-width) 162))
-    ;;       (split-window-horizontally))
-    ;;   ;; Note: Some modules sets `pop-up-windows' to t before calling
-    ;;   ;; `display-buffer' -- Why, oh, why!
-    ;;   (let ((display-buffer-function nil)
-    ;; 	(pop-up-windows nil))
-    ;;     (display-buffer buf not-this-window)))
-
-    ;; (setq display-buffer-function 'my-display-buffer-function)
-
-
-#+END_SRC
 *** Keybindings
 
 #+BEGIN_SRC emacs-lisp
@@ -289,92 +267,92 @@ Per language modes.
 
 **** Global hydra
 #+BEGIN_SRC emacs-lisp
-  (defun kill-other-window-buffer ()
-    "Kill buffer in other window"
-    (interactive)
-    (other-window 1)
-    (kill-this-buffer)
-    (other-window 1))
+(defun kill-other-window-buffer ()
+  "Kill buffer in other window"
+  (interactive)
+  (other-window 1)
+  (kill-this-buffer)
+  (other-window 1))
 
-  (defhydra hydra-window-menu
-    (:color pink :hint nil)
-    ("o" other-window "other window" :column "windows")
-    ("O" other-window "other window" :color blue)
-    ("s" split-window-right "split right")
-    ("S" split-window-right "split right" :color blue)
-    ("w" kill-other-window-buffer "kill other window buffer" :column "buffers")
-    ("W" kill-other-window-buffer "kill other window buffer" :color blue)
-    ("n" switch-to-next-buffer "next buffer other window")
-    ("p" switch-to-prev-buffer "prev buffer other window")
-    ("M-n" (switch-to-next-buffer (next-window)) "next buffer other window")
-    ("M-p" (switch-to-prev-buffer (next-window)) "prev buffer other window")
-    ("q" nil "quit" :column "quit"))
+(defhydra hydra-window-menu
+  (:color pink :hint nil)
+  ("o" other-window "other window" :column "windows")
+  ("O" other-window "other window" :color blue)
+  ("s" split-window-right "split right")
+  ("S" split-window-right "split right" :color blue)
+  ("w" kill-other-window-buffer "kill other window buffer" :column "buffers")
+  ("W" kill-other-window-buffer "kill other window buffer" :color blue)
+  ("n" switch-to-next-buffer "next buffer other window")
+  ("p" switch-to-prev-buffer "prev buffer other window")
+  ("M-n" (switch-to-next-buffer (next-window)) "next buffer other window")
+  ("M-p" (switch-to-prev-buffer (next-window)) "prev buffer other window")
+  ("q" nil "quit" :column "quit"))
 
-  (global-set-key
-   (kbd "s-e")
-   (defhydra hydra-global-menu
-     (:color blue :hint nil)
-     ("p f" projectile-find-file "project find file" :color blue :column "project")
-     ("p t" treemacs-select-window "project tree" :color blue)
-     ("t t" treemacs "toggle tree" :color blue :column "toggle")
-     ("f r" counsel-recentf "recentf" :color blue :column "files")
-     ("f e" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
-     ("f i" (lambda () (interactive) (find-file "~/configs/etc/nixos/configuration.ixy.nix")) "ixy.nix")
-     ("f t" (lambda () (interactive) (find-file "~/org/todo.org")) "todo.org")
-     ("f c c" (lambda () (interactive) (find-file "~/configs/dotfiles/.config")) "configs")
-     ("f c b" (lambda () (interactive) (find-file "~/.config/bspwm/bspwmrc")) "bspwmrc")
-     ("f c r" (lambda () (interactive) (find-file "~/.config/bspwm/external_rules")) "bspwmrc external rules")
-     ("f c s" (lambda () (interactive) (find-file "~/.config/sxhkd/sxhkdrc")) "sxhkdrc")
-     ("h o" org-info "org mode info" :column "help" :color blue)
-     ("s s" counsel-rg "ripgrep" :color blue :column "search")
-     ("n w" widen "widen" :column "narrow")
-     ("n s" org-narrow-to-subtree "subtree")
-     ("n e" org-narrow-to-element "element")
-     ("n z" writeroom-mode "zen mode")
-     ("o t" org-todo-list "todo" :column "org" :color blue)
-     ("o a" org-agenda-list "agenda")
-     ("o c" org-capture "capture")
-     ("w" hydra-window-menu/body "window/buffer menu" :column "hydras")
-     ))
+(global-set-key
+ (kbd "s-e")
+ (defhydra hydra-global-menu
+   (:color blue :hint nil)
+   ("p f" projectile-find-file "project find file" :color blue :column "project")
+   ("p t" treemacs-select-window "project tree" :color blue)
+   ("t t" treemacs "toggle tree" :color blue :column "toggle")
+   ("f r" counsel-recentf "recentf" :color blue :column "files")
+   ("f e" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
+   ("f i" (lambda () (interactive) (find-file "~/configs/etc/nixos/configuration.ixy.nix")) "ixy.nix")
+   ("f t" (lambda () (interactive) (find-file "~/org/todo.org")) "todo.org")
+   ("f c c" (lambda () (interactive) (find-file "~/configs/dotfiles/.config")) "configs")
+   ("f c b" (lambda () (interactive) (find-file "~/.config/bspwm/bspwmrc")) "bspwmrc")
+   ("f c r" (lambda () (interactive) (find-file "~/.config/bspwm/external_rules")) "bspwmrc external rules")
+   ("f c s" (lambda () (interactive) (find-file "~/.config/sxhkd/sxhkdrc")) "sxhkdrc")
+   ("h o" org-info "org mode info" :column "help" :color blue)
+   ("s s" counsel-rg "ripgrep" :color blue :column "search")
+   ("n w" widen "widen" :column "narrow")
+   ("n s" org-narrow-to-subtree "subtree")
+   ("n e" org-narrow-to-element "element")
+   ("n z" writeroom-mode "zen mode")
+   ("o t" org-todo-list "todo" :column "org" :color blue)
+   ("o a" org-agenda-list "agenda")
+   ("o c" org-capture "capture")
+   ("w" hydra-window-menu/body "window/buffer menu" :column "hydras")
+   ))
 
 
-  ;; (global-set-key (kbd "s-e") 'hydra-global-menu/body)
+;; (global-set-key (kbd "s-e") 'hydra-global-menu/body)
 
 #+END_SRC
 **** Major hydra
 #+BEGIN_SRC emacs-lisp
-  (global-set-key (kbd "M-o") #'major-mode-hydra)
+(global-set-key (kbd "M-o") #'major-mode-hydra)
 
-  (major-mode-hydra-define org-mode nil
-    ("Refile"
-     (("r" org-refile "refile"))))
+(major-mode-hydra-define org-mode nil
+  ("Refile"
+   (("r" org-refile "refile"))))
 
-  (major-mode-hydra-define clojure-mode nil
-    ("Eval"
-     (("e e" 'cider-eval-last-sexp "eval last sexp")
-      ("e f" 'cider-eval-defun-at-point "eval form")
-      ("e p" 'cider-pprint-eval-defun-at-point "eval form with pprint")
-      )))
+(major-mode-hydra-define clojure-mode nil
+  ("Eval"
+   (("e e" 'cider-eval-last-sexp "eval last sexp")
+    ("e f" 'cider-eval-defun-at-point "eval form")
+    ("e p" 'cider-pprint-eval-defun-at-point "eval form with pprint")
+    )))
 #+END_SRC
 **** Misc
 #+BEGIN_SRC emacs-lisp
-  (add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
+(add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
 
-  (defun prev-window ()
-    (interactive)
-    (other-window -1))
-  (global-set-key (kbd "C-.") #'other-window)
-  (global-set-key (kbd "C-,") #'prev-window)
-  (global-set-key (kbd "s-.") 'ace-window)
-  (global-set-key (kbd "M-/") 'hippie-expand)
-  (global-set-key (kbd "M-z") 'zap-up-to-char)
+(defun prev-window ()
+  (interactive)
+  (other-window -1))
+(global-set-key (kbd "C-.") #'other-window)
+(global-set-key (kbd "C-,") #'prev-window)
+(global-set-key (kbd "s-.") 'ace-window)
+(global-set-key (kbd "M-/") 'hippie-expand)
+(global-set-key (kbd "M-z") 'zap-up-to-char)
 
-  (global-set-key (kbd "C-;") 'avy-goto-char)
-  (global-set-key (kbd "C-s") 'swiper)
-  (global-set-key (kbd "C-c g") 'counsel-rg)
-  (global-set-key (kbd "C-h") 'delete-backward-char)
-  (global-set-key (kbd "C-?") 'help-command)
-  (global-set-key (kbd "C-x g") 'magit-status)
+(global-set-key (kbd "C-;") 'avy-goto-char)
+(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-c g") 'counsel-rg)
+(global-set-key (kbd "C-h") 'delete-backward-char)
+(global-set-key (kbd "C-?") 'help-command)
+(global-set-key (kbd "C-x g") 'magit-status)
 
 #+END_SRC
 
