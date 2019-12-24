@@ -118,6 +118,7 @@ Some magic with tangling org config.
 	     counsel-mode
 	     which-key-mode
 	     org-super-agenda-mode
+	     org-indent-mode
 	     ;; global-whitespace-mode
 	     ))
     (funcall mode 1))
@@ -173,18 +174,26 @@ Some magic with tangling org config.
   (setq org-super-agenda-groups
 	'((:name "Currently working"
 		 :todo "NEXT")
+	  (:name "Today WAITING/HOLD"
+		 :and (:scheduled today
+				  :todo ("WAITING" "HOLD")))
 	  (:name "Today TODO"
-		 :and (:tag "Today"
-			    :todo "TODO"))
-	  (:name "Today"
-		 :tag "Today")
+		 :and (:scheduled today
+				  :todo "TODO"))
+
+	  (:name "Scheduled"
+		 :scheduled future)
+
 	  (:name "Week plan"
 		 :tag "Week")
+
+	  (:name "To Refile"
+		 :category "inbox")
+
 	  (:name "Backlog"
 		 :todo "TODO")
 	  (:name "DONE"
-		 )
-	  ))
+		 )))
     (setq org-src-window-setup 'current-window)
     (setq org-capture-templates
 	  `(("t" "Task" entry
@@ -308,8 +317,10 @@ Some magic with tangling org config.
      ("f e" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
      ("f i" (lambda () (interactive) (find-file "~/configs/etc/nixos/configuration.ixy.nix")) "ixy.nix")
      ("f t" (lambda () (interactive) (find-file "~/org/todo.org")) "todo.org")
-     ("f b" (lambda () (interactive) (find-file "~/.config/bspwm/bspwmrc")) "bspwmrc")
-     ("f s" (lambda () (interactive) (find-file "~/.config/sxhkd/sxhkdrc")) "sxhkdrc")
+     ("f c c" (lambda () (interactive) (find-file "~/configs/dotfiles/.config")) "configs")
+     ("f c b" (lambda () (interactive) (find-file "~/.config/bspwm/bspwmrc")) "bspwmrc")
+     ("f c r" (lambda () (interactive) (find-file "~/.config/bspwm/external_rules")) "bspwmrc external rules")
+     ("f c s" (lambda () (interactive) (find-file "~/.config/sxhkd/sxhkdrc")) "sxhkdrc")
      ("h o" org-info "org mode info" :column "help" :color blue)
      ("s s" counsel-rg "ripgrep" :color blue :column "search")
      ("n w" widen "widen" :column "narrow")
