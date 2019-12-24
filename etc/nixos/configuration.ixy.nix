@@ -61,11 +61,11 @@ in
   services.actkbd = {
     enable = true;
     bindings = [
-      # { keys = [ 224 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/light -U 4"; }
-      # { keys = [ 225 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/light -A 4"; }
-      # { keys = [ 113 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q set Master toggle'"; }
-      # { keys = [ 114 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q -c 0 set Master 4- unmute'"; }
-      # { keys = [ 115 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q -c 0 set Master 4+ unmute'"; }
+      { keys = [ 224 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/light -U 4"; }
+      { keys = [ 225 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/light -A 4"; }
+      { keys = [ 113 ]; events = [ "key" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q set Master toggle'"; }
+      { keys = [ 114 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q -c 0 set Master 4- unmute'"; }
+      { keys = [ 115 ]; events = [ "key" "rep" ]; command = "/run/current-system/sw/bin/runuser -l abcdw -c '${pkgs.alsaUtils}/bin/amixer -q -c 0 set Master 4+ unmute'"; }
     ];
   };
 
@@ -218,8 +218,12 @@ in
     nixos-unstable.steam
     gimp nixos-unstable.krita
     nixos-unstable.tdesktop discord
+
     lxappearance
     i3lock
+    xtitle xclip scrot
+    dunst
+    nixos-unstable.polybar
 
     imagemagick
     ffmpeg
@@ -301,7 +305,7 @@ in
     };
     desktopManager = {
       default = "none";
-#      gnome3.enable = true;
+      # gnome3.enable = true;
     };
     synaptics = {
       enable = true;
@@ -361,7 +365,13 @@ in
       syntaxHighlighting.enable = true;
     };
   };
+
+  # enable keychain
+  services.gnome3.gnome-keyring.enable = true;
+  services.gnome3.seahorse.enable = true;
   security.pam.enableSSHAgentAuth = true;
+#  security.pam.services.lightdm.enable = true;
+
   virtualisation.docker.enable = true;
 
   services.emacs = {
