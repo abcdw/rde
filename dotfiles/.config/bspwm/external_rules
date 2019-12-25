@@ -1,0 +1,16 @@
+#!/bin/sh
+
+wid=$1
+class=$2
+instance=$3
+
+# notify-send "$wid| $class| $instance| $(xtitle $wid)|"
+
+if [ "$class" = TelegramDesktop ] ; then
+   title=$(xtitle "$wid")
+	    case "$title" in
+		"Telegram")
+			echo "desktop=^6 rectangle=1400x1400+1140+20 follow=on state=floating"
+		;;
+	esac
+fi
