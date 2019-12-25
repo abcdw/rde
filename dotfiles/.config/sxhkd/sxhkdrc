@@ -1,0 +1,30 @@
+super + Escape
+	pkill -USR1 -x sxhkd
+
+super + alt + {q,r}
+	bspc {quit,wm -r}
+
+super + {t,shift + t,s,f}
+	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+
+super + {Tab,grave}
+	bspc {node,desktop} -f last
+super + m
+	bspc desktop -l next
+
+super + d
+      rofi -show run
+super + c
+      chromium
+
+super + l
+      i3lock
+
+super + Return
+      alacritty
+
+shift + Print
+      scrot ~/Pictures/shots/%Y-%m-%d-%T-screenshot.png -s -e 'xclip -selection c -t image/png < $f'
+
+super + {_,shift + }{1-9,0}
+	bspc {desktop -f,node -d} '^{1-9,10}'
