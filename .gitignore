@@ -1,3 +1,9 @@
 /dotfiles/spacemacs.d/private.el
+/dotfiles/.emacs.d/places
+/dotfiles/.emacs.d/session*
+/dotfiles/.emacs.d/tramp
+/dotfiles/.emacs.d/bookmarks
+/dotfiles/.emacs.d/.cache/
+/dotfiles/.emacs.d/auto-save/
 .cpcache
 lein
