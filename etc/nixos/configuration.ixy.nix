@@ -223,7 +223,7 @@ in
     lxappearance
     i3lock
     xtitle xclip xdotool
-    maim
+    maim gromit-mpx
     dunst
     nixos-unstable.polybar
 

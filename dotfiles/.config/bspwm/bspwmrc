@@ -25,7 +25,7 @@ bspc config external_rules_command "${HOME}/.config/bspwm/external_rules"
 bspc rule -a Alacritty:scratchterm rectangle=0x0+25+25 state=floating sticky=on
 
 dunst &
-
+gromit-mpx &
 # "$(which external_rules)"
 
 # chromium &
