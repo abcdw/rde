@@ -41,9 +41,7 @@ Some magic with tangling org config.
 (require 'cl-lib)
 (require 'package)
 (package-initialize)
-#+END_SRC
 
-#+BEGIN_SRC emacs-lisp
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
@@ -52,45 +50,47 @@ Some magic with tangling org config.
 
 **** Package list
 #+BEGIN_SRC emacs-lisp
-  (let* ((package--builtins nil)
-	 (packages
-	  '(auto-compile         ; automatically compile Emacs Lisp libraries
-	    org
-	    treemacs
-	    beacon
-	    cider                ; Clojure Interactive Development Environment
-	    clj-refactor         ; A collection of clojure refactoring functions
-	    company              ; Modular text completion framework
-	    ivy
-	    swiper
-	    counsel
-	    avy                  ; jump to visible characters
-	    magit                ; control Git from Emacs
-	    git-link
-	    rainbow-delimiters
-	    base16-theme
-	    nord-theme
-	    leuven-theme
-	    ;; doom-themes
-	    paredit              ; minor mode for editing parentheses
-	    projectile           ; Manage and navigate projects in Emacs easily
-	    rust-mode
-	    yaml-mode
-	    nix-mode
-	    markdown-mode
-	    writeroom-mode
-	    org-super-agenda
-	    major-mode-hydra
-	    posframe
-;;	    hydra-posframe
-	    ivy-posframe
-	    which-key)))         ; Display available keybindings in popup
-    (ignore-errors
-      (let ((packages (cl-remove-if 'package-installed-p packages)))
-	(when packages
-	  ;; Install uninstalled packages
-	  (package-refresh-contents)
-	  (mapc 'package-install packages)))))
+(let* ((package--builtins nil)
+       (packages
+	'(auto-compile	  ; automatically compile Emacs Lisp libraries
+	  org
+	  treemacs
+	  beacon
+	  cider		 ; Clojure Interactive Development Environment
+	  clj-refactor ; A collection of clojure refactoring functions
+	  company      ; Modular text completion framework
+	  ivy
+	  swiper
+	  counsel
+	  avy				; jump to visible characters
+	  magit				; control Git from Emacs
+	  git-link
+	  rainbow-delimiters
+	  base16-theme
+	  nord-theme
+	  leuven-theme
+	  ;; doom-themes
+	  paredit	; minor mode for editing parentheses
+	  projectile	; Manage and navigate projects in Emacs easily
+	  rust-mode
+	  yaml-mode
+	  nix-mode
+	  markdown-mode
+	  writeroom-mode
+	  ob-restclient
+	  org-super-agenda
+	  origami
+	  major-mode-hydra
+	  posframe
+	  ;;	    hydra-posframe
+	  ivy-posframe
+	  which-key)))	      ; Display available keybindings in popup
+  (ignore-errors
+    (let ((packages (cl-remove-if 'package-installed-p packages)))
+      (when packages
+	;; Install uninstalled packages
+	(package-refresh-contents)
+	(mapc 'package-install packages)))))
 #+END_SRC
 
 *** Modes
@@ -100,28 +100,27 @@ Some magic with tangling org config.
 Global modes.
 
 #+BEGIN_SRC emacs-lisp
-  (dolist (mode
-	   '(menu-bar-mode
-	     tool-bar-mode
-	     scroll-bar-mode
-	     blink-cursor-mode))
-    (funcall mode 0))
+(dolist (mode
+	 '(menu-bar-mode
+	   tool-bar-mode
+	   scroll-bar-mode
+	   blink-cursor-mode))
+  (funcall mode 0))
 
-  (dolist (mode
-	   '(projectile-global-mode
-	     global-company-mode
-	     column-number-mode
-	     beacon-mode
-	     yas-global-mode
-	     show-paren-mode
-	     ivy-mode
-	     counsel-mode
-	     which-key-mode
-	     org-super-agenda-mode
-	     org-indent-mode
-	     ;; global-whitespace-mode
-	     ))
-    (funcall mode 1))
+(dolist (mode
+	 '(projectile-global-mode
+	   global-company-mode
+	   column-number-mode
+	   beacon-mode
+	   yas-global-mode
+	   show-paren-mode
+	   ivy-mode
+	   counsel-mode
+	   which-key-mode
+	   org-super-agenda-mode
+	   ;; global-whitespace-mode
+	   ))
+  (funcall mode 1))
 #+END_SRC
 
 Per language modes.
@@ -137,6 +136,8 @@ Per language modes.
   (add-hook (intern (concat (symbol-name mode) "-hook")) 'paredit-mode))
 
 (add-hook 'clojure-mode-hook 'rainbow-delimiters-mode)
+(add-hook 'org-agenda-mode-hook 'origami-mode)
+(add-hook 'org-mode-hook 'org-indent-mode)
 
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
@@ -152,6 +153,20 @@ Per language modes.
 (setq org-default-notes-file "~/org/todo.org")
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
 (setq org-hide-leading-stars t)
+(setq org-fontify-whole-heading-line t)
+
+(setq org-confirm-babel-evaluate nil)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((shell      . t)
+   (emacs-lisp . t)
+   (clojure    . t)
+   (python     . t)
+   (restclient . t)
+   (dot        . t)
+   (css        . t)
+   (plantuml   . t)))
+(setq org-src-fontify-natively t)
 (setq org-edit-src-content-indentation 0
     org-src-tab-acts-natively t
     org-src-preserve-indentation t)
@@ -198,6 +213,20 @@ Per language modes.
         (:name "DONE"
                )))
 
+(defvar osa/org-super-agenda-auto-show-groups
+  '("Currently working" "Today WAITING" "Today TODO"))
+
+(defun osa/org-super-agenda-origami-fold-default ()
+    "Fold certain groups by default in Org Super Agenda buffer."
+    (forward-line 3)
+    (cl-loop do (origami-forward-toggle-node (current-buffer) (point))
+             while (origami-forward-fold-same-level (current-buffer) (point)))
+    (--each osa/org-super-agenda-auto-show-groups
+      (goto-char (point-min))
+      (when (re-search-forward (rx-to-string `(seq bol " " ,it)) nil t)
+        (origami-show-node (current-buffer) (point)))))
+
+(add-hook 'org-agenda-finalize-hook 'osa/org-super-agenda-origami-fold-default)
 
 (setq org-capture-templates
       `(("t" "Task" entry
@@ -210,7 +239,6 @@ Per language modes.
          (file+headline "~/org/todo.org" "Notes")
          "* %? :Note:\n")
         ))
-
 #+END_SRC
 *** Look and feel
 **** TODO Add amx and ivy rich plugins for better ivy experience
@@ -219,7 +247,6 @@ Per language modes.
 (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
 ;;  (load-theme 'nord t)
 (load-theme 'leuven t)
-(setq org-fontify-whole-heading-line t)
 ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
 (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
 (setq ivy-posframe-border-width 10)
@@ -261,10 +288,6 @@ Per language modes.
 
 *** Keybindings
 
-#+BEGIN_SRC emacs-lisp
-;; (hydra-posframe-enable)
-#+END_SRC
-
 **** Global hydra
 #+BEGIN_SRC emacs-lisp
 (defun kill-other-window-buffer ()
@@ -299,6 +322,7 @@ Per language modes.
    ("f e" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
    ("f i" (lambda () (interactive) (find-file "~/configs/etc/nixos/configuration.ixy.nix")) "ixy.nix")
    ("f t" (lambda () (interactive) (find-file "~/org/todo.org")) "todo.org")
+   ("f o" (lambda () (interactive) (find-file "~/org")) "org file")
    ("f c c" (lambda () (interactive) (find-file "~/configs/dotfiles/.config")) "configs")
    ("f c b" (lambda () (interactive) (find-file "~/.config/bspwm/bspwmrc")) "bspwmrc")
    ("f c r" (lambda () (interactive) (find-file "~/.config/bspwm/external_rules")) "bspwmrc external rules")
@@ -337,6 +361,8 @@ Per language modes.
 **** Misc
 #+BEGIN_SRC emacs-lisp
 (add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
+
+(define-key org-super-agenda-header-map (kbd "<tab>") #'origami-toggle-node)
 
 (defun prev-window ()
   (interactive)
@@ -379,6 +405,14 @@ Show trailing whitespaces and cleanup them on save.
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
+(let ((my-auto-save-dir (locate-user-emacs-file "auto-save")))
+  (setq auto-save-file-name-transforms
+        `((".*" ,(expand-file-name "\\2" my-auto-save-dir) t)))
+  (unless (file-exists-p my-auto-save-dir)
+    (make-directory my-auto-save-dir)))
+
+(setq auto-save-file-name-transforms
+      `((".*" "~/.emacs.d/auto-save/" t)))
 (setq backup-directory-alist '(("." . "~/.emacs.d/backup"))
   backup-by-copying t    ; Don't delink hardlinks
   version-control t      ; Use version numbers on backups
