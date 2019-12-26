@@ -29,9 +29,9 @@ in
 
   services.tlp = {
     enable = true;
+#      START_CHARGE_THRESH_BAT0=75
+#      STOP_CHARGE_THRESH_BAT0=91
     extraConfig = ''
-      START_CHARGE_THRESH_BAT0=75
-      STOP_CHARGE_THRESH_BAT0=91
       CPU_SCALING_GOVERNOR_ON_BAT=powersave
       ENERGY_PERF_POLICY_ON_BAT=powersave
   '';
@@ -134,13 +134,13 @@ in
     "net.ipv4.ip_default_ttl" = 65;
   };
 
-  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
+#  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
 #  boot.extraModulePackages = [ config.boot.kernelPackages.exfat-nofuse ];
 
   environment.variables = {
     # BROWSER="qutebrowser";
     # EDITOR="emacs";
-    BROWSER="chromium";
+    BROWSER="brave";
     GDK_SCALE = "2";
     GDK_DPI_SCALE = "0.5";
     QT_AUTO_SCREEN_SCALE_FACTOR = "1";
@@ -218,10 +218,12 @@ in
     nixos-unstable.steam
     gimp nixos-unstable.krita
     nixos-unstable.tdesktop discord
+    gnome3.nautilus gnome3.gvfs
 
     lxappearance
     i3lock
-    xtitle xclip scrot
+    xtitle xclip xdotool
+    maim
     dunst
     nixos-unstable.polybar
 
@@ -235,6 +237,7 @@ in
     nixos-unstable.libmtp
     feh
     exfat-utils
+    cifs-utils
     fuse_exfat
     mtpfs
     gnome3.gvfs
@@ -281,6 +284,12 @@ in
 
   users.defaultUserShell = pkgs.zsh;
 
+  fileSystems."/mnt/olorin/public" = {
+    device = "//olorin.lan/public";
+    fsType = "cifs";
+    options = [ "vers=2.0" "credentials=/home/abcdw/.smbpasswd"];
+  };
+
   services.xserver = {
     dpi = 192;
     enable = true;
@@ -307,10 +316,11 @@ in
       default = "none";
       # gnome3.enable = true;
     };
-    synaptics = {
-      enable = true;
-      twoFingerScroll = true;
-    };
+    libinput.enable = true;
+    # synaptics = {
+    #   enable = true;
+    #   twoFingerScroll = true;
+    # };
   };
   services.compton = {
     enable = true;
