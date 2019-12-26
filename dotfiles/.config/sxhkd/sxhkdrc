@@ -4,16 +4,27 @@ super + Escape
 super + alt + {q,r}
 	bspc {quit,wm -r}
 
-super + {t,shift + t,s,f}
-	bspc node -t {tiled,pseudo_tiled,floating,fullscreen}
+super + b
+      bspc desktop -f '^5'
+
+super + t
+      ${HOME}/.config/bspwm/st_toggle
+
+super + shift + {t,s,f}
+	bspc node -t {tiled,floating,fullscreen}
 
 super + {Tab,grave}
 	bspc {node,desktop} -f last
+
+alt + Tab
+	bspc {node,desktop} -f last
+
 super + m
 	bspc desktop -l next
 
 super + d
       rofi -show run
+
 super + c
       chromium
 
@@ -24,7 +35,10 @@ super + Return
       alacritty
 
 shift + Print
-      scrot ~/Pictures/shots/%Y-%m-%d-%T-screenshot.png -s -e 'xclip -selection c -t image/png < $f'
+      maim -s | xclip -selection clipboard -t image/png
+
+super + Print
+      maim ~/Pictures/shots/$(date +"%Y-%m-%d-%T").png; notify-send "yep"
 
 super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'

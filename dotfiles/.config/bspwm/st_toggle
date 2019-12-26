@@ -1,0 +1,9 @@
+id=$(xdotool search --classname scratchterm)
+
+if [ "$id" != "" ]
+
+then
+  bspc node "$id" --flag hidden -f
+else
+  alacritty --class scratchterm -d 100 20 -e tmux &
+fi
