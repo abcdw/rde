@@ -177,9 +177,9 @@ in
     package = pkgs.pulseaudioFull;
   };
 
-  # nixpkgs.config.packageOverrides = pkgs: {
-  #   vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
-  # };
+  nixpkgs.config.packageOverrides = pkgs: {
+    # vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+  };
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
@@ -219,13 +219,14 @@ in
     gimp nixos-unstable.krita
     nixos-unstable.tdesktop discord
     gnome3.nautilus gnome3.gvfs
+    networkmanagerapplet
 
     lxappearance
     i3lock
     xtitle xclip xdotool
     maim gromit-mpx
     dunst
-    nixos-unstable.polybar
+    nixos-unstable.polybarFull
 
     imagemagick
     ffmpeg
@@ -287,7 +288,11 @@ in
   fileSystems."/mnt/olorin/public" = {
     device = "//olorin.lan/public";
     fsType = "cifs";
-    options = [ "vers=2.0" "credentials=/home/abcdw/.smbpasswd"];
+    options = let
+      # this line prevents hanging on network split
+      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+    in ["${automount_opts},vers=2.0,credentials=/home/abcdw/.smbpasswd,gid=100,uid=1000"];
+#    options = [ "vers=2.0" "credentials=/home/abcdw/.smbpasswd" "gid=100" "uid=1000"];
   };
 
   services.xserver = {
