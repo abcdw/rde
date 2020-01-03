@@ -94,10 +94,7 @@ Some magic with tangling org config.
 #+END_SRC
 
 *** Modes
-
-**** Basic modes
-
-Global modes.
+**** Global modes
 
 #+BEGIN_SRC emacs-lisp
 (dolist (mode
@@ -123,7 +120,7 @@ Global modes.
   (funcall mode 1))
 #+END_SRC
 
-Per language modes.
+**** Per language modes.
 
 #+BEGIN_SRC emacs-lisp
 (dolist (mode '(cider-repl-mode
@@ -145,6 +142,7 @@ Per language modes.
 #+END_SRC
 
 **** org mode
+
 #+BEGIN_SRC emacs-lisp
 (setq org-directory "~/org")
 (setq org-default-notes-file (concat org-directory "/todo.org"))
@@ -154,6 +152,8 @@ Per language modes.
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
 (setq org-hide-leading-stars t)
 (setq org-fontify-whole-heading-line t)
+(setq org-catch-invisible-edits 'smart)
+(setq org-log-into-drawer t)
 
 (setq org-confirm-babel-evaluate nil)
 (org-babel-do-load-languages
@@ -166,16 +166,15 @@ Per language modes.
    (dot        . t)
    (css        . t)
    (plantuml   . t)))
-(setq org-src-fontify-natively t)
+;; (setq org-src-fontify-natively t)
 (setq org-edit-src-content-indentation 0
     org-src-tab-acts-natively t
     org-src-preserve-indentation t)
 (setq org-src-window-setup 'current-window)
+(setq org-export-backends '(html md latex ascii icalendar odt))
 
 (setq org-todo-keywords
-      '((sequence "TODO" "NEXT" "|" "DONE" "DELEGATED")))
-(setq org-todo-keywords
-      (quote ((sequence "TODO(t)" "NEXT(n)" "|" "DONE(d)")
+      (quote ((sequence "TODO(t)" "NEXT(n!)" "|" "DONE(d!)")
               (sequence "WAITING(w@/!)" "HOLD(h@/!)" "DELEGATED(D@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
 
 (setq org-todo-keyword-faces
@@ -240,6 +239,7 @@ Per language modes.
          "* %? :Note:\n")
         ))
 #+END_SRC
+
 *** Look and feel
 **** TODO Add amx and ivy rich plugins for better ivy experience
 **** Better defaults
@@ -287,7 +287,6 @@ Per language modes.
 #+END_SRC
 
 *** Keybindings
-
 **** Global hydra
 #+BEGIN_SRC emacs-lisp
 (defun kill-other-window-buffer ()
@@ -336,6 +335,7 @@ Per language modes.
    ("o t" org-todo-list "todo" :column "org" :color blue)
    ("o a" org-agenda-list "agenda")
    ("o c" org-capture "capture")
+   ("o b" org-switchb "switch buffer")
    ("w" hydra-window-menu/body "window/buffer menu" :column "hydras")
    ))
 
@@ -343,6 +343,7 @@ Per language modes.
 ;; (global-set-key (kbd "s-e") 'hydra-global-menu/body)
 
 #+END_SRC
+
 **** Major hydra
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "M-o") #'major-mode-hydra)
@@ -358,6 +359,7 @@ Per language modes.
     ("e p" 'cider-pprint-eval-defun-at-point "eval form with pprint")
     )))
 #+END_SRC
+
 **** Misc
 #+BEGIN_SRC emacs-lisp
 (add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
