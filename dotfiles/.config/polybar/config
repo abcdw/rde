@@ -29,24 +29,28 @@ secondary = #e60053
 alert = #bd2c40
 
 [bar/mybar]
+wm-restack = bspwmc
 enable-ipc = true
-; dpi = 192
-height = 20
-margin-top = 10
+dpi = 192
+height = 30
+; margin-top = 3
 
 background = ${colors.background}
 foreground = ${colors.foreground}
 
+module-margin-right = 2
+padding-right = 0
+tray-padding = 4
 
 modules-left = bspwm
-modules-center =
+modules-center = xwindow
 modules-right = battery pulseaudio xkeyboard date
 # filesystem xbacklight  memory cpu wlan eth  temperature date powermenu
 tray-position = right
 
-font-0 = Iosevka:fontformat=truetype:size=10:antialias=false;0
-font-1 = Iosevka:fontformat=truetype:size=10:antialias=false;0
-font-2 = Iosevka:fontformat=truetype:size=10:antialias=false;0
+font-0 = Iosevka Nerd Font:fontformat=truetype:size=8:antialias=true;0
+font-1 = Hack Nerd Font:fontformat=truetype:size=8:antialias=true;0
+font-2 = Inconsolata Nerd Font:fontformat=truetype:size=8:antialias=true;0
 ; font-2 = siji:pixelsize=10;1
 
 
@@ -137,18 +141,18 @@ type = internal/bspwm
 label-focused = %index%
 label-focused-background = ${colors.background-alt}
 label-focused-underline= ${colors.primary}
-label-focused-padding = 2
+label-focused-padding = 1
 
 label-occupied = %index%
-label-occupied-padding = 2
+label-occupied-padding = 1
 
 label-urgent = %index%!
 label-urgent-background = ${colors.alert}
-label-urgent-padding = 2
+label-urgent-padding = 1
 
 label-empty = %index%
 label-empty-foreground = ${colors.foreground-alt}
-label-empty-padding = 2
+label-empty-padding = 1
 
 ; Separator in between workspaces
 ; label-separator = |
@@ -284,13 +288,13 @@ format-disconnected =
 type = internal/date
 interval = 5
 
-date =
+date = "%y-%m-%d"
 date-alt = " %Y-%m-%d"
 
 time = %H:%M
 time-alt = %H:%M:%S
 
-format-prefix = 
+format-prefix = clock:
 format-prefix-foreground = ${colors.foreground-alt}
 format-underline = #0a6cf5
 
@@ -299,8 +303,14 @@ label = %date% %time%
 [module/pulseaudio]
 type = internal/pulseaudio
 
-format-volume = <label-volume> <bar-volume>
-label-volume = VOL %percentage%%
+ramp-volume-0 = 🔈
+ramp-volume-1 = 🔉
+ramp-volume-2 = 🔊
+
+format-prefix = test
+format-volume = <label-volume>
+;; <bar-volume>
+label-volume = vol: %percentage%%
 label-volume-foreground = ${root.foreground}
 
 label-muted = 🔇 muted
@@ -357,12 +367,14 @@ battery = BAT0
 adapter = ADP1
 time-format = %H:%M
 full-at = 98
+
+format-prefix = "test"
 label-discharging = %time% %percentage%%
 
-format-charging = "<animation-charging> <label-charging> | "
+format-charging = "<label-charging>"
 format-charging-underline = #ffb52a
 
-format-discharging = "<animation-discharging> <label-discharging> | "
+format-discharging = "<label-discharging>"
 format-discharging-underline = ${self.format-charging-underline}
 ; label-discharging = %percentage% %time%
 
