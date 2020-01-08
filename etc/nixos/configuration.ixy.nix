@@ -276,23 +276,37 @@ in
     hack-font
     hasklig
     inconsolata
-    iosevka
+#    iosevka
     source-code-pro
     unifont
-    nerdfonts
+    nixos-unstable.nerdfonts
     ];
   fonts.fontconfig.defaultFonts.monospace = [ "Hack" ];
 
   users.defaultUserShell = pkgs.zsh;
-
+  fileSystems."/mnt/flash" = {
+    device = "/dev/sda1";
+    fsType = "auto";
+    options = let
+      # this line prevents hanging on network split
+    in ["noauto,gid=100,uid=1000"];
+  };
   fileSystems."/mnt/olorin/public" = {
     device = "//olorin.lan/public";
     fsType = "cifs";
     options = let
       # this line prevents hanging on network split
       automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-    in ["${automount_opts},vers=2.0,credentials=/home/abcdw/.smbpasswd,gid=100,uid=1000"];
-#    options = [ "vers=2.0" "credentials=/home/abcdw/.smbpasswd" "gid=100" "uid=1000"];
+    in ["${automount_opts},vers=3.0,credentials=/home/abcdw/.smbpasswd,gid=100,uid=1000"];
+  };
+
+  fileSystems."/mnt/olorin/footage-archive" = {
+    device = "//olorin.lan/footage-archive";
+    fsType = "cifs";
+    options = let
+      # this line prevents hanging on network split
+      automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
+    in ["${automount_opts},vers=3.0,credentials=/home/abcdw/.smbpasswd,gid=100,uid=1000"];
   };
 
   services.xserver = {
