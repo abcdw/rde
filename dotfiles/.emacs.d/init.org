@@ -164,6 +164,7 @@ Some magic with tangling org config.
    (python     . t)
    (restclient . t)
    (dot        . t)
+;;   (ditta      . t)
    (css        . t)
    (plantuml   . t)))
 ;; (setq org-src-fontify-natively t)
@@ -257,7 +258,7 @@ Some magic with tangling org config.
 ;; (load-theme 'doom-tomorrow-day t)
 ;; (load-theme 'base16-tomorrow t)
 
-(set-face-attribute 'default nil :font "Iosevka 10")
+(set-face-attribute 'default nil :font "Iosevka Nerd Font 10" :width 'Regular)
 
 ;; blink modeline instead of beep
 (setq visible-bell nil
@@ -311,7 +312,7 @@ Some magic with tangling org config.
   ("q" nil "quit" :column "quit"))
 
 (global-set-key
- (kbd "s-e")
+ (kbd "M-o")
  (defhydra hydra-global-menu
    (:color blue :hint nil)
    ("p f" projectile-find-file "project find file" :color blue :column "project")
@@ -334,7 +335,7 @@ Some magic with tangling org config.
    ("n z" writeroom-mode "zen mode")
    ("o t" org-todo-list "todo" :column "org" :color blue)
    ("o a" org-agenda-list "agenda")
-   ("o c" org-capture "capture")
+   ("o c" org-columns "columns")
    ("o b" org-switchb "switch buffer")
    ("w" hydra-window-menu/body "window/buffer menu" :column "hydras")
    ))
@@ -346,7 +347,7 @@ Some magic with tangling org config.
 
 **** Major hydra
 #+BEGIN_SRC emacs-lisp
-(global-set-key (kbd "M-o") #'major-mode-hydra)
+(global-set-key (kbd "s-e") #'major-mode-hydra)
 
 (major-mode-hydra-define org-mode nil
   ("Refile"
@@ -371,6 +372,8 @@ Some magic with tangling org config.
   (other-window -1))
 (global-set-key (kbd "C-.") #'other-window)
 (global-set-key (kbd "C-,") #'prev-window)
+
+(global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "s-.") 'ace-window)
 (global-set-key (kbd "M-/") 'hippie-expand)
 (global-set-key (kbd "M-z") 'zap-up-to-char)
@@ -383,6 +386,9 @@ Some magic with tangling org config.
 (global-set-key (kbd "C-x g") 'magit-status)
 
 #+END_SRC
+
+#+RESULTS:
+: magit-status
 
 *** Whitespaces
 Show trailing whitespaces and cleanup them on save.
