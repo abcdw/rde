@@ -10,7 +10,7 @@ if [ "$class" = TelegramDesktop ] ; then
    title=$(xtitle "$wid")
 	    case "$title" in
 		"Telegram")
-			echo "desktop=^6 rectangle=1400x1400+1140+20 follow=on state=floating"
+			echo "desktop=^6 rectangle=1400x1370+1140+50 follow=on state=floating"
 		;;
 	esac
 fi

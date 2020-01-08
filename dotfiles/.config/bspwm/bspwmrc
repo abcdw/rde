@@ -22,10 +22,12 @@ bspc rule -a Emacs state=tiled
 
 bspc config external_rules_command "${HOME}/.config/bspwm/external_rules"
 
-bspc rule -a Alacritty:scratchterm rectangle=0x0+25+25 state=floating sticky=on
+bspc rule -a Alacritty:scratchterm rectangle=0x0+85+95 state=floating sticky=on
 
 dunst &
 gromit-mpx &
+nm-applet &
+polybar mybar &
 # "$(which external_rules)"
 
 # chromium &
