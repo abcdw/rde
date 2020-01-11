@@ -5,5 +5,5 @@ if [ "$id" != "" ]
 then
   bspc node "$id" --flag hidden -f
 else
-  alacritty --class scratchterm -d 100 20 -e tmux &
+  alacritty --class scratchterm -d 148 34 -e tmux &
 fi
