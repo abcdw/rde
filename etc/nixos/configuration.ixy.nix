@@ -205,6 +205,7 @@ in
     nixos-unstable.cura
     nixos-unstable.freecad
     nixos-unstable.openscad
+    nixos-unstable.kicad
 
     nixos-unstable.brave
     nixos-unstable.firefox
