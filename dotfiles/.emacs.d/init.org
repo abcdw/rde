@@ -147,19 +147,23 @@ Some magic with tangling org config.
 (setq org-directory "~/org")
 (setq org-default-notes-file (concat org-directory "/todo.org"))
 (setq org-archive-location (concat org-directory "/archived.org::"))
-(setq org-agenda-files (list "~/org/todo.org"))
-(setq org-default-notes-file "~/org/todo.org")
+(setq org-agenda-files (list (concat org-directory "/todo.org")
+			     (concat org-directory "/tropin.org")))
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
 (setq org-hide-leading-stars t)
 (setq org-fontify-whole-heading-line t)
 (setq org-catch-invisible-edits 'smart)
 (setq org-log-into-drawer t)
+(setq org-refile-use-outline-path t)
+(setq org-outline-path-complete-in-steps nil)
+
 
 (setq org-confirm-babel-evaluate nil)
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((shell      . t)
    (emacs-lisp . t)
+   (calc       . t)
    (clojure    . t)
    (python     . t)
    (restclient . t)
@@ -167,6 +171,8 @@ Some magic with tangling org config.
 ;;   (ditta      . t)
    (css        . t)
    (plantuml   . t)))
+
+(setq org-babel-clojure-backend 'cider)
 ;; (setq org-src-fontify-natively t)
 (setq org-edit-src-content-indentation 0
     org-src-tab-acts-natively t
@@ -305,8 +311,8 @@ Some magic with tangling org config.
   ("S" split-window-right "split right" :color blue)
   ("w" kill-other-window-buffer "kill other window buffer" :column "buffers")
   ("W" kill-other-window-buffer "kill other window buffer" :color blue)
-  ("n" switch-to-next-buffer "next buffer other window")
-  ("p" switch-to-prev-buffer "prev buffer other window")
+  ("n" switch-to-next-buffer "next buffer")
+  ("p" switch-to-prev-buffer "prev buffer")
   ("M-n" (switch-to-next-buffer (next-window)) "next buffer other window")
   ("M-p" (switch-to-prev-buffer (next-window)) "prev buffer other window")
   ("q" nil "quit" :column "quit"))
