@@ -14,7 +14,7 @@ autoload -U promptinit
 promptinit
 
 if [[ -n $SSH_CONNECTION ]]; then
-  prompt bart
+  prompt bnart
 else
   prompt off
 fi
@@ -39,8 +39,9 @@ echo -en "\033[6 q" # Make a cursor to be a vertical bar
 
 bindkey -e
 
-autoload -U select-word-style
-select-word-style bash
+# Remove slashes and dashes from wordchars to make M-b, M-f working
+# correctly
+WORDCHARS=""
 
 zstyle ':completion:*' matcher-list '' \
   'm:{a-z\-}={A-Z\_}' \
@@ -51,9 +52,11 @@ autoload edit-command-line
 zle -N edit-command-line
 bindkey '^v' edit-command-line
 
-export HISTSIZE=2000
+export HISTSIZE=10000
 export HISTFILE="$HOME/.history"
 export SAVEHIST=$HISTSIZE
+unsetopt EXTENDED_HISTORY
+
 setopt hist_ignore_all_dups
 setopt hist_ignore_space
 setopt autocd
