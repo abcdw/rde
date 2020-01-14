@@ -53,7 +53,7 @@ zle -N edit-command-line
 bindkey '^v' edit-command-line
 
 export HISTSIZE=10000
-export HISTFILE="$HOME/.history"
+export HISTFILE="$HOME/.zhistory"
 export SAVEHIST=$HISTSIZE
 unsetopt EXTENDED_HISTORY
 
