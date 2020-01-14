@@ -6,17 +6,12 @@
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+PROPERTY: header-args :tangle yes
 
-** Credits
-
-Thanks for inspiration to [[https://github.com/mitrx][Dmitry Alexeev]].
-
 ** Configuration
-
 Configuration from [[./init.org][init.org]] will be loaded by [[./init.el][init.el]].
-
 *** Org tangle-mangle
 
-Some magic with tangling org config.
+Each save triggers tangle process, which saves all code blocks to
+~init.el~ and byte compile it to init.elc.
 
 #+BEGIN_SRC emacs-lisp
 ;;; -*- lexical-binding: t -*-
@@ -168,7 +163,7 @@ Some magic with tangling org config.
    (python     . t)
    (restclient . t)
    (dot        . t)
-;;   (ditta      . t)
+   (ditaa      . t)
    (css        . t)
    (plantuml   . t)))
 
@@ -237,26 +232,31 @@ Some magic with tangling org config.
 (setq org-capture-templates
       `(("t" "Task" entry
          (file+headline "~/org/todo.org" "Inbox")
-         "* TODO %?\n")
+         "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n")
         ("c" "Today task" entry
          (file+headline "~/org/todo.org" "Today")
-         "* TODO %?\nSCHEDULED: %t\n")
+         "* TODO %?\nSCHEDULED: %t\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n")
         ("q" "Quick note" entry
          (file+headline "~/org/todo.org" "Notes")
-         "* %? :Note:\n")
+         "* %? :Note:\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n")
         ))
 #+END_SRC
+
+#+RESULTS:
+| t | Task | entry | (file+headline ~/org/todo.org Inbox) | * TODO %? |
 
 *** Look and feel
 **** TODO Add amx and ivy rich plugins for better ivy experience
 **** Better defaults
 #+BEGIN_SRC emacs-lisp
+(set-language-environment "UTF-8")
 (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
 ;;  (load-theme 'nord t)
 (load-theme 'leuven t)
 ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
 (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
 (setq ivy-posframe-border-width 10)
+(setq ivy-initial-inputs-alist nil)
 ;;  (setq ivy-posframe-display-functions-alist '((t . nil)))
 ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-point)))
 (ivy-posframe-mode 1)
@@ -294,14 +294,52 @@ Some magic with tangling org config.
 #+END_SRC
 
 *** Keybindings
-**** Global hydra
+**** Windows and buffers
+All keybindings starting with ~super~ key are buffers or windows
+related. Keybindings with ~C-s-~ prefix operates on other window.
 #+BEGIN_SRC emacs-lisp
 (defun kill-other-window-buffer ()
   "Kill buffer in other window"
   (interactive)
   (other-window 1)
   (kill-this-buffer)
-  (other-window 1))
+  (other-window -1))
+
+(defun kill-other-window-and-buffer ()
+  "Kill buffer in other window"
+  (interactive)
+  (other-window 1)
+  (kill-this-buffer)
+  (delete-window))
+
+(defun prev-window ()
+  (interactive)
+  (other-window -1))
+
+(defun switch-to-next-buffer-other-window ()
+  (interactive)
+  (switch-to-next-buffer (next-window)))
+
+(defun switch-to-prev-buffer-other-window ()
+  (interactive)
+  (switch-to-prev-buffer (next-window)))
+
+(defun maximize-other-window ()
+  (interactive)
+  (other-window 1)
+  (delete-other-windows))
+
+(global-set-key (kbd "s-w") #'kill-current-buffer)
+(global-set-key (kbd "s-o") #'other-window)
+(global-set-key (kbd "s-n") #'switch-to-next-buffer)
+(global-set-key (kbd "s-p") #'switch-to-prev-buffer)
+(global-set-key (kbd "s-q") #'kill-buffer-and-window)
+(global-set-key (kbd "s-m") #'delete-other-windows)
+;; (global-set-key (kbd "s-TAB") #'alternate-buffer)
+(global-set-key (kbd "C-s-n") 'switch-to-next-buffer-other-window)
+(global-set-key (kbd "C-s-p") 'switch-to-prev-buffer-other-window)
+(global-set-key (kbd "C-s-w") #'kill-other-window-and-buffer)
+(global-set-key (kbd "C-s-m") #'maximize-other-window)
 
 (defhydra hydra-window-menu
   (:color pink :hint nil)
@@ -317,6 +355,9 @@ Some magic with tangling org config.
   ("M-p" (switch-to-prev-buffer (next-window)) "prev buffer other window")
   ("q" nil "quit" :column "quit"))
 
+#+END_SRC
+**** Global hydra
+#+BEGIN_SRC emacs-lisp
 (global-set-key
  (kbd "M-o")
  (defhydra hydra-global-menu
@@ -351,6 +392,9 @@ Some magic with tangling org config.
 
 #+END_SRC
 
+#+RESULTS:
+: hydra-global-menu/body
+
 **** Major hydra
 #+BEGIN_SRC emacs-lisp
 (global-set-key (kbd "s-e") #'major-mode-hydra)
@@ -372,12 +416,6 @@ Some magic with tangling org config.
 (add-hook 'cider-repl-mode-hook (lambda () (local-set-key (kbd "C-l") 'cider-repl-clear-buffer)))
 
 (define-key org-super-agenda-header-map (kbd "<tab>") #'origami-toggle-node)
-
-(defun prev-window ()
-  (interactive)
-  (other-window -1))
-(global-set-key (kbd "C-.") #'other-window)
-(global-set-key (kbd "C-,") #'prev-window)
 
 (global-set-key (kbd "C-c c") #'org-capture)
 (global-set-key (kbd "s-.") 'ace-window)
@@ -413,11 +451,7 @@ Show trailing whitespaces and cleanup them on save.
 #+END_SRC
 
 *** Other stuff
-
-#+BEGIN_SRC emacs-lisp
-(setq ivy-initial-inputs-alist nil)
-#+END_SRC
-
+**** Backup and autosave
 #+BEGIN_SRC emacs-lisp
 (let ((my-auto-save-dir (locate-user-emacs-file "auto-save")))
   (setq auto-save-file-name-transforms
@@ -436,6 +470,6 @@ Show trailing whitespaces and cleanup them on save.
   )
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-(set-language-environment "UTF-8")
-#+END_SRC
+** Credits
+
+Thanks for inspiration to [[https://github.com/mitrx][Dmitry Alexeev]].
