@@ -19,26 +19,29 @@ super + {Tab,grave}
 alt + Tab
 	bspc {node,desktop} -f last
 
-super + m
+super + shift + m
 	bspc desktop -l next
 
-super + d
+super + shift + d
       rofi -show run
 
-super + c
+super + shift + c
       chromium
 
-super + l
+super + shift + l
       i3lock
 
-super + Return
+super + shift + Return
       alacritty
 
 shift + Print
       maim -s | xclip -selection clipboard -t image/png
 
 super + Print
-      maim ~/Pictures/shots/$(date +"%Y-%m-%d-%T").png; notify-send "yep"
+      maim | xclip -selection clipboard -t image/png && xclip -selection clipboard -out > ~/Pictures/shots/$(date +"%Y-%m-%d-%T").png; notify-send "ysc"
+
+super + shift + Print
+      maim -s | xclip -selection clipboard -t image/png && xclip -selection clipboard -out > ~/Pictures/shots/$(date +"%Y-%m-%d-%T").png
 
 super + {_,shift + }{1-9,0}
 	bspc {desktop -f,node -d} '^{1-9,10}'
