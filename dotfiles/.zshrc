@@ -34,6 +34,13 @@ vcs_info_wrapper() {
   fi
 }
 
+if [[ -n $SSH_CONNECTION ]]; then
+    PROMPT='%F{red}❯%f%F{yellow}❯%f❯ '
+    RPROMPT='%M'
+else
+  PROMPT='%F{red}❯%f%F{yellow}❯%f%F{green}❯%f '
+fi
+
 PROMPT='%F{red}❯%f%F{yellow}❯%f%F{green}❯%f '
 echo -en "\033[6 q" # Make a cursor to be a vertical bar
 
@@ -55,7 +62,7 @@ bindkey '^v' edit-command-line
 export HISTSIZE=10000
 export HISTFILE="$HOME/.zhistory"
 export SAVEHIST=$HISTSIZE
-unsetopt EXTENDED_HISTORY
+# unsetopt EXTENDED_HISTORY
 
 setopt hist_ignore_all_dups
 setopt hist_ignore_space
