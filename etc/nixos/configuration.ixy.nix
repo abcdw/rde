@@ -229,9 +229,15 @@ in
     dunst
     nixos-unstable.polybarFull
 
+    google-cloud-sdk
+    nixos-unstable.kubectl
     imagemagick
     ffmpeg
     youtube-dl
+    nixos-unstable.plantuml graphviz
+    adoptopenjdk-bin
+    goldendict
+    pass
 
     pamixer alsaTools alsaUtils
     pavucontrol
@@ -245,6 +251,7 @@ in
     gnome3.gvfs
     jmtpfs
 
+    ditaa
     python3
     zeal
     wget vim htop
@@ -337,10 +344,6 @@ in
       # gnome3.enable = true;
     };
     libinput.enable = true;
-    # synaptics = {
-    #   enable = true;
-    #   twoFingerScroll = true;
-    # };
   };
   services.compton = {
     enable = true;
@@ -389,6 +392,10 @@ in
     };
 
     zsh = {
+      promptInit = ''
+  export CLOUD_SDK_HOME="${pkgs.google-cloud-sdk}"
+  source "$CLOUD_SDK_HOME/google-cloud-sdk/completion.zsh.inc"
+'';
       enable = true;
       enableCompletion = true;
       autosuggestions.enable = true;
