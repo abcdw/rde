@@ -4,7 +4,7 @@
 #+LATEX_HEADER: \usepackage{parskip}
 #+LATEX_HEADER: \usepackage{inconsolata}
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
-#+PROPERTY: header-args :tangle yes
+#+PROPERTY: header-args :tangle yes :results none
 
 ** Configuration
 Configuration from [[./init.org][init.org]] will be loaded by [[./init.el][init.el]].
@@ -21,11 +21,11 @@ Each save triggers tangle process, which saves all code blocks to
   "If the current buffer is 'init.org' the code-blocks are
     tangled, and the tangled file is compiled."
   (when (equal (buffer-file-name)
-               (expand-file-name (concat user-emacs-directory "init.org")))
+               (expand-file-name "init.org" user-emacs-directory))
     ;; Avoid running hooks when tangling.
     (let ((prog-mode-hook nil))
       (org-babel-tangle)
-      (byte-compile-file (concat user-emacs-directory "init.el")))))
+      (byte-compile-file (expand-file-name "init.el" user-emacs-directory)))))
 
 (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
@@ -48,12 +48,15 @@ Each save triggers tangle process, which saves all code blocks to
 (let* ((package--builtins nil)
        (packages
 	'(auto-compile	  ; automatically compile Emacs Lisp libraries
+	  use-package
 	  org
 	  treemacs
 	  beacon
 	  cider		 ; Clojure Interactive Development Environment
 	  clj-refactor ; A collection of clojure refactoring functions
 	  company      ; Modular text completion framework
+	  docker
+	  dockerfile-mode
 	  ivy
 	  swiper
 	  counsel
@@ -72,6 +75,7 @@ Each save triggers tangle process, which saves all code blocks to
 	  nix-mode
 	  markdown-mode
 	  writeroom-mode
+	  plantuml-mode
 	  ob-restclient
 	  org-super-agenda
 	  origami
@@ -88,6 +92,12 @@ Each save triggers tangle process, which saves all code blocks to
 	(mapc 'package-install packages)))))
 #+END_SRC
 
+
+*** Status line
+#+BEGIN_SRC emacs-lisp
+(use-package mood-line
+  :config (mood-line-mode 1))
+#+END_SRC
 *** Modes
 **** Global modes
 
@@ -109,6 +119,7 @@ Each save triggers tangle process, which saves all code blocks to
 	   ivy-mode
 	   counsel-mode
 	   which-key-mode
+	   mood-line-mode
 	   org-super-agenda-mode
 	   ;; global-whitespace-mode
 	   ))
@@ -116,7 +127,6 @@ Each save triggers tangle process, which saves all code blocks to
 #+END_SRC
 
 **** Per language modes.
-
 #+BEGIN_SRC emacs-lisp
 (dolist (mode '(cider-repl-mode
                 clojure-mode
@@ -134,16 +144,19 @@ Each save triggers tangle process, which saves all code blocks to
 (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
 (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
 (add-to-list 'auto-mode-alist '("\\.nix\\'" . nix-mode))
+(add-to-list 'auto-mode-alist '("Dockerfile\\'" . dockerfile-mode))
 #+END_SRC
 
 **** org mode
 
 #+BEGIN_SRC emacs-lisp
+
 (setq org-directory "~/org")
 (setq org-default-notes-file (concat org-directory "/todo.org"))
 (setq org-archive-location (concat org-directory "/archived.org::"))
 (setq org-agenda-files (list (concat org-directory "/todo.org")
-			     (concat org-directory "/tropin.org")))
+			     (concat org-directory "/tropin.org")
+			     (concat org-directory "/infra.org")))
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
 (setq org-hide-leading-stars t)
 (setq org-fontify-whole-heading-line t)
@@ -175,9 +188,11 @@ Each save triggers tangle process, which saves all code blocks to
 (setq org-src-window-setup 'current-window)
 (setq org-export-backends '(html md latex ascii icalendar odt))
 
+(setq org-log-done 'time)
+
 (setq org-todo-keywords
       (quote ((sequence "TODO(t)" "NEXT(n!)" "|" "DONE(d!)")
-              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "DELEGATED(D@/!)" "|" "CANCELLED(c@/!)" "PHONE" "MEETING"))))
+              (sequence "WAITING(w@/!)" "HOLD(h@/!)" "DELEGATED(D@/!)" "|" "CANCELLED(c@/!)" "SOMEDAY(s)" "MEETING(m)"))))
 
 (setq org-todo-keyword-faces
       (quote (("NEXT" :foreground "forest green" :weight bold :background "light green"
@@ -234,16 +249,34 @@ Each save triggers tangle process, which saves all code blocks to
          (file+headline "~/org/todo.org" "Inbox")
          "* TODO %?\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n")
         ("c" "Today task" entry
-         (file+headline "~/org/todo.org" "Today")
+         (file+headline "~/org/todo.org" "Inbox")
          "* TODO %?\nSCHEDULED: %t\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n")
+	("m" "Meeting" entry
+         (file+headline "~/org/todo.org" "Meetings")
+         "* MEETING %?\n:PROPERTIES:\n:CREATED: %U\n:END:\nParticipants:\nAgenda:\n- [ ] \nResults:\n- \n\n")
+	("w" "Weekly life review" entry
+         (file+headline "~/org/todo.org" "Weekly reviews")
+         "* TODO [/] Life review %t\n:PROPERTIES:\n:CREATED: %U\n:END:\n
+- [ ] Review agenda%?
+- [ ] Review tasks
+\n\n")
         ("q" "Quick note" entry
          (file+headline "~/org/todo.org" "Notes")
          "* %? :Note:\n:PROPERTIES:\n:CREATED: %U\n:END:\n\n")
         ))
 #+END_SRC
 
-#+RESULTS:
-| t | Task | entry | (file+headline ~/org/todo.org Inbox) | * TODO %? |
+**** PlantUML
+#+NAME: plantuml-jar
+#+BEGIN_SRC shell :results silent
+readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.jar;'
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp :var plantuml-jar=plantuml-jar() :results silent
+(setq plantuml-jar-path plantuml-jar)
+(setq plantuml-default-exec-mode 'jar)
+(setq org-plantuml-jar-path plantuml-jar-path)
+#+END_SRC
 
 *** Look and feel
 **** TODO Add amx and ivy rich plugins for better ivy experience
@@ -295,9 +328,11 @@ Each save triggers tangle process, which saves all code blocks to
 
 *** Keybindings
 **** Windows and buffers
+
 All keybindings starting with ~super~ key are buffers or windows
 related. Keybindings with ~C-s-~ prefix operates on other window.
 #+BEGIN_SRC emacs-lisp
+
 (defun kill-other-window-buffer ()
   "Kill buffer in other window"
   (interactive)
@@ -356,6 +391,7 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
   ("q" nil "quit" :column "quit"))
 
 #+END_SRC
+
 **** Global hydra
 #+BEGIN_SRC emacs-lisp
 (global-set-key
