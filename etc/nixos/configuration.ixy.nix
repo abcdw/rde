@@ -230,7 +230,8 @@ in
     nixos-unstable.polybarFull
 
     google-cloud-sdk
-    nixos-unstable.kubectl
+    nixos-unstable.kubectl nixos-unstable.kubeseal
+    nixos-unstable.kustomize
     imagemagick
     ffmpeg
     youtube-dl
@@ -286,10 +287,11 @@ in
     inconsolata
 #    iosevka
     source-code-pro
+    open-sans # need for telegram app
     unifont
     nixos-unstable.nerdfonts
     ];
-  fonts.fontconfig.defaultFonts.monospace = [ "Hack" ];
+  fonts.fontconfig.defaultFonts.monospace = [ "Iosevka" ];
 
   users.defaultUserShell = pkgs.zsh;
   fileSystems."/mnt/flash" = {
