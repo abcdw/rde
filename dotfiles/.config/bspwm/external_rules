@@ -14,3 +14,9 @@ if [ "$class" = TelegramDesktop ] ; then
 		;;
 	esac
 fi
+title=$(xtitle "$wid")
+  case "$title" in
+		"meet.jit.si is sharing your screen.")
+			echo "state=tiled sticky=off hidden=on"
+		;;
+esac

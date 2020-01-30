@@ -22,11 +22,11 @@ alt + Tab
 super + shift + m
 	bspc desktop -l next
 
+super + shift + c
+	bspc node -c
+
 super + shift + d
       rofi -show run
-
-super + shift + c
-      chromium
 
 super + shift + l
       i3lock
