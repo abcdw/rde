@@ -25,7 +25,8 @@ Each save triggers tangle process, which saves all code blocks to
     ;; Avoid running hooks when tangling.
     (let ((prog-mode-hook nil))
       (org-babel-tangle)
-      (byte-compile-file (expand-file-name "init.el" user-emacs-directory)))))
+      ;; (byte-compile-file (expand-file-name "init.el" user-emacs-directory))
+      )))
 
 (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
@@ -80,9 +81,11 @@ Each save triggers tangle process, which saves all code blocks to
 	  org-super-agenda
 	  origami
 	  major-mode-hydra
-	  posframe
+	  ;; posframe
 	  ;;	    hydra-posframe
-	  ivy-posframe
+	  ;; ivy-posframe
+	  amx
+	  ivy-rich
 	  which-key)))	      ; Display available keybindings in popup
   (ignore-errors
     (let ((packages (cl-remove-if 'package-installed-p packages)))
@@ -268,7 +271,7 @@ Each save triggers tangle process, which saves all code blocks to
 
 **** PlantUML
 #+NAME: plantuml-jar
-#+BEGIN_SRC shell :results silent
+#+BEGIN_SRC shell :results silent :tangle no
 readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.jar;'
 #+END_SRC
 
@@ -279,7 +282,7 @@ readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.j
 #+END_SRC
 
 *** Look and feel
-**** TODO Add amx and ivy rich plugins for better ivy experience
+
 **** Better defaults
 #+BEGIN_SRC emacs-lisp
 (set-language-environment "UTF-8")
@@ -287,12 +290,17 @@ readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.j
 ;;  (load-theme 'nord t)
 (load-theme 'leuven t)
 ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
-(setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
-(setq ivy-posframe-border-width 10)
+;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
+;; (setq ivy-posframe-border-width 10)
+;; (ivy-posframe-mode 1)
+
 (setq ivy-initial-inputs-alist nil)
+(ivy-rich-mode 1)
+(add-hook 'minibuffer-setup-hook (lambda () (setq show-trailing-whitespace nil)))
+
 ;;  (setq ivy-posframe-display-functions-alist '((t . nil)))
 ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-point)))
-(ivy-posframe-mode 1)
+
 
 ;; (load-theme 'doom-tomorrow-day t)
 ;; (load-theme 'base16-tomorrow t)
@@ -324,9 +332,16 @@ readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.j
 (setq create-lockfiles nil)
 
 (global-set-key [remap list-buffers] 'ibuffer)
+
+(defalias 'yes-or-no-p 'y-or-n-p)
 #+END_SRC
 
 *** Keybindings
+**** Cheatsheet
+| key       | description       |
+|-----------+-------------------|
+| ~C-M-SPC~ | Select sexp       |
+| ~M-;~     | Comment something |
 **** Windows and buffers
 
 All keybindings starting with ~super~ key are buffers or windows
@@ -391,16 +406,15 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
   ("q" nil "quit" :column "quit"))
 
 #+END_SRC
-
 **** Global hydra
 #+BEGIN_SRC emacs-lisp
 (global-set-key
  (kbd "M-o")
  (defhydra hydra-global-menu
    (:color blue :hint nil)
-   ("p f" projectile-find-file "project find file" :color blue :column "project")
-   ("p t" treemacs-select-window "project tree" :color blue)
-   ("t t" treemacs "toggle tree" :color blue :column "toggle")
+   ("p f" projectile-find-file "find file" :color blue :column "project")
+   ("p t" treemacs-select-window "tree" :color blue)
+   ("t t" treemacs "tree" :color blue :column "toggle")
    ("f r" counsel-recentf "recentf" :color blue :column "files")
    ("f e" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
    ("f i" (lambda () (interactive) (find-file "~/configs/etc/nixos/configuration.ixy.nix")) "ixy.nix")
@@ -408,7 +422,7 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
    ("f o" (lambda () (interactive) (find-file "~/org")) "org file")
    ("f c c" (lambda () (interactive) (find-file "~/configs/dotfiles/.config")) "configs")
    ("f c b" (lambda () (interactive) (find-file "~/.config/bspwm/bspwmrc")) "bspwmrc")
-   ("f c r" (lambda () (interactive) (find-file "~/.config/bspwm/external_rules")) "bspwmrc external rules")
+   ("f c r" (lambda () (interactive) (find-file "~/.config/bspwm/external_rules")) "bspwmrc rules")
    ("f c s" (lambda () (interactive) (find-file "~/.config/sxhkd/sxhkdrc")) "sxhkdrc")
    ("h o" org-info "org mode info" :column "help" :color blue)
    ("s s" counsel-rg "ripgrep" :color blue :column "search")
@@ -420,6 +434,7 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
    ("o a" org-agenda-list "agenda")
    ("o c" org-columns "columns")
    ("o b" org-switchb "switch buffer")
+   ("v d" vc-diff "vc-diff" :column "vc")
    ("w" hydra-window-menu/body "window/buffer menu" :column "hydras")
    ))
 
@@ -459,7 +474,7 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
 (global-set-key (kbd "M-z") 'zap-up-to-char)
 
 (global-set-key (kbd "C-;") 'avy-goto-char)
-(global-set-key (kbd "C-s") 'swiper)
+(global-set-key (kbd "C-S-s") 'swiper)
 (global-set-key (kbd "C-c g") 'counsel-rg)
 (global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "C-?") 'help-command)
@@ -506,6 +521,9 @@ Show trailing whitespaces and cleanup them on save.
   )
 #+END_SRC
 
+** Tasks
+**** TODO Add amx and ivy rich plugins for better ivy experience
+**** TODO Add additional info to ivy buffers
 ** Credits
 
 Thanks for inspiration to [[https://github.com/mitrx][Dmitry Alexeev]].
