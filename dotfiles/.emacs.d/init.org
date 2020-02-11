@@ -81,11 +81,13 @@ Each save triggers tangle process, which saves all code blocks to
 	  org-super-agenda
 	  origami
 	  major-mode-hydra
+	  eshell-toggle
 	  ;; posframe
 	  ;;	    hydra-posframe
 	  ;; ivy-posframe
-	  amx
+;;	  amx
 	  ivy-rich
+;;	  all-the-icons-ivy-rich
 	  which-key)))	      ; Display available keybindings in popup
   (ignore-errors
     (let ((packages (cl-remove-if 'package-installed-p packages)))
@@ -96,6 +98,30 @@ Each save triggers tangle process, which saves all code blocks to
 #+END_SRC
 
 
+**** AMX (Better M-x)
+#+BEGIN_SRC emacs-lisp
+(use-package amx :ensure t :defer t)
+#+END_SRC
+
+**** eshell-toggle
+Allows to toggle term and uses a projectile for finding the root of
+the project.
+#+BEGIN_SRC emacs-lisp
+(use-package eshell-toggle
+  :custom
+  (eshell-toggle-size-fraction 3)
+  (eshell-toggle-use-projectile-root t)
+  (eshell-toggle-run-command nil)
+  ;;(eshell-toggle-init-function #'eshell-toggle-init-ansi-term)
+  ;; :quelpa
+  ;; (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
+  :bind
+  ("s-`" . eshell-toggle))
+#+END_SRC
+**** ivy-rich-all-the-icons
+#+BEGIN_SRC emacs-lisp
+;;(all-the-icons-ivy-rich-mode 1)
+#+END_SRC
 *** Status line
 #+BEGIN_SRC emacs-lisp
 (use-package mood-line
@@ -182,6 +208,8 @@ Each save triggers tangle process, which saves all code blocks to
    (ditaa      . t)
    (css        . t)
    (plantuml   . t)))
+
+(defun org-babel-execute:yaml (body params) body)
 
 (setq org-babel-clojure-backend 'cider)
 ;; (setq org-src-fontify-natively t)
@@ -297,7 +325,8 @@ readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.j
 (setq ivy-initial-inputs-alist nil)
 (ivy-rich-mode 1)
 (add-hook 'minibuffer-setup-hook (lambda () (setq show-trailing-whitespace nil)))
-
+(add-hook 'ansi-term-setup-hook (lambda () (setq show-trailing-whitespace nil)))
+(add-hook 'eshell-setup-hook (lambda () (setq show-trailing-whitespace nil)))
 ;;  (setq ivy-posframe-display-functions-alist '((t . nil)))
 ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-point)))
 
