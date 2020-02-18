@@ -13,7 +13,7 @@ super + t
 super + shift + {t,s,f}
 	bspc node -t {tiled,floating,fullscreen}
 
-super + {Tab,grave}
+super + Tab
 	bspc {node,desktop} -f last
 
 alt + Tab
