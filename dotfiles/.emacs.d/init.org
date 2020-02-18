@@ -41,7 +41,6 @@ Each save triggers tangle process, which saves all code blocks to
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/"))
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
-(add-to-list 'package-pinned-packages '(cider . "melpa-stable") t)
 #+END_SRC
 
 **** Package list
@@ -53,7 +52,6 @@ Each save triggers tangle process, which saves all code blocks to
 	  org
 	  treemacs
 	  beacon
-	  cider		 ; Clojure Interactive Development Environment
 	  clj-refactor ; A collection of clojure refactoring functions
 	  company      ; Modular text completion framework
 	  docker
@@ -97,10 +95,42 @@ Each save triggers tangle process, which saves all code blocks to
 	(mapc 'package-install packages)))))
 #+END_SRC
 
+**** Cider
+#+BEGIN_SRC emacs-lisp
+(use-package cider
+  :ensure t
+  :pin melpa-stable
+  :custom
+  cider-known-endpoints
+  '(("local-front" "localhost" "7888")
+    ("local-back" "localhost" "7889")))
+#+END_SRC
 
+**** JabaScript
+#+BEGIN_SRC emacs-lisp
+(use-package js2-mode
+  :ensure t
+  :mode "\\.js\\'"
+  :init
+  (setq-default js2-basic-indent 2
+                js2-basic-offset 2
+                js2-auto-indent-p t
+                js2-cleanup-whitespace t
+                js2-enter-indents-newline t
+                js2-indent-on-enter-key t))
+#+END_SRC
 **** AMX (Better M-x)
 #+BEGIN_SRC emacs-lisp
 (use-package amx :ensure t :defer t)
+#+END_SRC
+
+**** move-text
+~M-up~ and ~M-down~ for moving.
+~C-M-up~ and ~C-M-down~ for duplicating.
+#+BEGIN_SRC emacs-lisp
+(use-package move-dup
+  :ensure t
+  :init (global-move-dup-mode))
 #+END_SRC
 
 **** eshell-toggle
@@ -315,7 +345,7 @@ readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.j
 #+BEGIN_SRC emacs-lisp
 (set-language-environment "UTF-8")
 (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-;;  (load-theme 'nord t)
+;; (load-theme 'nord t)
 (load-theme 'leuven t)
 ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
 ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
@@ -463,6 +493,7 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
    ("o a" org-agenda-list "agenda")
    ("o c" org-columns "columns")
    ("o b" org-switchb "switch buffer")
+   ("o o" org-open-at-point "open link")
    ("v d" vc-diff "vc-diff" :column "vc")
    ("w" hydra-window-menu/body "window/buffer menu" :column "hydras")
    ))
