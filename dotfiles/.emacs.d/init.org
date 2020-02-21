@@ -6,9 +6,9 @@
 #+LATEX_HEADER: \usepackage[utf8]{inputenc}
 #+PROPERTY: header-args :tangle yes :results none
 
-** Configuration
+* Tangle setup
 Configuration from [[./init.org][init.org]] will be loaded by [[./init.el][init.el]].
-*** Org tangle-mangle
+** Org tangle-mangle
 
 Each save triggers tangle process, which saves all code blocks to
 ~init.el~ and byte compile it to init.elc.
@@ -31,8 +31,9 @@ Each save triggers tangle process, which saves all code blocks to
 (add-hook 'after-save-hook 'tangle-init)
 #+END_SRC
 
-*** Packages
-**** Init package system
+* Old package setup
+Old way to setup packages
+** Init package system
 #+BEGIN_SRC emacs-lisp
 (require 'cl-lib)
 (require 'package)
@@ -43,8 +44,10 @@ Each save triggers tangle process, which saves all code blocks to
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/"))
 #+END_SRC
 
-**** Package list
+** Package list
+
 #+BEGIN_SRC emacs-lisp
+
 (let* ((package--builtins nil)
        (packages
 	'(auto-compile	  ; automatically compile Emacs Lisp libraries
@@ -95,7 +98,16 @@ Each save triggers tangle process, which saves all code blocks to
 	(mapc 'package-install packages)))))
 #+END_SRC
 
-**** Cider
+* use-package with categories
+** git
+*** Time Machine
+#+BEGIN_SRC emacs-lisp
+(use-package git-timemachine
+  :ensure t
+  :defer t)
+#+END_SRC
+
+** Cider
 #+BEGIN_SRC emacs-lisp
 (use-package cider
   :ensure t
@@ -106,7 +118,7 @@ Each save triggers tangle process, which saves all code blocks to
     ("local-back" "localhost" "7889")))
 #+END_SRC
 
-**** JabaScript
+** JabaScript
 #+BEGIN_SRC emacs-lisp
 (use-package js2-mode
   :ensure t
@@ -119,21 +131,22 @@ Each save triggers tangle process, which saves all code blocks to
                 js2-enter-indents-newline t
                 js2-indent-on-enter-key t))
 #+END_SRC
-**** AMX (Better M-x)
+** AMX (Better M-x)
 #+BEGIN_SRC emacs-lisp
 (use-package amx :ensure t :defer t)
 #+END_SRC
 
-**** move-text
+** move-text
 ~M-up~ and ~M-down~ for moving.
 ~C-M-up~ and ~C-M-down~ for duplicating.
 #+BEGIN_SRC emacs-lisp
 (use-package move-dup
   :ensure t
-  :init (global-move-dup-mode))
+;;  :init (global-move-dup-mode '(not org-mode))
+)
 #+END_SRC
 
-**** eshell-toggle
+** eshell-toggle
 Allows to toggle term and uses a projectile for finding the root of
 the project.
 #+BEGIN_SRC emacs-lisp
@@ -148,15 +161,19 @@ the project.
   :bind
   ("s-`" . eshell-toggle))
 #+END_SRC
-**** ivy-rich-all-the-icons
+** ivy-rich-all-the-icons
 #+BEGIN_SRC emacs-lisp
 ;;(all-the-icons-ivy-rich-mode 1)
 #+END_SRC
+
+* Some minor configurations
+Old way for configuration without use-package
 *** Status line
 #+BEGIN_SRC emacs-lisp
 (use-package mood-line
   :config (mood-line-mode 1))
 #+END_SRC
+
 *** Modes
 **** Global modes
 
@@ -247,6 +264,7 @@ the project.
     org-src-tab-acts-natively t
     org-src-preserve-indentation t)
 (setq org-src-window-setup 'current-window)
+(setq org-link-file-path-type 'relative)
 (setq org-export-backends '(html md latex ascii icalendar odt))
 
 (setq org-log-done 'time)
@@ -581,9 +599,6 @@ Show trailing whitespaces and cleanup them on save.
   )
 #+END_SRC
 
-** Tasks
-**** TODO Add amx and ivy rich plugins for better ivy experience
-**** TODO Add additional info to ivy buffers
-** Credits
+* Credits
 
 Thanks for inspiration to [[https://github.com/mitrx][Dmitry Alexeev]].
