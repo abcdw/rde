@@ -119,6 +119,7 @@ Old way to setup packages
 #+END_SRC
 
 ** JabaScript
+
 #+BEGIN_SRC emacs-lisp
 (use-package js2-mode
   :ensure t
@@ -131,24 +132,27 @@ Old way to setup packages
                 js2-enter-indents-newline t
                 js2-indent-on-enter-key t))
 #+END_SRC
+
 ** AMX (Better M-x)
+
 #+BEGIN_SRC emacs-lisp
 (use-package amx :ensure t :defer t)
 #+END_SRC
 
-** move-text
+** move text
 ~M-up~ and ~M-down~ for moving.
 ~C-M-up~ and ~C-M-down~ for duplicating.
 #+BEGIN_SRC emacs-lisp
 (use-package move-dup
   :ensure t
-;;  :init (global-move-dup-mode '(not org-mode))
-)
+  :init (global-move-dup-mode)
+  :hook (org-mode . (lambda () (move-dup-mode -1))))
 #+END_SRC
 
 ** eshell-toggle
 Allows to toggle term and uses a projectile for finding the root of
 the project.
+
 #+BEGIN_SRC emacs-lisp
 (use-package eshell-toggle
   :custom
@@ -160,10 +164,6 @@ the project.
   ;; (eshell-toggle :repo "4DA/eshell-toggle" :fetcher github :version original)
   :bind
   ("s-`" . eshell-toggle))
-#+END_SRC
-** ivy-rich-all-the-icons
-#+BEGIN_SRC emacs-lisp
-;;(all-the-icons-ivy-rich-mode 1)
 #+END_SRC
 
 * Some minor configurations
