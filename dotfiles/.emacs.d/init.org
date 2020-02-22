@@ -50,7 +50,8 @@ Old way to setup packages
 
 (let* ((package--builtins nil)
        (packages
-	'(auto-compile	  ; automatically compile Emacs Lisp libraries
+	'(
+;; auto-compile	  ; automatically compile Emacs Lisp libraries
 	  use-package
 	  org
 	  treemacs
@@ -82,7 +83,7 @@ Old way to setup packages
 	  org-super-agenda
 	  origami
 	  major-mode-hydra
-	  eshell-toggle
+;;	  eshell-toggle
 	  ;; posframe
 	  ;;	    hydra-posframe
 	  ;; ivy-posframe
@@ -99,15 +100,17 @@ Old way to setup packages
 #+END_SRC
 
 * use-package with categories
-** git
+** Git
 *** Time Machine
+
 #+BEGIN_SRC emacs-lisp
 (use-package git-timemachine
   :ensure t
   :defer t)
 #+END_SRC
 
-** Cider
+** Programming
+*** Cider
 #+BEGIN_SRC emacs-lisp
 (use-package cider
   :ensure t
@@ -118,7 +121,7 @@ Old way to setup packages
     ("local-back" "localhost" "7889")))
 #+END_SRC
 
-** JabaScript
+*** JabaScript
 
 #+BEGIN_SRC emacs-lisp
 (use-package js2-mode
@@ -133,15 +136,19 @@ Old way to setup packages
                 js2-indent-on-enter-key t))
 #+END_SRC
 
-** AMX (Better M-x)
+** Ivy related stuff
+*** AMX (Better M-x)
+Makes commands sorted by popularity for M-x.
 
 #+BEGIN_SRC emacs-lisp
 (use-package amx :ensure t :defer t)
 #+END_SRC
 
-** move text
+** Utility
+*** move text
 ~M-up~ and ~M-down~ for moving.
 ~C-M-up~ and ~C-M-down~ for duplicating.
+
 #+BEGIN_SRC emacs-lisp
 (use-package move-dup
   :ensure t
@@ -149,12 +156,13 @@ Old way to setup packages
   :hook (org-mode . (lambda () (move-dup-mode -1))))
 #+END_SRC
 
-** eshell-toggle
+*** eshell-toggle
 Allows to toggle term and uses a projectile for finding the root of
 the project.
 
 #+BEGIN_SRC emacs-lisp
 (use-package eshell-toggle
+  :ensure t
   :custom
   (eshell-toggle-size-fraction 3)
   (eshell-toggle-use-projectile-root t)
@@ -166,20 +174,29 @@ the project.
   ("s-`" . eshell-toggle))
 #+END_SRC
 
-* Some minor configurations
-Old way for configuration without use-package
-*** Status line
+** Better defaults
+
+#+BEGIN_SRC emacs-lisp
+  (use-package menu-bar
+  :config (menu-bar-mode -1))
+#+END_SRC
+
+** Status line
+
 #+BEGIN_SRC emacs-lisp
 (use-package mood-line
   :config (mood-line-mode 1))
 #+END_SRC
+
+* Some minor configurations
+Old way for configuration without use-package
 
 *** Modes
 **** Global modes
 
 #+BEGIN_SRC emacs-lisp
 (dolist (mode
-	 '(menu-bar-mode
+	 '(
 	   tool-bar-mode
 	   scroll-bar-mode
 	   blink-cursor-mode))
@@ -195,7 +212,7 @@ Old way for configuration without use-package
 	   ivy-mode
 	   counsel-mode
 	   which-key-mode
-	   mood-line-mode
+
 	   org-super-agenda-mode
 	   ;; global-whitespace-mode
 	   ))
@@ -346,16 +363,16 @@ Old way for configuration without use-package
 #+END_SRC
 
 **** PlantUML
-#+NAME: plantuml-jar
-#+BEGIN_SRC shell :results silent :tangle no
-readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.jar;'
-#+END_SRC
+# #+NAME: plantuml-jar
+# #+BEGIN_SRC sh :results silent :tangle no
+# readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.jar;'
+# #+END_SRC
 
-#+BEGIN_SRC emacs-lisp :var plantuml-jar=plantuml-jar() :results silent
-(setq plantuml-jar-path plantuml-jar)
-(setq plantuml-default-exec-mode 'jar)
-(setq org-plantuml-jar-path plantuml-jar-path)
-#+END_SRC
+# #+BEGIN_SRC emacs-lisp :var plantuml-jar=plantuml-jar() :results silent
+# (setq plantuml-jar-path plantuml-jar)
+# (setq plantuml-default-exec-mode 'jar)
+# (setq org-plantuml-jar-path plantuml-jar-path)
+# #+END_SRC
 
 *** Look and feel
 
@@ -371,7 +388,7 @@ readlink `which plantuml` | sed 's;/bin/;/lib/;' | sed 's;/plantuml$;/plantuml.j
 ;; (ivy-posframe-mode 1)
 
 (setq ivy-initial-inputs-alist nil)
-(ivy-rich-mode 1)
+;; (ivy-rich-mode 1)
 (add-hook 'minibuffer-setup-hook (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'ansi-term-setup-hook (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'eshell-setup-hook (lambda () (setq show-trailing-whitespace nil)))
@@ -481,8 +498,8 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
   ("M-n" (switch-to-next-buffer (next-window)) "next buffer other window")
   ("M-p" (switch-to-prev-buffer (next-window)) "prev buffer other window")
   ("q" nil "quit" :column "quit"))
-
 #+END_SRC
+
 **** Global hydra
 #+BEGIN_SRC emacs-lisp
 (global-set-key
