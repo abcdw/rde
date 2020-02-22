@@ -64,13 +64,10 @@ Old way to setup packages
 	  swiper
 	  counsel
 	  avy				; jump to visible characters
-;;	  magit				; control Git from Emacs
-;;	  git-link
 	  rainbow-delimiters
 	  base16-theme
 	  nord-theme
 	  leuven-theme
-	  ;; doom-themes
 	  paredit	; minor mode for editing parentheses
 	  projectile	; Manage and navigate projects in Emacs easily
 	  rust-mode
@@ -83,14 +80,7 @@ Old way to setup packages
 	  org-super-agenda
 	  origami
 	  major-mode-hydra
-;;	  eshell-toggle
-	  ;; posframe
-	  ;;	    hydra-posframe
-	  ;; ivy-posframe
-;;	  amx
 	  ivy-rich
-;;	  all-the-icons-ivy-rich
-	  ;; which-key
 	  )))	      ; Display available keybindings in popup
   (ignore-errors
     (let ((packages (cl-remove-if 'package-installed-p packages)))
@@ -441,7 +431,7 @@ Old way for configuration without use-package
 ;; (ivy-posframe-mode 1)
 
 (setq ivy-initial-inputs-alist nil)
-;; (ivy-rich-mode 1)
+(ivy-rich-mode 1)
 (add-hook 'minibuffer-setup-hook (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'ansi-term-setup-hook (lambda () (setq show-trailing-whitespace nil)))
 (add-hook 'eshell-setup-hook (lambda () (setq show-trailing-whitespace nil)))
