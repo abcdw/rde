@@ -192,6 +192,23 @@ the project.
   ("s-`" . eshell-toggle))
 #+END_SRC
 
+*** Smart comment
+Comment line when you are in the middle of the line.
+
+#+BEGIN_SRC emacs-lisp
+(use-package smart-comment
+  :ensure t
+  :bind ("M-;" . smart-comment))
+#+END_SRC
+
+*** Comment sexp
+
+#+BEGIN_SRC emacs-lisp
+(use-package comment-or-uncomment-sexp
+  :ensure t
+  :bind ("C-M-;" . comment-or-uncomment-sexp))
+#+END_SRC
+
 ** Better defaults
 *** GUI
 Disable gui elements
