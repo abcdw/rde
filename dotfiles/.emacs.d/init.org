@@ -107,7 +107,7 @@ Good interface for git.
 #+BEGIN_SRC emacs-lisp
 (use-package magit
   :ensure t
-  :map ("C-x g" . magit-status))
+  :bind ("C-x g" . magit-status))
 #+END_SRC
 
 *** Git link
