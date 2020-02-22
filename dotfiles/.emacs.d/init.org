@@ -90,7 +90,8 @@ Old way to setup packages
 ;;	  amx
 	  ivy-rich
 ;;	  all-the-icons-ivy-rich
-	  which-key)))	      ; Display available keybindings in popup
+	  ;; which-key
+	  )))	      ; Display available keybindings in popup
   (ignore-errors
     (let ((packages (cl-remove-if 'package-installed-p packages)))
       (when packages
@@ -233,6 +234,15 @@ Disable gui elements
 
 #+END_SRC
 
+*** Which key
+Show following keybindings for incomplete chord.
+
+#+BEGIN_SRC emacs-lisp
+(use-package which-key
+  :ensure t
+  :config
+  (which-key-mode))
+#+END_SRC
 ** Status line
 
 #+BEGIN_SRC emacs-lisp
@@ -256,8 +266,6 @@ Old way for configuration without use-package
 	   show-paren-mode
 	   ivy-mode
 	   counsel-mode
-	   which-key-mode
-
 	   org-super-agenda-mode
 	   ;; global-whitespace-mode
 	   ))
