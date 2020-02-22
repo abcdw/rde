@@ -175,10 +175,27 @@ the project.
 #+END_SRC
 
 ** Better defaults
+*** GUI
+Disable gui elements
 
 #+BEGIN_SRC emacs-lisp
-  (use-package menu-bar
-  :config (menu-bar-mode -1))
+(use-package tool-bar
+  :config
+  (tool-bar-mode -1))
+
+(use-package scroll-bar
+  :config
+  (scroll-bar-mode -1))
+
+(use-package menu-bar
+  :config
+  (menu-bar-mode -1))
+
+(use-package tooltip
+  :defer t
+  :custom
+  (tooltip-mode -1))
+
 #+END_SRC
 
 ** Status line
@@ -195,13 +212,6 @@ Old way for configuration without use-package
 **** Global modes
 
 #+BEGIN_SRC emacs-lisp
-(dolist (mode
-	 '(
-	   tool-bar-mode
-	   scroll-bar-mode
-	   blink-cursor-mode))
-  (funcall mode 0))
-
 (dolist (mode
 	 '(projectile-global-mode
 	   global-company-mode
