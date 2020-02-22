@@ -64,8 +64,8 @@ Old way to setup packages
 	  swiper
 	  counsel
 	  avy				; jump to visible characters
-	  magit				; control Git from Emacs
-	  git-link
+;;	  magit				; control Git from Emacs
+;;	  git-link
 	  rainbow-delimiters
 	  base16-theme
 	  nord-theme
@@ -102,11 +102,29 @@ Old way to setup packages
 * use-package with categories
 ** Git
 *** Time Machine
+Go back in a git history for current file.
 
 #+BEGIN_SRC emacs-lisp
 (use-package git-timemachine
   :ensure t
   :defer t)
+#+END_SRC
+
+*** Magit
+Good interface for git.
+
+#+BEGIN_SRC emacs-lisp
+(use-package magit
+  :ensure t
+  :map ("C-x g" . magit-status))
+#+END_SRC
+
+*** Git link
+Creates a link to github or other remote for current file and line.
+
+#+BEGIN_SRC emacs-lisp
+(use-package git-link
+  :ensure t)
 #+END_SRC
 
 ** Programming
@@ -583,7 +601,6 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
 (global-set-key (kbd "C-c g") 'counsel-rg)
 (global-set-key (kbd "C-h") 'delete-backward-char)
 (global-set-key (kbd "C-?") 'help-command)
-(global-set-key (kbd "C-x g") 'magit-status)
 
 #+END_SRC
 
