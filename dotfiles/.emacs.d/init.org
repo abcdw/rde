@@ -57,7 +57,6 @@ Old way to setup packages
 	  treemacs
 	  beacon
 	  clj-refactor ; A collection of clojure refactoring functions
-	  company      ; Modular text completion framework
 	  docker
 	  dockerfile-mode
 	  ivy
@@ -154,6 +153,28 @@ Makes commands sorted by popularity for M-x.
 #+END_SRC
 
 ** Utility
+*** Company
+Autocompletion framework.
+
+#+BEGIN_SRC emacs-lisp
+(use-package company
+  :ensure t
+  :hook
+  (after-init . global-company-mode)
+  :bind (:map company-active-map
+     ("C-n" . company-select-next-or-abort)
+     ("C-p" . company-select-previous-or-abort)))
+#+END_SRC
+
+*** Company quickhelp
+Show tooltip next to autocompletion popup.
+
+#+BEGIN_SRC emacs-lisp
+(use-package company-quickhelp
+  :ensure t
+  :hook (prog-mode . company-quickhelp-mode))
+#+END_SRC
+
 *** move text
 ~M-up~ and ~M-down~ for moving.
 ~C-M-up~ and ~C-M-down~ for duplicating.
@@ -260,7 +281,6 @@ Old way for configuration without use-package
 #+BEGIN_SRC emacs-lisp
 (dolist (mode
 	 '(projectile-global-mode
-	   global-company-mode
 	   column-number-mode
 	   beacon-mode
 	   yas-global-mode
@@ -452,7 +472,7 @@ Old way for configuration without use-package
 ;; (load-theme 'doom-tomorrow-day t)
 ;; (load-theme 'base16-tomorrow t)
 
-(set-face-attribute 'default nil :font "Iosevka Nerd Font 10" :width 'Regular)
+(set-face-attribute 'default nil :font "Iosevka Nerd Font 9" :width 'Regular)
 
 ;; blink modeline instead of beep
 (setq visible-bell nil
