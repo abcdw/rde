@@ -221,6 +221,18 @@ Comment line when you are in the middle of the line.
   :bind ("C-M-;" . comment-or-uncomment-sexp))
 #+END_SRC
 
+*** Recent files
+Automatically save list of recent files
+
+#+BEGIN_SRC emacs-lisp
+(use-package recentf
+  :defer 0.1
+  :custom
+  (recentf-auto-cleanup 30)
+  :config
+  (run-with-idle-timer 30 t 'recentf-save-list))
+#+END_SRC
+
 ** Better defaults
 *** Coding system
 
@@ -482,9 +494,6 @@ Old way for configuration without use-package
   (run-with-timer 0.1 nil #'invert-face 'mode-line))
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (setq vc-follow-symlinks t)
-
-(recentf-mode 1)
-(run-at-time nil (* 5 60) 'recentf-save-list)
 
 (save-place-mode 1)
 (setq save-interprogram-paste-before-kill t
