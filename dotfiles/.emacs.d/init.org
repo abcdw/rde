@@ -277,6 +277,28 @@ Show following keybindings for incomplete chord.
   (which-key-mode))
 #+END_SRC
 
+*** Dashboard
+#+BEGIN_SRC emacs-lisp
+(use-package dashboard
+  :ensure t
+  :if (< (length command-line-args) 2)
+  :custom
+  (dashboard-banner-logo-title "With Great Power Comes Great Responsibility")
+  (dashboard-center-content t)
+  (dashboard-items
+   '((agenda . 8)
+     (projects . 6)
+     (recents . 5)
+     ))
+  (dashboard-set-file-icons t)
+  (dashboard-set-heading-icons t)
+  (dashboard-set-init-info nil)
+  (dashboard-set-navigator t)
+  (dashboard-startup-banner 1)
+  :config
+  (dashboard-setup-startup-hook))
+#+END_SRC
+
 ** Status line
 
 #+BEGIN_SRC emacs-lisp
@@ -566,7 +588,7 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
 (global-set-key (kbd "C-s-p") 'switch-to-prev-buffer-other-window)
 (global-set-key (kbd "C-s-w") #'kill-other-window-and-buffer)
 (global-set-key (kbd "C-s-m") #'maximize-other-window)
-
+(global-set-key (kbd "s-a") #'projectile-toggle-between-implementation-and-test)
 (defhydra hydra-window-menu
   (:color pink :hint nil)
   ("o" other-window "other window" :column "windows")
