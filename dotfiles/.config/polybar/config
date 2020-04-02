@@ -288,7 +288,7 @@ format-disconnected =
 type = internal/date
 interval = 5
 
-date = "%y-%m-%d"
+date = "%Y-%m-%d"
 date-alt = " %Y-%m-%d"
 
 time = %H:%M
