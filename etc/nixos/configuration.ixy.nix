@@ -234,11 +234,12 @@ in
     nixos-unstable.kustomize
     imagemagick
     ffmpeg
-    youtube-dl
+    nixos-unstable.youtube-dl
     nixos-unstable.plantuml graphviz
     adoptopenjdk-bin
     goldendict
     pass
+    broot
 
     pamixer alsaTools alsaUtils
     pavucontrol
@@ -265,7 +266,7 @@ in
 
     qt5.qtwayland
     unzip p7zip unrar
-    git
+    gitFull
     gnupg
     ranger
     ripgrep
