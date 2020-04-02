@@ -109,6 +109,13 @@ Good interface for git.
   :bind ("C-x g" . magit-status))
 #+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+(use-package magit-todos
+  :ensure t
+  :after magit
+  :hook (magit-mode-hook . magit-todos-mode))
+#+END_SRC
+
 *** Git link
 Creates a link to github or other remote for current file and line.
 
@@ -487,7 +494,7 @@ Old way for configuration without use-package
 **** Better defaults
 #+BEGIN_SRC emacs-lisp
 (add-to-list 'custom-theme-load-path (expand-file-name "~/.emacs.d/themes/"))
-;; (load-theme 'nord t)
+;;(load-theme 'nord t)
 (load-theme 'leuven t)
 ;;  (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-bottom-left)))
 ;; (setq ivy-posframe-display-functions-alist '((t . ivy-posframe-display-at-frame-center)))
@@ -589,6 +596,7 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
 (global-set-key (kbd "C-s-w") #'kill-other-window-and-buffer)
 (global-set-key (kbd "C-s-m") #'maximize-other-window)
 (global-set-key (kbd "s-a") #'projectile-toggle-between-implementation-and-test)
+(global-set-key (kbd "s-f") #'counsel-projectile)
 (defhydra hydra-window-menu
   (:color pink :hint nil)
   ("o" other-window "other window" :column "windows")
@@ -612,6 +620,8 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
    (:color blue :hint nil)
    ("p f" projectile-find-file "find file" :color blue :column "project")
    ("p t" treemacs-select-window "tree" :color blue)
+   ("p b" counsel-projectile-switch-to-buffer "buffers" :color blue)
+   ("p p" counsel-projectile-switch-project "switch" :color blue)
    ("t t" treemacs "tree" :color blue :column "toggle")
    ("f r" counsel-recentf "recentf" :color blue :column "files")
    ("f e" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
@@ -695,6 +705,8 @@ Show trailing whitespaces and cleanup them on save.
 *** Projectile
 
 #+BEGIN_SRC emacs-lisp
+(use-package counsel-projectile :ensure t)
+(use-package projectile)
 (setq projectile-completion-system 'ivy)
 (setq projectile-create-missing-test-files t)
 #+END_SRC
