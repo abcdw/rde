@@ -309,8 +309,8 @@ Show following keybindings for incomplete chord.
 ** Status line
 
 #+BEGIN_SRC emacs-lisp
-(use-package mood-line
-  :config (mood-line-mode 1))
+;; (use-package mood-line
+;;   :config (mood-line-mode 1))
 #+END_SRC
 
 * Some minor configurations
@@ -513,7 +513,7 @@ Old way for configuration without use-package
 ;; (load-theme 'doom-tomorrow-day t)
 ;; (load-theme 'base16-tomorrow t)
 
-(set-face-attribute 'default nil :font "Iosevka Nerd Font 9" :width 'Regular)
+(set-face-attribute 'default nil :font "Iosevka 9" :width 'Regular)
 
 ;; blink modeline instead of beep
 (setq visible-bell nil

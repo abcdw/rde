@@ -102,7 +102,7 @@ tabspaces: 8
 font:
   # Normal (roman) font face
   normal:
-    family: Iosevka Nerd Font
+    family: Iosevka
     # Font family
     #
     # Default:
@@ -116,7 +116,7 @@ font:
 
   # Bold font face
   bold:
-    family: Iosevka Nerd Font
+    family: Iosevka
     # Font family
     #
     # If the bold family is not specified, it will fall back to the
@@ -128,7 +128,7 @@ font:
 
   # Italic font face
   italic:
-    family: Iosevka Nerd Font
+    family: Iosevka
     # Font family
     #
     # If the italic family is not specified, it will fall back to the
