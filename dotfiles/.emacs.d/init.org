@@ -306,9 +306,12 @@ Show following keybindings for incomplete chord.
   (dashboard-setup-startup-hook))
 #+END_SRC
 
-** Status line
+** Prettication
 
 #+BEGIN_SRC emacs-lisp
+(use-package all-the-icons
+  :ensure t)
+
 ;; (use-package mood-line
 ;;   :config (mood-line-mode 1))
 #+END_SRC
@@ -359,12 +362,11 @@ Old way for configuration without use-package
 
 #+BEGIN_SRC emacs-lisp
 
-(setq org-directory "~/org")
+(setq org-directory "~/work/org-files")
 (setq org-default-notes-file (concat org-directory "/todo.org"))
 (setq org-archive-location (concat org-directory "/archived.org::"))
 (setq org-agenda-files (list (concat org-directory "/todo.org")
-			     (concat org-directory "/tropin.org")
-			     (concat org-directory "/infra.org")))
+			     (concat org-directory "/tropin.org")))
 (setq org-refile-targets '((org-agenda-files . (:maxlevel . 2))))
 (setq org-hide-leading-stars t)
 (setq org-fontify-whole-heading-line t)
@@ -626,8 +628,8 @@ related. Keybindings with ~C-s-~ prefix operates on other window.
    ("f r" counsel-recentf "recentf" :color blue :column "files")
    ("f e" (lambda () (interactive) (find-file "~/.emacs.d/init.org")) "init.org")
    ("f i" (lambda () (interactive) (find-file "~/configs/etc/nixos/configuration.ixy.nix")) "ixy.nix")
-   ("f t" (lambda () (interactive) (find-file "~/org/todo.org")) "todo.org")
-   ("f o" (lambda () (interactive) (find-file "~/org")) "org file")
+   ("f t" (lambda () (interactive) (find-file (expand-file-name "todo.org" org-directory))) "todo.org")
+   ("f o" (lambda () (interactive) (find-file org-directory)) "org file")
    ("f c c" (lambda () (interactive) (find-file "~/configs/dotfiles/.config")) "configs")
    ("f c b" (lambda () (interactive) (find-file "~/.config/bspwm/bspwmrc")) "bspwmrc")
    ("f c r" (lambda () (interactive) (find-file "~/.config/bspwm/external_rules")) "bspwmrc rules")
