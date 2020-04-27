@@ -4,7 +4,7 @@ My current setup
 | Tool type            | Tool                                                                      |
 | ---:                 | :---                                                                      |
 | Operating system:    | [Guix](https://guix.gnu.org)/[NixOS](https://nixos.org/)                  |
-| Window manager:      | [bspwm](https://github.com/baskerville/bspwm)/[sway](https://swaywm.org/) |
+| Window manager:      | [i3-gaps](https://github.com/Airblader/i3)/[sway](https://swaywm.org/) |
 | Editor/secondary OS: | [emacs](https://www.gnu.org/s/emacs/)                                     |
 | Terminal:            | [alacritty](https://github.com/jwilm/alacritty)                           |
 | Shell:               | [zsh](https://wiki.archlinux.org/index.php/zsh)                           |
@@ -18,7 +18,7 @@ My current hardware setup:
 My previous harware:
 - ThinkPad [X1 Carbon](./x1carbon5.org) 5th generation
 
-Also, some legacy configs (vimrc/i3/etc) can be found in
+Also, some legacy configs (vimrc/awesome/etc) can be found in
 [old-configs directory](./stale/old-configs).
 
 ### bspwm
