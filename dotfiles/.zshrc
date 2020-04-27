@@ -62,10 +62,13 @@ bindkey '^v' edit-command-line
 export HISTSIZE=10000
 export HISTFILE="$HOME/.cache/.zhistory"
 export SAVEHIST=$HISTSIZE
-unsetopt EXTENDED_HISTORY
+export HISTTIMEFORMAT="[%F %T] "
 
-setopt hist_ignore_all_dups
-setopt hist_ignore_space
+setopt INC_APPEND_HISTORY
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_SPACE
+
 setopt autocd
 # setopt extendedglob # Extended regular expressions cp ^*.(tar.
 
