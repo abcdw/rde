@@ -1,7 +1,7 @@
 [user]
 	name = Andrew Tropin
-	email = andrewtropin@gmail.com
-	signingkey = 55D6417704020524
+	email = andrew@trop.in
+	signingkey = ABEDF9050C0AF46E
 
 [alias]
 	aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /' | sort    # list all aliases
@@ -15,4 +15,3 @@
 	process = git-lfs filter-process
 	required = true
 	clean = git-lfs clean -- %f
-
