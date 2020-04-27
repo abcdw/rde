@@ -60,9 +60,9 @@ zle -N edit-command-line
 bindkey '^v' edit-command-line
 
 export HISTSIZE=10000
-export HISTFILE="$HOME/.zhistory"
+export HISTFILE="$HOME/.cache/.zhistory"
 export SAVEHIST=$HISTSIZE
-# unsetopt EXTENDED_HISTORY
+unsetopt EXTENDED_HISTORY
 
 setopt hist_ignore_all_dups
 setopt hist_ignore_space
