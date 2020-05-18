@@ -131,6 +131,13 @@ Creates a link to github or other remote for current file and line.
 (use-package htmlize
   :ensure t)
 #+END_SRC
+
+** Tools
+#+BEGIN_SRC emacs-lisp
+(use-package ledger-mode
+  :ensure t)
+#+END_SRC
+
 ** Programming
 *** Cider
 #+BEGIN_SRC emacs-lisp
@@ -167,6 +174,13 @@ Makes commands sorted by popularity for M-x.
 #+END_SRC
 
 ** Utility
+*** direnv
+#+BEGIN_SRC emacs-lisp
+(use-package direnv
+  :ensure t
+  :config
+  (direnv-mode))
+#+END_SRC
 *** Company
 Autocompletion framework.
 
