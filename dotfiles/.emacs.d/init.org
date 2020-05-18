@@ -717,9 +717,12 @@ Show trailing whitespaces and cleanup them on save.
 
 #+BEGIN_SRC emacs-lisp
 (use-package counsel-projectile :ensure t)
-(use-package projectile)
-(setq projectile-completion-system 'ivy)
-(setq projectile-create-missing-test-files t)
+(use-package projectile
+  :ensure t
+  :init
+  (setq projectile-completion-system 'ivy)
+  (setq projectile-create-missing-test-files t)
+  (setq projectile-project-search-path '("~/work/")))
 #+END_SRC
 
 *** Other stuff
