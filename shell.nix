@@ -4,5 +4,5 @@ let
 in
 with pkgs;
 mkShell {
-  buildInputs = [ gnumake stow ];
+  buildInputs = [ gnumake stow nix-deploy];
 }
