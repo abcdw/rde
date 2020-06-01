@@ -1,7 +1,12 @@
 
-
-Generate config for mobile phone
+Update REMOTE_HOST variable in `Makefile`. Deploy wireguard
 
 ``` shell
-qrencode -t ansiutf8 < wg0.conf
+make deploy
+```
+
+Generate qr from config for clients/1 and use it on your mobile phone.
+
+``` shell
+make clients/1.qr
 ```
