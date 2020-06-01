@@ -46,7 +46,7 @@ in {
     [
       # v4l2loopback
       exfat-nofuse
-      # wireguard
+      wireguard
     ];
 
   # The global useDHCP flag is deprecated, therefore explicitly set to false here.
@@ -116,7 +116,7 @@ in {
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     ledger
-    chromium
+    nixos-unstable.chromium
     firefox
     brave
     nixos-unstable.next
