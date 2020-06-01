@@ -14,14 +14,14 @@ let
 
       networking.nat = {
         enable = true;
-        externalInterface = "ens5";
+        externalInterface = "eth0";
         internalInterfaces = [ "wg0" ];
       };
       networking.firewall = {
         allowedUDPPorts = [ 51820 ];
         allowedTCPPorts = [ 22 8081 ];
         extraCommands = ''
-          iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o ens5 -j MASQUERADE
+          iptables -t nat -A POSTROUTING -s 10.100.0.0/24 -o eth0 -j MASQUERADE
         '';
       };
 
@@ -29,11 +29,19 @@ let
         wg0 = {
           ips = [ "10.100.0.1/24" ];
           listenPort = 51820;
-          privateKey = builtins.readFile ./server.privatekey;
+          privateKey = builtins.readFile ./keys/server.privkey;
           peers = [
             {
-              publicKey = builtins.readFile ./client.pubkey;
-              allowedIPs = [ "10.100.0.2/32" "10.100.0.3/32" ];
+              publicKey = builtins.readFile ./keys/1.pubkey;
+              allowedIPs = [ "10.100.0.101/32" ];
+            }
+            {
+              publicKey = builtins.readFile ./keys/2.pubkey;
+              allowedIPs = [ "10.100.0.102/32" ];
+            }
+            {
+              publicKey = builtins.readFile ./keys/3.pubkey;
+              allowedIPs = [ "10.100.0.103/32" ];
             }
           ];
         };

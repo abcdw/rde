@@ -28,7 +28,7 @@ clients/%.conf: keys/%.privkey keys/server.pubkey
 clients/%.qr: clients/%.conf
 	qrencode -t ansiutf8 < $<
 
-wireguard.out:
+wireguard.out: keys/server.privkey keys/1.pubkey keys/2.pubkey keys/3.pubkey
 	nix-build -o wireguard.out
 
 deploy: wireguard.out

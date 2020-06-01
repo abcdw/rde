@@ -7,7 +7,7 @@ endpoint=$4
 cat <<END
 [Interface]
 PrivateKey = $client_privkey
-Address = 10.100.0.$client_id/32
+Address = 10.100.0.10$client_id/32
 DNS = 8.8.8.8,208.67.222.222
 
 [Peer]
