@@ -131,11 +131,14 @@ in {
     wireguard
     pass
     nixos-unstable.gopass
+    nixos-unstable.sway
 
     #    nixos-unstable.steam
     vanilla-dmz
     tdesktop
     gnome3.nautilus
+    gromit-mpx
+    scrcpy
     feh
     unzip
     ripgrep
@@ -157,17 +160,17 @@ in {
     alsaUtils
   ];
 
-  # services.compton = {
-  #   enable = true;
-  #   # inactiveOpacity = "0.8";
-  #   backend = "glx";
-  #   # vSync = "opengl";
-  #   settings = {
-  #     paint-on-overlay = true;
-  #     glx-no-stencil = true;
-  #     glx-no-rebind-pixmap = true;
-  #   };
-  # };
+  services.compton = {
+    enable = true;
+    # inactiveOpacity = "0.8";
+    backend = "glx";
+    # vSync = "opengl";
+    settings = {
+      paint-on-overlay = true;
+      glx-no-stencil = true;
+      glx-no-rebind-pixmap = true;
+    };
+  };
   hardware.pulseaudio = {
     enable = true;
     tcp.enable = true; # need for mpd
