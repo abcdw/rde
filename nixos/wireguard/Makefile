@@ -2,15 +2,16 @@ REMOTE_HOST = 13.49.74.86
 
 .PRECIOUS: keys/%.privkey keys/%.pubkey
 
-
-clean:
-	unlink wireguard.out || true
-
 clean-keys:
 	rm -rf keys
 
 clean-clients:
 	rm -rf clients
+
+clean-wireguard:
+	unlink wireguard.out || true
+
+clean: clean-wireguard clean-keys clean-clients
 
 
 keys/%.privkey:
