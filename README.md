@@ -1,15 +1,16 @@
 My current setup
 =======
 
-| Tool type            | Tool                                                                      |
-| ---:                 | :---                                                                      |
-| Operating system:    | [Guix](https://guix.gnu.org)/[NixOS](https://nixos.org/)                  |
+| Tool type            | Tool                                                                   |
+| ---:                 | :---                                                                   |
+| Operating system:    | [NixOS](https://nixos.org/)                                            |
 | Window manager:      | [i3-gaps](https://github.com/Airblader/i3)/[sway](https://swaywm.org/) |
-| Editor/secondary OS: | [emacs](https://www.gnu.org/s/emacs/)                                     |
-| Terminal:            | [alacritty](https://github.com/jwilm/alacritty)                           |
-| Shell:               | [zsh](https://wiki.archlinux.org/index.php/zsh)                           |
-| Layouts:             | us,ru ([dvorak](http://www.dvzine.org/zine/01-toc.html),)                 |
+| Editor/secondary OS: | [emacs](https://www.gnu.org/s/emacs/)                                  |
+| Terminal:            | [alacritty](https://github.com/jwilm/alacritty)                        |
+| Shell:               | [zsh](https://wiki.archlinux.org/index.php/zsh)                        |
+| Layouts:             | us,ru ([dvorak](http://www.dvzine.org/zine/01-toc.html),)              |
 
+## Hardware
 My current hardware setup:
 - Ixy - ThinkPad [X1 Yoga](./etc/nixos/configuration.ixy.nix) 4th generation
 - Xenia - evga sr-2 + 2x xeon x5650
@@ -20,6 +21,8 @@ My previous harware:
 
 Also, some legacy configs (vimrc/awesome/etc) can be found in
 [old-configs directory](./stale/old-configs).
+
+## Screenshots
 
 ### bspwm
 ![2020-04-04-12:01:29](https://user-images.githubusercontent.com/1218615/78423008-06bfcc80-766c-11ea-8a79-ec63f1237126.png)
@@ -33,6 +36,9 @@ Also, some legacy configs (vimrc/awesome/etc) can be found in
 Usage
 =======
 
+Packages are managed by [nix](https://nixos.org/nix). This setup is
+NixOS focused, but nix works on GNU/Linux and mac.
+
 Get:
 ```
 cd ~
@@ -42,5 +48,9 @@ git clone https://github.com/abcdw/configs.git
 Install
 ```
 cd configs
+nix-shell # or direnv allow
 make dotfiles-install
 ```
+
+## Alternatives
+- [Guix](https://guix.gnu.org)
