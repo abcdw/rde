@@ -170,7 +170,8 @@ Generates a link to github or other remote for current file and line.
 Makes commands sorted by popularity for M-x.
 
 #+BEGIN_SRC emacs-lisp
-(use-package amx :ensure t :defer t)
+(use-package amx :ensure t :defer t
+  :custom (amx-save-file "~/.cache/amx-item"))
 #+END_SRC
 
 ** Utility
