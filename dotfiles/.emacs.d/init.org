@@ -250,16 +250,25 @@ Comment line when you are in the middle of the line.
   :bind ("C-M-;" . comment-or-uncomment-sexp))
 #+END_SRC
 
-*** Recent files
+*** Recent files and save place
 Automatically save list of recent files
 
 #+BEGIN_SRC emacs-lisp
 (use-package recentf
-  :defer 0.1
+  :ensure t
+  :demand t
+  :hook (after-init . recentf-mode)
   :custom
-  (recentf-auto-cleanup 30)
-  :config
-  (run-with-idle-timer 30 t 'recentf-save-list))
+  (recentf-max-saved-items 200)
+  ;; (recentf-exclude '((expand-file-name package-user-dir)
+  ;;                    "COMMIT_EDITMSG\\'"))
+  )
+
+;; When buffer is closed, saves the cursor location
+(use-package saveplace
+  :config (save-place-mode))
+;; save-place-file (concat user-emacs-directory "places")
+
 #+END_SRC
 
 ** Better defaults
@@ -548,14 +557,12 @@ Old way for configuration without use-package
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
 (setq vc-follow-symlinks t)
 
-(save-place-mode 1)
 (setq save-interprogram-paste-before-kill t
       apropos-do-all t
       mouse-yank-at-point t
       require-final-newline t
       load-prefer-newer t
       ediff-window-setup-function 'ediff-setup-windows-plain
-      save-place-file (concat user-emacs-directory "places")
       backup-directory-alist `(("." . ,(concat user-emacs-directory
 					       "backups"))))
 (setq create-lockfiles nil)
