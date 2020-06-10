@@ -117,7 +117,7 @@ Good interface for git.
 #+END_SRC
 
 *** Git link
-Creates a link to github or other remote for current file and line.
+Generates a link to github or other remote for current file and line.
 
 #+BEGIN_SRC emacs-lisp
 (use-package git-link
