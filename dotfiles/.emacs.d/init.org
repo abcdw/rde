@@ -536,7 +536,7 @@ Old way for configuration without use-package
 ;; (load-theme 'doom-tomorrow-day t)
 ;; (load-theme 'base16-tomorrow t)
 
-(set-face-attribute 'default nil :font "Iosevka 9" :width 'Regular)
+(set-face-attribute 'default nil :font "Iosevka 12" :width 'Regular)
 
 ;; blink modeline instead of beep
 (setq visible-bell nil
