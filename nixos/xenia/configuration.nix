@@ -25,7 +25,9 @@ in {
 
   # TODO: check https://github.com/srid/nix-config
   # https://github.com/colemickens/nixpkgs-wayland
-
+  nixpkgs.overlays = [
+    (import (builtins.fetchTarball https://github.com/nix-community/emacs-overlay/archive/master.tar.gz))
+  ];
   nixpkgs.config = { allowUnfree = true; };
   # Use the GRUB 2 boot loader.
   boot.loader.grub = {
@@ -109,7 +111,7 @@ in {
   #   defaultLocale = "en_US.UTF-8";
   # };
   i18n.consoleUseXkbConfig = true;
-
+  
   environment.sessionVariables.TERMINAL = [ "alacritty" ];
   environment.variables = { BROWSER = "chromium"; };
 
@@ -120,9 +122,14 @@ in {
     firefox
     brave
     nixos-unstable.next
+    nixos-unstable.streamlink
+    cura
+    python2
 
     alacritty
-    emacs
+    emacsGit
+    sqlite
+    graphviz
     git
     nixos-unstable.tmux
     direnv
@@ -235,7 +242,7 @@ in {
       "audio"
       "networkmanager"
       "docker"
-      "sway"
+#      "sway"
       "adbusers"
     ];
   };
