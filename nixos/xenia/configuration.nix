@@ -9,7 +9,7 @@ let
   # Import unstable channel.
   # sudo nix-channel --add http://nixos.org/channels/nixos-unstable nixos-unstable
   # sudo nix-channel --update nixos-unstable
-  nixos-unstable = import inputs.nixos-unstable { config = config.nixpkgs.config; };
+  nixos-unstable = import inputs.nixos-unstable { config = config.nixpkgs.config; system.localSystem = "x86_64-linux"; };
 
 in {
   imports = [ # Include the results of the hardware scan.
