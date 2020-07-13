@@ -9,7 +9,7 @@ let
   # Import unstable channel.
   # sudo nix-channel --add http://nixos.org/channels/nixos-unstable nixos-unstable
   # sudo nix-channel --update nixos-unstable
-  nixos-unstable = import inputs.nixos-unstable { config = config.nixpkgs.config; system.localSystem = "x86_64-linux"; };
+  nixos-unstable = import inputs.nixos-unstable { config = config.nixpkgs.config; localSystem = "x86_64-linux"; };
 
 in {
   imports = [ # Include the results of the hardware scan.
@@ -110,7 +110,7 @@ in {
   #   consoleKeyMap = "us";
   #   defaultLocale = "en_US.UTF-8";
   # };
-  i18n.consoleUseXkbConfig = true;
+  console.useXkbConfig = true;
   
   environment.sessionVariables.TERMINAL = [ "alacritty" ];
   environment.variables = { BROWSER = "chromium"; };
@@ -279,11 +279,10 @@ in {
       "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch, grp:alt_shift_toggle";
 
     desktopManager = {
-      default = "none";
       xterm.enable = false;
       wallpaper.mode = "fill";
     };
-    windowManager.default = "i3";
+    displayManager.defaultSession = "none+i3";
     windowManager.i3 = {
       enable = true;
       extraPackages = with pkgs; [ rofi dmenu i3status i3lock i3blocks ];

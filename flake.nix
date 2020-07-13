@@ -18,6 +18,9 @@
           modules = [(import ./nixos/xenia/configuration.nix)];
           specialArgs = { inherit inputs; };
         };};
+
+
+
    defaultPackage.x86_64-linux = (builtins.head (builtins.attrValues self.nixosConfigurations)).pkgs;
    # nixosConfigurations = with nixpkgs.lib;
    #    let
