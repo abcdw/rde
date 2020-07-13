@@ -2,14 +2,14 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 let
 
   # Import unstable channel.
   # sudo nix-channel --add http://nixos.org/channels/nixos-unstable nixos-unstable
   # sudo nix-channel --update nixos-unstable
-  nixos-unstable = import <nixos-unstable> { config = config.nixpkgs.config; };
+  nixos-unstable = import inputs.nixos-unstable { config = config.nixpkgs.config; };
 
 in {
   imports = [ # Include the results of the hardware scan.
@@ -25,9 +25,9 @@ in {
 
   # TODO: check https://github.com/srid/nix-config
   # https://github.com/colemickens/nixpkgs-wayland
-  nixpkgs.overlays = [
-    (import (builtins.fetchTarball https://github.com/nix-community/emacs-overlay/archive/master.tar.gz))
-  ];
+  # nixpkgs.overlays = [
+  #   (import (builtins.fetchTarball https://github.com/nix-community/emacs-overlay/archive/master.tar.gz))
+  # ];
   nixpkgs.config = { allowUnfree = true; };
   # Use the GRUB 2 boot loader.
   boot.loader.grub = {
@@ -127,7 +127,8 @@ in {
     python2
 
     alacritty
-    emacsGit
+    # emacsGit
+    emacs
     sqlite
     graphviz
     git
