@@ -265,7 +265,7 @@ in {
     # python3
     # zeal
     wget
-    vim
+    neovim
     htop
     direnv
     killall
