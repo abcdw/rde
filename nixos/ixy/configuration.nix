@@ -274,7 +274,7 @@ in {
 
     gnumake
 
-    qt5.qtwayland
+    # qt5.qtwayland
     unzip
     p7zip
     unrar
@@ -300,7 +300,7 @@ in {
     source-code-pro
     open-sans # need for telegram app
     unifont
-    nixos-unstable.nerdfonts
+#    nixos-unstable.nerdfonts
   ];
   fonts.fontconfig.defaultFonts.monospace = [ "Iosevka" ];
 
@@ -376,28 +376,28 @@ in {
 
   programs = {
     light.enable = true;
-    sway = {
-      enable = true;
+    # sway = {
+    #   enable = true;
 
-      extraPackages = with pkgs; [
+    #   extraPackages = with pkgs; [
 
-        nixos-unstable.swaylock
-        swayidle
-        xwayland
-        nixos-unstable.grim
-        nixos-unstable.slurp
-        nixos-unstable.mako
-        libnotify
-        wl-clipboard
-        nixos-unstable.clipman
-        alacritty
-        rxvt_unicode
-        rofi
-        dmenu
-        i3status
-        i3status-rust
-      ];
-    };
+    #     nixos-unstable.swaylock
+    #     swayidle
+    #     xwayland
+    #     nixos-unstable.grim
+    #     nixos-unstable.slurp
+    #     nixos-unstable.mako
+    #     libnotify
+    #     wl-clipboard
+    #     nixos-unstable.clipman
+    #     alacritty
+    #     rxvt_unicode
+    #     rofi
+    #     dmenu
+    #     i3status
+    #     i3status-rust
+    #   ];
+    # };
 
     ssh.startAgent = true;
 
