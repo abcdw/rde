@@ -300,7 +300,7 @@ in {
     source-code-pro
     open-sans # need for telegram app
     unifont
-#    nixos-unstable.nerdfonts
+    nixos-unstable.nerdfonts
   ];
   fonts.fontconfig.defaultFonts.monospace = [ "Iosevka" ];
 
