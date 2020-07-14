@@ -200,25 +200,25 @@ in {
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    nixos-unstable.cura
-    nixos-unstable.freecad
-    nixos-unstable.openscad
-    nixos-unstable.kicad
+    # nixos-unstable.cura
+    # nixos-unstable.freecad
+    # nixos-unstable.openscad
+    # nixos-unstable.kicad
 
     nixos-unstable.brave
     nixos-unstable.firefox
     nixos-unstable.chromium
-    nixos-unstable.next
-    qutebrowser
+    # nixos-unstable.next
+    # qutebrowser
 
     nixos-unstable.okular
-    libreoffice
-    nixos-unstable.zoom-us
-    nixos-unstable.steam
-    gimp
-    nixos-unstable.krita
+    # libreoffice
+    # nixos-unstable.zoom-us
+    # nixos-unstable.steam
+    # gimp
+    # nixos-unstable.krita
     nixos-unstable.tdesktop
-    discord
+    # discord
     gnome3.nautilus
     gnome3.gvfs
     networkmanagerapplet
@@ -233,19 +233,19 @@ in {
     dunst
     nixos-unstable.polybarFull
 
-    google-cloud-sdk
-    nixos-unstable.kubectl
-    nixos-unstable.kubeseal
-    nixos-unstable.kustomize
+    # google-cloud-sdk
+    # nixos-unstable.kubectl
+    # nixos-unstable.kubeseal
+    # nixos-unstable.kustomize
     imagemagick
     ffmpeg
     nixos-unstable.youtube-dl
     nixos-unstable.plantuml
     graphviz
-    adoptopenjdk-bin
-    goldendict
+    # adoptopenjdk-bin
+    # goldendict
     pass
-    broot
+    # broot
 
     pamixer
     alsaTools
@@ -262,8 +262,8 @@ in {
     jmtpfs
 
     ditaa
-    python3
-    zeal
+    # python3
+    # zeal
     wget
     vim
     htop
@@ -280,7 +280,7 @@ in {
     unrar
     gitFull
     gnupg
-    ranger
+    # ranger
     ripgrep
     stow
     mpv
