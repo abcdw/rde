@@ -205,6 +205,7 @@ in {
     # nixos-unstable.openscad
     # nixos-unstable.kicad
 
+    alacritty
     nixos-unstable.brave
     nixos-unstable.firefox
     nixos-unstable.chromium
