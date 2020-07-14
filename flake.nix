@@ -16,8 +16,19 @@
         modules = [ (import ./nixos/xenia/configuration.nix) ];
         specialArgs = { inherit inputs; };
       };
+      aws-sample = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        modules = [
+          (import ./nixos/aws-sample/configuration.nix)
+          inputs.nixpkgs.legacyPackages.x86_64-linux.nixos.modules.virtualisation.amazon-image.config
+        ];
+        specialArgs = { inherit inputs; };
+      };
     };
 
+    xenia = self.nixosConfigurations.xenia.config.system.build.toplevel;
+    aws-sample =
+      self.nixosConfigurations.aws-sample.config.system.build.toplevel;
     defaultPackage.x86_64-linux =
       (builtins.head (builtins.attrValues self.nixosConfigurations)).pkgs;
     # nixosConfigurations = with nixpkgs.lib;
