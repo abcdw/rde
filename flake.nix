@@ -21,25 +21,26 @@
         modules = [ (import ./nixos/ixy/configuration.nix) ];
         specialArgs = { inherit inputs; };
       };
-      aws-sample = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          (import ./nixos/aws-sample/configuration.nix)
-          import "${inputs.nixpkgs}/nixos/modules/virtualisation/amazon-image.nix"
-          #inputs.nixpkgs.legacyPackages.x86_64-linux.nixos.modules.virtualisation.amazon-image.config
-        ];
-        specialArgs = { inherit inputs; };
-      };
+
+      # aws-sample = nixpkgs.lib.nixosSystem {
+      #   system = "x86_64-linux";
+      #   modules = [
+      #     (import ./nixos/aws-sample/configuration.nix)
+      #     import "${inputs.nixpkgs}/nixos/modules/virtualisation/amazon-image.nix"
+      #     #inputs.nixpkgs.legacyPackages.x86_64-linux.nixos.modules.virtualisation.amazon-image.config
+      #   ];
+      #   specialArgs = { inherit inputs; };
+      # };
     };
 
     xenia = self.nixosConfigurations.xenia.config.system.build.toplevel;
     ixy = self.nixosConfigurations.ixy.config.system.build.toplevel;
 
-    aws-sample =
-      self.nixosConfigurations.aws-sample.config.system.build.toplevel;
+    # aws-sample =
+    #   self.nixosConfigurations.aws-sample.config.system.build.toplevel;
 
-    defaultPackage.x86_64-linux =
-      (builtins.head (builtins.attrValues self.nixosConfigurations)).pkgs;
+    # defaultPackage.x86_64-linux =
+    #   (builtins.head (builtins.attrValues self.nixosConfigurations)).pkgs;
     # nixosConfigurations = with nixpkgs.lib;
     #    let
     #      hosts = map (fname: builtins.head (builtins.match "(.*)\\.nix" fname))
