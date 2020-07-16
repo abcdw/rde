@@ -12,3 +12,10 @@ etc-uninstall:
 
 install: etc-install dotfiles-install
 	echo "yay!"
+
+ixy.out:
+	nix build .#ixy -o ixy.out --experimental-features "flakes nix-command"
+
+ixy/switch: ixy.out
+	sudo ./ixy.out/bin/switch-to-configuration switch
+	unlink ixy.out

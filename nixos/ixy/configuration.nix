@@ -17,18 +17,18 @@ in {
       ./hardware-configuration.nix
     ];
   nixpkgs.config = { allowUnfree = true; };
-  powerManagement.enable = true;
-  powerManagement.powertop.enable = true;
+  # powerManagement.enable = true;
+  # powerManagement.powertop.enable = true;
 
-  services.tlp = {
-    enable = true;
-    #      START_CHARGE_THRESH_BAT0=75
-    #      STOP_CHARGE_THRESH_BAT0=91
-    extraConfig = ''
-      CPU_SCALING_GOVERNOR_ON_BAT=powersave
-      ENERGY_PERF_POLICY_ON_BAT=powersave
-    '';
-  };
+  # services.tlp = {
+  #   enable = true;
+  #   #      START_CHARGE_THRESH_BAT0=75
+  #   #      STOP_CHARGE_THRESH_BAT0=91
+  #   extraConfig = ''
+  #     CPU_SCALING_GOVERNOR_ON_BAT=powersave
+  #     ENERGY_PERF_POLICY_ON_BAT=powersave
+  #   '';
+  # };
 
   #######################################################
   # systemd.services.powertop = {                       #
@@ -85,6 +85,7 @@ in {
     ];
   };
 
+  boot.kernelPackages = nixos-unstable.linuxPackages_latest;
   boot.loader = {
     # systemd-boot.enable = true;
     efi = {
@@ -116,19 +117,19 @@ in {
     };
   };
 
-  boot.extraModprobeConfig = ''
-    options snd_hda_intel power_save=1
-    options iwlwifi power_save=1 d0i3_disable=0 uapsd_disable=0
-    options iwldvm force_cam=0
-  '';
+  # boot.extraModprobeConfig = ''
+  #   options snd_hda_intel power_save=1
+  #   options iwlwifi power_save=1 d0i3_disable=0 uapsd_disable=0
+  #   options iwldvm force_cam=0
+  # '';
 
-  boot.kernel.sysctl = {
-    "kernel.nmi_watchdog" = 0;
-    "vm.dirty_writeback_centisecs" = 6000;
-    "vm.laptop_mode" = 5;
-    "swappiness" = 1;
-    "net.ipv4.ip_default_ttl" = 65;
-  };
+  # boot.kernel.sysctl = {
+  #   "kernel.nmi_watchdog" = 0;
+  #   "vm.dirty_writeback_centisecs" = 6000;
+  #   "vm.laptop_mode" = 5;
+  #   "swappiness" = 1;
+  #   "net.ipv4.ip_default_ttl" = 65;
+  # };
 
   #  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
   #  boot.extraModulePackages = [ config.boot.kernelPackages.exfat-nofuse ];
@@ -173,10 +174,6 @@ in {
     package = pkgs.pulseaudioFull;
   };
 
-  nixpkgs.config.packageOverrides = pkgs:
-    {
-      # vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
-    };
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
@@ -186,17 +183,19 @@ in {
 
   #  sound.mediaKeys.enable = true;
 
-  systemd.services.thinkpad-fix-sound = {
-    description = "Fix the sound on X1 Yoga";
-    path = [ pkgs.alsaTools ];
-    wantedBy = [ "default.target" ];
-    after = [ "sound.target" "alsa-store.service" ];
-    script = ''
-      hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0
-    '';
-  };
-  powerManagement.powerUpCommands =
-    "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
+  # systemd.services.thinkpad-fix-sound = {
+  #   description = "Fix the sound on X1 Yoga";
+  #   path = [ pkgs.alsaTools ];
+  #   wantedBy = [ "default.target" ];
+  #   after = [ "sound.target" "alsa-store.service" ];
+  #   script = ''
+  #     hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0
+  #   '';
+  # };
+
+  # powerManagement.powerUpCommands =
+  #   "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
+
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
@@ -206,6 +205,7 @@ in {
     # nixos-unstable.kicad
 
     alacritty
+    rofi
     nixos-unstable.brave
     nixos-unstable.firefox
     nixos-unstable.chromium
@@ -487,6 +487,6 @@ in {
   # compatible, in order to avoid breaking some software such as database
   # servers. You should change this only after NixOS release notes say you
   # should.
-  system.stateVersion = "19.03"; # Did you read the comment?
+  system.stateVersion = "20.03"; # Did you read the comment?
 
 }

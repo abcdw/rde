@@ -18,7 +18,8 @@
       };
       ixy = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        modules = [ (import ./nixos/ixy/configuration.nix) ];
+        modules = [ (import ./nixos/ixy/configuration.nix)
+                    nixpkgs.nixosModules.notDetected];
         specialArgs = { inherit inputs; };
       };
 
