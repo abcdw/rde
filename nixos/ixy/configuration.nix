@@ -183,18 +183,18 @@ in {
 
   #  sound.mediaKeys.enable = true;
 
-  # systemd.services.thinkpad-fix-sound = {
-  #   description = "Fix the sound on X1 Yoga";
-  #   path = [ pkgs.alsaTools ];
-  #   wantedBy = [ "default.target" ];
-  #   after = [ "sound.target" "alsa-store.service" ];
-  #   script = ''
-  #     hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0
-  #   '';
-  # };
+  systemd.services.thinkpad-fix-sound = {
+    description = "Fix the sound on X1 Yoga";
+    path = [ pkgs.alsaTools ];
+    wantedBy = [ "default.target" ];
+    after = [ "sound.target" "alsa-store.service" ];
+    script = ''
+      ${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0
+    '';
+  };
 
-  # powerManagement.powerUpCommands =
-  #   "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
+  powerManagement.powerUpCommands =
+    "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
@@ -203,7 +203,7 @@ in {
     # nixos-unstable.freecad
     # nixos-unstable.openscad
     # nixos-unstable.kicad
-
+    sqlite
     alacritty
     rofi
     nixos-unstable.brave

@@ -4,6 +4,8 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-20.03";
     nixos-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
+    home.url = "github:rycee/home-manager/bqv-flakes";
+
     #emacs.url = github:nix-community/emacs-overlay;
   };
   outputs = { self, nixpkgs, ... }@inputs: {
@@ -19,7 +21,9 @@
       ixy = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [ (import ./nixos/ixy/configuration.nix)
-                    nixpkgs.nixosModules.notDetected];
+                    nixpkgs.nixosModules.notDetected
+                  #  inputs.home.nixosModules
+                  ];
         specialArgs = { inherit inputs; };
       };
 
