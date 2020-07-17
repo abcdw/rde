@@ -19,3 +19,6 @@ ixy.out:
 ixy/switch: ixy.out
 	sudo ./ixy.out/bin/switch-to-configuration switch
 	unlink ixy.out
+
+switch:
+	sudo nixos-rebuild switch --flake .
