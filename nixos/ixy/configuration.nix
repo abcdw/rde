@@ -370,19 +370,26 @@ in {
     libinput.enable = true;
   };
 
-  services.compton = {
-    enable = true;
+  services.lorri.enable = true;
+
+  services.picom = {
+    enable = false;
     # inactiveOpacity = "0.8";
     backend = "glx";
     # vSync = "opengl";
     settings = {
+      glx-swap-method = 2;
       paint-on-overlay = true;
       glx-no-stencil = true;
       glx-no-rebind-pixmap = true;
     };
   };
 
+
   programs = {
+    gnupg.agent = {
+      enable = true;
+    };
     light.enable = true;
     # sway = {
     #   enable = true;
