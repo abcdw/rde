@@ -1,7 +1,7 @@
 [user]
 	name = Andrew Tropin
 	email = andrew@trop.in
-	signingkey = ABEDF9050C0AF46E
+	signingkey = 6D941396BE823A85
 
 [alias]
 	aliases = !git config --get-regexp 'alias.*' | colrm 1 6 | sed 's/[ ]/ = /' | sort    # list all aliases
