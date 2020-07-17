@@ -17,6 +17,13 @@ in {
       ./hardware-configuration.nix
     ];
   nixpkgs.config = { allowUnfree = true; };
+  nix = {
+    package = nixos-unstable.nixFlakes;
+    extraOptions = ''
+      experimental-features = nix-command flakes
+    '';
+  };
+
   # powerManagement.enable = true;
   # powerManagement.powertop.enable = true;
 
