@@ -25,5 +25,6 @@
     localVariables = {
       PROMPT="%F{red}❯%f%F{yellow}❯%f%F{green}❯%f ";
     };
+    initExtra = ''echo -en "\033[6 q"'';
   };
 }
