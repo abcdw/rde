@@ -280,7 +280,7 @@ in {
     wget
     neovim
     htop
-
+    
     killall
     powertop
     xorg.xeyes
@@ -421,12 +421,12 @@ in {
 
     ssh.startAgent = true;
 
-    tmux = {
-      enable = true;
-      keyMode = "vi";
-      shortcut = "t";
-      terminal = "screen-256color";
-    };
+    # tmux = {
+    #   enable = true;
+    #   keyMode = "vi";
+    #   shortcut = "t";
+    #   terminal = "screen-256color";
+    # };
 
     # zsh = {
     #   promptInit = ''
