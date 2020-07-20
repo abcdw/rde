@@ -155,6 +155,7 @@ in {
     # QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
 
   };
+  home-manager.users.abcdw = import ../../modules/home.nix;
 
   networking = {
     hostName = "ixy";
@@ -423,16 +424,16 @@ in {
       terminal = "screen-256color";
     };
 
-    zsh = {
-      promptInit = ''
-        export CLOUD_SDK_HOME="${pkgs.google-cloud-sdk}"
-        source "$CLOUD_SDK_HOME/google-cloud-sdk/completion.zsh.inc"
-      '';
-      enable = true;
-      enableCompletion = true;
-      autosuggestions.enable = true;
-      syntaxHighlighting.enable = true;
-    };
+    # zsh = {
+    #   promptInit = ''
+    #     export CLOUD_SDK_HOME="${pkgs.google-cloud-sdk}"
+    #     source "$CLOUD_SDK_HOME/google-cloud-sdk/completion.zsh.inc"
+    #   '';
+    #   enable = true;
+    #   enableCompletion = true;
+    #   autosuggestions.enable = true;
+    #   syntaxHighlighting.enable = true;
+    # };
   };
 
   # enable keychain
