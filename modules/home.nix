@@ -12,7 +12,7 @@
     publicShare = "\$HOME/public";
     templates = "\$HOME/templates";
   };
-
+  
   programs.zsh = {
     enable = true;
     dotDir = ".config/zsh";
@@ -25,6 +25,5 @@
     localVariables = {
       PROMPT="%F{red}❯%f%F{yellow}❯%f%F{green}❯%f ";
     };
-    # environment.pathsToLink = [ "/share/zsh" ] in configuration.nix for autocomplete?
   };
 }

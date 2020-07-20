@@ -155,6 +155,10 @@ in {
     # QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
 
   };
+
+  environment.pathsToLink = [
+    "/share/zsh" # Required for zsh autocomplete for systemctl
+  ];
   home-manager.users.abcdw = import ../../modules/home.nix;
 
   networking = {
