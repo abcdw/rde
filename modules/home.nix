@@ -27,4 +27,8 @@
     };
     initExtra = ''echo -en "\033[6 q"'';
   };
+
+  programs.direnv = {
+    enable = true;
+  };
 }

@@ -280,7 +280,7 @@ in {
     wget
     neovim
     htop
-    direnv
+
     killall
     powertop
     xorg.xeyes
