@@ -21,6 +21,7 @@
     shellAliases = {
       gis = "git status -s";
       ku = "kubectl";
+      ls = "ls --color";
     };
     localVariables = {
       PROMPT="%F{red}❯%f%F{yellow}❯%f%F{green}❯%f ";
@@ -52,7 +53,5 @@
     '';
   };
 
-  programs.direnv = {
-    enable = true;
-  };
+  programs.direnv.enable = true;
 }
