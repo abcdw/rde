@@ -55,4 +55,12 @@
 
   programs.direnv.enable = true;
   services.lorri.enable = true;
+  services.gpg-agent = {
+    enable = true;
+    enableSshSupport = true;
+    defaultCacheTtl = 34560;
+    defaultCacheTtlSsh = 34560;
+    maxCacheTtl = 34560;
+    maxCacheTtlSsh = 34560;
+  };
 }

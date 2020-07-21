@@ -390,9 +390,9 @@ in {
 
 
   programs = {
-    gnupg.agent = {
-      enable = true;
-    };
+    # gnupg.agent = {
+    #   enable = true;
+    # };
     light.enable = true;
     # sway = {
     #   enable = true;
