@@ -375,8 +375,6 @@ in {
     libinput.enable = true;
   };
 
-  services.lorri.enable = true;
-
   services.picom = {
     enable = false;
     # inactiveOpacity = "0.8";

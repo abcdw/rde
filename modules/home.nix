@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 {
-  home.packages = with pkgs; [bat];
+  home.packages = with pkgs; [bat gimp];
   xdg.userDirs = {
     enable = true;
     desktop = "\$HOME/desktop";
@@ -54,4 +54,5 @@
   };
 
   programs.direnv.enable = true;
+  services.lorri.enable = true;
 }
