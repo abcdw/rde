@@ -28,10 +28,13 @@
   xsession.enable = true;
   xsession.windowManager.i3 = {
     enable = true;
+    package = pkgs.i3-gaps;
     config = {
       terminal = "alacritty";
       modifier = "Mod4";
       menu = "rofi -show run";
+      # gaps.smartBorders = "on";
+      workspaceAutoBackAndForth = true;
       keybindings = let mod = config.xsession.windowManager.i3.config.modifier;
       in lib.mkOptionDefault {
         "${mod}+Shift+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
