@@ -217,7 +217,7 @@ in {
     # nixos-unstable.kicad
     sqlite
     alacritty
-    rofi
+
     nixos-unstable.brave
     nixos-unstable.firefox
     nixos-unstable.chromium
@@ -234,10 +234,8 @@ in {
     # discord
     gnome3.nautilus
     gnome3.gvfs
-    networkmanagerapplet
 
     lxappearance
-    i3lock
     xtitle
     xclip
     xdotool
