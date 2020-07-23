@@ -4,7 +4,11 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-20.03";
     nixos-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    home-manager.url = "github:rycee/home-manager/bqv-flakes";
+    home-manager = {
+      url = "github:rycee/home-manager/bqv-flakes";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
 
     #emacs.url = github:nix-community/emacs-overlay;
   };
