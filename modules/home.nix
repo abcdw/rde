@@ -25,6 +25,13 @@
     extraConfig = "rofi.dpi: 192";
   };
 
+  programs.i3status = {
+    enable = true;
+    modules."ipv6".enable = false;
+    modules."ethernet _first_".enable = false;
+    modules."wireless _first_".enable = false;
+  };
+
   xsession.enable = true;
   xsession.windowManager.i3 = rec {
     enable = true;
