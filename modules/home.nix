@@ -2,6 +2,9 @@
 
 {
   home.packages = with pkgs; [bat gimp];
+  home.keyboard.layout = "us,ru";
+  home.keyboard.variant = "dvorak,";
+  home.keyboard.options = [ "ctrl:nocaps" "grp:win_space_toggle" "grp:rctrl_switch" ];
   xdg.userDirs = {
     enable = true;
     desktop = "\$HOME/desktop";
