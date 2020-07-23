@@ -5,15 +5,17 @@
   home.keyboard.layout = "us,ru";
   home.keyboard.variant = "dvorak,";
   home.keyboard.options = [ "ctrl:nocaps" "grp:win_space_toggle" "grp:rctrl_switch" ];
+  home.homeDirectory = "/home/abcdw";
+
   xdg.userDirs = {
     enable = true;
-    desktop = "\$HOME/desktop";
-    documents = "\$HOME/docs";
-    download = "\$HOME/dl";
-    music = "\$HOME/music";
-    pictures = "\$HOME/pics";
-    publicShare = "\$HOME/public";
-    templates = "\$HOME/templates";
+    desktop = "${config.home.homeDirectory}/desktop";
+    documents = "${config.home.homeDirectory}/docs";
+    download = "${config.home.homeDirectory}/dl";
+    music = "${config.home.homeDirectory}/music";
+    pictures = "${config.home.homeDirectory}/pics";
+    publicShare = "${config.home.homeDirectory}/public";
+    templates = "${config.home.homeDirectory}/templates";
   };
   
   xsession.enable = true;
