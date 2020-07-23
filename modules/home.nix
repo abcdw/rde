@@ -4,7 +4,8 @@
   home.packages = with pkgs; [bat gimp];
   home.keyboard.layout = "us,ru";
   home.keyboard.variant = "dvorak,";
-  home.keyboard.options = [ "ctrl:nocaps" "grp:win_space_toggle" "grp:rctrl_switch" ];
+  home.keyboard.options =
+    [ "ctrl:nocaps" "grp:win_space_toggle" "grp:rctrl_switch" ];
   home.homeDirectory = "/home/abcdw";
 
   xdg.userDirs = {
@@ -31,18 +32,18 @@
       terminal = "alacritty";
       modifier = "Mod4";
       menu = "rofi -show run";
-      keybindings =
-        let
-          mod = config.xsession.windowManager.i3.config.modifier;
-        in lib.mkOptionDefault {
-          "${mod}+Shift+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
-          "${mod}+d" = null;
-          "${mod}+Return" = null;
-          "${mod}+Shift+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
-          "${mod}+Shift+c" = "kill";
-          "Shift+Print" = "exec ${pkgs.maim}/bin/maim -s | ${pkgs.xclip}/bin/xclip -selection clipboard -t image/png";
-        };
-      bars = [{position = "top";}];
+      keybindings = let mod = config.xsession.windowManager.i3.config.modifier;
+      in lib.mkOptionDefault {
+        "${mod}+Shift+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
+        "${mod}+d" = null;
+        "${mod}+w" = null;
+        "${mod}+Return" = null;
+        "${mod}+Shift+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
+        "${mod}+Shift+c" = "kill";
+        "Shift+Print" =
+          "exec ${pkgs.maim}/bin/maim -s | ${pkgs.xclip}/bin/xclip -selection clipboard -t image/png";
+      };
+      bars = [{ position = "top"; }];
     };
   };
   services.random-background = {
@@ -72,23 +73,24 @@
     enable = true;
     shortcut = "t";
     terminal = "screen-256color";
-    plugins = with pkgs.tmuxPlugins; [
-      copycat # prefix + C-u to find url, n/N to navigate
-    ];
+    plugins = with pkgs.tmuxPlugins;
+      [
+        copycat # prefix + C-u to find url, n/N to navigate
+      ];
     extraConfig = ''
-    bind s split-window -c "#{pane_current_path}"
-    bind v split-window -h -c "#{pane_current_path}"
-    bind -n M-v copy-mode\; send-keys -X page-up
-    set-option -g mouse on
-    unbind -T copy-mode MouseDragEnd1Pane
+      bind s split-window -c "#{pane_current_path}"
+      bind v split-window -h -c "#{pane_current_path}"
+      bind -n M-v copy-mode\; send-keys -X page-up
+      set-option -g mouse on
+      unbind -T copy-mode MouseDragEnd1Pane
 
-    set-window-option -g window-status-activity-style fg="black",bg="red"
+      set-window-option -g window-status-activity-style fg="black",bg="red"
 
-    set -g status-bg black
-    set -g status-fg brightcyan
-    set -g status-right-length 100
-    set -g status-right '#[fg=brightcyan,bold][#(cd #{pane_current_path}; git rev-parse --abbrev-ref HEAD)] #[fg=white]#(echo "#{pane_current_path}"|sed "s;$HOME;~;") #[fg=white,bg=brightcyan] %d/%m #[fg=cyan,bg=brightwhite,bold] #(hostname) '
-    set -g window-status-current-format "#[fg=black,bg=brightcyan]#I#[fg=black,bg=brightcyan,nobold,noitalics,nounderscore]:#[fg=black,bg=brightcyan]#W#F"
+      set -g status-bg black
+      set -g status-fg brightcyan
+      set -g status-right-length 100
+      set -g status-right '#[fg=brightcyan,bold][#(cd #{pane_current_path}; git rev-parse --abbrev-ref HEAD)] #[fg=white]#(echo "#{pane_current_path}"|sed "s;$HOME;~;") #[fg=white,bg=brightcyan] %d/%m #[fg=cyan,bg=brightwhite,bold] #(hostname) '
+      set -g window-status-current-format "#[fg=black,bg=brightcyan]#I#[fg=black,bg=brightcyan,nobold,noitalics,nounderscore]:#[fg=black,bg=brightcyan]#W#F"
     '';
   };
 
