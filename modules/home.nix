@@ -17,7 +17,13 @@
     publicShare = "${config.home.homeDirectory}/public";
     templates = "${config.home.homeDirectory}/templates";
   };
-  
+
+  programs.rofi = {
+    enable = true;
+    theme = "Arc";
+    extraConfig = "rofi.dpi: 192";
+  };
+
   xsession.enable = true;
   xsession.windowManager.i3 = {
     enable = true;
