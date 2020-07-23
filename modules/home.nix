@@ -19,7 +19,12 @@
     publicShare = "${config.home.homeDirectory}/public";
     templates = "${config.home.homeDirectory}/templates";
   };
+  programs.chromium = {
     enable = true;
+    extensions = [
+      "cjpalhdlnbpafiamejdnhcphjbkeiagm" # ublock origin
+      "pachckjkecffpdphbpmfolblodfkgbhl" # VidIQ
+    ];
   };
 
   programs.alacritty = {
