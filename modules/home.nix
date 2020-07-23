@@ -13,6 +13,33 @@
     templates = "\$HOME/templates";
   };
   
+  xsession.enable = true;
+  xsession.windowManager.i3 = {
+    enable = true;
+    config = {
+      terminal = "alacritty";
+      modifier = "Mod4";
+      menu = "rofi -show run";
+      keybindings =
+        let
+          mod = config.xsession.windowManager.i3.config.modifier;
+        in lib.mkOptionDefault {
+          "${mod}+Shift+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
+          "${mod}+d" = null;
+          "${mod}+Return" = null;
+          "${mod}+Shift+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
+          "${mod}+Shift+c" = "kill";
+          "Shift+Print" = "exec ${pkgs.maim}/bin/maim -s | ${pkgs.xclip}/bin/xclip -selection clipboard -t image/png";
+        };
+      bars = [{position = "top";}];
+    };
+  };
+  services.random-background = {
+    enable = true;
+    imageDirectory = "${config.xdg.userDirs.pictures}/wallpapers";
+  };
+  services.network-manager-applet.enable = true;
+
   programs.zsh = {
     enable = true;
     dotDir = ".config/zsh";

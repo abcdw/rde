@@ -350,28 +350,22 @@ in {
   };
 
   services.xserver = {
-    dpi = 192;
+    # dpi = 192;
     enable = true;
     layout = "us,ru";
     xkbVariant = "dvorak,";
     xkbOptions = "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
 
-    #    hardware.opengl.extraPackages = [ pkgs.vaapiIntel pkgs.vaapiVdpau ];
-    #    videoDrivers = ["intel"];
-
-    windowManager.bspwm = {
-      enable = true;
-      package = nixos-unstable.bspwm;
-      sxhkd.package = nixos-unstable.sxhkd;
-    };
-    #    windowManager.default = "bspwm";
-
-    displayManager.lightdm = {
-      enable = true;
-      #      autoLogin.enable = true;
-      #      autoLogin.user = "abcdw";
-    };
-    displayManager.defaultSession = "none+bspwm";
+    displayManager.lightdm.enable = true;
+    displayManager.lightdm.autoLogin = { enable = true; user = "abcdw"; };
+    displayManager.session = [
+      {
+        manage = "desktop";
+        name = "xsession";
+        start = ''exec $HOME/.xsession'';
+      }
+    ];
+    displayManager.defaultSession = "xsession";
     libinput.enable = true;
   };
 
