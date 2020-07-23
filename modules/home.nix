@@ -19,18 +19,7 @@
     publicShare = "${config.home.homeDirectory}/public";
     templates = "${config.home.homeDirectory}/templates";
   };
-
-  programs.rofi = {
     enable = true;
-    theme = "Arc";
-    extraConfig = "rofi.dpi: 192";
-  };
-
-  programs.i3status = {
-    enable = true;
-    modules."ipv6".enable = false;
-    modules."ethernet _first_".enable = false;
-    modules."wireless _first_".enable = false;
   };
 
   programs.alacritty = {
@@ -79,6 +68,20 @@
       };
     };
   };
+
+  programs.rofi = {
+    enable = true;
+    theme = "Arc";
+    extraConfig = "rofi.dpi: 192";
+  };
+
+  programs.i3status = {
+    enable = true;
+    modules."ipv6".enable = false;
+    modules."ethernet _first_".enable = false;
+    modules."wireless _first_".enable = false;
+  };
+
   xsession.enable = true;
   xsession.windowManager.i3 = rec {
     enable = true;
