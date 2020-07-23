@@ -26,21 +26,23 @@
   };
 
   xsession.enable = true;
-  xsession.windowManager.i3 = {
+  xsession.windowManager.i3 = rec {
     enable = true;
-    package = pkgs.i3-gaps;
+    package = pkgs.i3-gaps; # Also disables titlebars https://rycee.gitlab.io/home-manager/options.html#opt-xsession.windowManager.i3.config.window.titlebar
     config = {
       terminal = "alacritty";
       modifier = "Mod4";
       menu = "rofi -show run";
       # gaps.smartBorders = "on";
       workspaceAutoBackAndForth = true;
-      keybindings = let mod = config.xsession.windowManager.i3.config.modifier;
+      keybindings = let mod = config.modifier;
       in lib.mkOptionDefault {
         "${mod}+Shift+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
+        "${mod}+t" = "workspace number 1";
         "${mod}+d" = null;
         "${mod}+w" = null;
         "${mod}+Return" = null;
+        "${mod}+Tab" = "workspace back_and_forth";
         "${mod}+Shift+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
         "${mod}+Shift+c" = "kill";
         "Shift+Print" =
