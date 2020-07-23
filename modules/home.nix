@@ -1,7 +1,8 @@
 { config, lib, pkgs, ... }:
 
 {
-  home.packages = with pkgs; [bat gimp];
+  home.packages = with pkgs; [ bat gimp nixfmt ];
+
   home.keyboard.layout = "us,ru";
   home.keyboard.variant = "dvorak,";
   home.keyboard.options =
@@ -81,7 +82,8 @@
   xsession.enable = true;
   xsession.windowManager.i3 = rec {
     enable = true;
-    package = pkgs.i3-gaps; # Also disables titlebars https://rycee.gitlab.io/home-manager/options.html#opt-xsession.windowManager.i3.config.window.titlebar
+    # Also disables titlebars https://rycee.gitlab.io/home-manager/options.html#opt-xsession.windowManager.i3.config.window.titlebar
+    package = pkgs.i3-gaps;
     config = {
       terminal = "alacritty";
       modifier = "Mod4";
@@ -159,6 +161,7 @@
 
   programs.direnv.enable = true;
   services.lorri.enable = true;
+
   services.gpg-agent = {
     enable = true;
     enableSshSupport = true;
