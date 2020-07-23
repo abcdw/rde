@@ -42,14 +42,19 @@
       menu = "rofi -show run";
       # gaps.smartBorders = "on";
       workspaceAutoBackAndForth = true;
+      # TODO: revisit and cleanup hotkeys
+      # https://github.com/rycee/home-manager/blob/master/modules/services/window-managers/i3-sway/i3.nix#L22
       keybindings = let mod = config.modifier;
       in lib.mkOptionDefault {
         "${mod}+Shift+d" = "exec ${pkgs.rofi}/bin/rofi -show run";
-        "${mod}+t" = "workspace number 1";
+
         "${mod}+d" = null;
         "${mod}+w" = null;
         "${mod}+Return" = null;
+
+        "${mod}+t" = "workspace number 1";
         "${mod}+Tab" = "workspace back_and_forth";
+        "${mod}+Shift+l" = "exec ${pkgs.i3lock}/bin/i3lock";
         "${mod}+Shift+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
         "${mod}+Shift+c" = "kill";
         "Shift+Print" =
