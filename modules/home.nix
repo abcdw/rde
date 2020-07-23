@@ -62,7 +62,8 @@
       ls = "ls --color";
     };
     localVariables = {
-      PROMPT="%F{red}❯%f%F{yellow}❯%f%F{green}❯%f ";
+      PROMPT = "%F{red}❯%f%F{yellow}❯%f%F{green}❯%f ";
+      WORDCHARS = ""; # Make M-f, M-b jump to slashes in/the/path
     };
     initExtra = ''echo -en "\033[6 q"'';
   };
