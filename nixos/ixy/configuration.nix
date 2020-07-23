@@ -144,11 +144,11 @@ in {
   environment.variables = {
     # BROWSER="qutebrowser";
     # EDITOR="emacs";
-    BROWSER = "brave";
-    GDK_SCALE = "2";
-    GDK_DPI_SCALE = "0.5";
-    QT_AUTO_SCREEN_SCALE_FACTOR = "1";
-    XCURSOR_SIZE = "32";
+    # BROWSER = "brave";
+    # GDK_SCALE = "2";
+    # GDK_DPI_SCALE = "0.5";
+    # QT_AUTO_SCREEN_SCALE_FACTOR = "1";
+    # XCURSOR_SIZE = "32";
     # _JAVA_AWT_WM_NONREPARENTING="1";
     # MOZ_ENABLE_WAYLAND="1";
     # QT_QPA_PLATFORM="wayland";
@@ -278,7 +278,7 @@ in {
     wget
     neovim
     htop
-    
+
     killall
     powertop
     xorg.xeyes
@@ -355,17 +355,20 @@ in {
     xkbOptions = "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
 
     displayManager.lightdm.enable = true;
-    displayManager.lightdm.autoLogin = { enable = true; user = "abcdw"; };
-    displayManager.session = [
-      {
-        manage = "desktop";
-        name = "xsession";
-        start = ''exec $HOME/.xsession'';
-      }
-    ];
+    displayManager.lightdm.autoLogin = {
+      enable = true;
+      user = "abcdw";
+    };
+    displayManager.session = [{
+      manage = "desktop";
+      name = "xsession";
+      start = "exec $HOME/.xsession";
+    }];
     displayManager.defaultSession = "xsession";
     libinput.enable = true;
   };
+  #    hardware.opengl.extraPackages = [ pkgs.vaapiIntel pkgs.vaapiVdpau ];
+  #    videoDrivers = ["intel"];
 
   services.picom = {
     enable = true;
@@ -379,7 +382,6 @@ in {
       glx-no-rebind-pixmap = true;
     };
   };
-
 
   programs = {
     # gnupg.agent = {
