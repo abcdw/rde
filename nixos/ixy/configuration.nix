@@ -376,10 +376,10 @@ in {
   };
 
   services.picom = {
-    enable = false;
+    enable = true;
     # inactiveOpacity = "0.8";
     backend = "glx";
-    # vSync = "opengl";
+    vSync = true;
     settings = {
       glx-swap-method = 2;
       paint-on-overlay = true;
