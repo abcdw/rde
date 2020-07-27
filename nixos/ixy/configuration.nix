@@ -64,12 +64,12 @@ in {
       {
         keys = [ 224 ];
         events = [ "key" "rep" ];
-        command = "/run/current-system/sw/bin/light -U 4";
+        command = "${pkgs.light}/bin/light -U 4";
       }
       {
         keys = [ 225 ];
         events = [ "key" "rep" ];
-        command = "/run/current-system/sw/bin/light -A 4";
+        command = "${pkgs.light}/bin/light -A 4";
       }
       {
         keys = [ 113 ];
