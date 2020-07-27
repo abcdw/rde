@@ -214,89 +214,9 @@ in {
   # List packages installed in system profile. To search, run:
   # $ nix search wget
   environment.systemPackages = with pkgs; [
-    # nixos-unstable.cura
-    # nixos-unstable.freecad
-    # nixos-unstable.openscad
-    # nixos-unstable.kicad
-    # sqlite
-
-    # nixos-unstable.brave
-    # nixos-unstable.firefox
-#    nixos-unstable.chromium
-    # nixos-unstable.next
-    # qutebrowser
-
-    # nixos-unstable.okular
-    # libreoffice
-    # nixos-unstable.zoom-us
-    # nixos-unstable.steam
-    # gimp
-    # nixos-unstable.krita
-    # nixos-unstable.tdesktop
-    # discord
-    # gnome3.nautilus
-    # gnome3.gvfs
-
-    # lxappearance
-    # xtitle
-    # xclip
-    # xdotool
-    # maim
-    # gromit-mpx
-#    dunst
-#    nixos-unstable.polybarFull
-
-    # google-cloud-sdk
-    # nixos-unstable.kubectl
-    # nixos-unstable.kubeseal
-    # nixos-unstable.kustomize
-#    imagemagick
-#    ffmpeg
-#    nixos-unstable.youtube-dl
-#    nixos-unstable.plantuml
-#    graphviz
-    # adoptopenjdk-bin
-    # goldendict
-    # pass
-    # broot
-
-    # pamixer
-    # alsaTools
-    # alsaUtils
-    # pavucontrol
-
-    # nixos-unstable.libmtp
-    # # feh
-    # exfat-utils
-    # cifs-utils
-    # fuse_exfat
-    # mtpfs
-    # gnome3.gvfs
-    # jmtpfs
-
-    # ditaa
-    # python3
-    # zeal
-    # wget
-    # neovim
-    # htop
-
-    # killall
-    # powertop
-    # xorg.xeyes
-
-    # gnumake
-
-    # qt5.qtwayland
-    # unzip
-    # p7zip
-    # unrar
-    # gitFull
-    # gnupg
-    # ranger
-    # ripgrep
-    # stow
-    # mpv
+    # emacs
+    # vim
+    # git
   ];
 
   fonts.enableFontDir = true;
