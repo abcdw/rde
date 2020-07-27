@@ -18,7 +18,6 @@ let
     feh
     gimp
     imagemagick
-    mpv
     ffmpeg
     pavucontrol
   ];
@@ -44,6 +43,16 @@ in {
     publicShare = "${config.home.homeDirectory}/public";
     templates = "${config.home.homeDirectory}/templates";
   };
+
+  programs.mpv = {
+    enable = true;
+    config = {
+      save-position-on-quit = true;
+      hdr-compute-peak = false; # prevents brightness changes
+      keep-open = true;
+    };
+  };
+
   programs.chromium = {
     enable = true;
     extensions = [
