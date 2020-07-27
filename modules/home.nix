@@ -26,6 +26,10 @@ let
 in {
   home.packages = home-packages;
 
+  home.sessionVariables = {
+    LESSHISTFILE = "${config.xdg.dataHome}/.lesshst";
+    HISTFILE = "${config.xdg.dataHome}/bash/bash_history";
+  };
 
   home.stateVersion = "20.09";
   home.keyboard.layout = "us,ru";
