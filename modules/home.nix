@@ -26,6 +26,8 @@ let
 in {
   home.packages = home-packages;
 
+
+  home.stateVersion = "20.09";
   home.keyboard.layout = "us,ru";
   home.keyboard.variant = "dvorak,";
   home.keyboard.options =
