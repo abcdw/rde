@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  dev-packages = with pkgs; [ gitFull sqlite gnupg ];
+  dev-packages = with pkgs; [ sqlite ];
   cli-packages = with pkgs; [
     nixfmt
     unzip
@@ -195,6 +195,27 @@ in {
   programs.direnv.enable = true;
   services.lorri.enable = true;
 
+  programs.git = {
+    enable = true;
+    package = pkgs.gitAndTools.gitFull;
+    userName = "Andrew Tropin";
+    userEmail = "andrew@trop.in";
+    signing = {
+      gpgPath = "${pkgs.gnupg}/bin/gpg2";
+      key = "6D941396BE823A85";
+      signByDefault = true;
+    };
+  };
+  programs.ssh = {
+    enable = true;
+    matchBlocks = {
+      "ti.wtf" = {
+        hostname = "ec2-13-49-75-141.eu-north-1.compute.amazonaws.com";
+        user = "root";
+        forwardAgent = true;
+      };
+    };
+  };
   services.gpg-agent = {
     enable = true;
     enableSshSupport = true;
