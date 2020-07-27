@@ -364,6 +364,7 @@ in {
       start = "exec $HOME/.xsession";
     }];
     displayManager.defaultSession = "xsession";
+    displayManager.job.logToJournal = true;
     libinput.enable = true;
   };
   #    hardware.opengl.extraPackages = [ pkgs.vaapiIntel pkgs.vaapiVdpau ];
