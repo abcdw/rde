@@ -29,11 +29,11 @@ in {
 
   # services.tlp = {
   #   enable = true;
-  #   #      START_CHARGE_THRESH_BAT0=75
-  #   #      STOP_CHARGE_THRESH_BAT0=91
   #   extraConfig = ''
-  #     CPU_SCALING_GOVERNOR_ON_BAT=powersave
-  #     ENERGY_PERF_POLICY_ON_BAT=powersave
+  #     # CPU_SCALING_GOVERNOR_ON_BAT=powersave
+  #     # ENERGY_PERF_POLICY_ON_BAT=powersave
+  #     START_CHARGE_THRESH_BAT0=85
+  #     STOP_CHARGE_THRESH_BAT0=90
   #   '';
   # };
 
@@ -205,8 +205,8 @@ in {
     '';
   };
 
-  powerManagement.powerUpCommands =
-    "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
+  # powerManagement.powerUpCommands =
+  #   "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
 
   # List packages installed in system profile. To search, run:
   # $ nix search wget
