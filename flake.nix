@@ -8,14 +8,23 @@
       url = "github:rycee/home-manager/bqv-flakes";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nur.url = "github:nix-community/NUR";
 
+    # secrets = {
+    #   type = "indirect";
+    #   id = "secrets";
+    #   flake = false;
+    # };
 
     #emacs.url = github:nix-community/emacs-overlay;
   };
   outputs = { self, nixpkgs, ... }@inputs: {
 
     # packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
-
+    template = { };
+    # TODO: Create template repo
+    # TODO: Write setup instruction
+    inpts = inputs;
     nixosConfigurations = {
       xenia = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
@@ -25,10 +34,11 @@
       ixy = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-                    inputs.home-manager.nixosModules.home-manager
-                    (import ./nixos/ixy/configuration.nix)
-                    nixpkgs.nixosModules.notDetected
-                  ];
+          { nixpkgs.overlays = [ inputs.nur.overlay ]; }
+          inputs.home-manager.nixosModules.home-manager
+          (import ./nixos/ixy/configuration.nix)
+          nixpkgs.nixosModules.notDetected
+        ];
         specialArgs = { inherit inputs; };
       };
 
