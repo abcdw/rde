@@ -159,6 +159,9 @@ in {
   environment.pathsToLink = [
     "/share/zsh" # Required for zsh autocomplete for systemctl
   ];
+
+  home-manager.useGlobalPkgs = true;
+  home-manager.useUserPackages = true;
   home-manager.users.abcdw = import ../../modules/home.nix;
 
   networking = {
