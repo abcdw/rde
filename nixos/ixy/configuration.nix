@@ -309,7 +309,7 @@ in {
     hack-font
     # hasklig
     inconsolata
-    #    iosevka
+    iosevka
     source-code-pro
     open-sans # need for telegram app
     # unifont
@@ -317,7 +317,7 @@ in {
   ];
   fonts.fontconfig.defaultFonts.monospace = [ "Iosevka" ];
 
-#  users.defaultUserShell = pkgs.zsh;
+  users.defaultUserShell = pkgs.zsh;
   fileSystems."/mnt/flash" = {
     device = "/dev/sda1";
     fsType = "auto";
@@ -367,7 +367,7 @@ in {
       start = "exec $HOME/.xsession";
     }];
     displayManager.defaultSession = "xsession";
-    displayManager.job.logToJournal = true;
+    displayManager.job.logToJournal = true; # https://vid.bina.me/tools/nixos/breaking-down-the-nixos-gui-setup/
     libinput.enable = true;
   };
   #    hardware.opengl.extraPackages = [ pkgs.vaapiIntel pkgs.vaapiVdpau ];
@@ -414,7 +414,7 @@ in {
     #   ];
     # };
 
-    ssh.startAgent = true;
+    # ssh.startAgent = true;
 
     # tmux = {
     #   enable = true;
@@ -436,9 +436,9 @@ in {
   };
 
   # enable keychain
-  services.gnome3.gnome-keyring.enable = true;
-  programs.seahorse.enable = true;
-  security.pam.enableSSHAgentAuth = true;
+  # services.gnome3.gnome-keyring.enable = true;
+  # programs.seahorse.enable = true;
+  # security.pam.enableSSHAgentAuth = true;
   #  security.pam.services.lightdm.enable = true;
 
   virtualisation.docker.enable = true;
