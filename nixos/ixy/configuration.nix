@@ -307,17 +307,17 @@ in {
     nixos-unstable.font-awesome
     fira-code
     hack-font
-    hasklig
+    # hasklig
     inconsolata
     #    iosevka
     source-code-pro
     open-sans # need for telegram app
-    unifont
-    nixos-unstable.nerdfonts
+    # unifont
+    # nixos-unstable.nerdfonts
   ];
   fonts.fontconfig.defaultFonts.monospace = [ "Iosevka" ];
 
-  users.defaultUserShell = pkgs.zsh;
+#  users.defaultUserShell = pkgs.zsh;
   fileSystems."/mnt/flash" = {
     device = "/dev/sda1";
     fsType = "auto";
