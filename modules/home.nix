@@ -5,7 +5,6 @@ let
   cli-packages = with pkgs; [
     nixfmt
     unzip
-    unrar
     killall
     htop
     ripgrep
