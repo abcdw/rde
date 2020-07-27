@@ -164,6 +164,7 @@ in {
     enable = true;
     dotDir = ".config/zsh";
     enableAutosuggestions = true;
+    defaultKeymap = "emacs";
     history.path = "${config.xdg.dataHome}/zsh/zsh_history";
     shellAliases = {
       gis = "git status -s";
