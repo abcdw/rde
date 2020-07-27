@@ -1,7 +1,32 @@
 { config, lib, pkgs, ... }:
 
-{
-  home.packages = with pkgs; [ bat gimp nixfmt ];
+let
+  dev-packages = with pkgs; [ gitFull sqlite gnupg ];
+  cli-packages = with pkgs; [
+    nixfmt
+    unzip
+    unrar
+    killall
+    htop
+    ripgrep
+    wget
+    neovim
+    youtube-dl
+  ];
+  media-packages = with pkgs; [
+    okular
+    feh
+    gimp
+    imagemagick
+    mpv
+    ffmpeg
+    pavucontrol
+  ];
+  other-packages = with pkgs; [ tdesktop xfce.thunar ];
+  home-packages = dev-packages ++ cli-packages ++ media-packages
+    ++ other-packages;
+in {
+  home.packages = home-packages;
 
   home.keyboard.layout = "us,ru";
   home.keyboard.variant = "dvorak,";
@@ -34,7 +59,7 @@
 
       font = {
         size = 9;
-        bold = {style = "Bold";};
+        bold = { style = "Bold"; };
       };
 
       window.padding = {

@@ -215,86 +215,85 @@ in {
     # nixos-unstable.freecad
     # nixos-unstable.openscad
     # nixos-unstable.kicad
-    sqlite
-    alacritty
+    # sqlite
 
-    nixos-unstable.brave
-    nixos-unstable.firefox
-    nixos-unstable.chromium
+    # nixos-unstable.brave
+    # nixos-unstable.firefox
+#    nixos-unstable.chromium
     # nixos-unstable.next
     # qutebrowser
 
-    nixos-unstable.okular
+    # nixos-unstable.okular
     # libreoffice
     # nixos-unstable.zoom-us
     # nixos-unstable.steam
     # gimp
     # nixos-unstable.krita
-    nixos-unstable.tdesktop
+    # nixos-unstable.tdesktop
     # discord
-    gnome3.nautilus
-    gnome3.gvfs
+    # gnome3.nautilus
+    # gnome3.gvfs
 
-    lxappearance
-    xtitle
-    xclip
-    xdotool
-    maim
-    gromit-mpx
-    dunst
-    nixos-unstable.polybarFull
+    # lxappearance
+    # xtitle
+    # xclip
+    # xdotool
+    # maim
+    # gromit-mpx
+#    dunst
+#    nixos-unstable.polybarFull
 
     # google-cloud-sdk
     # nixos-unstable.kubectl
     # nixos-unstable.kubeseal
     # nixos-unstable.kustomize
-    imagemagick
-    ffmpeg
-    nixos-unstable.youtube-dl
-    nixos-unstable.plantuml
-    graphviz
+#    imagemagick
+#    ffmpeg
+#    nixos-unstable.youtube-dl
+#    nixos-unstable.plantuml
+#    graphviz
     # adoptopenjdk-bin
     # goldendict
-    pass
+    # pass
     # broot
 
-    pamixer
-    alsaTools
-    alsaUtils
-    pavucontrol
+    # pamixer
+    # alsaTools
+    # alsaUtils
+    # pavucontrol
 
-    nixos-unstable.libmtp
-    feh
-    exfat-utils
-    cifs-utils
-    fuse_exfat
-    mtpfs
-    gnome3.gvfs
-    jmtpfs
+    # nixos-unstable.libmtp
+    # # feh
+    # exfat-utils
+    # cifs-utils
+    # fuse_exfat
+    # mtpfs
+    # gnome3.gvfs
+    # jmtpfs
 
-    ditaa
+    # ditaa
     # python3
     # zeal
-    wget
-    neovim
-    htop
+    # wget
+    # neovim
+    # htop
 
-    killall
-    powertop
-    xorg.xeyes
+    # killall
+    # powertop
+    # xorg.xeyes
 
-    gnumake
+    # gnumake
 
     # qt5.qtwayland
-    unzip
-    p7zip
-    unrar
-    gitFull
-    gnupg
+    # unzip
+    # p7zip
+    # unrar
+    # gitFull
+    # gnupg
     # ranger
-    ripgrep
-    stow
-    mpv
+    # ripgrep
+    # stow
+    # mpv
   ];
 
   fonts.enableFontDir = true;
