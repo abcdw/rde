@@ -52,6 +52,7 @@
               ];
             }
             inputs.home-manager.nixosModules.home-manager
+            (import ./src/modules/rde.nix)
             (import ./nixos/ixy/configuration.nix)
             inputs.stable.nixosModules.notDetected
           ];

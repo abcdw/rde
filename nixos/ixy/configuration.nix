@@ -409,8 +409,8 @@ in {
   #   isNormalUser = true;
   #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
   # };
-
-  users.extraUsers.abcdw = {
+  
+  users.extraUsers.${config.rde.username} = {
     isNormalUser = true;
     uid = 1000;
     extraGroups =
