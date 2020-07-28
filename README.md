@@ -9,7 +9,7 @@ My current setup
 | Terminal:            | [alacritty](https://github.com/jwilm/alacritty)                        |
 | Shell:               | [zsh](https://wiki.archlinux.org/index.php/zsh)                        |
 | Layouts:             | us,ru ([dvorak](http://www.dvzine.org/zine/01-toc.html),)              |
-
+ 
 ## Hardware
 My current hardware setup:
 - Ixy - ThinkPad [X1 Yoga](./etc/nixos/configuration.ixy.nix) 4th generation
@@ -52,5 +52,11 @@ nix-shell # or direnv allow
 make dotfiles-install
 ```
 
-## Alternatives
-- [Guix](https://guix.gnu.org)
+## Layout
+- files
+- `modules/` description
+  - `hosts/`
+  
+## Flakes
+## Modules
+## Overlays
