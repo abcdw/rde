@@ -22,39 +22,49 @@
   outputs = inputs:
     let
       lib = inputs.stable.lib;
+
+      system = "x86_64-linux";
+      overlays = {
+        unstable = final: prev: {
+          unstable = (import inputs.unstable { inherit system; });
+        };
+      };
     in {
 
-    # packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
-    template = { };
-    # TODO: Create template repo
-    # TODO: Write setup instruction
-    inpts = inputs;
-    # unstable-overlay = final: prev: {
-    #   unstable = (import inputs.nixos-unstable {inherit config system;});
-    # };
-    nixosConfigurations = {
-      xenia = lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [ (import ./nixos/xenia/configuration.nix) ];
-        specialArgs = { inherit inputs; };
+      # packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
+      template = { };
+      # TODO: Create template repo
+      # TODO: Write setup instruction
+      inpts = inputs;
+      # unstable-overlay =
+      nixosConfigurations = {
+        xenia = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [ (import ./nixos/xenia/configuration.nix) ];
+          specialArgs = { inherit inputs; };
+        };
+        ixy = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            {
+              nixpkgs.overlays = [
+                inputs.nur.overlay
+                overlays.unstable
+                # inputs.nixos
+              ];
+            }
+            inputs.home-manager.nixosModules.home-manager
+            (import ./nixos/ixy/configuration.nix)
+            inputs.stable.nixosModules.notDetected
+          ];
+          specialArgs = { inherit inputs; };
+        };
+
       };
-      ixy = lib.nixosSystem {
-        system = "x86_64-linux";
-        modules = [
-          { nixpkgs.overlays = [ inputs.nur.overlay
-                                 # inputs.nixos
-                               ]; }
-          inputs.home-manager.nixosModules.home-manager
-          (import ./nixos/ixy/configuration.nix)
-          inputs.stable.nixosModules.notDetected
-        ];
-        specialArgs = { inherit inputs; };
-      };
+
+      xenia =
+        inputs.self.nixosConfigurations.xenia.config.system.build.toplevel;
+      ixy = inputs.self.nixosConfigurations.ixy.config.system.build.toplevel;
 
     };
-
-    xenia = inputs.self.nixosConfigurations.xenia.config.system.build.toplevel;
-    ixy = inputs.self.nixosConfigurations.ixy.config.system.build.toplevel;
-
-  };
 }
