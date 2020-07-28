@@ -1,0 +1,15 @@
+#+TITLE: Reproducible Development Environment
+
+* Setup description
+| Tool type | Tool |
+|-----------+---|
+|           |   |
+
+* Flakes
+* Modules
+* Overlays
+* Layout
+- src/
+  - profiles/
+  - devices/
+  - hosts/
