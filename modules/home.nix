@@ -20,10 +20,11 @@ let
     ffmpeg
     pavucontrol
   ];
+  font-packages = with pkgs; [ emacs-all-the-icons-fonts ];
   other-packages = with pkgs; [ tdesktop xfce.thunar ];
   home-packages = dev-packages ++ cli-packages ++ media-packages
-    ++ other-packages;
-in {
+    ++ font-packages ++ other-packages;
+in rec {
   home.packages = home-packages;
 
   home.sessionVariables = {
