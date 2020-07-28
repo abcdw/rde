@@ -3,7 +3,7 @@
     "home-manager": {
       "inputs": {
         "nixpkgs": [
-          "nixpkgs"
+          "stable"
         ]
       },
       "locked": {
@@ -18,38 +18,6 @@
         "owner": "rycee",
         "ref": "bqv-flakes",
         "repo": "home-manager",
-        "type": "github"
-      }
-    },
-    "nixos-unstable": {
-      "locked": {
-        "lastModified": 1595770343,
-        "narHash": "sha256-GTmeVtwj+ZvtPMYyliFspWRoLly1P25suz694NfD9d8=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "28fce082c8ca1a8fb3dfac5c938829e51fb314c8",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixos-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
-    "nixpkgs": {
-      "locked": {
-        "lastModified": 1595801797,
-        "narHash": "sha256-esMYMOrelVZv9l+FbJpg+rRl5EFCXlSMLaze75m6s2s=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "b50d55871fb7de1e5791bbd56738ff20f4d15f2c",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "ref": "nixos-20.03",
-        "repo": "nixpkgs",
         "type": "github"
       }
     },
@@ -71,9 +39,41 @@
     "root": {
       "inputs": {
         "home-manager": "home-manager",
-        "nixos-unstable": "nixos-unstable",
-        "nixpkgs": "nixpkgs",
-        "nur": "nur"
+        "nur": "nur",
+        "stable": "stable",
+        "unstable": "unstable"
+      }
+    },
+    "stable": {
+      "locked": {
+        "lastModified": 1595891366,
+        "narHash": "sha256-emx8s0LWUxxm4kh4zcacVP9NmCR5eT/JhzIXn111mAE=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "eeb91b03a5cef25c3931bdd4438f006a293adef9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-20.03",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
+    "unstable": {
+      "locked": {
+        "lastModified": 1595770343,
+        "narHash": "sha256-GTmeVtwj+ZvtPMYyliFspWRoLly1P25suz694NfD9d8=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "28fce082c8ca1a8fb3dfac5c938829e51fb314c8",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-unstable",
+        "repo": "nixpkgs",
+        "type": "github"
       }
     }
   },

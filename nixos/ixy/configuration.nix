@@ -5,7 +5,7 @@
 { config, pkgs, inputs, ... }:
 
 let
-  nixos-unstable = import inputs.nixos-unstable {
+  nixos-unstable = import inputs.unstable {
     config = config.nixpkgs.config;
     localSystem = "x86_64-linux";
   };
