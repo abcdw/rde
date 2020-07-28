@@ -9,14 +9,13 @@
       inputs.nixpkgs.follows = "stable";
     };
     nur.url = "github:nix-community/NUR";
+    emacs.url = "github:nix-community/emacs-overlay";
 
     # secrets = {
     #   type = "indirect";
     #   id = "secrets";
     #   flake = false;
     # };
-
-    #emacs.url = github:nix-community/emacs-overlay;
   };
 
   outputs = inputs:
@@ -31,12 +30,11 @@
       };
     in {
 
-      # packages.x86_64-linux.hello = nixpkgs.legacyPackages.x86_64-linux.hello;
       template = { };
       # TODO: Create template repo
       # TODO: Write setup instruction
       inpts = inputs;
-      # unstable-overlay =
+
       nixosConfigurations = {
         xenia = lib.nixosSystem {
           system = "x86_64-linux";
@@ -50,7 +48,7 @@
               nixpkgs.overlays = [
                 inputs.nur.overlay
                 overlays.unstable
-                # inputs.nixos
+                inputs.emacs.overlay
               ];
             }
             inputs.home-manager.nixosModules.home-manager
