@@ -42,21 +42,30 @@ NixOS focused, but nix works on GNU/Linux and mac.
 Get:
 ```
 cd ~
-git clone https://github.com/abcdw/configs.git
+git clone https://github.com/abcdw/rde.git
 ```
 
 Install
 ```
-cd configs
+cd rde
 nix-shell # or direnv allow
-make dotfiles-install
+make switch
 ```
 
 ## Layout
-- files
-- `modules/` description
+- `files/`
+- `src/` source code for different features
   - `hosts/`
+  - `profiles/`
+  - `devices/`
+  - `modules/`
   
 ## Flakes
 ## Modules
+
 ## Overlays
+
+| stable   |   |
+| unstable |   |
+| emacs    |   |
+| nur      |   |
