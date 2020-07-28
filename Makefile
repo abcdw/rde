@@ -24,4 +24,4 @@ switch:
 	sudo nixos-rebuild switch --flake .
 
 repl:
-	nix repl lib/flake-repl.nix
+	nix repl src/flake-repl.nix
