@@ -60,12 +60,19 @@
           ];
           specialArgs = { inherit inputs; };
         };
+        aws = lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            (import ./src/profiles/aws.nix)
+          ];
+          specialArgs = { inherit inputs; };
+        };
 
       };
 
       xenia =
         inputs.self.nixosConfigurations.xenia.config.system.build.toplevel;
       ixy = inputs.self.nixosConfigurations.ixy.config.system.build.toplevel;
-
+      aws = inputs.self.nixosConfigurations.aws.config.system.build.toplevel;
     };
 }
