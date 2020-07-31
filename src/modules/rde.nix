@@ -18,6 +18,16 @@ with lib; {
         default = 12;
         type = types.int;
       };
+      browserpass = { enable = mkEnableOption "hello service"; };
+    };
+  };
+
+  config = lib.mkIf config.rde.browserpass.enable {
+    home-manager.users.abcdw = {
+      programs.browserpass.enable = true;
+      programs.chromium.extensions = [
+        "naepdomgkenhinolocfifgehidddafch" # browserpass
+      ];
     };
   };
 }

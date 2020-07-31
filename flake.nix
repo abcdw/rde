@@ -53,6 +53,7 @@
             }
             (import ./src/modules/rde.nix)
             (import ./src/home.nix)
+            (import ./src/config.nix)
             (import ./nixos/ixy/configuration.nix)
             inputs.home-manager.nixosModules.home-manager
             inputs.stable.nixosModules.notDetected
