@@ -186,6 +186,7 @@
 
     programs.zsh = {
       enable = true;
+      autocd = true;
       dotDir = ".config/zsh";
       enableAutosuggestions = true;
       defaultKeymap = "emacs";
@@ -194,6 +195,7 @@
         gis = "git status -s";
         ku = "kubectl";
         ls = "ls --color";
+        rde = "cd ~/work/rde; make switch; cd -";
       };
       localVariables = {
         #PROMPT = "${config.rde.username}%F{red}❯%f%F{yellow}❯%f%F{green}❯%f ";
