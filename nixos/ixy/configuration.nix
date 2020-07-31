@@ -3,14 +3,7 @@
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
 { config, pkgs, inputs, ... }:
-
-let
-  nixos-unstable = import inputs.unstable {
-    config = config.nixpkgs.config;
-    localSystem = "x86_64-linux";
-  };
-
-in {
+{
   imports =
 
     [ # Include the results of the hardware scan.
@@ -18,10 +11,11 @@ in {
     ];
   nixpkgs.config = { allowUnfree = true; };
   nix = {
-    package = nixos-unstable.nixFlakes;
+    package = pkgs.unstable.nixFlakes;
     extraOptions = ''
       experimental-features = nix-command flakes
     '';
+    registry.rde.flake = inputs.self;
   };
 
   # powerManagement.enable = true;
@@ -92,7 +86,7 @@ in {
     ];
   };
 
-  boot.kernelPackages = nixos-unstable.linuxPackages_latest;
+  boot.kernelPackages = pkgs.unstable.linuxPackages_latest;
   boot.loader = {
     # systemd-boot.enable = true;
     efi = {
@@ -221,7 +215,7 @@ in {
   fonts.fontconfig.dpi = 192;
   fonts.fonts = with pkgs; [
     corefonts # Micrsoft free fonts
-    nixos-unstable.font-awesome
+    font-awesome
     fira-code
     hack-font
     # hasklig
@@ -267,7 +261,8 @@ in {
   };
 
   services.xserver = {
-    # dpi = 192;
+
+    # resolutions = [{ x = 1600; y = 900; }];
     enable = true;
     layout = "us,ru";
     xkbVariant = "dvorak,";
@@ -360,11 +355,11 @@ in {
 
   virtualisation.docker.enable = true;
 
-  services.emacs = {
-    enable = true;
-    package = nixos-unstable.emacs;
-    defaultEditor = true;
-  };
+  # services.emacs = {
+  #   enable = true;
+  #   package = nixos-unstable.emacs;
+  #   defaultEditor = true;
+  # };
 
   # Some programs need SUID wrappers, can be configured further or are
   # started in user sessions.
