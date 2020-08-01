@@ -70,10 +70,13 @@
 
     programs.firefox = {
       enable = true;
-      extensions = with pkgs.nur.repos.rycee.firefox-addons; [
-        https-everywhere
-        privacy-badger
-      ];
+      # extensions = with pkgs.nur.repos.rycee.firefox-addons; [
+      #   https-everywhere
+      #   privacy-badger
+      # ];
+      profiles.default.settings = {
+        "browser.shell.checkDefaultBrowser" = false;
+      };
     };
 
     programs.chromium = {
