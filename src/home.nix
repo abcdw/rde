@@ -135,8 +135,8 @@
     programs.rofi = {
       enable = true;
       theme = "Arc";
-      # extraConfig = "rofi.dpi: ${config.fonts.fontconfig.dpi}";
-      extraConfig = "rofi.dpi: 196";
+      extraConfig = "rofi.dpi: ${toString config.fonts.fontconfig.dpi}";
+      # extraConfig = "rofi.dpi: 196";
     };
 
     programs.i3status = {
