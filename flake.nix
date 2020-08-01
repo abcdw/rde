@@ -63,6 +63,7 @@
         aws = lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
+            # { nixpkgs.overlays = [ overlays.unstable ]; }
             (import ./src/profiles/aws.nix)
           ];
           specialArgs = { inherit inputs; };
