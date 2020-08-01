@@ -230,7 +230,7 @@
 
   fonts.enableFontDir = true;
   fonts.enableGhostscriptFonts = true;
-  fonts.fontconfig.dpi = 192;
+  fonts.fontconfig.dpi = 144;
   fonts.fonts = with pkgs; [
     corefonts # Micrsoft free fonts
     font-awesome
@@ -280,7 +280,7 @@
 
   services.xserver = {
 
-    # resolutions = [{ x = 1600; y = 900; }];
+    resolutions = [{ x = 1600; y = 900; }];
     enable = true;
     layout = "us,ru";
     xkbVariant = "dvorak,";
