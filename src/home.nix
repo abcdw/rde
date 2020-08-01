@@ -24,7 +24,7 @@
       pavucontrol
     ];
     font-packages = with pkgs; [ emacs-all-the-icons-fonts ];
-    other-packages = with pkgs; [ tdesktop xfce.thunar ];
+    other-packages = with pkgs; [ tdesktop xfce.thunar gopass ];
     home-packages = dev-packages ++ cli-packages ++ media-packages
       ++ font-packages ++ other-packages;
   in rec {
