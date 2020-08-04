@@ -26,7 +26,9 @@
     font-packages = with pkgs; [ emacs-all-the-icons-fonts ];
     other-packages = with pkgs; [ tdesktop xfce.thunar gopass ];
     home-packages = dev-packages ++ cli-packages ++ media-packages
-      ++ font-packages ++ other-packages;
+                    ++ font-packages ++ other-packages;
+
+    ssh-tunnel-port = 8888;
   in rec {
     home.packages = home-packages;
 
@@ -68,6 +70,16 @@
       };
     };
 
+    systemd.user.services.ssh-tunnel = {
+      Service = {
+        ExecStart = "${pkgs.openssh}/bin/ssh -NT -D ${toString ssh-tunnel-port} ti.wtf";
+        Restart = "always";
+        RestartSec = 5;
+      };
+      Install = { WantedBy = ["default.target"]; };
+    };
+
+    systemd.user.startServices = true;
     programs.firefox = {
       enable = true;
       # extensions = with pkgs.nur.repos.rycee.firefox-addons; [
@@ -76,9 +88,11 @@
       # ];
       profiles.default.settings = {
         "browser.shell.checkDefaultBrowser" = false;
+        "network.proxy.socks" = "localhost";
+        "network.proxy.socks_port" = ssh-tunnel-port;
+        "network.proxy.type" = 1;
       };
     };
-
     programs.chromium = {
       enable = true;
       extensions = [

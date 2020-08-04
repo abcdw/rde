@@ -65,6 +65,11 @@
           modules = [
             # { nixpkgs.overlays = [ overlays.unstable ]; }
             (import ./src/profiles/aws.nix)
+            ({ pkgs, ... }: {
+              networking.hostName = "aws-proxy";
+              environment.systemPackages = [ pkgs.htop ];
+              users.users.root.openssh.authorizedKeys.keyFiles = [ ./files/keys/id_rsa.pub ];
+            })
           ];
           specialArgs = { inherit inputs; };
         };
