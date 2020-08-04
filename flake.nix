@@ -35,6 +35,9 @@
       # TODO: Write setup instruction
       inpts = inputs;
 
+      devShell."${system}" = import ./shell.nix {
+        pkgs = import inputs.stable { inherit system; };
+      };
       nixosConfigurations = {
         xenia = lib.nixosSystem {
           system = "x86_64-linux";
