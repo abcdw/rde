@@ -186,7 +186,7 @@
 
           "${mod}+t" = "workspace number 1";
           "${mod}+Tab" = "workspace back_and_forth";
-          "${mod}+Shift+l" = "exec ${pkgs.i3lock}/bin/i3lock";
+          "${mod}+Shift+l" = "exec ${pkgs.i3lock}/bin/i3lock -c 222222";
           "${mod}+Shift+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
           "${mod}+Shift+c" = "kill";
           "Shift+Print" =
