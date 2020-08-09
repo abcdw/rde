@@ -36,7 +36,12 @@
       inpts = inputs;
 
       devShell."${system}" = import ./shell.nix {
-        pkgs = import inputs.stable { inherit system; };
+        pkgs = inputs.stable.legacyPackages.${system};
+          #import inputs.stable { inherit system; };
+      };
+
+      nixosModules = {
+            rde = (import ./src/modules/rde.nix);
       };
       nixosConfigurations = {
         xenia = lib.nixosSystem {
@@ -54,10 +59,11 @@
                 inputs.emacs.overlay
               ];
             }
-            (import ./src/modules/rde.nix)
+
             (import ./src/hosts/ixy)
             (import ./src/home.nix)
             (import ./src/config.nix)
+            inputs.self.nixosModules.rde
             inputs.home-manager.nixosModules.home-manager
             inputs.stable.nixosModules.notDetected
           ];
