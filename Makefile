@@ -1,16 +1,4 @@
-dotfiles-install:
-	stow dotfiles -v 2
-
-dotfiles-uninstall:
-	stow -D dotfiles -v 2
-
-etc-install:
-	sudo stow -t /etc/ etc
-
-etc-uninstall:
-	sudo stow -t /etc/ etc -D
-
-install: etc-install dotfiles-install
+install: switch
 	echo "yay!"
 
 ixy.out:
@@ -25,3 +13,6 @@ switch:
 
 repl:
 	nix repl src/flake-repl.nix
+
+clean:
+	unlink ./result
