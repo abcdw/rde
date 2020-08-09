@@ -12,6 +12,7 @@
       htop
       ripgrep
       wget
+      graphviz
       neovim
       youtube-dl
     ];
