@@ -73,7 +73,7 @@
           system = "x86_64-linux";
           modules = [
             # { nixpkgs.overlays = [ overlays.unstable ]; }
-            (import ./src/profiles/aws.nix)
+            (import ./src/devices/aws.nix)
             ({ pkgs, ... }: {
               networking.hostName = "aws-proxy";
               environment.systemPackages = [ pkgs.htop ];
