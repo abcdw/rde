@@ -84,11 +84,12 @@
 
     systemd.user.services.ssh-tunnel = {
       Service = {
-        ExecStart = "${pkgs.openssh}/bin/ssh -NT -D ${toString ssh-tunnel-port} ti.wtf";
+        ExecStart =
+          "${pkgs.openssh}/bin/ssh -NT -D ${toString ssh-tunnel-port} ti.wtf";
         Restart = "always";
         RestartSec = 5;
       };
-      Install = { WantedBy = ["default.target"]; };
+      Install = { WantedBy = [ "default.target" ]; };
     };
 
     systemd.user.startServices = true;
