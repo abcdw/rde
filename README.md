@@ -10,6 +10,65 @@ My current setup
 | Shell:               | [zsh](https://wiki.archlinux.org/index.php/zsh)                        |
 | Layouts:             | us,ru ([dvorak](http://www.dvzine.org/zine/01-toc.html),)              |
  
+ 
+Lightweight environment for work and fun. Some neat properties:
+
+- Reproducible
+- Modular
+- Minimalistic
+- Manages your dotfiles
+
+Environments are managed by [nix](https://nixos.org/nix). This setup is NixOS
+focused.
+
+The documentation is WIP. Some or all commands may not work.
+
+Usage
+=======
+
+## Get nix first
+The simpliest approach is to [install nix](https://nixos.org/download.html) in
+your current system with:
+
+``` sh
+curl -L https://nixos.org/nix/install | sh
+```
+
+## Get flakes
+Currently flakes are experimental and not shipped with `nix`. That's why you
+need to open a shell with `flakes` installed.
+
+``` sh
+nix-shell -p nixFlakes
+```
+
+## Get and configure rde
+
+Create a directory with configuration:
+```
+nix flake new -t "github:abcdw/rde/configs" configs 
+cd configs
+git init .
+```
+
+Edit `hosts/<your-hostname>`.
+
+Install
+```
+make switch
+```
+
+## Layout
+- `files/`
+- `src/` source code for different features
+  - `hosts/`
+  - `profiles/`
+  - `devices/`
+  - `modules/`
+
+Additional info
+=======
+
 ## Hardware
 My current hardware setup:
 - Ixy - ThinkPad [X1 Yoga](./etc/nixos/configuration.ixy.nix) 4th generation
@@ -32,40 +91,3 @@ Also, some legacy configs (vimrc/awesome/etc) can be found in
 
 ### awesomewm
 ![2018-04-03-194232_1600x900_scrot](https://user-images.githubusercontent.com/1218615/38268733-87d842d2-3787-11e8-8379-e7bc6fa4be2c.png)
-
-Usage
-=======
-
-Packages are managed by [nix](https://nixos.org/nix). This setup is
-NixOS focused, but nix works on GNU/Linux and mac.
-
-Get:
-```
-cd ~
-git clone https://github.com/abcdw/rde.git
-```
-
-Install
-```
-cd rde
-nix-shell # or direnv allow
-make switch
-```
-
-## Layout
-- `files/`
-- `src/` source code for different features
-  - `hosts/`
-  - `profiles/`
-  - `devices/`
-  - `modules/`
-  
-## Flakes
-## Modules
-
-## Overlays
-
-| stable   |   |
-| unstable |   |
-| emacs    |   |
-| nur      |   |
