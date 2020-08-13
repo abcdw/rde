@@ -2,27 +2,26 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, inputs, ... }:
-{
+{ config, lib, pkgs, inputs, ... }: {
 
-  boot.initrd.availableKernelModules = [ "xhci_pci" "nvme" "usb_storage" "sd_mod" ];
+  boot.initrd.availableKernelModules =
+    [ "xhci_pci" "nvme" "usb_storage" "sd_mod" ];
   boot.initrd.kernelModules = [ "dm-snapshot" ];
   boot.kernelModules = [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
-  fileSystems."/" =
-    { device = "/dev/disk/by-uuid/469716a5-d145-4152-95ed-23ab91923c91";
-      fsType = "ext4";
-    };
+  fileSystems."/" = {
+    device = "/dev/disk/by-uuid/469716a5-d145-4152-95ed-23ab91923c91";
+    fsType = "ext4";
+  };
 
-  fileSystems."/boot" =
-    { device = "/dev/disk/by-uuid/8C99-0704";
-      fsType = "vfat";
-    };
+  fileSystems."/boot" = {
+    device = "/dev/disk/by-uuid/8C99-0704";
+    fsType = "vfat";
+  };
 
   swapDevices =
-    [ { device = "/dev/disk/by-uuid/dd7d0f7c-3596-4b5e-9bcf-90181c6401af"; }
-    ];
+    [{ device = "/dev/disk/by-uuid/dd7d0f7c-3596-4b5e-9bcf-90181c6401af"; }];
 
   nix.maxJobs = lib.mkDefault 8;
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
@@ -34,6 +33,8 @@
       experimental-features = nix-command flakes
     '';
     registry.rde.flake = inputs.self;
+    registry.stable.flake = inputs.stable;
+    registry.unstable.flake = inputs.unstable;
   };
 
   # powerManagement.enable = true;
@@ -142,36 +143,9 @@
   #   options iwldvm force_cam=0
   # '';
 
-  # boot.kernel.sysctl = {
-  #   "kernel.nmi_watchdog" = 0;
-  #   "vm.dirty_writeback_centisecs" = 6000;
-  #   "vm.laptop_mode" = 5;
-  #   "swappiness" = 1;
-  #   "net.ipv4.ip_default_ttl" = 65;
-  # };
-
-  #  boot.extraModulePackages = [ config.boot.kernelPackages.acpi_call ];
-  #  boot.extraModulePackages = [ config.boot.kernelPackages.exfat-nofuse ];
-
-  environment.variables = {
-    # BROWSER="qutebrowser";
-    # EDITOR="emacs";
-    # BROWSER = "brave";
-    # GDK_SCALE = "2";
-    # GDK_DPI_SCALE = "0.5";
-    # QT_AUTO_SCREEN_SCALE_FACTOR = "1";
-    # XCURSOR_SIZE = "32";
-    # _JAVA_AWT_WM_NONREPARENTING="1";
-    # MOZ_ENABLE_WAYLAND="1";
-    # QT_QPA_PLATFORM="wayland";
-    # QT_WAYLAND_DISABLE_WINDOWDECORATION="1";
-
-  };
-
   environment.pathsToLink = [
     "/share/zsh" # Required for zsh autocomplete for systemctl
   ];
-
 
   networking = {
     hostName = "ixy";
@@ -181,13 +155,9 @@
   };
   networking.extraHosts = "127.0.0.1 ${config.networking.hostName}.lan";
 
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
   hardware.bluetooth.enable = true;
   console.useXkbConfig = true;
-  console.font = "sun12x22";
+  console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-u28n.psf.gz";
 
   time.timeZone = "Europe/Moscow";
 
@@ -205,8 +175,6 @@
   };
   hardware.steam-hardware.enable = true;
 
-  #  sound.mediaKeys.enable = true;
-
   systemd.services.thinkpad-fix-sound = {
     description = "Fix the sound on X1 Yoga";
     path = [ pkgs.alsaTools ];
@@ -217,43 +185,34 @@
     '';
   };
 
-  # powerManagement.powerUpCommands =
-  #   "${pkgs.alsaTools}/bin/hda-verb /dev/snd/hwC0D0 0x1d SET_PIN_WIDGET_CONTROL 0x0";
-
-  # List packages installed in system profile. To search, run:
-  # $ nix search wget
-  environment.systemPackages = with pkgs; [
-    # emacs
-    # vim
-    # git
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      # emacs
+      # vim
+      # git
+    ];
 
   fonts.enableFontDir = true;
   fonts.enableGhostscriptFonts = true;
-  fonts.fontconfig.dpi = 144;
-  fonts.fonts = with pkgs; [
-    corefonts # Micrsoft free fonts
-    font-awesome
-    fira-code
-    hack-font
-    # hasklig
-    inconsolata
-    iosevka
-    source-code-pro
-    open-sans # need for telegram app
-    # unifont
-    # nixos-unstable.nerdfonts
-  ];
+  fonts.fontconfig.dpi = 192;
+  fonts.fonts = with pkgs;
+    [
+      # corefonts # Micrsoft free fonts
+      # iosevka
+      # open-sans # need for telegram app
+    ];
   fonts.fontconfig.defaultFonts.monospace = [ "Iosevka" ];
+  fonts.enableDefaultFonts = true;
 
   users.defaultUserShell = pkgs.zsh;
+
   fileSystems."/mnt/flash" = {
     device = "/dev/sda1";
     fsType = "auto";
     options = let
-      # this line prevents hanging on network split
     in [ "noauto,gid=100,uid=1000" ];
   };
+
   fileSystems."/mnt/olorin/public" = {
     device = "//olorin.lan/public";
     fsType = "cifs";
@@ -280,7 +239,7 @@
 
   services.xserver = {
 
-    resolutions = [{ x = 1600; y = 900; }];
+    # resolutions = [{ x = 1600; y = 900; }];
     enable = true;
     layout = "us,ru";
     xkbVariant = "dvorak,";
@@ -297,11 +256,11 @@
       start = "exec $HOME/.xsession";
     }];
     displayManager.defaultSession = "xsession";
-    displayManager.job.logToJournal = true; # https://vid.bina.me/tools/nixos/breaking-down-the-nixos-gui-setup/
+    # https://vid.bina.me/tools/nixos/breaking-down-the-nixos-gui-setup/
+    displayManager.job.logToJournal = true;
+    
     libinput.enable = true;
   };
-  #    hardware.opengl.extraPackages = [ pkgs.vaapiIntel pkgs.vaapiVdpau ];
-  #    videoDrivers = ["intel"];
 
   services.picom = {
     enable = true;
@@ -316,110 +275,10 @@
     };
   };
 
-  programs = {
-    # gnupg.agent = {
-    #   enable = true;
-    # };
-    light.enable = true;
-    # sway = {
-    #   enable = true;
-
-    #   extraPackages = with pkgs; [
-
-    #     nixos-unstable.swaylock
-    #     swayidle
-    #     xwayland
-    #     nixos-unstable.grim
-    #     nixos-unstable.slurp
-    #     nixos-unstable.mako
-    #     libnotify
-    #     wl-clipboard
-    #     nixos-unstable.clipman
-    #     alacritty
-    #     rxvt_unicode
-    #     rofi
-    #     dmenu
-    #     i3status
-    #     i3status-rust
-    #   ];
-    # };
-
-    # ssh.startAgent = true;
-
-    # tmux = {
-    #   enable = true;
-    #   keyMode = "vi";
-    #   shortcut = "t";
-    #   terminal = "screen-256color";
-    # };
-
-    # zsh = {
-    #   promptInit = ''
-    #     export CLOUD_SDK_HOME="${pkgs.google-cloud-sdk}"
-    #     source "$CLOUD_SDK_HOME/google-cloud-sdk/completion.zsh.inc"
-    #   '';
-    #   enable = true;
-    #   enableCompletion = true;
-    #   autosuggestions.enable = true;
-    #   syntaxHighlighting.enable = true;
-    # };
-  };
-
-  # enable keychain
-  # services.gnome3.gnome-keyring.enable = true;
-  # programs.seahorse.enable = true;
-  # security.pam.enableSSHAgentAuth = true;
-  #  security.pam.services.lightdm.enable = true;
+  programs = { light.enable = true; };
 
   virtualisation.docker.enable = true;
 
-  # services.emacs = {
-  #   enable = true;
-  #   package = nixos-unstable.emacs;
-  #   defaultEditor = true;
-  # };
-
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
-  # programs.gnupg.agent = { enable = true; enableSSHSupport = true; };
-
-  # List services that you want to enable:
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Open ports in the firewall.
-  # networking.firewall.allowedTCPPorts = [ ... ];
-  # networking.firewall.allowedUDPPorts = [ ... ];
-  # Or disable the firewall altogether.
-  # networking.firewall.enable = false;
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
-
-  # Enable the X11 windowing system.
-  # services.xserver.enable = true;
-  # services.xserver.layout = "us";
-  # services.xserver.xkbOptions = "eurosign:e";
-
-  # Enable touchpad support.
-  # services.xserver.libinput.enable = true;
-
-  # Enable the KDE Desktop Environment.
-  # services.xserver.displayManager.sddm.enable = true;
-  # services.xserver.desktopManager.plasma5.enable = true;
-
-  # Define a user account. Don't forget to set a password with ‘passwd’.
-  # users.users.jane = {
-  #   isNormalUser = true;
-  #   extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-  # };
-  
   users.extraUsers.${config.rde.username} = {
     isNormalUser = true;
     uid = 1000;
@@ -427,10 +286,5 @@
       [ "users" "wheel" "input" "audio" "networkmanager" "docker" "sway" ];
   };
 
-  # This value determines the NixOS release with which your system is to be
-  # compatible, in order to avoid breaking some software such as database
-  # servers. You should change this only after NixOS release notes say you
-  # should.
   system.stateVersion = "20.03"; # Did you read the comment?
-
 }
