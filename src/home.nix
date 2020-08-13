@@ -24,10 +24,21 @@
       ffmpeg
       pavucontrol
     ];
-    font-packages = with pkgs; [ emacs-all-the-icons-fonts ];
+    font-packages = with pkgs; [
+      emacs-all-the-icons-fonts
+      corefonts # Micrsoft free fonts
+      unstable.font-awesome
+      fira-code
+      hack-font
+      inconsolata
+      iosevka
+      source-code-pro
+      open-sans # required for telegram app
+      unstable.nerdfonts
+    ];
     other-packages = with pkgs; [ tdesktop xfce.thunar gopass ];
     home-packages = dev-packages ++ cli-packages ++ media-packages
-                    ++ font-packages ++ other-packages;
+      ++ font-packages ++ other-packages;
 
     ssh-tunnel-port = 8888;
   in rec {
