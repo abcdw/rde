@@ -246,7 +246,8 @@
       extraConfig = ''
         bind s split-window -c "#{pane_current_path}"
         bind v split-window -h -c "#{pane_current_path}"
-        bind -n M-v copy-mode\; send-keys -X page-up
+        bind M-v copy-mode\; send-keys -X page-up
+        bind -T copy-mode M-v send-keys -X page-up
         set-option -g mouse on
         unbind -T copy-mode MouseDragEnd1Pane
 
