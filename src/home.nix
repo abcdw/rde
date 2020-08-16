@@ -195,10 +195,13 @@
 
           "${mod}+d" = null;
           "${mod}+w" = null;
+          "${mod}+f" = null;
           "${mod}+Return" = null;
 
           "${mod}+t" = "workspace number 1";
           "${mod}+Tab" = "workspace back_and_forth";
+
+          "${mod}+Shift+f" = "fullscreen toggle";
           "${mod}+Shift+l" = "exec ${pkgs.i3lock}/bin/i3lock -c 222222";
           "${mod}+Shift+Return" = "exec ${pkgs.alacritty}/bin/alacritty";
           "${mod}+Shift+c" = "kill";
