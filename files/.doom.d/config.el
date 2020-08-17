@@ -82,7 +82,7 @@
 (global-set-key (kbd "s-o") #'other-window)
 (global-set-key (kbd "s-n") #'switch-to-next-buffer)
 (global-set-key (kbd "s-p") #'switch-to-prev-buffer)
-(global-set-key (kbd "s-q") #'kill-buffer-and-window)
+(global-set-key (kbd "s-d") #'kill-buffer-and-window)
 (global-set-key (kbd "s-m") #'delete-other-windows)
 ;; (global-set-key (kbd "s-TAB") #'alternate-buffer)
 (global-set-key (kbd "C-s-n") 'switch-to-next-buffer-other-window)
