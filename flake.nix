@@ -57,7 +57,15 @@
       nixosConfigurations = {
         xenia = lib.nixosSystem {
           system = "x86_64-linux";
-          modules = [ (import ./nixos/xenia/configuration.nix) ];
+          modules = [
+            {
+              nixpkgs.overlays =
+                [ inputs.nur.overlay overlays.unstable inputs.emacs.overlay ];
+            }
+
+            (import ./src/hosts/xenia)
+            inputs.stable.nixosModules.notDetected
+          ];
           specialArgs = { inherit inputs; };
         };
         ixy = lib.nixosSystem {
