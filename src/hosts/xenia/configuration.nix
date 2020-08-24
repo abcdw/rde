@@ -4,30 +4,11 @@
 
 { config, pkgs, inputs, ... }:
 
-let
-
-  # Import unstable channel.
-  # sudo nix-channel --add http://nixos.org/channels/nixos-unstable nixos-unstable
-  # sudo nix-channel --update nixos-unstable
-  #nixos-unstable = import inputs.nixos-unstable { config = config.nixpkgs.config; localSystem = "x86_64-linux"; };
-
-in {
+{
   imports = [ # Include the results of the hardware scan.
     ./hardware-configuration.nix
   ];
 
-  nix = {
-    package = pkgs.unstable.nixFlakes;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-  };
-
-  # TODO: check https://github.com/srid/nix-config
-  # https://github.com/colemickens/nixpkgs-wayland
-  # nixpkgs.overlays = [
-  #   (import (builtins.fetchTarball https://github.com/nix-community/emacs-overlay/archive/master.tar.gz))
-  # ];
   nixpkgs.config = { allowUnfree = true; };
   # Use the GRUB 2 boot loader.
   boot.loader.grub = {
@@ -51,9 +32,6 @@ in {
       wireguard
     ];
 
-  # The global useDHCP flag is deprecated, therefore explicitly set to false here.
-  # Per-interface useDHCP will be mandatory in the future, so this generated config
-  # replicates the default behaviour.
 
   time.timeZone = "Europe/Moscow";
 
@@ -66,57 +44,12 @@ in {
     allowedTCPPorts = [ 22 ];
   };
 
-  # networking.wireguard.interfaces = {
-  #   # "wg0" is the network interface name. You can name the interface arbitrarily.
-  #   wg0 = {
-  #     # Determines the IP address and subnet of the client's end of the tunnel interface.
-  #     # ips = [ "10.100.0.2/24" ];
-
-  #     # Path to the private key file.
-  #     #
-  #     # Note: The private key can also be included inline via the privateKey option,
-  #     # but this makes the private key world-readable; thus, using privateKeyFile is
-  #     # recommended.
-  #     privateKeyFile = "../client.privatekey";
-
-  #     peers = [
-  #       # For a client configuration, one peer entry for the server will suffice.
-  #       {
-  #         # Public key of the server (not a file path).
-  #         publicKey = "hZroNzudF4v3KgCF0zZqe5ZY3yHt85yjxOOY4vS5bxA=";
-
-  #         # Forward all the traffic via VPN.
-  #         allowedIPs = [ "0.0.0.0/0" ];
-  #         # Or forward only particular subnets
-  #         #allowedIPs = [ "10.100.0.1" "91.108.12.0/22" ];
-
-  #         # Set this to the server IP and port.
-  #         endpoint = "13.49.18.164:51820";
-
-  #         # Send keepalives every 25 seconds. Important to keep NAT tables alive.
-  #         persistentKeepalive = 25;
-  #       }
-  #     ];
-  #   };
-  # };
-
-  # Configure network proxy if necessary
-  # networking.proxy.default = "http://user:password@proxy:port/";
-  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
-
-  # Select internationalisation properties.
-  # i18n = {
-  #   consoleFont = "Lat2-Terminus16";
-  #   consoleKeyMap = "us";
-  #   defaultLocale = "en_US.UTF-8";
-  # };
-  console.useXkbConfig = true;
-  
   environment.sessionVariables.TERMINAL = [ "alacritty" ];
   environment.variables = { BROWSER = "chromium"; };
 
   # $ nix search wget
   environment.systemPackages = with pkgs; [
+    steam
     ledger
     unstable.chromium
     firefox
@@ -124,10 +57,14 @@ in {
     unstable.next
     unstable.streamlink
     cura
-    python2
 
     alacritty
     # emacsGit
+
+    ffmpeg-full
+    frei0r
+    kdenlive
+
     emacs
     sqlite
     graphviz
@@ -152,7 +89,7 @@ in {
     ripgrep
     mpv
     imagemagick
-    ffmpeg
+
     maim
     xclip
 
@@ -168,6 +105,7 @@ in {
     alsaUtils
   ];
 
+  hardware.opengl.driSupport32Bit = true;
   services.compton = {
     enable = true;
     # inactiveOpacity = "0.8";
@@ -185,23 +123,11 @@ in {
     support32Bit = true; # need for steam
     package = pkgs.pulseaudioFull;
   };
-  # Some programs need SUID wrappers, can be configured further or are
-  # started in user sessions.
-  # programs.mtr.enable = true;
+
   programs.gnupg.agent = {
     enable = true;
     enableSSHSupport = true;
   };
-
-  # Enable the OpenSSH daemon.
-  # services.openssh.enable = true;
-
-  # Enable CUPS to print documents.
-  # services.printing.enable = true;
-
-  # Enable sound.
-  # sound.enable = true;
-  # hardware.pulseaudio.enable = true;
 
   fonts.enableFontDir = true;
   fonts.enableGhostscriptFonts = true;
@@ -273,10 +199,6 @@ in {
     videoDrivers = [ "nvidia" ];
     dpi = 192;
     enable = true;
-    layout = "us,ru";
-    xkbVariant = "dvorak,";
-    xkbOptions =
-      "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch, grp:alt_shift_toggle";
 
     desktopManager = {
       xterm.enable = false;
