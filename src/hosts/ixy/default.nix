@@ -1,7 +1,10 @@
 { config, lib, pkgs, ... }:
 
 {
-  imports = [./configuration.nix];
+  imports = [
+    ../../default.nix
+    ./configuration.nix
+  ];
 
   # rde = {
   #   username = "abcdw";

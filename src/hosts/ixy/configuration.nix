@@ -27,15 +27,6 @@
   powerManagement.cpuFreqGovernor = lib.mkDefault "powersave";
 
   nixpkgs.config = { allowUnfree = true; };
-  nix = {
-    package = pkgs.unstable.nixFlakes;
-    extraOptions = ''
-      experimental-features = nix-command flakes
-    '';
-    registry.rde.flake = inputs.self;
-    registry.stable.flake = inputs.stable;
-    registry.unstable.flake = inputs.unstable;
-  };
 
   # powerManagement.enable = true;
   # powerManagement.powertop.enable = true;
@@ -156,7 +147,6 @@
   networking.extraHosts = "127.0.0.1 ${config.networking.hostName}.lan";
 
   hardware.bluetooth.enable = true;
-  console.useXkbConfig = true;
   console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-u28n.psf.gz";
 
   time.timeZone = "Europe/Moscow";
@@ -241,9 +231,6 @@
 
     # resolutions = [{ x = 1600; y = 900; }];
     enable = true;
-    layout = "us,ru";
-    xkbVariant = "dvorak,";
-    xkbOptions = "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
 
     displayManager.lightdm.enable = true;
     displayManager.lightdm.autoLogin = {
