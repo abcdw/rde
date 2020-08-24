@@ -20,11 +20,16 @@
     stable.url = "github:NixOS/nixpkgs/nixos-20.03";
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
     home-manager = {
-      url = "github:rycee/home-manager/bqv-flakes";
-      inputs.nixpkgs.follows = "stable";
+      url = "github:rycee/home-manager";
+      flake = false;
+      #inputs.nixpkgs.follows = "stable";
     };
     nur.url = "github:nix-community/NUR";
     emacs.url = "github:nix-community/emacs-overlay";
+    nix-direnv = {
+      url = "github:nix-community/nix-direnv";
+      flake = false;
+    };
     # secrets = {
     #   type = "indirect";
     #   id = "secrets";
@@ -64,6 +69,13 @@
             }
 
             (import ./src/hosts/xenia)
+
+            inputs.self.nixosModules.rde
+            (import ./src/config.nix)
+
+            "${inputs.home-manager}/nixos"
+            (import ./src/home-splitted.nix)
+
             inputs.stable.nixosModules.notDetected
           ];
           specialArgs = { inherit inputs; };
@@ -77,10 +89,13 @@
             }
 
             (import ./src/hosts/ixy)
+
+            "${inputs.home-manager}/nixos"
             (import ./src/home.nix)
-            (import ./src/config.nix)
+
             inputs.self.nixosModules.rde
-            inputs.home-manager.nixosModules.home-manager
+            (import ./src/config.nix)
+
             inputs.stable.nixosModules.notDetected
           ];
           specialArgs = { inherit inputs; };
