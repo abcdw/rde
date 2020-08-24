@@ -44,9 +44,6 @@
     allowedTCPPorts = [ 22 ];
   };
 
-  environment.sessionVariables.TERMINAL = [ "alacritty" ];
-  environment.variables = { BROWSER = "chromium"; };
-
   # $ nix search wget
   environment.systemPackages = with pkgs; [
     steam
