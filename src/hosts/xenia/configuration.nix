@@ -209,11 +209,6 @@
     };
   };
 
-  services.nginx = {
-    enable = true;
-    config = "";
-  };
-
   users.defaultUserShell = pkgs.zsh;
   programs.adb.enable = true;
   programs.zsh = {
