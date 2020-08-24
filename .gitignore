@@ -7,3 +7,4 @@
 /dotfiles/.emacs.d/auto-save/
 .cpcache
 lein
+/.direnv/
