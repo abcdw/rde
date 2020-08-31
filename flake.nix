@@ -40,7 +40,7 @@
   outputs = inputs:
     let
       lib = inputs.stable.lib;
-
+      inputs-with-rde = inputs // { rde = inputs.self; };
       system = "x86_64-linux";
       overlays = {
         unstable = final: prev: {
@@ -78,7 +78,7 @@
 
             inputs.stable.nixosModules.notDetected
           ];
-          specialArgs = { inherit inputs; };
+          specialArgs = { inputs = inputs-with-rde; };
         };
         ixy = lib.nixosSystem {
           system = "x86_64-linux";
@@ -98,7 +98,7 @@
 
             inputs.stable.nixosModules.notDetected
           ];
-          specialArgs = { inherit inputs; };
+          specialArgs = { inputs = inputs-with-rde; };
         };
         aws = lib.nixosSystem {
           system = "x86_64-linux";
