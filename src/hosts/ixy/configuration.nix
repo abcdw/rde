@@ -111,12 +111,7 @@
       device = "nodev";
       enableCryptodisk = true;
       gfxmodeEfi = "1024x768";
-      #       useOSProber = true;
-      extraEntries = ''
-        menuentry "NixOS experimental" {
-        chainloader (hd0,2)+1
-        }
-      '';
+      useOSProber = true;
     };
   };
 
