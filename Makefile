@@ -1,3 +1,6 @@
+build:
+	nixos-rebuild build --flake .
+
 install: switch
 	echo "yay!"
 
