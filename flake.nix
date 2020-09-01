@@ -19,15 +19,17 @@
   inputs = {
     stable.url = "github:NixOS/nixpkgs/nixos-20.03";
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    home-manager = {
-      url = "github:rycee/home-manager";
-      flake = false;
-      #inputs.nixpkgs.follows = "stable";
-    };
+    home-manager.url = "github:rycee/home-manager";
     nur.url = "github:nix-community/NUR";
     emacs.url = "github:nix-community/emacs-overlay";
+    nixos-hardware.url = "github:NixOS/nixos-hardware";
+
     nix-direnv = {
       url = "github:nix-community/nix-direnv";
+      flake = false;
+    };
+    doom-emacs = {
+      url = "github:hlissner/doom-emacs";
       flake = false;
     };
     # secrets = {
@@ -73,7 +75,7 @@
             inputs.self.nixosModules.rde
             (import ./src/config.nix)
 
-            "${inputs.home-manager}/nixos"
+            inputs.home-manager.nixosModules.home-manager
             (import ./src/home-splitted.nix)
 
             inputs.stable.nixosModules.notDetected
@@ -88,9 +90,10 @@
                 [ inputs.nur.overlay overlays.unstable inputs.emacs.overlay ];
             }
 
+            inputs.nixos-hardware.nixosModules.lenovo-thinkpad-x1-7th-gen
             (import ./src/hosts/ixy)
 
-            "${inputs.home-manager}/nixos"
+            inputs.home-manager.nixosModules.home-manager
             (import ./src/home.nix)
 
             inputs.self.nixosModules.rde

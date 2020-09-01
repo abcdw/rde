@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "doom-emacs": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1598957973,
+        "narHash": "sha256-xk2NHjVHh+qePsP83envZyftg9NADY1HG7LVVrEQYRM=",
+        "owner": "hlissner",
+        "repo": "doom-emacs",
+        "rev": "c55391d4ac937569ed8be8e658020b33edd98ce4",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hlissner",
+        "repo": "doom-emacs",
+        "type": "github"
+      }
+    },
     "emacs": {
       "locked": {
         "lastModified": 1595924565,
@@ -16,13 +32,15 @@
       }
     },
     "home-manager": {
-      "flake": false,
+      "inputs": {
+        "nixpkgs": "nixpkgs"
+      },
       "locked": {
-        "lastModified": 1597790005,
-        "narHash": "sha256-inbsm0szFg8/ADQPM031dlGc95xKrMlKd1G1DeMgxP8=",
+        "lastModified": 1598718123,
+        "narHash": "sha256-11UAJTLn+F9tP24eDz5mE5A/TKwQeYzLQhdmy2fXwYs=",
         "owner": "rycee",
         "repo": "home-manager",
-        "rev": "9854342b9f088712ca3c5b67059fff5ec4f59182",
+        "rev": "4fe5afa7557e1f135b02ca9adef7c592852adccb",
         "type": "github"
       },
       "original": {
@@ -47,6 +65,34 @@
         "type": "github"
       }
     },
+    "nixos-hardware": {
+      "locked": {
+        "lastModified": 1598811325,
+        "narHash": "sha256-NwZ/07R7BXejliKYpIY5N9fWwKlSi06VZfFcwevP0+U=",
+        "owner": "NixOS",
+        "repo": "nixos-hardware",
+        "rev": "f2b06f530e0df77a32dcc2a154e59193c0e96fc3",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "repo": "nixos-hardware",
+        "type": "github"
+      }
+    },
+    "nixpkgs": {
+      "locked": {
+        "lastModified": 1595891366,
+        "narHash": "sha256-emx8s0LWUxxm4kh4zcacVP9NmCR5eT/JhzIXn111mAE=",
+        "path": "/nix/store/kdj5yhcwqz156dvgm3vg7k487xsf6ywg-source",
+        "rev": "eeb91b03a5cef25c3931bdd4438f006a293adef9",
+        "type": "path"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
     "nur": {
       "locked": {
         "lastModified": 1595823230,
@@ -64,9 +110,11 @@
     },
     "root": {
       "inputs": {
+        "doom-emacs": "doom-emacs",
         "emacs": "emacs",
         "home-manager": "home-manager",
         "nix-direnv": "nix-direnv",
+        "nixos-hardware": "nixos-hardware",
         "nur": "nur",
         "stable": "stable",
         "unstable": "unstable"

@@ -207,8 +207,23 @@
           "${mod}+Shift+c" = "kill";
           "Shift+Print" =
             "exec ${pkgs.maim}/bin/maim -s | ${pkgs.xclip}/bin/xclip -selection clipboard -t image/png";
+
+          "${mod}+Print" = ''
+            exec ${pkgs.maim}/bin/maim | \
+            ${pkgs.xclip}/bin/xclip -selection clipboard -t image/png'';
+          "Ctrl+${mod}+Print" = ''
+            exec mkdir -p ${xdg.userDirs.pictures}/shots && \
+            ${pkgs.maim}/bin/maim ${xdg.userDirs.pictures}/shots/$(date +%FT%R:%S).png'';
         };
-        bars = [{ position = "top"; }];
+        bars = [{
+          position = "top";
+          statusCommand = "${pkgs.i3status}/bin/i3status";
+            colors = {
+              background = "#000000";
+              statusline = "#ffffff";
+              separator = "#666666";
+            };
+        }];
       };
     };
     services.random-background = {
