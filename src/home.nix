@@ -70,7 +70,7 @@
 
     programs.emacs = {
       enable = true;
-      # package = pkgs.emacsGit;
+      package = pkgs.emacsGit;
     };
 
     programs.mpv = {
