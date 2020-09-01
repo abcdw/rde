@@ -58,7 +58,7 @@
         #import inputs.stable { inherit system; };
       };
 
-      nixosModules = { rde = (import ./src/modules/rde.nix); };
+      nixosModules = { rde = (import ./src/modules/default.nix); };
       nixosConfigurations = {
         xenia = lib.nixosSystem {
           system = "x86_64-linux";

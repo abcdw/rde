@@ -264,7 +264,6 @@
       '';
     };
 
-    programs.direnv.enable = true;
     services.lorri.enable = true;
 
     programs.git = {
