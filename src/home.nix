@@ -264,8 +264,6 @@
       '';
     };
 
-    services.lorri.enable = true;
-
     programs.git = {
       enable = true;
       package = pkgs.gitAndTools.gitFull;
