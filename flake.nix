@@ -51,9 +51,14 @@
       };
     in {
 
-      template = { };
-
-      inpts = inputs;
+      templates = {
+        python.poetry = {
+          path = ./templates/python/poetry;
+          description = "Project with poetry2nix, nix devel and nix build.";
+        };
+        rde = {};
+      };
+      defaultTemplate = inputs.self.templates.rde;
 
       devShell."${system}" = import ./shell.nix {
         pkgs = inputs.stable.legacyPackages.${system};
@@ -61,6 +66,8 @@
       };
 
       nixosModules = { rde = (import ./src/modules/default.nix); };
+      nixosModule = inputs.self.nixosModules.rde;
+
       nixosConfigurations = {
         xenia = lib.nixosSystem {
           system = "x86_64-linux";

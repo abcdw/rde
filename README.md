@@ -42,6 +42,12 @@ need to open a shell with `flakes` installed.
 nix-shell -p nixFlakes
 ```
 
+## Using templates
+
+```
+nix flake new -t "github:abcdw/rde#python.poetry" ~/work/python-poetry-project 
+```
+
 ## Get and configure rde
 
 Create a directory with configuration:
