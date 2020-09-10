@@ -42,6 +42,9 @@ need to open a shell with `flakes` installed.
 nix-shell -p nixFlakes
 ```
 
+More information about flake installation:
+https://nixos.wiki/wiki/Flakes#Installing_nix_flakes
+
 ## Using templates
 
 ```
