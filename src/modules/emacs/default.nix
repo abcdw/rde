@@ -6,7 +6,16 @@ in with lib; {
   options = {
     rde.emacs = {
       enable = mkEnableOption "Enable rde emacs";
-      layers = { };
+      layers = {
+        enableEverything = mkEnableOption
+          "Enable all rde emacs layers with all keybindings and features";
+        use-package = {
+          enable = true;
+        };
+        reasonable-defaults = {
+          
+        };
+      };
     };
   };
   config = mkIf config.rde.emacs.enable {
@@ -28,6 +37,8 @@ in with lib; {
             org-roam
             company-org-roam
             ivy
+            olivetti
+            restart-emacs
           ];
       };
     };

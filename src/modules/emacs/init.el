@@ -24,7 +24,7 @@
 
 ;; (set-face-attribute 'default (selected-frame) :family "Iosevka" :weight 'semi-light)
 ;;; https://www.freedesktop.org/software/fontconfig/fontconfig-user.html
-(setq my-font (font-spec :family "Iosevka" :weight 'semi-light :size 26))
+(setq my-font (font-spec :family "Iosevka" :weight 'semi-light :size 28))
 (set-face-attribute 'default nil :font my-font)
 
 
@@ -89,5 +89,9 @@
   (ivy-mode 1)
   (global-set-key (kbd "C-c C-r") 'ivy-resume))
 
+(use-package olivetti
+  :config
+  (setq olivetti-minimum-body-width 80))
 
+(use-package restart-emacs)
 ;; TODO: Visualise regexp substitution
