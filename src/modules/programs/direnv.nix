@@ -2,7 +2,7 @@
 
 with lib; {
   options = {
-    direnv = { enable = mkEnableOption "direnv with flakes support"; };
+    rde.direnv = { enable = mkEnableOption "direnv with flakes support"; };
   };
   config = mkIf config.rde.direnv.enable {
     home-manager.users.${config.rde.username} = {

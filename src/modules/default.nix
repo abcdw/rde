@@ -30,7 +30,6 @@ with lib; {
       browserpass = { enable = mkEnableOption "browserpass plugin"; };
 
       zsh = { enable = mkEnableOption "zsh simple configuration"; };
-      direnv = { enable = mkEnableOption "direnv with flakes support"; };
     };
   };
 
