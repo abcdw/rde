@@ -1,6 +1,32 @@
 ;; (menu-bar-mode -1)
 
-; (setq font-use-system-font t)
+					; (setq font-use-system-font t)
+
+(defun run-command-in-eshell (cmd)
+  (eshell)
+  (eshell-kill-input)
+  (end-of-buffer)
+  (insert cmd)
+  (eshell-send-input))
+
+(defun rde/rebuild ()
+  (interactive)
+  (run-command-in-eshell "nixos-rebuild build --flake /home/abcdw/work/rde"))
+
+(defun rde/switch ()
+  (interactive)
+  (run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde"))
+
+(defun rde/switch-and-restart-emacs ()
+  (interactive)
+  (run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde && restart-emacs"))
+
+
+
+;; (call-process "sudo nixos-rebuild switch --flake /home/abcdw/work/rde" nil (get-buffer-create "test-buf"))
+;; (call-process "sudo nixos-rebuild switch --flake /home/abcdw/work/rde" nil (get-buffer-create "test-buf"))
+;; (if (eshell-exit-success-p)
+;;     (restart-emacs))
 
 ;; (set-face-attribute 'default (selected-frame) :height 100
 ;; 		    :weight 'semi-light)
@@ -31,6 +57,7 @@
 ;; ;; It doesn't
 
 
+(global-set-key (kbd "C-c r r") 'rde/switch-and-restart-emacs)
 (global-set-key (kbd "C-c f e") '(lambda () (interactive) (find-file "~/work/rde/src/modules/emacs/init.el")))
 (global-set-key (kbd "C-c f h") '(lambda () (interactive) (find-file "~/work/rde/src/home.nix")))
 (global-set-key (kbd "C-c f i") '(lambda () (interactive) (find-file "~/work/rde/src/hosts/ixy/configuration.nix")))
@@ -65,9 +92,10 @@
 (use-package org :defer t)
 
 (use-package org-roam
-  :defer t 
   :hook
   (after-init . org-roam-mode)
+  :config
+  (org-roam-mode 1)
   :custom
   (org-roam-directory "~/work/org-files/notes")
   :bind (
@@ -80,9 +108,13 @@
          (("C-c n I" . org-roam-insert-immediate))))
 
 (use-package company-org-roam
-  :defer t
+  :after org-roam company ; saves 0.3s startup time
   :config
   (push 'company-org-roam company-backends))
+
+(use-package company
+  :hook
+  (after-init . global-company-mode))
 
 (use-package ivy
   :config
