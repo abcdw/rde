@@ -1,7 +1,7 @@
 { config, lib, pkgs, inputs, ... }:
 
 with lib; {
-  imports = [ ./programs/direnv.nix ];
+  imports = [ ./programs/direnv.nix ./emacs ];
   options = {
     rde = {
       name = mkOption {
