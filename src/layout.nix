@@ -6,6 +6,6 @@
     layout = "us,ru";
     xkbVariant = "dvorak,";
     xkbOptions =
-      "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch, grp:alt_shift_toggle";
+      "ctrl:nocaps, grp:win_space_toggle, grp:rctrl_switch";
   };
 }
