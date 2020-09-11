@@ -10,5 +10,6 @@
     registry.nixpkgs.flake = inputs.stable;
     registry.stable.flake = inputs.stable;
     registry.unstable.flake = inputs.unstable;
+    registry.emacs.flake = inputs.emacs;
   };
 }
