@@ -34,19 +34,22 @@
       iosevka
       source-code-pro
       open-sans # required for telegram app
-      unstable.nerdfonts
+#      unstable.nerdfonts
     ];
     other-packages = with pkgs; [ tdesktop xfce.thunar gopass ];
     home-packages = dev-packages ++ cli-packages ++ media-packages
       ++ font-packages ++ other-packages;
 
     ssh-tunnel-port = 8888;
+
   in rec {
     home.packages = home-packages;
 
     home.sessionVariables = {
+      # History files probably should go to STATE dir: https://wiki.debian.org/XDGBaseDirectorySpecification
       LESSHISTFILE = "${xdg.dataHome}/.lesshst";
       HISTFILE = "${xdg.dataHome}/bash/bash_history";
+      PSQL_HISTORY = "${xdg.dataHome}/pg/psql_history";
     };
 
     home.stateVersion = "20.09";
@@ -54,9 +57,11 @@
     home.keyboard.variant = "dvorak,";
     home.keyboard.options =
       [ "ctrl:nocaps" "grp:win_space_toggle" "grp:rctrl_switch" ];
+
     home.homeDirectory = "/home/abcdw";
 
     xdg.dataHome = "${home.homeDirectory}/.local/share";
+    xdg.configHome = "${home.homeDirectory}/.config";
     xdg.userDirs = {
       enable = true;
       desktop = "${home.homeDirectory}/desktop";
