@@ -10,18 +10,16 @@ with lib; {
       name = mkOption {
         type = types.str;
         description = ''
-          Person full name, will be used across
-             configs '';
+          Person full name, will be used across configs'';
       };
       username = mkOption {
         type = types.str;
-        description = "Username, will be used across configs ";
+        description = "Username, will be used across configs";
       };
       email = mkOption {
         type = types.str;
         description = ''
-          Email address, will be used
-             across configs '';
+          Email address, will be used across configs'';
       };
       fontSize = mkOption {
         default = 12;
@@ -33,7 +31,7 @@ with lib; {
         default = { };
         description = ''
           It's a proxy object, which just copies everything to
-                    home-manager.users.${config.rde.username}'';
+          home-manager.users.${config.rde.username}'';
       };
 
       zsh = { enable = mkEnableOption "zsh simple configuration"; };
