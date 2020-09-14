@@ -75,8 +75,9 @@
   ;;
   ;; This is to empower help commands with their contextual awareness,
   ;; such as `describe-symbol'.
-  
-  ;; (setq use-package-hook-name-suffix nil)
+  ;; without ivy `describe-variable' won't suggest after-init-hook for
+  ;; after-init
+  (setq use-package-hook-name-suffix nil)
   )
 
 (eval-when-compile
@@ -108,7 +109,7 @@
 
 (use-package org-roam
   :hook
-  (after-init . org-roam-mode)
+  (after-init-hook . org-roam-mode)
   :custom
   (org-roam-directory "~/work/org-files/notes")
   :bind (
@@ -127,7 +128,7 @@
 
 (use-package company
   :hook
-  (after-init . global-company-mode))
+  (after-init-hook . global-company-mode))
 
 (use-package ivy
   :demand t
@@ -150,10 +151,17 @@
   (setq uniquify-strip-common-suffix nil)
   (setq uniquify-after-kill-buffer-p t))
 
+(use-package keycast
+  ;; :config
+  ;; (setq keycast-window-predicate 'keycast-bottom-left-window-p)
+  :bind ("C-c t k" . keycast-mode))
+
 ;; custom file is set for one session
 ;; (setq custom-file (expand-file-name
 ;;                    (format "custom-%d-%d.el" (emacs-pid) (random))
 ;;                    temporary-file-directory))
+
+;; (setq org-hide-emphasis-markers t)
 
 (defgroup rde-core nil
   "Configuration variables for rde Emacs."
