@@ -4,7 +4,7 @@
   home-manager.useGlobalPkgs = true;
   home-manager.useUserPackages = true;
   home-manager.users.abcdw = let
-    dev-packages = with pkgs; [ sqlite gnupg ];
+    dev-packages = with pkgs; [ gnupg ];
     cli-packages = with pkgs; [
       nixfmt
       unzip
@@ -25,7 +25,7 @@
       pavucontrol
     ];
     font-packages = with pkgs; [
-      emacs-all-the-icons-fonts
+
       corefonts # Micrsoft free fonts
       unstable.font-awesome
       fira-code
@@ -68,10 +68,6 @@
       templates = "${home.homeDirectory}/templates";
     };
 
-    programs.emacs = {
-      enable = true;
-      package = pkgs.emacsGit;
-    };
 
     programs.mpv = {
       enable = true;
