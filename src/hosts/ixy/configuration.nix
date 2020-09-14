@@ -28,18 +28,18 @@
 
   nixpkgs.config = { allowUnfree = true; };
 
-  # powerManagement.enable = true;
-  # powerManagement.powertop.enable = true;
+  powerManagement.enable = true;
+  powerManagement.powertop.enable = true;
 
-  # services.tlp = {
-  #   enable = true;
-  #   extraConfig = ''
-  #     # CPU_SCALING_GOVERNOR_ON_BAT=powersave
-  #     # ENERGY_PERF_POLICY_ON_BAT=powersave
-  #     START_CHARGE_THRESH_BAT0=85
-  #     STOP_CHARGE_THRESH_BAT0=90
-  #   '';
-  # };
+  services.tlp = {
+    enable = true;
+    extraConfig = ''
+      CPU_SCALING_GOVERNOR_ON_BAT=powersave
+      ENERGY_PERF_POLICY_ON_BAT=powersave
+      START_CHARGE_THRESH_BAT0=90
+      STOP_CHARGE_THRESH_BAT0=95
+    '';
+  };
 
   #######################################################
   # systemd.services.powertop = {                       #
