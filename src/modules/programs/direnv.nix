@@ -5,7 +5,7 @@ with lib; {
     rde.direnv = { enable = mkEnableOption "direnv with flakes support"; };
   };
   config = mkIf config.rde.direnv.enable {
-    home-manager.users.${config.rde.username} = {
+    rde.home-manager = {
       programs.direnv = {
         enable = true;
         # enableNixDirenvIntegration = true;

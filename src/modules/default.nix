@@ -27,6 +27,13 @@ with lib; {
         type = types.int;
       };
 
+      home-manager = mkOption {
+        type = types.attrs;
+        default = { };
+        description = ''
+          It's a proxy object, which just copies everything to
+                    home-manager.users.${config.rde.username}'';
+      };
       browserpass = { enable = mkEnableOption "browserpass plugin"; };
 
       zsh = { enable = mkEnableOption "zsh simple configuration"; };
@@ -34,6 +41,7 @@ with lib; {
   };
 
   config = mkMerge [
+    { home-manager.users.${config.rde.username} = config.rde.home-manager; }
     (mkIf config.rde.browserpass.enable {
       home-manager.users.${config.rde.username} = {
         programs.browserpass.enable = true;
