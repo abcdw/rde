@@ -88,10 +88,23 @@ in {
   };
 
   config = mkIf config.rde.emacs.enable {
-    _module.args.emacs-dir = "${hm.xdg.configHome}" /emacs;
-    home-manager.users.${config.rde.username} = {
+    #    _module.args.emacs-dir = "${hm.xdg.configHome}" /emacs;
+    home-manager.users."${username}" = {
       home.file."${emacs-init}".text = mkBefore (readFile ./init.el);
-      home.file."${emacs-early-init}".source = ./early-init.el;
+      home.file."${emacs.files.early-init}".source = ./early-init.el;
+      home.file."${emacs.files.rde-features}".text = emacs.config
+        + "(provide 'rde-features)";
+      home.file."${emacs.files.rde-variables}".text = mkAfter (''
+        (defconst rde/username "${username}" "Username prvoided by rde.")
+        (defconst rde/test-var "test-value" "Just a test variable.")
+        (defconst rde/custom-file "${emacs.files.custom}" "Path to custom.el.")
+        (defconst rde/font
+          (font-spec :family "${config.rde.emacs.font}"
+                     :weight 'semi-light
+                     :size ${toString config.rde.emacs.fontSize}))
+              '' + ''
+          (provide 'rde-variables)
+        '');
 
       home.packages = with pkgs; [ emacs-all-the-icons-fonts sqlite ];
       programs.emacs = {

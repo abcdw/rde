@@ -1,6 +1,30 @@
-;; (setq font-use-system-font t)
+(eval-and-compile
+  ;; (setq use-package-expand-minimally nil)
+  (setq use-package-enable-imenu-support t)
+  (setq use-package-compute-statistics t)
 
-(setq rde/font (font-spec :family "Iosevka" :weight 'semi-light :size 28))
+  ;; The following is VERY IMPORTANT.  Write hooks using their real name
+  ;; instead of a shorter version: after-init ==> `after-init-hook'.
+  ;;
+  ;; This is to empower help commands with their contextual awareness,
+  ;; such as `describe-symbol'.
+  ;; without ivy `describe-variable' won't suggest after-init-hook for
+  ;; after-init
+  (setq use-package-hook-name-suffix nil))
+
+(eval-when-compile
+  (require 'use-package))
+
+(add-to-list 'load-path
+	     (expand-file-name "rde/" user-emacs-directory))
+
+(eval-when-compile
+  (require 'rde-variables))
+
+(require 'rde-features)
+
+(setq custom-file rde/custom-file)
+
 (set-face-attribute 'default nil :font rde/font)
 
 (defun run-command-in-eshell (cmd)
@@ -22,19 +46,8 @@
   (interactive)
   (run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde && restart-emacs"))
 
-
-
-;; (call-process "sudo nixos-rebuild switch --flake /home/abcdw/work/rde" nil (get-buffer-create "test-buf"))
-;; (call-process "sudo nixos-rebuild switch --flake /home/abcdw/work/rde" nil (get-buffer-create "test-buf"))
-;; (if (eshell-exit-success-p)
-;;     (restart-emacs))
-
-;; (set-face-attribute 'default (selected-frame) :height 100
-;; 		    :weight 'semi-light)
-
 ;;; Configs to reference
 ;;; https://github.com/bbatsov/emacs.d/blob/master/init.el
-;;; https://github.com/balsoft/nixos-config/blob/master/modules/applications/emacs/default.nix
 
 ;; It works
 
@@ -64,24 +77,6 @@
 (global-set-key (kbd "s-n") 'switch-to-next-buffer)
 (global-set-key (kbd "s-p") 'switch-to-prev-buffer)
 
-
-(eval-and-compile
-  ;; (setq use-package-expand-minimally nil)
-  (setq use-package-enable-imenu-support t)
-  (setq use-package-compute-statistics t)
-
-  ;; The following is VERY IMPORTANT.  Write hooks using their real name
-  ;; instead of a shorter version: after-init ==> `after-init-hook'.
-  ;;
-  ;; This is to empower help commands with their contextual awareness,
-  ;; such as `describe-symbol'.
-  ;; without ivy `describe-variable' won't suggest after-init-hook for
-  ;; after-init
-  (setq use-package-hook-name-suffix nil)
-  )
-
-(eval-when-compile
-  (require 'use-package))
 
 
 (use-package nix-mode
