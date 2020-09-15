@@ -9,29 +9,26 @@ with lib; {
         mkEnableOption "Enable reproducible development environment module";
       name = mkOption {
         type = types.str;
-        description = ''
-          Person full name, will be used across configs'';
+        description = "Person full name, will be used across configs";
       };
+
       username = mkOption {
         type = types.str;
         description = "Username, will be used across configs";
       };
+      
       email = mkOption {
         type = types.str;
-        description = ''
-          Email address, will be used across configs'';
+        description = "Email address, will be used across configs";
       };
+
+      font = mkOption {
+        type = types.str;
+      };
+
       fontSize = mkOption {
         default = 12;
         type = types.int;
-      };
-
-      home-manager = mkOption {
-        type = types.attrs;
-        default = { };
-        description = ''
-          It's a proxy object, which just copies everything to
-          home-manager.users.${config.rde.username}'';
       };
 
       zsh = { enable = mkEnableOption "zsh simple configuration"; };
@@ -39,6 +36,6 @@ with lib; {
   };
 
   config = mkIf config.rde.enable {
-    home-manager.users.${config.rde.username} = config.rde.home-manager;
+    _module.args.username = "${config.rde.username}";
   };
 }
