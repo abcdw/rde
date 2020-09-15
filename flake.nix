@@ -16,11 +16,14 @@
   # TODO: Secrets from another flake
   # TODO: i3 icons for ws 
 
-  inputs = {
+  inputs = rec {
     stable.url = "github:NixOS/nixpkgs/nixos-20.03";
     unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-    home-manager.url = "github:rycee/home-manager";
-    nur.url = "github:nix-community/NUR";
+    home-manager = {
+      url = "github:rycee/home-manager";
+      inputs.nixpkgs.follows = "stable";
+    };
+    # nur.url = "github:nix-community/NUR";
     emacs.url = "github:nix-community/emacs-overlay";
     nixos-hardware.url = "github:NixOS/nixos-hardware";
 
@@ -28,10 +31,10 @@
       url = "github:nix-community/nix-direnv";
       flake = false;
     };
-    doom-emacs = {
-      url = "github:hlissner/doom-emacs";
-      flake = false;
-    };
+    # doom-emacs = {
+    #   url = "github:hlissner/doom-emacs";
+    #   flake = false;
+    # };
     # secrets = {
     #   type = "indirect";
     #   id = "secrets";
@@ -46,7 +49,10 @@
       system = "x86_64-linux";
       overlays = {
         unstable = final: prev: {
-          unstable = (import inputs.unstable { inherit system; });
+          unstable = (import inputs.unstable {
+            overlays = [ inputs.emacs.overlay ];
+            inherit system;
+          });
         };
       };
     in {
@@ -56,7 +62,7 @@
           path = ./templates/python/poetry;
           description = "Project with poetry2nix, nix devel and nix build.";
         };
-        rde = {};
+        rde = { };
       };
       defaultTemplate = inputs.self.templates.rde;
 
@@ -72,10 +78,7 @@
         xenia = lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            {
-              nixpkgs.overlays =
-                [ inputs.nur.overlay overlays.unstable inputs.emacs.overlay ];
-            }
+            { nixpkgs.overlays = [ overlays.unstable ]; }
 
             (import ./src/hosts/xenia)
 
@@ -92,10 +95,7 @@
         ixy = lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            {
-              nixpkgs.overlays =
-                [ inputs.nur.overlay overlays.unstable inputs.emacs.overlay ];
-            }
+            { nixpkgs.overlays = [ overlays.unstable ]; }
 
             inputs.nixos-hardware.nixosModules.lenovo-thinkpad-x1-7th-gen
             (import ./src/hosts/ixy)

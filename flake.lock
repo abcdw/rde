@@ -1,21 +1,5 @@
 {
   "nodes": {
-    "doom-emacs": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1598957973,
-        "narHash": "sha256-xk2NHjVHh+qePsP83envZyftg9NADY1HG7LVVrEQYRM=",
-        "owner": "hlissner",
-        "repo": "doom-emacs",
-        "rev": "c55391d4ac937569ed8be8e658020b33edd98ce4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "hlissner",
-        "repo": "doom-emacs",
-        "type": "github"
-      }
-    },
     "emacs": {
       "locked": {
         "lastModified": 1599740367,
@@ -33,14 +17,16 @@
     },
     "home-manager": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": [
+          "stable"
+        ]
       },
       "locked": {
-        "lastModified": 1598718123,
-        "narHash": "sha256-11UAJTLn+F9tP24eDz5mE5A/TKwQeYzLQhdmy2fXwYs=",
+        "lastModified": 1600023128,
+        "narHash": "sha256-oSkMOe0rQ90bC5pfNSl85ren05cmk9Z9xrzrf5rVbr0=",
         "owner": "rycee",
         "repo": "home-manager",
-        "rev": "4fe5afa7557e1f135b02ca9adef7c592852adccb",
+        "rev": "472ca211cac604efdf621337067a237be9df389e",
         "type": "github"
       },
       "original": {
@@ -80,53 +66,23 @@
         "type": "github"
       }
     },
-    "nixpkgs": {
-      "locked": {
-        "lastModified": 1595891366,
-        "narHash": "sha256-emx8s0LWUxxm4kh4zcacVP9NmCR5eT/JhzIXn111mAE=",
-        "path": "/nix/store/kdj5yhcwqz156dvgm3vg7k487xsf6ywg-source",
-        "rev": "eeb91b03a5cef25c3931bdd4438f006a293adef9",
-        "type": "path"
-      },
-      "original": {
-        "id": "nixpkgs",
-        "type": "indirect"
-      }
-    },
-    "nur": {
-      "locked": {
-        "lastModified": 1595823230,
-        "narHash": "sha256-tIHJEzXxxmGZWFw78aMvmaHApiehOP52UICVTMjHSBA=",
-        "owner": "nix-community",
-        "repo": "NUR",
-        "rev": "00556f74dd250370b9317539ac373009d1d62932",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nix-community",
-        "repo": "NUR",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
-        "doom-emacs": "doom-emacs",
         "emacs": "emacs",
         "home-manager": "home-manager",
         "nix-direnv": "nix-direnv",
         "nixos-hardware": "nixos-hardware",
-        "nur": "nur",
         "stable": "stable",
         "unstable": "unstable"
       }
     },
     "stable": {
       "locked": {
-        "lastModified": 1595891366,
-        "narHash": "sha256-emx8s0LWUxxm4kh4zcacVP9NmCR5eT/JhzIXn111mAE=",
+        "lastModified": 1599903709,
+        "narHash": "sha256-tinVKY7zRdSXmVOp7BAulNtIb2iP5nvNp5UAxihKXNI=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "eeb91b03a5cef25c3931bdd4438f006a293adef9",
+        "rev": "252bfe0107587d40092057f338e9ffcf7bbd90cb",
         "type": "github"
       },
       "original": {
