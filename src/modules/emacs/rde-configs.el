@@ -1,4 +1,32 @@
+;;; use-package configuration
+(eval-and-compile
+  (setq use-package-enable-imenu-support t)
+  (setq use-package-compute-statistics t)
+  (setq use-package-verbose t)
+  ;; The following is VERY IMPORTANT.  Write hooks using their real name
+  ;; instead of a shorter version: after-init ==> `after-init-hook'.
+  ;;
+  ;; This is to empower help commands with their contextual awareness,
+  ;; such as `describe-symbol'.
+  ;; without ivy `describe-variable' won't suggest after-init-hook for
+  ;; after-init
+  (setq use-package-hook-name-suffix nil))
+
 (require 'use-package)
+
+;;; May improve startup time, but doesn't work with compute-statistics
+;; (eval-when-compile
+;;   (require 'use-package))
+;; (require 'bind-key)
+
+;; TODO: add use-package info to info dirs
+;; https://jwiegley.github.io/use-package/installation/
+
+
+
+
+
+
 
 (setq isearch-lazy-count t)
 
@@ -90,24 +118,10 @@
 ;; (setq org-hide-emphasis-markers t)
 
 
-(use-package org-roam
-  :hook
-  (after-init-hook . org-roam-mode)
-  :config
-  (setq org-roam-directory "~/work/org-files/notes")
-  :bind (
-	 :map org-roam-mode-map
-         (("C-c n l" . org-roam)
-          ("C-c n f" . org-roam-find-file)
-          ("C-c n g" . org-roam-graph-show))
-         :map org-mode-map
-         (("C-c n i" . org-roam-insert))
-         (("C-c n I" . org-roam-insert-immediate))))
-
-(use-package company-org-roam
-  :after org-roam company ; saves 0.3s startup time
-  :config
-  (push 'company-org-roam company-backends))
+;; (use-package company-org-roam
+;;   :after org-roam company ; saves 0.3s startup time
+;;   :config
+;;   (push 'company-org-roam company-backends))
 
 (use-package company
   :hook
@@ -144,5 +158,3 @@
 ;;                    (format "custom-%d-%d.el" (emacs-pid) (random))
 ;;                    temporary-file-directory))
 
-
-(provide 'rde-configs)

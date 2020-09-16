@@ -22,6 +22,11 @@ with lib; {
         description = "Email address, will be used across configs";
       };
 
+      workDir = mkOption {
+        type = types.path;
+        description = "Path to directory with projects.";
+      };
+
       font = mkOption {
         type = types.str;
       };
