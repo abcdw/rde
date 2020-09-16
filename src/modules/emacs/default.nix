@@ -9,7 +9,8 @@ let
   # Source: https://gitlab.com/rycee/nur-expressions/-/blob/master/hm-modules/emacs-init.nix#L9
   packageFunctionType = mkOptionType {
     name = "packageFunction";
-    description = "Function from epkgs to packages, like epkgs: [ epkgs.org ]";
+    description =
+      "Function returning list of packages, like epkgs: [ epkgs.org ]";
     check = isFunction;
     merge = mergeOneOption;
   };
@@ -17,7 +18,10 @@ let
   varType = types.submodule ({ name, config, ... }: {
     options = {
       value = mkOption { type = types.either types.str types.int; };
-      docstring = mkOption { type = types.str; default = ""; };
+      docstring = mkOption {
+        type = types.str;
+        default = "";
+      };
     };
   });
 
@@ -34,16 +38,17 @@ let
 
   precfgType = types.submodule ({ name, config, ... }: {
     options = {
-      enable = mkEnableOption "Emacs package ${name}";
+      enable = mkEnableOption "Enable precfg.${name}";
 
-      package = mkOption {
-        type = types.either (types.str // { description = "name of package"; })
+      packages = mkOption {
+        type = types.either
+          ((types.listOf types.str) // { description = "List of packages"; })
           packageFunctionType;
-        default = name;
+        default = [ name ];
         description = ''
           The package to use for this module. Either the package name
           within the Emacs package set or a function taking the Emacs
-          package set and returning a package.
+          package set and returning a package list.
         '';
       };
       config = mkIf config.enable {
@@ -63,9 +68,6 @@ let
 in {
 
   imports = [ ];
-  #rde-core
-  #rde-defaults
-  #
   options = {
     rde.emacs = {
       enable = mkEnableOption "Enable rde emacs";
@@ -79,10 +81,6 @@ in {
       files = {
         init = mkROFileOption "${config.rde.emacs.dir}/init.el";
         early-init = mkROFileOption "${config.rde.emacs.dir}/early-init.el";
-        rde-features =
-          mkROFileOption "${config.rde.emacs.dir}/rde/rde-features.el";
-        rde-variables =
-          mkROFileOption "${config.rde.emacs.dir}/rde/rde-variables.el";
         custom = mkOption {
           type = types.path;
           description = "Path to custom.el.";
@@ -102,14 +100,14 @@ in {
       config = mkOption {
         type = types.lines;
         description = ''
-          Every feature adds use-package declaration(s) here.
+          Every config adds use-package declaration(s) here.
           Don't use it for user defined configurations.'';
         default = "";
       };
 
       vars = mkOption {
         type = types.attrsOf varType;
-        description = "Every precfg adds variable declaration(s) here.";
+        description = "Every config adds variable declaration(s) here.";
         default = "";
       };
 
@@ -126,11 +124,10 @@ in {
   };
 
   config = mkIf config.rde.emacs.enable {
-    #    _module.args.emacs-dir = "${hm.xdg.configHome}" /emacs;
     rde.emacs.vars = {
       "rde/username" = {
         value = username;
-        #        docstring = "Username provided by rde.";
+        docstring = "System username provided by rde.";
       };
       "rde/custom-file" = {
         value = cfg.files.custom;
@@ -140,20 +137,41 @@ in {
       "rde/font-size".value = cfg.fontSize;
     };
     home-manager.users."${username}" = {
-      home.file."${cfg.files.init}".text = mkBefore (readFile ./init.el);
+      home.file."${cfg.files.init}".text = ''
+        (require 'rde-variables)
+        (require 'rde-configs)
+      ''
+      ;
       home.file."${cfg.files.early-init}".source = ./early-init.el;
-      home.file."${cfg.files.rde-features}".text = cfg.config
-        + "(provide 'rde-features)";
-      home.file."${cfg.files.rde-variables}".text = mkAfter
-        ((varSetToConfig cfg.vars) + ''
-          (provide 'rde-variables)
-        '');
 
       home.packages = with pkgs; [
         emacs-all-the-icons-fonts
         sqlite
         (emacs-with-pkgs (epkgs:
-          with epkgs; [
+          let
+            build-emacs-package = pname: text:
+              (epkgs.trivialBuild {
+                pname = pname;
+                version = "1.0";
+                src = pkgs.writeText "${pname}.el" text;
+                packageRequires = [ epkgs.use-package ];
+                preferLocalBuild = true;
+                allowSubstitutes = false;
+              });
+
+            rde-variables-text = (varSetToConfig cfg.vars) + ''
+
+              (provide 'rde-variables)
+            '';
+            rde-variables-package =
+              build-emacs-package "rde-variables" rde-variables-text;
+            rde-configs-package =
+              build-emacs-package "rde-configs" (readFile ./rde-configs.el);
+            
+
+          in with epkgs; [
+            rde-variables-package
+            rde-configs-package
             use-package
             nix-mode
             magit

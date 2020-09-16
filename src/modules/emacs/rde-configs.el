@@ -1,30 +1,4 @@
-(eval-and-compile
-  ;; (setq use-package-expand-minimally nil)
-  (setq use-package-enable-imenu-support t)
-  (setq use-package-compute-statistics t)
-
-  ;; The following is VERY IMPORTANT.  Write hooks using their real name
-  ;; instead of a shorter version: after-init ==> `after-init-hook'.
-  ;;
-  ;; This is to empower help commands with their contextual awareness,
-  ;; such as `describe-symbol'.
-  ;; without ivy `describe-variable' won't suggest after-init-hook for
-  ;; after-init
-  (setq use-package-hook-name-suffix nil))
-
-(eval-when-compile
-  (require 'use-package))
-
-(add-to-list 'load-path
-	     (expand-file-name "rde/" user-emacs-directory))
-
-(eval-when-compile
-  (require 'rde-variables))
-
-(require 'rde-features)
-
-
-
+(require 'use-package)
 
 (setq isearch-lazy-count t)
 
@@ -33,6 +7,7 @@
 (setq custom-file rde/custom-file)
 
 (use-package faces
+  :config
   (set-face-attribute 'default nil :font
 		      (font-spec :family rde/font-family
 				 :weight 'semi-light
@@ -112,6 +87,8 @@
         "-aFhl --group-directories-first --time-style=long-iso"))
   
 ;; (use-package org :defer t)
+;; (setq org-hide-emphasis-markers t)
+
 
 (use-package org-roam
   :hook
@@ -167,17 +144,5 @@
 ;;                    (format "custom-%d-%d.el" (emacs-pid) (random))
 ;;                    temporary-file-directory))
 
-;; (setq org-hide-emphasis-markers t)
 
-(defgroup rde-core nil
-  "Configuration variables for rde Emacs."
-  :group 'convenience
-  :prefix "rde-"
-  :link '(url-link :tag "GitHub" "https://github.com/abcdw/rde"))
-
-(defcustom rde-test-variable t
-  "Non-nil values enable rde test feature."
-  :type 'boolean
-  :group 'rde-core)
-
-
+(provide 'rde-configs)
