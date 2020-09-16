@@ -23,9 +23,20 @@
 
 (require 'rde-features)
 
+
+
+
+(setq isearch-lazy-count t)
+
+
+
 (setq custom-file rde/custom-file)
 
-(set-face-attribute 'default nil :font rde/font)
+(use-package faces
+  (set-face-attribute 'default nil :font
+		      (font-spec :family rde/font-family
+				 :weight 'semi-light
+				 :size rde/font-size)))
 
 (defun run-command-in-eshell (cmd)
   (eshell)
@@ -100,13 +111,13 @@
   (setq dired-listing-switches
         "-aFhl --group-directories-first --time-style=long-iso"))
   
-(use-package org :defer t)
+;; (use-package org :defer t)
 
 (use-package org-roam
   :hook
   (after-init-hook . org-roam-mode)
-  :custom
-  (org-roam-directory "~/work/org-files/notes")
+  :config
+  (setq org-roam-directory "~/work/org-files/notes")
   :bind (
 	 :map org-roam-mode-map
          (("C-c n l" . org-roam)

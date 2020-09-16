@@ -2,8 +2,56 @@
 with lib;
 let
   hm = config.home-manager.users.${username};
-  emacs-with-pkgs = (pkgs.unstable.emacsPackagesGen pkgs.unstable.emacsGit).emacsWithPackages;
+  emacs-with-pkgs =
+    (pkgs.unstable.emacsPackagesGen pkgs.unstable.emacsGit).emacsWithPackages;
   cfg = config.rde.emacs;
+
+  # Source: https://gitlab.com/rycee/nur-expressions/-/blob/master/hm-modules/emacs-init.nix#L9
+  packageFunctionType = mkOptionType {
+    name = "packageFunction";
+    description = "Function from epkgs to packages, like epkgs: [ epkgs.org ]";
+    check = isFunction;
+    merge = mergeOneOption;
+  };
+
+  varType = types.submodule ({ name, config, ... }: {
+    options = {
+      value = mkOption { type = types.either types.str types.int; };
+      docstring = mkOption { type = types.str; default = ""; };
+    };
+  });
+
+  varSetToConfig = v:
+    let
+      valueToStr = v:
+        if (isString v.value) then ''"${v.value}"'' else toString v.value;
+      ifDocString = v:
+        if (stringLength v.docstring > 0) then " \"${v.docstring}\"" else "";
+      tmp = mapAttrsToList (name: value: ''
+        (defvar ${name} ${valueToStr value}${ifDocString value})
+      '') v;
+    in concatStrings tmp;
+
+  precfgType = types.submodule ({ name, config, ... }: {
+    options = {
+      enable = mkEnableOption "Emacs package ${name}";
+
+      package = mkOption {
+        type = types.either (types.str // { description = "name of package"; })
+          packageFunctionType;
+        default = name;
+        description = ''
+          The package to use for this module. Either the package name
+          within the Emacs package set or a function taking the Emacs
+          package set and returning a package.
+        '';
+      };
+      config = mkIf config.enable {
+
+      };
+
+    };
+  });
 
   mkROFileOption = path:
     (mkOption {
@@ -60,8 +108,8 @@ in {
       };
 
       vars = mkOption {
-        type = types.lines;
-        description = "Every feature adds variable declaration(s) here.";
+        type = types.attrsOf varType;
+        description = "Every precfg adds variable declaration(s) here.";
         default = "";
       };
 
@@ -79,20 +127,25 @@ in {
 
   config = mkIf config.rde.emacs.enable {
     #    _module.args.emacs-dir = "${hm.xdg.configHome}" /emacs;
+    rde.emacs.vars = {
+      "rde/username" = {
+        value = username;
+        #        docstring = "Username provided by rde.";
+      };
+      "rde/custom-file" = {
+        value = cfg.files.custom;
+        docstring = "Path to custom.el.";
+      };
+      "rde/font-family".value = cfg.font;
+      "rde/font-size".value = cfg.fontSize;
+    };
     home-manager.users."${username}" = {
       home.file."${cfg.files.init}".text = mkBefore (readFile ./init.el);
       home.file."${cfg.files.early-init}".source = ./early-init.el;
       home.file."${cfg.files.rde-features}".text = cfg.config
         + "(provide 'rde-features)";
-      home.file."${cfg.files.rde-variables}".text = mkAfter (''
-        (defconst rde/username "${username}" "Username prvoided by rde.")
-        (defconst rde/test-var "test-value" "Just a test variable.")
-        (defconst rde/custom-file "${cfg.files.custom}" "Path to custom.el.")
-        (defconst rde/font
-          (font-spec :family "${cfg.font}"
-                     :weight 'semi-light
-                     :size ${toString cfg.fontSize}))
-              '' + ''
+      home.file."${cfg.files.rde-variables}".text = mkAfter
+        ((varSetToConfig cfg.vars) + ''
           (provide 'rde-variables)
         '');
 
