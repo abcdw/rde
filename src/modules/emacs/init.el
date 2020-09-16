@@ -54,7 +54,7 @@
 
 (defun rde/display-load-time ()
   (interactive)
-  (message "rde emacs loaded in %s, C-h C-a for welcome screen." (emacs-init-time)))
+  (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
 ;; (add-hook 'after-init-hook 'rde/display-load-time)
 
 (setq inhibit-splash-screen t)
