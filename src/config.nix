@@ -10,4 +10,5 @@
   rde.security.yubikey.enable = true;
   rde.direnv.enable = true;
   rde.emacs.enable = true;
+  rde.emacs.preset.tropin.enable = true;
 }

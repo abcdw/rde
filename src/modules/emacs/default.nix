@@ -6,6 +6,7 @@ let
     (pkgs.unstable.emacsPackagesGen pkgs.unstable.emacsGit).emacsWithPackages;
   cfg = config.rde.emacs;
 
+  ### Types
   # Source: https://gitlab.com/rycee/nur-expressions/-/blob/master/hm-modules/emacs-init.nix#L9
   packageFunctionType = mkOptionType {
     name = "packageFunction";
@@ -17,31 +18,15 @@ let
 
   varType = types.submodule ({ name, config, ... }: {
     options = {
-      value = mkOption { type = types.either types.str (types.either types.int types.bool); };
+      value = mkOption {
+        type = types.either types.str (types.either types.int types.bool);
+      };
       docstring = mkOption {
         type = types.str;
         default = "";
       };
     };
   });
-
-  varSetToConfig = v:
-    let
-      dispatcher = { bool = v: if v then "t" else "nil";
-                     string = v: ''"${v}"'';};
-
-      valueToStr = v:
-        ((attrByPath [(builtins.typeOf v)] toString dispatcher) v);
-      ifDocString = v:
-        if (stringLength v.docstring > 0) then " \"${v.docstring}\"" else "";
-      tmp = mapAttrsToList (name: value: ''
-        (defvar ${name} ${valueToStr value.value}${ifDocString value})
-      '') v;
-    in concatStrings tmp;
-
-  configSetToConfig = v:
-    let tmp = mapAttrsToList (name: value: "${value.config}") v;
-    in concatStrings tmp;
 
   emacsConfigType = types.submodule ({ name, config, ... }: {
     options = {
@@ -76,9 +61,33 @@ let
     config = mkIf config.enable {
       vars = {
         "rde/config-${name}-enabled".value = true;
+        # TODO: add enabled configs variable
       };
     };
   });
+
+  ### Auxiliary functions
+  varSetToConfig = v:
+    let
+      dispatcher = {
+        bool = v: if v then "t" else "nil";
+        string = v: ''"${v}"'';
+      };
+      valueToStr = v:
+        ((attrByPath [ (builtins.typeOf v) ] toString dispatcher) v);
+      ifDocString = v:
+        if (stringLength v.docstring > 0) then " \"${v.docstring}\"" else "";
+      tmp = mapAttrsToList (name: value: ''
+        (defvar ${name} ${valueToStr value.value}${ifDocString value})
+      '') v;
+    in concatStrings tmp;
+
+  configSetToConfig = v:
+    let tmp = mapAttrsToList (name: value: "${value.config}") v;
+    in concatStrings tmp;
+
+  enableConfigs = configList:
+    foldl (res: name: res // { "${name}".enable = true; }) {} configList;
 
   mkROFileOption = path:
     (mkOption {
@@ -87,9 +96,10 @@ let
       default = path;
       readOnly = true;
     });
+
 in {
 
-  imports = [ ];
+  imports = [ ./configs/org-roam ];
   options = {
     rde.emacs = {
       enable = mkEnableOption "Enable rde emacs";
@@ -100,6 +110,7 @@ in {
         default =
           "${config.home-manager.users.${username}.xdg.configHome}/emacs";
       };
+
       files = {
         init = mkROFileOption "${config.rde.emacs.dir}/init.el";
         early-init = mkROFileOption "${config.rde.emacs.dir}/early-init.el";
@@ -111,21 +122,6 @@ in {
             }/emacs/custom.el";
         };
       };
-
-      # user-init = mkOption {
-      #   type = types.path;
-      #   description = "Can source"
-      #   default = "${config.rde.emacs.dir}/user.el";
-      # };
-      # custom-file = mkFileOption "${config.rde.emacs.dir}/custom.el";
-
-      # config = mkOption {
-      #   type = types.lines;
-      #   description = ''
-      #     Every config adds use-package declaration(s) here.
-      #     Don't use it for user defined configurations.'';
-      #   default = "";
-      # };
 
       configs = mkOption {
         type = types.attrsOf emacsConfigType;
@@ -141,11 +137,18 @@ in {
         type = types.str;
         default = config.rde.font;
       };
+
       fontSize = mkOption {
         type = types.int;
         default = config.rde.fontSize;
       };
 
+      preset.tropin.enable = mkEnableOption "Enable tropin's configuration.";
+      preset.tropin.configList = mkOption {
+        type = types.listOf types.str;
+        readOnly = true;
+        default = [ "org-roam" ];
+      };
     };
   };
 
@@ -162,32 +165,10 @@ in {
       "rde/font-family".value = cfg.font;
       "rde/font-size".value = cfg.fontSize;
     };
-    rde.emacs.configs = {
-      org-roam = {
-        enable = true;
-        vars = {
-          "rde/org-roam-directory".value =
-            "${config.rde.workDir}/org-files/notes";
-        };
-        config = ''
-          (use-package org-roam
-            :hook
-            (after-init-hook . org-roam-mode)
-            :config
-            (setq org-roam-directory rde/org-roam-directory)
-            :bind (
-          	 :map org-roam-mode-map
-                   (("C-c n l" . org-roam)
-                    ("C-c n f" . org-roam-find-file)
-                    ("C-c n g" . org-roam-graph-show))
-                   :map org-mode-map
-                   (("C-c n i" . org-roam-insert))
-                   (("C-c n I" . org-roam-insert-immediate))))
-        '';
-        packages = epkgs: [ epkgs.org-roam ];
-        systemPackages = [ pkgs.sqlite ];
-      };
-    };
+
+    rde.emacs.configs = mkIf cfg.preset.tropin.enable
+      (enableConfigs cfg.preset.tropin.configList);
+
     home-manager.users."${username}" = {
       home.file."${cfg.files.init}".text = ''
         (require 'rde-variables)
@@ -199,7 +180,7 @@ in {
       home.packages = with pkgs;
         let
           emacsConfigs = filterAttrs (n: v: v.enable) cfg.configs;
-          systemPackageList = flatten
+          systemPackageList = concatLists
             (mapAttrsToList (key: value: value.systemPackages) emacsConfigs);
         in systemPackageList ++ [
           emacs-all-the-icons-fonts
@@ -235,9 +216,10 @@ in {
               rde-configs-package =
                 build-emacs-package "rde-configs" rde-configs-text;
 
-              packageList = flatten
+              packageList = concatLists
                 (mapAttrsToList (key: value: (value.packages epkgs))
                   emacsConfigs);
+
             in with epkgs;
             packageList ++ [
               rde-variables-package
