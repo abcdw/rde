@@ -30,6 +30,6 @@
     (dolist (char-regexp ligatures)
       (set-char-table-range composition-function-table (car char-regexp)
                             `([,(cdr char-regexp) 0 font-shape-gstring]))))
-  :hook (prog-mode . auto-composition-mode)
+  :hook (prog-mode-hook . auto-composition-mode)
   :init (global-auto-composition-mode -1))
 
