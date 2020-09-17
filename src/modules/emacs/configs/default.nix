@@ -1,4 +1,10 @@
-{ ... }:
-{
-  imports = [ ./org-roam ./ligatures ./faces ];
+{ ... }: {
+  imports = [
+    ./rde-core
+    ./rde-defaults
+    ./faces
+    ./ligatures
+    ./icomplete
+    ./org-roam
+  ];
 }

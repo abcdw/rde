@@ -24,16 +24,7 @@
 
 
 
-
-
-
-
 (setq isearch-lazy-count t)
-
-
-
-(setq custom-file rde/custom-file)
-
 
 (defun run-command-in-eshell (cmd)
   (eshell)
@@ -59,7 +50,6 @@
 
 ;; It works
 
-
 (defun rde/display-load-time ()
   (interactive)
   (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
@@ -78,7 +68,7 @@
 
 (global-set-key (kbd "C-c r r") 'rde/switch-and-restart-emacs)
 (global-set-key (kbd "C-c f c") '(lambda () (interactive) (find-file "~/.config/emacs/init.el")))
-(global-set-key (kbd "C-c f e") '(lambda () (interactive) (find-file "~/work/rde/src/modules/emacs/init.el")))
+(global-set-key (kbd "C-c f e") '(lambda () (interactive) (find-file "~/work/rde/src/modules/emacs/default.nix")))
 (global-set-key (kbd "C-c f h") '(lambda () (interactive) (find-file "~/work/rde/src/home.nix")))
 (global-set-key (kbd "C-c f i") '(lambda () (interactive) (find-file "~/work/rde/src/hosts/ixy/configuration.nix")))
 (global-set-key (kbd "s-o") 'other-window)
@@ -122,11 +112,11 @@
   :hook
   (after-init-hook . global-company-mode))
 
-(use-package ivy
-  :demand t
-  :config
-  (ivy-mode 1)
-  :bind ("C-c C-r" . ivy-resume))
+;; (use-package ivy
+;;   :demand t
+;;   :config
+;;   (ivy-mode 1)
+;;   :bind ("C-c C-r" . ivy-resume))
 
 (use-package olivetti
   :config

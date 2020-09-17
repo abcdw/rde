@@ -84,11 +84,15 @@ let
     in concatStrings tmp;
 
   configSetToConfig = v:
-    let tmp = mapAttrsToList (name: value: "${value.config}") v;
+    let
+      tmp = mapAttrsToList (name: value: ''
+        ;;; configs.${name}
+        ${value.config}
+      '') v;
     in concatStrings tmp;
 
   enableConfigs = configList:
-    foldl (res: name: res // { "${name}".enable = true; }) {} configList;
+    foldl (res: name: res // { "${name}".enable = true; }) { } configList;
 
   mkROFileOption = path:
     (mkOption {
@@ -148,7 +152,13 @@ in {
       preset.tropin.configList = mkOption {
         type = types.listOf types.str;
         readOnly = true;
-        default = [ "org-roam" "ligatures" "faces" ];
+        default = [
+          "rde-core"
+          "rde-defaults"
+          "faces" "ligatures"
+          "icomplete"
+          "org-roam"
+        ];
       };
     };
   };
@@ -225,14 +235,11 @@ in {
             packageList ++ [
               rde-variables-package
               rde-configs-package
-              use-package
               nix-mode
               magit
               modus-operandi-theme
               org
-              company-org-roam
               company
-              ivy
               olivetti
               restart-emacs
               keycast
