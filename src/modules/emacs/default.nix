@@ -55,6 +55,7 @@ let
       systemPackages = mkOption {
         type = types.listOf types.package;
         description = "System dependencies for ${name}.";
+        default = [ ];
       };
 
     };
@@ -147,7 +148,7 @@ in {
       preset.tropin.configList = mkOption {
         type = types.listOf types.str;
         readOnly = true;
-        default = [ "org-roam" ];
+        default = [ "org-roam" "ligatures" ];
       };
     };
   };
