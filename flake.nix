@@ -4,6 +4,7 @@
   # TODO: Add default apps for mimes setup https://github.com/balsoft/nixos-config/blob/master/modules/applications.nix
   # TODO: Source color scheme from inputs https://github.com/balsoft/nixos-config/blob/master/modules/themes.nix
 
+  # NOTE: XDG vairables collection https://github.com/jwiegley/nix-config/blob/master/config/home.nix#L48
   # TODO: Add notifications
   # TODO: Setup GTK theme
   # TODO: Create template repo
