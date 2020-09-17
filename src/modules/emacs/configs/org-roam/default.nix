@@ -21,7 +21,8 @@ with lib; {
                    (("C-c n i" . org-roam-insert))
                    (("C-c n I" . org-roam-insert-immediate)))) 
         '';
-        packages = epkgs: [ epkgs.org-roam ];
+        config = readFile ./config.el;
+        emacsPackages = epkgs: [ epkgs.org-roam ];
         systemPackages = [ pkgs.sqlite ];
       };
     };

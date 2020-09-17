@@ -35,7 +35,7 @@ let
         type = types.attrsOf varType;
         description = "Variable declaration for emacs.configs.${name}.";
       };
-      packages = mkOption {
+      emacsPackages = mkOption {
         type =
           # types.either
           # ((types.listOf types.str) // { description = "List of packages."; })
@@ -217,7 +217,7 @@ in {
                 build-emacs-package "rde-configs" rde-configs-text;
 
               packageList = concatLists
-                (mapAttrsToList (key: value: (value.packages epkgs))
+                (mapAttrsToList (key: value: (value.emacsPackages epkgs))
                   emacsConfigs);
 
             in with epkgs;
