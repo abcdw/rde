@@ -1,7 +1,7 @@
 { config, lib, pkgs, inputs, ... }:
 
 with lib; {
-  imports = [ ./programs/direnv.nix ./emacs ];
+  imports = [ ./programs/direnv.nix ./emacs ./security/yubikey];
 
   options = {
     rde = {

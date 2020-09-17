@@ -7,6 +7,7 @@
   rde.font = "Iosevka";
   rde.fontSize = 28;
   rde.workDir = "/home/abcdw/work";
+  rde.security.yubikey.enable = true;
   rde.direnv.enable = true;
   rde.emacs.enable = true;
 }
