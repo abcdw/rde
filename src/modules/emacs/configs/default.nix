@@ -1,4 +1,4 @@
 { ... }:
 {
-  imports = [ ./org-roam ];
+  imports = [ ./org-roam ./ligatures ./faces ];
 }

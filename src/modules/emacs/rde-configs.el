@@ -34,12 +34,6 @@
 
 (setq custom-file rde/custom-file)
 
-(use-package faces
-  :config
-  (set-face-attribute 'default nil :font
-		      (font-spec :family rde/font-family
-				 :weight 'semi-light
-				 :size rde/font-size)))
 
 (defun run-command-in-eshell (cmd)
   (eshell)
@@ -113,8 +107,9 @@
   :config
   (setq dired-listing-switches
         "-aFhl --group-directories-first --time-style=long-iso"))
-  
-;; (use-package org :defer t)
+
+;; (require 'org-tempo)
+(use-package org :defer t)
 ;; (setq org-hide-emphasis-markers t)
 
 

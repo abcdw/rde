@@ -148,7 +148,7 @@ in {
       preset.tropin.configList = mkOption {
         type = types.listOf types.str;
         readOnly = true;
-        default = [ "org-roam" "ligatures" ];
+        default = [ "org-roam" "ligatures" "faces" ];
       };
     };
   };
