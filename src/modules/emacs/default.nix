@@ -99,7 +99,7 @@ let
 
 in {
 
-  imports = [ ./configs/org-roam ];
+  imports = [ ./configs ];
   options = {
     rde.emacs = {
       enable = mkEnableOption "Enable rde emacs";
