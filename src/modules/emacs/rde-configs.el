@@ -23,9 +23,6 @@
 ;; https://jwiegley.github.io/use-package/installation/
 
 
-
-(setq isearch-lazy-count t)
-
 (defun run-command-in-eshell (cmd)
   (eshell)
   (eshell-kill-input)
@@ -50,17 +47,7 @@
 
 ;; It works
 
-(defun rde/display-load-time ()
-  (interactive)
-  (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
-;; (add-hook 'after-init-hook 'rde/display-load-time)
 
-(setq inhibit-splash-screen t)
-;; (setq inhibit-startup-echo-area-message "abcdw")
-(defun display-startup-echo-area-message ()
-  (rde/display-load-time))
-
-;; (set-face-attribute 'default (selected-frame) :family "Iosevka" :weight 'semi-light)
 ;;; https://www.freedesktop.org/software/fontconfig/fontconfig-user.html
 
 ;; ;; It doesn't
@@ -68,7 +55,9 @@
 
 (global-set-key (kbd "C-c r r") 'rde/switch-and-restart-emacs)
 (global-set-key (kbd "C-c f c") '(lambda () (interactive) (find-file "~/.config/emacs/init.el")))
-(global-set-key (kbd "C-c f e") '(lambda () (interactive) (find-file "~/work/rde/src/modules/emacs/default.nix")))
+(global-set-key (kbd "C-c f d") '(lambda () (interactive) (find-file "~/work/rde/src/modules/emacs/default.nix")))
+(global-set-key (kbd "C-c f e") '(lambda () (interactive) (find-file "~/work/rde/src/modules/emacs/configs/rde-defaults/config.el")))
+(global-set-key (kbd "C-c f r") '(lambda () (interactive) (dired (cons "recentf" recentf-list))))
 (global-set-key (kbd "C-c f h") '(lambda () (interactive) (find-file "~/work/rde/src/home.nix")))
 (global-set-key (kbd "C-c f i") '(lambda () (interactive) (find-file "~/work/rde/src/hosts/ixy/configuration.nix")))
 (global-set-key (kbd "s-o") 'other-window)
@@ -91,12 +80,6 @@
   ;;; Read more here: https://protesilaos.com/modus-themes/
   :config
   (load-theme 'modus-operandi t))
-
-(use-package dired
-  :defer t
-  :config
-  (setq dired-listing-switches
-        "-aFhl --group-directories-first --time-style=long-iso"))
 
 ;; (require 'org-tempo)
 (use-package org :defer t)
@@ -126,12 +109,6 @@
 (use-package restart-emacs
   :commands restart-emacs
   :bind ("C-c r e" . restart-emacs))
-
-(use-package uniquify
-  :config
-  (setq uniquify-buffer-name-style 'forward)
-  (setq uniquify-strip-common-suffix nil)
-  (setq uniquify-after-kill-buffer-p t))
 
 (use-package keycast
   ;; :config
