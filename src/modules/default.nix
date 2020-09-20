@@ -27,6 +27,12 @@ with lib; {
         description = "Path to directory with projects.";
       };
 
+      rdeDir = mkOption {
+        type = types.path;
+        description = "Path to directory with projects.";
+        default = config.rde.workDir + "/rde";
+      };
+
       font = mkOption {
         type = types.str;
       };

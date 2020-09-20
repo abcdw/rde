@@ -108,23 +108,27 @@ in {
   options = {
     rde.emacs = {
       enable = mkEnableOption "Enable rde emacs";
-      dir = mkOption {
-        type = types.path;
-        description =
-          "Directory, where emacs configuration files will be placed.";
-        default =
-          "${config.home-manager.users.${username}.xdg.configHome}/emacs";
+      dirs = {
+        config = mkOption {
+          type = types.path;
+          description =
+            "Directory, where emacs configuration files will be placed.";
+          default = "${hm.xdg.configHome}/emacs";
+        };
+        data = mkOption {
+          type = types.path;
+          description =
+            "Directory, where emacs configuration files will be placed.";
+          default = "${hm.xdg.dataHome}/emacs";
+        };
       };
-
       files = {
-        init = mkROFileOption "${config.rde.emacs.dir}/init.el";
-        early-init = mkROFileOption "${config.rde.emacs.dir}/early-init.el";
+        init = mkROFileOption "${cfg.dirs.config}/init.el";
+        early-init = mkROFileOption "${cfg.dirs.config}/early-init.el";
         custom = mkOption {
           type = types.path;
           description = "Path to custom.el.";
-          default = "${
-              config.home-manager.users.${username}.xdg.dataHome
-            }/emacs/custom.el";
+          default = "${cfg.dirs.data}/custom.el";
         };
       };
 
@@ -155,7 +159,8 @@ in {
         default = [
           "rde-core"
           "rde-defaults"
-          "faces" "ligatures"
+          "faces"
+          "ligatures"
           "icomplete"
           "org-roam"
         ];
@@ -164,11 +169,13 @@ in {
   };
 
   config = mkIf config.rde.emacs.enable {
+
     rde.emacs.vars = {
       "rde/username" = {
         value = username;
         docstring = "System username provided by rde.";
       };
+      "rde/data-dir" = { value = cfg.dirs.data; };
       "rde/custom-file" = {
         value = cfg.files.custom;
         docstring = "Path to custom.el.";
@@ -181,6 +188,13 @@ in {
       (enableConfigs cfg.preset.tropin.configList);
 
     home-manager.users."${username}" = {
+      home.activation = {
+        enusreEmacsDataDir =
+          #inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ]
+          ''
+            $DRY_RUN_CMD mkdir $VERBOSE_ARG -p ${cfg.dirs.data}
+          '';
+      };
       home.file."${cfg.files.init}".text = ''
         (require 'rde-variables)
         (require 'rde-configs)
