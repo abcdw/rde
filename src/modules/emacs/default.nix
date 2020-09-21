@@ -3,7 +3,7 @@ with lib;
 let
   hm = config.home-manager.users.${username};
   emacs-with-pkgs =
-    (pkgs.unstable.emacsPackagesGen pkgs.unstable.emacsGit).emacsWithPackages;
+    (pkgs.unstable.emacsPackagesGen (pkgs.unstable.emacsGit.override { withXwidgets = true; })).emacsWithPackages;
   cfg = config.rde.emacs;
 
   ### Types
