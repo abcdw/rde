@@ -25,7 +25,11 @@
       pavucontrol
     ];
     font-packages = with pkgs; [
-      unstable.iosevka
+      # unstable.iosevka
+      # (unstable.nerdfonts.override {
+      #   fonts = [ "Iosevka" ];
+      # })
+
       # fira-code
 
       # hack-font

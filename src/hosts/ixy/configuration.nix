@@ -185,7 +185,7 @@
   fonts.fonts = with pkgs;
     [
       # corefonts # Micrsoft free fonts
-      # iosevka
+      iosevka
       # open-sans # need for telegram app
     ];
   fonts.fontconfig.defaultFonts.monospace = [ "Iosevka" ];
