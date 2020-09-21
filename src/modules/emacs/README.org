@@ -1,0 +1,10 @@
+
+* Simple guidelines
+- Declare things only inside use-package
+- Use full hook name in ~:hook~ section, ~after-init-hook~ instead of ~after-init~.[fn:1]
+- Use ~(setq ...)~ in ~:config~ section instead of ~:custom~.
+
+* Footnotes
+
+[fn:1] To make it possible to use ~xref-find-definitions~ or
+~describe-variable~ on the symbol.
