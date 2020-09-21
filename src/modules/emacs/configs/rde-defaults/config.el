@@ -34,9 +34,6 @@
   (setq dired-listing-switches
         "-aFhl --group-directories-first --time-style=long-iso"))
 
-(use-package ibuffer
-  :config
-  (global-set-key [remap list-buffers] 'ibuffer-list-buffers))
 
 (use-package uniquify
   :config

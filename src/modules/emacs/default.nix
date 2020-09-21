@@ -162,6 +162,7 @@ in {
           "faces"
           "ligatures"
           "icomplete"
+          "ibuffer"
           "org-roam"
         ];
       };
