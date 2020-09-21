@@ -175,6 +175,22 @@
       modules."wireless _first_".enable = false;
     };
 
+    # wayland.windowManager.sway = {
+    #   enable = true;
+    #   package = pkgs.unstable.sway;
+    #   config = {
+    #     modifier = "Mod4";
+    #     terminal = "${pkgs.alacritty}/bin/alacritty";
+    #     input = {
+    #       "*" = {
+    #         xkb_layout = "us";
+    #         xkb_variant = "dvorak";
+    #         xkb_options = "ctrl:nocaps";
+    #       };
+    #     };
+    #   };
+    # };
+
     xsession.enable = true;
     xsession.windowManager.i3 = rec {
       enable = true;
