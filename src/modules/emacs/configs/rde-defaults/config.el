@@ -96,6 +96,10 @@
   :config
   (setq isearch-lazy-count t))
 
+(use-package minibuffer
+  :config
+  (defalias 'yes-or-no-p 'y-or-n-p))
+
 (use-package eshell
   :config
   (global-set-key (kbd "s-e") 'eshell)
