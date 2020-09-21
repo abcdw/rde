@@ -226,6 +226,8 @@
         }];
       };
     };
+
+    services.rsibreak.enable = true;
     services.random-background = {
       enable = true;
       imageDirectory = "${xdg.userDirs.pictures}/wallpapers";
