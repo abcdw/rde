@@ -2,7 +2,7 @@
 (eval-and-compile
   (setq use-package-enable-imenu-support t)
   (setq use-package-compute-statistics t)
-  (setq use-package-verbose t)
+  (setq use-package-verbose nil)
   ;; The following is VERY IMPORTANT.  Write hooks using their real name
   ;; instead of a shorter version: after-init ==> `after-init-hook'.
   ;;
@@ -85,7 +85,6 @@
 (use-package org :defer t)
 ;; (setq org-hide-emphasis-markers t)
 
-
 ;; (use-package company-org-roam
 ;;   :after org-roam company ; saves 0.3s startup time
 ;;   :config
@@ -94,12 +93,6 @@
 (use-package company
   :hook
   (after-init-hook . global-company-mode))
-
-;; (use-package ivy
-;;   :demand t
-;;   :config
-;;   (ivy-mode 1)
-;;   :bind ("C-c C-r" . ivy-resume))
 
 (use-package olivetti
   :config
@@ -114,9 +107,3 @@
   ;; :config
   ;; (setq keycast-window-predicate 'keycast-bottom-left-window-p)
   :bind ("C-c t k" . keycast-mode))
-
-;; custom file is set for one session
-;; (setq custom-file (expand-file-name
-;;                    (format "custom-%d-%d.el" (emacs-pid) (random))
-;;                    temporary-file-directory))
-

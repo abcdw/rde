@@ -16,7 +16,7 @@ with lib; {
         type = types.str;
         description = "Username, will be used across configs";
       };
-      
+
       email = mkOption {
         type = types.str;
         description = "Email address, will be used across configs";
