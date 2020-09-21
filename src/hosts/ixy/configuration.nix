@@ -224,6 +224,8 @@
     ];
   };
 
+  location.provider = "geoclue2";
+  services.redshift.enable = true;
   services.xserver = {
 
     # resolutions = [{ x = 1600; y = 900; }];
