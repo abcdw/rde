@@ -109,6 +109,7 @@ let
 
   emacs-pkgs = (pkgs.unstable.emacsPackagesFor
     (pkgs.unstable.emacsGit.override { withXwidgets = true; }));
+  #emacsPackage = pkgs.unstable.emacsGit;
   emacsPackage = (emacs-with-pkgs (epkgs:
     let
       build-emacs-package = pname: text:
@@ -157,16 +158,33 @@ let
       keycast
     ]));
   socketName = "main";
-  clientCmd = "${emacsPackage}/bin/emacsclient --alternate-editor ${emacsPackage}/bin/emacs --socket-name=${socketName}";
-  emacsClientPackage = pkgs.writeScriptBin "ec" ''
+  clientCmd =
+    "${emacsPackage}/bin/emacsclient --socket-name=${socketName}";
+  emacsClientScriptName = "ec";
+  emacsClientPackage = pkgs.writeScriptBin emacsClientScriptName ''
     #!${pkgs.runtimeShell}
     if [ -z "$1" ]; then
-      exec ${clientCmd} --create-frame
+      exec ${clientCmd} --alternate-editor ${emacsPackage}/bin/emacs --create-frame
     else
-      exec ${clientCmd} "$@"
+      exec ${clientCmd} --alternate-editor ${emacsPackage}/bin/emacs "$@"
     fi
   '';
-
+  emacsClientDesktopItem = pkgs.makeDesktopItem rec {
+    name = "emacsclient";
+    desktopName = "Emacs Client";
+    genericName = "Text Editor";
+    comment = "Edit text";
+    mimeType =
+      "text/english;text/plain;text/x-makefile;text/x-c++hdr;text/x-c++src;text/x-chdr;text/x-csrc;text/x-java;text/x-moc;text/x-pascal;text/x-tcl;text/x-tex;application/x-shellscript;text/x-c;text/x-c++;";
+    exec = "${emacsClientScriptName} %F";
+    icon = "emacs";
+    type = "Application";
+    terminal = "false";
+    categories = "Utility;TextEditor;";
+    extraEntries = ''
+      StartupWMClass=Emacs
+    '';
+  };
 in {
 
   imports = [ ./configs ];
@@ -244,7 +262,6 @@ in {
   };
 
   config = mkIf config.rde.emacs.enable {
-
     rde.emacs.vars = {
       "rde/username" = {
         value = username;
@@ -279,8 +296,37 @@ in {
 
       home.packages = with pkgs;
 
-        systemPackageList
-        ++ [ emacs-all-the-icons-fonts emacsPackage emacsClientPackage ];
+        systemPackageList ++ [
+          emacs-all-the-icons-fonts
+          emacsPackage
+          emacsClientPackage
+          # emacsClientDesktopItem
+        ];
+
+      systemd.user.services.emacs = {
+        Unit = {
+          Description = "Emacs: the extensible, self-documenting text editor";
+          Documentation =
+            "info:emacs man:emacs(1) https://gnu.org/software/emacs/";
+
+          # Avoid killing the Emacs session, which may be full of
+          # unsaved buffers.
+          X-RestartIfChanged = false;
+        };
+
+        Service = {
+          # We wrap ExecStart in a login shell so Emacs starts with the user's
+          # environment, most importantly $PATH and $NIX_PROFILES. It may be
+          # worth investigating a more targeted approach for user services to
+          # import the user environment.
+          ExecStart = ''
+            ${pkgs.runtimeShell} -l -c "${emacsPackage}/bin/emacs --fg-daemon=${socketName}"'';
+          # We use '(kill-emacs 0)' to avoid exiting with a failure code, which
+          # would restart the service immediately.
+          ExecStop = "${clientCmd} --eval '(kill-emacs 0)'";
+          Restart = "on-failure";
+        };
+      };
     };
   };
 }
