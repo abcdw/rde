@@ -81,7 +81,8 @@
   ;; Save system clipboard in yank-ring
   (setq save-interprogram-paste-before-kill t)
   ;; Disable soft word wrapping
-  (set-default 'truncate-lines t))
+  :hook
+  ((prog-mode-hook dired-mode-hook) . (lambda () (setq truncate-lines t))))
 
 (use-package isearch
   :config
