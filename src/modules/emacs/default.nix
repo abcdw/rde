@@ -2,8 +2,6 @@
 with lib;
 let
   hm = config.home-manager.users.${username};
-  emacs-with-pkgs =
-    (pkgs.unstable.emacsPackagesGen (pkgs.unstable.emacsGit.override { withXwidgets = true; })).emacsWithPackages;
   cfg = config.rde.emacs;
 
   ### Types
@@ -46,18 +44,17 @@ let
         '';
         example = "epkgs: [ epkgs.org ]";
       };
+      systemPackages = mkOption {
+        type = types.listOf types.package;
+        description = "System dependencies for ${name}.";
+        default = [ ];
+      };
       config = mkOption {
         type = types.lines;
         description = ''
           Use-package configuration for ${name}.
         '';
       };
-      systemPackages = mkOption {
-        type = types.listOf types.package;
-        description = "System dependencies for ${name}.";
-        default = [ ];
-      };
-
     };
     config = mkIf config.enable {
       vars = {
@@ -101,6 +98,74 @@ let
       default = path;
       readOnly = true;
     });
+
+  emacsConfigs = filterAttrs (n: v: v.enable) cfg.configs;
+  systemPackageList = concatLists
+    (mapAttrsToList (key: value: value.systemPackages) emacsConfigs);
+  emacs-with-pkgs = (pkgs.unstable.emacsPackagesFor
+    (pkgs.unstable.emacsGit.override {
+      withXwidgets = true;
+    })).emacsWithPackages;
+
+  emacs-pkgs = (pkgs.unstable.emacsPackagesFor
+    (pkgs.unstable.emacsGit.override { withXwidgets = true; }));
+  emacsPackage = (emacs-with-pkgs (epkgs:
+    let
+      build-emacs-package = pname: text:
+        (epkgs.trivialBuild {
+          pname = pname;
+          version = "1.0";
+          src = pkgs.writeText "${pname}.el" text;
+          packageRequires = [ epkgs.use-package ];
+          preferLocalBuild = true;
+          allowSubstitutes = false;
+        });
+
+      concatVarSets = configs:
+        let
+          tmp = mapAttrsToList (key: value:
+            ''
+              ;;; Variables by configs.${key}
+            '' + (varSetToConfig value.vars)) configs;
+        in concatStrings tmp;
+      rde-variables-text = (varSetToConfig cfg.vars)
+        + (concatVarSets emacsConfigs) + ''
+
+          (provide 'rde-variables)
+        '';
+      rde-variables-package =
+        build-emacs-package "rde-variables" rde-variables-text;
+
+      rde-configs-text = (readFile ./rde-configs.el)
+        + configSetToConfig emacsConfigs + "(provide 'rde-configs)";
+      rde-configs-package = build-emacs-package "rde-configs" rde-configs-text;
+
+      packageList = concatLists
+        (mapAttrsToList (key: value: (value.emacsPackages epkgs)) emacsConfigs);
+
+    in with epkgs;
+    packageList ++ [
+      rde-variables-package
+      rde-configs-package
+      nix-mode
+      magit
+      modus-operandi-theme
+      org
+      company
+      olivetti
+      restart-emacs
+      keycast
+    ]));
+  socketName = "main";
+  clientCmd = "${emacsPackage}/bin/emacsclient --alternate-editor ${emacsPackage}/bin/emacs --socket-name=${socketName}";
+  emacsClientPackage = pkgs.writeScriptBin "ec" ''
+    #!${pkgs.runtimeShell}
+    if [ -z "$1" ]; then
+      exec ${clientCmd} --create-frame
+    else
+      exec ${clientCmd} "$@"
+    fi
+  '';
 
 in {
 
@@ -151,6 +216,15 @@ in {
         type = types.int;
         default = config.rde.fontSize;
       };
+
+      emacsPackageList = mkOption {
+        type = types.attrsOf types.package;
+        default = emacs-pkgs;
+      };
+      # package = mkOption {
+      #   type = types.package;
+      #   default = emacs-with-pkgs;
+      # };
 
       preset.tropin.enable = mkEnableOption "Enable tropin's configuration.";
       preset.tropin.configList = mkOption {
@@ -204,62 +278,9 @@ in {
       home.file."${cfg.files.early-init}".source = ./early-init.el;
 
       home.packages = with pkgs;
-        let
-          emacsConfigs = filterAttrs (n: v: v.enable) cfg.configs;
-          systemPackageList = concatLists
-            (mapAttrsToList (key: value: value.systemPackages) emacsConfigs);
-        in systemPackageList ++ [
-          emacs-all-the-icons-fonts
-          (emacs-with-pkgs (epkgs:
-            let
-              build-emacs-package = pname: text:
-                (epkgs.trivialBuild {
-                  pname = pname;
-                  version = "1.0";
-                  src = pkgs.writeText "${pname}.el" text;
-                  packageRequires = [ epkgs.use-package ];
-                  preferLocalBuild = true;
-                  allowSubstitutes = false;
-                });
 
-              concatVarSets = configs:
-                let
-                  tmp = mapAttrsToList (key: value:
-                    ''
-                      ;;; Variables by configs.${key}
-                    '' + (varSetToConfig value.vars)) configs;
-                in concatStrings tmp;
-              rde-variables-text = (varSetToConfig cfg.vars)
-                + (concatVarSets emacsConfigs) + ''
-
-                  (provide 'rde-variables)
-                '';
-              rde-variables-package =
-                build-emacs-package "rde-variables" rde-variables-text;
-
-              rde-configs-text = (readFile ./rde-configs.el)
-                + configSetToConfig emacsConfigs + "(provide 'rde-configs)";
-              rde-configs-package =
-                build-emacs-package "rde-configs" rde-configs-text;
-
-              packageList = concatLists
-                (mapAttrsToList (key: value: (value.emacsPackages epkgs))
-                  emacsConfigs);
-
-            in with epkgs;
-            packageList ++ [
-              rde-variables-package
-              rde-configs-package
-              nix-mode
-              magit
-              modus-operandi-theme
-              org
-              company
-              olivetti
-              restart-emacs
-              keycast
-            ]))
-        ];
+        systemPackageList
+        ++ [ emacs-all-the-icons-fonts emacsPackage emacsClientPackage ];
     };
   };
 }
