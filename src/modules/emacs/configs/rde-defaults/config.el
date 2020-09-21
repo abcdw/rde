@@ -12,8 +12,8 @@
 
   ;; Highlight trailing whitespace and delete on save
   (setq whitespace-style '(face trailing spaces space-mark))
-  (setq-default show-trailing-whitespace t)
-  :hook (before-save-hook . delete-trailing-whitespace))
+  :hook ((before-save-hook . delete-trailing-whitespace)
+	 ((prog-mode-hook text-mode-hook) . (lambda () (setq show-trailing-whitespace t)))))
 
 (use-package custom
   :config
