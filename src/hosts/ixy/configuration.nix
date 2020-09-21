@@ -142,6 +142,8 @@
   networking.extraHosts = "127.0.0.1 ${config.networking.hostName}.lan";
 
   hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
+
   console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-u28n.psf.gz";
 
   time.timeZone = "Europe/Moscow";

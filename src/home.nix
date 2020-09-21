@@ -81,6 +81,7 @@
       };
     };
 
+    services.blueman-applet.enable = true;
     systemd.user.services.ssh-tunnel = {
       Service = {
         ExecStart =
