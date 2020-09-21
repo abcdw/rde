@@ -8,7 +8,12 @@
 
   ;; Add newline at the end of the file on save, the reason:
   ;; https://stackoverflow.com/questions/729692/why-should-text-files-end-with-a-newline
-  (setq require-final-newline t))
+  (setq require-final-newline t)
+
+  ;; Highlight trailing whitespace and delete on save
+  (setq whitespace-style '(face trailing spaces space-mark))
+  (setq-default show-trailing-whitespace t)
+  :hook (before-save-hook . delete-trailing-whitespace))
 
 (use-package custom
   :config
