@@ -25,7 +25,7 @@
   :config
   (setq recentf-max-saved-items 200)
   (setq recentf-save-file (expand-file-name "recentf" rde/data-dir))
-  (run-with-idle-timer 10 t 'recentf-save-list)
+  (run-with-idle-timer 127 t 'recentf-save-list)
   :hook (after-init-hook . recentf-mode))
 
 (use-package saveplace
