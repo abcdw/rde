@@ -32,7 +32,9 @@
   :defer t
   :config
   (setq dired-listing-switches
-        "-aFhl --group-directories-first --time-style=long-iso"))
+        "-aFhl --group-directories-first --time-style=long-iso")
+  (setq dired-hide-details-hide-symlink-targets nil)
+  :hook (dired-mode-hook . dired-hide-details-mode))
 
 (use-package dired-x
   :bind ("s-d" . dired-jump))
