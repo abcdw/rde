@@ -25,8 +25,8 @@
       pavucontrol
     ];
     font-packages = with pkgs; [
-      iosevka
-      fira-code
+      unstable.iosevka
+      # fira-code
 
       # hack-font
       # inconsolata
