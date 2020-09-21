@@ -34,6 +34,8 @@
   (setq dired-listing-switches
         "-aFhl --group-directories-first --time-style=long-iso"))
 
+(use-package dired-x
+  :bind ("s-d" . dired-jump))
 
 (use-package uniquify
   :config
