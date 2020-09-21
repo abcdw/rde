@@ -71,7 +71,6 @@
       templates = "${home.homeDirectory}/templates";
     };
 
-
     programs.mpv = {
       enable = true;
       config = {
@@ -196,6 +195,7 @@
           "${mod}+d" = null;
           "${mod}+w" = null;
           "${mod}+f" = null;
+          "${mod}+e" = null;
           "${mod}+Return" = null;
 
           "${mod}+t" = "workspace number 1";
@@ -218,11 +218,11 @@
         bars = [{
           position = "top";
           statusCommand = "${pkgs.i3status}/bin/i3status";
-            colors = {
-              background = "#000000";
-              statusline = "#ffffff";
-              separator = "#666666";
-            };
+          colors = {
+            background = "#000000";
+            statusline = "#ffffff";
+            separator = "#666666";
+          };
         }];
       };
     };
