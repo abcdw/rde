@@ -102,13 +102,13 @@ let
   emacsConfigs = filterAttrs (n: v: v.enable) cfg.configs;
   systemPackageList = concatLists
     (mapAttrsToList (key: value: value.systemPackages) emacsConfigs);
-  emacs-with-pkgs = (pkgs.unstable.emacsPackagesFor
-    (pkgs.unstable.emacsGit.override {
-      withXwidgets = true;
-    })).emacsWithPackages;
 
-  emacs-pkgs = (pkgs.unstable.emacsPackagesFor
-    (pkgs.unstable.emacsGit.override { withXwidgets = true; }));
+  emacs-pkg = (pkgs.unstable.emacsUnstable.override {
+    withXwidgets = true;
+  }).overrideAttrs (oa: { name = "rde-${oa.version}"; });
+  emacs-pkgs = (pkgs.unstable.emacsPackagesFor emacs-pkg);
+  emacs-with-pkgs = emacs-pkgs.emacsWithPackages;
+
   #emacsPackage = pkgs.unstable.emacsGit;
   emacsPackage = (emacs-with-pkgs (epkgs:
     let
@@ -158,8 +158,7 @@ let
       keycast
     ]));
   socketName = "main";
-  clientCmd =
-    "${emacsPackage}/bin/emacsclient --socket-name=${socketName}";
+  clientCmd = "${emacsPackage}/bin/emacsclient --socket-name=${socketName}";
   emacsClientScriptName = "ec";
   emacsClientPackage = pkgs.writeScriptBin emacsClientScriptName ''
     #!${pkgs.runtimeShell}
