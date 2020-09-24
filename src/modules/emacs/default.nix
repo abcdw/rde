@@ -103,9 +103,9 @@ let
   systemPackageList = concatLists
     (mapAttrsToList (key: value: value.systemPackages) emacsConfigs);
 
-  emacs-pkg = (pkgs.unstable.emacsUnstable.override {
+  emacs-pkg = (pkgs.unstable.emacs.override {
     withXwidgets = true;
-  }).overrideAttrs (oa: { name = "rde-${oa.version}"; });
+  }).overrideAttrs (oa: { name = "rde-${oa.pname}-${oa.version}"; });
   emacs-pkgs = (pkgs.unstable.emacsPackagesFor emacs-pkg);
   emacs-with-pkgs = emacs-pkgs.emacsWithPackages;
 
@@ -154,9 +154,11 @@ let
       org
       company
       olivetti
+      project
       restart-emacs
       keycast
     ]));
+
   socketName = "main";
   clientCmd = "${emacsPackage}/bin/emacsclient --socket-name=${socketName}";
   emacsClientScriptName = "ec";
