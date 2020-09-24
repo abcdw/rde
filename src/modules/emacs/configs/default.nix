@@ -1,11 +1,5 @@
-{ ... }: {
-  imports = [
-    ./rde-core
-    ./rde-defaults
-    ./faces
-    ./ligatures
-    ./icomplete
-    ./ibuffer
-    ./org-roam
-  ];
+{ lib, ... }: {
+  imports =
+    lib.mapAttrsToList (k: v: builtins.toString ./. + "/${k}")
+    (lib.filterAttrs (k: v: v == "directory") (builtins.readDir ./.));
 }
