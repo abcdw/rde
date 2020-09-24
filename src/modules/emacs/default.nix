@@ -259,6 +259,7 @@ in {
           "icomplete"
           "ibuffer"
           "org-roam"
+          "rg"
         ];
       };
     };
