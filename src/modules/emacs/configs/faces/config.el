@@ -1,4 +1,7 @@
 (use-package faces
+  ;; string-join defined in subr-x
+  :after subr-x
+  :demand
   :config
   (let* ((font-size (number-to-string rde/font-size))
 	 (default-font (string-join (list rde/font-family font-size) " ")))
