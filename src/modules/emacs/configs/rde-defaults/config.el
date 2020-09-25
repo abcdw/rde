@@ -26,6 +26,22 @@
   (setq recentf-max-saved-items 200)
   (setq recentf-save-file (expand-file-name "recentf" rde/data-dir))
   (run-with-idle-timer 127 t 'recentf-save-list)
+
+  (defun rde/recentf-dired ()
+    (interactive)
+    (dired (cons "recentf" recentf-list)))
+
+  ;; For inspiration: https://github.com/bbatsov/crux
+  (defun rde/recentf-find-file ()
+    "Find a recent file using `completing-read'."
+    (interactive)
+    ;; Space as initial input required to trigger icomplete
+    (let ((file (completing-read "Choose recent file: "
+				 (mapcar #'abbreviate-file-name recentf-list)
+				 nil t " ")))
+      (when file
+	(find-file file))))
+  :bind ("C-c f r" . rde/recentf-find-file)
   :hook (after-init-hook . recentf-mode))
 
 (use-package saveplace
@@ -43,11 +59,9 @@
   ;; Suggest other dired buffer path instead of current. Works
   ;; similiar to midnight commander, when two dired buffers available
   (setq dired-dwim-target t)
-  (defun rde/get-recentf-dired-list ()
-    (interactive)
-    (dired (cons "recentf" recentf-list)))
+
   :hook (dired-mode-hook . dired-hide-details-mode)
-  :bind ("C-c f r" . rde/get-recentf-dired-list))
+  )
 
 (use-package dired-x
   :bind ("s-d" . dired-jump))
@@ -188,11 +202,15 @@ previous window layout otherwise."
 
 (global-set-key (kbd "C-c f h") '(lambda () (interactive) (find-file "~/work/rde/src/home.nix")))
 (global-set-key (kbd "C-c f i") '(lambda () (interactive) (find-file "~/work/rde/src/hosts/ixy/configuration.nix")))
-(global-set-key (kbd "s-j") 'join-line)
+
+(defun rde/join-line ()
+  (interactive)
+  (join-line 1))
+
+(global-set-key (kbd "s-j") 'rde/join-line)
 (global-set-key (kbd "s-o") 'other-window)
 (global-set-key (kbd "s-n") 'switch-to-next-buffer)
 (global-set-key (kbd "s-p") 'switch-to-prev-buffer)
-
 
 
 (use-package nix-mode
