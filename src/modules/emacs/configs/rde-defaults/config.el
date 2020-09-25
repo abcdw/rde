@@ -203,9 +203,15 @@ previous window layout otherwise."
 (global-set-key (kbd "C-c f h") '(lambda () (interactive) (find-file "~/work/rde/src/home.nix")))
 (global-set-key (kbd "C-c f i") '(lambda () (interactive) (find-file "~/work/rde/src/hosts/ixy/configuration.nix")))
 
-(defun rde/join-line ()
-  (interactive)
-  (join-line 1))
+(defun rde/join-line (number-of-lines)
+  "number-of-lines passed as universal argument. For positive
+  value joins number-of-lines lines downwards. For negative joins
+  -number-of-lines upwards."
+  (interactive "p")
+  (dotimes (i (abs number-of-lines))
+    (if (> number-of-lines 0)
+	(join-line 1)
+      (join-line))))
 
 (global-set-key (kbd "s-j") 'rde/join-line)
 (global-set-key (kbd "s-o") 'other-window)
