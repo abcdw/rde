@@ -332,22 +332,23 @@ in {
         };
       };
 
-      systemd.user.sockets.emacs = {
-        Unit = {
-          Description = "Emacs: the extensible, self-documenting text editor";
-          Documentation =
-            "info:emacs man:emacs(1) https://gnu.org/software/emacs/";
-        };
+      # systemd.user.sockets.emacs = {
+      #   Unit = {
+      #     Description = "Emacs: the extensible, self-documenting text editor";
+      #     Documentation =
+      #       "info:emacs man:emacs(1) https://gnu.org/software/emacs/";
+      #     PartOf = "emacs.service";
+      #   };
 
-        Socket = {
-          ListenStream = socketPath;
-          FileDescriptorName = "server";
-          SocketMode = "0600";
-          DirectoryMode = "0700";
-        };
+      #   Socket = {
+      #     ListenStream = socketPath;
+      #     # FileDescriptorName = "server";
+      #     # SocketMode = "0600";
+      #     # DirectoryMode = "0700";
+      #   };
 
-        Install = { WantedBy = [ "sockets.target" ]; };
-      };
+      #   Install = { WantedBy = [ "sockets.target" ]; };
+      # };
     };
   };
 }
