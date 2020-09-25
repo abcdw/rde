@@ -260,6 +260,7 @@ in {
           "ibuffer"
           "org-roam"
           "rg"
+          "dired"
         ];
       };
     };
