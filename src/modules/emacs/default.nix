@@ -261,6 +261,7 @@ in {
           "org-roam"
           "rg"
           "dired"
+          "keycast"
         ];
       };
     };

@@ -240,8 +240,3 @@ previous window layout otherwise."
 (use-package restart-emacs
   :commands restart-emacs
   :bind ("C-c r e" . restart-emacs))
-
-(use-package keycast
-  ;; :config
-  ;; (setq keycast-window-predicate 'keycast-bottom-left-window-p)
-  :bind ("C-c t k" . keycast-mode))
