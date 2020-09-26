@@ -263,6 +263,7 @@ in {
           "dired"
           "keycast"
           "monocle"
+          "mode-line"
         ];
       };
     };

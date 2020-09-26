@@ -76,14 +76,7 @@
   ;; (setq hl-line-sticky-flag nil)
   (global-hl-line-mode 1)
 
-  (blink-cursor-mode -1)
-  (column-number-mode 1)
-
-  (defun flash-mode-line ()
-    (invert-face 'mode-line)
-    (run-with-timer 0.1 nil #'invert-face 'mode-line))
-  (setq visible-bell nil
-	ring-bell-function 'flash-mode-line))
+  (blink-cursor-mode -1))
 
 (use-package emacs
   :config
@@ -152,17 +145,6 @@
 (defun rde/switch-and-restart-emacs ()
   (interactive)
   (run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde && restart-emacs"))
-
-;;; Configs to reference
-;;; https://github.com/bbatsov/emacs.d/blob/master/init.el
-
-;; It works
-
-
-;;; https://www.freedesktop.org/software/fontconfig/fontconfig-user.html
-
-;; ;; It doesn't
-
 
 (global-set-key (kbd "C-c r r") 'rde/switch-and-restart-emacs)
 (global-set-key (kbd "C-c f c") '(lambda () (interactive) (find-file "~/.config/emacs/init.el")))
