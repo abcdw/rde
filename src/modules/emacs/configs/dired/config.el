@@ -8,7 +8,10 @@
   ;; similiar to midnight commander, when two dired buffers available
   (setq dired-dwim-target t)
 
-  :hook (dired-mode-hook . dired-hide-details-mode))
+  :hook (dired-mode-hook . dired-hide-details-mode)
+  :bind (:map dired-mode-map
+	      ("M-n" . dired-next-subdir)
+	      ("M-p" . dired-prev-subdir)))
 
 (use-package dired-x
   :bind ("s-d" . dired-jump))
