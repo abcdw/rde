@@ -57,6 +57,9 @@
   :config
   (define-key ctl-x-map "p" project-prefix-map))
 
+(use-package bind-key
+  :bind ("C-h y" . describe-personal-keybindings))
+
 (use-package uniquify
   :config
   (setq uniquify-buffer-name-style 'forward)
@@ -103,6 +106,7 @@
   :config
   ;; Save system clipboard in yank-ring
   (setq save-interprogram-paste-before-kill t)
+  :bind ("C-c t t" . toggle-truncate-lines)
   ;; Disable soft word wrapping
   :hook
   ((prog-mode-hook dired-mode-hook) . (lambda () (setq truncate-lines t))))
