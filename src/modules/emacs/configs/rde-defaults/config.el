@@ -35,10 +35,13 @@
   (defun rde/recentf-find-file ()
     "Find a recent file using `completing-read'."
     (interactive)
-    ;; Space as initial input required to trigger icomplete
+    ;; Space as initial input required to trigger icomplete,
+    ;; but it's not necessary with icomplete-vertical
     (let ((file (completing-read "Choose recent file: "
 				 (mapcar #'abbreviate-file-name recentf-list)
-				 nil t " ")))
+				 nil t
+				 ;; " "
+				 )))
       (when file
 	(find-file file))))
   :bind ("C-c f r" . rde/recentf-find-file)
