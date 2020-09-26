@@ -262,6 +262,7 @@ in {
           "rg"
           "dired"
           "keycast"
+          "monocle"
         ];
       };
     };
