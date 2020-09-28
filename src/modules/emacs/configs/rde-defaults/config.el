@@ -112,21 +112,6 @@
   :config
   (defalias 'yes-or-no-p 'y-or-n-p))
 
-(use-package eshell
-  :config
-  (global-set-key (kbd "s-e") 'eshell)
-
-  ;; Eshell bug prevents this from working
-  ;; https://github.com/noctuid/general.el/issues/32
-  ;; :bind (:map eshell-mode-map
-  ;; 	      ("s-e" . 'switch-to-prev-buffer))
-
-  :hook
-  (eshell-mode-hook .
-   (lambda ()
-     (define-key eshell-mode-map (kbd "s-e") 'switch-to-prev-buffer))))
-
-
 (defun run-command-in-eshell (cmd)
   (eshell)
   (eshell-kill-input)
@@ -184,11 +169,6 @@
   ;;; Read more here: https://protesilaos.com/modus-themes/
   :config
   (load-theme 'modus-operandi t))
-
-
-(use-package org :defer t)
-(use-package org-tempo :after org)
-;; (setq org-hide-emphasis-markers t)
 
 ;; (use-package company-org-roam
 ;;   :after org-roam company ; saves 0.3s startup time

@@ -1,4 +1,5 @@
 { config, lib, pkgs, inputs, username, ... }:
+# TODO: Highlight the region last command operated on
 with lib;
 let
   hm = config.home-manager.users.${username};
@@ -264,6 +265,8 @@ in {
           "keycast"
           "monocle"
           "mode-line"
+          "eshell"
+          "org"
         ];
       };
     };
