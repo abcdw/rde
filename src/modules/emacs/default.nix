@@ -152,7 +152,6 @@ let
       rde-configs-package
       nix-mode
       magit
-      modus-operandi-theme
       olivetti
       project
       restart-emacs
@@ -266,6 +265,7 @@ in {
           "eshell"
           "org"
           "company"
+          "modus-themes"
         ];
       };
     };

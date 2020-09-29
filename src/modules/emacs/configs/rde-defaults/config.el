@@ -165,11 +165,6 @@
   :defer t
   :bind (("C-x g" . magit-status)))
 
-(use-package modus-operandi-theme
-  ;;; Read more here: https://protesilaos.com/modus-themes/
-  :config
-  (load-theme 'modus-operandi t))
-
 ;; (use-package company-org-roam
 ;;   :after org-roam company ; saves 0.3s startup time
 ;;   :config
