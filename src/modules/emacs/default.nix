@@ -151,7 +151,6 @@ let
       rde-variables-package
       rde-configs-package
       restart-emacs
-      keycast
     ]));
 
   socketName = "main";
