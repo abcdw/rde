@@ -53,10 +53,6 @@
   (setq save-place-file (expand-file-name "places" rde/data-dir))
   (save-place-mode 1))
 
-(use-package project
-  :config
-  (define-key ctl-x-map "p" project-prefix-map))
-
 (use-package bind-key
   :bind ("C-h y" . describe-personal-keybindings))
 

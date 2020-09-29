@@ -150,7 +150,6 @@ let
     packageList ++ [
       rde-variables-package
       rde-configs-package
-      project
       restart-emacs
       keycast
     ]));
