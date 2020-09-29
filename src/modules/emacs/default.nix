@@ -150,7 +150,6 @@ let
     packageList ++ [
       rde-variables-package
       rde-configs-package
-      magit
       olivetti
       project
       restart-emacs
@@ -266,6 +265,7 @@ in {
           "company"
           "modus-themes"
           "nix"
+          "magit"
         ];
       };
     };

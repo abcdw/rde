@@ -154,10 +154,6 @@
 (global-set-key (kbd "s-n") 'switch-to-next-buffer)
 (global-set-key (kbd "s-p") 'switch-to-prev-buffer)
 
-(use-package magit
-  :defer t
-  :bind (("C-x g" . magit-status)))
-
 ;; (use-package company-org-roam
 ;;   :after org-roam company ; saves 0.3s startup time
 ;;   :config
