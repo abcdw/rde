@@ -159,11 +159,6 @@
 ;;   :config
 ;;   (push 'company-org-roam company-backends))
 
-(use-package olivetti
-  :config
-  (setq olivetti-minimum-body-width 80)
-  :bind ("C-c t o" . olivetti-mode))
-
 (use-package restart-emacs
   :commands restart-emacs
   :bind ("C-c r e" . restart-emacs))

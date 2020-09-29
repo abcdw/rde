@@ -150,7 +150,6 @@ let
     packageList ++ [
       rde-variables-package
       rde-configs-package
-      olivetti
       project
       restart-emacs
       keycast
@@ -266,6 +265,7 @@ in {
           "modus-themes"
           "nix"
           "magit"
+          "olivetti"
         ];
       };
     };
