@@ -264,6 +264,7 @@ in {
           "nix"
           "magit"
           "olivetti"
+          "project"
         ];
       };
     };
