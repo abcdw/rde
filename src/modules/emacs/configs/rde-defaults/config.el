@@ -154,13 +154,6 @@
 (global-set-key (kbd "s-n") 'switch-to-next-buffer)
 (global-set-key (kbd "s-p") 'switch-to-prev-buffer)
 
-
-(use-package nix-mode
-  :defer t
-  :mode "\\.nix\\'"
-  :bind (:map nix-mode-map
-	      (("C-c l p" . nix-format-buffer))))
-
 (use-package magit
   :defer t
   :bind (("C-x g" . magit-status)))

@@ -150,7 +150,6 @@ let
     packageList ++ [
       rde-variables-package
       rde-configs-package
-      nix-mode
       magit
       olivetti
       project
@@ -266,6 +265,7 @@ in {
           "org"
           "company"
           "modus-themes"
+          "nix"
         ];
       };
     };
