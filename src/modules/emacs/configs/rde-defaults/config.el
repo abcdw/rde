@@ -112,7 +112,7 @@
   :config
   (defalias 'yes-or-no-p 'y-or-n-p))
 
-(defun run-command-in-eshell (cmd)
+(defun rde/run-command-in-eshell (cmd)
   (eshell)
   (eshell-kill-input)
   (end-of-buffer)
@@ -121,15 +121,15 @@
 
 (defun rde/build ()
   (interactive)
-  (run-command-in-eshell "nixos-rebuild build --flake /home/abcdw/work/rde"))
+  (rde/run-command-in-eshell "nixos-rebuild build --flake /home/abcdw/work/rde"))
 
 (defun rde/switch ()
   (interactive)
-  (run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde"))
+  (rde/run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde"))
 
 (defun rde/switch-and-restart-emacs ()
   (interactive)
-  (run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde && restart-emacs"))
+  (rde/run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde && restart-emacs"))
 
 (global-set-key (kbd "C-c r r") 'rde/switch-and-restart-emacs)
 (global-set-key (kbd "C-c f c") '(lambda () (interactive) (find-file "~/.config/emacs/init.el")))
@@ -153,11 +153,6 @@
 (global-set-key (kbd "s-o") 'other-window)
 (global-set-key (kbd "s-n") 'switch-to-next-buffer)
 (global-set-key (kbd "s-p") 'switch-to-prev-buffer)
-
-;; (use-package company-org-roam
-;;   :after org-roam company ; saves 0.3s startup time
-;;   :config
-;;   (push 'company-org-roam company-backends))
 
 (use-package restart-emacs
   :commands restart-emacs
