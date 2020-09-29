@@ -153,8 +153,6 @@ let
       nix-mode
       magit
       modus-operandi-theme
-      org
-      company
       olivetti
       project
       restart-emacs
@@ -267,6 +265,7 @@ in {
           "mode-line"
           "eshell"
           "org"
+          "company"
         ];
       };
     };

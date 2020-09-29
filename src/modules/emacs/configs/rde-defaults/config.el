@@ -175,10 +175,6 @@
 ;;   :config
 ;;   (push 'company-org-roam company-backends))
 
-(use-package company
-  :hook
-  (after-init-hook . global-company-mode))
-
 (use-package olivetti
   :config
   (setq olivetti-minimum-body-width 80)
