@@ -276,6 +276,8 @@ in {
         docstring = "System username provided by rde.";
       };
       "rde/data-dir" = { value = cfg.dirs.data; };
+      "rde/config-dir" = { value = cfg.dirs.config; };
+      "rde/rde-dir" = { value = config.rde.rdeDir; };
       "rde/custom-file" = {
         value = cfg.files.custom;
         docstring = "Path to custom.el.";

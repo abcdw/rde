@@ -108,47 +108,63 @@
   :config
   (defalias 'yes-or-no-p 'y-or-n-p))
 
-(defun rde/run-command-in-eshell (cmd)
-  (eshell)
-  (eshell-kill-input)
-  (end-of-buffer)
-  (insert cmd)
-  (eshell-send-input))
 
-(defun rde/build ()
-  (interactive)
-  (rde/run-command-in-eshell "nixos-rebuild build --flake /home/abcdw/work/rde"))
+(use-package emacs
+  :config
+  (defun rde/run-command-in-eshell (cmd)
+    (eshell)
+    (eshell-kill-input)
+    (end-of-buffer)
+    (insert cmd)
+    (eshell-send-input))
 
-(defun rde/switch ()
-  (interactive)
-  (rde/run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde"))
+  (defun rde/build ()
+    (interactive)
+    (rde/run-command-in-eshell
+     (format "nixos-rebuild build --flake %s" rde/rde-dir)))
 
-(defun rde/switch-and-restart-emacs ()
-  (interactive)
-  (rde/run-command-in-eshell "sudo nixos-rebuild switch --flake /home/abcdw/work/rde && restart-emacs"))
+  (defun rde/switch ()
+    (interactive)
+    (rde/run-command-in-eshell
+     (format "sudo nixos-rebuild switch --flake %s" rde/rde-dir)))
 
-(global-set-key (kbd "C-c r r") 'rde/switch-and-restart-emacs)
-(global-set-key (kbd "C-c f c") '(lambda () (interactive) (find-file "~/.config/emacs/init.el")))
-(global-set-key (kbd "C-c f d") '(lambda () (interactive) (find-file "~/work/rde/src/modules/emacs/default.nix")))
-(global-set-key (kbd "C-c f e") '(lambda () (interactive) (find-file "~/work/rde/src/modules/emacs/configs/rde-defaults/config.el")))
+  (defun rde/switch-and-restart-emacs ()
+    (interactive)
+    (rde/run-command-in-eshell
+     (format "sudo nixos-rebuild switch --flake %s && restart-emacs" rde/rde-dir)))
 
-(global-set-key (kbd "C-c f h") '(lambda () (interactive) (find-file "~/work/rde/src/home.nix")))
-(global-set-key (kbd "C-c f i") '(lambda () (interactive) (find-file "~/work/rde/src/hosts/ixy/configuration.nix")))
+  (global-set-key (kbd "C-c r r") 'rde/switch-and-restart-emacs)
+  (global-set-key (kbd "C-c f c")
+		  '(lambda () (interactive)
+		     (find-file (format "%s/init.el" rde/config-dir))))
+  (global-set-key (kbd "C-c f d")
+		  '(lambda () (interactive)
+		     (find-file (format "%s/src/modules/emacs/default.nix" rde/rde-dir))))
+  (global-set-key (kbd "C-c f e")
+		  '(lambda () (interactive)
+		     (find-file (format "%s/src/modules/emacs/configs/rde-defaults/config.el" rde/rde-dir))))
 
-(defun rde/join-line (number-of-lines)
-  "number-of-lines passed as universal argument. For positive
+  (global-set-key (kbd "C-c f h")
+		  '(lambda () (interactive)
+		     (find-file (format "%s/src/home.nix" rde/rde-dir))))
+  (global-set-key (kbd "C-c f i")
+		  '(lambda () (interactive)
+		     (find-file (format "%s/src/hosts/ixy/configuration.nix" rde/rde-dir))))
+
+  (defun rde/join-line (number-of-lines)
+    "number-of-lines passed as universal argument. For positive
   value joins number-of-lines lines downwards. For negative joins
   -number-of-lines upwards."
-  (interactive "p")
-  (dotimes (i (abs number-of-lines))
-    (if (> number-of-lines 0)
-	(join-line 1)
-      (join-line))))
+    (interactive "p")
+    (dotimes (i (abs number-of-lines))
+      (if (> number-of-lines 0)
+	  (join-line 1)
+	(join-line))))
 
-(global-set-key (kbd "s-j") 'rde/join-line)
-(global-set-key (kbd "s-o") 'other-window)
-(global-set-key (kbd "s-n") 'switch-to-next-buffer)
-(global-set-key (kbd "s-p") 'switch-to-prev-buffer)
+  (global-set-key (kbd "s-j") 'rde/join-line)
+  (global-set-key (kbd "s-o") 'other-window)
+  (global-set-key (kbd "s-n") 'switch-to-next-buffer)
+  (global-set-key (kbd "s-p") 'switch-to-prev-buffer))
 
 (use-package restart-emacs
   :commands restart-emacs
