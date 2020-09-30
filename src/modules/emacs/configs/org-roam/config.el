@@ -10,3 +10,8 @@
          :map	org-mode-map
          (("C-c n i" . org-roam-insert))
          (("C-c n I" . org-roam-insert-immediate))))
+
+(use-package company-org-roam
+  :after org-roam company
+  :config
+  (push 'company-org-roam company-backends))

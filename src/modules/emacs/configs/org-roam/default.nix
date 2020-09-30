@@ -9,7 +9,7 @@ with lib; {
             "${config.rde.workDir}/org-files/notes";
         };
         config = readFile ./config.el;
-        emacsPackages = epkgs: [ epkgs.org-roam ];
+        emacsPackages = epkgs: [ epkgs.org-roam epkgs.company-org-roam ];
         systemPackages = [ pkgs.sqlite ];
       };
     };
