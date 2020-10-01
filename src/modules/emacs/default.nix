@@ -267,6 +267,7 @@ in {
           "project"
           # TODO: re-implement it with pules
           "volatile-highlights"
+          "elpher"
         ];
       };
     };
