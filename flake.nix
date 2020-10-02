@@ -7,15 +7,9 @@
   # NOTE: XDG vairables collection https://github.com/jwiegley/nix-config/blob/master/config/home.nix#L48
   # TODO: Add notifications
   # TODO: Setup GTK theme
-  # TODO: Create template repo
   # TODO: Write setup instruction
 
-  # TODO: Add doom emacs https://github.com/vlaci/nix-doom-emacs/
   # TODO: Desktop entry for roam protocol https://www.orgroam.com/manual/Installation-_00281_0029.html#Installation-_00281_0029
-  # TODO: Chromium extra options https://github.com/jollheef/localhost/blob/master/desktop.nix#L126
-  # TODO: Configure self flake registry entry https://github.com/balsoft/nixos-config/blob/8b73315235c690a95cb8b83feb42d1eba0fd4122/modules/packages.nix
-  # TODO: Secrets from another flake
-  # TODO: i3 icons for ws 
 
   inputs = rec {
     stable.url = "github:NixOS/nixpkgs/nixos-20.03";
