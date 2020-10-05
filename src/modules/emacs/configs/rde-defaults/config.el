@@ -74,6 +74,12 @@
 
   (blink-cursor-mode -1))
 
+(use-package elisp-mode
+  :delight (emacs-lisp-mode "Elisp" :major))
+
+;; (use-package eldoc
+;;   :delight (eldoc-mode " εδ"))
+
 (use-package emacs
   :config
   ;; Disabled by default, but pretty useful in some cases

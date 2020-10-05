@@ -1,4 +1,5 @@
 (use-package company
+  :delight
   :hook
   (after-init-hook . global-company-mode)
   :bind (:map company-active-map
