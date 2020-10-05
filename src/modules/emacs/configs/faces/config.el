@@ -11,4 +11,6 @@
   (add-to-list 'default-frame-alist `(font . ,default-font))
   ;; (set-face-attribute 'variable-pitch nil :font "Source Sans Pro-10")
   (set-face-attribute 'variable-pitch nil :font "Open Sans-10")
+  ;; Without it tables becomes missaligned
+  (set-face-attribute 'link nil :inherit '(fixed-pitch button))
   ))
