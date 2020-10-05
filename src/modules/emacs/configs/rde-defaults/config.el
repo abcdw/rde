@@ -76,7 +76,7 @@
 (use-package frame
   :config
   ;; (setq hl-line-sticky-flag nil)
-  (global-hl-line-mode 1)
+  ;; (global-hl-line-mode 1)
 
   ;; box shape works bad with variable-pitch font because cursor has
   ;; the same width as letter under it and letters has variable width.
@@ -186,3 +186,37 @@
 (use-package restart-emacs
   :commands restart-emacs
   :bind ("C-c r e" . restart-emacs))
+
+(use-package pulse
+  :config
+  (setq pulse-delay 0.06)
+
+  ;; Inspired by Prot
+  (defface rde/pulse-face
+    '((t
+       :inherit
+       modus-theme-intense-yellow
+       ;; pulse-highlight-face
+       :extend t))
+    "Ad-hoc face for `rde/pulse-line'.
+This is done because it is not possible to highlight empty lines
+without the `:extend' property.")
+
+  (defun rde/pulse-line (&optional face)
+    "Temporarily highlight the current line."
+    (interactive)
+    (let ((start (if (and (eobp) (bolp))
+                     (line-beginning-position 0)
+                   (line-beginning-position)))
+          (end (line-beginning-position 2))
+          (face (or face 'rde/pulse-face)))
+      (pulse-momentary-highlight-region start end face)))
+
+  ;; https://www.reddit.com/r/emacs/comments/8qyq53/can_i_make_emacs_highlight_the_area_that_i_just/
+  (advice-add 'insert-for-yank :around
+	    (lambda (oldfun &rest args)
+	      (let ((beg (point)))
+		(prog1 (apply oldfun args)
+		  (pulse-momentary-highlight-region beg (point) 'rde/pulse-face))))
+            '((name . rde/pulse-after-yank)))
+  :hook (window-state-change-hook . rde/pulse-line))
