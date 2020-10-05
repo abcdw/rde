@@ -72,6 +72,11 @@
   ;; (setq hl-line-sticky-flag nil)
   (global-hl-line-mode 1)
 
+  ;; box shape works bad with variable-pitch font because cursor has
+  ;; the same width as letter under it and letters has variable width.
+  (setq-default cursor-type 'bar)
+
+  ;; Blinking sometimes distracting
   (blink-cursor-mode -1))
 
 (use-package elisp-mode
