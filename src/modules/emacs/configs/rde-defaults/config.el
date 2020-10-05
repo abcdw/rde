@@ -53,6 +53,12 @@
   (setq save-place-file (expand-file-name "places" rde/data-dir))
   (save-place-mode 1))
 
+(use-package autorevert
+  :diminish
+  :config
+  (setq auto-revert-verbose t)
+  :hook (after-init-hook . global-auto-revert-mode))
+
 (use-package bind-key
   :bind ("C-h y" . describe-personal-keybindings))
 
