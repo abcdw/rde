@@ -223,6 +223,13 @@ without the `:extend' property.")
             '((name . rde/pulse-after-yank)))
   :hook (window-state-change-hook . rde/pulse-line))
 
+
+(use-package info
+  :config
+  (add-to-list 'Info-directory-list ;; "/var/guix/profiles/per-user/abcdw/current-guix/share/info")
+	       "/home/abcdw/.guix-profile/share/info"))
+
+
 (use-package mwheel
   :custom
   (mouse-wheel-scroll-amount '(1
