@@ -266,6 +266,9 @@ in {
           "olivetti"
           "project"
           "elpher"
+          "geiser"
+          "guix"
+          "smartparens"
         ];
       };
     };
