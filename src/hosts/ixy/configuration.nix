@@ -144,7 +144,8 @@
   hardware.bluetooth.enable = true;
   services.blueman.enable = true;
 
-  console.font = lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-u28n.psf.gz";
+  console.font =
+    lib.mkDefault "${pkgs.terminus_font}/share/consolefonts/ter-u28n.psf.gz";
 
   time.timeZone = "Europe/Moscow";
 
@@ -162,6 +163,20 @@
   };
   hardware.steam-hardware.enable = true;
 
+  systemd.services.guix-daemon = {
+    enable = true;
+    description = "Build daemon for GNU Guix";
+    serviceConfig = {
+      ExecStart =
+        "/var/guix/profiles/per-user/root/current-guix/bin/guix-daemon --build-users-group=guixbuild";
+      Environment = "GUIX_LOCPATH=/root/.guix-profile/lib/locale";
+      RemainAfterExit = "yes";
+      StandardOutput = "syslog";
+      StandardError = "syslog";
+      TaskMax = "8192";
+    };
+    wantedBy = [ "multi-user.target" ];
+  };
   systemd.services.thinkpad-fix-sound = {
     description = "Fix the sound on X1 Yoga";
     path = [ pkgs.alsaTools ];
@@ -172,8 +187,11 @@
     '';
   };
 
+  virtualisation.libvirtd.enable = true;
+
   environment.systemPackages = with pkgs;
     [
+#      qemu
       # emacs
       # vim
       # git
@@ -196,8 +214,7 @@
   fileSystems."/mnt/flash" = {
     device = "/dev/sda1";
     fsType = "auto";
-    options = let
-    in [ "noauto,gid=100,uid=1000" ];
+    options = let in [ "noauto,gid=100,uid=1000" ];
   };
 
   fileSystems."/mnt/olorin/public" = {
@@ -244,7 +261,7 @@
     displayManager.defaultSession = "xsession";
     # https://vid.bina.me/tools/nixos/breaking-down-the-nixos-gui-setup/
     displayManager.job.logToJournal = true;
-    
+
     libinput.enable = true;
   };
 
