@@ -10,7 +10,7 @@
       unzip
       killall
       htop
-      ripgrep
+      #      ripgrep
       wget
       graphviz
       neovim
@@ -21,8 +21,10 @@
       feh
       gimp
       imagemagick
+      flameshot # Pretty cool qt screen shot tool
       ffmpeg
       pavucontrol
+      obs-studio
     ];
     font-packages = with pkgs; [
       # unstable.iosevka
@@ -35,10 +37,16 @@
       # hack-font
       # inconsolata
       # source-code-pro
-
+      source-sans-pro
       open-sans # required for telegram app
     ];
-    other-packages = with pkgs; [ tdesktop xfce.thunar gopass ];
+    other-packages = with pkgs; [
+      hexchat
+      tdesktop
+      xfce.thunar
+      gopass
+      guile
+    ];
     home-packages = dev-packages ++ cli-packages ++ media-packages
       ++ font-packages ++ other-packages;
 
@@ -247,7 +255,7 @@
       };
     };
 
-    services.rsibreak.enable = true;
+    #    services.rsibreak.enable = true;
     services.random-background = {
       enable = true;
       imageDirectory = "${xdg.userDirs.pictures}/wallpapers";
@@ -262,6 +270,7 @@
       defaultKeymap = "emacs";
       history.path = "${xdg.dataHome}/zsh/zsh_history";
       shellAliases = {
+        #        guix = "/var/guix/profiles/per-user/root/current-guix/bin/guix";
         gis = "git status -s";
         ku = "kubectl";
         ls = "ls --color";
@@ -272,7 +281,10 @@
         PROMPT = "%F{red}❯%f%F{yellow}❯%f%F{green}❯%f ";
         WORDCHARS = ""; # Make M-f, M-b jump to slashes in/the/path
       };
-      # initExtra = ''echo -en "\033[6 q"''; # Bar cursor
+      initExtra = # Bar cursor
+        ''
+          echo -en "\033[6 q"
+          source /var/guix/profiles/per-user/root/current-guix/etc/profile'';
     };
 
     programs.tmux = {
