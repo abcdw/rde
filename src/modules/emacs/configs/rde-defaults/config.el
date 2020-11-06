@@ -181,7 +181,9 @@
   (global-set-key (kbd "s-j") 'rde/join-line)
   (global-set-key (kbd "s-o") 'other-window)
   (global-set-key (kbd "s-n") 'switch-to-next-buffer)
-  (global-set-key (kbd "s-p") 'switch-to-prev-buffer))
+  (global-set-key (kbd "s-p") 'switch-to-prev-buffer)
+  ;; TODO: Add universal argument support to kill window and buffer.
+  (global-set-key (kbd "s-w") 'kill-current-buffer))
 
 (use-package restart-emacs
   :commands restart-emacs
