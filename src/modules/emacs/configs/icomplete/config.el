@@ -15,8 +15,8 @@
 
   ;; (setq icomplete-prospects-height 1)
   :bind (:map icomplete-minibuffer-map
-              ;; ("<down>" . icomplete-forward-completions)
-              ;; ("<up>" . icomplete-backward-completions)
+              ("<down>" . icomplete-forward-completions)
+              ("<up>" . icomplete-backward-completions)
 	      ("C-e" . rde/icomplete-eol-or-complete)
               ("C-n" . icomplete-forward-completions)
               ("C-p" . icomplete-backward-completions)))
