@@ -220,3 +220,20 @@ without the `:extend' property.")
 		  (pulse-momentary-highlight-region beg (point) 'rde/pulse-face))))
             '((name . rde/pulse-after-yank)))
   :hook (window-state-change-hook . rde/pulse-line))
+
+(use-package mwheel
+  :custom
+  (mouse-wheel-scroll-amount '(1
+                               ((shift) . 5)
+                               ((control))))
+  (mouse-wheel-progressive-speed nil))
+
+(use-package pixel-scroll
+  :config
+  (pixel-scroll-mode))
+
+(use-package emacs
+  :config
+  ;; (setq auto-window-vscroll nil)
+  (setq scroll-margin 7)
+  (setq scroll-conservatively 10000))
