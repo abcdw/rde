@@ -1,0 +1,51 @@
+Difference between system/modules and user/modules?
+
+* How to reuse rde?
+Pick all necessary profiles/packages/services. If you want to modify
+something just inherit or modify with special function.
+* Other
+- guix-hardware :: repository with hardware specific configurations
+
+* Principles
+- Compfort :: good contrast, readable fonts.
+- Reproducible :: setup can be easily replicated.
+* src content
+- modules :: small configuration for one or few packages
+- profiles :: collection of modules
+- hosts :: combination of profiles and modules
+
+* RDE parts
+- System configuration
+- User-space programs
+- Per-project environments
+* Directories and partitions
+** XDG intro
+Read [[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html][XDG Base Directory Specification]] for more information.
+*** User directories
+| variable        | default value     | description |
+|-----------------+-------------------+-------------|
+| XDG_CONFIG_HOME | [[file:~/.config][~/.config]]         | /hehe/        |
+| XDG_CACHE_HOME  | [[file:~/.cache][~/.cache]]          | =test=        |
+| XDG_DATA_HOME   | [[file:~/.local/share][~/.local/share]]    |             |
+| XDG_RUNTIME_DIR | /run/user/USER-ID |             |
+** Persistant store
+| destination                   | description         | /persistent                 | partition | sync | init url             |
+|-------------------------------+---------------------+-----------------------------+-----------+------+----------------------|
+| /etc/NetworkManager           | connections info    | ./system/etc/NetworkManager | @system   |      |                      |
+| -                             | swap file           | ./system/swap/swapfile      | @swap     |      |                      |
+| ~/pics                        |                     |                             |           |      |                      |
+| ~/vids                        |                     |                             |           |      |                      |
+| ~/archive                     | brtfs compression   |                             |           |      |                      |
+| ~/dl                          |                     |                             | @tmp      |      |                      |
+| ~/files/org                   | notes and org files | ./abcdw/files/org           | @small    | git  | olorin.lan/org-files |
+| ~/.local/share/password-store | passwords           | ./abcdw/pass-store1         | @small    | git  | olorin.lan/pw-store  |
+| ~/files/ledger                | finances info       | ./abcdw/files/ledger        | @small    | git  | olorin.lan/ledger    |
+* Tools
+| type     | component        | tool      | source |
+|----------+------------------+-----------+--------|
+| dev      | editor           | emacs     |        |
+| im       | telegram         | telega.el |        |
+| news     | rss              | elfeed.el |        |
+| security | password manager | pass      |        |
+|          | encryption tool  | gpg2      |        |
+|          | backup           | borg      |        |
