@@ -1,4 +1,4 @@
-Difference between system/modules and user/modules?
+-*- mode: org -*-
 
 * How to reuse rde?
 Pick all necessary profiles/packages/services. If you want to modify
