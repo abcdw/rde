@@ -29,17 +29,19 @@ Read [[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.h
 | XDG_DATA_HOME   | [[file:~/.local/share][~/.local/share]]    |             |
 | XDG_RUNTIME_DIR | /run/user/USER-ID |             |
 ** Persistant store
-| destination                   | description         | /persistent                 | partition | sync | init url             |
-|-------------------------------+---------------------+-----------------------------+-----------+------+----------------------|
-| /etc/NetworkManager           | connections info    | ./system/etc/NetworkManager | @system   |      |                      |
-| -                             | swap file           | ./system/swap/swapfile      | @swap     |      |                      |
-| ~/pics                        |                     |                             |           |      |                      |
-| ~/vids                        |                     |                             |           |      |                      |
-| ~/archive                     | brtfs compression   |                             |           |      |                      |
-| ~/dl                          |                     |                             | @tmp      |      |                      |
-| ~/files/org                   | notes and org files | ./abcdw/files/org           | @small    | git  | olorin.lan/org-files |
-| ~/.local/share/password-store | passwords           | ./abcdw/pass-store1         | @small    | git  | olorin.lan/pw-store  |
-| ~/files/ledger                | finances info       | ./abcdw/files/ledger        | @small    | git  | olorin.lan/ledger    |
+| destination                   | description         | /persistent                 | partition | sync    | init url             |
+|-------------------------------+---------------------+-----------------------------+-----------+---------+----------------------|
+| /etc/NetworkManager           | connections info    | ./system/etc/NetworkManager | @system   |         |                      |
+| -                             | swap file           | ./system/swap/swapfile      | @swap     |         |                      |
+| ~/pics                        |                     |                             |           |         |                      |
+| ~/vids                        |                     |                             |           |         |                      |
+| ~/archive                     | brtfs compression   |                             |           |         |                      |
+| ~/dl                          |                     |                             | @tmp      |         |                      |
+| ~/files/org                   | notes and org files | ./abcdw/files/org           | @small    | git     | olorin.lan/org-files |
+| ~/.local/share/password-store | passwords           | ./abcdw/pass-store1         | @small    | git     | olorin.lan/pw-store  |
+| ~/files/ledger                | finances info       | ./abcdw/files/ledger        | @small    | git     | olorin.lan/ledger    |
+| ~/files/stream-materials      |                     |                             |           | archive |                      |
+| /gnu/store                    |                     |                             |           |         |                      |
 * Tools
 | type     | component        | tool      | source |
 |----------+------------------+-----------+--------|
