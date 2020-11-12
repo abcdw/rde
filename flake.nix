@@ -54,12 +54,12 @@
 
       templates = {
         python.poetry = {
-          path = ./templates/python/poetry;
+          path = ./src/templates/python/poetry;
           description = "Project with poetry2nix, nix devel and nix build.";
         };
         rde = { };
       };
-      defaultTemplate = inputs.self.templates.rde;
+      defaultTemplate = inputs.self.templates.python.poetry;
 
       devShell."${system}" = import ./shell.nix {
         pkgs = inputs.stable.legacyPackages.${system};
