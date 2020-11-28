@@ -139,7 +139,7 @@ let
       rde-variables-package =
         build-emacs-package "rde-variables" rde-variables-text;
 
-      rde-configs-text = (readFile ./rde-configs.el)
+      rde-configs-text = (readFile ./use-package-init.el)
         + configSetToConfig emacsConfigs + "(provide 'rde-configs)";
       rde-configs-package = build-emacs-package "rde-configs" rde-configs-text;
 
