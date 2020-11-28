@@ -1,6 +1,6 @@
 (use-package ibuffer
   :config
-  (global-set-key [remap list-buffers] 'ibuffer-list-buffers))
+  (global-set-key [remap list-buffers] 'ibuffer-jump))
 
 (use-package ibuffer-vc
   :after ibuffer
