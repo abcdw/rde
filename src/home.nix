@@ -132,7 +132,7 @@
         draw_bold_text_with_bright_colors = true;
 
         font = {
-          size = 9;
+          size = config.rde.fontSize;
           bold = { style = "Bold"; };
         };
 
@@ -324,6 +324,7 @@
         signByDefault = true;
       };
     };
+
     programs.ssh = {
       enable = true;
       matchBlocks = {
