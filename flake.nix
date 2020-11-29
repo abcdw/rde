@@ -54,7 +54,7 @@
 
       templates = {
         python.poetry = {
-          path = ./src/templates/python/poetry;
+          path = ./nix/templates/python/poetry;
           description = "Project with poetry2nix, nix devel and nix build.";
         };
         rde = { };
@@ -66,7 +66,7 @@
         #import inputs.stable { inherit system; };
       };
 
-      nixosModules = { rde = (import ./src/modules/default.nix); };
+      nixosModules = { rde = (import ./nix/modules/default.nix); };
       nixosModule = inputs.self.nixosModules.rde;
 
       nixosConfigurations = {
@@ -75,13 +75,13 @@
           modules = [
             { nixpkgs.overlays = [ overlays.unstable ]; }
 
-            (import ./src/hosts/xenia)
+            (import ./nix/hosts/xenia)
 
             inputs.self.nixosModules.rde
-            (import ./src/config.nix)
+            (import ./nix/config.nix)
 
             inputs.home-manager.nixosModules.home-manager
-            (import ./src/home-splitted.nix)
+            (import ./nix/home-splitted.nix)
 
             inputs.stable.nixosModules.notDetected
           ];
@@ -93,13 +93,13 @@
             { nixpkgs.overlays = [ overlays.unstable ]; }
 
             inputs.nixos-hardware.nixosModules.lenovo-thinkpad-x1-7th-gen
-            (import ./src/hosts/ixy)
+            (import ./nix/hosts/ixy)
 
             inputs.home-manager.nixosModules.home-manager
-            (import ./src/home.nix)
+            (import ./nix/home.nix)
 
             inputs.self.nixosModules.rde
-            (import ./src/config.nix)
+            (import ./nix/config.nix)
 
             inputs.stable.nixosModules.notDetected
           ];
@@ -109,7 +109,7 @@
           system = "x86_64-linux";
           modules = [
             # { nixpkgs.overlays = [ overlays.unstable ]; }
-            (import ./src/devices/aws.nix)
+            (import ./nix/devices/aws.nix)
             ({ pkgs, ... }: {
               networking.hostName = "aws-proxy";
               environment.systemPackages = [ pkgs.htop ];
