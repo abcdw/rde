@@ -1,0 +1,10 @@
+-*- mode: org -*-
+* UI
+** TODO Separate workspaces for different workflows
+- code
+- communication
+- multimedia
+** TODO Setup 3 main fonts
+| Monospaced | Iosveka   |
+| Sans       | OpenSans? |
+| Sans-serif | Arial?    |
