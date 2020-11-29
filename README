@@ -1,10 +1,10 @@
 -*- mode: org -*-
 * rde
+Set of tools for managing computing environments with GNU Guix.
+
 *Disclaimer:* currently this is a proof of concept project.
 
 *Tip:* older Nix source code is available under ~stale/~ directory.
-
-Set of tools for managing computing environments with GNU Guix.
 ** Principles
 - Ergonomic :: Sane keybindings, good contrast, readable fonts.
 - Reproducible :: Setup can be easily replicated.
@@ -12,11 +12,16 @@ Set of tools for managing computing environments with GNU Guix.
 - Stateless :: All state must be explicit and syncable or temporary.
 
 ** Latest screenshot
-
+Just a picture to catch your eye.
 #+CAPTION: Latest rde screenshot
 #+NAME:   fig:latest-screenshot
 [[https://user-images.githubusercontent.com/1218615/78423008-06bfcc80-766c-11ea-8a79-ec63f1237126.png]]
-** Draft sections [WIP]
+** Usage [WIP]
+
+#+begin_src shell
+make everything
+#+end_src
+** COMMENT Draft sections [WIP]
 *** src content
 - modules :: small configuration for one or few packages
 - profiles :: collection of modules
