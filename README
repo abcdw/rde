@@ -6,23 +6,32 @@ Set of tools for managing computing environments.
 - Reproducible :: setup can be easily replicated.
 - Hackable :: easy to throw out or modify any part of setup.
 - Stateless :: all state must be explicit and syncable or temporary.
-* src content
+
+*Tip:*
+Nix source code is available under ~stale/~ directory
+** Latest screenshot
+
+#+CAPTION: Latest rde screenshot
+#+NAME:   fig:latest-screenshot
+[[https://user-images.githubusercontent.com/1218615/78423008-06bfcc80-766c-11ea-8a79-ec63f1237126.png]]
+** Draft sections [WIP]
+*** src content
 - modules :: small configuration for one or few packages
 - profiles :: collection of modules
 - hosts :: combination of profiles and modules
 
-* Directories and partitions [WIP]
+*** Directories and partitions
 
-** XDG intro
+**** XDG intro
 Read [[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html][XDG Base Directory Specification]] for more information.
-*** User directories
+***** User directories
 | variable        | default value     | description |
 |-----------------+-------------------+-------------|
 | XDG_CONFIG_HOME | [[file:~/.config][~/.config]]         | /hehe/        |
 | XDG_CACHE_HOME  | [[file:~/.cache][~/.cache]]          | =test=        |
 | XDG_DATA_HOME   | [[file:~/.local/share][~/.local/share]]    |             |
 | XDG_RUNTIME_DIR | /run/user/USER-ID |             |
-* Tools [WIP]
+*** Tools
 | type     | component        | tool      | source |
 |----------+------------------+-----------+--------|
 | dev      | editor           | emacs     |        |
