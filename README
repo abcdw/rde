@@ -1,16 +1,22 @@
 -*- mode: org -*-
 * rde
-Set of tools for managing computing environments with GNU Guix.
+Set of tools for managing computing environments with GNU Guix. More
+info is available on [[http://trop.in][trop.in]].
 
-*Disclaimer:* currently this is a proof of concept project.
+*Disclaimer:* project in a proof of concept stage.
 
 *Tip:* older Nix source code is available under ~stale/~ directory.
 ** Principles
+*** Main
 - Ergonomic :: Sane keybindings, good contrast, readable fonts.
 - Reproducible :: Setup can be easily replicated.
 - Hackable :: Easy to throw out or modify any part of setup.
 - Stateless :: All state must be explicit and syncable or temporary.
-
+*** Secondary
+- Battery efficient :: wayland, no hungry constantly running apps.
+- Offline :: most of workflows and apps should work without network.
+- Attention-friendly :: minimal use of notification and other
+  distractive things.
 ** Latest screenshot
 Just a picture to catch your eye.
 #+CAPTION: Latest rde screenshot
