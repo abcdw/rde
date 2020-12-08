@@ -9,6 +9,8 @@
 
 ;; Ignore X resources
 (advice-add #'x-apply-session-resources :override #'ignore)
+;; TODO: Probably the better approach is:
+;; (setq inhibit-x-resources t)
 
 ;; Do not resize the frame at this early stage.
 (setq frame-inhibit-implied-resize t)
@@ -21,4 +23,3 @@
 (push '(menu-bar-lines . 0) default-frame-alist)
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
-
