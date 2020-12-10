@@ -15,15 +15,6 @@
   (timezone "Europe/Moscow")
   (locale "en_US.utf8")
 
-  ;; (kernel linux)
-  ;; (firmware (cons* iwlwifi-firmware
-  ;;                  %base-firmware))
-
-  ;; (kernel linux@5.4)
-  ;; (initrd microcode-initrd)
-  ;; (firmware (list linux-firmware))
-  ;; Choose US English keyboard layout.  The "altgr-intl"
-  ;; variant provides dead keys for accented characters.
   (keyboard-layout
    (keyboard-layout "us,ru" "dvorak,"
 		    #:options '("grp:win_space_toggle" "ctrl:nocaps")))
