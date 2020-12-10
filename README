@@ -13,7 +13,7 @@ info is available on [[http://trop.in][trop.in]].
 - Hackable :: Easy to throw out or modify any part of setup.
 - Stateless :: All state must be explicit and syncable or temporary.
 *** Secondary
-- Battery efficient :: wayland, no hungry constantly running apps.
+- Lightweight and battery efficient :: wayland, fast native apps.
 - Offline :: most of workflows and apps should work without network.
 - Attention-friendly :: minimal use of notification and other
   distractive things.
