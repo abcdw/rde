@@ -47,38 +47,40 @@
 	       %base-packages-disk-utilities
 	       %base-packages))
 
-    (sudoers-file (plain-file "sudoers" "\
-root ALL=(ALL) ALL
-%wheel ALL=NOPASSWD: ALL\n"))
-
-    (services
-     (append
-      (list
-       ;; (service documentation-service-type "tty2")
-       (service pcscd-service-type)
-       (service console-font-service-type
-                (map (match-lambda
-                       ("tty2"
-                        '("tty2" . "LatGrkCyr-8x16"))
-		       ("tty3"
-			`("tty3" . ,(file-append
-				     font-terminus
-				     "/share/consolefonts/ter-132n")))
-                       (tty
-                        ;; Use a font that doesn't have more than 256
-                        ;; glyphs so that we can use colors with varying
-                        ;; brightness levels (see note in setfont(8)).
-                        `(,tty . "lat9u-16")))
-                     '("tty1" "tty2" "tty3" "tty4" "tty5" "tty6"))))
-      (cons*
-       (modify-services
-	(remove (lambda (service)
-                  (member (service-kind service)
-                          (list
-                           gdm-service-type
-			   console-font-service-type
-                           )))
-		%desktop-services)))))))
+    (services (append (list (service pcscd-service-type))
+		      (operating-system-services gnu-system-install:installation-os)))
+    ;; (services
+    ;;  (append
+    ;;   (list
+    ;;    ;; (service documentation-service-type "tty2")
+    ;;    (service pcscd-service-type)
+    ;;    ;; (service console-font-service-type
+    ;;    ;;          (map (match-lambda
+    ;;    ;;                 ("tty2"
+    ;;    ;;                  '("tty2" . "LatGrkCyr-8x16"))
+    ;;    ;; 		       ("tty3"
+    ;;    ;; 			`("tty3" . ,(file-append
+    ;;    ;; 				     font-terminus
+    ;;    ;; 				     "/share/consolefonts/ter-132n")))
+    ;;    ;;                 (tty
+    ;;    ;;                  ;; Use a font that doesn't have more than 256
+    ;;    ;;                  ;; glyphs so that we can use colors with varying
+    ;;    ;;                  ;; brightness levels (see note in setfont(8)).
+    ;;    ;;                  `(,tty . "lat9u-16")))
+    ;;    ;;               '("tty1" "tty2" "tty3" "tty4" "tty5" "tty6")))
+    ;;    )
+    ;;   (operating-system-services gnu-system-install:installation-os)
+    ;;   ;; (cons*
+    ;;   ;;  (modify-services
+    ;;   ;; 	(remove (lambda (service)
+    ;;   ;;             (member (service-kind service)
+    ;;   ;;                     (list
+    ;;   ;;                      gdm-service-type
+    ;;   ;; 			   console-font-service-type
+    ;;   ;;                      )))
+    ;;   ;; 		)))
+    ;;   ))
+    ))
 
 (pretty-print (map service-kind (operating-system-services installation-os)))
 installation-os
