@@ -8,7 +8,7 @@
   #:use-module (gnu packages admin)
   #:use-module (gnu packages fonts)
   #:use-module (gnu system keyboard)
-  #:use-module ((gnu system install) #:prefix gnu-system-install)
+  #:use-module ((gnu system install) #:prefix gnu-system-install:)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system accounts)
   #:use-module (gnu system shadow)
@@ -26,7 +26,7 @@
 
 (define installation-os
   (operating-system
-    (inherit gun-system-install:installation-os)
+    (inherit gnu-system-install:installation-os)
     (keyboard-layout
      (keyboard-layout "us,ru" "dvorak,"
 		      #:options '("grp:win_space_toggle" "ctrl:nocaps")))
