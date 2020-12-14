@@ -2,100 +2,79 @@
   #:use-module (gnu system)
   #:use-module (gnu packages)
   #:use-module (guix packages)
+  #:use-module (guix gexp)
   #:use-module (gnu packages bootloaders)
   #:use-module (gnu packages bash)
+  #:use-module (gnu packages admin)
+  #:use-module (gnu packages fonts)
   #:use-module (gnu system keyboard)
-  #:use-module (gnu system install)
+  #:use-module ((gnu system install) #:prefix gnu-system-install)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system accounts)
+  #:use-module (gnu system shadow)
+  #:use-module (gnu system pam)
   #:use-module (gnu services)
+  #:use-module (gnu services base)
   #:use-module (gnu services xorg)
   #:use-module (gnu services desktop)
   #:use-module (gnu services sddm)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 pretty-print)
-  #:use-module (nongnu packages linux)
-  #:export (installation-os-nonfree))
+  #:use-module (ice-9 match)
+  #:use-module (rde emacs packages)
+  #:export (installation-os))
 
-(define installation-os-nonfree
+(define installation-os
   (operating-system
-    (inherit installation-os)
-    (kernel linux)
+    (inherit gun-system-install:installation-os)
     (keyboard-layout
      (keyboard-layout "us,ru" "dvorak,"
 		      #:options '("grp:win_space_toggle" "ctrl:nocaps")))
 
-    ;; (firmware (list linux-firmware))
-    (firmware (cons* iwlwifi-firmware
-                     %base-firmware))
-
-    (file-systems
-     ;; Note: the disk image build code overrides this root file system with
-     ;; the appropriate one.
-     (cons* (file-system
-              (mount-point "/")
-              (device (file-system-label "Guix_image"))
-              (type "ext4"))
-
-            ;; Make /tmp a tmpfs instead of keeping the overlayfs.  This
-            ;; originally was used for unionfs because FUSE creates
-            ;; '.fuse_hiddenXYZ' files for each open file, and this confuses
-            ;; Guix's test suite, for instance (see
-            ;; <http://bugs.gnu.org/23056>).  We keep this for overlayfs to be
-            ;; on the safe side.
-            (file-system
-              (mount-point "/tmp")
-              (device "none")
-              (type "tmpfs")
-              (check? #f))
-
-            ;; XXX: This should be %BASE-FILE-SYSTEMS but we don't need
-            ;; elogind's cgroup file systems.
-            (list %pseudo-terminal-file-system
-                  %shared-memory-file-system
-                  %efivars-file-system
-                  %immutable-store)))
-
-    (users (list (user-account
-                  (name "guest")
-                  (group "users")
-                  (supplementary-groups '("wheel")) ; allow use of sudo
-                  (password "")
-                  (comment "Guest of GNU"))))
-
     (packages (append
 	       (map specification->package+output
-		    '("htop" "font-iosevka"
+		    '("htop"
+		      "font-iosevka" "font-dejavu" "font-gnu-unifont"
 		      "emacs-next-pgtk" "emacs-guix" "emacs-use-package"
 		      "emacs-magit"
 		      "dmenu" "alacritty"
 		      "ungoogled-chromium-wayland"
 		      "sway" "wofi" "waybar" "light"
-		      "git" "make" "iwd"
-		      "gparted"))
+		      "git" "gnupg" "make" "iwd"
+		      "gparted" "grub"
+		      "glibc" "nss-certs"))
 	       %base-packages-disk-utilities
 	       %base-packages))
 
     (services
      (append
-      (list (service sddm-service-type
-		     (sddm-configuration
-		      (display-server "wayland")
-		      (xorg-configuration
-                       (xorg-configuration
-                        (keyboard-layout keyboard-layout)))
-		      (auto-login-user "guest")
-		      (auto-login-session "sway.desktop"))))
+      (list
+       ;; (service documentation-service-type "tty2")
+       (service console-font-service-type
+                (map (match-lambda
+                       ("tty2"
+                        '("tty2" . "LatGrkCyr-8x16"))
+		       ("tty3"
+			`("tty3" . ,(file-append
+				     font-terminus
+				     "/share/consolefonts/ter-132n")))
+                       (tty
+                        ;; Use a font that doesn't have more than 256
+                        ;; glyphs so that we can use colors with varying
+                        ;; brightness levels (see note in setfont(8)).
+                        `(,tty . "lat9u-16")))
+                     '("tty1" "tty2" "tty3" "tty4" "tty5" "tty6"))))
       (cons*
        (modify-services
 	(remove (lambda (service)
                   (member (service-kind service)
                           (list
                            gdm-service-type
+			   console-font-service-type
                            )))
 		%desktop-services))) ;;end of remove services
        ))
     ))
 
 (pretty-print (map service-kind (operating-system-services installation-os)))
-installation-os-nonfree
+installation-os
