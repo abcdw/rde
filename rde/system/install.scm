@@ -18,6 +18,7 @@
   #:use-module (gnu services xorg)
   #:use-module (gnu services desktop)
   #:use-module (gnu services sddm)
+  #:use-module (gnu services security-token)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 pretty-print)
   #:use-module (ice-9 match)
@@ -46,10 +47,15 @@
 	       %base-packages-disk-utilities
 	       %base-packages))
 
+    (sudoers-file (plain-file "sudoers" "\
+root ALL=(ALL) ALL
+%wheel ALL=NOPASSWD: ALL\n"))
+
     (services
      (append
       (list
        ;; (service documentation-service-type "tty2")
+       (service pcscd-service-type)
        (service console-font-service-type
                 (map (match-lambda
                        ("tty2"
@@ -72,9 +78,7 @@
                            gdm-service-type
 			   console-font-service-type
                            )))
-		%desktop-services))) ;;end of remove services
-       ))
-    ))
+		%desktop-services)))))))
 
 (pretty-print (map service-kind (operating-system-services installation-os)))
 installation-os
