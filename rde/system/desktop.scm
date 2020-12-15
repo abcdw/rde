@@ -28,7 +28,7 @@
   ;; The UUID is that returned by 'cryptsetup luksUUID'.
 
   (mapped-devices (list (mapped-device
-                         (source "0e51ee1e-49ef-45c6-b0c3-6307e9980fa9")
+                         (source (uuid "0e51ee1e-49ef-45c6-b0c3-6307e9980fa9"))
                          (target "enc")
                          (type luks-device-mapping))))
 
