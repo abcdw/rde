@@ -46,9 +46,10 @@
 			 (options "subvol=boot")
                          ;; (flags '(no-atime))
                          (dependencies mapped-devices))
-		       ;; (file-system
-		       ;; 	(mount-point "/boot/efi")
-                       ;;  (type "vfat"))
+		       (file-system
+			(mount-point "/boot/efi")
+                        (type "vfat")
+			(device (uuid "8C99-0704" 'fat32)))
                        %base-file-systems))
 
   ;; Create user `bob' with `alice' as its initial password.
