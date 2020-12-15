@@ -20,7 +20,8 @@ set $term alacritty
 # on the original workspace that the command was run on.
 set $menu wofi --show=drun
 # dmenu_path | dmenu | xargs swaymsg exec --
-
+default_border pixel
+gaps inner 10
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/share/backgrounds/sway/)
