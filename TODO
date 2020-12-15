@@ -9,7 +9,7 @@
 | Sans       | OpenSans? |
 | Sans-serif | Arial?    |
 * LiveCD image
-** TODO Make a simple image for installation purpose
+** DONE Make a simple image for installation purpose
 * General
 ** DONE Make a channel for rde like home manager
 - https://framagit.org/tyreunom/guix-home-manager
