@@ -52,3 +52,5 @@ chown guest:users desktop.scm
 chmod u+w desktop.scm
 
 cryptsetup luksUUID /dev/nvme0n1p5
+
+guix system init /home/guest/work/rde/rde/system/desktop.scm /mnt
