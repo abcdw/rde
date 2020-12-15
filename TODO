@@ -1,6 +1,6 @@
 -*- mode: org -*-
 * UI
-** TODO Separate workspaces for different workflows
+** TODO Separate sway workspaces for different workflows
 - code
 - communication
 - multimedia
@@ -10,3 +10,8 @@
 | Sans-serif | Arial?    |
 * LiveCD image
 ** TODO Make a simple image for installation purpose
+* General
+** DONE Make a channel for rde like home manager
+- https://framagit.org/tyreunom/guix-home-manager
+** TODO Example -> systems + make instruction how to inherit
+- Make README inside system directory explaining inheritance.
