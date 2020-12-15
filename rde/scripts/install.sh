@@ -11,9 +11,12 @@ ln -sf /home/guest/work/rde/stale/dotfiles/.config/alacritty ~/.config/
 ln -sf /home/guest/work/rde/stale/dotfiles/.tmux.conf ~/
 
 sudo -s
+# /dev/nvme0n1p5 empty partition without filesystem that will be
+# encrypted
+cryptsetup luksFormat /dev/nvme0n1p5 enc
 cryptsetup luksOpen /dev/nvme0n1p5 enc
-mount -t btrfs /dev/mapper/enc /mnt
 
+mount -t btrfs /dev/mapper/enc /mnt
 
 
 btrfs subvolume create /mnt/root
@@ -43,6 +46,9 @@ mount -o subvol=gnu /dev/mapper/enc gnu
 mount -o subvol=data /dev/mapper/enc data
 mount -o subvol=log /dev/mapper/enc var/log
 mount -o subvol=boot /dev/mapper/enc boot
+
+blkid # to get uuid of EFI_PARTITION
+mount YOUR_EFI_PARTITION /mnt/boot/efi
 
 herd start cow-store /mnt
 
