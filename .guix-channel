@@ -1,5 +1,3 @@
-;; -*- mode: scheme -*-
-
 (channel
  (version 0)
  (dependencies
