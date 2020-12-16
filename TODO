@@ -15,3 +15,7 @@
 - https://framagit.org/tyreunom/guix-home-manager
 ** TODO Example -> systems + make instruction how to inherit
 - Make README inside system directory explaining inheritance.
+* Emacs
+** TODO Package early-init.el
+** TODO Package rde-core
+Contains use-package initialization.
