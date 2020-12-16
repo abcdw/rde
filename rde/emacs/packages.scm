@@ -11,21 +11,33 @@
   #:use-module (guix build emacs-utils)
   #:use-module (ice-9 pretty-print)
   #:use-module (guix utils)
-  #:use-module ((guix licenses) #:prefix license:))
+  #:use-module ((guix licenses) #:prefix license:)
+  ;; #:export (%rde-emacs-packages
+  ;; 	    emacs-rde-core)
+  )
 
-(define-public emacs-rde
+(define-public emacs-rde-core
   (package
-    (name "emacs-rde")
+    (name "emacs-rde-core")
     (version "0.2.0")
     (build-system emacs-build-system)
-    (source (local-file "emacs-rde.el"))
-    (propagated-inputs `(("which-key" ,emacs-which-key)
-			 ("use-package" ,emacs-use-package)))
-    (synopsis "test")
-    (description "test")
+    (source (local-file "rde-core.el"))
+    (propagated-inputs `(("use-package" ,emacs-use-package)))
+    (synopsis "use-package initialization")
+    (description "use-package initialization")
     (home-page "https://github.com/abcdw/rde")
     (license license:gpl3+)))
 
+(define-public emacs-rde-early-init
+  (package
+    (name "emacs-rde-early-init")
+    (version "0.2.0")
+    (build-system emacs-build-system)
+    (source (local-file "early-init.el"))
+    (synopsis "Different tweaks for faster startup")
+    (description "In addition to tweaks, disables GUI elements")
+    (home-page "https://github.com/abcdw/rde")
+    (license license:gpl3+)))
 
 ;; (symlink "./emacs-rde.el" "/home/abcdw/tmp-file.el")
 
@@ -54,17 +66,9 @@
 (packages->manifest
  ;; (append (map rde-emacs-instead-of-emacs rde-emacs-packages)
  ;; 	 '(rde-emacs))
- (list
-  emacs
-  ;; emacs-next-pgtk
-  ;; (rde-emacs-instead-of-emacs
-  ;;  )
-  emacs-use-package
-  emacs-which-key
-  emacs-magit
-  emacs-rde
-  ;; emacs-ivy
-  ))
+)
 
+(define-public %rde-emacs-packages
+  (list emacs-next-pgtk emacs-rde-early-init emacs-rde-core))
 ;; (specifications->manifest
 ;;  '("emacs"))
