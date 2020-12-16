@@ -13,10 +13,12 @@
   (setq use-package-hook-name-suffix nil))
 
 (require 'use-package)
+;;; May improve startup time, but doesn't work with compute-statistics
+;; (eval-when-compile
+;;   (require 'use-package))
+;; (require 'bind-key)
 
+;; TODO: add use-package info to info dirs
+;; https://jwiegley.github.io/use-package/installation/
 
-(use-package which-key
-  :config
-  (which-key-mode))
-
-;; (provide 'rde-configs)
+(provide 'rde-core)
