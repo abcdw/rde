@@ -64,5 +64,5 @@
     (setuid-programs (list (file-append shadow "/bin/passwd")
 			   (file-append sudo "/bin/sudo")))))
 
-(pretty-print (map service-kind (operating-system-services installation-os)))
+;; (pretty-print (map service-kind (operating-system-services installation-os)))
 installation-os

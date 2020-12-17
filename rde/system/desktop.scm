@@ -35,9 +35,6 @@
   #:use-module (rde packages)
   #:export (os))
 
-;; (use-modules (rde emacs packages))
-;; (pretty-print %rde-base-packages)
-
 (define os
   (operating-system
    (host-name "antelope")
@@ -134,7 +131,7 @@
 		     "git" "gnupg" "make" "iwd"
 		     "grub" "glibc" "nss-certs"))
 	      ;; (list emacs-rde-core)
-	      ;; %rde-emacs-packages
+	      %rde-base-packages
 	      %base-packages-disk-utilities
 	      %base-packages))
    
@@ -152,7 +149,6 @@
    ;; Allow resolution of '.local' host names with mDNS.
    (name-service-switch %mdns-host-lookup-nss)))
 
-
-(pretty-print (map service-kind (operating-system-services os)))
+;; (pretty-print (map service-kind (operating-system-services os)))
 
 os
