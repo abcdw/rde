@@ -32,8 +32,11 @@
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 pretty-print)
   #:use-module (ice-9 match)
-  #:use-module (rde emacs packages)
+  #:use-module (rde packages)
   #:export (os))
+
+;; (use-modules (rde emacs packages))
+;; (pretty-print %rde-base-packages)
 
 (define os
   (operating-system
@@ -149,7 +152,7 @@
    ;; Allow resolution of '.local' host names with mDNS.
    (name-service-switch %mdns-host-lookup-nss)))
 
-(pretty-print %rde-emacs-packages)
-(pretty-print (map service-kind (operating-system-services installation-os)))
+
+(pretty-print (map service-kind (operating-system-services os)))
 
 os
