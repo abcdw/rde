@@ -5,7 +5,6 @@
 (define-module (rde system desktop)
   #:use-module (gnu system)
   #:use-module (gnu packages)
-  #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)
@@ -139,16 +138,29 @@
    ;; by clicking the gear.  Use the "desktop" services, which
    ;; include the X11 log-in service, networking with
    ;; NetworkManager, and more.
-   (services (append (list (service gnome-desktop-service-type)
-                           (service xfce-desktop-service-type)
-                           (set-xorg-configuration
-                            (xorg-configuration
-                             (keyboard-layout keyboard-layout))))
-                     %desktop-services))
+   (services
+    (append
+     (list
+      (service pcscd-service-type)
+      (service sddm-service-type
+		     (sddm-configuration
+		      (display-server "wayland")
+		      (xorg-configuration
+                       (xorg-configuration
+                        (keyboard-layout keyboard-layout)))
+		      ;; (auto-login-user "guest")
+		      ;; (auto-login-session "sway.desktop")
+		      )))
+     (remove (lambda (service)
+	       (member (service-kind service)
+		       (list gdm-service-type
+			     screen-locker-service-type)))
+	     %desktop-services)))
 
    ;; Allow resolution of '.local' host names with mDNS.
    (name-service-switch %mdns-host-lookup-nss)))
 
 ;; (pretty-print (map service-kind (operating-system-services os)))
-
+;; (pretty-print (map service-kind %desktop-services))
+;; (pretty-print (map service-kind %base-services))
 os
