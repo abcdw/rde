@@ -1,0 +1,6 @@
+-*- mode: org -*-
+
+** Principles
+- Get out of the way :: WM just positioning windows + have few
+  explicit hotkeys for operating on windows, mostly
+  ~Win+Shift+something~.
