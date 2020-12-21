@@ -8,6 +8,7 @@
   #:use-module (guix gexp)
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)
+  #:use-module (gnu packages wm)
   #:use-module (gnu packages bootloaders)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages admin)
@@ -119,18 +120,16 @@
 	      (map specification->package+output
 		   '("htop"
 		     "font-iosevka" "font-dejavu" "font-gnu-unifont"
-		     "emacs-next-pgtk" "emacs-guix" "emacs-use-package"
-		     "emacs-magit"
 		     "hexchat" "mpv" "imv"
 		     "dmenu" "alacritty"
 		     "ungoogled-chromium-wayland"
 		     "sway" "wofi" "waybar" "light"
-
+		     ;; "swaylock"
 		     ;; System packages
 		     "git" "gnupg" "make" "iwd"
 		     "grub" "glibc" "nss-certs"))
 	      ;; (list emacs-rde-core)
-	      %rde-base-packages
+	      %rde-all-packages
 	      %base-packages-disk-utilities
 	      %base-packages))
    
@@ -142,6 +141,7 @@
     (append
      (list
       (service pcscd-service-type)
+      (screen-locker-service swaylock "swaylock")
       (service sddm-service-type
 		     (sddm-configuration
 		      (display-server "wayland")
