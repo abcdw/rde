@@ -1,8 +1,9 @@
 
-(eval-and-compile
-  (setq use-package-enable-imenu-support t)
-  (setq use-package-compute-statistics t)
+(progn
+  ;; (setq use-package-enable-imenu-support t)
+  ;; (setq use-package-compute-statistics t)
   (setq use-package-verbose nil)
+  (setq use-package-expand-minimally t)
   ;; The following is VERY IMPORTANT.  Write hooks using their real name
   ;; instead of a shorter version: after-init ==> `after-init-hook'.
   ;;
@@ -13,6 +14,7 @@
   (setq use-package-hook-name-suffix nil))
 
 (require 'use-package)
+
 ;;; May improve startup time, but doesn't work with compute-statistics
 ;; (eval-when-compile
 ;;   (require 'use-package))
