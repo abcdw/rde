@@ -1,0 +1,5 @@
+-*- mode: org -*-
+
+* COMMENT Notes
+  ~gpgconf --list-dirs~
+  
