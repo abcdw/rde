@@ -19,7 +19,9 @@
   :config
   ;; According to XDG files with data should be placed in
   ;; ~/.local/share, btw it's not necessary to use customize at all
-  (setq custom-file rde/custom-file))
+  (setq custom-file rde/custom-file)
+  ;; FIXME: probably (load custom-file) is required here
+  )
 
 (use-package recentf
   :config
