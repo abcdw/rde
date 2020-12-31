@@ -10,6 +10,7 @@
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages sqlite)
   #:use-module (guix build emacs-utils)
   #:use-module (ice-9 pretty-print)
   #:use-module (guix utils)
@@ -61,6 +62,33 @@
     (source (local-file "early-init.el"))
     (synopsis "Different tweaks for faster startup")
     (description "In addition to tweaks, disables GUI elements")
+    (home-page "https://github.com/abcdw/rde")
+    (license license:gpl3+)))
+
+(define-public emacs-rde-org-roam
+  (package
+    (name "emacs-rde-org-roam")
+    (version "0.2.0")
+    (build-system emacs-build-system)
+    (source (local-file "rde-org-roam.el"))
+    (inputs `(("emacs-rde-core" ,emacs-rde-core)))
+    (propagated-inputs `(("emacs-org-roam" ,emacs-org-roam)
+			 ("sqlite3" ,sqlite)))
+    (synopsis "Enables org-roam and configures basic hotkeys")
+    (description "")
+    (home-page "https://github.com/abcdw/rde")
+    (license license:gpl3+)))
+
+(define-public emacs-rde-modus-themes
+  (package
+    (name "emacs-rde-modus-themes")
+    (version "0.2.0")
+    (build-system emacs-build-system)
+    (source (local-file "rde-modus-themes.el"))
+    (inputs `(("emacs-rde-core" ,emacs-rde-core)))
+    (propagated-inputs `(("emacs-modus-themes" ,emacs-modus-themes)))
+    (synopsis "Few tweaks for modus themes")
+    (description "")
     (home-page "https://github.com/abcdw/rde")
     (license license:gpl3+)))
 
@@ -123,10 +151,10 @@ also enabled and works without glitches even on X server."))))
 
 (define %rde-emacs emacs-next-pgtk-latest)
 (define (update-package-emacs p)
-  (pretty-print p)
-  (pretty-print  (equal?
-		  (package-build-system p)
-		  emacs-build-system))
+  ;; (pretty-print p)
+  ;; (pretty-print  (equal?
+  ;; 		  (package-build-system p)
+  ;; 		  emacs-build-system))
   (if (equal?
        (package-build-system p)
        emacs-build-system)
@@ -148,8 +176,13 @@ also enabled and works without glitches even on X server."))))
 
 (define %rde-emacs-runtime-packages
   (map update-package-emacs
-       (list emacs-rde-variables
-	     emacs-rde-faces)))
+       (list
+	emacs-use-package
+	emacs-orderless
+	emacs-rde-variables
+	emacs-rde-faces
+	emacs-rde-org-roam
+	emacs-rde-modus-themes)))
 
 (define %rde-emacs-all-packages
   (append
