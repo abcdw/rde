@@ -6,6 +6,7 @@
   #:use-module (gnu system)
   #:use-module (gnu packages)
   #:use-module (guix gexp)
+  #:use-module (guix packages)
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)
   #:use-module (gnu packages wm)
@@ -126,10 +127,10 @@
 		     "sway" "wofi" "waybar" "light"
 		     ;; "swaylock"
 		     ;; System packages
-		     "git" "gnupg" "make" "iwd"
+		     "iwd"
 		     "grub" "glibc" "nss-certs"))
 	      ;; (list emacs-rde-core)
-	      %rde-all-packages
+	      ;; %rde-all-packages
 	      %base-packages-disk-utilities
 	      %base-packages))
    
