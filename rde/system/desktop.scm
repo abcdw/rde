@@ -121,9 +121,7 @@
 	      (map specification->package+output
 		   '("htop"
 		     "font-iosevka" "font-dejavu" "font-gnu-unifont"
-		     "hexchat" "mpv" "imv"
 		     "dmenu" "alacritty"
-		     "ungoogled-chromium-wayland"
 		     "sway" "wofi" "waybar" "light"
 		     ;; "swaylock"
 		     ;; System packages
