@@ -24,6 +24,19 @@
     (version "0.2.0")
     (build-system emacs-build-system)
     (source (local-file "rde-core.el"))
+    (propagated-inputs `(("use-package" ,emacs-use-package)
+			 ("delight" ,emacs-delight)))
+    (synopsis "use-package initialization for rde-emacs")
+    (description "Compile time dependency for rde emacs packags.")
+    (home-page "https://github.com/abcdw/rde")
+    (license license:gpl3+)))
+
+(define-public emacs-rde-use-package
+  (package
+    (name "emacs-rde-use-package")
+    (version "0.2.0")
+    (build-system emacs-build-system)
+    (source (local-file "rde-use-package.el"))
     (propagated-inputs `(("use-package" ,emacs-use-package)))
     (synopsis "use-package initialization for rde-emacs")
     (description "Compile time dependency for rde emacs packags.")
@@ -48,7 +61,7 @@
     (version "0.2.0")
     (build-system emacs-build-system)
     (source (local-file "rde-faces.el"))
-    (inputs `(("emacs-rde-core" ,emacs-rde-core)))
+    (inputs `(("emacs-rde-use-package" ,emacs-rde-use-package)))
     (synopsis "Set default fonts and other faces")
     (description "")
     (home-page "https://github.com/abcdw/rde")
@@ -71,7 +84,7 @@
     (version "0.2.0")
     (build-system emacs-build-system)
     (source (local-file "rde-org-roam.el"))
-    (inputs `(("emacs-rde-core" ,emacs-rde-core)))
+    (inputs `(("emacs-rde-use-package" ,emacs-rde-use-package)))
     (propagated-inputs `(("emacs-org-roam" ,emacs-org-roam)
 			 ("sqlite3" ,sqlite)))
     (synopsis "Enables org-roam and configures basic hotkeys")
@@ -85,7 +98,7 @@
     (version "0.2.0")
     (build-system emacs-build-system)
     (source (local-file "rde-modus-themes.el"))
-    (inputs `(("emacs-rde-core" ,emacs-rde-core)))
+    (inputs `(("emacs-rde-use-package" ,emacs-rde-use-package)))
     (propagated-inputs `(("emacs-modus-themes" ,emacs-modus-themes)))
     (synopsis "Few tweaks for modus themes")
     (description "")
@@ -121,7 +134,7 @@
   (let ((commit "565d8f57d349c19d9bbb5d5d5fdacf3c70b85d42")
         (revision "0"))
     (package/inherit emacs-next
-      (name "emacs-next-pgtk")
+      (name "emacs-next-pgtk-latest")
       (version (git-version "28.0.50" revision commit))
       (source
        (origin
@@ -177,8 +190,9 @@ also enabled and works without glitches even on X server."))))
 (define %rde-emacs-runtime-packages
   (map update-package-emacs
        (list
-	emacs-use-package
+	;; emacs-use-package
 	emacs-orderless
+	emacs-rde-core
 	emacs-rde-variables
 	emacs-rde-faces
 	emacs-rde-org-roam

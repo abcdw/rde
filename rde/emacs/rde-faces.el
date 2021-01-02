@@ -1,6 +1,6 @@
 ;; C-u C-x = to get face under cursor
 (eval-when-compile
-  (require 'rde-core))
+  (require 'rde-use-package))
 
 (use-package faces
   :demand

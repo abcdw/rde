@@ -1,5 +1,5 @@
 (eval-when-compile
-  (require 'rde-core))
+  (require 'rde-use-package))
 
 (use-package org-roam
   ;; :delight

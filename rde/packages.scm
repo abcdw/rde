@@ -10,7 +10,10 @@
 
 (define-public %rde-base-packages
   (map specification->package+output
-       '("tmux" "openssh" "git" "make")))
+       '("tmux" "openssh" "git" "make"
+	 "pavucontrol"
+	 "ungoogled-chromium-wayland"
+	 "mpv" "imv")))
 
 (define-public %rde-all-packages
   (append

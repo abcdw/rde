@@ -1,5 +1,5 @@
 (eval-when-compile
-  (require 'rde-core))
+  (require 'rde-use-package))
 
 ;;; Read more here: https://protesilaos.com/modus-themes/
 (use-package modus-operandi-theme
