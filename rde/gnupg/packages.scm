@@ -3,4 +3,4 @@
 
 (define-public %rde-gnupg-packages
   (map specification->package+output
-       '("gnupg" "pinentry-gnome3" "pinentry-qt")))
+       '("gnupg" "pinentry-gtk2")))
