@@ -36,6 +36,7 @@
   #:use-module (rde packages)
   #:export (os))
 
+
 (define os
   (operating-system
    (host-name "antelope")
@@ -123,7 +124,7 @@
 		     "font-iosevka" "font-dejavu" "font-gnu-unifont"
 		     "dmenu" "alacritty"
 		     "sway" "wofi" "waybar" "light"
-		     ;; "swaylock"
+		     "swaylock"
 		     ;; System packages
 		     "iwd"
 		     "grub" "glibc" "nss-certs"))
@@ -140,16 +141,7 @@
     (append
      (list
       (service pcscd-service-type)
-      (screen-locker-service swaylock "swaylock")
-      (service sddm-service-type
-		     (sddm-configuration
-		      (display-server "wayland")
-		      (xorg-configuration
-                       (xorg-configuration
-                        (keyboard-layout keyboard-layout)))
-		      ;; (auto-login-user "guest")
-		      ;; (auto-login-session "sway.desktop")
-		      )))
+      (screen-locker-service swaylock "swaylock"))
      (remove (lambda (service)
 	       (member (service-kind service)
 		       (list gdm-service-type
