@@ -141,7 +141,11 @@
     (append
      (list
       (service pcscd-service-type)
-      (screen-locker-service swaylock "swaylock"))
+      (screen-locker-service swaylock "swaylock")
+      (udev-rules-service
+       'backlight
+       (file->udev-rule "90-backlight.rules"
+			(file-append light "/lib/udev/rules.d/90-backlight.rules"))))
      (remove (lambda (service)
 	       (member (service-kind service)
 		       (list gdm-service-type
