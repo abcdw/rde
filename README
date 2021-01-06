@@ -24,6 +24,11 @@ existing email account:
 - [[https://lists.sr.ht/~abcdw/rde-announce/][~abcdw/rde-announce@lists.sr.ht]] :: for news and updates.
 - [[https://lists.sr.ht/~abcdw/rde-discuss/][~abcdw/rde-discuss@lists.sr.ht]] :: for discussions and questions.
 - [[https://lists.sr.ht/~abcdw/rde-devel/][~abcdw/rde-devel@lists.sr.ht]] :: for development related discussion.
+** Tools
+| Purpose        | tool  |
+|----------------+-------|
+| Window Manager | Sway  |
+| Text editing   | Emacs |
 ** Latest screenshot
 Just a picture to catch your eye.
 #+CAPTION: Latest rde screenshot
