@@ -6,6 +6,7 @@ info is available on [[http://trop.in][trop.in]].
 *Disclaimer:* project in a proof of concept stage.
 
 *Tip:* older Nix source code is available under ~stale/~ directory.
+
 ** Principles
 *** Main
 - Ergonomic :: Sane keybindings, good contrast, readable fonts.
@@ -17,6 +18,12 @@ info is available on [[http://trop.in][trop.in]].
 - Offline :: most of workflows and apps should work without network.
 - Attention-friendly :: minimal use of notification and other
   distractive things.
+** Community
+There are few [[https://lists.sr.ht/~abcdw][mailing lists]] you can subscribe and/or post with your
+existing email account:
+- [[https://lists.sr.ht/~abcdw/rde-announce/][~abcdw/rde-announce@lists.sr.ht]] :: for news and updates.
+- [[https://lists.sr.ht/~abcdw/rde-discuss/][~abcdw/rde-discuss@lists.sr.ht]] :: for discussions and questions.
+- [[https://lists.sr.ht/~abcdw/rde-devel/][~abcdw/rde-devel@lists.sr.ht]] :: for development related discussion.
 ** Latest screenshot
 Just a picture to catch your eye.
 #+CAPTION: Latest rde screenshot
