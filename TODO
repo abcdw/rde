@@ -4,18 +4,13 @@
 - code
 - communication
 - multimedia
-** TODO Setup 3 main fonts
-| Monospaced | Iosveka   |
-| Sans       | OpenSans? |
-| Sans-serif | Arial?    |
 * LiveCD image
 ** DONE Make a simple image for installation purpose
 * General
 ** DONE Make a channel for rde like home manager
 - https://framagit.org/tyreunom/guix-home-manager
-** TODO Example -> systems + make instruction how to inherit
-- Make README inside system directory explaining inheritance.
+** TODO Implement pam_shepherd.so
+Start user-space shepherd on first user login and exit on last logout.
+[[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
 * Emacs
-** TODO Package early-init.el
-** TODO Package rde-core
-Contains use-package initialization.
+** TODO Emacs extensible home-service
