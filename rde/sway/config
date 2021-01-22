@@ -215,7 +215,7 @@ bindsym $mod+r mode "resize"
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
-bindsym $mod+b bar mode toggle
+bindsym $mod+Shift+b bar mode toggle
 bar {
     mode invisible
     position top
@@ -227,7 +227,7 @@ bar {
     colors {
         statusline #ffffff
         background #323232
-        inactive_workspace #32323200 #32323200 #5c5c5c
+        # inactive_workspace #32323200 #32323200 #5c5c5c
     }
 }
 
