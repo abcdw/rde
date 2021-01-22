@@ -8,11 +8,12 @@ Set of reasonable configurations for emacs & packages.
 In addition to rde principles:
 - Vanilla :: Stick to defaults, where possible, change something if it
   necessary.
-- Simple :: Prefer built-in or simpler package to external or more
-  complex.
+- Simple :: Prefer simplier and more composable packages to
+  "full-fledged" complex combines.
 - Consistent :: Prefer emacs way solution to more fancy modern
   approaches, for consistent and pleasant user experience.
-  
+- Non-distractive :: No flashy/shiny/jumping around stuff.
+
 ** Tips
 *** Getting all the help
 Read how to read [[info:info#Top][info]] format. Learn basics and advanced topics reading
