@@ -1,16 +1,17 @@
 -*- mode: org -*-
 * UI
-** TODO Separate sway workspaces for different workflows
+** TODO Visually separate sway workspaces for different workflows
 - code
 - communication
 - multimedia
 * LiveCD image
 ** DONE Make a simple image for installation purpose
 * General
-** DONE Make a channel for rde like home manager
-- https://framagit.org/tyreunom/guix-home-manager
 ** TODO Implement pam_shepherd.so
 Start user-space shepherd on first user login and exit on last logout.
-[[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
+- [[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
+- https://www.opennet.ru/base/dev/pam_linux.txt.html
+Take a look at mpd service for user-service example and /run/user/ID
+creation.
 * Emacs
 ** TODO Emacs extensible home-service
