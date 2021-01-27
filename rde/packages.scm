@@ -1,22 +1,22 @@
 (define-module (rde packages)
   #:use-module (gnu packages)
   #:use-module (rde emacs packages)
-  #:use-module (rde gnupg packages))
+  #:use-module (rde gnupg packages)
+  #:use-module (rde obs))
 
-(use-modules
- (gnu packages)
- (rde emacs packages)
- (rde gnupg packages))
 
 (define-public %rde-base-packages
   (map specification->package+output
        '("tmux" "openssh" "git" "make"
-	 "pavucontrol"
+	 "xdg-utils"
 	 "ungoogled-chromium-wayland"
-	 "mpv" "imv")))
+	 "pavucontrol"
+	 ;; "obs-next" "obs-wlrobs"
+	 "mpv" "imv" "ffmpeg")))
 
 (define-public %rde-all-packages
   (append
+   ;; '(obs-next)
    %rde-base-packages
    %rde-gnupg-packages
    %rde-emacs-all-packages))
