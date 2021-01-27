@@ -2,7 +2,7 @@
   (require 'rde-use-package))
 
 (use-package org-roam
-  ;; :delight
+  :delight
   :hook (after-init-hook . org-roam-mode)
   :config (setq org-roam-directory rde/org-roam-directory)
   :bind (

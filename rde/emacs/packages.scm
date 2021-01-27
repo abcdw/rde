@@ -105,6 +105,23 @@
     (home-page "https://github.com/abcdw/rde")
     (license license:gpl3+)))
 
+(define-public emacs-rde-default-init
+  (package
+    (name "emacs-rde-default-init")
+    (version "0.2.0")
+    (build-system emacs-build-system)
+    (propagated-inputs `(("emacs-rde-core" ,emacs-rde-core)
+			 ("emacs-rde-variables" ,emacs-rde-variables)
+			 ("emacs-rde-faces" ,emacs-rde-faces)
+			 ("emacs-rde-org-roam" ,emacs-rde-org-roam)
+			 ("emacs-rde-modus-themes" ,emacs-rde-modus-themes)
+			 ("emacs-orderless" ,emacs-orderless)))
+    (source (local-file "default.el"))
+    (synopsis "Init file")
+    (description "")
+    (home-page "https://github.com/abcdw/rde")
+    (license license:gpl3+)))
+
 ;; (define emacs-rde-init
 ;;   (text-file
 ;;    "init.el"
@@ -191,18 +208,24 @@ also enabled and works without glitches even on X server."))))
   (map update-package-emacs
        (list
 	;; emacs-use-package
-	emacs-orderless
-	emacs-rde-core
-	emacs-rde-variables
-	emacs-rde-faces
-	emacs-rde-org-roam
-	emacs-rde-modus-themes)))
+	;; emacs-orderless
+	;; emacs-rde-core
+	;; emacs-rde-variables
+	;; emacs-rde-faces
+	;; emacs-rde-org-roam
+	;; emacs-rde-modus-themes
+	emacs-rde-default-init
+	)))
 
 (define %rde-emacs-all-packages
   (append
    (list %rde-emacs
 	 emacs-guix
+	 emacs-delight
+	 emacs-telega
 	 emacs-magit
+	 emacs-pdf-tools
+	 emacs-yasnippet
 	 ;; emacs-rde-early-init
 	 ;; emacs-rde-init
 	 )
