@@ -9,7 +9,11 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (ice-9 pretty-print)
-  #:use-module (guix records))
+  #:use-module (guix records)
+  #:export (home-environment
+	    home-environment?
+	    this-home-environment
+	    home-environment-derivation))
 
 
 (define (home-derivation entries mextensions)
