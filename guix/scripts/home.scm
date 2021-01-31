@@ -1,18 +1,28 @@
 (define-module (guix scripts home)
+  #:use-module (gnu packages admin)
+  #:use-module (gnu home)
+  #:use-module (guix derivations)
   #:use-module (guix ui)
   #:use-module (guix grafts)
+  #:use-module (guix packages)
+  #:use-module (guix profiles)
+  #:use-module (guix store)
   #:use-module (guix scripts)
   #:use-module (guix scripts package)
-  #:use-module ((guix scripts build)
-                #:select (%standard-build-options))
+  #:use-module (guix scripts build)
   #:use-module ((guix status) #:select (with-status-verbosity))
-  #:use-module (guix scripts)
+  #:use-module (guix gexp)
+  #:use-module (guix monads)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
   #:use-module (ice-9 pretty-print)
   #:export (guix-home))
+
+(define %user-module
+  ;; Module in which the machine description file is loaded.
+  (make-user-module '((gnu home))))
 
 (define (show-help)
   (display (G_ "Usage: guix home [OPTION ...] ACTION [ARG ...] [FILE]
@@ -52,8 +62,107 @@ Some ACTIONS support additional ARGS.\n"))
               %standard-build-options)))
 
 (define %default-options
-  '((verbosity . #f)
-    (graft? . #t)))
+  `((substitutes? . #t)
+    (graft? . #t)
+    (debug . 0)))
+
+
+(define* (perform-action action he
+			 #:key
+                         dry-run?
+			 derivations-only?
+                         use-substitutes?)
+  "Perform ACTION for home environment. "
+
+  (define println
+    (cut format #t "~a~%" <>))
+
+  (mlet* %store-monad
+      ((drv      (home-environment-derivation he))
+       (drvs     (mapm/accumulate-builds lower-object (list drv)))
+       (%        (if derivations-only?
+                     (return
+		      (for-each (compose println derivation-file-name) drvs))
+                     (built-derivations drvs))))
+    (if (or dry-run? derivations-only?)
+	(return #f)
+        (begin
+          (for-each (compose println derivation->output-path) drvs)
+
+          (case action
+            (else
+             (newline)
+	     (return (derivation->output-path drv))))))))
+
+(define (process-action action args opts)
+  "Process ACTION, a sub-command, with the arguments are listed in ARGS.
+ACTION must be one of the sub-commands that takes a home environment
+declaration as an argument (a file name.)  OPTS is the raw alist of options
+resulting from command-line parsing."
+  (define (ensure-home-environment file-or-exp obj)
+    (unless (home-environment? obj)
+      (leave (G_ "'~a' does not return a home environment ~%")
+             file-or-exp))
+    obj)
+
+  (let* ((file   (match args
+                   (() #f)
+                   ((x . _) x)))
+         (expr   (assoc-ref opts 'expression))
+         (system (assoc-ref opts 'system))
+
+         (home-environment
+          (ensure-home-environment
+           (or file expr)
+           (cond
+            ((and expr file)
+             (leave
+              (G_ "both file and expression cannot be specified~%")))
+            (expr
+             (read/eval expr))
+            (file
+             (load* file %user-module
+                    #:on-error (assoc-ref opts 'on-error)))
+            (else
+             (leave (G_ "no configuration specified~%"))))))
+
+         (dry?        (assoc-ref opts 'dry-run?)))
+
+    (with-store store
+      (set-build-options-from-command-line store opts)
+      (with-build-handler (build-notifier #:use-substitutes?
+                                          (assoc-ref opts 'substitutes?)
+                                          #:verbosity
+                                          (verbosity-level opts)
+                                          #:dry-run?
+                                          (assoc-ref opts 'dry-run?))
+
+        (run-with-store store
+          (mbegin %store-monad
+	    (set-guile-for-build (default-guile))
+
+	    (case action
+              (else
+               ;; (unless (eq? action 'build)
+               ;;   (warn-about-old-distro #:suggested-command
+               ;;                          "guix home reconfigure"))
+               (perform-action action home-environment
+                               #:dry-run? dry?
+                               #:derivations-only? (assoc-ref opts 'derivations-only?)
+                               #:use-substitutes? (assoc-ref opts 'substitutes?))
+	       ))))))
+    (warn-about-disk-space)))
+
+
+(define (process-command command args opts)
+  "Process COMMAND, one of the 'guix home' sub-commands.  ARGS is its
+argument list and OPTS is the option alist."
+  (case command
+    ;; The following commands do not need to use the store, and they do not need
+    ;; an operating home environment file.
+    ((search)
+     (apply (resolve-subcommand "search") args))
+    (else (process-action command args opts))))
 
 (define-command (guix-home . args)
   (synopsis "build and deploy home environments")
@@ -72,21 +181,6 @@ Some ACTIONS support additional ARGS.\n"))
 	      switch-generation search)
              (alist-cons 'action action result))
             (else (leave (G_ "~a: unknown action~%") action))))))
-
-  ;; (define (handle-argument arg result)
-  ;;   ;; Treat all non-option arguments as regexps.
-  ;;   (cons `(query show ,arg)
-  ;;         result))
-
-  ;; (define opts
-  ;;   (args-fold* args %options
-  ;;               (lambda (opt name arg . rest)
-  ;;                 (leave (G_ "~A: unrecognized option~%") name))
-  ;;               handle-argument
-  ;;               '()))
-
-  ;; (unless (assoc-ref opts 'query)
-  ;;   (leave (G_ "missing arguments: no package to show~%")))
 
   (define (match-pair car)
     ;; Return a procedure that matches a pair with CAR.
@@ -107,13 +201,13 @@ Some ACTIONS support additional ARGS.\n"))
 
       (unless action
         (format (current-error-port)
-                (G_ "guix system: missing command name~%"))
+                (G_ "guix home: missing command name~%"))
         (format (current-error-port)
-                (G_ "Try 'guix system --help' for more information.~%"))
+                (G_ "Try 'guix home --help' for more information.~%"))
         (exit 1))
 
       (case action
-        ((build container vm vm-image disk-image docker-image reconfigure)
+        ((build reconfigure)
          (unless (or (= count 1)
                      (and expr (= count 0)))
            (fail)))
@@ -129,14 +223,10 @@ Some ACTIONS support additional ARGS.\n"))
                                          parse-sub-command))
            (args     (option-arguments opts))
            (command  (assoc-ref opts 'action)))
-      (pretty-print opts)
-      (pretty-print args)
-      (pretty-print command)
-      (pretty-print (assoc-ref opts 'graft?))
+      ;; (pretty-print opts)
+      ;; (pretty-print args)
+      ;; (pretty-print command)
+      ;; (pretty-print (assoc-ref opts 'graft?))
       (parameterize ((%graft? (assoc-ref opts 'graft?)))
         (with-status-verbosity (verbosity-level opts)
-          ;; (process-command command args opts)
-	  (pretty-print command)))))
-    
-  (display "hi there!\n")
-  (display args))
+          (process-command command args opts))))))
