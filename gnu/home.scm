@@ -88,15 +88,15 @@ wants to be globally available to all the system users.")))
 (define (home-environment-default-essential-services he)
   "Return the list of essential services for home environment."
   (list
-    ;; cleanup-service, which will remove links of previous generation?
-    ;; home-shepherd-service
-    ;; home-activation-service
-    ;; home-environment-service
-    ;; home-profile-service
+   ;; cleanup-service, which will remove links of previous generation?
+   ;; home-shepherd-service
+   ;; home-activation-service
+   ;; home-environment-service
+   ;; xdg-configuration
+
    (service home-service-type `())
    (service home-profile-service-type (home-environment-packages he))))
 
-;; (define instantiate-missing-services identity)
 (define* (home-environment-services he)
   "Return all the services of home environment."
   (instantiate-missing-services
@@ -108,28 +108,7 @@ wants to be globally available to all the system users.")))
   (let* ((services         (home-environment-services he))
          (home (fold-services services
 			      #:target-type home-service-type)))
-    ;; SYSTEM contains the derivation as a monadic value.
     (service-value home)))
-
-
-
-;; (define sample-he
-;;   (home-environment
-;;    (packages `(,htop))))
-
-;; (pretty-print (home-environment-services sample-he))
-;; (home-environment-derivation sample-he)
-
-;; (use-modules (guix ui))
-;; (pretty-print
-
-;; (with-store store
-;;   (let ((drv (run-with-store store (home-environment-derivation sample-he))))
-;;     (show-what-to-build store (list drv))
-;;     (build-derivations store (list drv))
-;;     drv
-;;     ))
-
 
 ;; home-profile-service-type
 ;; home-activation-service-type
