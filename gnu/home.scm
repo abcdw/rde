@@ -1,5 +1,4 @@
 (define-module (gnu home)
-  #:use-module (gnu packages admin)
   #:use-module (gnu services)
   #:use-module (guix monads)
   #:use-module (guix store)
@@ -71,7 +70,7 @@ wants to be globally available to all the system users.")))
   home-environment?
   this-home-environment
   (packages home-environment-packages             ; list of (PACKAGE OUTPUT...)
-            (default '(htop)))
+            (default '()))
 
   (essential-services home-environment-essential-services ; list of services
                       (thunked)
@@ -95,8 +94,7 @@ wants to be globally available to all the system users.")))
     ;; home-environment-service
     ;; home-profile-service
    (service home-service-type `())
-   (service home-profile-service-type `(,htop ,shepherd))
-    ))
+   (service home-profile-service-type (home-environment-packages he))))
 
 ;; (define instantiate-missing-services identity)
 (define* (home-environment-services he)
