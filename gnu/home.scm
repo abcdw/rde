@@ -7,6 +7,7 @@
   #:use-module (guix profiles)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
+  #:use-module (ice-9 match)
   #:use-module (ice-9 pretty-print)
   #:use-module (guix records)
   #:export (home-environment
@@ -52,23 +53,50 @@ packages, configuration files, activation script, and so on.")))
                                      (delete-duplicates packages eq?)))))))))
 
 (define home-profile-service-type
-  (service-type (name 'profile)
+  (service-type (name 'home-profile)
                 (extensions
                  (list (service-extension home-service-type
                                           packages->profile-entry)))
                 (compose concatenate)
                 (extend append)
                 (description
-                 "This is the @dfn{system profile}, available as
-@file{/run/current-system/profile}.  It contains packages that the sysadmin
-wants to be globally available to all the system users.")))
+                 "This is the @dfn{home profile}, available as
+@file{~/.local/share/home-environment/profile} ???.  It contains
+packages that the user wants to be available.")))
 
+
+(define (environment-variables->environment-vars-file vars)
+  "Return a file that can be sourced by bash/zsh that contains
+environment variables VARS."
+
+  (with-monad %store-monad
+    (return
+     `(("environment-vars.sh"
+	,(apply mixed-text-file "environment-vars"
+		(append-map (match-lambda
+			      ((key . value)
+                               (list "export " key "=" value "\n")))
+			    vars)))))))
+
+(define home-environment-vars-service-type
+  (service-type (name 'home-environment-vars)
+                (extensions
+                 (list (service-extension
+			home-service-type
+                        environment-variables->environment-vars-file)))
+                (compose concatenate)
+                (extend append)
+                (description "Sets the environment variables on first
+login.")))
 
 
 (define-record-type* <home-environment> home-environment
   make-home-environment
   home-environment?
   this-home-environment
+
+  ;; (layout)
+  ;; (xdg-dirs)
   (packages home-environment-packages             ; list of (PACKAGE OUTPUT...)
             (default '()))
 
@@ -93,8 +121,10 @@ wants to be globally available to all the system users.")))
    ;; home-activation-service
    ;; home-environment-service
    ;; xdg-configuration
+   ;; brightness-service
 
    (service home-service-type `())
+   (service home-environment-vars-service-type `(("TEST_VARI" . "value")))
    (service home-profile-service-type (home-environment-packages he))))
 
 (define* (home-environment-services he)
@@ -113,6 +143,10 @@ wants to be globally available to all the system users.")))
 ;; home-profile-service-type
 ;; home-activation-service-type
 ;; home-shepherd-services-type
+
+;; shepherd-service-type
+;; https://specifications.freedesktop.org/autostart-spec/autostart-spec-latest.html
+
 
 ;; Guix home manager intro:
 ;; https://lists.gnu.org/archive/html/guix-devel/2019-09/msg00218.html
