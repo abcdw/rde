@@ -65,14 +65,26 @@ packages, configuration files, activation script, and so on.")))
 packages that the user wants to be available.")))
 
 
-(define (environment-variables->environment-vars-file vars)
-  "Return a file that can be sourced by bash/zsh that contains
-environment variables VARS."
+(define (environment-variables->setup-environment-script vars)
+  "Return a file that can be sourced by bash/zsh that initialize the
+environment. Sources home profile, sets default variables and sets
+variables provided in @code{vars}."
 
   (with-monad %store-monad
     (return
-     `(("environment-vars.sh"
-	,(apply mixed-text-file "environment-vars"
+     `(("setup-environment"
+	,(apply mixed-text-file "setup-environment"
+		"\
+HOME_ENVIRONMENT=\"$HOME/.guix-home-environment\"
+GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\" ; \\
+. \"$HOME_ENVIRONMENT/profile/etc/profile\"
+
+# export MANPATH=$HOME/.guix-home-environment/profile/share/man:$MANPATH
+# export INFOPATH=$HOME/.guix-home-environment/profile/share/info:$INFOPATH
+# export XDG_DATA_DIRS=$HOME/.guix-home-environment/profile/share:$XDG_DATA_DIRS
+# export XDG_CONFIG_DIRS=$HOME/.guix-home-environment/profile/etc/xdg:$XDG_CONFIG_DIRS
+# export XCURSOR_PATH=$HOME/.guix-home-environment/profile/share/icons:$XCURSOR_PATH
+"
 		(append-map (match-lambda
 			      ((key . value)
                                (list "export " key "=" value "\n")))
@@ -83,7 +95,7 @@ environment variables VARS."
                 (extensions
                  (list (service-extension
 			home-service-type
-                        environment-variables->environment-vars-file)))
+                        environment-variables->setup-environment-script)))
                 (compose concatenate)
                 (extend append)
                 (description "Sets the environment variables on first
