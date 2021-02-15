@@ -7,6 +7,7 @@
   #:use-module (guix packages)
   #:use-module (guix profiles)
   #:use-module (guix store)
+  #:use-module (guix utils)
   #:use-module (guix scripts)
   #:use-module (guix scripts package)
   #:use-module (guix scripts build)
@@ -23,6 +24,9 @@
 (define %user-module
   ;; Module in which the machine description file is loaded.
   (make-user-module '((gnu home))))
+
+(define %guix-home-profile
+  (string-append %profile-directory "/guix-home-profile"))
 
 (define (show-help)
   (display (G_ "Usage: guix home [OPTION ...] ACTION [ARG ...] [FILE]
@@ -78,21 +82,32 @@ Some ACTIONS support additional ARGS.\n"))
     (cut format #t "~a~%" <>))
 
   (mlet* %store-monad
-      ((drv      (home-environment-derivation he))
-       (drvs     (mapm/accumulate-builds lower-object (list drv)))
+      ((he-drv   (home-environment-derivation he))
+       (drvs     (mapm/accumulate-builds lower-object (list he-drv)))
        (%        (if derivations-only?
                      (return
 		      (for-each (compose println derivation-file-name) drvs))
-                     (built-derivations drvs))))
+                     (built-derivations drvs)))
+
+       (he-profile -> (derivation->output-path he-drv)))
     (if (or dry-run? derivations-only?)
 	(return #f)
         (begin
           (for-each (compose println derivation->output-path) drvs)
 
           (case action
+	    ((reconfigure)
+	     (let* ((number (generation-number %guix-home-profile))
+                    (generation (generation-file-name
+				 %guix-home-profile (+ 1 number))))
+	       (switch-symlinks generation he-profile)
+	       (switch-symlinks %guix-home-profile generation)
+	       ;; (println generation)
+	       (return #f)
+	       ))
             (else
              (newline)
-	     (return (derivation->output-path drv))))))))
+	     (return he-profile)))))))
 
 (define (process-action action args opts)
   "Process ACTION, a sub-command, with the arguments are listed in ARGS.
@@ -160,8 +175,8 @@ argument list and OPTS is the option alist."
   (case command
     ;; The following commands do not need to use the store, and they do not need
     ;; an operating home environment file.
-    ((search)
-     (apply (resolve-subcommand "search") args))
+    ;; ((search)
+    ;;  (apply (resolve-subcommand "search") args))
     (else (process-action command args opts))))
 
 (define-command (guix-home . args)
