@@ -33,7 +33,6 @@
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 pretty-print)
   #:use-module (ice-9 match)
-  #:use-module (rde packages)
   #:export (os))
 
 
@@ -155,7 +154,14 @@
    ;; Allow resolution of '.local' host names with mDNS.
    (name-service-switch %mdns-host-lookup-nss)))
 
-;; (pretty-print (map service-kind (operating-system-services os)))
+;; (operating-system-derivation os)
+;; (pretty-print (fold-services (operating-system-services os)))
+;; (pretty-print (operating-system-services os))
+;; (use-modules (guix store)
+;; 	     (guix derivations))
+;; (with-store store
+;;     (run-with-store store (operating-system-derivation os)))
+;; (pretty-print (map service-kind (operating-system-user-services os)))
 ;; (pretty-print (map service-kind %desktop-services))
 ;; (pretty-print (map service-kind %base-services))
 os
