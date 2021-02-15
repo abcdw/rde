@@ -25,8 +25,12 @@
   ;; Module in which the machine description file is loaded.
   (make-user-module '((gnu home))))
 
-(define %guix-home-profile
-  (string-append %profile-directory "/guix-home-profile"))
+(define %guix-home-environment
+  (string-append %profile-directory "/guix-home-environment"))
+
+(define %user-home-environment-directory
+  (and=> (getenv "HOME")
+         (cut string-append <> "/.guix-home-environment")))
 
 (define (show-help)
   (display (G_ "Usage: guix home [OPTION ...] ACTION [ARG ...] [FILE]
@@ -89,7 +93,7 @@ Some ACTIONS support additional ARGS.\n"))
 		      (for-each (compose println derivation-file-name) drvs))
                      (built-derivations drvs)))
 
-       (he-profile -> (derivation->output-path he-drv)))
+       (he-path -> (derivation->output-path he-drv)))
     (if (or dry-run? derivations-only?)
 	(return #f)
         (begin
@@ -97,17 +101,17 @@ Some ACTIONS support additional ARGS.\n"))
 
           (case action
 	    ((reconfigure)
-	     (let* ((number (generation-number %guix-home-profile))
+	     (let* ((number (generation-number %guix-home-environment))
                     (generation (generation-file-name
-				 %guix-home-profile (+ 1 number))))
-	       (switch-symlinks generation he-profile)
-	       (switch-symlinks %guix-home-profile generation)
+				 %guix-home-environment (+ 1 number))))
+	       (switch-symlinks generation he-path)
+	       (switch-symlinks %guix-home-environment generation)
+	       (switch-symlinks %user-home-environment-directory %guix-home-environment)
 	       ;; (println generation)
-	       (return #f)
-	       ))
+	       (return he-path)))
             (else
              (newline)
-	     (return he-profile)))))))
+	     (return he-path)))))))
 
 (define (process-action action args opts)
   "Process ACTION, a sub-command, with the arguments are listed in ARGS.
