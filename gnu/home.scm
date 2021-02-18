@@ -68,27 +68,41 @@ packages that the user wants to be available.")))
 (define (environment-variables->setup-environment-script vars)
   "Return a file that can be sourced by bash/zsh that initialize the
 environment. Sources home profile, sets default variables and sets
-variables provided in @code{vars}."
+variables provided in @code{vars}. @code{vars} is a list of pairs
+string + string/file-like object or list of items, where the first one
+is variable and rest are strings/file-like objects.
 
-  (with-monad %store-monad
-    (return
-     `(("setup-environment"
-	,(apply mixed-text-file "setup-environment"
-		"\
+It's done to be able to express both following cases:
+@example
+`((\"TMP\" . \"VAR_VALUE\")
+  (\"SSH_AUTH_SOCK\" \"$(\" (\\, (file-append gnupg \"/bin/gpgconf\")) \" --list-dirs agent-ssh-socket)\"))
+@end example
+"
+
+  (with-monad
+   %store-monad
+   (return
+    `(("setup-environment"
+       ,(apply mixed-text-file "setup-environment"
+	       "\
 HOME_ENVIRONMENT=\"$HOME/.guix-home-environment\"
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\" ; \\
 . \"$HOME_ENVIRONMENT/profile/etc/profile\"
 
 # export MANPATH=$HOME/.guix-home-environment/profile/share/man:$MANPATH
 # export INFOPATH=$HOME/.guix-home-environment/profile/share/info:$INFOPATH
-# export XDG_DATA_DIRS=$HOME/.guix-home-environment/profile/share:$XDG_DATA_DIRS
+export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
 # export XDG_CONFIG_DIRS=$HOME/.guix-home-environment/profile/etc/xdg:$XDG_CONFIG_DIRS
 # export XCURSOR_PATH=$HOME/.guix-home-environment/profile/share/icons:$XCURSOR_PATH
 "
-		(append-map (match-lambda
-			      ((key . value)
-                               (list "export " key "=" value "\n")))
-			    vars)))))))
+	       (append-map
+		(match-lambda
+		  ((key . value)
+		   (let ((values (if (not (list? value))
+				  (list value) value)))
+
+                     `("export " ,key "=" ,@values "\n"))))
+		  vars)))))))
 
 (define home-environment-vars-service-type
   (service-type (name 'home-environment-vars)
