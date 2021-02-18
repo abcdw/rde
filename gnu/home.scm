@@ -61,8 +61,8 @@ packages, configuration files, activation script, and so on.")))
                 (extend append)
                 (description
                  "This is the @dfn{home profile}, available as
-@file{~/.local/share/home-environment/profile} ???.  It contains
-packages that the user wants to be available.")))
+@file{~/.guix-home-environment/profile}.  It contains packages that
+the user wants to be available.")))
 
 
 (define (environment-variables->setup-environment-script vars)
