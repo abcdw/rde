@@ -101,6 +101,55 @@ GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\" ; \\
                 (description "Sets the environment variables on first
 login.")))
 
+;; TODO: maybe change to guile script instead of bash to make it more
+;; convinient to generate it. Despite the environment-vars-service it
+;; won't be sourced by any shells.
+(define (commands->on-login-script cmds)
+  "Return a script that can be started by bash/zsh's profile that will
+run @code{cmds} on login."
+  (with-monad
+   %store-monad
+   (return
+    `(("on-login"
+       ,(apply mixed-text-file
+	 "on-login"
+	 ;; XDG_RUNTIME_DIR dissapears on logout, that means such
+	 ;; trick allows to launch on-login script on first login only
+	 ;; after complete logout/reboot.
+	 "\
+if [ ! -f $XDG_RUNTIME_DIR/on-login-executed ]; then
+
+"
+	  (append cmds
+		  '("
+touch $XDG_RUNTIME_DIR/on-login-executed
+fi\n"))))))))
+
+(define home-run-on-first-login-service-type
+  (service-type (name 'home-environment-vars)
+                (extensions
+                 (list (service-extension
+			home-service-type
+                        commands->on-login-script)))
+                (compose concatenate)
+                (extend append)
+                (description "Runs commands on first user login.")))
+
+(define (add-ssh-agent-socket %)
+  "Adds SSH_AUTH_SOCK variable to user's environment."
+  `(("SSH_AUTH_SOCK" "$(" ,(file-append gnupg "/bin/gpgconf") " --list-dirs agent-ssh-socket)")))
+
+(define-public home-gnupg-service-type
+  (service-type (name 'home-gnupg)
+                (extensions
+                 (list (service-extension
+			home-environment-vars-service-type
+                        add-ssh-agent-socket)
+		       (service-extension
+			home-profile-service-type
+			(lambda (%) `(,gnupg)))))
+		(default-value #f)
+                (description "Configures and installs gpg-agent.")))
 
 (define-record-type* <home-environment> home-environment
   make-home-environment
