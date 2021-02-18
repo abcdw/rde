@@ -112,8 +112,8 @@ export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
                         environment-variables->setup-environment-script)))
                 (compose concatenate)
                 (extend append)
-                (description "Sets the environment variables on first
-login.")))
+		(default-value '())
+                (description "Sets the environment variables.")))
 
 ;; TODO: maybe change to guile script instead of bash to make it more
 ;; convinient to generate it. Despite the environment-vars-service it
@@ -147,6 +147,7 @@ fi\n"))))))))
                         commands->on-login-script)))
                 (compose concatenate)
                 (extend append)
+		(default-value '())
                 (description "Runs commands on first user login.")))
 
 (define (add-ssh-agent-socket %)
