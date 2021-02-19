@@ -1,8 +1,21 @@
+;; -*- mode: scheme -*-
 (use-modules (gnu home)
-	     (gnu packages bash))
+	     (gnu home-services)
+	     (gnu home-services gnupg)
+	     (gnu packages)
+	     (gnu system keyboard))
 
+;; home-gnupg-service-type
 (define sample-he
   (home-environment
-   (packages `(,bash))))
+   (keyboard-layout
+    (keyboard-layout "us,ru" "dvorak,"
+		     #:options '("grp:win_space_toggle" "ctrl:nocaps")))
+   (packages
+    (map specification->package+output
+	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))
+   (services
+    (list
+     (service home-gnupg-service-type)))))
 
 sample-he
