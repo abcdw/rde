@@ -44,8 +44,7 @@
   "Return the list of essential services for home environment."
   (let* ((layout (home-environment-keyboard-layout he))
 	 (layout-service
-	  ;; TODO: fix it to use layout instead of #f
-	  (if #f
+	  (if layout
 	      (simple-service
 	       'layout-env-vars home-environment-vars-service-type
 	       `(("XKB_DEFAULT_LAYOUT" . ,(keyboard-layout-name layout))

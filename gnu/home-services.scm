@@ -79,6 +79,8 @@ It's done to be able to express both following cases:
 `((\"TMP\" . \"VAR_VALUE\")
   (\"SSH_AUTH_SOCK\" \"$(\" (\\, (file-append gnupg \"/bin/gpgconf\")) \" --list-dirs agent-ssh-socket)\"))
 @end example
+
+If value is @code{#f} variable will be set to empty string.
 "
 
   (with-monad
@@ -101,7 +103,7 @@ export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
 		(match-lambda
 		  ((key . value)
 		   (let ((values (if (not (list? value))
-				  (list value) value)))
+				  (list (or value "")) value)))
 
                      `("export " ,key "=" ,@values "\n"))))
 		  vars)))))))
