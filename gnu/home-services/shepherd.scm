@@ -1,9 +1,11 @@
 (define-module (gnu home-services shepherd)
   #:use-module (gnu home-services)
+  #:use-module (gnu packages admin)
   #:use-module (gnu services shepherd)
   #:use-module (guix sets)
   #:use-module (guix gexp)
   #:use-module (guix i18n)
+  #:use-module (guix records)
 
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
@@ -14,6 +16,13 @@
   #:re-export (shepherd-service
 	       shepherd-action))
 
+(define-record-type* <home-shepherd-configuration>
+  home-shepherd-configuration make-home-shepherd-configuration
+  home-shepherd-configuration?
+  (shepherd home-shepherd-configuration-shepherd
+            (default shepherd)) ; package
+  (services home-shepherd-configuration-services
+            (default '())))
 
 (define (assert-valid-graph services)
   "Raise an error if SERVICES does not define a valid shepherd service graph,
@@ -97,8 +106,8 @@ as shepherd package."
 
 (define (launch-shepherd-daemon config)
   "Return commands for on-login script."
-  (let* ((shepherd (shepherd-configuration-shepherd config))
-	 (services (shepherd-configuration-services config)))
+  (let* ((shepherd (home-shepherd-configuration-shepherd config))
+	 (services (home-shepherd-configuration-services config)))
   `("mkdir -p $HOME/.local/var/log/"
     "\n"
 
@@ -120,14 +129,16 @@ as shepherd package."
 		       (service-extension
 			home-profile-service-type
 			(lambda (config)
-			  `(,(shepherd-configuration-shepherd config))))))
+			  `(,(home-shepherd-configuration-shepherd config))))))
 		(compose concatenate)
-		(extend (lambda (config extra-services)
-			  (shepherd-configuration
-			   (inherit config)
-			   (services (append (shepherd-configuration-services config)
-					     extra-services)))))
-		(default-value (shepherd-configuration))
-                (description "Configures and installs shepherd.")))
+		(extend
+		 (lambda (config extra-services)
+		   (home-shepherd-configuration
+		    (inherit config)
+		    (services
+		     (append (home-shepherd-configuration-services config)
+			     extra-services)))))
+		(default-value (home-shepherd-configuration))
+                (description "Configures and installs user's shepherd.")))
 
 
