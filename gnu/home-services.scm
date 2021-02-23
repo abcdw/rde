@@ -1,5 +1,6 @@
 (define-module (gnu home-services)
   #:use-module (gnu services)
+  #:use-module (gnu home-services-utils)
   #:use-module (guix monads)
   #:use-module (guix store)
   #:use-module (guix gexp)
@@ -100,12 +101,7 @@ export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
 # export XCURSOR_PATH=$HOME/.guix-home-environment/profile/share/icons:$XCURSOR_PATH
 "
 	       (append-map
-		(match-lambda
-		  ((key . value)
-		   (let ((values (if (not (list? value))
-				  (list (or value "")) value)))
-
-                     `("export " ,key "=" ,@values "\n"))))
+                (alist->key-value "export " "=")
 		  vars)))))))
 
 (define home-environment-vars-service-type
