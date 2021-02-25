@@ -101,7 +101,7 @@ export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
 # export XCURSOR_PATH=$HOME/.guix-home-environment/profile/share/icons:$XCURSOR_PATH
 "
 	       (append-map
-                (alist->key-value "export " "=")
+                (alist-entry->mixed-text "export " "=")
 		  vars)))))))
 
 (define home-environment-vars-service-type
