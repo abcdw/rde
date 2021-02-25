@@ -103,11 +103,14 @@ Some ACTIONS support additional ARGS.\n"))
 	    ((reconfigure)
 	     (let* ((number (generation-number %guix-home-environment))
                     (generation (generation-file-name
-				 %guix-home-environment (+ 1 number))))
+				 %guix-home-environment (+ 1 number)))
+
+		    (user-home-environment-symlink-path
+		     (home-environment-symlink-path he)))
 	       (switch-symlinks generation he-path)
 	       (switch-symlinks %guix-home-environment generation)
-	       (switch-symlinks %user-home-environment-directory %guix-home-environment)
-	       ;; (println generation)
+	       (switch-symlinks user-home-environment-symlink-path
+				%guix-home-environment)
 	       (return he-path)))
             (else
              (newline)

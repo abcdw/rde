@@ -8,8 +8,10 @@
   #:export (home-environment
 	    home-environment?
 	    this-home-environment
-	    home-environment-derivation))
-
+	    home-environment-derivation
+	    home-environment-user-home-directory
+	    home-environment-symlink-name
+	    home-environment-symlink-path))
 
 (define-record-type* <home-environment> home-environment
   make-home-environment
@@ -33,7 +35,19 @@
                                 this-home-environment)))
   (services home-environment-user-services
 	    (default '()))
-  
+
+  (user-home-directory home-environment-user-home-directory
+		       (default (getenv "HOME")))
+  (symlink-name home-environment-symlink-name
+		(default ".guix-home-environment"))
+
+  (symlink-path home-environment-symlink-path (thunked)
+		(default
+		  (string-append
+		   (home-environment-user-home-directory this-home-environment)
+		   "/"
+		   (home-environment-symlink-name this-home-environment))))
+
   ;; (location home-environment-location             ; <location>
   ;;           (default (and=> (current-source-location)
   ;;                           source-properties->location))
@@ -67,7 +81,12 @@
        
        (service home-shepherd-service-type)
        (service home-run-on-first-login-service-type)
-       (service home-environment-vars-service-type)
+       ;; It should be safe to use symlink-path as
+       ;; HOME_ENVIRONMENT_DIRECTORY, however
+       ;; /var/guix/profiles/per-user/... is another option
+       (service home-environment-vars-service-type
+		`(("HOME_ENVIRONMENT_DIRECTORY" .
+		   ,(home-environment-symlink-path he))))
        (service home-service-type)
        (service home-profile-service-type (home-environment-packages he)))))))
 

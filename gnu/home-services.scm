@@ -89,20 +89,21 @@ If value is @code{#f} variable will be set to empty string.
    (return
     `(("setup-environment"
        ,(apply mixed-text-file "setup-environment"
-	       "\
-HOME_ENVIRONMENT=\"$HOME/.guix-home-environment\"
+	       (format #f "\
+HOME_ENVIRONMENT=\"~a\"
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\" ; \\
 . \"$HOME_ENVIRONMENT/profile/etc/profile\"
 
+export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
 # export MANPATH=$HOME/.guix-home-environment/profile/share/man:$MANPATH
 # export INFOPATH=$HOME/.guix-home-environment/profile/share/info:$INFOPATH
-export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
 # export XDG_CONFIG_DIRS=$HOME_ENVIRONMENT/profile/etc/xdg:$XDG_CONFIG_DIRS
 # export XCURSOR_PATH=$HOME/.guix-home-environment/profile/share/icons:$XCURSOR_PATH
-"
-	       (append-map
-                (alist-entry->mixed-text "export " "=")
-		  vars)))))))
+" (assoc-ref vars "HOME_ENVIRONMENT_DIRECTORY"))
+	       (append
+		(append-map
+                 (alist-entry->mixed-text "export " "=")
+		 vars))))))))
 
 (define home-environment-vars-service-type
   (service-type (name 'home-environment-vars)
