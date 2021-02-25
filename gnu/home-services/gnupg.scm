@@ -19,10 +19,10 @@
 (define (add-ssh-agent-socket config)
   "Adds SSH_AUTH_SOCK variable to user's environment."
   (if (home-gnupg-configuration-ssh-agent config)
-      `(("SSH_AUTH_SOCK"
-	 "$("
-	 ,(file-append gnupg "/bin/gpgconf")
-	 " --list-dirs agent-ssh-socket)"))
+      `(("SSH_AUTH_SOCK" .
+	 ("$("
+	  ,(file-append gnupg "/bin/gpgconf")
+	  " --list-dirs agent-ssh-socket)")))
       '()))
 
 (define (add-home-gnupg-agent-to-shepherd config)
