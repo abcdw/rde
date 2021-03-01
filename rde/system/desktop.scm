@@ -24,6 +24,7 @@
   #:use-module (gnu system nss)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu services)
+  #:use-module (gnu services shepherd)
   #:use-module (gnu services xorg)
   #:use-module (gnu services base)
   #:use-module (gnu services desktop)
@@ -119,11 +120,10 @@
    ;; This is where we specify system-wide packages.
    (packages (append
 	      (map specification->package+output
-		   '("htop"
-		     "font-iosevka" "font-dejavu" "font-gnu-unifont"
-		     "dmenu" "alacritty"
+		   '("font-iosevka" "font-dejavu" "font-gnu-unifont"
 		     "sway" "wofi" "waybar" "light"
 		     "swaylock"
+		     "alacritty"
 		     ;; System packages
 		     "iwd"
 		     "grub" "glibc" "nss-certs"))
@@ -139,6 +139,13 @@
    (services
     (append
      (list
+      (simple-service 'switch-to-tty2 shepherd-root-service-type
+                      (list (shepherd-service
+                             (provision '(kdb))
+                             (requirement '(virtual-terminal))
+                             (start #~(lambda ()
+                                        (invoke #$(file-append kbd "/bin/chvt") "2")))
+                             (respawn? #f))))
       (service pcscd-service-type)
       (screen-locker-service swaylock "swaylock")
       (udev-rules-service
