@@ -2,8 +2,12 @@
 (use-modules (gnu home)
 	     (gnu home-services)
 	     (gnu home-services gnupg)
+	     (gnu home-services files)
+	     (gnu services)
 	     (gnu packages)
-	     (gnu system keyboard))
+	     (gnu system keyboard)
+	     (guix gexp))
+
 
 ;; home-gnupg-service-type
 (define sample-he
@@ -11,11 +15,18 @@
    (keyboard-layout
     (keyboard-layout "us,ru" "dvorak,"
 		     #:options '("grp:win_space_toggle" "ctrl:nocaps")))
+
+   ;; (symlink-name ".guix-home-env")
    (packages
     (map specification->package+output
 	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))
    (services
     (list
-     (service home-gnupg-service-type)))))
+     (simple-service
+      'test-config home-files-service-type
+      (list `("config/test.conf"
+              ,(plain-file "tmp-file.txt" "hehe"))))
+     (service home-gnupg-service-type
+	      (home-gnupg-configuration (ssh-agent #t)))))))
 
 sample-he
