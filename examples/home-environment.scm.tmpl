@@ -5,6 +5,7 @@
 	     (gnu home-services files)
 	     (gnu services)
 	     (gnu packages)
+	     (gnu packages linux)
 	     (gnu system keyboard)
 	     (guix gexp))
 
@@ -22,6 +23,9 @@
 	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))
    (services
     (list
+     (simple-service
+      'set-brightness-on-login home-run-on-first-login-service-type
+      (list (file-append light "/bin/light") " -S 80\n"))
      (simple-service
       'test-config home-files-service-type
       (list `("config/test.conf"
