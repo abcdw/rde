@@ -33,7 +33,7 @@
      (shepherd-service
       (documentation "Run and control gpg-agent.")
       (provision provision-list)
-      (start #~(make-system-constructor "gpg-connect-agent /bye"))
+      (start #~(make-system-constructor "gpgconf --launch gpg-agent"))
       (stop #~(make-system-destructor "gpgconf --kill gpg-agent"))))))
 
 (define home-gnupg-service-type
