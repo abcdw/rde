@@ -99,7 +99,7 @@ export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
 # export INFOPATH=$HOME/.guix-home-environment/profile/share/info:$INFOPATH
 # export XDG_CONFIG_DIRS=$HOME_ENVIRONMENT/profile/etc/xdg:$XDG_CONFIG_DIRS
 # export XCURSOR_PATH=$HOME/.guix-home-environment/profile/share/icons:$XCURSOR_PATH
-" (assoc-ref vars "HOME_ENVIRONMENT_DIRECTORY"))
+" (assoc-ref vars "GUIX_HOME_ENVIRONMENT_DIRECTORY"))
 	       (append
 		(append-map
                  (alist-entry->mixed-text "export " "=")

@@ -82,10 +82,10 @@
        (service home-shepherd-service-type)
        (service home-run-on-first-login-service-type)
        ;; It should be safe to use symlink-path as
-       ;; HOME_ENVIRONMENT_DIRECTORY, however
+       ;; GUIX_HOME_ENVIRONMENT_DIRECTORY, however
        ;; /var/guix/profiles/per-user/... is another option
        (service home-environment-vars-service-type
-		`(("HOME_ENVIRONMENT_DIRECTORY" .
+		`(("GUIX_HOME_ENVIRONMENT_DIRECTORY" .
 		   ,(home-environment-symlink-path he))))
        (service home-service-type)
        (service home-profile-service-type (home-environment-packages he)))))))
