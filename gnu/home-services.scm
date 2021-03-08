@@ -117,8 +117,8 @@ export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
                 (description "Sets the environment variables.")))
 
 ;; TODO: maybe change to guile script instead of bash to make it more
-;; convinient to generate it. Despite the environment-vars-service it
-;; won't be sourced by any shells.
+;; convinient to generate it. In contrast to the
+;; environment-vars-service it won't be sourced by any shells.
 (define (commands->on-login-script cmds)
   "Return a script that can be started by bash/zsh's profile that will
 run @code{cmds} on login."
