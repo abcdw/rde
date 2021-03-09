@@ -94,7 +94,7 @@ as shepherd package."
 	   (map
 	    (lambda (file) (load file))
 	    '#$files))
-
+	  (action 'root 'daemonize)
           (format #t "starting services...~%")
           (for-each
 	   (lambda (service) (start service))
@@ -112,12 +112,12 @@ as shepherd package."
     "\n"
 
     ,(file-append shepherd "/bin/shepherd")
+    ;; TODO: logfile path must be set based on home-environment
+    ;; configuration
     "\\\n --logfile=$HOME/.local/var/log/shepherd.log"
+    "\\\n --config=" ,(home-shepherd-configuration-file services shepherd)
     "\n"
-
-    ,(file-append shepherd "/bin/herd")
-    "\\\n load root " ,(home-shepherd-configuration-file services shepherd)
-    "\n")))
+    )))
 
 (define (reload-configuration-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
