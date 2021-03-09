@@ -12,7 +12,8 @@
   #:export (home-service-type
 	    home-profile-service-type
 	    home-environment-vars-service-type
-	    home-run-on-first-login-service-type)
+	    home-run-on-first-login-service-type
+	    home-run-on-reconfigure-service-type)
 
   #:re-export (service
 	       service-type
@@ -141,7 +142,7 @@ touch $XDG_RUNTIME_DIR/on-login-executed
 fi\n"))))))))
 
 (define home-run-on-first-login-service-type
-  (service-type (name 'home-environment-vars)
+  (service-type (name 'home-run-on-first-login)
                 (extensions
                  (list (service-extension
 			home-service-type
@@ -150,3 +151,25 @@ fi\n"))))))))
                 (extend append)
 		(default-value '())
                 (description "Runs commands on first user login.")))
+
+(define (compute-on-reconfigure-script _ gexps)
+  (gexp->file "on-reconfigure"
+              #~(begin #$@gexps)))
+
+(define (on-reconfigure-script-entry m-on-reconfigure)
+  "Return, as a monadic value, an entry for the on-reconfigure script
+in the home environment directory."
+  (mlet %store-monad ((on-reconfigure m-on-reconfigure))
+    (return `(("on-reconfigure" ,on-reconfigure)))))
+
+(define home-run-on-reconfigure-service-type
+  (service-type (name 'home-run-on-reconfigure)
+                (extensions
+                 (list (service-extension
+			home-service-type
+                        on-reconfigure-script-entry)))
+                (compose identity)
+                (extend compute-on-reconfigure-script)
+		(default-value #f)
+                (description "Runs idempotent commands to update
+current state of home.")))

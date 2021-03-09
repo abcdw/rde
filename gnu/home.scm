@@ -78,7 +78,7 @@
        ;; home-environment-service
        ;; xdg-configuration
        ;; brightness-service
-       
+
        (service home-shepherd-service-type)
        (service home-run-on-first-login-service-type)
        ;; It should be safe to use symlink-path as
@@ -87,6 +87,7 @@
        (service home-environment-vars-service-type
 		`(("GUIX_HOME_ENVIRONMENT_DIRECTORY" .
 		   ,(home-environment-symlink-path he))))
+       (service home-run-on-reconfigure-service-type)
        (service home-service-type)
        (service home-profile-service-type (home-environment-packages he)))))))
 

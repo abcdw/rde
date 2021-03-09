@@ -119,6 +119,12 @@ as shepherd package."
     "\\\n load root " ,(home-shepherd-configuration-file services shepherd)
     "\n")))
 
+(define (reload-configuration-gexp config)
+  (let* ((shepherd (home-shepherd-configuration-shepherd config))
+	 (services (home-shepherd-configuration-services config)))
+      #~(execl #$(file-append shepherd "/bin/herd")
+	     "herd" "load" "root"
+	     #$(home-shepherd-configuration-file services shepherd))))
 
 (define-public home-shepherd-service-type
   (service-type (name 'home-shepherd)
@@ -126,6 +132,9 @@ as shepherd package."
                  (list (service-extension
 			home-run-on-first-login-service-type
                         launch-shepherd-daemon)
+		       (service-extension
+			home-run-on-reconfigure-service-type
+			reload-configuration-gexp)
 		       (service-extension
 			home-profile-service-type
 			(lambda (config)
