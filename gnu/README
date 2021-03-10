@@ -1,6 +1,15 @@
 -*- mode: org -*-
 
-~home guix~'s [[https://lists.sr.ht/~abcdw/rde-discuss/%3C878s7ho4bk.fsf%40yoctocell.xyz%3E][getting started]] for very curious people.
+~guix home~'s [[https://lists.sr.ht/~abcdw/rde-discuss/%3C878s7ho4bk.fsf%40yoctocell.xyz%3E][getting started]] for very curious people.
 
 The project is not ready for day to day use! Explore and try it on
 your own risk.
+
+Command, which builds and setup home-environment. Should be executed
+in the root of rde repository.
+
+#+begin_src shell
+GUILE_LOAD_PATH=./ \
+guix home reconfigure ./examples/home-environment.scm.tmpl \
+&& guile ~/.guix-home-environment/on-reconfigure
+#+end_src

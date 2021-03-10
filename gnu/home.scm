@@ -1,6 +1,7 @@
 (define-module (gnu home)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services shepherd)
+  #:use-module (gnu home-services symlink-manager)
   #:use-module (gnu services)
   #:use-module (gnu system keyboard)
   #:use-module (srfi srfi-1)
@@ -80,6 +81,7 @@
        ;; brightness-service
 
        (service home-shepherd-service-type)
+       (service home-symlink-manager-service-type)
        (service home-run-on-first-login-service-type)
        ;; It should be safe to use symlink-path as
        ;; GUIX_HOME_ENVIRONMENT_DIRECTORY, however
