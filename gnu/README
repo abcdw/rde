@@ -13,3 +13,11 @@ GUILE_LOAD_PATH=./ \
 guix home reconfigure ./examples/home-environment.scm.tmpl \
 && guile ~/.guix-home-environment/on-reconfigure
 #+end_src
+
+If your shell configuration not managed by ~guix home~, it should have
+following code in ~~/.profile~, ~~/.bash_profile~ or ~~/.zprofile~:
+
+#+begin_src shell
+source ~/.guix-home-environment/setup-environment
+sh ~/.guix-home-environment/on-login
+#+end_src
