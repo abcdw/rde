@@ -51,8 +51,7 @@ after all nested items already listed."
 	   (lambda (port)
 	     (display ";; Don't touch this file, it used for proper cleanup on
 ;; guix home reconfigure.\n" port)
-	     (write tree port)
-	     (close-port port))))
+	     (write tree port))))
 
        (define (load-tree path)
 	 (if (file-exists? path)
