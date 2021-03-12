@@ -9,8 +9,8 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-171)
 
-  #:export (alist-entry->mixed-text))
-
+  #:export (alist-entry->mixed-text
+            boolean->yes-or-no))
 
 (define* ((alist-entry->mixed-text prefix sep #:optional (suffix "\n"))
 	  alist-entry)
@@ -87,4 +87,11 @@ would yield
            '())))
     (_ (not-alist-entry-error))))
 
-
+(define* (boolean->yes-or-no bool #:optional (capitalize? #f))
+  "Convert a boolean BOOL to \"yes\" or \"no\".
+Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
+@code{#f} by default."
+  (let ((word (if (eq? bool #t) "yes" "no")))
+    (if capitalize?
+        (string-capitalize word)
+        word)))
