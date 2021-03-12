@@ -1,0 +1,53 @@
+-*- mode: org -*-
+
+* Guix system services notes
+Notes based on observations of ~(gnu services ...)~.
+** Enums
+How to implement a finite set?  Not the cleanest, but working
+solution: [[file:~/work/guix/gnu/services/networking.scm::unless (enum-set-member? type ntp-server-types][enum check implementation example]]
+** Service configurations
+Thread: [[https://lists.sr.ht/~abcdw/rde-devel/%3C87ft17dvhy.fsf%40yoctocell.xyz%3E][Reconsider service configurations]]
+Example: cups.scm has a lot of nested configs
+** Common field names
+It's not completely consistent across the project.
+- config-file :: #f or file-like object, e.g.  dhcpd-configuration
+- package :: in some cases it called package, in some cases it's the
+  same as service (e.g. network-manager) or it can be several separate
+  fields for each package used by this service.
+- extra-options :: a list of command line arguments passed to daemon,
+  also saw ~additional-options~ with the same purpose.  Sometimes it's
+  an alist exteding configuration, but consider it as a wrong
+  approach, use extra-config for this purpose instead.
+- extra-settings :: string added to the configuration file.
+- extra-content :: the same as extra-settings?
+- extra-config :: a list of strings or objects appended to config
+  verbatim. Sometimes it maybe alist or list of lists or something
+  requiring pre-processing.
+- extension-packages :: packages to install, most commonly
+  plugins/extensions.
+** Questions
+- How to deal with fields like log file? Use XDG variables?
+* home-services guidlines
+Few recommendations for implementing home-services:
+- Consult existing services for examples.
+- Service should not restrict the flexibility, any configuration must
+  be possible to implement for example by adding ~extra-content~
+  field.
+- Prefer not to duplicate system services, but if you do reuse their
+  configurations/records/etc.
+- If config format is stable and short, mimic its structure with
+  guile, if not, use Pareto principle: cover only small part of it and
+  rest will be set with ~extra-SOMETHING~ by advanced user if
+  necessary.
+- ~extra-config~ should be used if service-configuration doesn't cover
+  all possible settings, the field should accept values serializable
+  to resulting config, for example list of strings/file-like objects,
+  alist, etc, depending on underlying configuration structure. If
+  service is extensible it can rely on ~extra-config~ for those
+  capabilities.
+- ~extra-content~ should be used in case ~extra-config~ is hard to
+  implement (underlying config grammar is too complicated and hard to
+  serialiaze from config record for example), the field should accept
+  string or gexp, returning a string. Service with this field should
+  not be extensiable.
+
