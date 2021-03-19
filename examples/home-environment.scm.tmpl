@@ -2,6 +2,8 @@
 (use-modules (gnu home)
 	     (gnu home-services)
 	     (gnu home-services gnupg)
+	     (gnu home-services ssh)
+	     (gnu home-services version-control)
 	     (gnu home-services files)
 	     (gnu services)
 	     (gnu packages)
@@ -30,6 +32,18 @@
       'test-config home-files-service-type
       (list `("config/test.conf"
               ,(plain-file "tmp-file.txt" "hehe"))))
+     (service home-git-service-type
+	      (home-git-configuration
+	       (extra-config
+		(list
+		 (make-git-section 'sendmail
+				   '((annotate . #t)))))))
+     (service home-ssh-service-type
+	      (home-ssh-configuration
+	       (extra-config
+		(list
+		 (ssh-host "savannah"
+			   '((compression . #f)))))))
      (service home-gnupg-service-type
 	      (home-gnupg-configuration (ssh-agent #t)))))))
 
