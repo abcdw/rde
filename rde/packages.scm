@@ -8,8 +8,7 @@
 (define-public %rde-base-packages
   (map specification->package+output
        '("tmux" "openssh" "git" "make"
-	 "xdg-utils"
-	 "ungoogled-chromium-wayland"
+	 "xdg-utils" "xdg-user-dirs"
 	 "pavucontrol"
 	 ;; "obs-next" "obs-wlrobs"
 	 "mpv" "imv" "ffmpeg")))
