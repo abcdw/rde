@@ -20,6 +20,7 @@ set $term alacritty
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
+exec gpg-connect-agent updatestartuptty /bye >/dev/null
 set $menu wofi --show=drun
 # dmenu_path | dmenu | xargs swaymsg exec --
 default_border pixel
@@ -217,7 +218,7 @@ bindsym $mod+r mode "resize"
 # Read `man 5 sway-bar` for more information about this section.
 bindsym $mod+Shift+b bar mode toggle
 bar {
-    mode invisible
+    # mode invisible
     position top
 
     # When the status_command prints a new line to stdout, swaybar updates.
@@ -232,3 +233,4 @@ bar {
 }
 
 include /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/etc/sway/config.d/*
+# xwayland disable
