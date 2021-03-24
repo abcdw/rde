@@ -5,6 +5,7 @@
 	     (gnu home-services ssh)
 	     (gnu home-services version-control)
 	     (gnu home-services files)
+	     (gnu home-services mcron)
 	     (gnu services)
 	     (gnu packages)
 	     (gnu packages linux)
@@ -27,17 +28,23 @@
     (list
      (simple-service
       'set-brightness-on-login home-run-on-first-login-service-type
-      (list (file-append light "/bin/light") " -S 80\n"))
+      (list (file-append light "/bin/light") " -S 100\n"))
+
      (simple-service
       'test-config home-files-service-type
       (list `("config/test.conf"
               ,(plain-file "tmp-file.txt" "hehe"))))
-     (service home-git-service-type
-	      (home-git-configuration
-	       (extra-config
+     (service home-mcron-service-type
+              (home-mcron-configuration
+               (jobs
 		(list
-		 (make-git-section 'sendmail
-				   '((annotate . #t)))))))
+                 #~(job
+		    next-minute-from
+                    (lambda ()
+                      (call-with-output-file
+			  (string-append (getenv "HOME") "/tmp-mcron-test-file")
+                        (lambda (port)
+                          (display "Mcron service" port)))))))))
      (service home-ssh-service-type
 	      (home-ssh-configuration
 	       (extra-config
