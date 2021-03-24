@@ -17,20 +17,22 @@
 ;;; Version control related services.
 ;;;
 ;; (service home-git-service-type
-;; 	      (home-git-configuration
-;; 	       (attributes
-;; 		'((* . text=auto)
-;; 		  (*.sh . "text eol=lf")))
-;; 	       (ignore
-;; 		'("*.so" "*.o"))
-;; 	       (ignore-extra-content
-;; 		"*.dll\n*.exe\n")
-;; 	       (extra-config
-;; 		'((http "https://weak.example.com"
+;; 	 (home-git-configuration
+;; 	  (attributes
+;; 	   '((* . text=auto)
+;; 	     (*.sh . "text eol=lf")))
+;; 	  (ignore
+;; 	   '("*.so" "*.o"))
+;; 	  (ignore-extra-content
+;; 	   "*.dll\n*.exe\n")
+;; 	  (extra-config
+;; 	   `((http "https://weak.example.com"
 ;; 		   ((ssl-verify . #f)))
-;; 		  (sendmail
-;; 		   ((annotate . #t)))))
-;; 	       (extra-content (text-file->gexp "/home/bob/.gitconfig"))))
+;; 	     (gpg
+;; 	      ((program . ,(file-append gnupg "/bin/gpg"))))
+;; 	     (sendmail
+;; 	      ((annotate . #t))))
+;; 	   (extra-content (text-file->gexp "/home/bob/.gitconfig"))))
 ;;; Code:
 
 
@@ -44,10 +46,11 @@
 	   (map string-capitalize (cdr spl-str)))))
 
 (define (serialize-field field-name val)
-  (cond
-   ((boolean? val) (serialize-boolean field-name val))
-   (else
-    (format #f "\t~a = ~a\n" (uglify-field-name field-name) val))))
+   (cond
+    ((boolean? val) (serialize-boolean field-name val))
+    (else
+     (list (format #f "\t~a = " (uglify-field-name field-name))
+	   val "\n"))))
 
 ;; (field . name) => Field name
 (define (serialize-alist-entry entry)
@@ -57,7 +60,7 @@
 (define (serialize-alist field-name fields)
   (if (null? fields)
       ""
-      (apply string-append
+      (apply append
              (map serialize-alist-entry fields))))
 
 (define (serialize-boolean field-name val)
@@ -74,25 +77,28 @@
 (define serialize-git-section
   (match-lambda
     ((name options)
-     (string-append
+     (cons
       (serialize-git-section-header name #f)
       (serialize-alist #f options)))
     ((name value options)
-     (string-append
+     (cons
       (serialize-git-section-header name value)
       (serialize-alist #f options)))))
 
 ;; TODO: cover it with tests
 (define (serialize-git-config field-name val)
-  (apply string-append
+  (apply append
          (map serialize-git-section val)))
 
+;; (use-modules (gnu packages gnupg))
 ;; (serialize-git-config
 ;;  #f
-;;  '((http "https://weak.example.com"
-;; 		  	((ssl-verify . #f)))
-;; 		  (sendmail
-;; 		   ((annotate . #t)))))
+;;  `((http "https://weak.example.com"
+;; 	 ((ssl-verify . #f)))
+;;    (gpg
+;;     ((program . ,(file-append gnupg "/bin/gpg"))))
+;;    (sendmail
+;;     ((annotate . #t)))))
 
 (define (string-or-gexp? sg)
   (or (string? sg) (gexp? sg)))
@@ -174,12 +180,13 @@ of the configuration file."))
 	(filter-fields '(ignore)))
        (home-git-configuration-ignore-extra-content config)))
     ("config/git/config"
-     ,(mixed-text-file
-       "git-config"
-       (serialize-configuration
-        config
-	(filter-fields '(extra-config)))
-       (home-git-configuration-extra-content config)))))
+     ,(apply mixed-text-file
+	     "git-config"
+	     (append
+	      (serialize-git-config
+	       #f
+               (home-git-configuration-extra-config config))
+	      (list (home-git-configuration-extra-content config)))))))
 
 (define (add-git-packages config)
   (list (home-git-configuration-package config)))

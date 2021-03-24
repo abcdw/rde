@@ -34,6 +34,17 @@
       'test-config home-files-service-type
       (list `("config/test.conf"
               ,(plain-file "tmp-file.txt" "hehe"))))
+
+     (service home-git-service-type
+	      (home-git-configuration
+	       (extra-config
+		`((http "https://weak.example.com"
+			((ssl-verify . #f)))
+		  (gpg
+		   ((program . ,(file-append gnupg "/bin/gpg"))))
+		  (sendmail
+		   ((annotate . #t)))))))
+
      (service home-mcron-service-type
               (home-mcron-configuration
                (jobs
