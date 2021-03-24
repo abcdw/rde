@@ -1,4 +1,5 @@
 (define-module (gnu home-services version-control)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
   #:use-module (ice-9 match)
   #:use-module (gnu home-services)
@@ -10,6 +11,7 @@
   #:use-module (guix records)
 
   #:export (home-git-configuration
+	    home-git-extension
 	    home-git-service-type))
 
 ;;; Commentary:
@@ -33,6 +35,15 @@
 ;; 	     (sendmail
 ;; 	      ((annotate . #t))))
 ;; 	   (extra-content (text-file->gexp "/home/bob/.gitconfig"))))
+;;
+;; (simple-service
+;;  'add-something-to-git
+;;  home-git-service-type
+;;  (home-git-extension
+;;   (extra-config
+;; 	`((sendmail
+;; 	   ((annotate . #t)))))))
+;;
 ;;; Code:
 
 
@@ -52,7 +63,6 @@
      (list (format #f "\t~a = " (uglify-field-name field-name))
 	   val "\n"))))
 
-;; (field . name) => Field name
 (define (serialize-alist-entry entry)
   (match entry
     ((field . val) (serialize-field field val))))
@@ -90,16 +100,6 @@
   (apply append
          (map serialize-git-section val)))
 
-;; (use-modules (gnu packages gnupg))
-;; (serialize-git-config
-;;  #f
-;;  `((http "https://weak.example.com"
-;; 	 ((ssl-verify . #f)))
-;;    (gpg
-;;     ((program . ,(file-append gnupg "/bin/gpg"))))
-;;    (sendmail
-;;     ((annotate . #t)))))
-
 (define (string-or-gexp? sg)
   (or (string? sg) (gexp? sg)))
 (define (serialize-string-or-gexp field-name val) "")
@@ -120,6 +120,18 @@
     val)
    "\n"
    'suffix))
+
+(define-configuration home-git-extension
+  (attributes
+   (git-attributes '())
+   "Alist of pattern attribute pairs for git/attributes.")
+  (ignore
+   (git-ignore '())
+   "List of patterns for git/ignore.")
+  (extra-config
+   (git-config '())
+   "List of git sections.  The same format as in
+@code{home-git-configuration}."))
 
 (define-configuration home-git-configuration
   (package
@@ -191,6 +203,22 @@ of the configuration file."))
 (define (add-git-packages config)
   (list (home-git-configuration-package config)))
 
+(define (home-git-extensions original-config extension-configs)
+  (home-git-configuration
+   (inherit original-config)
+   (attributes
+    (append (home-git-configuration-attributes original-config)
+	    (append-map
+	     home-git-extension-attributes extension-configs)))
+   (ignore
+    (append (home-git-configuration-ignore original-config)
+	    (append-map
+	     home-git-extension-ignore extension-configs)))
+   (extra-config
+    (append (home-git-configuration-extra-config original-config)
+	    (append-map
+	     home-git-extension-extra-config extension-configs)))))
+
 (define home-git-service-type
   (service-type (name 'home-git)
                 (extensions
@@ -200,6 +228,8 @@ of the configuration file."))
                        (service-extension
                         home-profile-service-type
                         add-git-packages)))
+		(compose identity)
+		(extend home-git-extensions)
                 (default-value (home-git-configuration))
                 (description "Install and configure Git.")))
 
