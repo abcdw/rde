@@ -10,9 +10,7 @@
   #:use-module (guix records)
 
   #:export (home-git-configuration
-	    home-git-service-type
-	    ;; git-section
-	    make-git-section))
+	    home-git-service-type))
 
 ;;; Commentary:
 ;;;
@@ -28,13 +26,13 @@
 ;; 	       (ignore-extra-content
 ;; 		"*.dll\n*.exe\n")
 ;; 	       (extra-config
-;; 		(list
-;; 		 (make-git-section 'http "https://weak.example.com"
-;; 		  		   '((ssl-verify . #f)))
-;; 		 (make-git-section 'sendmail
-;; 				   '((annotate . #t)))))
+;; 		'((http "https://weak.example.com"
+;; 		   ((ssl-verify . #f)))
+;; 		  (sendmail
+;; 		   ((annotate . #t)))))
 ;; 	       (extra-content (text-file->gexp "/home/bob/.gitconfig"))))
 ;;; Code:
+
 
 (define (uglify-field-name field-name)
   "Convert symbol FIELD-NAME to a camel case string.
@@ -49,10 +47,7 @@
   (cond
    ((boolean? val) (serialize-boolean field-name val))
    (else
-    (let ((field-name (uglify-field-name field-name)))
-      (if (member field-name '(git-section))
-          (format #f "[~a \"~a\"]\n" field-name val)
-          (format #f "\t~a = ~a\n" field-name val))))))
+    (format #f "\t~a = ~a\n" (uglify-field-name field-name) val))))
 
 ;; (field . name) => Field name
 (define (serialize-alist-entry entry)
@@ -72,32 +67,32 @@
 (define alist? list?)
 (define git-config? list?)
 
-(define-record-type <git-section>
-  (git-section name value options)
-  git-section?
-  (name git-section-name)
-  (value git-section-value)
-  (options git-section-options))
-
-(define make-git-section
-  (case-lambda
-    ((name options) (git-section name #f options))
-    ((name value options) (git-section name value options))))
-
 (define (serialize-git-section-header name value)
   (format #f "[~a~a]\n" (uglify-field-name name)
 	  (if value (format #f " \"~a\"" value) "")))
 
 (define serialize-git-section
   (match-lambda
-    (($ <git-section> name value options)
+    ((name options)
+     (string-append
+      (serialize-git-section-header name #f)
+      (serialize-alist #f options)))
+    ((name value options)
      (string-append
       (serialize-git-section-header name value)
       (serialize-alist #f options)))))
 
+;; TODO: cover it with tests
 (define (serialize-git-config field-name val)
   (apply string-append
          (map serialize-git-section val)))
+
+;; (serialize-git-config
+;;  #f
+;;  '((http "https://weak.example.com"
+;; 		  	((ssl-verify . #f)))
+;; 		  (sendmail
+;; 		   ((annotate . #t)))))
 
 (define (string-or-gexp? sg)
   (or (string? sg) (gexp? sg)))
@@ -143,9 +138,8 @@ of the git/ignore file.")
    "List of sections and corresponding options.  Something like this:
 
 @lisp
-(list
- (make-git-section 'sendmail
-                   '((annotate . #t))))
+`((sendmail
+   ((annotate . #t))))
 @end lisp
 
 will turn into this:
