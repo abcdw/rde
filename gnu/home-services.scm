@@ -96,9 +96,9 @@ GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\" ; \\
 . \"$HOME_ENVIRONMENT/profile/etc/profile\"
 
 export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
-# export MANPATH=$HOME/.guix-home-environment/profile/share/man:$MANPATH
-# export INFOPATH=$HOME/.guix-home-environment/profile/share/info:$INFOPATH
-# export XDG_CONFIG_DIRS=$HOME_ENVIRONMENT/profile/etc/xdg:$XDG_CONFIG_DIRS
+export MANPATH=$HOME_ENVIRONMENT/profile/share/man:$MANPATH
+export INFOPATH=$HOME_ENVIRONMENT/profile/share/info:$INFOPATH
+export XDG_CONFIG_DIRS=$HOME_ENVIRONMENT/profile/etc/xdg:$XDG_CONFIG_DIRS
 # export XCURSOR_PATH=$HOME/.guix-home-environment/profile/share/icons:$XCURSOR_PATH
 " (assoc-ref vars "GUIX_HOME_ENVIRONMENT_DIRECTORY"))
 	       (append
