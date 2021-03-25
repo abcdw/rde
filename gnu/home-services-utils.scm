@@ -11,7 +11,9 @@
 
   #:export (alist-entry->mixed-text
             boolean->yes-or-no
-	    text-file->gexp))
+	    text-file->gexp
+            generic-serialize-alist-entry
+            generic-serialize-alist))
 
 
 (define* ((alist-entry->mixed-text prefix sep #:optional (suffix "\n"))
@@ -102,3 +104,21 @@ Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
   #~(call-with-input-file
 	#$(local-file path (string-trim (basename path) #\.))
 	(@@ (ice-9 textual-ports) get-string-all)))
+
+;;;
+;;; Serializers.
+;;;
+
+(define ((generic-serialize-alist-entry serialize-field) entry)
+  "Apply the SERIALIZE-FIELD procedure on the field and value of ENTRY."
+  (match entry
+    ((field . val) (serialize-field field val))))
+
+(define ((generic-serialize-alist combine serialize-field) field-name fields)
+  "Apply the SERIALIZE-FIELD procedure on the fields and values of FIELDS.
+Apply the COMBINE procedure to combine all the alist entries into one
+value, @code{string-append} or @code{append} are usually good
+candidates for this."
+  (apply combine
+         (map (generic-serialize-alist-entry serialize-field) fields)))
+

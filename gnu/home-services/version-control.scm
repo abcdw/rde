@@ -3,6 +3,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (ice-9 match)
   #:use-module (gnu home-services)
+  #:use-module (gnu home-services-utils)
   #:use-module (gnu home-services files)
   #:use-module (gnu services configuration)
   #:use-module (gnu packages version-control)
@@ -63,15 +64,7 @@
      (list (format #f "\t~a = " (uglify-field-name field-name))
 	   val "\n"))))
 
-(define (serialize-alist-entry entry)
-  (match entry
-    ((field . val) (serialize-field field val))))
-
-(define (serialize-alist field-name fields)
-  (if (null? fields)
-      ""
-      (apply append
-             (map serialize-alist-entry fields))))
+(define serialize-alist (generic-serialize-alist append serialize-field))
 
 (define (serialize-boolean field-name val)
   (serialize-field field-name (if val "true" "false")))
