@@ -5,6 +5,7 @@
 	     (gnu home-services ssh)
 	     (gnu home-services version-control)
 	     (gnu home-services files)
+	     (gnu home-services state)
 	     (gnu home-services mcron)
 	     (gnu services)
 	     (gnu packages)
@@ -13,7 +14,6 @@
 	     (guix gexp))
 
 
-;; home-gnupg-service-type
 (define sample-he
   (home-environment
    (keyboard-layout
@@ -29,6 +29,14 @@
      (simple-service
       'set-brightness-on-login home-run-on-first-login-service-type
       (list (file-append light "/bin/light") " -S 100\n"))
+     ;; home-state service is very experimental, use at your own risk
+     (service home-state-service-type
+	      (append
+	       (list
+		(state-rsync "/home/bob/tmp/example-rsync-state/"
+			     "abcdw@olorin.lan:/var/services/homes/abcdw/tmp-state/")
+		(state-git "/home/bob/tmp/talkes/"
+			   "git@git.sr.ht:~abcdw/rde"))))
 
      (simple-service
       'test-config home-files-service-type
