@@ -2,10 +2,8 @@ iso:
 	guix time-machine  -C rde/channels-lock -- system -L ./ disk-image -t iso9660 rde/system/install.scm
 
 home-reconfigure:
-	guix package -m rde/home/manifest.scm
-
-home-reconfigure-local:
-	guix package -L ./ -m rde/home/manifest.scm
+	GUILE_LOAD_PATH=./ guix home reconfigure ../rde/rde/config.scm \
+	&& guile ~/.guix-home-environment/on-reconfigure
 
 env:
 	guix time-machine -C rde/channels-lock -- environment --ad-hoc make

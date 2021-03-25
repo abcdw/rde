@@ -7,15 +7,7 @@
 
 (define-public %rde-base-packages
   (map specification->package+output
-       '("tmux" "openssh" "git" "make"
-	 "xdg-utils" "xdg-user-dirs"
-	 "pavucontrol"
-	 ;; "obs-next" "obs-wlrobs"
-	 "mpv" "imv" "ffmpeg")))
+       '()))
 
 (define-public %rde-all-packages
-  (append
-   ;; '(obs-next)
-   %rde-base-packages
-   %rde-gnupg-packages
-   %rde-emacs-all-packages))
+  (list))
