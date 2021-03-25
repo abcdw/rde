@@ -10,7 +10,9 @@
   #:use-module (srfi srfi-171)
 
   #:export (alist-entry->mixed-text
-            boolean->yes-or-no))
+            boolean->yes-or-no
+	    text-file->gexp))
+
 
 (define* ((alist-entry->mixed-text prefix sep #:optional (suffix "\n"))
 	  alist-entry)
@@ -95,3 +97,8 @@ Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
     (if capitalize?
         (string-capitalize word)
         word)))
+
+(define (text-file->gexp path)
+  #~(call-with-input-file
+	#$(local-file path (string-trim (basename path) #\.))
+	(@@ (ice-9 textual-ports) get-string-all)))
