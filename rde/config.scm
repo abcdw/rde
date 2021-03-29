@@ -51,20 +51,19 @@
      %rde-emacs-all-packages
      (map specification->package+output
 	  '("tmux" "make"
+	    ;; "zsh"
+	    ;; "qbittorrent"
 	    "xdg-utils" "xdg-user-dirs"
 	    "youtube-dl"
 	    "mpv" "imv" "ffmpeg"
 	    "obs" "obs-wlrobs"
 	    "curl" "sway"))))))
 
-(use-modules (gnu packages))
-(define (rde-browsers rde-config)
-  (list
-   (home-generic-service
-    'browsers
-    #:packages
-    (map specification->package+output
-	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))))
+;; (use-modules (gnu home-services shells))
+;; (define (rde-zsh rde-config)
+;;   (list
+;;    (service home-zsh-service-type
+;; 	    (home-zsh-configuration))))
 
 (use-modules (gnu home-services gnupg))
 (define (rde-gnupg rde-config)
@@ -83,19 +82,31 @@
   (list
    (service home-git-service-type
 	    (home-git-configuration
-	     (extra-config
+	     (config
 	      `((user
 		 ((name . ,(rde-config-full-name rde-config))
 		  (email . ,(rde-config-email rde-config))))
 		(sendmail
 		 ((annotate . #t)))))))))
 
+(use-modules (gnu packages))
+(define (rde-browsers rde-config)
+  (list
+   (home-generic-service
+    'browsers
+    #:packages
+    (map specification->package+output
+	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))))
+
+
+
 (define rde-features
   (list
-   rde-browsers
+   ;; rde-zsh
    rde-gnupg
    rde-ssh
    rde-git
+   rde-browsers
    rde-other-packages))
 
 (define (get-rde-services config features)

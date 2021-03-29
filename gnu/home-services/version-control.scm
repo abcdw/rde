@@ -28,20 +28,20 @@
 ;; 	   '("*.so" "*.o"))
 ;; 	  (ignore-extra-content
 ;; 	   "*.dll\n*.exe\n")
-;; 	  (extra-config
+;; 	  (config
 ;; 	   `((http "https://weak.example.com"
 ;; 		   ((ssl-verify . #f)))
 ;; 	     (gpg
 ;; 	      ((program . ,(file-append gnupg "/bin/gpg"))))
 ;; 	     (sendmail
 ;; 	      ((annotate . #t))))
-;; 	   (extra-content (text-file->gexp "/home/bob/.gitconfig"))))
+;; 	   (config-extra-content (text-file->gexp "/home/bob/.gitconfig"))))
 ;;
 ;; (simple-service
 ;;  'add-something-to-git
 ;;  home-git-service-type
 ;;  (home-git-extension
-;;   (extra-config
+;;   (config
 ;; 	`((sendmail
 ;; 	   ((annotate . #t)))))))
 ;;
@@ -93,11 +93,6 @@
   (apply append
          (map serialize-git-section val)))
 
-(define (string-or-gexp? sg)
-  (or (string? sg) (gexp? sg)))
-(define (serialize-string-or-gexp field-name val) "")
-
-
 (define (git-ignore? patterns)
   (list? patterns))
 (define (serialize-git-ignore field-name val)
@@ -121,7 +116,7 @@
   (ignore
    (git-ignore '())
    "List of patterns for git/ignore.")
-  (extra-config
+  (config
    (git-config '())
    "List of git sections.  The same format as in
 @code{home-git-configuration}."))
@@ -144,7 +139,7 @@ of the git/attributes file.")
    (string-or-gexp "")
     "String or value of string-valued g-exps will be added to the end
 of the git/ignore file.")
-  (extra-config
+  (config
    (git-config '())
    "List of sections and corresponding options.  Something like this:
 
@@ -159,7 +154,7 @@ will turn into this:
 [sendmail]
         annotate = true
 @end example")
-  (extra-content
+  (config-extra-content
    (string-or-gexp "")
    "String or value of string-valued g-exps will be added to the end
 of the configuration file."))
@@ -190,8 +185,8 @@ of the configuration file."))
 	     (append
 	      (serialize-git-config
 	       #f
-               (home-git-configuration-extra-config config))
-	      (list (home-git-configuration-extra-content config)))))))
+               (home-git-configuration-config config))
+	      (list (home-git-configuration-config-extra-content config)))))))
 
 (define (add-git-packages config)
   (list (home-git-configuration-package config)))
@@ -207,10 +202,10 @@ of the configuration file."))
     (append (home-git-configuration-ignore original-config)
 	    (append-map
 	     home-git-extension-ignore extension-configs)))
-   (extra-config
-    (append (home-git-configuration-extra-config original-config)
+   (config
+    (append (home-git-configuration-config original-config)
 	    (append-map
-	     home-git-extension-extra-config extension-configs)))))
+	     home-git-extension-config extension-configs)))))
 
 (define home-git-service-type
   (service-type (name 'home-git)
