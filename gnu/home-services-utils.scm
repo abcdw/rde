@@ -1,4 +1,5 @@
 (define-module (gnu home-services-utils)
+  #:use-module (gnu services configuration)
   #:use-module (guix ui)
   #:use-module (guix diagnostics)
   #:use-module (guix gexp)
@@ -12,8 +13,13 @@
   #:export (alist-entry->mixed-text
             boolean->yes-or-no
 	    text-file->gexp
+            list->human-readable-list
+            maybe-object->string
+            filter-configuration-fields
             generic-serialize-alist-entry
-            generic-serialize-alist))
+            generic-serialize-alist
+	    string-or-gexp?
+	    serialize-string-or-gexp))
 
 
 (define* ((alist-entry->mixed-text prefix sep #:optional (suffix "\n"))
@@ -105,6 +111,38 @@ Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
 	#$(local-file path (string-trim (basename path) #\.))
 	(@@ (ice-9 textual-ports) get-string-all)))
 
+(define (maybe-object->string object)
+  "Like @code{object->string} but don't do anyting if OBJECT already is
+a string."
+  (if (string? object)
+      object
+      (object->string object)))
+
+(define* (list->human-readable-list lst #:optional cumulative?)
+  "Turn a list LST into a sequence of terms readable by humans.
+If CUMULATIVE? is @code{#t}, use ``and'', otherwise use ``or'' before
+the last term.  @code{(list->human-readable-list '(a b c))} yields
+``a, b, or c''."
+  (let* ((word (if cumulative? "and " "or "))
+         (init (append (drop-right lst 1))))
+    (format #f "~a" (string-append (string-join (map object->string init)
+                                                ", " 'suffix)
+                                   word
+                                   (maybe-object->string (last lst))))))
+
+(define* (filter-configuration-fields configuration fields #:optional negate?)
+  "Retrieve the fields FIELDS from CONFIGURATION.
+If NEGATE? is @code{#t}, retrieve the FIELDS that are not in CONFIGURATION."
+  (filter (lambda (field)
+            (let ((membership? (member (configuration-field-name field)
+                                       fields)))
+              (if (not negate?)
+                  membership?
+                  (not membership?))))
+          configuration))
+
+
+
 ;;;
 ;;; Serializers.
 ;;;
@@ -122,3 +160,5 @@ candidates for this."
   (apply combine
          (map (generic-serialize-alist-entry serialize-field) fields)))
 
+(define (string-or-gexp? sg) (or (string? sg) (gexp? sg)))
+(define (serialize-string-or-gexp field-name val) "")

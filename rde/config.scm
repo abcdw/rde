@@ -69,7 +69,11 @@
 (define (rde-gnupg rde-config)
   (list
    (service home-gnupg-service-type
-	    (home-gnupg-configuration (ssh-agent #t)))))
+	    (home-gnupg-configuration
+	     (gpg-agent-config
+	      (home-gpg-agent-configuration
+	       (ssh-agent? #t)
+	       (pinentry-flavor 'qt)))))))
 
 (use-modules (gnu home-services ssh))
 (define (rde-ssh rde-config)

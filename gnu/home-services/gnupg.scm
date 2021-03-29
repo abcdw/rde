@@ -2,94 +2,339 @@
   #:use-module (gnu home-services)
   #:use-module (gnu home-services shepherd)
   #:use-module (gnu home-services files)
+  #:use-module (gnu home-services-utils)
+  #:use-module (gnu packages)
   #:use-module (gnu packages gnupg)
-  #:use-module (gnu packages qt)
+  #:use-module (gnu services configuration)
   #:use-module (guix gexp)
+  #:use-module (guix i18n)
+  #:use-module (guix diagnostics)
   #:use-module (guix records)
+  #:use-module (guix packages)
+  #:use-module (ice-9 match)
+  #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-13)
 
   #:export (home-gnupg-service-type
-	    home-gnupg-configuration))
+	    home-gnupg-configuration
+            home-gpg-configuration
+            home-gpg-agent-configuration))
 
-;; TODO: rename gnupg to gpg-agent and split record for gpg config?
-(define-record-type* <home-gnupg-configuration>
-  home-gnupg-configuration make-home-gnupg-configuration
-  home-gnupg-configuration?
-  ;; TODO: Add pinentry-flavour.
-  (package     home-gnupg-configuration-package
-               (default gnupg))
-  (ssh-agent   home-gnupg-configuration-ssh-agent
-               (default #f)))
+;;; Commentary:
+;;
+;; Service for installing and configuring gpg and gpg-agent.
+;;
+;; (service home-gnupg-service-type
+;;            (home-gnupg-configuration
+;;             (gpg-config
+;;              (home-gpg-configuration
+;;               (extra-config
+;;                '((cert-digest-algo . "SHA256")
+;;                  (default-preference-list . ("SHA512"
+;;                                              "SHA384"
+;;                                              "SHA256"
+;;                                              "SHA224"
+;;                                              "AES256"
+;;                                              "AES192"
+;;                                              "Uncompressed"))
+;;                  (with-fingerprint? . #t)))))
+;;             (gpg-agent-config
+;;              (home-gpg-agent-configuration
+;;               (ssh-agent? #t)
+;;               (pinentry-flavor 'emacs)
+;;               (extra-options '("--verbose"))
+;;               (extra-config
+;;                '((max-cache-ttl . 86400)))))))
+;;
+;;; Code:
 
-(define (add-ssh-agent-socket config)
-  "Adds SSH_AUTH_SOCK variable to user's environment."
-  (if (home-gnupg-configuration-ssh-agent config)
+(define (serialize-field field-name val)
+  (cond
+   ((list? val) (serialize-list field-name val))
+   ((boolean? val) (serialize-boolean field-name val))
+   (else (format #f "~a ~a~%" field-name val))))
+
+(define (serialize-list field-name lst)
+  (serialize-field field-name (format #f "~a" (string-join lst))))
+
+(define (serialize-boolean field-name boolean)
+  (let* ((stringified (maybe-object->string field-name))
+         (field-name (if (string-suffix? "?" stringified)
+                         (string-drop-right stringified 1)
+                         field-name)))
+    (if boolean
+        (serialize-field field-name "")
+        (serialize-field "" ""))))
+
+(define alist? list?)
+(define serialize-alist (generic-serialize-alist string-append serialize-field))
+
+(define serialize-string serialize-field)
+
+(define %pinentry-flavors '(tty emacs gtk2 qt gnome3 rofi efl))
+
+(define (serialize-pinentry-flavor field-name val)
+  (let ((pinentry-program #~(string-append "pinentry-program "
+                                           #$(file-append
+                                              (specification->package
+                                               (format #f "pinentry-~a" val))
+                                              "/bin/pinentry")
+                                           "\n")))
+    (if (equal? val 'emacs)
+        #~(string-append #$pinentry-program
+                         "allow-emacs-pinentry\n"
+                         "allow-loopback-pinentry\n")
+        pinentry-program)))
+
+(define (pinentry-flavor? flavor)
+  (if (member flavor %pinentry-flavors)
+      #t
+      (raise (formatted-message
+              (G_ "Pinentry must be one of ~a, was given: ~s")
+              (list->human-readable-list %pinentry-flavors)
+              flavor))))
+
+(define ssh-agent? boolean?)
+(define (serialize-ssh-agent field-name val)
+  (serialize-field "enable-ssh-support" val))
+
+(define (ssh-key? lst)
+  (let ((keygrip (first lst)))
+    (if (= (string-length keygrip) 40)
+        #t
+        (raise (formatted-message
+                (G_ "The keygrip of the GnuPG key must be of length 40, was given: ~s")
+                keygrip)))))
+
+(define (ssh-keys-list? lst)
+  (when (every ssh-key? lst) #t))
+
+(define (serialize-ssh-key lst)
+  (string-append (string-join (map maybe-object->string lst)) "\n"))
+
+(define (serialize-ssh-keys-list field-name val)
+  (apply string-append (map serialize-ssh-key
+                            val)))
+
+;; Dummy procedures, the real logic is handled in `home-gnupg-files-service'.
+(define (serialize-home-gpg-configuration field-name val) "")
+(define (serialize-home-gpg-agent-configuration field-name val) "")
+(define (serialize-extra-options field-name val) "")
+(define extra-options? list?)
+
+(define-configuration home-gpg-configuration
+  (extra-config
+   (alist '())
+   "Association list of key-value pair configuration.  The following configuration:
+@lisp
+(extra-config
+  '((cert-digest-algo . \"SHA256\")
+    (no-comments . #f)
+    (default-preference-list . (\"SHA512\" \"SHA384\"))))
+@end lisp
+
+would yield:
+
+@example
+cert-digest-algo SHA256
+no-comments
+default-preference-list SHA512 SHA384
+@end example")
+  (extra-content
+   (string-or-gexp "")
+   "Extra content for the @code{gpg.conf} file, useful if you already
+have a configuration for gpg."))
+
+(define-configuration home-gpg-agent-configuration
+  (ssh-agent?
+   (ssh-agent #f)
+   "Whether to use gpg-agent for SSH keys.  If you enable this option,
+you should also look at the @code{ssh-keys} option.")
+  (ssh-keys
+   (ssh-keys-list '())
+   "List of lists of GnuPG keys to expose as SSH keys.  The list
+contains sublists corresponding to a GnuPG key, the sublist can
+contain three elements.  The first one is the keygrip of the key, the
+second is the caching TTL in seconds, the third is a flag to give to
+the key, currently, only ``confirm'' is supported.  The keygrip is
+mandatory, the other two elements are optional
+(@pxref{Configuration,,,gpg-agent,gpg-agent}).  The following
+snippet:
+
+@lisp
+(ssh-keys
+  '((\"34B62F25E277CF13D3C6BCEBFD3F85D08F0A864B\" 0 \"confirm\")
+    (\"4B62F25E277CF13D3C6BCEBFD3F85D08F0DA32VD\")))
+@end lisp
+
+yields the following in @file{sshcontrol}:
+
+@example
+34B62F25E277CF13D3C6BCEBFD3F85D08F0A864B 0 confirm
+4B62F25E277CF13D3C6BCEBFD3F85D08F0DA32VD
+@end example")
+  (pinentry-flavor
+   (pinentry-flavor 'gtk2)
+   "Which pinentry interface to use.  Valid options are ``tty'', ``emacs'',
+``gtk2'', ``qt'', ``gnome3'', ``rofi'', and ``efl''.")
+  (extra-options
+   (extra-options '())
+   "Extra CLI options to give to @command{gpg-agent}.")
+  (extra-config
+   (alist '())
+   "Association list of key-value pair configuration, works the same
+way as the @code{extra-config} field for
+@code{home-gpg-configuration}.  The following configuration:
+
+@lisp
+(extra-config
+  '((default-cache-ttl . 80000)
+    (pinentry-invisible-char \"@@\")))
+@end lisp
+
+would yield:
+
+@example
+default-cache-ttl 80000
+pinentry-invisible-char @@
+@end example")
+  (extra-content
+   (string-or-gexp "")
+   "Extra content for the @code{gpg-agent.conf} file, useful if you already
+have a configuration for gpg-agent."))
+
+;; TODO: Add homedir option?
+(define-configuration home-gnupg-configuration
+  (package
+    (package gnupg)
+    "GnuPG package to use.")
+  (gpg-config
+   (home-gpg-configuration (home-gpg-configuration))
+   "Configuration for the @code{gpg} executable")
+  (gpg-agent-config
+   (home-gpg-agent-configuration (home-gpg-agent-configuration))
+   "Configuration for the @code{gpg-agent}"))
+
+(define (home-gnupg-environment-vars-service config)
+  "Add SSH_AUTH_SOCK variable to user's environment."
+  (if (home-gpg-agent-configuration-ssh-agent?
+       (home-gnupg-configuration-gpg-agent-config config))
       `(("SSH_AUTH_SOCK" .
 	 ("$("
 	  ,(file-append gnupg "/bin/gpgconf")
 	  " --list-dirs agent-ssh-socket)")))
       '()))
 
-(define (add-home-gpg-agent-to-shepherd config)
+(define (home-gpg-agent-file config)
+  (mixed-text-file
+       "gpg-agent.conf"
+       (serialize-configuration
+        (home-gnupg-configuration-gpg-agent-config config)
+        (filter-configuration-fields home-gpg-agent-configuration-fields
+                                     '(ssh-keys)
+                                     #t))
+       (home-gpg-agent-configuration-extra-content
+        (home-gnupg-configuration-gpg-agent-config config))))
+
+(define (home-gpg-sshcontrol-file config)
+  (mixed-text-file
+         "sshcontrol"
+         (serialize-configuration
+          (home-gnupg-configuration-gpg-agent-config config)
+          (filter-configuration-fields home-gpg-agent-configuration-fields
+                                       '(ssh-keys)))))
+
+(define (home-gpg-file config)
+  (mixed-text-file
+       "gpg.conf"
+       (serialize-configuration
+        (home-gnupg-configuration-gpg-config config)
+        home-gpg-configuration-fields)
+       (home-gpg-configuration-extra-content
+        (home-gnupg-configuration-gpg-config config))))
+
+(define (home-gnupg-files-service config)
+  ;; Don't create file if empty
+  (filter (compose not null?)
+          ;; TODO: Pass directly to gpg-agent to avoid symlink?
+          `(("gnupg/gpg-agent.conf"
+             ,(home-gpg-agent-file config))
+            ,(if (null? (home-gpg-agent-configuration-ssh-keys
+                         (home-gnupg-configuration-gpg-agent-config config)))
+                 '()
+                 '("gnupg/sshcontrol"
+                   (home-gpg-sshcontrol-file config)))
+            ("gnupg/gpg.conf"
+             ,(home-gpg-file config)))))
+
+(define (home-gnupg-shepherd-service config)
   (let ((provision-list `(gpg-agent
-			  ,@(if (home-gnupg-configuration-ssh-agent config)
-				'(ssh-agent) '()))))
+                          ,@(if (home-gpg-agent-configuration-ssh-agent?
+                                 (home-gnupg-configuration-gpg-agent-config config))
+                                '(ssh-agent) '()))))
     (list
      (shepherd-service
       (documentation "Run and control gpg-agent.")
       (provision provision-list)
-      (start #~(make-system-constructor "gpgconf --launch gpg-agent"
-	;; 	make-forkexec-constructor
-	;; 	(list #$(file-append gnupg "/bin/gpg-agent") "--daemon")
-	;; 	#:environment-variables
-	;; '("WAYLAND_DISPLAY=wayland-0")
-	))
+      ;; TODO: Use --supervised gpg-agent and sockets
+      ;; (start #~(make-forkexec-constructor
+      ;;           (append (list #$(file-append gnupg "/bin/gpg-agent")
+      ;;                         ;; "--supervised"
+      ;;                         "--options"
+      ;;                         #$(home-gpg-agent-file config))
+      ;; (quote #$(home-gpg-agent-configuration-extra-options
+      ;;         (home-gnupg-configuration-gpg-agent-config config))))))
+      ;;
+      ;; FIXME: any command using gpg hangs up and waiting for
+      ;; something if updatestartuptty wasn't executed. Necessary to
+      ;; restart gpg-agent.  With gpgconf and without updatestartuptty
+      ;; it just throws: "agent refused operation".
+      (start #~(make-system-constructor
+                (string-join
+                 (append
+                  (list #$(file-append gnupg "/bin/gpg-agent")
+			"--daemon"
+			"--options"
+                        #$(home-gpg-agent-file config))
+                  (quote #$(home-gpg-agent-configuration-extra-options
+                            (home-gnupg-configuration-gpg-agent-config config)))))))
+      ;; (stop #~(make-kill-destructor))
       (stop #~(make-system-destructor "gpgconf --kill gpg-agent"))))))
 
-(define (add-gnupg-configs config)
-  `(;; ("gnupg/gpg.conf" ,(plain-file "gpg.conf" "test"))
-    ("gnupg/gpg-agent.conf"
-     ,(apply
-       mixed-text-file "gpg-agent.conf"
-       (if (home-gnupg-configuration-ssh-agent config)
-	   "enable-ssh-support\n" "")
-       ;; NOTE: not really necessary, because if there is only one
-       ;; pinentry package in the environment /bin/pinentry will be
-       ;; pointing to /bin/pinentry-qt
-       (list "pinentry-program " pinentry-qt "/bin/pinentry-qt" "\n")
-
-       ))))
-
-(define (add-gnupg-packages config)
-  (append
-   (list (home-gnupg-configuration-package config))
-   ;; Probably have to be installed by some wayland-related service,
-   ;; because it is not a required dependency for pinentry-qt
-   ;; TODO: Move to wayland-related service
-   `(,qtwayland)))
+(define (home-gnupg-profile-service config)
+  (list (home-gnupg-configuration-package config)))
 
 (define home-gnupg-service-type
   (service-type (name 'home-gnupg)
                 (extensions
                  (list (service-extension
-			home-environment-vars-service-type
-                        add-ssh-agent-socket)
-		       (service-extension
-			home-shepherd-service-type
-			add-home-gpg-agent-to-shepherd)
-		       (service-extension
-			home-files-service-type
-			add-gnupg-configs)
-		       (service-extension
-			home-profile-service-type
-			add-gnupg-packages
-			)))
-		(default-value (home-gnupg-configuration))
-                (description "Configure and install gpg-agent.")))
+                        home-environment-vars-service-type
+                        home-gnupg-environment-vars-service)
+                       (service-extension
+                        home-shepherd-service-type
+                        home-gnupg-shepherd-service)
+                       (service-extension
+                        home-files-service-type
+                        home-gnupg-files-service)
+                       (service-extension
+                        home-profile-service-type
+                        home-gnupg-profile-service)))
+                (default-value (home-gnupg-configuration))
+                (description "Install and configure gpg and gpg-agent.")))
 
+(define (generate-home-gnupg-documentation)
+  (generate-documentation
+   `((home-gnupg-configuration
+      ,home-gnupg-configuration-fields
+      (gpg-config home-gpg-configuration)
+      (gpg-agent-config home-gpg-agent-configuration))
+     (home-gpg-configuration
+      ,home-gpg-configuration-fields)
+     (home-gpg-agent-configuration
+      ,home-gpg-agent-configuration-fields))
+   'home-gnupg-configuration))
 
-;; TODO: create services for bash/sway to run this command
-;; automatically to make pinentry work.
-(define update-gnupg-tty-command
-  (list
-   (file-append gnupg "/bin/gpg-connect-agent")
-   " updatestartuptty /bye\n"))
+;; TODO: Add stuff to bash/zsh/fish config
+;;   GPG_TTY=$(tty)
+;;   export GPG_TTY
+;;   gpg-connect-agent updatestartuptty /bye > /dev/null
