@@ -19,6 +19,8 @@ Define schedule and add the information to announce.
 *** TODO Announce on stream
 ** TODO Establish documenting workflow (write guideline)
 ** TODO Establish testing workflow (write guideline)
+** TODO Add ~guix home search~
+** TODO Add ~guix home rollback/list-generations~
 * Backlog
 ** UI
 *** TODO Visually separate sway workspaces for different workflows
