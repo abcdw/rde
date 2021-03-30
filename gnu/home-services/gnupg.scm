@@ -14,6 +14,7 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-13)
+  #:use-module (srfi srfi-26)
 
   #:export (home-gnupg-service-type
 	    home-gnupg-configuration
@@ -175,8 +176,11 @@ yields the following in @file{sshcontrol}:
 @end example")
   (pinentry-flavor
    (pinentry-flavor 'gtk2)
-   "Which pinentry interface to use.  Valid options are ``tty'', ``emacs'',
-``gtk2'', ``qt'', ``gnome3'', ``rofi'', and ``efl''.")
+   (string-append "Which pinentry interface to use.  Valid options are: "
+                  (list->human-readable-list
+                   %pinentry-flavors
+                   #:cumulative? #t
+                   #:proc (cut format #f "``~a''" <>))))
   (extra-options
    (extra-options '())
    "Extra CLI options to give to @command{gpg-agent}.")

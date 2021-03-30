@@ -9,6 +9,7 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-171)
+  #:use-module (srfi srfi-26)
 
   #:export (alist-entry->mixed-text
             boolean->yes-or-no
@@ -118,17 +119,31 @@ a string."
       object
       (object->string object)))
 
-(define* (list->human-readable-list lst #:optional cumulative?)
+(define* (list->human-readable-list lst
+                                    #:key
+                                    (cumulative? #f)
+                                    (proc identity))
   "Turn a list LST into a sequence of terms readable by humans.
 If CUMULATIVE? is @code{#t}, use ``and'', otherwise use ``or'' before
-the last term.  @code{(list->human-readable-list '(a b c))} yields
-``a, b, or c''."
+the last term.
+
+PROC is a procedure to apply to each of the elements of a list before
+turning them into a single human readable string.
+
+@example
+(list->human-readable-list '(1 4 9) #:cumulative? #t #:proc sqrt)
+@result{} \"1, 2, and 3\"
+@end example
+
+yields:"
   (let* ((word (if cumulative? "and " "or "))
          (init (append (drop-right lst 1))))
-    (format #f "~a" (string-append (string-join (map object->string init)
-                                                ", " 'suffix)
-                                   word
-                                   (maybe-object->string (last lst))))))
+    (format #f "~a" (string-append
+                     (string-join
+                      (map (compose maybe-object->string proc) init)
+                      ", " 'suffix)
+                     word
+                     (maybe-object->string (proc (last lst)))))))
 
 (define* (filter-configuration-fields configuration fields #:optional negate?)
   "Retrieve the fields FIELDS from CONFIGURATION.
