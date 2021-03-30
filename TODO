@@ -1,17 +1,34 @@
 -*- mode: org -*-
-* UI
-** TODO Visually separate sway workspaces for different workflows
+#+TODO: TODO IN-PROGRESS | DONE
+* ~guix home~ Before Upstream Checklist
+** IN-PROGRESS Implement zsh home-service
+** TODO Implement bash home-service
+** IN-PROGRESS Implement gnupg home-service
+** IN-PROGRESS Create clean example configuration
+~rde/config.scm~ is a ready to use configuration, but requires few
+helpers to make it customizable by the end user.
+** TODO Call on-reconfigure on reconfigure
+** TODO Run ~guix home~ on 5 early adopters
+*** TODO Establish/define support channels and schedule
+Define schedule and add the information to announce.
+- #guix IRC.
+- rde-discuss mailing list.
+- weekly calls.
+*** TODO Announce in rde-announce
+*** TODO Announce in guix-devel
+*** TODO Announce on stream
+** TODO Establish documenting workflow (write guideline)
+** TODO Establish testing workflow (write guideline)
+* Backlog
+** UI
+*** TODO Visually separate sway workspaces for different workflows
 - code
 - communication
-- multimedia
-* LiveCD image
-** DONE Make a simple image for installation purpose
-* General
-** TODO Implement pam_shepherd.so
+  - multimedia
+** General
+*** TODO Implement pam_shepherd.so
 Start user-space shepherd on first user login and exit on last logout.
 - [[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
 - https://www.opennet.ru/base/dev/pam_linux.txt.html
 Take a look at mpd service for user-service example and /run/user/ID
 creation.
-* Emacs
-** TODO Emacs extensible home-service
