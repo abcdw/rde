@@ -3,7 +3,7 @@
 * ~guix home~ Before Upstream Checklist
 ** IN-PROGRESS Implement zsh home-service
 ** TODO Implement bash home-service
-** IN-PROGRESS Implement gnupg home-service
+** DONE Implement gnupg home-service
 ** IN-PROGRESS Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
@@ -21,6 +21,14 @@ Define schedule and add the information to announce.
 ** TODO Establish testing workflow (write guideline)
 ** TODO Add ~guix home search~
 ** TODO Add ~guix home rollback/list-generations~
+** TODO Add copyrights to source code
+* ~guix home~ services backlog
+** TODO sway
+** TODO pass
+Also browser plugins and other stuff
+** TODO ungoogled-chromium
+** TODO nyxt
+** TODO emacs
 * Backlog
 ** UI
 *** TODO Visually separate sway workspaces for different workflows
