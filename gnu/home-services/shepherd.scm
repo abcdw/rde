@@ -24,48 +24,6 @@
   (services home-shepherd-configuration-services
             (default '())))
 
-(define (assert-valid-graph services)
-  "Raise an error if SERVICES does not define a valid shepherd service graph,
-for instance if a service requires a nonexistent service, or if more than one
-service uses a given name.
-
-These are constraints that shepherd's 'register-service' verifies but we'd
-better verify them here statically than wait until PID 1 halts with an
-assertion failure."
-  (define provisions
-    ;; The set of provisions (symbols).  Bail out if a symbol is given more
-    ;; than once.
-    (fold (lambda (service set)
-            (define (assert-unique symbol)
-              (when (set-contains? set symbol)
-                (raise (condition
-                        (&message
-                         (message
-                          (format #f (G_ "service '~a' provided more than once")
-                                  symbol)))))))
-
-            (for-each assert-unique (shepherd-service-provision service))
-            (fold set-insert set (shepherd-service-provision service)))
-          (setq 'shepherd)
-          services))
-
-  (define (assert-satisfied-requirements service)
-    ;; Bail out if the requirements of SERVICE aren't satisfied.
-    (for-each (lambda (requirement)
-                (unless (set-contains? provisions requirement)
-                  (raise (condition
-                          (&message
-                           (message
-                            (format #f (G_ "service '~a' requires '~a', \
-which is not provided by any service")
-                                    (match (shepherd-service-provision service)
-                                      ((head . _) head)
-                                      (_          service))
-                                    requirement)))))))
-              (shepherd-service-requirement service)))
-
-  (for-each assert-satisfied-requirements services))
-
 (define (home-shepherd-configuration-file services shepherd)
   "Return the shepherd configuration file for SERVICES.  SHEPHERD is used
 as shepherd package."
