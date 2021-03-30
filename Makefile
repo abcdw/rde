@@ -3,8 +3,8 @@ iso:
 
 home-reconfigure:
 	GUILE_LOAD_PATH=./ guix home reconfigure ../rde/rde/config.scm \
-	&& guile ~/.guix-home-environment/on-reconfigure
-
+	&& guile ~/.guix-home-environment/on-reconfigure \
+	&& gpg-connect-agent updatestartuptty /bye >/dev/null
 env:
 	guix time-machine -C rde/channels-lock -- environment --ad-hoc make
 
