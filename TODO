@@ -22,6 +22,12 @@ Define schedule and add the information to announce.
 ** TODO Add ~guix home search~
 ** TODO Add ~guix home rollback/list-generations~
 ** TODO Add copyrights to source code
+** TODO Fix environment-variables service
+It's enough to make it accept pairs, it doesn't have to be list,
+because value can be a gexp.
+** TODO Rewrite on-login script to guile
+** TODO Add XDG support to home-envirnoment
+Set explicitly XDG_CONFIG_HOME and friends.
 * ~guix home~ services backlog
 ** TODO sway
 ** TODO pass
