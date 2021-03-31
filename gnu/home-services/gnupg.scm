@@ -224,9 +224,10 @@ have a configuration for gpg-agent."))
   (if (home-gpg-agent-configuration-ssh-agent?
        (home-gnupg-configuration-gpg-agent-config config))
       `(("SSH_AUTH_SOCK" .
-	 ("$("
-	  ,(file-append gnupg "/bin/gpgconf")
-	  " --list-dirs agent-ssh-socket)")))
+	 ,#~(string-append
+	     "$("
+	     #$(file-append gnupg "/bin/gpgconf")
+	     " --list-dirs agent-ssh-socket)")))
       '()))
 
 (define (home-gpg-agent-file config)

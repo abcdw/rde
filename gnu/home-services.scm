@@ -68,23 +68,22 @@ packages, configuration files, activation script, and so on.")))
 @file{~/.guix-home-environment/profile}.  It contains packages that
 the user wants to be available.")))
 
-
 (define (environment-variables->setup-environment-script vars)
   "Return a file that can be sourced by bash/zsh that initialize the
-environment. Sources home profile, sets default variables and sets
-variables provided in @code{vars}. @code{vars} is a list of pairs
-string + string/file-like object or list of items, where the first one
-is variable and rest are strings/file-like objects.
+environment.  Sources home environment profile, sets default variables
+and sets variables provided in @code{vars}.  @code{vars} is a list of
+pairs (@code{(key . value)}), @code{key} is a string and @code{value}
+is a string or gexp.
 
-It's done to be able to express both following cases:
-@example
-`((\"TMP\" . \"VAR_VALUE\")
-  (\"SSH_AUTH_SOCK\" \"$(\" (\\, (file-append gnupg \"/bin/gpgconf\")) \" --list-dirs agent-ssh-socket)\"))
-@end example
-
-If value is @code{#f} variable will be set to empty string.
+If value is @code{#f} variable will be omitted.
+If value is @code{#t} variable will be just exported.
+For any other, value variable will be set to the @code{value} and
+exported.
 "
-
+  ;; TODO: Add environment variables uniqness check?  It can be valid
+  ;; to have the same variable twice if it extends value of itself,
+  ;; not overrides, but it's hard to check, because of gexps.  The
+  ;; other good solution is to add a display of the warning here.
   (with-monad
    %store-monad
    (return
@@ -99,12 +98,18 @@ export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
 export MANPATH=$HOME_ENVIRONMENT/profile/share/man:$MANPATH
 export INFOPATH=$HOME_ENVIRONMENT/profile/share/info:$INFOPATH
 export XDG_CONFIG_DIRS=$HOME_ENVIRONMENT/profile/etc/xdg:$XDG_CONFIG_DIRS
-# export XCURSOR_PATH=$HOME/.guix-home-environment/profile/share/icons:$XCURSOR_PATH
+export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH
 " (assoc-ref vars "GUIX_HOME_ENVIRONMENT_DIRECTORY"))
-	       (append
-		(append-map
-                 (alist-entry->mixed-text "export " "=")
-		 vars))))))))
+
+	       (append-map
+		(match-lambda
+		  ((key . #f)
+		   '())
+		  ((key . #t)
+		   (list "export " key "\n"))
+		  ((key . value)
+                   (list "export " key "=" value "\n")))
+		vars)))))))
 
 (define home-environment-vars-service-type
   (service-type (name 'home-environment-vars)
