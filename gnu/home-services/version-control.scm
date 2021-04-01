@@ -90,8 +90,7 @@
 
 ;; TODO: cover it with tests
 (define (serialize-git-config field-name val)
-  (apply append
-         (map serialize-git-section val)))
+  #~(string-append #$@(append-map serialize-git-section val)))
 
 (define (git-ignore? patterns)
   (list? patterns))
@@ -180,13 +179,12 @@ of the configuration file."))
 	(filter-fields '(ignore)))
        (home-git-configuration-ignore-extra-content config)))
     ("config/git/config"
-     ,(apply mixed-text-file
+     ,(mixed-text-file
 	     "git-config"
-	     (append
-	      (serialize-git-config
-	       #f
-               (home-git-configuration-config config))
-	      (list (home-git-configuration-config-extra-content config)))))))
+	     (serialize-configuration
+              config
+	      (filter-fields '(config)))
+	     (home-git-configuration-config-extra-content config)))))
 
 (define (add-git-packages config)
   (list (home-git-configuration-package config)))
