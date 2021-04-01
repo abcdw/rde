@@ -7,6 +7,7 @@
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (guix packages)
+  #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
 
   #:export (home-shell-profile-service-type
@@ -47,14 +48,23 @@ sh $HOME_ENVIRONMENT/on-login\n"
 	       (home-shell-profile-configuration-he-symlink-path config))
        (home-shell-profile-configuration-profile config)))))
 
+(define (add-profile-extensions config extensions)
+  (home-shell-profile-configuration
+   (inherit config)
+   (profile
+    (append (home-shell-profile-configuration-profile config)
+	    extensions))))
+
 (define home-shell-profile-service-type
   (service-type (name 'home-shell-profile)
                 (extensions
                  (list (service-extension
 			home-files-service-type
 			add-shell-profile-file)))
-		(compose identity)
-		(extend append)
+		(compose concatenate)
+		(extend add-profile-extensions)
 		(default-value (home-shell-profile-configuration))
                 (description "\
-Create @file{~/.profile} for environment initialization of POSIX shells.")))
+Create @file{~/.profile}, which is used for environment initialization
+of POSIX compatible login shells.  Can be extended with a list of strings or
+gexps.")))
