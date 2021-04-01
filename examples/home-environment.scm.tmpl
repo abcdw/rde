@@ -28,7 +28,7 @@
     (list
      (simple-service
       'set-brightness-on-login home-run-on-first-login-service-type
-      (list (file-append light "/bin/light") " -S 100\n"))
+      (list #~(string-append #$(file-append light "/bin/light") " -S 100")))
      ;; home-state service is very experimental, use at your own risk
      (service home-state-service-type
 	      (append

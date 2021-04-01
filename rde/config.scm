@@ -59,11 +59,28 @@
 	    "obs" "obs-wlrobs"
 	    "curl" "sway"))))))
 
-;; (use-modules (gnu home-services shells))
-;; (define (rde-zsh rde-config)
-;;   (list
-;;    (service home-zsh-service-type
-;; 	    (home-zsh-configuration))))
+(use-modules (gnu home-services shells))
+(use-modules (gnu packages shells))
+(use-modules (guix gexp))
+(define (rde-zsh rde-config)
+  (list
+   (simple-service 'set-default-shell-to-zsh
+		   home-environment-vars-service-type
+		   '(("SHELL" . "zsh")))
+   (simple-service 'set-default-shell-to-zsh
+		   home-shell-profile-service-type
+		   `("echo hi" "echo hi again"
+		     ,#~(string-append "echo " #$(file-append zsh "/bin/zsh"))))
+   (service home-zsh-service-type
+	    (home-zsh-configuration
+	     (xdg-flavor? #t)
+	     (zshrc-content "\
+autoload -U compinit && compinit
+
+alias ls='ls -p --color=auto'
+alias ll='ls -l'
+alias grep='grep --color=auto'
+")))))
 
 (use-modules (gnu home-services gnupg))
 (define (rde-gnupg rde-config)
@@ -106,7 +123,7 @@
 
 (define rde-features
   (list
-   ;; rde-zsh
+   rde-zsh
    rde-gnupg
    rde-ssh
    rde-git
@@ -143,7 +160,7 @@
      (list
       (simple-service
        'set-brightness-on-login home-run-on-first-login-service-type
-       (list (file-append light "/bin/light") " -S 100\n")))
+       (list #~(string-append #$(file-append light "/bin/light") " -S 100"))))
 
      ))))
 

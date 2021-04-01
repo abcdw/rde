@@ -141,7 +141,7 @@ run @code{cmds} on login."
 if [ ! -f $XDG_RUNTIME_DIR/on-login-executed ]; then
 
 "
-	  (append cmds
+	  (append (interpose cmds "\n" 'suffix)
 		  '("
 touch $XDG_RUNTIME_DIR/on-login-executed
 fi\n"))))))))

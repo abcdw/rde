@@ -66,22 +66,19 @@ as shepherd package."
   "Return commands for on-login script."
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
 	 (services (home-shepherd-configuration-services config)))
-  `("mkdir -p $HOME/.local/var/log/"
-    "\n"
-
-    ,(file-append shepherd "/bin/shepherd")
-    ;; TODO: logfile path must be set based on home-environment
-    ;; configuration
-    "\\\n --logfile=$HOME/.local/var/log/shepherd.log"
-    "\\\n --config=" ,(home-shepherd-configuration-file services shepherd)
-    "\n"
-    )))
+    `("mkdir -p $HOME/.local/var/log/"
+      ,#~(string-append
+	  #$(file-append shepherd "/bin/shepherd")
+	  ;; TODO: logfile path must be set based on home-environment
+	  ;; configuration
+	  "\\\n --logfile=$HOME/.local/var/log/shepherd.log"
+	  "\\\n --config=" #$(home-shepherd-configuration-file services shepherd)))))
 
 (define (reload-configuration-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
 	 (services (home-shepherd-configuration-services config)))
       #~(execl #$(file-append shepherd "/bin/herd")
-	     "herd" "load" "root"
+	     "herd" "reload" "root"
 	     #$(home-shepherd-configuration-file services shepherd))))
 
 (define-public home-shepherd-service-type
