@@ -19,6 +19,7 @@
             filter-configuration-fields
             generic-serialize-alist-entry
             generic-serialize-alist
+	    interpose
 	    string-or-gexp?
 	    serialize-string-or-gexp
 	    text-config?
@@ -188,15 +189,17 @@ candidates for this."
 (define (string-or-gexp? sg) (or (string? sg) (gexp? sg)))
 (define (serialize-string-or-gexp field-name val) "")
 
-(define* (interpose sep lst)
+(define* (interpose ls  #:optional (delimiter "\n") (grammar 'infix))
+  "Same as @code{string-join}, but without join and string, returns an
+DELIMITER interposed LS.  Support 'infix and 'suffix GRAMMAR values."
   (fold-right (lambda (e acc)
 		(cons e
-		      (if (null? acc)
+		      (if (and (null? acc) (eq? grammar 'infix))
 			  acc
-			  (cons sep acc))))
-	      '() lst))
+			  (cons delimiter acc))))
+	      '() ls))
 
 (define (text-config? config)
   (and (list? config) (every string-or-gexp? config)))
 (define (serialize-text-config field-name val)
-  #~(string-append #$@(interpose "\n" val)))
+  #~(string-append #$@(interpose val "\n" 'suffix)))
