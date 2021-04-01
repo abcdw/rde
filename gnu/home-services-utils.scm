@@ -20,7 +20,9 @@
             generic-serialize-alist-entry
             generic-serialize-alist
 	    string-or-gexp?
-	    serialize-string-or-gexp))
+	    serialize-string-or-gexp
+	    text-config?
+	    serialize-text-config))
 
 
 (define* ((alist-entry->mixed-text prefix sep #:optional (suffix "\n"))
@@ -177,3 +179,16 @@ candidates for this."
 
 (define (string-or-gexp? sg) (or (string? sg) (gexp? sg)))
 (define (serialize-string-or-gexp field-name val) "")
+
+(define* (interpose sep lst)
+  (fold-right (lambda (e acc)
+		(cons e
+		      (if (null? acc)
+			  acc
+			  (cons sep acc))))
+	      '() lst))
+
+(define (text-config? config)
+  (and (list? config) (every string-or-gexp? config)))
+(define (serialize-text-config field-name val)
+  #~(string-append #$@(interpose "\n" val)))
