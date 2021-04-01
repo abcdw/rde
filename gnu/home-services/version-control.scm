@@ -158,12 +158,9 @@ will turn into this:
    "String or value of string-valued g-exps will be added to the end
 of the configuration file."))
 
-(define (filter-fields fields)
-  (filter (lambda (field)
-	    (member (configuration-field-name field) fields))
-          home-git-configuration-fields))
-
 (define (add-git-configuration config)
+  (define (filter-fields fields)
+    (filter-configuration-fields home-git-configuration-fields fields))
   `(("config/git/attributes"
      ,(mixed-text-file
        "git-attributes"
