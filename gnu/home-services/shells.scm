@@ -15,8 +15,6 @@
 
 (define path? string?)
 (define (serialize-path field-name val) val)
-(define profile? list?)
-(define (serialize-profile field-name val) val)
 
 (define-configuration home-shell-profile-configuration
   (he-symlink-path
@@ -25,28 +23,35 @@
 to be sourced or executed by login shell.  This path will be set
 automatically by home-environment.")
   (profile
-   (profile '())
+   (text-config '())
    "\
-List of strings or gexps, which will go to @file{~/.profile}.  By
-default @file{~/.profile} contains the initialization code, which have
-to be evaluated by login shell to make home-environment's profile
-avaliable to the user, but other commands can be added to the file if
-it is really necessary.
+@code{home-shell-profile} is instantiated automatically by
+@code{home-environment}, DO NOT create this service manually, it can
+only be extended.
 
-In most cases shell's configuration files are preferred place for
-user's customizations.  Extend this service only if you really know
-what you do."))
+@code{profile} is a list of strings or gexps, which will go to
+@file{~/.profile}.  By default @file{~/.profile} contains the
+initialization code, which have to be evaluated by login shell to make
+home-environment's profile avaliable to the user, but other commands
+can be added to the file if it is really necessary.
+
+In most cases shell's configuration files are preferred places for
+user's customizations.  Extend home-shell-profile service only if you
+really know what you do."))
 
 (define (add-shell-profile-file config)
   `(("profile"
-     ,(apply mixed-text-file
+     ,(mixed-text-file
        "shell-profile"
        (format #f "\
 HOME_ENVIRONMENT=\"~a\"
 source $HOME_ENVIRONMENT/setup-environment
 sh $HOME_ENVIRONMENT/on-login\n"
 	       (home-shell-profile-configuration-he-symlink-path config))
-       (home-shell-profile-configuration-profile config)))))
+       (serialize-configuration
+	config
+	(filter-configuration-fields
+	 home-shell-profile-configuration-fields '(profile)))))))
 
 (define (add-profile-extensions config extensions)
   (home-shell-profile-configuration
