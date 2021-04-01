@@ -24,6 +24,19 @@
 	    text-config?
 	    serialize-text-config))
 
+;;;
+;;; User's utils.
+;;;
+
+(define (text-file->gexp path)
+  #~(call-with-input-file
+	#$(local-file path (string-trim (basename path) #\.))
+	(@@ (ice-9 textual-ports) get-string-all)))
+
+
+;;;
+;;; Configuration related helpers.
+;;;
 
 (define* ((alist-entry->mixed-text prefix sep #:optional (suffix "\n"))
 	  alist-entry)
@@ -109,11 +122,6 @@ Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
         (string-capitalize word)
         word)))
 
-(define (text-file->gexp path)
-  #~(call-with-input-file
-	#$(local-file path (string-trim (basename path) #\.))
-	(@@ (ice-9 textual-ports) get-string-all)))
-
 (define (maybe-object->string object)
   "Like @code{object->string} but don't do anyting if OBJECT already is
 a string."
@@ -157,7 +165,6 @@ If NEGATE? is @code{#t}, retrieve the FIELDS that are not in CONFIGURATION."
                   membership?
                   (not membership?))))
           configuration))
-
 
 
 ;;;
