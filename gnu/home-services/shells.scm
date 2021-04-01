@@ -11,7 +11,9 @@
   #:use-module (srfi srfi-26)
 
   #:export (home-shell-profile-service-type
-	    home-shell-profile-configuration))
+	    home-shell-profile-configuration
+	    home-zsh-service-type
+	    home-zsh-configuration))
 
 (define path? string?)
 (define (serialize-path field-name val) val)
@@ -73,3 +75,148 @@ sh $HOME_ENVIRONMENT/on-login\n"
 Create @file{~/.profile}, which is used for environment initialization
 of POSIX compatible login shells.  Can be extended with a list of strings or
 gexps.")))
+
+(define (serialize-boolean field-name val) "")
+
+(define-configuration home-zsh-configuration
+  (package
+   (package zsh)
+   "The Zsh package to use.")
+  (xdg-flavor?
+   (boolean #f)
+   "Place all the configs to @file{$XDG_CONFIG_HOME/zsh}.  Makes
+@file{~/.zshenv} to set @env{ZDOTDIR} to @file{$XDG_CONFIG_HOME/zsh}.
+Shell startup process will continue with
+@file{$XDG_CONFIG_HOME/zsh/.zshenv}.")
+  (zshenv
+   (text-config '())
+   "String or value of string-valued gexps will be added
+@file{.zshenv}.  Used for setting user's shell environment variables.
+Must not contain commands assuming the presence of tty or producing
+output.  Will be read always.  Will be read before any other file in
+@env{ZDOTDIR}.")
+  (zprofile
+   (text-config '())
+   "String or value of string-valued gexps will be added
+@file{.zprofile}.  Used for executing user's commands at start of
+login shell (In most cases the shell started on tty just after login).
+Will be read before @file{.zlogin}.")
+  (zshrc
+   (text-config '())
+   "String or value of string-valued gexps will be added to
+@file{.zshrc}.  Used for executing user's commands at start of
+interactive shell (The shell for interactive usage started by typing
+@code{zsh} or by terminal app or any other program).")
+  (zlogin
+   (text-config '())
+   "String or value of string-valued gexps will be added to
+@file{.zlogin}.  Used for executing user's commands at the end of
+starting process of login shell.")
+  (zlogout
+   (text-config '())
+   "String or value of string-valued gexps will be added to
+@file{.zlogout}.  Used for executing user's commands at the exit of
+login shell.  It won't be read in some cases (if the shell terminates
+by exec'ing another process for example)."))
+
+(define (add-zsh-configuration config)
+  (define (serialize-field field)
+    (serialize-configuration
+     config
+     (filter-configuration-fields home-zsh-configuration-fields
+				  (list field))))
+  (let* ((xdg-flavor? (home-zsh-configuration-xdg-flavor? config))
+	 (prefix-file (cut string-append
+			(if xdg-flavor?
+			    "config/zsh/."
+			    "") <>)))
+    (filter
+     (compose not null?)
+     `(,(if xdg-flavor?
+	   `("zshenv"
+	    ,(mixed-text-file
+	      "auxiliary-zshenv"
+	      (if xdg-flavor?
+		  "source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshenv\n"
+		  "")))
+	   '())
+       (,(prefix-file "zshenv")
+	,(mixed-text-file
+	  "zshenv"
+	      (if xdg-flavor?
+		  "export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh\n"
+		  "")
+	      (serialize-field 'zshenv)))
+       (,(prefix-file "zprofile")
+	,(mixed-text-file
+	  "zprofile"
+	  "\
+# Setups system and user profiles and related variables
+source /etc/profile
+# Setups home environment profile
+source ~/.profile
+
+# It's only necessary if zsh is a login shell, otherwise profiles will
+# be already sourced by bash
+"
+	  (serialize-field 'zprofile)))
+
+       ;; TODO: Do not create files if they are empty?
+       (,(prefix-file "zshrc")
+	,(mixed-text-file
+	  "zshrc"
+	  (serialize-field 'zshrc)))
+       (,(prefix-file "zlogin")
+	,(mixed-text-file
+	  "zlogin"
+	  (serialize-field 'zlogin)))
+       (,(prefix-file "zlogout")
+	,(mixed-text-file
+	  "zlogout"
+	  (serialize-field 'zlogout)))))))
+
+;; (define (if-content content file-name)
+;;   (if content
+;;   `(,(prefix-file file-name)
+;;     ,(mixed-text-file
+;;       file-name
+;;       content)))
+
+(define (add-zsh-packages config)
+  (list (home-zsh-configuration-package config)))
+
+(define home-zsh-service-type
+  (service-type (name 'home-zsh)
+                (extensions
+                 (list (service-extension
+                        home-files-service-type
+                        add-zsh-configuration)
+                       (service-extension
+                        home-profile-service-type
+                        add-zsh-packages)))
+		;; (compose identity)
+		;; (extend home-zsh-extensions)
+                (default-value (home-zsh-configuration))
+                (description "Install and configure Zsh.")))
+
+;; (define-record-type* <home-bash-configuration>
+;;   home-bash-configuration make-home-bash-configuration
+;;   home-bash-configuration?
+;;   (package     home-bash-configuration-package
+;;                (default bash)))
+
+;; (define (add-bash-packages config)
+;;   (append
+;;    (list (home-bash-configuration-package config))))
+
+;; (define home-bash-service-type
+;;   (service-type (name 'home-bash)
+;;                 (extensions
+;;                  (list (service-extension
+;; 			home-files-service-type
+;; 			add-bash-configs)
+;; 		       (service-extension
+;; 			home-profile-service-type
+;; 			)))
+;; 		(default-value (home-gnupg-configuration))
+;;                 (description "Configure and install gpg-agent.")))
