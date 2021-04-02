@@ -47,7 +47,8 @@
 (define (serialize-list field-name val)
   (if (null? val) "" (serialize-field field-name (string-join val " "))))
 
-(define serialize-alist (generic-serialize-alist string-append serialize-field))
+(define (serialize-alist field-name val)
+  (generic-serialize-alist string-append serialize-field val))
 
 (define (serialize-extra-config field-name val)
   (define serialize-extra-config-entry

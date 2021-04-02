@@ -65,7 +65,8 @@
      (list (format #f "\t~a = " (uglify-field-name field-name))
 	   val "\n"))))
 
-(define serialize-alist (generic-serialize-alist append serialize-field))
+(define (serialize-alist field-name val)
+  (generic-serialize-alist append serialize-field val))
 
 (define (serialize-boolean field-name val)
   (serialize-field field-name (if val "true" "false")))

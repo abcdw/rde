@@ -185,11 +185,19 @@ If NEGATE? is @code{#t}, retrieve the FIELDS that are not in CONFIGURATION."
   (match entry
     ((field . val) (serialize-field field val))))
 
-(define ((generic-serialize-alist combine serialize-field) field-name fields)
-  "Apply the SERIALIZE-FIELD procedure on the fields and values of FIELDS.
-Apply the COMBINE procedure to combine all the alist entries into one
-value, @code{string-append} or @code{append} are usually good
-candidates for this."
+(define (generic-serialize-alist combine serialize-field fields)
+  "Generate a configuration from an association list FIELDS.
+
+SERIALIZE-FIELD is a procedure that takes two arguments, it will be
+applied on the fields and values of FIELDS using the
+@code{generic-serialize-alist-entry} procedure.
+
+COMBINE is a procedure that takes one or more arguments and combines
+all the alist entries into one value, @code{string-append} or
+@code{append} are usually good candidates for this.
+
+See the @code{serialize-alist} procedure in `@code{(gnu home-services
+version-control}' for an example usage.)}"
   (apply combine
          (map (generic-serialize-alist-entry serialize-field) fields)))
 
