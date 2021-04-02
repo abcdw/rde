@@ -13,7 +13,8 @@
   #:export (home-shell-profile-service-type
 	    home-shell-profile-configuration
 	    home-zsh-service-type
-	    home-zsh-configuration))
+	    home-zsh-configuration
+	    home-zsh-extension))
 
 (define path? string?)
 (define (serialize-path field-name val) val)
@@ -184,6 +185,47 @@ source ~/.profile
 (define (add-zsh-packages config)
   (list (home-zsh-configuration-package config)))
 
+(define-configuration home-zsh-extension
+  (zshrc
+   (text-config '())
+   "List of strings or gexps.")
+  (zshenv
+   (text-config '())
+   "List of strings or gexps.")
+  (zprofile
+   (text-config '())
+   "List of strings or gexps.")
+  (zlogin
+   (text-config '())
+   "List of strings or gexps.")
+  (zlogout
+   (text-config '())
+   "List of strings or gexps."))
+
+(define (home-zsh-extensions original-config extension-configs)
+  (home-zsh-configuration
+   (inherit original-config)
+   (zshrc
+    (append (home-zsh-configuration-zshrc original-config)
+	    (append-map
+	     home-zsh-extension-zshrc extension-configs)))
+   (zshenv
+    (append (home-zsh-configuration-zshenv original-config)
+	    (append-map
+	     home-zsh-extension-zshenv extension-configs)))
+   (zprofile
+    (append (home-zsh-configuration-zprofile original-config)
+	    (append-map
+	     home-zsh-extension-zprofile extension-configs)))
+   (zlogin
+    (append (home-zsh-configuration-zlogin original-config)
+	    (append-map
+	     home-zsh-extension-zlogin extension-configs)))
+   (zlogout
+    (append (home-zsh-configuration-zlogout original-config)
+	    (append-map
+	     home-zsh-extension-zlogout extension-configs)))))
+
 (define home-zsh-service-type
   (service-type (name 'home-zsh)
                 (extensions
@@ -193,8 +235,8 @@ source ~/.profile
                        (service-extension
                         home-profile-service-type
                         add-zsh-packages)))
-		;; (compose identity)
-		;; (extend home-zsh-extensions)
+		(compose identity)
+		(extend home-zsh-extensions)
                 (default-value (home-zsh-configuration))
                 (description "Install and configure Zsh.")))
 
