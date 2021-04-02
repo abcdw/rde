@@ -192,6 +192,11 @@ candidates for this."
 (define* (interpose ls  #:optional (delimiter "\n") (grammar 'infix))
   "Same as @code{string-join}, but without join and string, returns an
 DELIMITER interposed LS.  Support 'infix and 'suffix GRAMMAR values."
+  (when (not (member grammar '(infix suffix)))
+    (raise
+     (formatted-message
+      (G_ "The GRAMMAR value must be 'infix or 'suffix, but ~a provided.")
+      grammar)))
   (fold-right (lambda (e acc)
 		(cons e
 		      (if (and (null? acc) (eq? grammar 'infix))
