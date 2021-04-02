@@ -90,34 +90,33 @@ Shell startup process will continue with
 @file{$XDG_CONFIG_HOME/zsh/.zshenv}.")
   (zshenv
    (text-config '())
-   "String or value of string-valued gexps will be added
-@file{.zshenv}.  Used for setting user's shell environment variables.
-Must not contain commands assuming the presence of tty or producing
-output.  Will be read always.  Will be read before any other file in
-@env{ZDOTDIR}.")
+   "List of strings or gexps, which will be added to @file{.zshenv}.
+Used for setting user's shell environment variables.  Must not contain
+commands assuming the presence of tty or producing output.  Will be
+read always.  Will be read before any other file in @env{ZDOTDIR}.")
   (zprofile
    (text-config '())
-   "String or value of string-valued gexps will be added
-@file{.zprofile}.  Used for executing user's commands at start of
-login shell (In most cases the shell started on tty just after login).
-Will be read before @file{.zlogin}.")
+   "List of strings or gexps, which will be added to @file{.zprofile}.
+Used for executing user's commands at start of login shell (In most
+cases the shell started on tty just after login).  Will be read before
+@file{.zlogin}.")
   (zshrc
    (text-config '())
-   "String or value of string-valued gexps will be added to
-@file{.zshrc}.  Used for executing user's commands at start of
-interactive shell (The shell for interactive usage started by typing
-@code{zsh} or by terminal app or any other program).")
+   "List of strings or gexps, which will be added to @file{.zshrc}.
+Used for executing user's commands at start of interactive shell (The
+shell for interactive usage started by typing @code{zsh} or by
+terminal app or any other program).")
   (zlogin
    (text-config '())
-   "String or value of string-valued gexps will be added to
-@file{.zlogin}.  Used for executing user's commands at the end of
-starting process of login shell.")
+   "List of strings or gexps, which will be added to @file{.zlogin}.
+Used for executing user's commands at the end of starting process of
+login shell.")
   (zlogout
    (text-config '())
-   "String or value of string-valued gexps will be added to
-@file{.zlogout}.  Used for executing user's commands at the exit of
-login shell.  It won't be read in some cases (if the shell terminates
-by exec'ing another process for example)."))
+   "List of strings or gexps, which will be added to @file{.zlogout}.
+Used for executing user's commands at the exit of login shell.  It
+won't be read in some cases (if the shell terminates by exec'ing
+another process for example)."))
 
 (define (add-zsh-configuration config)
   (let* ((xdg-flavor? (home-zsh-configuration-xdg-flavor? config)))
