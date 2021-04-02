@@ -120,33 +120,50 @@ login shell.  It won't be read in some cases (if the shell terminates
 by exec'ing another process for example)."))
 
 (define (add-zsh-configuration config)
-  (define (serialize-field field)
-    (serialize-configuration
-     config
-     (filter-configuration-fields home-zsh-configuration-fields
-				  (list field))))
-  (let* ((xdg-flavor? (home-zsh-configuration-xdg-flavor? config))
-	 (prefix-file (cut string-append
-			(if xdg-flavor?
-			    "config/zsh/."
-			    "") <>)))
+  (let* ((xdg-flavor? (home-zsh-configuration-xdg-flavor? config)))
+
+    (define prefix-file
+      (cut string-append
+	(if xdg-flavor?
+	    "config/zsh/."
+	    "") <>))
+
+    (define (filter-fields field)
+      (filter-configuration-fields home-zsh-configuration-fields
+				   (list field)))
+
+    (define (serialize-field field)
+      (serialize-configuration
+       config
+       (filter-fields field)))
+
+    (define (file-if-not-empty field)
+      (let ((file-name (symbol->string field))
+	    (field-obj (car (filter-fields field))))
+	(if (not (null? ((configuration-field-getter field-obj) config)))
+	    `(,(prefix-file file-name)
+	      ,(mixed-text-file
+		file-name
+		(serialize-field field)))
+	    '())))
+
     (filter
      (compose not null?)
      `(,(if xdg-flavor?
-	   `("zshenv"
-	    ,(mixed-text-file
-	      "auxiliary-zshenv"
-	      (if xdg-flavor?
-		  "source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshenv\n"
-		  "")))
-	   '())
+	    `("zshenv"
+	      ,(mixed-text-file
+		"auxiliary-zshenv"
+		(if xdg-flavor?
+		    "source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshenv\n"
+		    "")))
+	    '())
        (,(prefix-file "zshenv")
 	,(mixed-text-file
 	  "zshenv"
-	      (if xdg-flavor?
-		  "export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh\n"
-		  "")
-	      (serialize-field 'zshenv)))
+	  (if xdg-flavor?
+	      "export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh\n"
+	      "")
+	  (serialize-field 'zshenv)))
        (,(prefix-file "zprofile")
 	,(mixed-text-file
 	  "zprofile"
@@ -161,26 +178,9 @@ source ~/.profile
 "
 	  (serialize-field 'zprofile)))
 
-       ;; TODO: Do not create files if they are empty?
-       (,(prefix-file "zshrc")
-	,(mixed-text-file
-	  "zshrc"
-	  (serialize-field 'zshrc)))
-       (,(prefix-file "zlogin")
-	,(mixed-text-file
-	  "zlogin"
-	  (serialize-field 'zlogin)))
-       (,(prefix-file "zlogout")
-	,(mixed-text-file
-	  "zlogout"
-	  (serialize-field 'zlogout)))))))
-
-;; (define (if-content content file-name)
-;;   (if content
-;;   `(,(prefix-file file-name)
-;;     ,(mixed-text-file
-;;       file-name
-;;       content)))
+       ,@(list (file-if-not-empty 'zshrc)
+	       (file-if-not-empty 'zlogin)
+	       (file-if-not-empty 'zlogout))))))
 
 (define (add-zsh-packages config)
   (list (home-zsh-configuration-package config)))
