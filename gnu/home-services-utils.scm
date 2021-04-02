@@ -27,7 +27,9 @@
 	    serialize-string-or-gexp
 	    text-config?
 	    serialize-text-config
-            symbol->snake-case))
+            symbol->snake-case
+            ini-config?
+            generic-serialize-ini-config))
 
 ;;;
 ;;; User's utils.
@@ -246,3 +248,35 @@ DELIMITER interposed LS.  Support 'infix and 'suffix GRAMMAR values."
   (and (list? config) (every string-or-gexp? config)))
 (define (serialize-text-config field-name val)
   #~(string-append #$@(interpose val "\n" 'suffix)))
+
+(define ini-config? list?)
+(define (generic-serialize-ini-config-section section proc)
+  "Format a section from SECTION for an INI configuration.
+Apply the procedure PROC on SECTION after it has been converted to a string"
+  (format #f "[~a]\n" (proc (maybe-object->string section))))
+
+(define* (generic-serialize-ini-config #:key
+                                       (format-section identity)
+                                       (combine string-append)
+                                       serialize-field
+                                       fields)
+  "Create an INI configuration from nested lists FIELDS.  This uses
+@code{generic-serialize-ini-config-section} and @{generic-serialize-alist} to
+serialize the section and the association lists, respectively.
+
+@example
+(generic-serialize-ini-config
+ #:serialize-field (lambda (a b) (format #f \"~a = ~a\n\" a b))
+ #:format-section string-capitalize
+ #:fields '((application ((key . value)))))
+@end example
+
+@result{} \"[Application]\nkey = value\n\""
+  (string-join
+   (map (match-lambda
+          ((section alist)
+           (string-append
+            (generic-serialize-ini-config-section section format-section)
+            (generic-serialize-alist combine serialize-field alist))))
+        fields)
+   "\n"))
