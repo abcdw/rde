@@ -60,17 +60,20 @@
 	    "curl" "sway"))))))
 
 (use-modules (gnu home-services shells))
+(use-modules (gnu home-services shellutils))
 (use-modules (gnu packages shells))
+(use-modules (gnu packages shellutils))
 (use-modules (guix gexp))
 (define (rde-zsh rde-config)
   (list
    (simple-service 'set-default-shell-to-zsh
 		   home-environment-vars-service-type
 		   '(("SHELL" . "zsh")))
-   (simple-service 'set-default-shell-to-zsh
-		   home-shell-profile-service-type
-		   `("echo hi" "echo hi again"
-		     ,#~(string-append "echo " #$(file-append zsh "/bin/zsh"))))
+
+   (service home-zsh-plugin-manager-service-type
+	    (list zsh-autosuggestions))
+   home-zsh-direnv-service
+
    (service home-zsh-service-type
 	    (home-zsh-configuration
 	     (xdg-flavor? #t)
