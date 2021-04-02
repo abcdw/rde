@@ -1,7 +1,7 @@
 -*- mode: org -*-
 #+TODO: TODO IN-PROGRESS | DONE
 * ~guix home~ Before Upstream Checklist
-** IN-PROGRESS Implement zsh home-service
+** DONE Implement zsh home-service
 ** TODO Implement bash home-service
 ** DONE Implement gnupg home-service
 ** IN-PROGRESS Create clean example configuration
@@ -34,11 +34,13 @@ Split into utils and configuration related helper?
 ** TODO sway
 ** TODO pass
 Also browser plugins and other stuff
-** TODO ungoogled-chromium/icecat
+** Browsers
+*** TODO icecat
+*** TODO ungoogled-chromium
 - Browser extension
-** TODO nyxt
+*** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** TODO emacs
+** TODO Emacs
 ** TODO Implement a standard way to create common configuration file formats
 Some programs use the standard [[https://en.wikipedia.org/wiki/INI_file][INI configuration format]], e.g. XDG
 desktop entries, Notmuch.  Git uses a it's own variant of the INI
@@ -56,12 +58,14 @@ common.  See ~lib.generators~ in [[https://github.com/nixos/nixpkgs/blob/master/
 Things the user should be able to configure
 - IMAP and SMTP info (e.g. address, username, port)
 - PGP key
-*** TODO isync/offlineimap/fetchmail/getmail
+*** TODO Implement mail sync service
+- isync/offlineimap/fetchmail/getmail
 - Guix System already has a service for getmail, ~(gnu services getmail)~
 - Integrate with mcron/state service
-*** TODO notmuch/afew/procmail
-*** TODO msmtp/sendmail
-
+*** TODO Mail indexer
+- notmuch/mu
+*** TODO SMTP client
+- msmtp/sendmail
 * ~rde~ Backlog
 ** UI
 *** TODO Visually separate sway workspaces for different workflows
