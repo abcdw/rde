@@ -7,6 +7,7 @@
 
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 match)
+  #:use-module (ice-9 string-fun)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-171)
   #:use-module (srfi srfi-26)
@@ -25,7 +26,8 @@
 	    string-or-gexp?
 	    serialize-string-or-gexp
 	    text-config?
-	    serialize-text-config))
+	    serialize-text-config
+            symbol->snake-case))
 
 ;;;
 ;;; User's utils.
@@ -175,6 +177,27 @@ If NEGATE? is @code{#t}, retrieve the FIELDS that are not in CONFIGURATION."
                   (not membership?))))
           configuration-fields))
 
+;; Snake case: <https://en.wikipedia.org/wiki/Snake_case>
+(define* (symbol->snake-case symbol #:optional (style 'lower) (prefix ""))
+  "Convert the symbol SYMBOL to the equivalent string in ``snake
+case''.  STYLE can be three `@code{lower}', `@code{upper}', or
+`@code{capitalize}', defaults to `@code{lower}'.  PREFIX is a string
+to prefix the snake case version with.  Useful for converting symbols
+to environment variables.
+
+@example
+(symbol->snake-case 'variable-name 'upper \"$\")
+@result{} \"$VARIABLE_NAME\" @end example"
+  (if (not (member style '(lower upper capitalize)))
+      (error 'invalid-style (format #f "~a is not a valid style" style))
+      (let ((stringified (symbol->string symbol)))
+        (string-append prefix
+                       (string-replace-substring
+                        (cond
+                         ((equal? style 'lower) stringified)
+                         ((equal? style 'upper) (string-upcase stringified))
+                         (else (string-capitalize stringified)))
+                        "-" "_")))))
 
 ;;;
 ;;; Serializers.
