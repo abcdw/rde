@@ -113,6 +113,12 @@ alias grep='grep --color=auto'
 		(sendmail
 		 ((annotate . #t)))))))))
 
+(define (rde-sway rde-config)
+  (list
+   (simple-service 'set-wayland-specific-env-vars
+		   home-environment-vars-service-type
+		   '(("_JAVA_AWT_WM_NONREPARENTING" . "1")))))
+
 (use-modules (gnu packages))
 (define (rde-browsers rde-config)
   (list
@@ -123,13 +129,13 @@ alias grep='grep --color=auto'
 	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))))
 
 
-
 (define rde-features
   (list
    rde-zsh
    rde-gnupg
    rde-ssh
    rde-git
+   rde-sway
    rde-browsers
    rde-other-packages))
 
