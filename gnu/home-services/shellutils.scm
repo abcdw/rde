@@ -10,6 +10,7 @@
   #:use-module (srfi srfi-26)
 
   #:export (home-zsh-plugin-manager-service-type
+	    home-zsh-autosuggestions-service
 	    home-zsh-direnv-service))
 
 (define (add-zsh-plugins-load-command packages)
@@ -37,6 +38,24 @@
                 (default-value '())
                 (description "\
 Install plugins in profile and configure Zsh to load them.")))
+
+(define home-zsh-autosuggestions-service
+  (home-generic-service
+   'home-zsh-autosuggestions
+   #:extensions
+   (list
+    (cons
+     home-zsh-plugin-manager-service-type
+     (list zsh-autosuggestions))
+    (cons
+     home-zsh-service-type
+     (home-zsh-extension
+      ;; We set variables in zshrc because we need them only in
+      ;; interactive shell.
+      (zshrc '("# Improve the behavior and perfomance of auto suggestions"
+	       "ZSH_AUTOSUGGEST_MANUAL_REBIND=true"
+	       "ZSH_AUTOSUGGEST_STRATEGY=(history completion)"
+	       "ZSH_AUTOSUGGEST_USE_ASYNC=true")))))))
 
 (define home-zsh-direnv-service
   (home-generic-service

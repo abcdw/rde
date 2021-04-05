@@ -64,16 +64,20 @@
 (use-modules (gnu packages shells))
 (use-modules (gnu packages shellutils))
 (use-modules (guix gexp))
+
 (define (rde-zsh rde-config)
   (list
    (simple-service 'set-default-shell-to-zsh
 		   home-environment-vars-service-type
 		   '(("SHELL" . "zsh")))
 
-   (service home-zsh-plugin-manager-service-type
-	    (list zsh-autosuggestions))
-   home-zsh-direnv-service
+   ;; zsh-autosuggestions is very cool plugin, but a little
+   ;; distractive, I find them a little against Attention-friendly
+   ;; principle
+   home-zsh-autosuggestions-service
 
+   ;; https://github.com/purcell/envrc
+   ;; home-zsh-direnv-service
    (service home-zsh-service-type
 	    (home-zsh-configuration
 	     (xdg-flavor? #t)
