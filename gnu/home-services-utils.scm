@@ -11,14 +11,16 @@
   #:use-module (srfi srfi-171)
   #:use-module (srfi srfi-26)
 
-  #:export (alist-entry->mixed-text
+  #:export (slurp-file-gexp
+
+	    alist-entry->mixed-text
             boolean->yes-or-no
-	    text-file->gexp
             list->human-readable-list
             maybe-object->string
             filter-configuration-fields
             generic-serialize-alist-entry
             generic-serialize-alist
+
 	    interpose
 	    string-or-gexp?
 	    serialize-string-or-gexp
@@ -29,9 +31,14 @@
 ;;; User's utils.
 ;;;
 
-(define (text-file->gexp path)
-  #~(call-with-input-file
-	#$(local-file path (string-trim (basename path) #\.))
+(define (slurp-file-gexp file)
+  "Returns a gexp, which reads all the content of the FILE and returns
+it as a string.  FILE must be a file-like object."
+  (when (not (file-like? file))
+    (raise (formatted-message
+            (G_ "~a is not a file-like object.")
+            file)))
+  #~(call-with-input-file #$file
 	(@@ (ice-9 textual-ports) get-string-all)))
 
 

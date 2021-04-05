@@ -35,7 +35,8 @@
 ;; 	      ((program . ,(file-append gnupg "/bin/gpg"))))
 ;; 	     (sendmail
 ;; 	      ((annotate . #t))))
-;; 	   (config-extra-content (text-file->gexp "/home/bob/.gitconfig"))))
+;; 	   (config-extra-content (slurp-file-gexp
+;;                                (local-file "./gitconfig")))))
 ;;
 ;; (simple-service
 ;;  'add-something-to-git
