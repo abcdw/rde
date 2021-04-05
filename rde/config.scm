@@ -81,13 +81,8 @@
    (service home-zsh-service-type
 	    (home-zsh-configuration
 	     (xdg-flavor? #t)
-	     (zshrc '("\
-autoload -U compinit && compinit
-
-alias ls='ls -p --color=auto'
-alias ll='ls -l'
-alias grep='grep --color=auto'
-"))))))
+	     (zshrc (list
+		     (slurp-file-gexp (local-file "./zsh/zshrc"))))))))
 
 (use-modules (gnu home-services gnupg))
 (define (rde-gnupg rde-config)
