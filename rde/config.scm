@@ -69,7 +69,7 @@
   (list
    (simple-service 'set-default-shell-to-zsh
 		   home-environment-vars-service-type
-		   '(("SHELL" . "zsh")))
+		   `(("SHELL" . ,(file-append zsh "/bin/zsh"))))
 
    ;; zsh-autosuggestions is very cool plugin, but a little
    ;; distractive, I find them a little against Attention-friendly
