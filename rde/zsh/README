@@ -1,0 +1,17 @@
+-*- mode: org -*-
+* Principles
+- Snappy :: Performance is important, shell should be fast and
+  snappy. CPU-intensive task shold be asyncronous.
+- Emacsy :: Hotkeys, completion behavior and other stuff should be
+  close to emacs.
+- Self-contained :: zsh config should utilize mostly zsh features.
+  Plugins or external utilities should be easy to remove.
+
+* Important hotkeys 
+** Abort zsh action ~C-g~
+** Abort command ~C-c~ or clear the input
+** Clear the line ~C-u~ 
+** Search history ~C-r~ and ~C-s~
+** Look up manual for the current command ~M-h~
+** Undo ~C-/~
+
