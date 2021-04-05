@@ -7,7 +7,7 @@ info is available on [[http://trop.in][trop.in]].
 
 *Tip:* older Nix source code is available under ~stale/~ directory.
 
-~home guix~'s [[https://lists.sr.ht/~abcdw/rde-discuss/%3C878s7ho4bk.fsf%40yoctocell.xyz%3E][getting started]] for very curious people.
+~guix home~'s [[./gnu/README][README]] for very curious people.
 
 ** Principles
 *** Main
@@ -25,7 +25,7 @@ There are few [[https://lists.sr.ht/~abcdw][mailing lists]] you can subscribe an
 existing email account:
 - [[https://lists.sr.ht/~abcdw/rde-announce/][~abcdw/rde-announce@lists.sr.ht]] :: for news and updates.
 - [[https://lists.sr.ht/~abcdw/rde-discuss/][~abcdw/rde-discuss@lists.sr.ht]] :: for discussions and questions.
-- [[https://lists.sr.ht/~abcdw/rde-devel/][~abcdw/rde-devel@lists.sr.ht]] :: for development related discussion.
+- [[https://lists.sr.ht/~abcdw/rde-devel/][~abcdw/rde-devel@lists.sr.ht]] :: for development and related discussion.
 ** Tools
 | Purpose        | tool  |
 |----------------+-------|
