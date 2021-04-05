@@ -10,6 +10,7 @@
 	     (gnu services)
 	     (gnu packages)
 	     (gnu packages linux)
+	     (gnu packages gnupg)
 	     (gnu system keyboard)
 	     (guix gexp))
 
@@ -71,6 +72,9 @@
 		 (ssh-host "savannah"
 			   '((compression . #f)))))))
      (service home-gnupg-service-type
-	      (home-gnupg-configuration (ssh-agent #t)))))))
+	      (home-gnupg-configuration
+	       (gpg-agent-config
+		(home-gpg-agent-configuration
+		 (ssh-agent? #t)))))))))
 
 sample-he
