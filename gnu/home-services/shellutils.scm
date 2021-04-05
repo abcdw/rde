@@ -5,15 +5,23 @@
   #:use-module (gnu home-services base)
   #:use-module (gnu home-services shells)
   #:use-module (gnu packages shellutils)
+  #:use-module (guix packages)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
 
   #:export (home-zsh-plugin-manager-service-type
 	    home-zsh-direnv-service))
 
-(define (add-zsh-plugins-load-command _)
+(define (add-zsh-plugins-load-command packages)
   (home-zsh-extension
-   (zshrc (list "\
-source $GUIX_HOME_ENVIRONMENT_DIRECTORY/profile/share/zsh/plugins/*/*.zsh"))))
+   (zshrc
+    (append
+     '("he_zsh_plugins_dir=$GUIX_HOME_ENVIRONMENT_DIRECTORY/profile/share/zsh/plugins")
+     (map
+      (lambda (p)
+	(let ((x (package-name p)))
+	  (format #f "source $he_zsh_plugins_dir/~a/~a.zsh" x x)))
+      packages)))))
 
 (define home-zsh-plugin-manager-service-type
   (service-type (name 'home-zsh-plugin-manager)
