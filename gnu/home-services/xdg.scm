@@ -218,7 +218,7 @@ This would only have an effect if you have already defined
 @file{torrent.desktop} and @file{file.desktop} somewhere else."))
 
 (define (home-xdg-mime-applications-files-service config)
-  `(("local/share/applications/mimeapps.list"
+  `(("config/mimeapps.list"
      ,(mixed-text-file
       "xdg-mime-appplications"
       (serialize-configuration
