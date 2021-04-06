@@ -117,9 +117,13 @@ pre-populated content.")
    "Default directory for videos."))
 
 (define (home-xdg-user-directories-files-service config)
-  `(("config/user-dirs.dirs"
+  `(("config/user-dirs.conf"
      ,(mixed-text-file
-       "xdg-user-dirs"
+       "user-dirs.conf"
+       "enabled=False\n"))
+    ("config/user-dirs.dirs"
+     ,(mixed-text-file
+       "user-dirs.dirs"
       (serialize-configuration
        config
        home-xdg-user-directories-configuration-fields)))))
