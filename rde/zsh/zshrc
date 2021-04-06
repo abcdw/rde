@@ -54,7 +54,8 @@ prompt_rde_setup() {
   PS1="$user_part$genv_part "
   RPS1="$exit_code_part"
 
-  add-zsh-hook precmd prompt_rde_precmd
+  # Fish-like C-c behavior
+  # add-zsh-hook precmd prompt_rde_precmd
 }
 
 # Load promptinit and set rde theme
