@@ -41,6 +41,16 @@
    (email "andrew@trop.in")
    (keyboard-layout dvorak-jcuken)))
 
+(use-modules (gnu home-services xdg))
+(define (rde-xdg rde-config)
+  (list
+   (service home-xdg-base-directories-service-type)
+   (service home-xdg-user-directories-service-type
+	    (home-xdg-user-directories-configuration
+	     (music "$HOME/music")
+	     (publicshare "$HOME")
+	     (templates "$HOME")))))
+
 (use-modules (rde emacs packages))
 (define (rde-other-packages rde-config)
   (list
@@ -130,6 +140,7 @@
 
 (define rde-features
   (list
+   rde-xdg
    rde-zsh
    rde-gnupg
    rde-ssh
