@@ -13,3 +13,8 @@ channels-update:
 
 channels-lock:
 	guix describe -f channels > rde/channels-lock
+
+env-info:
+	echo -e "`guix describe -f recutils | grep -v intro`\n\
+	name: rde\nurl: https://git.sr.ht/~abcdw/rde\n\
+	commit: `git log -n1 --format=format:'%H'`"
