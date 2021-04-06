@@ -128,9 +128,18 @@ pre-populated content.")
        config
        home-xdg-user-directories-configuration-fields)))))
 
-;; Run 'xdg-user-dirs-update' on each login to keep things up to date.
-(define (home-xdg-user-directories-on-login-service config)
-  (list (file-append xdg-user-dirs "/bin/xdg-user-dirs-update")))
+(define (home-xdg-user-directories-on-reconfigure config)
+  (let ((dirs (map (lambda (field)
+		     ((configuration-field-getter field) config))
+		   home-xdg-user-directories-configuration-fields)))
+    #~(let ((ensure-dir
+	     (lambda (path)
+	       (mkdir-p
+		((@@ (ice-9 string-fun) string-replace-substring)
+		 path "$HOME" (getenv "HOME"))))))
+	(display "Creating XDG user directories...")
+	(map ensure-dir '#$dirs)
+	(display " done\n"))))
 
 (define home-xdg-user-directories-service-type
   (service-type (name 'home-xdg-user-directories)
@@ -139,8 +148,8 @@ pre-populated content.")
                         home-files-service-type
                         home-xdg-user-directories-files-service)
                        (service-extension
-                        home-run-on-first-login-service-type
-                        home-xdg-user-directories-on-login-service)))
+                        home-run-on-reconfigure-service-type
+                        home-xdg-user-directories-on-reconfigure)))
                 (default-value (home-xdg-user-directories-configuration))
                 (description "Configure XDG user directories.  To
 disable a directory, point it to the $HOME.")))
