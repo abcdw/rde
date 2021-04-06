@@ -5,6 +5,8 @@
   #:use-module (guix store)
   #:use-module (guix gexp)
   #:use-module (guix profiles)
+  #:use-module (guix diagnostics)
+  #:use-module (guix ui)
 
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
@@ -80,10 +82,18 @@ If value is @code{#t} variable will be just exported.
 For any other, value variable will be set to the @code{value} and
 exported.
 "
-  ;; TODO: Add environment variables uniqness check?  It can be valid
-  ;; to have the same variable twice if it extends value of itself,
-  ;; not overrides, but it's hard to check, because of gexps.  The
-  ;; other good solution is to add a display of the warning here.
+  (define (warn-about-duplicate-defenitions)
+    (fold
+     (lambda (x acc)
+       (when (equal? (car x) (car acc))
+	 (warning
+	  (G_ "duplicate definition for `~a' environment variable ~%") (car x)))
+       x)
+     (cons "" "")
+     (sort vars (lambda (a b)
+		  (string<? (car a) (car b))))))
+
+  (warn-about-duplicate-defenitions)
   (with-monad
    %store-monad
    (return
