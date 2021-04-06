@@ -39,7 +39,6 @@
 (define (serialize-path field-name val) "")
 (define path? string?)
 
-;; TODO: Very long name, should we shorten it?
 (define-configuration home-xdg-base-directories-configuration
   (cache-home
    (path "$HOME/.cache")
@@ -82,41 +81,41 @@ cache.")
 
 (define (serialize-string field-name val)
   ;; The path has to be quoted
-  (format #f "~a=\"~a\"\n"
-          (symbol->snake-case field-name 'upper "XDG_") val))
+  (format #f "XDG_~a_DIR=\"~a\"\n"
+          (symbol->snake-case field-name 'upper) val))
 
 (define-configuration home-xdg-user-directories-configuration
-  (desktop-dir
+  (desktop
    (string "$HOME/Desktop")
-   "Default ``desktop'' directory, this is what you see on your desktop
-when using a desktop environment, e.g. GNOME (@pxref{X
-Window,,,guix.info}).")
-  (documents-dir
+   "Default ``desktop'' directory, this is what you see on your
+desktop when using a desktop environment,
+e.g. GNOME (@pxref{XWindow,,,guix.info}).")
+  (documents
    (string "$HOME/Documents")
    "Default directory to put documents like PDFs.")
-  (download-dir
+  (download
    (string "$HOME/Downloads")
    "Default directory downloaded files, this is where your Web-broser
 will put downloaded files in.")
-  (music-dir
+  (music
    (string "$HOME/Music")
    "Default directory for audio files.")
-  (pictures-dir
+  (pictures
    (string "$HOME/Pictures")
    "Default directory for pictures and images.")
-  ;; TODO: I have no idea what this is used for, it doesn't say
-  ;; anything about it in the docs.
-  (publicshare-dir
+  (publicshare
    (string "$HOME/Public")
-   "I dunno ????")
-  (templates-dir
+   "Default directory for shared files, which can be accessed by other
+users on local machine or via network.")
+  (templates
    (string "$HOME/Templates")
-   "I dunno???")
-  (videos-dir
+   "Default directory for templates.  They can be used by graphical
+file manager or other apps for creating new files with some
+pre-populated content.")
+  (videos
    (string "$HOME/Videos")
    "Default directory for videos."))
 
-;; TODO: Generate user-dirs.locale?
 (define (home-xdg-user-directories-files-service config)
   `(("config/user-dirs.dirs"
      ,(mixed-text-file
@@ -139,7 +138,8 @@ will put downloaded files in.")
                         home-run-on-first-login-service-type
                         home-xdg-user-directories-on-login-service)))
                 (default-value (home-xdg-user-directories-configuration))
-                (description "Configure XDG user directories.")))
+                (description "Configure XDG user directories.  To
+disable a directory, point it to the $HOME.")))
 
 (define (generate-home-xdg-user-directories-documentation)
   (generate-documentation
