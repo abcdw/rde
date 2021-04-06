@@ -61,8 +61,8 @@
      %rde-emacs-all-packages
      (map specification->package+output
 	  '("tmux" "make"
-	    ;; "zsh"
 	    ;; "qbittorrent"
+	    "ripgrep"
 	    "xdg-utils" "xdg-user-dirs"
 	    "youtube-dl"
 	    "mpv" "imv" "ffmpeg"
@@ -75,6 +75,8 @@
 (use-modules (gnu packages shellutils))
 (use-modules (guix gexp))
 
+;; TODO: Maybe make C-m/C-j in isearch accept current candidate
+;; instead of just closing isearch
 (define (rde-zsh rde-config)
   (list
    (simple-service 'set-default-shell-to-zsh
