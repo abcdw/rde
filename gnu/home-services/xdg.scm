@@ -53,14 +53,11 @@ cache.")
    "Base directory for programs to store user data, like history."))
 
 (define (home-xdg-base-directories-environment-vars-service config)
-  ;; XXX: We don't use 'serialize-configuration' because it returns an
-  ;; opaque Gexp which we can't map over.  Should we create a version
-  ;; which just returns a string or list?
-  `(("$XDG_CACHE_HOME" . ,(home-xdg-base-directories-configuration-cache-home
+  `(("XDG_CACHE_HOME" . ,(home-xdg-base-directories-configuration-cache-home
                            config))
-    ("$XDG_CONFIG_HOME " . ,(home-xdg-base-directories-configuration-config-home
+    ("XDG_CONFIG_HOME" . ,(home-xdg-base-directories-configuration-config-home
                              config))
-    ("$XDG_CACHE_HOME" . ,(home-xdg-base-directories-configuration-data-home
+    ("XDG_DATA_HOME" . ,(home-xdg-base-directories-configuration-data-home
                            config))))
 
 (define home-xdg-base-directories-service-type
