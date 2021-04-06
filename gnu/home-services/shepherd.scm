@@ -77,9 +77,10 @@ as shepherd package."
 (define (reload-configuration-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
 	 (services (home-shepherd-configuration-services config)))
-      #~(execl #$(file-append shepherd "/bin/herd")
-	     "herd" "reload" "root"
-	     #$(home-shepherd-configuration-file services shepherd))))
+    #~(system*
+       #$(file-append shepherd "/bin/herd")
+       "reload" "root"
+       #$(home-shepherd-configuration-file services shepherd))))
 
 (define-public home-shepherd-service-type
   (service-type (name 'home-shepherd)
