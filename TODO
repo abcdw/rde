@@ -7,16 +7,16 @@
 ** IN-PROGRESS Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
-** TODO Call on-reconfigure on reconfigure
-** TODO Run ~guix home~ on 5 early adopters
-*** TODO Establish/define support channels and schedule
+** DONE Call on-reconfigure on reconfigure
+** IN-PROGRESS Run ~guix home~ on 5 early adopters
+*** DONE Establish/define support channels and schedule
 Define schedule and add the information to announce.
 - #guix IRC.
 - rde-discuss mailing list.
-- weekly calls.
-*** TODO Announce in rde-announce
-*** TODO Announce in guix-devel
-*** TODO Announce on stream
+- beweekly calls.
+*** DONE Announce in rde-announce
+*** DONE Announce in guix-devel
+*** DONE Announce on stream
 ** TODO Establish documenting workflow (write guideline)
 ** TODO Establish testing workflow (write guideline)
 ** TODO Add ~guix home search~
@@ -26,7 +26,7 @@ Define schedule and add the information to announce.
 It's enough to make it accept pairs, it doesn't have to be list,
 because value can be a gexp.
 ** TODO Rewrite on-login script to guile
-** TODO Add XDG support to home-envirnoment
+** DONE Add XDG support to home-envirnoment
 Set explicitly XDG_CONFIG_HOME and friends.
 ** TODO Cleanup utils module
 Split into utils and configuration related helper?
