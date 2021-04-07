@@ -1,0 +1,7 @@
+This branch is required for signing guix channel.
+
+An example of adding developer's key to the channel:
+
+gpg --search-keys andrew@trop.in
+gpg --list-public-keys --keyid-format long | grep S
+gpg --armor --export 2208D20958C1DEB0 > abcdw-2208D20958C1DEB0.key
