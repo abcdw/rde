@@ -73,7 +73,7 @@
 	    "youtube-dl"
 	    "mpv" "imv" "ffmpeg"
 	    "obs" "obs-wlrobs"
-	    "curl" "sway"))))))
+	    "curl"))))))
 
 (use-modules (gnu home-services shells))
 (use-modules (gnu home-services shellutils))
@@ -143,8 +143,20 @@
 		(sendmail
 		 ((annotate . #t)))))))))
 
+(use-modules (gnu packages wm))
+(use-modules (gnu packages terminals))
+
 (define (rde-sway rde-config)
   (list
+   (home-generic-service
+    'home-sway
+    #:files `(("config/sway/config" ,(local-file "./sway/config")))
+    #:packages (list sway))
+   (home-generic-service
+    'home-alacritty
+    #:files `(("config/alacritty/alacritty.yml"
+	       ,(local-file "../stale/dotfiles/.config/alacritty/alacritty.yml")))
+    #:packages (list alacritty))
    (simple-service 'set-wayland-specific-env-vars
 		   home-environment-vars-service-type
 		   '(("_JAVA_AWT_WM_NONREPARENTING" . "1")))))
