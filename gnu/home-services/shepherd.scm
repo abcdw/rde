@@ -79,7 +79,7 @@ as shepherd package."
 	 (services (home-shepherd-configuration-services config)))
     #~(system*
        #$(file-append shepherd "/bin/herd")
-       "reload" "root"
+       "load" "root"
        #$(home-shepherd-configuration-file services shepherd))))
 
 (define-public home-shepherd-service-type
