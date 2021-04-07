@@ -2,8 +2,8 @@ iso:
 	guix time-machine  -C rde/channels-lock -- system -L ./ disk-image -t iso9660 rde/system/install.scm
 
 home-reconfigure:
-	GUILE_LOAD_PATH=./ guix home reconfigure ../rde/rde/config.scm \
-	&& gpg-connect-agent updatestartuptty /bye >/dev/null
+	GUILE_LOAD_PATH=./ guix home reconfigure ../rde/rde/config.scm
+
 env:
 	guix time-machine -C rde/channels-lock -- environment --ad-hoc make
 

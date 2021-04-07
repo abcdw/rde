@@ -310,10 +310,22 @@ have a configuration for gpg-agent."))
 (define (home-gnupg-profile-service config)
   (list (home-gnupg-configuration-package config)))
 
+(define (home-gnupg-run-on-reconfigure-service config)
+  #~(let ((gnupg-path (or (getenv "GNUPGHOME")
+			 (string-append (getenv "HOME") "/.gnupg"))))
+      ;; Prevent WARNING: unsafe permissions on homedir
+      (chmod gnupg-path #o700)
+      (display "Updating startup tty for gpg...")
+      (system "gpg-connect-agent updatestartuptty /bye > /dev/null")
+      (display " done\n")))
+
 (define home-gnupg-service-type
   (service-type (name 'home-gnupg)
                 (extensions
                  (list (service-extension
+                        home-run-on-reconfigure-service-type
+                        home-gnupg-run-on-reconfigure-service)
+		       (service-extension
                         home-environment-vars-service-type
                         home-gnupg-environment-vars-service)
                        (service-extension
