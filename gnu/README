@@ -10,8 +10,7 @@ in the root of rde repository.
 
 #+begin_src shell
 GUILE_LOAD_PATH=./ \
-guix home reconfigure ./examples/home-environment.scm.tmpl \
-&& guile ~/.guix-home-environment/on-reconfigure
+guix home reconfigure ./examples/home-environment.scm.tmpl
 #+end_src
 
 If your shell configuration not managed by ~guix home~, it should have
