@@ -110,7 +110,9 @@
 	     (gpg-config
 	      (home-gpg-configuration
 	       (extra-config
-		'((keyserver . "hkps://keys.openpgp.org")))))
+		'((keyid-format . long)
+		  (with-subkey-fingerprint . #t)
+		  (keyserver . "hkps://keys.openpgp.org")))))
 	     (gpg-agent-config
 	      (home-gpg-agent-configuration
 	       (ssh-agent? #t)
