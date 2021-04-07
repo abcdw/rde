@@ -54,8 +54,8 @@ Read [[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.h
 ***** User directories
 | variable        | default value     | description |
 |-----------------+-------------------+-------------|
-| XDG_CONFIG_HOME | [[file:~/.config][~/.config]]         | /hehe/        |
-| XDG_CACHE_HOME  | [[file:~/.cache][~/.cache]]          | =test=        |
+| XDG_CONFIG_HOME | [[file:~/.config][~/.config]]         | /hehe/      |
+| XDG_CACHE_HOME  | [[file:~/.cache][~/.cache]]          | =test=      |
 | XDG_DATA_HOME   | [[file:~/.local/share][~/.local/share]]    |             |
 | XDG_RUNTIME_DIR | /run/user/USER-ID |             |
 *** Tools
@@ -67,3 +67,16 @@ Read [[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.h
 | security | password manager | pass      |        |
 |          | encryption tool  | gpg2      |        |
 |          | backup           | borg      |        |
+** COMMENT Channel introduction
+#+begin_src scheme
+(cons*
+ (channel
+  (name 'rde)
+  (url "https://git.sr.ht/~abcdw/rde")
+  (introduction
+   (make-channel-introduction
+    "257cebd587b66e4d865b3537a9a88cccd7107c95"
+    (openpgp-fingerprint
+     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
+ %default-channels)
+#+end_src
