@@ -101,6 +101,10 @@
   (list
    (service home-gnupg-service-type
 	    (home-gnupg-configuration
+	     (gpg-config
+	      (home-gpg-configuration
+	       (extra-config
+		'((keyserver . "hkps://keys.openpgp.org")))))
 	     (gpg-agent-config
 	      (home-gpg-agent-configuration
 	       (ssh-agent? #t)
