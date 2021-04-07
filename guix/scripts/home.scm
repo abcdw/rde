@@ -28,10 +28,6 @@
 (define %guix-home-environment
   (string-append %profile-directory "/guix-home-environment"))
 
-(define %user-home-environment-directory
-  (and=> (getenv "HOME")
-         (cut string-append <> "/.guix-home-environment")))
-
 (define (show-help)
   (display (G_ "Usage: guix home [OPTION ...] ACTION [ARG ...] [FILE]
 Build the home environment declared in FILE according to ACTION.
@@ -111,6 +107,8 @@ Some ACTIONS support additional ARGS.\n"))
 	       (switch-symlinks %guix-home-environment generation)
 	       (switch-symlinks user-home-environment-symlink-path
 				%guix-home-environment)
+
+	       (primitive-load (string-append he-path "/on-reconfigure"))
 	       (return he-path)))
             (else
              (newline)
