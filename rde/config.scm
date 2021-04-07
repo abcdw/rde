@@ -17,6 +17,9 @@
   (mails rde-config-mails
 	 (default '()))
 
+  (gpg-sign-key rde-config-gpg-sign-key
+		(default #f))
+
   (keyboard-layout rde-config-keyboard-layout
 		   (default #f))
   ;; (shell rde-config-shell
@@ -28,6 +31,8 @@
    (default (string-append
 	     "/home/"
              (rde-config-user-name this-rde-config)))))
+
+
 (use-modules (gnu system keyboard))
 
 (define dvorak-jcuken
@@ -39,6 +44,7 @@
    (user-name "bob")
    (full-name "Andrew Tropin")
    (email "andrew@trop.in")
+   (gpg-sign-key "2208D20958C1DEB0")
    (keyboard-layout dvorak-jcuken)))
 
 (use-modules (gnu home-services xdg))
@@ -124,7 +130,14 @@
 	     (config
 	      `((user
 		 ((name . ,(rde-config-full-name rde-config))
-		  (email . ,(rde-config-email rde-config))))
+		  (email . ,(rde-config-email rde-config))
+		  ,@(if (rde-config-gpg-sign-key rde-config)
+			`((signingkey . ,(rde-config-gpg-sign-key rde-config)))
+			'())))
+		(commit
+		 (,@(if (rde-config-gpg-sign-key rde-config)
+			'((gpgsign . #t))
+			'())))
 		(sendmail
 		 ((annotate . #t)))))))))
 
