@@ -43,10 +43,29 @@
 (use-modules (gnu packages freedesktop))
 (define (rde-xdg rde-config)
   (list
+   (service home-xdg-mime-applications-service-type
+	    (home-xdg-mime-applications-configuration
+	     (added '((x-scheme-handler/magnet . torrent.desktop)))
+	     (default '((inode/directory . file.desktop)))
+	     (removed '((inode/directory . thunar.desktop)))
+	     (desktop-entries
+	      (list (xdg-desktop-entry
+		     (file "file")
+		     (name "File manager")
+		     (type 'application)
+		     (extra-config
+		      '((exec . "emacsclient -c -a emacs %u"))))
+		    (xdg-desktop-entry
+		     (file "text")
+		     (name "Text editor")
+		     (type 'application)
+		     (extra-config
+		      '((exec . "emacsclient -c -a emacs %u"))))))))
+
    (home-generic-service
     'home-xdg-packages
     #:packages
-    (list xdg-utils xdg-user-dirs))
+    (list xdg-utils xdg-user-dirs desktop-file-utils))
    (service home-xdg-base-directories-service-type)
    (service home-xdg-user-directories-service-type
 	    (home-xdg-user-directories-configuration
