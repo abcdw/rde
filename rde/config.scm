@@ -171,6 +171,15 @@
 		   home-environment-vars-service-type
 		   '(("_JAVA_AWT_WM_NONREPARENTING" . "1")))))
 
+(use-modules (gnu packages tmux))
+(define (rde-tmux rde-config)
+  (list
+   (home-generic-service
+    'home-tmux
+    #:files `(("config/tmux/tmux.conf"
+	       ,(local-file "../stale/dotfiles/.tmux.conf" "tmux.conf")))
+    #:packages (list tmux))))
+
 (use-modules (gnu packages))
 (define (rde-browsers rde-config)
   (list
@@ -190,6 +199,7 @@
    rde-git
    rde-sway
    rde-emacs
+   rde-tmux
    rde-browsers
    rde-other-packages))
 
