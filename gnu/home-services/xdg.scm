@@ -23,6 +23,7 @@
             home-xdg-user-directories-service-type
             home-xdg-user-directories-configuration
 
+            xdg-desktop-action
             xdg-desktop-entry
             home-xdg-mime-applications-service-type
             home-xdg-mime-applications-configuration))
@@ -177,7 +178,7 @@ disable a directory, point it to the $HOME.")))
 
 ;; Example config
 ;;
-;; (home-xdg-mime-applications-configuration
+;;  (home-xdg-mime-applications-configuration
 ;;   (added '((x-scheme-handler/magnet . torrent.desktop)))
 ;;   (default '((inode/directory . file.desktop)))
 ;;   (removed '((inode/directory . thunar.desktop)))
@@ -186,14 +187,20 @@ disable a directory, point it to the $HOME.")))
 ;;           (file "file")
 ;;           (name "File manager")
 ;;           (type 'application)
-;;           (extra-config
+;;           (config
 ;;            '((exec . "emacsclient -c -a emacs %u"))))
 ;;          (xdg-desktop-entry
 ;;           (file "text")
 ;;           (name "Text editor")
 ;;           (type 'application)
-;;           (extra-config
-;;            '((exec . "emacsclient -c -a emacs %u")))))))
+;;           (config
+;;            '((exec . "emacsclient -c -a emacs %u")))
+;;           (actions
+;;            (list (xdg-desktop-action
+;;                   (action 'create)
+;;                   (name "Create an action")
+;;                   (config
+;;                    '((exec . "echo hi"))))))))))
 
 ;; See
 ;; <https://specifications.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html>
@@ -260,10 +267,17 @@ The value of an XDG MIME entry must be a list, string or symbol, was given ~a")
             (list->human-readable-list (enum-set->list xdg-desktop-types))
             type))))
 
-
 ;; TODO: Add proper docs for this
 ;; XXX: 'define-configuration' require that fields have a default
 ;; value.
+(define-record-type* <xdg-desktop-action>
+  xdg-desktop-action make-xdg-desktop-action
+  xdg-desktop-action?
+  (action xdg-desktop-action-action)    ; symbol
+  (name xdg-desktop-action-name)        ; string
+  (config xdg-desktop-action-config     ; alist
+                (default '())))
+
 (define-record-type* <xdg-desktop-entry>
   xdg-desktop-entry make-xdg-desktop-entry
   xdg-desktop-entry?
@@ -271,8 +285,10 @@ The value of an XDG MIME entry must be a list, string or symbol, was given ~a")
   (file xdg-desktop-entry-file)         ; string
   (name xdg-desktop-entry-name)         ; string
   (type xdg-desktop-entry-type)         ; xdg-desktop-type
-  (extra-config xdg-desktop-entry-type-extra-config ; alist
-                (default '())))
+  (config xdg-desktop-entry-config      ; alist
+                (default '()))
+  (actions xdg-desktop-entry-actions    ; list of <xdg-desktop-action>
+           (default '())))
 
 (define desktop-entries? list?)
 (define (serialize-desktop-entries field-name val) "")
@@ -293,20 +309,32 @@ configuration."
                   (string-drop-right key (- (string-length key) 1))
                   key)
               val)))
+
+  (define (serialize-alist config)
+    (generic-serialize-alist string-append format-config config))
+
+  (define (serialize-xdg-desktop-action action)
+    (match action
+      (($ <xdg-desktop-action> action name config)
+       (string-append
+        (format #f "[Desktop Action ~a]\n" (string-capitalize
+                                            (maybe-object->string action)))
+        (format #f "Name=~a\n" name)
+        (serialize-alist config)))))
   
   (match entry
-    (($ <xdg-desktop-entry> file name type extra-config)
+    (($ <xdg-desktop-entry> file name type config actions)
      (list (if (string-suffix? file ".desktop")
                file
                (string-append file ".desktop"))
            (string-append
             "[Desktop Entry]\n"
-            (format #f "Name=~a\n" (string-capitalize name))
+            (format #f "Name=~a\n" name)
             (format #f "Type=~a\n"
                     (string-capitalize (symbol->string type)))
-            (generic-serialize-alist string-append
-                                     format-config
-                                     extra-config))))))
+            (serialize-alist config)
+            (string-join (map serialize-xdg-desktop-action actions)
+                         "\n" 'prefix))))))
 
 (define-configuration home-xdg-mime-applications-configuration
   (added
