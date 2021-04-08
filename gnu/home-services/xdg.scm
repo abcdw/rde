@@ -179,17 +179,56 @@ disable a directory, point it to the $HOME.")))
 ;; <https://specifications.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html>
 ;; <https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html>
 
-;; TODO: Create a way to add custom desktop entries?
-;; (define-record-type <xdg-desktop-entry>)
+(define alist? list?)
+(define (serialize-alist field-name val)
+  (define (serialize-mimelist-entry key val)
+    (let ((val (cond
+                ((list? val)
+                 (string-join (map maybe-object->string val) ";"))
+                ((or (string? val) (symbol? val))
+                 val)
+                (else (raise (formatted-message
+                              (G_ "\
+The value of an XDG MIME entry must be a list, string or symbol, was given ~a")
+                              val))))))
+      (format #f "~a=~a\n" key val)))
 
-(define (serialize-ini-config field-name val)
-  (define (serialize-field field-name val)
-    (format #f "~a=~a\n" field-name val))
+  (define (merge-duplicates alist acc)
+    "Merge values that have the same key.
 
-  (define (format-section section)
-    (string-capitalize
-     (string-replace-substring
-      (maybe-object->string section) "-" " ")))
+@example
+(merge-duplicates '((key1 . value1)
+                      (key2 . value2)
+                      (key1 . value3)
+                      (key1 . value4)) '())
+
+@result{} ((key1 . (value4 value3 value1)) (key2 . value2))
+@end example"
+    (cond
+     ((null? alist) acc)
+     (else (let* ((head (first alist))
+                  (tail (cdr alist))
+                  (key (first head))
+                  (value (cdr head))
+                  (duplicate? (assoc key acc)))
+             (if duplicate?
+                 ;; XXX: This will change the order of things,
+                 ;; though, it shouldn't be a problem for XDG MIME.
+                 (merge-duplicates
+                  tail
+                  (alist-cons key
+                              (cons value (maybe-list (cdr duplicate?)))
+                              (alist-delete key acc)))
+                 (merge-duplicates tail (cons head acc)))))))
+
+  (string-append (if (equal? field-name 'default)
+                     "\n[Default Applications]\n"
+                     (format #f "\n[~a Associations]\n"
+                             (string-capitalize (symbol->string field-name))))
+                 (generic-serialize-alist string-append
+                                          serialize-mimelist-entry
+                                          (merge-duplicates val '()))))
+
 (define xdg-desktop-types (make-enumeration
                            '(application
                              link
@@ -215,6 +254,9 @@ disable a directory, point it to the $HOME.")))
   (type xdg-desktop-entry-type)         ; xdg-desktop-type
   (extra-config xdg-desktop-entry-type-extra-config ; alist
                 (default '())))
+
+(define desktop-entries? list?)
+(define (serialize-desktop-entries field-name val) "")
 
 (define (serialize-xdg-desktop-entry entry)
   "Return a tuple of the file name for ENTRY and the serialized
@@ -247,44 +289,45 @@ configuration."
                                      format-config
                                      extra-config))))))
 
-;; TODO: Or should we use records to stop the user from potentially
-;; creating an invalid config?
 (define-configuration home-xdg-mime-applications-configuration
-  (config
-   (ini-config '())
-   "List of lists representing an INI config file.
-Association list of MIME type and desktop entry.  An example like
-this:
-
-@example
-(config '((added-associations
-           ((application/x-bittorrent . torrent.desktop)
-            (inode/directory . file.desktop)))
-          (default-associations
-            ((x-scheme-handler/magnet . torrent.desktop)))))
-@end example
-
-would result in
-
-@example
-[Added Associations]
-application/x-bittorrent=torrent.desktop
-inode/directory=file.desktop
-
-[Default Applications]
-x-scheme-handler/magnet=torrent.desktop
-@end example
-
-This would only have an effect if you have already defined
-@file{torrent.desktop} and @file{file.desktop} somewhere else."))
+  (added
+   (alist '())
+   "An association list of MIME types and desktop entries which indicate
+that the application should used to open the specified MIME type.  The
+value has to be string, symbol, or list of strings or symbols, this
+applies to the `@code{default}', and `@code{removed}' fields as well.")
+  (default
+    (alist '())
+    "An association list of MIME types and desktop entries which indicate
+that the application should be the default for opening the specified
+MIME type.")
+  (removed
+   (alist '())
+   "An association list of MIME types and desktop entries which indicate
+that the application cannot open the specified MIME type.")
+  (desktop-entries
+   (desktop-entries '())
+   "A list of XDG desktop entries to create.  See
+@code{xdg-desktop-entry}."))
 
 (define (home-xdg-mime-applications-files-service config)
-  `(("config/mimeapps.list"
-     ,(mixed-text-file
-      "xdg-mime-appplications"
-      (serialize-configuration
-       config
-       home-xdg-mime-applications-configuration-fields)))))
+  (define (add-xdg-desktop-entry-file entry)
+    (let ((file (first entry))
+          (config (second entry)))
+      (list (format #f "local/share/applications/~a" file)
+          (mixed-text-file
+           (format #f "xdg-desktop-~a-entry" file)
+           config))))
+
+  (append
+   `(("config/mimeapps.list"
+      ,(mixed-text-file
+        "xdg-mime-appplications"
+        (serialize-configuration
+         config
+         home-xdg-mime-applications-configuration-fields))))
+   (map (compose add-xdg-desktop-entry-file serialize-xdg-desktop-entry)
+        (home-xdg-mime-applications-configuration-desktop-entries config))))
 
 ;; TODO: Make it extendable?
 (define home-xdg-mime-applications-service-type
