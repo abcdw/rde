@@ -73,7 +73,6 @@
   (serialize-field field-name (if val "true" "false")))
 
 (define serialize-string serialize-field)
-(define alist? list?)
 (define git-config? list?)
 
 (define (serialize-git-section-header name value)

@@ -63,7 +63,6 @@
 (define (serialize-boolean field-name val)
   (serialize-field field-name (boolean->yes-or-no val)))
 
-(define alist? list?)
 (define serialize-string serialize-field)
 (define ssh-host-or-ssh-match? list?)
 

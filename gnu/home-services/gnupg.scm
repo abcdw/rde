@@ -67,7 +67,6 @@
         (serialize-field field-name "")
         (serialize-field "" ""))))
 
-(define alist? list?)
 (define (serialize-alist field-name val)
   (generic-serialize-alist string-append serialize-field val))
 

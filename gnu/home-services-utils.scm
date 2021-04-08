@@ -30,6 +30,7 @@
             symbol->snake-case
             ini-config?
             generic-serialize-ini-config
+            alist?
 
             maybe-list))
 
@@ -280,6 +281,7 @@ serialize the section and the association lists, respectively.
         fields)
    "\n"))
 
+(define alist? list?)
 
 ;;;
 ;;; Miscellaneous.

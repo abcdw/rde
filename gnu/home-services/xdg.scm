@@ -199,7 +199,6 @@ disable a directory, point it to the $HOME.")))
 ;; <https://specifications.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html>
 ;; <https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html>
 
-(define alist? list?)
 (define (serialize-alist field-name val)
   (define (serialize-mimelist-entry key val)
     (let ((val (cond
