@@ -48,8 +48,13 @@
    (keyboard-layout dvorak-jcuken)))
 
 (use-modules (gnu home-services xdg))
+(use-modules (gnu packages freedesktop))
 (define (rde-xdg rde-config)
   (list
+   (home-generic-service
+    'home-xdg-packages
+    #:packages
+    (list xdg-utils xdg-user-dirs))
    (service home-xdg-base-directories-service-type)
    (service home-xdg-user-directories-service-type
 	    (home-xdg-user-directories-configuration
@@ -58,22 +63,27 @@
 	     (templates "$HOME")))))
 
 (use-modules (rde emacs packages))
+(use-modules (guix gexp))
+(define (rde-emacs rde-config)
+  (list
+   (home-generic-service
+    'home-emacs
+    #:files `(("config/emacs/early-init.el"
+	       ,(local-file "./emacs/early-init.el")))
+    #:packages %rde-emacs-all-packages)))
+
 (define (rde-other-packages rde-config)
   (list
    (home-generic-service
-    'other-packages
+    'rde-other-packages
     #:packages
-    (append
-     %rde-emacs-all-packages
-     (map specification->package+output
-	  '("tmux" "make"
-	    ;; "qbittorrent"
-	    "ripgrep"
-	    "xdg-utils" "xdg-user-dirs"
-	    "youtube-dl"
-	    "mpv" "imv" "ffmpeg"
-	    "obs" "obs-wlrobs"
-	    "curl"))))))
+    (map specification->package+output
+	 '("make"
+	   "ripgrep"
+	   "youtube-dl"
+	   "mpv" "imv" "ffmpeg"
+	   "obs" "obs-wlrobs"
+	   "curl")))))
 
 (use-modules (gnu home-services shells))
 (use-modules (gnu home-services shellutils))
@@ -179,6 +189,7 @@
    rde-ssh
    rde-git
    rde-sway
+   rde-emacs
    rde-browsers
    rde-other-packages))
 
