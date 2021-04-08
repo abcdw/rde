@@ -175,6 +175,26 @@ disable a directory, point it to the $HOME.")))
 ;;; XDG MIME applications.
 ;;;
 
+;; Example config
+;;
+;; (home-xdg-mime-applications-configuration
+;;   (added '((x-scheme-handler/magnet . torrent.desktop)))
+;;   (default '((inode/directory . file.desktop)))
+;;   (removed '((inode/directory . thunar.desktop)))
+;;   (desktop-entries
+;;    (list (xdg-desktop-entry
+;;           (file "file")
+;;           (name "File manager")
+;;           (type 'application)
+;;           (extra-config
+;;            '((exec . "emacsclient -c -a emacs %u"))))
+;;          (xdg-desktop-entry
+;;           (file "text")
+;;           (name "Text editor")
+;;           (type 'application)
+;;           (extra-config
+;;            '((exec . "emacsclient -c -a emacs %u")))))))
+
 ;; See
 ;; <https://specifications.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html>
 ;; <https://specifications.freedesktop.org/mime-apps-spec/mime-apps-spec-latest.html>
@@ -329,12 +349,42 @@ that the application cannot open the specified MIME type.")
    (map (compose add-xdg-desktop-entry-file serialize-xdg-desktop-entry)
         (home-xdg-mime-applications-configuration-desktop-entries config))))
 
-;; TODO: Make it extendable?
+(define (home-xdg-mime-applications-extension old-config extension-configs)
+  (define (extract-fields config)
+    ;; return '(added default removed desktop-entries)
+    (list (home-xdg-mime-applications-configuration-added config)
+          (home-xdg-mime-applications-configuration-default config)
+          (home-xdg-mime-applications-configuration-removed config)
+          (home-xdg-mime-applications-configuration-desktop-entries config)))
+
+  (define (append-configs elem acc)
+    (list (append (first elem) (first acc))
+          (append (second elem) (second acc))
+          (append (third elem) (third acc))
+          (append (fourth elem) (fourth acc))))
+
+  ;; TODO: Implement procedure to check for duplicates without
+  ;; sacrificing performance.
+  ;;
+  ;; Combine all the alists from 'added', 'default' and 'removed'
+  ;; into one big alist.
+  (let ((folded-configs (fold append-configs
+                              (extract-fields old-config)
+                              (map extract-fields extension-configs))))
+    (home-xdg-mime-applications-configuration
+     (added (first folded-configs))
+     (default (second folded-configs))
+     (removed (third folded-configs))
+     (desktop-entries (fourth folded-configs)))))
+
 (define home-xdg-mime-applications-service-type
   (service-type (name 'home-xdg-mime-applications)
                 (extensions
                  (list (service-extension
                         home-files-service-type
                         home-xdg-mime-applications-files-service)))
+                (compose identity)
+                (extend home-xdg-mime-applications-extension)
                 (default-value (home-xdg-mime-applications-configuration))
-                (description "Configure XDG MIME applications.")))
+                (description "\
+Configure XDG MIME applications, and XDG desktop entries.")))
