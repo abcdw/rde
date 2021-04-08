@@ -13,7 +13,8 @@
 
   #:export (home-git-configuration
 	    home-git-extension
-	    home-git-service-type))
+	    home-git-service-type
+	    serialize-git-config))
 
 ;;; Commentary:
 ;;;

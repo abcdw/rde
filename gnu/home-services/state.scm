@@ -36,7 +36,11 @@
 	   ;; TODO: create a config
 	   (waitpid WAIT_ANY)
 	   (display ((@@ (ice-9 rdelim) read-delimited) "" port))
-	   (close-port port))))
+	   (close-port port))
+
+	 (when #$config
+	   (call-with-output-file (string-append path "/.git/config")
+	     (lambda (port) (display #$config port))))))
    #:additional-metadata `((remote . ,remote)
 			   (general-sync? . #f))))
 
