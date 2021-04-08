@@ -29,7 +29,9 @@
 	    serialize-text-config
             symbol->snake-case
             ini-config?
-            generic-serialize-ini-config))
+            generic-serialize-ini-config
+
+            maybe-list))
 
 ;;;
 ;;; User's utils.
@@ -277,3 +279,14 @@ serialize the section and the association lists, respectively.
             (generic-serialize-alist combine serialize-field alist))))
         fields)
    "\n"))
+
+
+;;;
+;;; Miscellaneous.
+;;;
+
+(define (maybe-list a)
+  "If A is a list, return it, otherwise return a singleton list with A."
+      (if (list? a)
+          a
+          (list a)))
