@@ -5,15 +5,25 @@
   #:use-module (gnu home-services files)
   #:use-module (gnu home-services-utils)
   #:use-module (guix gexp)
+  #:use-module (guix records)
+  #:use-module (guix i18n)
+  #:use-module (guix diagnostics)
+  #:use-module ((guix import utils) #:select (flatten))
   #:use-module (ice-9 string-fun)
+  #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-9)
+  #:use-module (srfi srfi-26)
+  #:use-module (rnrs enums)
 
 
   #:export (home-xdg-base-directories-service-type
             home-xdg-base-directories-configuration
+
             home-xdg-user-directories-service-type
             home-xdg-user-directories-configuration
+
+            xdg-desktop-entry
             home-xdg-mime-applications-service-type
             home-xdg-mime-applications-configuration))
 
@@ -180,11 +190,62 @@ disable a directory, point it to the $HOME.")))
     (string-capitalize
      (string-replace-substring
       (maybe-object->string section) "-" " ")))
+(define xdg-desktop-types (make-enumeration
+                           '(application
+                             link
+                             directory)))
+
+(define (xdg-desktop-type? type)
+  (unless (enum-set-member? type xdg-desktop-types)
+    (raise (formatted-message
+            (G_ "XDG desktop type must be of of ~a, was given: ~a")
+            (list->human-readable-list (enum-set->list xdg-desktop-types))
+            type))))
+
+
+;; TODO: Add proper docs for this
+;; XXX: 'define-configuration' require that fields have a default
+;; value.
+(define-record-type* <xdg-desktop-entry>
+  xdg-desktop-entry make-xdg-desktop-entry
+  xdg-desktop-entry?
+  ;; ".desktop" will automatically be added
+  (file xdg-desktop-entry-file)         ; string
+  (name xdg-desktop-entry-name)         ; string
+  (type xdg-desktop-entry-type)         ; xdg-desktop-type
+  (extra-config xdg-desktop-entry-type-extra-config ; alist
+                (default '())))
+
+(define (serialize-xdg-desktop-entry entry)
+  "Return a tuple of the file name for ENTRY and the serialized
+configuration."
+  (define (format-config key val)
+    (let ((val (cond
+                ((list? val)
+                 (string-join (map maybe-object->string val) ";"))
+                ((boolean? val)
+                 (if val "true" "false"))
+                (else val)))
+          (key (string-capitalize (maybe-object->string key))))
+      (format #f "~a=~a\n"
+              (if (string-suffix? key "?")
+                  (string-drop-right key (- (string-length key) 1))
+                  key)
+              val)))
   
-  (generic-serialize-ini-config
-   #:format-section format-section
-   #:serialize-field serialize-field
-   #:fields val))
+  (match entry
+    (($ <xdg-desktop-entry> file name type extra-config)
+     (list (if (string-suffix? file ".desktop")
+               file
+               (string-append file ".desktop"))
+           (string-append
+            "[Desktop Entry]\n"
+            (format #f "Name=~a\n" (string-capitalize name))
+            (format #f "Type=~a\n"
+                    (string-capitalize (symbol->string type)))
+            (generic-serialize-alist string-append
+                                     format-config
+                                     extra-config))))))
 
 ;; TODO: Or should we use records to stop the user from potentially
 ;; creating an invalid config?
