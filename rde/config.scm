@@ -39,14 +39,6 @@
   (keyboard-layout "us,ru" "dvorak,"
 		   #:options '("grp:win_space_toggle" "ctrl:nocaps")))
 
-(define rde-cfg
-  (rde-config
-   (user-name "bob")
-   (full-name "Andrew Tropin")
-   (email "andrew@trop.in")
-   (gpg-sign-key "2208D20958C1DEB0")
-   (keyboard-layout dvorak-jcuken)))
-
 (use-modules (gnu home-services xdg))
 (use-modules (gnu packages freedesktop))
 (define (rde-xdg rde-config)
@@ -189,7 +181,6 @@
     (map specification->package+output
 	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))))
 
-
 (define rde-features
   (list
    rde-xdg
@@ -206,19 +197,54 @@
 (define (get-rde-services config features)
   (append-map (lambda (item) (item config)) features))
 
-;; (generic-service
-     ;;  'youtube-dl
-     ;;  ;; #:files `(("config/youtube-dl/config"
-     ;;  ;; 		 ,(plain-file "ytdl-config"
-     ;;  ;; 			      "--netrc /home/bob/.authinfo.gpg\n")))
-     ;;  #:packages (list youtube-dl))
 
-     ;; (service home-shell-profile-service-type)
+;; TODO: Move personal configurations to separate folder
+(use-modules (gnu home-services state))
+(use-modules (gnu home-services version-control))
+(define (working-repos rde-config)
+  (define (work-dir path)
+    (format #f "~a/work/~a" (rde-config-home-directory rde-config) path))
+  (list
+   (service
+    home-state-service-type
+    (list
+     (state-git
+      (work-dir "gnu/guix")
+      "https://git.savannah.gnu.org/git/guix.git/")
+     (state-git
+      (work-dir "gnu/shepherd")
+      "https://git.savannah.gnu.org/git/shepherd.git/")
+     (state-git
+      (work-dir "notes")
+      "git@github.com:abcdw/notes.git")
+     (state-git
+      (work-dir "rde")
+      "git@git.sr.ht:~abcdw/rde"
+      #:config
+      (serialize-git-config
+      #f
+      '((core ((repositoryformatversion . "0")
+	       (filemode . #t)
+	       (bare . #f)
+	       (logallrefupdates . #t)))
+	(remote origin
+		((url . "git@git.sr.ht:~abcdw/rde")
+		 (fetch . "+refs/heads/*:refs/remotes/origin/*")))
+	(remote github
+		((url . "git@github.com:abcdw/rde.git")
+		 (fetch . "+refs/heads/*:refs/remotes/github/*")))
+	(remote ((pushDefault . "github")))
+	(branch master
+		((remote . "origin")
+		 (merge . "refs/heads/master"))))))))))
 
-;; (simple-service
-     ;;  'set-some-vars home-environment-vars-service-type
-     ;;  '(("QT_QPA_PLATFORM" . "wayland")))
-
+(define rde-cfg
+  (rde-config
+   (user-name "bob")
+   (full-name "Andrew Tropin")
+   (email "andrew@trop.in")
+   (gpg-sign-key "2208D20958C1DEB0")
+   (keyboard-layout dvorak-jcuken)))
 
 (use-modules (guix gexp) (gnu packages linux))
 (define ixy-he
@@ -228,7 +254,9 @@
     (append
      (get-rde-services
       rde-cfg
-      rde-features)
+      (append
+       rde-features
+       (list working-repos)))
 
      (list
       (simple-service
