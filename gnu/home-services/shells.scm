@@ -16,6 +16,7 @@
 
 	    home-bash-service-type
 	    home-bash-configuration
+	    home-bash-extension
 
 	    home-zsh-service-type
 	    home-zsh-configuration
@@ -356,6 +357,33 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
 (define (add-bash-packages config)
   (list (home-bash-configuration-package config)))
 
+(define-configuration home-bash-extension
+  (bash-profile
+   (text-config '())
+   "List of strings or gexps.")
+  (bashrc
+   (text-config '())
+   "List of strings or gexps.")
+  (bash-logout
+   (text-config '())
+   "List of strings or gexps."))
+
+(define (home-bash-extensions original-config extension-configs)
+  (home-bash-configuration
+   (inherit original-config)
+   (bash-profile
+    (append (home-bash-configuration-bash-profile original-config)
+	    (append-map
+	     home-bash-extension-bash-profile extension-configs)))
+   (bashrc
+    (append (home-bash-configuration-bashrc original-config)
+	    (append-map
+	     home-bash-extension-bashrc extension-configs)))
+   (bash-logout
+    (append (home-bash-configuration-bash-logout original-config)
+	    (append-map
+	     home-bash-extension-bash-logout extension-configs)))))
+
 (define home-bash-service-type
   (service-type (name 'home-bash)
                 (extensions
@@ -365,7 +393,7 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
                        (service-extension
                         home-profile-service-type
                         add-bash-packages)))
-		;; (compose identity)
-		;; (extend home-bash-extensions)
+		(compose identity)
+		(extend home-bash-extensions)
                 (default-value (home-bash-configuration))
                 (description "Install and configure Bash.")))
