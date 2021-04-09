@@ -2,7 +2,7 @@
 #+TODO: TODO IN-PROGRESS | DONE
 * ~guix home~ Before Upstream Checklist
 ** DONE Implement zsh home-service
-** TODO Implement bash home-service
+** DONE Implement bash home-service
 ** DONE Implement gnupg home-service
 ** IN-PROGRESS Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
@@ -19,7 +19,7 @@ Define schedule and add the information to announce.
 *** DONE Announce on stream
 ** TODO Establish documenting workflow (write guideline)
 ** TODO Establish testing workflow (write guideline)
-** TODO Add ~guix home search~
+** DONE Add ~guix home search~
 ** TODO Add ~guix home rollback/list-generations~
 ** TODO Add copyrights to source code
 ** DONE Fix environment-variables service
