@@ -53,13 +53,13 @@
 		     (file "file")
 		     (name "File manager")
 		     (type 'application)
-		     (extra-config
+		     (config
 		      '((exec . "emacsclient -c -a emacs %u"))))
 		    (xdg-desktop-entry
 		     (file "text")
 		     (name "Text editor")
 		     (type 'application)
-		     (extra-config
+		     (config
 		      '((exec . "emacsclient -c -a emacs %u"))))))))
 
    (home-generic-service
