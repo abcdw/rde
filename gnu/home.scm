@@ -89,7 +89,23 @@
        (service home-environment-vars-service-type
 		`(("GUIX_HOME_ENVIRONMENT_DIRECTORY" .
 		   ,(home-environment-symlink-path he))))
+
+       ;; Make guix aware of `guix home` after first reconfigure, this
+       ;; declaration must go before xdg-base-dirs.  Potentially
+       ;; dangerous "fix", it makes possible for malicious channel
+       ;; expose it's own guix subcommands.
+       ;; TODO: Remove it once upstreamed.
+       (simple-service
+	'make-guix-aware-of-guix-home-subcomand
+	home-environment-vars-service-type
+	'(("GUILE_LOAD_PATH" .
+	   "$XDG_CONFIG_HOME/guix/current/share/guile/site/3.0\
+:$GUILE_LOAD_PATH")
+	  ("GUILE_LOAD_COMPILED_PATH" .
+	   "$XDG_CONFIG_HOME/guix/current/lib/guile/3.0/site-ccache\
+:$GUILE_LOAD_COMPILED_PATH")))
        (service home-xdg-base-directories-service-type)
+
        (service home-shell-profile-service-type
 		(home-shell-profile-configuration
 		 (he-symlink-path (home-environment-symlink-path he))))

@@ -254,22 +254,8 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
     #:files `(("config/guix/channels.scm"
 	       ,(mixed-text-file "channels.scm" guix-and-rde-channels))))))
 
-;; Make guix respect load path before looking up subcomands
-(define (rde-guix-fix rde-config)
-  (list
-   (simple-service
-    'guix-respect-guix-home
-    home-environment-vars-service-type
-    '(("GUILE_LOAD_PATH" .
-       "$XDG_CONFIG_HOME/guix/current/share/guile/site/3.0\
-:$GUILE_LOAD_PATH")
-      ("GUILE_LOAD_COMPILED_PATH" .
-       "$XDG_CONFIG_HOME/guix/current/lib/guile/3.0/site-ccache\
-:$GUILE_LOAD_COMPILED_PATH")))))
-
 (define rde-features
   (list
-   rde-guix-fix
    rde-guix-channels
    rde-xdg
    rde-bash
