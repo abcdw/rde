@@ -82,6 +82,10 @@
    (service home-xdg-user-directories-service-type
 	    (home-xdg-user-directories-configuration
 	     (music "$HOME/music")
+	     (videos "$HOME/vids")
+	     (pictures "$HOME/pics")
+	     (download "$HOME/dl")
+	     (desktop "$HOME")
 	     (publicshare "$HOME")
 	     (templates "$HOME")))))
 
@@ -97,6 +101,10 @@
 
 (define (rde-other-packages rde-config)
   (list
+   (simple-service
+    'xdg-friendly-env-vars
+    home-environment-vars-service-type
+    '(("LESSHISTFILE" . "$XDG_CACHE_HOME/.lesshst")))
    (home-generic-service
     'rde-other-packages
     #:packages
@@ -124,7 +132,7 @@
 		   `(("SHELL" . ,(file-append zsh "/bin/zsh"))))
 
    ;; zsh-autosuggestions is very cool plugin, but a little
-   ;; distractive, I find them a little against Attention-friendly
+   ;; distractive, I find it a little against Attention-friendly
    ;; principle
    home-zsh-autosuggestions-service
 
