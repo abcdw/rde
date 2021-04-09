@@ -90,6 +90,7 @@
     #:packages
     (map specification->package+output
 	 '("make"
+	   "hicolor-icon-theme" "adwaita-icon-theme"
 	   "ripgrep"
 	   "youtube-dl"
 	   "mpv" "imv" "ffmpeg"
