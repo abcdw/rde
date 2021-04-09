@@ -11,7 +11,7 @@
 	    home-environment?
 	    this-home-environment
 	    home-environment-derivation
-	    home-environment-user-home-directory
+	    home-environment-home-directory
 	    home-environment-symlink-name
 	    home-environment-symlink-path))
 
@@ -38,15 +38,15 @@
   (services home-environment-user-services
 	    (default '()))
 
-  (user-home-directory home-environment-user-home-directory
-		       (default (getenv "HOME")))
+  (home-directory home-environment-home-directory
+		       (default #f))
   (symlink-name home-environment-symlink-name
 		(default ".guix-home-environment"))
 
   (symlink-path home-environment-symlink-path (thunked)
 		(default
 		  (string-append
-		   (home-environment-user-home-directory this-home-environment)
+		   (home-environment-home-directory this-home-environment)
 		   "/"
 		   (home-environment-symlink-name this-home-environment))))
 

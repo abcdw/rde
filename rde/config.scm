@@ -270,6 +270,7 @@
 (define ixy-he
   (home-environment
    (keyboard-layout dvorak-jcuken)
+   (home-directory (rde-config-home-directory rde-config))
    (services
     (append
      (get-rde-services
@@ -285,4 +286,4 @@
 
      ))))
 
-ixy-he
+(ixy-he rde-cfg)

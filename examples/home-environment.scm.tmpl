@@ -21,6 +21,7 @@
     (keyboard-layout "us,ru" "dvorak,"
 		     #:options '("grp:win_space_toggle" "ctrl:nocaps")))
 
+   (home-directory (getenv "HOME"))
    ;; (symlink-name ".guix-home-env")
    (packages
     (map specification->package+output
