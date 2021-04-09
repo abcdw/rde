@@ -1,6 +1,8 @@
 (define-module (guix scripts home)
   #:use-module (gnu packages admin)
+  #:use-module (gnu services)
   #:use-module (gnu home)
+  #:use-module (gnu home-services)
   #:use-module (guix derivations)
   #:use-module (guix ui)
   #:use-module (guix grafts)
@@ -11,6 +13,7 @@
   #:use-module (guix scripts)
   #:use-module (guix scripts package)
   #:use-module (guix scripts build)
+  #:use-module (guix scripts system search)
   #:use-module ((guix status) #:select (with-status-verbosity))
   #:use-module (guix gexp)
   #:use-module (guix monads)
@@ -35,6 +38,8 @@ Some ACTIONS support additional ARGS.\n"))
     (newline)
   (display (G_ "The valid values for ACTION are:\n"))
   (newline)
+  (display (G_ "\
+   search           search for existing service types\n"))
   (display (G_ "\
    build            build the home environment without installing anything\n"))
   ;; (show-build-options-help)
@@ -180,8 +185,8 @@ argument list and OPTS is the option alist."
   (case command
     ;; The following commands do not need to use the store, and they do not need
     ;; an operating home environment file.
-    ;; ((search)
-    ;;  (apply (resolve-subcommand "search") args))
+    ((search)
+     (apply search args))
     (else (process-action command args opts))))
 
 (define-command (guix-home . args)
@@ -250,3 +255,60 @@ argument list and OPTS is the option alist."
       (parameterize ((%graft? (assoc-ref opts 'graft?)))
         (with-status-verbosity (verbosity-level opts)
           (process-command command args opts))))))
+
+
+;;;
+;;; Searching.
+;;;
+
+(define service-type-name*
+  (compose symbol->string service-type-name))
+
+(define (service-type-description-string type)
+  "Return the rendered and localised description of TYPE, a service type."
+  (and=> (service-type-description type)
+         (compose texi->plain-text P_)))
+
+(define %service-type-metrics
+  ;; Metrics used to estimate the relevance of a search result.
+  `((,service-type-name* . 3)
+    (,service-type-description-string . 2)
+    (,(lambda (type)
+        (match (and=> (service-type-location type) location-file)
+          ((? string? file)
+           (basename file ".scm"))
+          (#f
+           "")))
+     . 1)))
+
+(define (find-service-types regexps)
+  "Return a list of service type/score pairs: service types whose name or
+description matches REGEXPS sorted by relevance, and their score."
+  (let ((matches (fold-home-service-types
+                  (lambda (type result)
+                    (match (relevance type regexps
+                                      %service-type-metrics)
+                      ((? zero?)
+                       result)
+                      (score
+                       (cons (cons type score) result))))
+                  '())))
+    (sort matches
+          (lambda (m1 m2)
+            (match m1
+              ((type1 . score1)
+               (match m2
+                 ((type2 . score2)
+                  (if (= score1 score2)
+                      (string>? (service-type-name* type1)
+                                (service-type-name* type2))
+                      (> score1 score2))))))))))
+
+(define (search . args)
+  (with-error-handling
+    (let* ((regexps (map (cut make-regexp* <> regexp/icase) args))
+           (matches (find-service-types regexps)))
+      (leave-on-EPIPE
+       (display-search-results matches (current-output-port)
+                               #:print service-type->recutils
+                               #:command "guix home search")))))

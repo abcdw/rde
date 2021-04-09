@@ -6,6 +6,7 @@
   #:use-module (guix gexp)
   #:use-module (guix profiles)
   #:use-module (guix diagnostics)
+  #:use-module (guix discovery)
   #:use-module (guix ui)
 
   #:use-module (srfi srfi-1)
@@ -15,7 +16,8 @@
 	    home-profile-service-type
 	    home-environment-vars-service-type
 	    home-run-on-first-login-service-type
-	    home-run-on-reconfigure-service-type)
+	    home-run-on-reconfigure-service-type
+           fold-home-service-types)
 
   #:re-export (service
 	       service-type
@@ -196,3 +198,28 @@ in the home environment directory."
 		(default-value #f)
                 (description "Runs idempotent commands to update
 current state of home.")))
+
+
+
+;; Used for searching for services
+(define (parent-directory directory)
+  "Get the parent directory of DIRECTORY"
+  (string-join (drop-right (string-split directory #\/) 1) "/"))
+
+(define %guix-home-root-directory
+  ;; Absolute file name of the module hierarchy.
+  ;; TODO: Change this when merged upstream
+  (parent-directory (dirname (search-path %load-path "gnu/home.scm"))))
+
+(define %service-type-path
+  ;; Search path for service types.
+  (make-parameter `((,%guix-home-root-directory . "gnu/home-services"))))
+
+(define (all-service-modules)
+  "Return the default set of home-service modules."
+  (cons (resolve-interface '(gnu home-services))
+        (all-modules (%service-type-path)
+                     #:warn warn-about-load-error)))
+
+(define* (fold-home-service-types proc seed)
+  (fold-service-types proc seed (all-service-modules)))
