@@ -99,17 +99,25 @@ exported.
    (return
     `(("setup-environment"
        ,(apply mixed-text-file "setup-environment"
-	       (format #f "\
-HOME_ENVIRONMENT=\"~a\"
+	       (string-append
+	        "HOME_ENVIRONMENT="
+		(assoc-ref vars "GUIX_HOME_ENVIRONMENT_DIRECTORY")
+		"
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\" ; \\
 . \"$HOME_ENVIRONMENT/profile/etc/profile\"
 
+[[ :$XDG_DATA_DIRS: =~ :$HOME_ENVIRONMENT/profile/share: ]] || \
 export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
+[[ :$MANPATH: =~ :$HOME_ENVIRONMENT/profile/share/man: ]] || \
 export MANPATH=$HOME_ENVIRONMENT/profile/share/man:$MANPATH
+[[ :$INFOPATH: =~ :$HOME_ENVIRONMENT/profile/share/info: ]] || \
 export INFOPATH=$HOME_ENVIRONMENT/profile/share/info:$INFOPATH
+[[ :$XDG_CONFIG_DIRS: =~ :$HOME_ENVIRONMENT/profile/etc/xdg: ]] || \
 export XDG_CONFIG_DIRS=$HOME_ENVIRONMENT/profile/etc/xdg:$XDG_CONFIG_DIRS
+[[ :$XCURSOR_PATH: =~ :$HOME_ENVIRONMENT/profile/share/icons: ]] || \
 export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH
-" (assoc-ref vars "GUIX_HOME_ENVIRONMENT_DIRECTORY"))
+
+")
 
 	       (append-map
 		(match-lambda
