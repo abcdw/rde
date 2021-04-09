@@ -13,14 +13,14 @@
 (setq user-full-name "Andrew Tropin")
 (setq user-mail-address "andrew@trop.in")
 ;; Assuming the Guix checkout is in ~/src/guix.
-(load-file "~/work/guix/etc/copyright.el")
+(load-file "~/work/gnu/guix/etc/copyright.el")
 (setq copyright-names-regexp
       (format "%s <%s>" user-full-name user-mail-address))
 
 (require 'yasnippet)
 (yas-global-mode 1)
 (with-eval-after-load 'yasnippet
-  (add-to-list 'yas-snippet-dirs "~/work/guix/etc/snippets"))
+  (add-to-list 'yas-snippet-dirs "~/work/gnu/guix/etc/snippets"))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
