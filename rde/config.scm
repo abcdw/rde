@@ -66,7 +66,6 @@
     'home-xdg-packages
     #:packages
     (list xdg-utils xdg-user-dirs desktop-file-utils))
-   (service home-xdg-base-directories-service-type)
    (service home-xdg-user-directories-service-type
 	    (home-xdg-user-directories-configuration
 	     (music "$HOME/music")

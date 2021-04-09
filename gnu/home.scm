@@ -3,6 +3,7 @@
   #:use-module (gnu home-services shepherd)
   #:use-module (gnu home-services symlink-manager)
   #:use-module (gnu home-services shells)
+  #:use-module (gnu home-services xdg)
   #:use-module (gnu services)
   #:use-module (gnu system keyboard)
   #:use-module (srfi srfi-1)
@@ -72,21 +73,15 @@
     (remove
      nil?
      (cons*
-      ;; layout-service
       layout-service
       (list
-       ;; cleanup-service, which will remove links of previous generation?
-       ;; home-activation-service
-       ;; home-environment-service
-       ;; xdg-configuration
-       ;; brightness-service
-
        (service home-shepherd-service-type)
        (service home-symlink-manager-service-type)
+
+       ;; Will be instantiated automatically, but still explicitly
+       ;; declared for clarity
        (service home-run-on-first-login-service-type)
-       (service home-shell-profile-service-type
-		(home-shell-profile-configuration
-		 (he-symlink-path (home-environment-symlink-path he))))
+       (service home-run-on-reconfigure-service-type)
 
        ;; It should be safe to use symlink-path as
        ;; GUIX_HOME_ENVIRONMENT_DIRECTORY, however
@@ -94,7 +89,10 @@
        (service home-environment-vars-service-type
 		`(("GUIX_HOME_ENVIRONMENT_DIRECTORY" .
 		   ,(home-environment-symlink-path he))))
-       (service home-run-on-reconfigure-service-type)
+       (service home-xdg-base-directories-service-type)
+       (service home-shell-profile-service-type
+		(home-shell-profile-configuration
+		 (he-symlink-path (home-environment-symlink-path he))))
        (service home-service-type)
        (service home-profile-service-type (home-environment-packages he)))))))
 
