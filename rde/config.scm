@@ -196,9 +196,15 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
 
 (use-modules (gnu packages wm))
 (use-modules (gnu packages terminals))
+(use-modules (gnu home-services shells))
 
 (define (rde-sway rde-config)
   (list
+   (simple-service
+    'run-sway-on-tty2
+    home-bash-service-type
+    (home-bash-extension
+     (bash-profile '("[[ $(tty) = /dev/tty2 ]] && exec sway"))))
    (home-generic-service
     'home-sway
     #:files `(("config/sway/config" ,(local-file "./sway/config")))
