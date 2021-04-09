@@ -30,7 +30,20 @@
    (thunked)
    (default (string-append
 	     "/home/"
-             (rde-config-user-name this-rde-config)))))
+             (rde-config-user-name this-rde-config))))
+
+  (features rde-config-features
+	    (default '()))
+
+  ;; Not intended for manual setting, needed for internal
+  ;; machinery. User have to use features instead.
+  (services
+   rde-config-services
+   (thunked)
+   (default
+     (get-rde-services
+      this-rde-config
+      (rde-config-features this-rde-config)))))
 
 
 (use-modules (gnu system keyboard))
@@ -263,20 +276,19 @@
    (full-name "Andrew Tropin")
    (email "andrew@trop.in")
    (gpg-sign-key "2208D20958C1DEB0")
-   (keyboard-layout dvorak-jcuken)))
+   (keyboard-layout dvorak-jcuken)
+   (features (append
+	      rde-features
+	      (list working-repos)))))
 
 (use-modules (guix gexp) (gnu packages linux))
-(define ixy-he
+(define (ixy-he rde-config)
   (home-environment
-   (keyboard-layout dvorak-jcuken)
+   (keyboard-layout (rde-config-keyboard-layout rde-config))
    (home-directory (rde-config-home-directory rde-config))
    (services
     (append
-     (get-rde-services
-      rde-cfg
-      (append
-       rde-features
-       (list working-repos)))
+     (rde-config-services rde-config)
 
      (list
       (simple-service
