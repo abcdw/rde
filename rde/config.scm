@@ -84,6 +84,7 @@
 	     (music "$HOME/music")
 	     (videos "$HOME/vids")
 	     (pictures "$HOME/pics")
+	     (documents "$HOME/docs")
 	     (download "$HOME/dl")
 	     (desktop "$HOME")
 	     (publicshare "$HOME")
@@ -143,6 +144,14 @@
 	     (xdg-flavor? #t)
 	     (zshrc (list
 		     (slurp-file-gexp (local-file "./zsh/zshrc"))))))))
+
+(define (rde-bash rde-config)
+  (list
+   (service home-bash-service-type
+	    (home-bash-configuration
+	     (guix-defaults? #f)
+	     (bash-profile '("\
+export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
 
 (use-modules (gnu home-services gnupg))
 (define (rde-gnupg rde-config)
@@ -263,6 +272,7 @@
    rde-guix-fix
    rde-guix-channels
    rde-xdg
+   rde-bash
    rde-zsh
    rde-gnupg
    rde-ssh
