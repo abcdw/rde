@@ -93,7 +93,7 @@ cache.")
 (define (serialize-string field-name val)
   ;; The path has to be quoted
   (format #f "XDG_~a_DIR=\"~a\"\n"
-          (symbol->snake-case field-name 'upper) val))
+          (object->snake-case-string field-name 'upper) val))
 
 (define-configuration home-xdg-user-directories-configuration
   (desktop

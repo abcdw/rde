@@ -27,7 +27,7 @@
 	    serialize-string-or-gexp
 	    text-config?
 	    serialize-text-config
-            symbol->snake-case
+            object->snake-case-string
             ini-config?
             generic-serialize-ini-config
             alist?
@@ -183,17 +183,17 @@ If NEGATE? is @code{#t}, retrieve the FIELDS that are not in CONFIGURATION."
           configuration-fields))
 
 ;; Snake case: <https://en.wikipedia.org/wiki/Snake_case>
-(define* (symbol->snake-case symbol #:optional (style 'lower))
-  "Convert the symbol SYMBOL to the equivalent string in ``snake
+(define* (object->snake-case-string object #:optional (style 'lower))
+  "Convert the object OBJECT to the equivalent string in ``snake
 case''.  STYLE can be three `@code{lower}', `@code{upper}', or
 `@code{capitalize}', defaults to `@code{lower}'.
 
 @example
-(symbol->snake-case 'variable-name 'upper)
+(object->snake-case-string 'variable-name 'upper)
 @result{} \"VARIABLE_NAME\" @end example"
   (if (not (member style '(lower upper capitalize)))
       (error 'invalid-style (format #f "~a is not a valid style" style))
-      (let ((stringified (symbol->string symbol)))
+      (let ((stringified (maybe-object->string object)))
         (string-replace-substring
          (cond
           ((equal? style 'lower) stringified)
