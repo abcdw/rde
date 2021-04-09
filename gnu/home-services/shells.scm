@@ -4,6 +4,7 @@
   #:use-module (gnu home-services)
   #:use-module (gnu home-services files)
   #:use-module (gnu packages shells)
+  #:use-module (gnu packages bash)
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (guix packages)
@@ -12,6 +13,10 @@
 
   #:export (home-shell-profile-service-type
 	    home-shell-profile-configuration
+
+	    home-bash-service-type
+	    home-bash-configuration
+
 	    home-zsh-service-type
 	    home-zsh-configuration
 	    home-zsh-extension))
@@ -240,24 +245,127 @@ source ~/.profile
                 (default-value (home-zsh-configuration))
                 (description "Install and configure Zsh.")))
 
-;; (define-record-type* <home-bash-configuration>
-;;   home-bash-configuration make-home-bash-configuration
-;;   home-bash-configuration?
-;;   (package     home-bash-configuration-package
-;;                (default bash)))
 
-;; (define (add-bash-packages config)
-;;   (append
-;;    (list (home-bash-configuration-package config))))
+(define-configuration home-bash-configuration
+  (package
+   (package bash)
+   "The Bash package to use.")
+  (guix-defaults?
+   (boolean #t)
+   "Add sane defaults like reading @file{/etc/bashrc}, coloring output
+for @code{ls} provided by guix to @file{.bashrc}.")
+  (bash-profile
+   (text-config '())
+   "List of strings or gexps, which will be added to @file{.bash_profile}.
+Used for executing user's commands at start of login shell (In most
+cases the shell started on tty just after login).  @file{.bash_login}
+won't be ever read, because @file{.bash_profile} always present.")
+  (bashrc
+   (text-config '())
+   "List of strings or gexps, which will be added to @file{.bashrc}.
+Used for executing user's commands at start of interactive shell (The
+shell for interactive usage started by typing @code{bash} or by
+terminal app or any other program).")
+  (bash-logout
+   (text-config '())
+   "List of strings or gexps, which will be added to @file{.bash_logout}.
+Used for executing user's commands at the exit of login shell.  It
+won't be read in some cases (if the shell terminates by exec'ing
+another process for example)."))
 
-;; (define home-bash-service-type
-;;   (service-type (name 'home-bash)
-;;                 (extensions
-;;                  (list (service-extension
-;; 			home-files-service-type
-;; 			add-bash-configs)
-;; 		       (service-extension
-;; 			home-profile-service-type
-;; 			)))
-;; 		(default-value (home-gnupg-configuration))
-;;                 (description "Configure and install gpg-agent.")))
+;; TODO: Use value from (gnu system shadow)
+(define guix-bashrc
+  "\
+# Bash initialization for interactive non-login shells and
+# for remote shells (info \"(bash) Bash Startup Files\").
+
+# Export 'SHELL' to child processes.  Programs such as 'screen'
+# honor it and otherwise use /bin/sh.
+export SHELL
+
+if [[ $- != *i* ]]
+then
+    # We are being invoked from a non-interactive shell.  If this
+    # is an SSH session (as in \"ssh host command\"), source
+    # /etc/profile so we get PATH and other essential variables.
+    [[ -n \"$SSH_CLIENT\" ]] && source /etc/profile
+
+    # Don't do anything else.
+    return
+fi
+
+# Source the system-wide file.
+source /etc/bashrc
+
+# Adjust the prompt depending on whether we're in 'guix environment'.
+if [ -n \"$GUIX_ENVIRONMENT\" ]
+then
+    PS1='\\u@\\h \\w [env]\\$ '
+else
+    PS1='\\u@\\h \\w\\$ '
+fi
+alias ls='ls -p --color=auto'
+alias ll='ls -l'
+alias grep='grep --color=auto'\n")
+
+(define (add-bash-configuration config)
+    (define (filter-fields field)
+      (filter-configuration-fields home-bash-configuration-fields
+				   (list field)))
+
+    (define (serialize-field field)
+      (serialize-configuration
+       config
+       (filter-fields field)))
+
+    (define* (file-if-not-empty field #:optional (extra-content #f))
+      (let ((file-name (symbol->string field))
+	    (field-obj (car (filter-fields field))))
+	(if (or extra-content
+		(not (null? ((configuration-field-getter field-obj) config))))
+	    `(,(object->snake-case-string file-name)
+	      ,(mixed-text-file
+		(object->snake-case-string file-name)
+		(if extra-content extra-content "")
+		(serialize-field field)))
+	    '())))
+
+    (filter
+     (compose not null?)
+     `(("bash_profile"
+	,(mixed-text-file
+	  "bash_profile"
+	  "\
+# Setups system and user profiles and related variables
+# /etc/profile will be sourced by bash automatically
+# Setups home environment profile
+source ~/.profile
+
+# Honor per-interactive-shell startup file
+if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
+"
+	  (serialize-field 'bash-profile)))
+
+       ,@(list (file-if-not-empty
+		'bashrc
+		(if (home-bash-configuration-guix-defaults? config)
+		    guix-bashrc
+		    #f))
+	       (file-if-not-empty 'bash-logout)))))
+
+(define (add-bash-packages config)
+  (list (home-bash-configuration-package config)))
+
+(define home-bash-service-type
+  (service-type (name 'home-bash)
+                (extensions
+                 (list (service-extension
+                        home-files-service-type
+                        add-bash-configuration)
+                       (service-extension
+                        home-profile-service-type
+                        add-bash-packages)))
+		;; (compose identity)
+		;; (extend home-bash-extensions)
+                (default-value (home-bash-configuration))
+                (description "Install and configure Bash.")))
