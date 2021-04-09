@@ -135,7 +135,7 @@
    ;; zsh-autosuggestions is very cool plugin, but a little
    ;; distractive, I find it a little against Attention-friendly
    ;; principle
-   home-zsh-autosuggestions-service
+   (service home-zsh-autosuggestions-service-type)
 
    ;; https://github.com/purcell/envrc
    ;; home-zsh-direnv-service
