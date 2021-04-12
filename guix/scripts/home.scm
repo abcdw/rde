@@ -42,19 +42,21 @@ Some ACTIONS support additional ARGS.\n"))
   (display (G_ "The valid values for ACTION are:\n"))
   (newline)
   (display (G_ "\
-   search           search for existing service types\n"))
+   search             search for existing service types\n"))
   (display (G_ "\
-   reconfigure      switch to a new home environment configuration\n"))
+   reconfigure        switch to a new home environment configuration\n"))
   (display (G_ "\
-   roll-back        switch to the previous home environment configuration\n"))
+   roll-back          switch to the previous home environment configuration\n"))
   (display (G_ "\
-   describe         describe the current home environment\n"))
+   describe           describe the current home environment\n"))
   (display (G_ "\
-   list-generations list the home environment generations\n"))
+   list-generations   list the home environment generations\n"))
   (display (G_ "\
-   switch-generation switch to an existing home environment configuration\n"))
+   switch-generation  switch to an existing home environment configuration\n"))
   (display (G_ "\
-   build            build the home environment without installing anything\n"))
+   delete-generations delete old home environment generations\n"))
+  (display (G_ "\
+   build              build the home environment without installing anything\n"))
 
   ;; (show-build-options-help)
   (newline)
