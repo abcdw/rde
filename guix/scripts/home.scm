@@ -44,13 +44,17 @@ Some ACTIONS support additional ARGS.\n"))
   (display (G_ "\
    search           search for existing service types\n"))
   (display (G_ "\
-   build            build the home environment without installing anything\n"))
-  (display (G_ "\
    reconfigure      switch to a new home environment configuration\n"))
+  (display (G_ "\
+   roll-back        switch to the previous home environment configuration\n"))
   (display (G_ "\
    describe         describe the current home environment\n"))
   (display (G_ "\
    list-generations list the home environment generations\n"))
+  (display (G_ "\
+   switch-generation switch to an existing home environment configuration\n"))
+  (display (G_ "\
+   build            build the home environment without installing anything\n"))
 
   ;; (show-build-options-help)
   (newline)
@@ -192,23 +196,39 @@ resulting from command-line parsing."
 (define (process-command command args opts)
   "Process COMMAND, one of the 'guix home' sub-commands.  ARGS is its
 argument list and OPTS is the option alist."
+  (define-syntax-rule (with-store* store exp ...)
+    (with-store store
+		(set-build-options-from-command-line store opts)
+		exp ...))
   (case command
     ;; The following commands do not need to use the store, and they do not need
     ;; an operating home environment file.
     ((search)
      (apply search args))
-    ((list-generations)
-     (let ((pattern (match args
-                      (() #f)
-                      ((pattern) pattern)
-                      (x (leave (G_ "wrong number of arguments~%"))))))
-       (list-generations pattern)))
     ((describe)
      (match (generation-number %guix-home-environment)
        (0
         (error (G_ "no home environment generation, nothing to describe~%")))
        (generation
         (display-home-environment-generation generation))))
+    ((list-generations)
+     (let ((pattern (match args
+                      (() #f)
+                      ((pattern) pattern)
+                      (x (leave (G_ "wrong number of arguments~%"))))))
+       (list-generations pattern)))
+    ((switch-generation)
+     (let ((pattern (match args
+                      ((pattern) pattern)
+                      (x (leave (G_ "wrong number of arguments~%"))))))
+       (with-store* store
+		    (switch-to-home-environment-generation store pattern))))
+    ((roll-back)
+     (let ((pattern (match args
+                      (() "")
+                      (x (leave (G_ "wrong number of arguments~%"))))))
+       (with-store* store
+		    (roll-back-home-environment store))))
     (else (process-action command args opts))))
 
 (define-command (guix-home . args)
@@ -379,8 +399,9 @@ human-readable format."
                     config-file))))))
 
 (define* (list-generations pattern #:optional (profile %guix-home-environment))
-  "Display in a human-readable format all the system generations matching
-PATTERN, a string.  When PATTERN is #f, display all the system generations."
+  "Display in a human-readable format all the home environment
+generations matching PATTERN, a string.  When PATTERN is #f, display
+all the home environment generations."
   (cond ((not (file-exists? profile))             ; XXX: race condition
          (raise (condition (&profile-not-found-error
                             (profile profile)))))
@@ -393,4 +414,40 @@ PATTERN, a string.  When PATTERN is #f, display all the system generations."
                (exit 1)
                (leave-on-EPIPE
                 (for-each display-home-environment-generation numbers)))))))
+
+
+;;;
+;;; Switch generations.
+;;;
+
+;; TODO: Make it public in (guix scripts system)
+(define-syntax-rule (unless-file-not-found exp)
+  (catch 'system-error
+    (lambda ()
+      exp)
+    (lambda args
+      (if (= ENOENT (system-error-errno args))
+          #f
+          (apply throw args)))))
+
+(define (switch-to-home-environment-generation store spec)
+  "Switch the home-environment profile to the generation specified by
+SPEC.  STORE is an open connection to the store."
+  (let* ((number (relative-generation-spec->number %guix-home-environment spec))
+         (generation (generation-file-name %guix-home-environment number))
+         (activate (string-append generation "/on-reconfigure")))
+    (if number
+        (begin
+          (switch-to-generation* %guix-home-environment number)
+          (unless-file-not-found (primitive-load activate)))
+        (leave (G_ "cannot switch to home environment generation '~a'~%") spec))))
+
+
+;;;
+;;; Roll-back.
+;;;
+(define (roll-back-home-environment store)
+  "Roll back the home-environment profile to its previous generation.
+STORE is an open connection to the store."
+  (switch-to-home-environment-generation store "-1"))
 
