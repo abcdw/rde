@@ -27,7 +27,7 @@ zstyle ':completion:*' matcher-list '' \
 zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,args -w -w"
 
 # Colored completion for files and dirs according to LS_COLORS
-eval $(dircolors)
+eval $(dircolors --sh)
 zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
 
 # Prompt theme setup
