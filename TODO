@@ -1,13 +1,15 @@
 -*- mode: org -*-
 #+TODO: TODO IN-PROGRESS | DONE
 * ~guix home~ Before Upstream Checklist
-** DONE Implement zsh home-service
-** DONE Implement bash home-service
-** DONE Implement gnupg home-service
+** TODO Establish documenting workflow (write guideline)
+** TODO Establish testing workflow (write guideline)
+** TODO Add copyrights to source code
+** TODO Rewrite on-login script to guile
+** TODO Cleanup utils module
+Split into utils and configuration related helper?
 ** IN-PROGRESS Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
-** DONE Call on-reconfigure on reconfigure
 ** IN-PROGRESS Run ~guix home~ on 5 early adopters
 *** DONE Establish/define support channels and schedule
 Define schedule and add the information to announce.
@@ -17,19 +19,18 @@ Define schedule and add the information to announce.
 *** DONE Announce in rde-announce
 *** DONE Announce in guix-devel
 *** DONE Announce on stream
-** TODO Establish documenting workflow (write guideline)
-** TODO Establish testing workflow (write guideline)
+** DONE Implement zsh home-service
+** DONE Implement bash home-service
+** DONE Implement gnupg home-service
+** DONE Call on-reconfigure on reconfigure
 ** DONE Add ~guix home search~
-** TODO Add ~guix home rollback/list-generations~
-** TODO Add copyrights to source code
+** DONE Add ~list-generations~
+** DONE Add ~guix home roll-back/switch/delete~
 ** DONE Fix environment-variables service
 It's enough to make it accept pairs, it doesn't have to be list,
 because value can be a gexp.
-** TODO Rewrite on-login script to guile
 ** DONE Add XDG support to home-envirnoment
 Set explicitly XDG_CONFIG_HOME and friends.
-** TODO Cleanup utils module
-Split into utils and configuration related helper?
 * ~guix home~ Backlog
 ** TODO sway
 ** TODO pass
