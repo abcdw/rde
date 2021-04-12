@@ -3,6 +3,8 @@
   #:use-module (gnu services)
   #:use-module (gnu home)
   #:use-module (gnu home-services)
+  #:use-module (guix channels)
+  #:autoload   (guix scripts pull) (channel-commit-hyperlink)
   #:use-module (guix derivations)
   #:use-module (guix ui)
   #:use-module (guix grafts)
@@ -19,6 +21,7 @@
   #:use-module (guix monads)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
+  #:use-module (srfi srfi-35)
   #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
   #:use-module (ice-9 pretty-print)
@@ -187,6 +190,12 @@ argument list and OPTS is the option alist."
     ;; an operating home environment file.
     ((search)
      (apply search args))
+    ((list-generations)
+     (let ((pattern (match args
+                      (() #f)
+                      ((pattern) pattern)
+                      (x (leave (G_ "wrong number of arguments~%"))))))
+       (list-generations pattern)))
     (else (process-action command args opts))))
 
 (define-command (guix-home . args)
@@ -312,3 +321,63 @@ description matches REGEXPS sorted by relevance, and their score."
        (display-search-results matches (current-output-port)
                                #:print service-type->recutils
                                #:command "guix home search")))))
+
+
+;;;
+;;; Generations.
+;;;
+
+(define* (display-home-environment-generation
+	  number
+          #:optional (profile %guix-home-environment))
+  "Display a summary of home-environment generation NUMBER in a
+human-readable format."
+  (define (display-channel channel)
+    (format #t     "    ~a:~%" (channel-name channel))
+    (format #t (G_ "      repository URL: ~a~%") (channel-url channel))
+    (when (channel-branch channel)
+      (format #t (G_ "      branch: ~a~%") (channel-branch channel)))
+    (format #t (G_ "      commit: ~a~%")
+            (if (supports-hyperlinks?)
+                (channel-commit-hyperlink channel)
+                (channel-commit channel))))
+
+  (unless (zero? number)
+    (let* ((generation  (generation-file-name profile number)))
+      (define-values (channels config-file)
+	;; The function will work for home environments too, we just
+	;; need to keep provenance file.
+        (system-provenance generation))
+
+      (display-generation profile number)
+      (format #t (G_ "  file name: ~a~%") generation)
+      (format #t (G_ "  canonical file name: ~a~%") (readlink* generation))
+      ;; TRANSLATORS: Please preserve the two-space indentation.
+
+      (unless (null? channels)
+        ;; TRANSLATORS: Here "channel" is the same terminology as used in
+        ;; "guix describe" and "guix pull --channels".
+        (format #t (G_ "  channels:~%"))
+        (for-each display-channel channels))
+      (when config-file
+        (format #t (G_ "  configuration file: ~a~%")
+                (if (supports-hyperlinks?)
+                    (file-hyperlink config-file)
+                    config-file))))))
+
+(define* (list-generations pattern #:optional (profile %guix-home-environment))
+  "Display in a human-readable format all the system generations matching
+PATTERN, a string.  When PATTERN is #f, display all the system generations."
+  (cond ((not (file-exists? profile))             ; XXX: race condition
+         (raise (condition (&profile-not-found-error
+                            (profile profile)))))
+        ((not pattern)
+         (for-each display-home-environment-generation (profile-generations profile)))
+        ((matching-generations pattern profile)
+         =>
+         (lambda (numbers)
+           (if (null-list? numbers)
+               (exit 1)
+               (leave-on-EPIPE
+                (for-each display-home-environment-generation numbers)))))))
+
