@@ -229,6 +229,14 @@ argument list and OPTS is the option alist."
                       (x (leave (G_ "wrong number of arguments~%"))))))
        (with-store* store
 		    (roll-back-home-environment store))))
+    ((delete-generations)
+     (let ((pattern (match args
+                      (() #f)
+                      ((pattern) pattern)
+                      (x (leave (G_ "wrong number of arguments~%"))))))
+       (with-store*
+	store
+	(delete-matching-generations store %guix-home-environment pattern))))
     (else (process-action command args opts))))
 
 (define-command (guix-home . args)
