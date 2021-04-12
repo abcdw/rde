@@ -45,6 +45,11 @@ Some ACTIONS support additional ARGS.\n"))
    search           search for existing service types\n"))
   (display (G_ "\
    build            build the home environment without installing anything\n"))
+  (display (G_ "\
+   reconfigure      switch to a new home environment configuration\n"))
+  (display (G_ "\
+   list-generations list the home environment generations\n"))
+
   ;; (show-build-options-help)
   (newline)
   (show-bug-report-information))
