@@ -48,6 +48,8 @@ Some ACTIONS support additional ARGS.\n"))
   (display (G_ "\
    reconfigure      switch to a new home environment configuration\n"))
   (display (G_ "\
+   describe         describe the current home environment\n"))
+  (display (G_ "\
    list-generations list the home environment generations\n"))
 
   ;; (show-build-options-help)
@@ -201,6 +203,12 @@ argument list and OPTS is the option alist."
                       ((pattern) pattern)
                       (x (leave (G_ "wrong number of arguments~%"))))))
        (list-generations pattern)))
+    ((describe)
+     (match (generation-number %guix-home-environment)
+       (0
+        (error (G_ "no home environment generation, nothing to describe~%")))
+       (generation
+        (display-home-environment-generation generation))))
     (else (process-action command args opts))))
 
 (define-command (guix-home . args)
