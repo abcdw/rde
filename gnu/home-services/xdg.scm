@@ -304,37 +304,33 @@ configuration."
                  (if val "true" "false"))
                 (else val)))
           (key (string-capitalize (maybe-object->string key))))
-      (format #f "~a=~a\n"
-              (if (string-suffix? key "?")
-                  (string-drop-right key (- (string-length key) 1))
-                  key)
-              val)))
+      (list (if (string-suffix? key "?")
+                (string-drop-right key (- (string-length key) 1))
+                key)
+            "=" val "\n")))
 
   (define (serialize-alist config)
-    (generic-serialize-alist string-append format-config config))
+    (generic-serialize-alist identity format-config config))
 
   (define (serialize-xdg-desktop-action action)
     (match action
       (($ <xdg-desktop-action> action name config)
-       (string-append
-        (format #f "[Desktop Action ~a]\n" (string-capitalize
-                                            (maybe-object->string action)))
-        (format #f "Name=~a\n" name)
-        (serialize-alist config)))))
+       `(,(format #f "[Desktop Action ~a]\n"
+                  (string-capitalize (maybe-object->string action)))
+         ,(format #f "Name=~a\n" name)
+         ,@(serialize-alist config)))))
   
   (match entry
     (($ <xdg-desktop-entry> file name type config actions)
      (list (if (string-suffix? file ".desktop")
                file
                (string-append file ".desktop"))
-           (string-append
-            "[Desktop Entry]\n"
-            (format #f "Name=~a\n" name)
-            (format #f "Type=~a\n"
-                    (string-capitalize (symbol->string type)))
-            (serialize-alist config)
-            (string-join (map serialize-xdg-desktop-action actions)
-                         "\n" 'prefix))))))
+           `("[Desktop Entry]\n"
+             ,(format #f "Name=~a\n" name)
+             ,(format #f "Type=~a\n"
+                      (string-capitalize (symbol->string type)))
+             ,@(serialize-alist config)
+             ,@(append-map serialize-xdg-desktop-action actions))))))
 
 (define-configuration home-xdg-mime-applications-configuration
   (added
@@ -362,9 +358,9 @@ that the application cannot open the specified MIME type.")
     (let ((file (first entry))
           (config (second entry)))
       (list (format #f "local/share/applications/~a" file)
-          (mixed-text-file
-           (format #f "xdg-desktop-~a-entry" file)
-           config))))
+          (apply mixed-text-file
+                 (format #f "xdg-desktop-~a-entry" file)
+                 config))))
 
   (append
    `(("config/mimeapps.list"
