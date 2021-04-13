@@ -28,7 +28,7 @@ gaps inner 10
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/share/backgrounds/sway/)
-output * bg /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
+# output * bg /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 # output eDP-1 res 1920x1080
 output HDMI-A-1 res 1920x1080 scale 1.5
 output DP-2 scale 2
@@ -232,5 +232,4 @@ bar {
     }
 }
 
-include /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/etc/sway/config.d/*
 # xwayland disable
