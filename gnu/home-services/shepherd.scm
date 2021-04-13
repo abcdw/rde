@@ -71,8 +71,20 @@ as shepherd package."
 	  #$(file-append shepherd "/bin/shepherd")
 	  ;; TODO: logfile path must be set based on home-environment
 	  ;; configuration
-	  "\\\n --logfile=$HOME/.local/var/log/shepherd.log"
+	  ;; "\\\n --logfile=$HOME/.local/var/log/shepherd.log"
 	  "\\\n --config=" #$(home-shepherd-configuration-file services shepherd)))))
+
+(define (launch-shepherd-gexp config)
+  (let* ((shepherd (home-shepherd-configuration-shepherd config))
+	 (services (home-shepherd-configuration-services config)))
+    #~(begin
+	(system*
+	 #$(file-append shepherd "/bin/shepherd")
+	 ;; TODO: ensure log dir is correct, maybe add XDG_LOG_DIR
+	 ;; "--logfile"
+	 ;; (string-append (getenv "HOME") "/.local/var/log/shepherd.log")
+	 "--config"
+	 #$(home-shepherd-configuration-file services shepherd)))))
 
 (define (reload-configuration-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
@@ -82,6 +94,15 @@ as shepherd package."
        "load" "root"
        #$(home-shepherd-configuration-file services shepherd))))
 
+(define (ensure-shepherd-gexp config)
+  #~(if (file-exists?
+	 (string-append
+	  (or (getenv "XDG_RUNTIME_DIR")
+	      (format #f "/run/user/~s" (getuid)))
+	  "/shepherd/socket"))
+	#$(reload-configuration-gexp config)
+	#$(launch-shepherd-gexp config)))
+
 (define-public home-shepherd-service-type
   (service-type (name 'home-shepherd)
                 (extensions
@@ -90,7 +111,7 @@ as shepherd package."
                         launch-shepherd-daemon)
 		       (service-extension
 			home-run-on-reconfigure-service-type
-			reload-configuration-gexp)
+			ensure-shepherd-gexp)
 		       (service-extension
 			home-profile-service-type
 			(lambda (config)
