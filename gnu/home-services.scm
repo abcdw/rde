@@ -172,7 +172,8 @@ in the home environment directory."
                 (compose identity)
                 (extend compute-on-first-login-script)
 		(default-value #f)
-                (description "Runs commands on first user login.")))
+                (description "Runs gexps on first user login.  Can
+be extended with one gexp.")))
 
 (define (compute-on-reconfigure-script _ gexps)
   (gexp->file "on-reconfigure"
@@ -193,8 +194,9 @@ in the home environment directory."
                 (compose identity)
                 (extend compute-on-reconfigure-script)
 		(default-value #f)
-                (description "Runs idempotent commands to update
-current state of home.")))
+                (description "Runs gexps to update current state of
+home during reconfiguration.  All gexps must be idempotent.  Can
+be extended with one gexp.")))
 
 
 
