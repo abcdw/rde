@@ -142,39 +142,36 @@ export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH
 		(default-value '())
                 (description "Sets the environment variables.")))
 
-;; TODO: maybe change to guile script instead of bash to make it more
-;; convinient to generate it. In contrast to the
-;; environment-vars-service it won't be sourced by any shells.
-(define (commands->on-login-script cmds)
-  "Return a script that can be started by bash/zsh's profile that will
-run @code{cmds} on login."
-  (with-monad
-   %store-monad
-   (return
-    `(("on-login"
-       ,(apply mixed-text-file
-	 "on-login"
-	 ;; XDG_RUNTIME_DIR dissapears on logout, that means such
-	 ;; trick allows to launch on-login script on first login only
-	 ;; after complete logout/reboot.
-	 "\
-if [ ! -f $XDG_RUNTIME_DIR/on-login-executed ]; then
+(define (compute-on-first-login-script _ gexps)
+  (gexp->file
+   "on-first-login"
+   #~(let* ((xdg-runtime-dir (or (getenv "XDG_RUNTIME_DIR")
+				 (format #f "/run/user/~s" (getuid))))
+	    (flag-file-path (string-append
+			     xdg-runtime-dir "/on-first-login-executed"))
+	    (touch (lambda (file-name)
+		     (call-with-output-file file-name (const #t)))))
+       ;; XDG_RUNTIME_DIR dissapears on logout, that means such trick
+       ;; allows to launch on-first-login script on first login only
+       ;; after complete logout/reboot.
+       (when (not (file-exists? flag-file-path))
+	 (begin #$@gexps (touch flag-file-path))))))
 
-"
-	  (append (interpose cmds "\n" 'suffix)
-		  '("
-touch $XDG_RUNTIME_DIR/on-login-executed
-fi\n"))))))))
+(define (on-first-login-script-entry m-on-first-login)
+  "Return, as a monadic value, an entry for the on-first-login script
+in the home environment directory."
+  (mlet %store-monad ((on-first-login m-on-first-login))
+	(return `(("on-first-login" ,on-first-login)))))
 
 (define home-run-on-first-login-service-type
   (service-type (name 'home-run-on-first-login)
                 (extensions
                  (list (service-extension
 			home-service-type
-                        commands->on-login-script)))
-                (compose concatenate)
-                (extend append)
-		(default-value '())
+                        on-first-login-script-entry)))
+                (compose identity)
+                (extend compute-on-first-login-script)
+		(default-value #f)
                 (description "Runs commands on first user login.")))
 
 (define (compute-on-reconfigure-script _ gexps)

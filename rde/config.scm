@@ -341,8 +341,8 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
 
      (list
       (simple-service
-       'set-brightness-on-login home-run-on-first-login-service-type
-       (list #~(string-append #$(file-append light "/bin/light") " -S 100"))))
+       'set-brightness-on-first-login home-run-on-first-login-service-type
+       #~(system* #$(file-append light "/bin/light") "-S" "100")))
 
      ))))
 

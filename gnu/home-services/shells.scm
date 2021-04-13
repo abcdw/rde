@@ -55,7 +55,7 @@ really know what you do."))
        (format #f "\
 HOME_ENVIRONMENT=\"~a\"
 source $HOME_ENVIRONMENT/setup-environment
-sh $HOME_ENVIRONMENT/on-login\n"
+guile $HOME_ENVIRONMENT/on-first-login\n"
 	       (home-shell-profile-configuration-he-symlink-path config))
        (serialize-configuration
 	config

@@ -62,18 +62,6 @@ as shepherd package."
 
     (scheme-file "shepherd.conf" config)))
 
-(define (launch-shepherd-daemon config)
-  "Return commands for on-login script."
-  (let* ((shepherd (home-shepherd-configuration-shepherd config))
-	 (services (home-shepherd-configuration-services config)))
-    `("mkdir -p $HOME/.local/var/log/"
-      ,#~(string-append
-	  #$(file-append shepherd "/bin/shepherd")
-	  ;; TODO: logfile path must be set based on home-environment
-	  ;; configuration
-	  ;; "\\\n --logfile=$HOME/.local/var/log/shepherd.log"
-	  "\\\n --config=" #$(home-shepherd-configuration-file services shepherd)))))
-
 (define (launch-shepherd-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
 	 (services (home-shepherd-configuration-services config)))
@@ -108,7 +96,7 @@ as shepherd package."
                 (extensions
                  (list (service-extension
 			home-run-on-first-login-service-type
-                        launch-shepherd-daemon)
+                        launch-shepherd-gexp)
 		       (service-extension
 			home-run-on-reconfigure-service-type
 			ensure-shepherd-gexp)

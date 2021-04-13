@@ -18,5 +18,5 @@ following code in ~~/.profile~, ~~/.bash_profile~ or ~~/.zprofile~:
 
 #+begin_src shell
 source ~/.guix-home-environment/setup-environment
-sh ~/.guix-home-environment/on-login
+guile ~/.guix-home-environment/on-first-login
 #+end_src
