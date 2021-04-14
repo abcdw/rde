@@ -1,6 +1,9 @@
 -*- mode: org -*-
 #+TODO: TODO IN-PROGRESS | DONE
 * ~guix home~ Before Upstream Checklist
+** TODO Make symlink manager to check
+if the file is modified by user before removing it, even if it already
+under the control of guix home.
 ** TODO Establish testing workflow (write guideline)
 ** TODO Add copyrights to source code
 ** TODO Ensure style is correct
