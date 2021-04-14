@@ -55,8 +55,10 @@ Install plugins in profile and configure Zsh to load them.")))
 	;; interactive shell.
 	(zshrc '("# Improve the behavior and perfomance of auto suggestions"
 		 "ZSH_AUTOSUGGEST_MANUAL_REBIND=true"
-		 "ZSH_AUTOSUGGEST_STRATEGY=(history completion)"
-		 "ZSH_AUTOSUGGEST_USE_ASYNC=true")))))))
+		 ;; Workaround for
+		 ;; https://github.com/zsh-users/zsh-autosuggestions/issues/364#issuecomment-819255627
+		 "[ -n \"$GUIX_ENVIRONMENT\" ] || ZSH_AUTOSUGGEST_USE_ASYNC=true"
+		 "ZSH_AUTOSUGGEST_STRATEGY=(history completion)")))))))
    (default-value #f)
    (description "Enables Fish-like fast/unobtrusive autosuggestions
 for @code{zsh} and sets reasonable default values for some plugin's variables
