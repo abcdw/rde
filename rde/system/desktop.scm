@@ -121,21 +121,13 @@
    (packages (append
 	      (map specification->package+output
 		   '("font-iosevka" "font-dejavu" "font-gnu-unifont"
-		     "sway" "wofi" "waybar" "light"
-		     "swaylock"
-		     "alacritty"
 		     ;; System packages
 		     "iwd"
 		     "grub" "glibc" "nss-certs"))
-	      ;; (list emacs-rde-core)
-	      ;; %rde-all-packages
 	      %base-packages-disk-utilities
 	      %base-packages))
-   
-   ;; Add GNOME and Xfce---we can choose at the log-in screen
-   ;; by clicking the gear.  Use the "desktop" services, which
-   ;; include the X11 log-in service, networking with
-   ;; NetworkManager, and more.
+
+   (kernel-loadable-modules (list v4l2loopback-linux-module))
    (services
     (append
      (list
@@ -161,14 +153,8 @@
    ;; Allow resolution of '.local' host names with mDNS.
    (name-service-switch %mdns-host-lookup-nss)))
 
-;; (operating-system-derivation os)
-;; (pretty-print (fold-services (operating-system-services os)))
-;; (pretty-print (operating-system-services os))
 ;; (use-modules (guix store)
 ;; 	     (guix derivations))
 ;; (with-store store
 ;;     (run-with-store store (operating-system-derivation os)))
-;; (pretty-print (map service-kind (operating-system-user-services os)))
-;; (pretty-print (map service-kind %desktop-services))
-;; (pretty-print (map service-kind %base-services))
 os
