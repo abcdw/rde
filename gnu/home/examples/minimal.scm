@@ -5,7 +5,7 @@
 	     (gnu home-services ssh)
 	     (gnu home-services version-control)
 	     (gnu home-services files)
-	     (gnu home-services state)
+	     (gnu home-services shells)
 	     (gnu home-services mcron)
 	     (gnu services)
 	     (gnu packages)
@@ -27,7 +27,11 @@
       'test-config home-files-service-type
       (list `("config/test.conf"
               ,(plain-file "tmp-file.txt" "hehe"))))
-
+     (service home-bash-service-type
+	      (home-bash-configuration
+	       (guix-defaults? #f)
+	       (bash-profile '("\
+export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))
      (service home-ssh-service-type
 	      (home-ssh-configuration
 	       (extra-config
