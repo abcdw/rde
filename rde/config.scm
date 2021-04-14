@@ -54,26 +54,41 @@
 
 (use-modules (gnu home-services xdg))
 (use-modules (gnu packages freedesktop))
+(use-modules (guix gexp))
 (define (rde-xdg rde-config)
   (list
-   (service home-xdg-mime-applications-service-type
-	    (home-xdg-mime-applications-configuration
-	     (added '((x-scheme-handler/magnet . torrent.desktop)))
-	     (default '((inode/directory . file.desktop)))
-	     (removed '((inode/directory . thunar.desktop)))
-	     (desktop-entries
-	      (list (xdg-desktop-entry
-		     (file "file")
-		     (name "File manager")
-		     (type 'application)
-		     (config
-		      '((exec . "emacsclient -c -a emacs %u"))))
-		    (xdg-desktop-entry
-		     (file "text")
-		     (name "Text editor")
-		     (type 'application)
-		     (config
-		      '((exec . "emacsclient -c -a emacs %u"))))))))
+   (service
+    home-xdg-mime-applications-service-type
+    (home-xdg-mime-applications-configuration
+     (added '((x-scheme-handler/magnet . torrent.desktop)))
+     (default '((x-scheme-handler/mailto . emacs-mailto.desktop)
+		(inode/directory . file.desktop)))
+     (removed '((inode/directory . thunar.desktop)))
+     (desktop-entries
+      (list
+       (xdg-desktop-entry
+	(file "emacs-mailto")
+	(name "Handler for mailto:")
+	(type 'application)
+	(config
+	 `((exec . ,(program-file
+		     "emacs-mailto"
+		     #~(system
+			(string-append
+			 "emacs --eval '(browse-url-mail \""
+			 (car (cdr (command-line))) "\")'")))))))
+       (xdg-desktop-entry
+	(file "file")
+	(name "File manager")
+	(type 'application)
+	(config
+	 '((exec . "emacsclient -c -a emacs %u"))))
+       (xdg-desktop-entry
+	(file "text")
+	(name "Text editor")
+	(type 'application)
+	(config
+	 '((exec . "emacsclient -c -a emacs %u"))))))))
 
    (home-generic-service
     'home-xdg-packages
@@ -112,6 +127,7 @@
     (map specification->package+output
 	 '("make"
 	   "hicolor-icon-theme" "adwaita-icon-theme"
+	   "alsa-utils"
 	   "ripgrep"
 	   "youtube-dl"
 	   "mpv" "imv" "ffmpeg"
