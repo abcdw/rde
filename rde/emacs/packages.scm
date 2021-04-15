@@ -180,42 +180,17 @@ graphical toolkit to work natively on Wayland.  In addition to that, xwidgets
 also enabled and works without glitches even on X server."))))
 
 (define %rde-emacs emacs-next-pgtk-latest)
-(define (update-package-emacs p)
-  ;; (pretty-print p)
-  ;; (pretty-print  (equal?
-  ;; 		  (package-build-system p)
-  ;; 		  emacs-build-system))
-  (if (equal?
-       (package-build-system p)
-       emacs-build-system)
-      (package (inherit p)
-	       (arguments
-		(substitute-keyword-arguments
-		    (package-arguments p)
-		  ((#:emacs e #:emacs) %rde-emacs))))
-      p))
-
-(define rde-emacs-instead-of-emacs
-  (package-mapping update-package-emacs
-		   (lambda (p) #f)))
-
-;; (packages->manifest
-;;  ;; (append (map rde-emacs-instead-of-emacs rde-emacs-packages)
-;;  ;; 	 '(rde-emacs))
-;; )
 
 (define %rde-emacs-runtime-packages
-  (map update-package-emacs
-       (list
-	;; emacs-use-package
-	;; emacs-orderless
-	;; emacs-rde-core
-	;; emacs-rde-variables
-	;; emacs-rde-faces
-	;; emacs-rde-org-roam
-	;; emacs-rde-modus-themes
-	emacs-rde-default-init
-	)))
+  (list
+   ;; emacs-use-package
+   ;; emacs-orderless
+   ;; emacs-rde-core
+   ;; emacs-rde-variables
+   ;; emacs-rde-faces
+   ;; emacs-rde-org-roam
+   ;; emacs-rde-modus-themes
+   emacs-rde-default-init))
 
 (define %rde-emacs-all-packages
   (append
