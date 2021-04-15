@@ -105,6 +105,12 @@ after all nested items already listed."
 	       (lambda (dir)
 		 (equal? (scandir dir) '("." ".."))))
 
+	      (symlink-to-store?
+	       (lambda (path)
+		 (and
+		  (equal? (stat:type (lstat path)) 'symlink)
+		  (string-prefix? "/gnu/store" (readlink path)))))
+
 	      (backup-file
 	       (lambda (path)
 		 (mkdir-p backup-dir)
@@ -137,9 +143,19 @@ after all nested items already listed."
 
 		      (('file . path)
 		       (when (file-exists? (get-target-path path))
-			 (format #t "Removing ~a..." (get-target-path path))
-			 (delete-file (get-target-path path))
-			 (display " done\n"))))
+			 ;; DO NOT remove the file if it was modified
+			 ;; by user (not a symlink to the /gnu/store
+			 ;; anymore) it will be backed up later during
+			 ;; create-symlinks phase.
+			 (if (symlink-to-store? (get-target-path path))
+			     (begin
+			       (format #t "Removing ~a..." (get-target-path path))
+			       (delete-file (get-target-path path))
+			       (display " done\n"))
+			     (format
+			      #t
+			      "Skipping (not a symlink to store) ~a... done\n"
+			      (get-target-path path))))))
 		    to-delete))))
 
 	      (create-symlinks
