@@ -1,9 +1,6 @@
 -*- mode: org -*-
 #+TODO: TODO IN-PROGRESS | DONE
 * ~guix home~ Before Upstream Checklist
-** TODO Make symlink manager to check
-if the file is modified by user before removing it, even if it already
-under the control of guix home.
 ** TODO Establish testing workflow (write guideline)
 ** TODO Add copyrights to source code
 ** TODO Ensure style is correct
@@ -23,6 +20,9 @@ Define schedule and add the information to announce.
 *** DONE Announce in rde-announce
 *** DONE Announce in guix-devel
 *** DONE Announce on stream
+** DONE Make symlink manager to check
+if the file is modified by user before removing it, even if it already
+under the control of guix home.
 ** DONE Rewrite on-first-login script to guile
 ** DONE Check it works on debian
 ** DONE Implement zsh home-service
@@ -47,7 +47,7 @@ Also browser plugins and other stuff
 - Browser extension
 *** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** TODO Emacs
+** IN-PROGRESS Emacs
 Features:
 - xdg-flavor? :: use ~.config/emacs/~
 - separate-customize? :: move customize to state dir
