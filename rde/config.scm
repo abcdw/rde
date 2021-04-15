@@ -106,14 +106,22 @@
 	     (templates "$HOME")))))
 
 (use-modules (rde emacs packages))
+(use-modules (gnu home-services emacs))
+(use-modules (gnu packages emacs-xyz))
 (use-modules (guix gexp))
+
 (define (rde-emacs rde-config)
   (list
    (home-generic-service
     'home-emacs
     #:files `(("config/emacs/early-init.el"
 	       ,(local-file "./emacs/early-init.el")))
-    #:packages %rde-emacs-all-packages)))
+    #:packages %rde-emacs-all-packages)
+   ;; (service home-emacs-service-type
+   ;; 	    (home-emacs-configuration
+   ;; 	     (elisp-packages (list emacs-treemacs))
+   ;; 	     (rebuild-elisp-packages? #t)))
+   ))
 
 (define (rde-other-packages rde-config)
   (list
