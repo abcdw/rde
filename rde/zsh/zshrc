@@ -5,11 +5,16 @@
 hash stty 2> /dev/null && stty -ixon
 
 # Completions and other stuff
-autoload -U compinit && compinit
+autoload -U compinit
+compinit -d ${XDG_CACHE_HOME:$HOME/.cache}/.zcompdump
+
+# Enable bash completion, requires to source them from somewhere
+# autoload -U bashcompinit && bashcompinit
+
 zstyle ':completion:*' menu yes select search
 zstyle ':completion:*' insert-tab false
 
-# Automaticall update cache of binaries avaliable in $PATH
+# Automatically update cache of binaries avaliable in $PATH
 zstyle ':completion:*' rehash true # Can have a performance penalty
 
 # Approximate completion
