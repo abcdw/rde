@@ -135,11 +135,13 @@ after all nested items already listed."
 			    (directory? (get-target-path path))
 			    (empty-directory? (get-target-path path)))
 			   (begin
-			     (format #t "Removing ~a..." (get-target-path path))
+			     (format #t "Removing ~a..."
+				     (get-target-path path))
 			     (rmdir (get-target-path path))
 			     (display " done\n"))
-			   (format #t "Skipping ~a... done\n"
-				   (get-target-path path))))
+			   (format
+			    #t "Skipping ~a (not an empty directory)... done\n"
+			    (get-target-path path))))
 
 		      (('file . path)
 		       (when (file-exists? (get-target-path path))
@@ -154,7 +156,7 @@ after all nested items already listed."
 			       (display " done\n"))
 			     (format
 			      #t
-			      "Skipping (not a symlink to store) ~a... done\n"
+			      "Skipping ~a (not a symlink to store)... done\n"
 			      (get-target-path path))))))
 		    to-delete))))
 
@@ -176,10 +178,11 @@ after all nested items already listed."
 			   (backup-file path))
 
 			 (if (file-exists? target-path)
-			     (format #t "Skipping creation of directory ~a... done\n"
-				     target-path)
+			     (format
+			      #t "Skipping   ~a (directory already exists)... done\n"
+			      target-path)
 			     (begin
-			       (format #t "Creating directory ~a..." target-path)
+			       (format #t "Creating   ~a..." target-path)
 			       (mkdir target-path)
 			       (display " done\n")))))
 
