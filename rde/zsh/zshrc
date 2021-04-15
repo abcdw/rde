@@ -6,7 +6,7 @@ hash stty 2> /dev/null && stty -ixon
 
 # Completions and other stuff
 autoload -U compinit
-compinit -d ${XDG_CACHE_HOME:$HOME/.cache}/.zcompdump
+compinit -d ${XDG_CACHE_HOME:-$HOME/.cache}/.zcompdump
 
 # Enable bash completion, requires to source them from somewhere
 # autoload -U bashcompinit && bashcompinit
@@ -78,7 +78,7 @@ WORDCHARS=""
 # Configure history
 HISTSIZE=5000
 SAVEHIST=$HISTSIZE
-HISTFILE="${XDG_CACHE_HOME:-$HOME/.cache}/.zhistory"
+HISTFILE=${XDG_CACHE_HOME:-$HOME/.cache}/.zhistory
 
 setopt sharehistory     # Share history across shell sessions
 setopt histignorespace  # Ignore commands that start with space
