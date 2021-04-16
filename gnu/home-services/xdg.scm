@@ -53,14 +53,18 @@
 (define-configuration home-xdg-base-directories-configuration
   (cache-home
    (path "$HOME/.cache")
-   "Base directory for programs to store non-essential user data, like
-cache.")
+   "Base directory for programs to store user-specific non-essential
+(cached) data.  Files in this directory can be deleted anytime without
+loss of important data.")
   (config-home
    (path "$HOME/.config")
-   "Base directory for programs to store configuration files.")
+   "Base directory for programs to store configuration files.
+Some programs store here log or state files, but it's not desired,
+this directory should contain static configurations.")
   (data-home
    (path "$HOME/.local/share")
-   "Base directory for programs to store user data, like history."))
+   "Base directory for programs to store architecture independent
+read-only shared data, analog of @file{/usr/share}, but for user."))
 
 (define (home-xdg-base-directories-environment-vars-service config)
   (map
