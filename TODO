@@ -1,6 +1,7 @@
 -*- mode: org -*-
 #+TODO: TODO IN-PROGRESS | DONE
 * ~guix home~ Before Upstream Checklist
+** TODO How to update env variables on reconfigure?
 ** TODO Establish testing workflow (write guideline)
 ** TODO Add copyrights to source code
 ** TODO Ensure style is correct
@@ -39,8 +40,6 @@ because value can be a gexp.
 Set explicitly XDG_CONFIG_HOME and friends.
 * ~guix home~ Backlog
 ** TODO sway
-** TODO pass
-Also browser plugins and other stuff
 ** Browsers
 *** TODO icecat
 *** TODO ungoogled-chromium
@@ -49,9 +48,10 @@ Also browser plugins and other stuff
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
 ** IN-PROGRESS Emacs
 Features:
-- xdg-flavor? :: use ~.config/emacs/~
-- separate-customize? :: move customize to state dir
-- no-init-el? :: use default.el instead of init.el
+- xdg-flavor? :: Use ~.config/emacs/~
+- separate-customize? :: Move customize to state dir
+- no-init-el? :: Use default.el instead of init.el
+- server-mode? :: Create shepherd service for emacs
 ** TODO Implement a standard way to create common configuration file formats
 Some programs use the standard [[https://en.wikipedia.org/wiki/INI_file][INI configuration format]], e.g. XDG
 desktop entries, Notmuch.  Git uses a it's own variant of the INI
@@ -77,6 +77,8 @@ Things the user should be able to configure
 - notmuch/mu
 *** TODO SMTP client
 - msmtp/sendmail
+** DONE pass
+Also browser plugins and other stuff
 * ~rde~ Backlog
 ** UI
 *** TODO Visually separate sway workspaces for different workflows
