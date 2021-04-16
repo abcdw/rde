@@ -64,11 +64,23 @@ this directory should contain static configurations.")
   (data-home
    (path "$HOME/.local/share")
    "Base directory for programs to store architecture independent
-read-only shared data, analog of @file{/usr/share}, but for user.")
+read-only shared data, analogus to @file{/usr/share}, but for user.")
   (runtime-dir
    (path "${XDG_RUNTIME_DIR:-/run/user/$UID}")
    "Base directory for programs to store user-specific runtime files,
-like sockets."))
+like sockets.")
+  (log-home
+   (path "$HOME/.local/var/log")
+   "Base directory for programs to store log files, analogus to
+@file{/var/log}, but for user.  It is not a part of XDG Base Directory
+Specification, but helps to make implementation of home services more
+consistent.")
+  (state-home
+   (path "$HOME/.local/var/lib")
+   "Base directory for programs to store state files, like databases,
+analogus to @file{/var/lib}, but for user.  It is not a part of XDG
+Base Directory Specification, but helps to make implementation of home
+services more consistent."))
 
 (define (home-xdg-base-directories-environment-vars-service config)
   (map
@@ -86,7 +98,11 @@ like sockets."))
                         home-environment-vars-service-type
                         home-xdg-base-directories-environment-vars-service)))
                 (default-value (home-xdg-base-directories-configuration))
-                (description "Configure XDG base directories.")))
+                (description "Configure XDG base directories.  This
+service introduces two additional variables @env{XDG_STATE_HOME},
+@env{XDG_LOG_HOME}.  They are not a part of XDG specification, at
+least yet, but are convinient to have, it improves a consistency
+between different home services.")))
 
 (define (generate-home-xdg-base-directories-documentation)
   (generate-documentation
