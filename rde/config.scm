@@ -290,6 +290,11 @@ sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
     #:files `(("config/guix/channels.scm"
 	       ,(mixed-text-file "channels.scm" guix-and-rde-channels))))))
 
+(use-modules (gnu home-services password-utils))
+(define (rde-password-store rde-config)
+  (list
+   (service home-password-store-service-type)))
+
 (define rde-features
   (list
    rde-guix-channels
@@ -297,6 +302,7 @@ sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
    rde-bash
    rde-zsh
    rde-gnupg
+   rde-password-store
    rde-ssh
    rde-git
    rde-sway
