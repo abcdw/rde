@@ -63,12 +63,13 @@ cache.")
    "Base directory for programs to store user data, like history."))
 
 (define (home-xdg-base-directories-environment-vars-service config)
-  `(("XDG_CACHE_HOME" . ,(home-xdg-base-directories-configuration-cache-home
-                           config))
-    ("XDG_CONFIG_HOME" . ,(home-xdg-base-directories-configuration-config-home
-                             config))
-    ("XDG_DATA_HOME" . ,(home-xdg-base-directories-configuration-data-home
-                           config))))
+  (map
+   (lambda (field)
+     (cons (format
+	    #f "XDG_~a"
+	    (object->snake-case-string (configuration-field-name field) 'upper))
+	   ((configuration-field-getter field) config)))
+   home-xdg-base-directories-configuration-fields))
 
 (define home-xdg-base-directories-service-type
   (service-type (name 'home-xdg-base-directories)
