@@ -64,7 +64,11 @@ this directory should contain static configurations.")
   (data-home
    (path "$HOME/.local/share")
    "Base directory for programs to store architecture independent
-read-only shared data, analog of @file{/usr/share}, but for user."))
+read-only shared data, analog of @file{/usr/share}, but for user.")
+  (runtime-dir
+   (path "${XDG_RUNTIME_DIR:-/run/user/$UID}")
+   "Base directory for programs to store user-specific runtime files,
+like sockets."))
 
 (define (home-xdg-base-directories-environment-vars-service config)
   (map
