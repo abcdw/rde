@@ -11,7 +11,7 @@ compinit -d ${XDG_CACHE_HOME:-$HOME/.cache}/.zcompdump
 # Enable bash completion, requires to source them from somewhere
 # autoload -U bashcompinit && bashcompinit
 
-zstyle ':completion:*' menu yes select
+zstyle ':completion:*' menu yes select=2 # search
 zstyle ':completion:*' insert-tab false
 
 # Automatically update cache of binaries avaliable in $PATH
@@ -88,6 +88,10 @@ autoload -Uz run-help
 (( ${+aliases[run-help]} )) && unalias run-help
 autoload -Uz run-help-git
 
+# Delete, home, end buttons
+bindkey  "^[[3~"  delete-char
+bindkey  "^[[H"   beginning-of-line
+bindkey  "^[[F"   end-of-line
 
 alias help=run-help
 alias try='guix environment --ad-hoc'
