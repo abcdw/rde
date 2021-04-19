@@ -139,8 +139,8 @@ files."
                                 "/profile/bin")
                                (remove (cut string-prefix? "PATH=" <>)
                                        (environ)))
-                        #:log-file (string-append (getenv "HOME")
-                                                  "/.local/var/log/mcron.log")))
+                        #:log-file (string-append (getenv "XDG_LOG_HOME")
+                                                  "/mcron.log")))
               (stop #~(make-kill-destructor))
               (actions
                (list (shepherd-schedule-action mcron files)))))))))

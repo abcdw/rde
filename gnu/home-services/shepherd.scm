@@ -68,9 +68,8 @@ as shepherd package."
     #~(begin
 	(system*
 	 #$(file-append shepherd "/bin/shepherd")
-	 ;; TODO: ensure log dir is correct, maybe add XDG_LOG_DIR
-	 ;; "--logfile"
-	 ;; (string-append (getenv "HOME") "/.local/var/log/shepherd.log")
+	 "--logfile"
+	 (string-append (getenv "XDG_LOG_HOME") "/shepherd.log")
 	 "--config"
 	 #$(home-shepherd-configuration-file services shepherd)))))
 
