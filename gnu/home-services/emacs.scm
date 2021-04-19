@@ -2,6 +2,7 @@
   #:use-module (gnu home-services)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu home-services files)
+  #:use-module (gnu home-services shepherd)
   #:use-module (gnu packages emacs)
   #:use-module (gnu services configuration)
 
@@ -35,9 +36,9 @@
    (boolean #f)
    "Rebuild Emacs Lisp packages with version of Emacs specified in
 PACKAGE field.")
-  ;; (server-mode?
-  ;;  (boolean #f)
-  ;;  "Create a shepherd service, which starts emacs in a server-mode.")
+  (server-mode?
+   (boolean #f)
+   "Create a shepherd service, which starts emacs in a server-mode.")
   ;; (xdg-flavor?
   ;;  (boolean #f)
   ;;  "Place all the configs to @file{$XDG_CONFIG_HOME/emacs}.")
@@ -77,15 +78,33 @@ inputs."
 	  updated-elisp-packages)))
 
 
+(define (add-emacs-shepherd-service config)
+  (if (home-emacs-configuration-server-mode? config)
+      (list (shepherd-service
+             (documentation "Emacs server.  Use @code{emacsclient} to
+connect to it.")
+             (provision '(emacs-server))
+             (start #~(make-forkexec-constructor
+                       (list #$(file-append
+				(home-emacs-configuration-package config)
+				"/bin/emacs") "--fg-daemon")
+                       #:log-file (string-append (getenv "XDG_LOG_HOME")
+						 "/emacs.log")))
+             (stop #~(make-kill-destructor))))
+      '()))
+
 (define home-emacs-service-type
   (service-type (name 'home-emacs)
                 (extensions
-                 (list ;; (service-extension
+                 (list (service-extension
+			home-shepherd-service-type
+			add-emacs-shepherd-service)
+		       ;; (service-extension
                        ;;  home-files-service-type
                        ;;  add-emacs-configuration)
-                       (service-extension
-                        home-profile-service-type
-                        add-emacs-packages)))
+		       (service-extension
+			home-profile-service-type
+			add-emacs-packages)))
 		;; (compose identity)
 		;; (extend home-git-extensions)
                 (default-value (home-emacs-configuration))
