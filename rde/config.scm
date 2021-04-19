@@ -75,7 +75,7 @@
 		     "emacs-mailto"
 		     #~(system
 			(string-append
-			 "emacs --eval '(browse-url-mail \""
+			 "emacsclient -c --eval '(browse-url-mail \""
 			 (car (cdr (command-line))) "\")'")))))))
        (xdg-desktop-entry
 	(file "file")
@@ -107,6 +107,7 @@
 
 (use-modules (rde emacs packages))
 (use-modules (gnu home-services emacs))
+(use-modules (gnu packages emacs))
 (use-modules (gnu packages emacs-xyz))
 (use-modules (guix gexp))
 
@@ -115,13 +116,18 @@
    (home-generic-service
     'home-emacs
     #:files `(("config/emacs/early-init.el"
-	       ,(local-file "./emacs/early-init.el")))
-    #:packages %rde-emacs-all-packages)
-   ;; (service home-emacs-service-type
-   ;; 	    (home-emacs-configuration
-   ;; 	     (elisp-packages (list emacs-treemacs))
-   ;; 	     (rebuild-elisp-packages? #t)))
-   ))
+	       ,(local-file "./emacs/early-init.el"))))
+   (service home-emacs-service-type
+	    (home-emacs-configuration
+	     (package emacs-next-pgtk)
+	     (elisp-packages (cons*
+			      emacs-rde-default-init
+			      emacs-treemacs
+			      emacs-yaml-mode
+			      %rde-additional-emacs-packages))
+	     (server-mode? #t)
+	     ;; (rebuild-elisp-packages? #t)
+	     ))))
 
 (define (rde-other-packages rde-config)
   (list

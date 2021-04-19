@@ -192,18 +192,17 @@ also enabled and works without glitches even on X server."))))
    ;; emacs-rde-modus-themes
    emacs-rde-default-init))
 
+(define-public %rde-additional-emacs-packages
+  (list emacs-guix
+	emacs-telega
+	emacs-magit
+	emacs-pdf-tools
+	emacs-yasnippet))
+
 (define %rde-emacs-all-packages
   (append
-   (list %rde-emacs
-	 emacs-guix
-	 emacs-delight
-	 emacs-telega
-	 emacs-magit
-	 emacs-pdf-tools
-	 emacs-yasnippet
-	 ;; emacs-rde-early-init
-	 ;; emacs-rde-init
-	 )
+   (list %rde-emacs)
+   %rde-additional-emacs-packages
    %rde-emacs-runtime-packages))
 
 ;; (pretty-print "test")
