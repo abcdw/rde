@@ -1,7 +1,15 @@
 -*- mode: org -*-
+#+STARTUP: showall
 #+TODO: TODO IN-PROGRESS | DONE
+
 * ~guix home~ Before Upstream Checklist
+:PROPERTIES:
+:VISIBILITY: children
+:END:
+** TODO Discuss xdg-flavor? default to #t
 ** TODO How to update env variables on reconfigure?
+** TODO Add on-change to on-reconfigure script?
+For some apps to run some commands like restart if their configs updated
 ** TODO Establish testing workflow (write guideline)
 ** TODO Add copyrights to source code
 ** TODO Ensure style is correct
@@ -21,24 +29,37 @@ Define schedule and add the information to announce.
 *** DONE Announce in rde-announce
 *** DONE Announce in guix-devel
 *** DONE Announce on stream
-** DONE Make symlink manager to check
+** Finished
+:PROPERTIES:
+:VISIBILITY: folded
+:END:
+*** DONE Make symlink manager to check
 if the file is modified by user before removing it, even if it already
 under the control of guix home.
-** DONE Rewrite on-first-login script to guile
-** DONE Check it works on debian
-** DONE Implement zsh home-service
-** DONE Implement bash home-service
-** DONE Implement gnupg home-service
-** DONE Call on-reconfigure on reconfigure
-** DONE Add ~guix home search~
-** DONE Add ~list-generations~
-** DONE Add ~guix home roll-back/switch/delete~
-** DONE Fix environment-variables service
+*** DONE Rewrite on-first-login script to guile
+*** DONE Check it works on debian
+*** DONE Implement zsh home-service
+*** DONE Implement bash home-service
+*** DONE Implement gnupg home-service
+*** DONE Call on-reconfigure on reconfigure
+*** DONE Add ~guix home search~
+*** DONE Add ~list-generations~
+*** DONE Add ~guix home roll-back/switch/delete~
+*** DONE Fix environment-variables service
 It's enough to make it accept pairs, it doesn't have to be list,
 because value can be a gexp.
-** DONE Add XDG support to home-envirnoment
+*** DONE Add XDG support to home-envirnoment
 Set explicitly XDG_CONFIG_HOME and friends.
 * ~guix home~ Backlog
+:PROPERTIES:
+:VISIBILITY: children
+:END:
+** IN-PROGRESS Emacs
+Features:
+- xdg-flavor? :: Use ~/.config/emacs/~
+- separate-customize? :: Move customize to state dir
+- no-init-el? :: Use default.el instead of init.el
+- server-mode? :: Create shepherd service for emacs
 ** TODO sway
 ** Browsers
 *** TODO icecat
@@ -46,12 +67,6 @@ Set explicitly XDG_CONFIG_HOME and friends.
 - Browser extension
 *** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** IN-PROGRESS Emacs
-Features:
-- xdg-flavor? :: Use ~.config/emacs/~
-- separate-customize? :: Move customize to state dir
-- no-init-el? :: Use default.el instead of init.el
-- server-mode? :: Create shepherd service for emacs
 ** TODO Implement a standard way to create common configuration file formats
 Some programs use the standard [[https://en.wikipedia.org/wiki/INI_file][INI configuration format]], e.g. XDG
 desktop entries, Notmuch.  Git uses a it's own variant of the INI
@@ -80,6 +95,9 @@ Things the user should be able to configure
 ** DONE pass
 Also browser plugins and other stuff
 * ~rde~ Backlog
+:PROPERTIES:
+:VISIBILITY: content
+:END:
 ** UI
 *** TODO Visually separate sway workspaces for different workflows
 - code
