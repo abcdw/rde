@@ -15,7 +15,8 @@
   #:use-module (ice-9 match)
 
   #:export (home-xresources-service-type
-            home-xresources-configuration))
+            home-xresources-configuration
+            xresources-file))
 
 ;;; Commentary:
 ;;;
@@ -28,10 +29,11 @@
 ;;;
 ;;; (home-xresources-configuration
 ;;;  (config
-;;;   `((*headingFont . "-*-fixed-bold-r-*-*-*-100-*-*-*-*-iso8859-1")
-;;;     (?.Dialog.headingFont . "-*-fixed-bold-r-*-*-*-100-*-*-*-*-iso8859-1")
-;;;     (Xcursor.size . 3)
-;;;     (XTerm.vt100.utf8 . #t))))
+;;;   `((include . ,(xresources-file "urxvt-xresources"
+;;;                                  `((font.size . 34))))
+;;;     (*headingFont . "DejaVu Sans Mono")
+;;;     (Xcursor.size . 13))))
+;;;
 
 (define (serialize-alist field-name val) "")
 
@@ -44,42 +46,65 @@
    (alist '())
    "Association list of key and value pairs for the Xresources file.
 The value can be a string, G-expression, boolean, number or list
-strings.  The following example:
+strings.
+
+Below is an example configuraiton:
 
 @example
 (home-xresources-configuration
  (config
-  '((Xft.antialias . #t)
+  `((Xft.antialias . #t)
     (XTerm.termName . \"xterm-256color\")
-    (URxvt.secondaryScroll . 0))))
+    (URxvt.secondaryScroll . 0)
+    (define . (black . \"#000000\"))
+    (include . ,(local-file \"/path/to/legacy/config\"))
+    (include . ,(xresources-file \"urxvt-config\"
+                                 `((URxvt*scrollTtyKeypress . #t))')))))
 @end example
 
-would yield:
+It would result in:
 
 @example
 Xft.antialias: true
 XTerm.termName: xterm-256color
 URxvt.secondaryScroll: 0
+#define black #00000
+#include \"/gnu/store/...-legacy-config\"
+#include \"/gnu/store/...-urxvt-config\"
 @end example"))
+
+(define (xresources-file filename config)
+  (apply mixed-text-file
+         filename
+         (serialize-xresources-config config)))
 
 (define (serialize-xresources-config config)
   (define (format-config key val)
-    (let ((val (cond
-                ((list? val)
-                ;; TODO: Support list of gexps.
-                ;;  (with-imported-modules (source-module-closure
-                ;;                          '((gnu home-services-utils)))
-                ;;    #~(begin
-                ;;        (use-modules (gnu home-services-utils))
-                ;;        (string-join (map maybe-object->string #$val) ","))))
-                (string-join (map maybe-object->string val) ","))
-                ((boolean? val)
-                 (if val "true" "false"))
-                ((or (symbol? val) (number? val))
-                 (maybe-object->string val))
-                (else val)))            ;gexps most likely
-          (key (maybe-object->string key)))
-      (list key ": " val "\n")))
+    (let* ((val (cond
+                 ((pair? val)           ;for #define directives
+                  (string-append (maybe-object->string (car val))
+                                 " "
+                                 (maybe-object->string (cdr val))))
+                 ((computed-file? val)  ;from `xresources-file'
+                  #~(string-append "\"" #$val "\""))
+                 ((list? val)
+                  ;; TODO: Support list of gexps.
+                  ;;  (with-imported-modules (source-module-closure
+                  ;;                          '((gnu home-services-utils)))
+                  ;;    #~(begin
+                  ;;        (use-modules (gnu home-services-utils))
+                  ;;        (string-join (map maybe-object->string #$val) ","))))
+                  (string-join (map maybe-object->string val) ","))
+                 ((boolean? val)
+                  (if val "true" "false"))
+                 ((or (symbol? val) (number? val))
+                  (maybe-object->string val))
+                 (else val)))           ;gexps most likely
+           (key (cond
+                 ((or (equal? key 'include) (equal? key 'define))
+                  (format #f "#~a" key))
+                 (else (string-append (maybe-object->string key) ":")))))
+      (list key " " val "\n")))
 
   (define (check-duplicates alist)
     "Check if there are any duplicate keys in the alist pairs."
@@ -98,16 +123,14 @@ URxvt.secondaryScroll: 0
                            key))
                    (loop tail (cons head acc))))))))
 
-  (check-duplicates '((key1 . val1) (key2 . val2)))
-
   (generic-serialize-alist append format-config (check-duplicates config)))
 
 (define (home-xresources-files-service config)
   `(("Xresources"
      ,(apply mixed-text-file
-       "Xresources"
-       (serialize-xresources-config
-        (home-xresources-configuration-config config))))))
+             "Xresources"
+             (serialize-xresources-config
+              (home-xresources-configuration-config config))))))
 
 (define (home-xresources-profile-service config)
   (list (home-xresources-configuration-package config)))
@@ -118,8 +141,8 @@ URxvt.secondaryScroll: 0
      (home-xresources-configuration
       (package package*)
       (config (append config*
-                    (append-map home-xresources-configuration-config
-                                extension-configs)))))))
+                      (append-map home-xresources-configuration-config
+                                  extension-configs)))))))
 
 (define home-xresources-service-type
   (service-type (name 'home-xresources)
