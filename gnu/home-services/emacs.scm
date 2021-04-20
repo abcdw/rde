@@ -7,7 +7,9 @@
   #:use-module (gnu services configuration)
 
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-26)
   #:use-module (ice-9 curried-definitions)
+  #:use-module (ice-9 pretty-print)
 
   #:use-module (guix packages)
   #:use-module (guix gexp)
@@ -25,6 +27,25 @@
 (define serialize-boolean
   (const ""))
 
+(define elisp-config? list?)
+(define (serialize-elisp-config field-name val)
+  (define (serialize-list-element elem)
+    (cond
+     ((gexp? elem)
+      elem)
+     (else
+      #~(string-trim-right
+	   (with-output-to-string
+	     (lambda ()
+	       ((@@ (ice-9 pretty-print) pretty-print)
+		'#$elem)))
+	   #\newline))))
+
+  #~(string-append
+     #$@(interpose
+	 (map serialize-list-element val)
+	 "\n" 'suffix)))
+
 (define-configuration home-emacs-configuration
   (package
    (package emacs)
@@ -39,10 +60,72 @@ PACKAGE field.")
   (server-mode?
    (boolean #f)
    "Create a shepherd service, which starts emacs in a server-mode.")
-  ;; (xdg-flavor?
-  ;;  (boolean #f)
-  ;;  "Place all the configs to @file{$XDG_CONFIG_HOME/emacs}.")
-  )
+  (xdg-flavor?
+   (boolean #f)
+   "Place all the configs to @file{$XDG_CONFIG_HOME/emacs}.")
+  (init-el
+   (elisp-config '())
+   "List of expressions, each expression can be a Sexp or Gexp.
+
+Sexp is a Emacs Lisp form, preferably valid.  Be aware, if you include
+values of Guile variables, they won't be automatically converted to
+Elisp.  Strings doesn't require conversion, but for example booleans
+do: @code{#t} -> @code{t}, @code{#f} -> @code{nil}.  Be careful here.
+
+However, Sexp can contain file-like objects; String with path to a
+corresponding file will appear in place of each such object.  See an
+example below for more details.
+
+Gexp should be string-valued.  The value of Gexp will be appended to
+resulting Emacs Lisp file.
+
+The list of expressions will be interposed with \\n and everything
+will end up in @file{init.el}.
+
+@example
+(let ((guile-bool-value #f))
+  (home-emacs-configuration
+   (init-el
+    `((setq rg-binary ,(file-append ripgrep \"/bin/rg\"))
+      (load-file ,(local-file \"./emacs/test-init.el\"))
+      \"just a string\"
+      ;; Make sure you converted guile values to Elisp
+      (setq tmp-boolean ,(if guile-bool-value 't 'nil))
+      ,(if guile-bool-value '(setq v1 nil) '(setq v2 t))
+
+      ,#~\"\\n;;; Section with gexps results:\"
+
+      ,(slurp-file-gexp (local-file \"./emacs/test-init.el\"))
+      ,#~(string-append \"(princ \" \"'hello)\")
+      ,#~\"\\n\"
+      ,#~\";; Another comment\"))))
+@end example
+
+would yield something like:
+
+@example
+(setq rg-binary
+      \"/gnu/store/dw884p9d2jb83j4fqvdj2i10fn9xgwqd-ripgrep-12.1.1/bin/rg\")
+(load-file
+  \"/gnu/store/9b1s48crng5dy9xmxskcdnillw18bkg2-test-init.el\")
+\"just a string\"
+(setq tmp-boolean nil)
+(setq v2 t)
+
+;;; Section with gexps results:
+;; Here is
+\"a sample\"
+;; content of test-init.el
+
+(princ 'hello)
+
+
+;; Another comment
+@end example")
+  (early-init-el
+   (elisp-config '())
+   "List of expressions, each expression can be a Sexp or Gexp.
+Same as @code{init-el}, but result will go to @file{early-init.el}."))
 
 
 (define ((update-emacs-argument-for-package desired-emacs) p)
@@ -54,8 +137,8 @@ packages with proper GNU Emacs version."
       (package (inherit p)
 	       (arguments
 		(substitute-keyword-arguments
-		 (package-arguments p)
-		 ((#:emacs e #f) desired-emacs))))
+		    (package-arguments p)
+		  ((#:emacs e #f) desired-emacs))))
       p))
 
 (define (emacs-argument-updater desired-emacs)
@@ -68,7 +151,6 @@ inputs."
   (let* ((emacs-package  (home-emacs-configuration-package config))
 	 (elisp-packages (home-emacs-configuration-elisp-packages config))
 
-	 ;; TODO: build elisp packages with provided emacs version
 	 (updated-elisp-packages
 	  (if (home-emacs-configuration-rebuild-elisp-packages? config)
 	      (map (emacs-argument-updater emacs-package)
@@ -93,18 +175,54 @@ connect to it.")
              (stop #~(make-kill-destructor))))
       '()))
 
+(define (add-emacs-configuration config)
+  (let* ((xdg-flavor? (home-emacs-configuration-xdg-flavor? config)))
+    (define prefix-file
+      (cut string-append
+	(if xdg-flavor?
+	    "config/emacs/"
+	    "emacs.d/")
+	<>))
+
+    (define (filter-fields field)
+      (filter-configuration-fields home-emacs-configuration-fields
+				   (list field)))
+
+    (define (serialize-field field)
+      (serialize-configuration
+       config
+       (filter-fields field)))
+
+    (define (file-if-not-empty field)
+      (let ((file-name (string-append
+			(string-drop-right (symbol->string field) 3)
+			".el"))
+	    (field-obj (car (filter-fields field))))
+	(if (not (null? ((configuration-field-getter field-obj) config)))
+	    `(,(prefix-file file-name)
+	      ,(mixed-text-file
+		file-name
+		(serialize-field field)))
+	    '())))
+
+    (filter
+     (compose not null?)
+     (list
+      (file-if-not-empty 'init-el)
+      (file-if-not-empty 'early-init-el)))))
+
 (define home-emacs-service-type
   (service-type (name 'home-emacs)
                 (extensions
                  (list (service-extension
+			home-profile-service-type
+			add-emacs-packages)
+		       (service-extension
 			home-shepherd-service-type
 			add-emacs-shepherd-service)
-		       ;; (service-extension
-                       ;;  home-files-service-type
-                       ;;  add-emacs-configuration)
 		       (service-extension
-			home-profile-service-type
-			add-emacs-packages)))
+                        home-files-service-type
+                        add-emacs-configuration)))
 		;; (compose identity)
 		;; (extend home-git-extensions)
                 (default-value (home-emacs-configuration))
