@@ -94,7 +94,7 @@ bindkey  "^[[H"   beginning-of-line
 bindkey  "^[[F"   end-of-line
 
 alias help=run-help
-alias try='guix environment --ad-hoc'
+alias try='guix environment --ad-hoc man-db'
 alias ls='ls -p --color=auto'
 alias ll='ls -l'
 alias grep='grep --color=auto'
