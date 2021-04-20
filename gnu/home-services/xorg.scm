@@ -126,7 +126,10 @@ URxvt.secondaryScroll: 0
                 (extensions
                  (list (service-extension
                         home-files-service-type
-                        home-xresources-files-service)))
+                        home-xresources-files-service)
+                       (service-extension
+                        home-profile-service-type
+                        home-xresources-profile-service)))
                 (compose concatenate)
                 (extend home-xresources-extension)
                 (default-value (home-xresources-configuration))
