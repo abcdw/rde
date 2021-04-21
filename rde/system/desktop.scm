@@ -4,7 +4,7 @@
 
 (define-module (rde system desktop)
   #:use-module (gnu system)
-  #:use-module (rde packages)
+  ;; #:use-module (rde packages)
   #:use-module (gnu packages)
   #:use-module (guix gexp)
   #:use-module (guix packages)
@@ -37,7 +37,6 @@
   #:use-module (ice-9 pretty-print)
   #:use-module (ice-9 match)
   #:export (os))
-
 
 (define os
   (operating-system
@@ -133,10 +132,10 @@
    (services
     (append
      (list
-      (simple-service
-       'add-xdg-desktop-portals
-       dbus-root-service-type
-       (list xdg-desktop-portal xdg-desktop-portal-wlr))
+      ;; (simple-service
+      ;;  'add-xdg-desktop-portals
+      ;;  dbus-root-service-type
+      ;;  (list xdg-desktop-portal xdg-desktop-portal-wlr))
       (simple-service 'switch-to-tty2 shepherd-root-service-type
                       (list (shepherd-service
                              (provision '(kdb))
