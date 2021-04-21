@@ -45,6 +45,18 @@
       this-rde-config
       (rde-config-features this-rde-config)))))
 
+(define (get-rde-services config features)
+  (append-map (lambda (item) (item config)) features))
+
+(define* (get-home-environment rde-config #:key (additional-services '()))
+  (home-environment
+   (keyboard-layout (rde-config-keyboard-layout rde-config))
+   (home-directory (rde-config-home-directory rde-config))
+   (services
+    (append
+     additional-services
+     (rde-config-services rde-config)))))
+
 
 (use-modules (gnu system keyboard))
 
@@ -328,9 +340,6 @@ sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
    rde-browsers
    rde-other-packages))
 
-(define (get-rde-services config features)
-  (append-map (lambda (item) (item config)) features))
-
 
 ;; TODO: Move personal configurations to separate folder
 (use-modules (gnu home-services state))
@@ -384,19 +393,13 @@ sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
 	      (list working-repos)))))
 
 (use-modules (guix gexp) (gnu packages linux))
-(define (ixy-he rde-config)
-  (home-environment
-   (keyboard-layout (rde-config-keyboard-layout rde-config))
-   (home-directory (rde-config-home-directory rde-config))
-   (services
-    (append
-     (rde-config-services rde-config)
+(define ixy-he
+  (get-home-environment
+   rde-cfg
+   #:additional-services
+   (list
+    (simple-service
+     'set-brightness-on-first-login home-run-on-first-login-service-type
+     #~(system* #$(file-append light "/bin/light") "-S" "100")))))
 
-     (list
-      (simple-service
-       'set-brightness-on-first-login home-run-on-first-login-service-type
-       #~(system* #$(file-append light "/bin/light") "-S" "100")))
-
-     ))))
-
-(ixy-he rde-cfg)
+ixy-he
