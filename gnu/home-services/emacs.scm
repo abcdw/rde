@@ -15,8 +15,10 @@
   #:use-module (guix gexp)
   #:use-module (guix utils)
   #:use-module (guix build-system emacs)
+  #:use-module ((guix licenses) #:prefix license:)
   #:export (home-emacs-service-type
-	    home-emacs-configuration))
+	    home-emacs-configuration
+	    home-emacs-extension))
 
 (define (packages? lst)
   (and (list? lst) (every package? lst)))
@@ -52,7 +54,7 @@
    "The Emacs package to use.")
   (elisp-packages
    (elisp-packages '())
-   "A list of Emacs Lisp packages.")
+   "List of Emacs Lisp packages.")
   (rebuild-elisp-packages?
    (boolean #f)
    "Rebuild Emacs Lisp packages with version of Emacs specified in
@@ -175,6 +177,7 @@ connect to it.")
              (stop #~(make-kill-destructor))))
       '()))
 
+
 (define (add-emacs-configuration config)
   (let* ((xdg-flavor? (home-emacs-configuration-xdg-flavor? config)))
     (define prefix-file
@@ -211,6 +214,37 @@ connect to it.")
       (file-if-not-empty 'init-el)
       (file-if-not-empty 'early-init-el)))))
 
+
+(define-configuration home-emacs-extension
+  (elisp-packages
+   (elisp-packages '())
+   "List of additional Emacs Lisp packages.")
+  (init-el
+   (elisp-config '())
+   "List of expressions to add to @code{init-el}.  See
+@code{home-emacs-service-type} for more information.")
+  (early-init-el
+   (elisp-config '())
+   "List of expressions to add to @code{ealy-init-el}.  See
+@code{home-emacs-service-type} for more information."))
+
+(define (home-emacs-extensions original-config extension-configs)
+  (home-emacs-configuration
+   (inherit original-config)
+   (elisp-packages
+    (append (home-emacs-configuration-elisp-packages original-config)
+	    (append-map
+	     home-emacs-extension-elisp-packages extension-configs)))
+   (init-el
+    (append (home-emacs-configuration-init-el original-config)
+	    (append-map
+	     home-emacs-extension-init-el extension-configs)))
+   (early-init-el
+    (append (home-emacs-configuration-early-init-el original-config)
+	    (append-map
+	     home-emacs-extension-early-init-el extension-configs)))))
+
+
 (define home-emacs-service-type
   (service-type (name 'home-emacs)
                 (extensions
@@ -223,7 +257,7 @@ connect to it.")
 		       (service-extension
                         home-files-service-type
                         add-emacs-configuration)))
-		;; (compose identity)
-		;; (extend home-git-extensions)
+		(compose identity)
+		(extend home-emacs-extensions)
                 (default-value (home-emacs-configuration))
                 (description "Install and configure GNU Emacs.")))
