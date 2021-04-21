@@ -65,13 +65,16 @@ as shepherd package."
 (define (launch-shepherd-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
 	 (services (home-shepherd-configuration-services config)))
-    #~(begin
+    #~(let ((log-dir (or (getenv "XDG_LOG_HOME")
+			 (format #f "~s/.local/var/log" (getenv "HOME")))))
+	;; FIXME: It's a temporary semi-solution, it must be handled
+	;; somewhere around xdg service-type.
+	(mkdir-p log-dir)
 	(system*
 	 #$(file-append shepherd "/bin/shepherd")
 	 "--logfile"
 	 (string-append
-	  (or (getenv "XDG_LOG_HOME")
-	      (format #f "~s/.local/var/log" (getenv "HOME")))
+	  log-dir
 	   "/shepherd.log")
 	 "--config"
 	 #$(home-shepherd-configuration-file services shepherd)))))
