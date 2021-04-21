@@ -54,12 +54,8 @@ Set explicitly XDG_CONFIG_HOME and friends.
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** IN-PROGRESS Emacs
-Features:
-- xdg-flavor? :: Use ~/.config/emacs/~
-- separate-customize? :: Move customize to state dir
-- no-init-el? :: Use default.el instead of init.el
-- server-mode? :: Create shepherd service for emacs
+** TODO Add provenance
+To make ~guix home describe~ more informative.
 ** TODO sway
 ** Browsers
 *** TODO icecat
@@ -92,6 +88,12 @@ Things the user should be able to configure
 - notmuch/mu
 *** TODO SMTP client
 - msmtp/sendmail
+** DONE Emacs
+Features:
+- xdg-flavor? :: Use ~/.config/emacs/~
+- separate-customize? :: Move customize to state dir
+- no-init-el? :: Use default.el instead of init.el
+- server-mode? :: Create shepherd service for emacs
 ** DONE pass
 Also browser plugins and other stuff
 * ~rde~ Backlog
