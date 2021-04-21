@@ -123,30 +123,39 @@
 (use-modules (gnu packages emacs-xyz))
 (use-modules (guix gexp))
 
-(define (rde-emacs rde-config)
-  (list
-   ;; (simple-service
-   ;;  'add-emacs-package
-   ;;  home-emacs-service-type
-   ;;  (home-emacs-extension
-   ;;   (elisp-packages (list emacs-treemacs))))
+(define* (rde-emacs #:key (server-mode? #t))
+  (lambda (rde-config)
+    (let ((emacs-editor-cmd "emacs --no-splash")
+	  (emacs-client-cmd "emacsclient -q -c"))
+      (list
+       (simple-service 'set-default-shell-to-zsh
+		       home-environment-vars-service-type
+		       `(("ALTERNATE_EDITOR" .
+			  ,#~(format #f "\"~a\"" #$emacs-editor-cmd))
+			 ("VISUAL" .
+			  ,#~(format #f "\"~a\"" #$emacs-client-cmd))))
+       ;; (simple-service
+       ;;  'add-emacs-package
+       ;;  home-emacs-service-type
+       ;;  (home-emacs-extension
+       ;;   (elisp-packages (list emacs-treemacs))))
 
-   (service home-emacs-service-type
-	    (home-emacs-configuration
-	     (package emacs-next-pgtk)
-	     (elisp-packages (cons*
-			      emacs-rde-default-init
-			      emacs-yaml-mode
-			      %rde-additional-emacs-packages))
-	     (server-mode? #t)
-	     (xdg-flavor? #f)
-	     (init-el
-	      `((load-file ,(local-file "./emacs/test-init.el"))
-		,(slurp-file-gexp (local-file "./emacs/init.el"))))
-	     (early-init-el
-	      `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
-	     ;; (rebuild-elisp-packages? #t)
-	     ))))
+       (service home-emacs-service-type
+		(home-emacs-configuration
+		 (package emacs-next-pgtk)
+		 (elisp-packages (cons*
+				  emacs-rde-default-init
+				  emacs-yaml-mode
+				  %rde-additional-emacs-packages))
+		 (server-mode? server-mode?)
+		 (xdg-flavor? #f)
+		 (init-el
+		  `((load-file ,(local-file "./emacs/test-init.el"))
+		    ,(slurp-file-gexp (local-file "./emacs/init.el"))))
+		 (early-init-el
+		  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
+		 ;; (rebuild-elisp-packages? #t)
+		 ))))))
 
 (define (rde-other-packages rde-config)
   (list
@@ -339,7 +348,7 @@ sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
    rde-ssh
    rde-git
    rde-sway
-   rde-emacs
+   (rde-emacs #:server-mode? #t)
    rde-tmux
    rde-browsers
    rde-other-packages))
