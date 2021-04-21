@@ -1,4 +1,6 @@
 (authorizations
  (version 0)               ;current file format version
  (("2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"
-   (name "abcdw"))))
+   (name "abcdw"))
+  ("0158 61E3 2C8A E7E4 84CA  4233 ACF5 0999 A2FB 5C79"
+   (name "yoctocell"))))
