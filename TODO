@@ -6,29 +6,23 @@
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** TODO Discuss xdg-flavor? default to #t
-** TODO How to update env variables on reconfigure?
+** TODO Add provenance
+To make ~guix home describe~ more informative.
 ** TODO Add on-change to on-reconfigure script?
 For some apps to run some commands like restart if their configs updated
+** TODO How to update env variables on reconfigure?
+Make them available in format suitable for shepherd services?
 ** TODO Establish testing workflow (write guideline)
 ** TODO Add copyrights to source code
 ** TODO Ensure style is correct
 https://guix.gnu.org/manual/en/guix.html#Coding-Style
 ** TODO Cleanup utils module
 Split into utils and configuration related helper?
+** IN-PROGRESS Discuss xdg-flavor? default to #t
 ** IN-PROGRESS Establish documenting workflow (write guideline)
 ** IN-PROGRESS Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
-** IN-PROGRESS Run ~guix home~ on 5 early adopters
-*** DONE Establish/define support channels and schedule
-Define schedule and add the information to announce.
-- #guix IRC.
-- rde-discuss mailing list.
-- beweekly calls.
-*** DONE Announce in rde-announce
-*** DONE Announce in guix-devel
-*** DONE Announce on stream
 ** Finished
 :PROPERTIES:
 :VISIBILITY: folded
@@ -50,12 +44,19 @@ It's enough to make it accept pairs, it doesn't have to be list,
 because value can be a gexp.
 *** DONE Add XDG support to home-envirnoment
 Set explicitly XDG_CONFIG_HOME and friends.
+*** DONE Run ~guix home~ on 5 early adopters
+**** DONE Establish/define support channels and schedule
+Define schedule and add the information to announce.
+- #guix IRC.
+- rde-discuss mailing list.
+- beweekly calls.
+**** DONE Announce in rde-announce
+**** DONE Announce in guix-devel
+**** DONE Announce on stream
 * ~guix home~ Backlog
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** TODO Add provenance
-To make ~guix home describe~ more informative.
 ** TODO sway
 ** Browsers
 *** TODO icecat
@@ -75,7 +76,6 @@ common.  See ~lib.generators~ in [[https://github.com/nixos/nixpkgs/blob/master/
 - Look at the service for Transmission in ~(gnu services file-sharing)~
 *** TODO TOML format
 *** TODO YAML format
-
 ** TODO Comprehensive Email configuration
 Things the user should be able to configure
 - IMAP and SMTP info (e.g. address, username, port)
