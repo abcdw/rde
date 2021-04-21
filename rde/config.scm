@@ -113,12 +113,17 @@
 
 (define (rde-emacs rde-config)
   (list
+   ;; (simple-service
+   ;;  'add-emacs-package
+   ;;  home-emacs-service-type
+   ;;  (home-emacs-extension
+   ;;   (elisp-packages (list emacs-treemacs))))
+
    (service home-emacs-service-type
 	    (home-emacs-configuration
 	     (package emacs-next-pgtk)
 	     (elisp-packages (cons*
 			      emacs-rde-default-init
-			      emacs-treemacs
 			      emacs-yaml-mode
 			      %rde-additional-emacs-packages))
 	     (server-mode? #t)
