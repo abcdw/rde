@@ -133,7 +133,9 @@ state related items like git-state, rsync-state, etc."
 		(procedure #~(lambda* (#:rest rest)
 			       (if (car (action '#$self 'state-exists?))
 				   (format #t "~a already initialized.\n" '#$self)
-				   (action '#$self 'unchecked-init '#$self))))))))))
+				   (begin
+				     (action '#$self 'unchecked-init '#$self)
+				     (start '#$self)))))))))))
 
 (define (add-shepherd-services services)
   (let* ((service-names

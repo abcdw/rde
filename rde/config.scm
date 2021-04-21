@@ -374,6 +374,14 @@ sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
       (work-dir "notes")
       "git@github.com:abcdw/notes.git")
      (state-git
+      (work-dir "trop.in")
+      "git@git.sr.ht:~abcdw/trop.in")
+     (state-git
+      (string-append
+       (rde-config-home-directory rde-config)
+       "/.local/var/lib/password-store")
+      "ssh://abcdw@olorin.lan/~/state/password-store")
+     (state-git
       (work-dir "rde")
       "git@git.sr.ht:~abcdw/rde"
       #:config
@@ -390,9 +398,12 @@ sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
 		((url . "git@github.com:abcdw/rde.git")
 		 (fetch . "+refs/heads/*:refs/remotes/github/*")))
 	(remote ((pushDefault . "github")))
+	(format ((to . "~abcdw/rde-devel@lists.sr.ht")))
 	(branch master
 		((remote . "origin")
-		 (merge . "refs/heads/master"))))))))))
+		 (merge . "refs/heads/master")
+		 (rebase . #t))))))))))
+
 
 (define rde-cfg
   (rde-config
