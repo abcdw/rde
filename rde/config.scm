@@ -212,6 +212,10 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
   (list
    (service home-git-service-type
 	    (home-git-configuration
+	     (ignore
+             '("*~"
+               "*.\\#\\*"
+               "*.\\#*\\#"))
 	     (config
 	      `((user
 		 ((name . ,(rde-config-full-name rde-config))
