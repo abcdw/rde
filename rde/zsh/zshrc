@@ -93,9 +93,14 @@ bindkey  "^[[3~"  delete-char
 bindkey  "^[[H"   beginning-of-line
 bindkey  "^[[F"   end-of-line
 
+# Launch $VISUAL or $EDITOR, for emacsclient if there is no server
+# avaliable $ALTERNATE_EDITOR will be used.
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
+
 alias help=run-help
 alias try='guix environment --ad-hoc man-db'
 alias ls='ls -p --color=auto'
 alias ll='ls -l'
 alias grep='grep --color=auto'
-
