@@ -113,10 +113,6 @@
 
 (define (rde-emacs rde-config)
   (list
-   (home-generic-service
-    'home-emacs
-    #:files `(("config/emacs/early-init.el"
-	       ,(local-file "./emacs/early-init.el"))))
    (service home-emacs-service-type
 	    (home-emacs-configuration
 	     (package emacs-next-pgtk)
@@ -126,6 +122,12 @@
 			      emacs-yaml-mode
 			      %rde-additional-emacs-packages))
 	     (server-mode? #t)
+	     (xdg-flavor? #f)
+	     (init-el
+	      `((load-file ,(local-file "./emacs/test-init.el"))
+		,(slurp-file-gexp (local-file "./emacs/init.el"))))
+	     (early-init-el
+	      `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
 	     ;; (rebuild-elisp-packages? #t)
 	     ))))
 
