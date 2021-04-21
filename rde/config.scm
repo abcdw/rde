@@ -175,6 +175,7 @@
 
 ;; TODO: Maybe make C-m/C-j in isearch accept current candidate
 ;; instead of just closing isearch
+;; TODO: Add completion for shepherd https://issues.guix.gnu.org/45004
 (define (rde-zsh rde-config)
   (list
    (simple-service 'set-default-shell-to-zsh
@@ -188,11 +189,14 @@
 
    ;; https://github.com/purcell/envrc
    ;; home-zsh-direnv-service
-   (service home-zsh-service-type
-	    (home-zsh-configuration
-	     (xdg-flavor? #t)
-	     (zshrc (list
-		     (slurp-file-gexp (local-file "./zsh/zshrc"))))))))
+   (service
+    home-zsh-service-type
+    (home-zsh-configuration
+     (xdg-flavor? #t)
+     (zshrc
+      (list
+       (slurp-file-gexp (local-file "./zsh/zshrc"))
+       "alias state-sync='herd sync state && pass git push origin master'"))))))
 
 (define (rde-bash rde-config)
   (list
