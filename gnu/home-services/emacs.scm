@@ -172,8 +172,11 @@ connect to it.")
                        (list #$(file-append
 				(home-emacs-configuration-package config)
 				"/bin/emacs") "--fg-daemon")
-                       #:log-file (string-append (getenv "XDG_LOG_HOME")
-						 "/emacs.log")))
+                       #:log-file (string-append
+				   (or (getenv "XDG_LOG_HOME")
+				       (format #f "~s/.local/var/log"
+					       (getenv "HOME")))
+				   "/emacs.log")))
              (stop #~(make-kill-destructor))))
       '()))
 

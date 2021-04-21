@@ -69,7 +69,10 @@ as shepherd package."
 	(system*
 	 #$(file-append shepherd "/bin/shepherd")
 	 "--logfile"
-	 (string-append (getenv "XDG_LOG_HOME") "/shepherd.log")
+	 (string-append
+	  (or (getenv "XDG_LOG_HOME")
+	      (format #f "~s/.local/var/log" (getenv "HOME")))
+	   "/shepherd.log")
 	 "--config"
 	 #$(home-shepherd-configuration-file services shepherd)))))
 
