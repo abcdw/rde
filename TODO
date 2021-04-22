@@ -18,7 +18,6 @@ Make them available in format suitable for shepherd services?
 https://guix.gnu.org/manual/en/guix.html#Coding-Style
 ** TODO Cleanup utils module
 Split into utils and configuration related helper?
-** IN-PROGRESS Discuss xdg-flavor? default to #t
 ** IN-PROGRESS Establish documenting workflow (write guideline)
 ** IN-PROGRESS Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
@@ -53,11 +52,12 @@ Define schedule and add the information to announce.
 **** DONE Announce in rde-announce
 **** DONE Announce in guix-devel
 **** DONE Announce on stream
+*** DONE Discuss xdg-flavor? default to #t
 * ~guix home~ Backlog
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** TODO sway
+** IN-PROGRESS sway
 ** Browsers
 *** TODO icecat
 *** TODO ungoogled-chromium
@@ -104,7 +104,7 @@ Also browser plugins and other stuff
 *** TODO Visually separate sway workspaces for different workflows
 - code
 - communication
-  - multimedia
+- multimedia
 ** General
 *** TODO Implement pam_shepherd.so
 Start user-space shepherd on first user login and exit on last logout.
