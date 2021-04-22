@@ -90,7 +90,7 @@ gexps.")))
    (package zsh)
    "The Zsh package to use.")
   (xdg-flavor?
-   (boolean #f)
+   (boolean #t)
    "Place all the configs to @file{$XDG_CONFIG_HOME/zsh}.  Makes
 @file{~/.zshenv} to set @env{ZDOTDIR} to @file{$XDG_CONFIG_HOME/zsh}.
 Shell startup process will continue with

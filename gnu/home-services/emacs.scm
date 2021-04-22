@@ -63,7 +63,7 @@ PACKAGE field.")
    (boolean #f)
    "Create a shepherd service, which starts emacs in a server-mode.")
   (xdg-flavor?
-   (boolean #f)
+   (boolean #t)
    "Place all the configs to @file{$XDG_CONFIG_HOME/emacs}.")
   (init-el
    (elisp-config '())
