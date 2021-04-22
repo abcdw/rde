@@ -141,7 +141,7 @@ files."
                                        (environ)))
                         #:log-file (string-append
 				    (or (getenv "XDG_LOG_HOME")
-					(format #f "~s/.local/var/log"
+					(format #f "~a/.local/var/log"
 						(getenv "HOME")))
                                     "/mcron.log")))
               (stop #~(make-kill-destructor))

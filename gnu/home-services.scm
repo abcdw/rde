@@ -146,7 +146,7 @@ export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH
   (gexp->file
    "on-first-login"
    #~(let* ((xdg-runtime-dir (or (getenv "XDG_RUNTIME_DIR")
-				 (format #f "/run/user/~s" (getuid))))
+				 (format #f "/run/user/~a" (getuid))))
 	    (flag-file-path (string-append
 			     xdg-runtime-dir "/on-first-login-executed"))
 	    (touch (lambda (file-name)

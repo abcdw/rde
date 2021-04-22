@@ -66,7 +66,7 @@ as shepherd package."
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
 	 (services (home-shepherd-configuration-services config)))
     #~(let ((log-dir (or (getenv "XDG_LOG_HOME")
-			 (format #f "~s/.local/var/log" (getenv "HOME")))))
+			 (format #f "~a/.local/var/log" (getenv "HOME")))))
 	;; FIXME: It's a temporary semi-solution, it must be handled
 	;; somewhere around xdg service-type.
 	(mkdir-p log-dir)
@@ -91,7 +91,7 @@ as shepherd package."
   #~(if (file-exists?
 	 (string-append
 	  (or (getenv "XDG_RUNTIME_DIR")
-	      (format #f "/run/user/~s" (getuid)))
+	      (format #f "/run/user/~a" (getuid)))
 	  "/shepherd/socket"))
 	#$(reload-configuration-gexp config)
 	#$(launch-shepherd-gexp config)))
