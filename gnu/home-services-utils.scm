@@ -259,6 +259,7 @@ Apply the procedure PROC on SECTION after it has been converted to a string"
                                        (format-section identity)
                                        (combine-ini string-join)
                                        (combine-alist string-append)
+                                       (combine-section-alist string-append)
                                        serialize-field
                                        fields)
   "Create an INI configuration from nested lists FIELDS.  This uses
@@ -276,7 +277,7 @@ serialize the section and the association lists, respectively.
   (combine-ini
    (map (match-lambda
           ((section alist)
-           (string-append
+           (combine-section-alist
             (generic-serialize-ini-config-section section format-section)
             (generic-serialize-alist combine-alist serialize-field alist))))
         fields)
