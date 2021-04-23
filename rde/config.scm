@@ -83,12 +83,14 @@
 	(name "Handler for mailto:")
 	(type 'application)
 	(config
-	 `((exec . ,(program-file
-		     "emacs-mailto"
-		     #~(system
-			(string-append
-			 "emacsclient -c --eval '(browse-url-mail \""
-			 (car (cdr (command-line))) "\")'")))))))
+	 `((exec . ,(file-append
+		     (program-file
+		      "emacs-mailto"
+		      #~(system
+			 (string-append
+			  "emacsclient -c --eval '(browse-url-mail \""
+			  (car (cdr (command-line))) "\")'")))
+		     " %u")))))
        (xdg-desktop-entry
 	(file "file")
 	(name "File manager")
