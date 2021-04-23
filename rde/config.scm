@@ -266,7 +266,7 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
 (use-modules (gnu packages terminals))
 (use-modules (gnu packages xdisorg))
 (use-modules (gnu home-services shells))
-
+(use-modules (gnu home-services wm))
 (define (rde-sway rde-config)
   (list
    (simple-service
@@ -274,14 +274,24 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
     home-bash-service-type
     (home-bash-extension
      (bash-profile '("[[ $(tty) = /dev/tty2 ]] && exec sway"))))
+   (service
+    home-sway-service-type
+    (home-sway-configuration
+     (config
+      `((include ,(local-file "./sway/config"))
+	(bindsym $mod+Ctrl+Shift+a exec emacsclient -c --eval "'(eshell)'")
+	(bindsym $mod+Ctrl+Shift+o "[class=\"IceCat\"]" kill)
+	;; (input * ((xkb_layout us,ru)
+	;; 	  (xkb_variant dvorak,)))
+	))))
    (home-generic-service
-    'home-sway
-    #:files `(("config/sway/config"
-	       ,(mixed-text-file
-		 "sway-config"
-		 #~(format #f "output * bg ~a/share/backgrounds/\
-sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
-		 (slurp-file-gexp (local-file "./sway/config")))))
+    'home-sway-packages
+    ;;     #:files `(("config/sway/config"
+    ;; 	       ,(mixed-text-file
+    ;; 		 "sway-config"
+    ;; 		 #~(format #f "output * bg ~a/share/backgrounds/\
+    ;; sway/Sway_Wallpaper_Blue_1920x1080.png fill\n" #$sway)
+    ;; 		 (slurp-file-gexp (local-file "./sway/config")))))
     #:packages (list sway wofi))
    (home-generic-service
     'home-alacritty
