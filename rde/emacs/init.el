@@ -12,7 +12,8 @@
 
 (setq user-full-name "Andrew Tropin")
 (setq user-mail-address "andrew@trop.in")
-;; Assuming the Guix checkout is in ~/src/guix.
+(setq message-auto-save-directory "~/.cache/mail-drafts")
+
 (load-file "~/work/gnu/guix/etc/copyright.el")
 (setq copyright-names-regexp
       (format "%s <%s>" user-full-name user-mail-address))
