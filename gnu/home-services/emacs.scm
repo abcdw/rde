@@ -51,7 +51,7 @@
 (define-configuration home-emacs-configuration
   (package
    (package emacs)
-   "The Emacs package to use.")
+   "Emacs package to use.")
   (elisp-packages
    (elisp-packages '())
    "List of Emacs Lisp packages.")
