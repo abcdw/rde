@@ -20,34 +20,37 @@
 ;;;
 ;;; Version control related services.
 ;;;
-;; (service home-git-service-type
-;; 	 (home-git-configuration
-;; 	  (attributes
-;; 	   '((* . text=auto)
-;; 	     (*.sh . "text eol=lf")))
-;; 	  (ignore
-;; 	   '("*.so" "*.o"))
-;; 	  (ignore-extra-content
-;; 	   "*.dll\n*.exe\n")
-;; 	  (config
-;; 	   `((http "https://weak.example.com"
-;; 		   ((ssl-verify . #f)))
-;; 	     (gpg
-;; 	      ((program . ,(file-append gnupg "/bin/gpg"))))
-;; 	     (sendmail
-;; 	      ((annotate . #t))))
-;; 	   (config-extra-content (slurp-file-gexp
-;;                                (local-file "./gitconfig")))))
-;;
-;; (simple-service
-;;  'add-something-to-git
-;;  home-git-service-type
-;;  (home-git-extension
-;;   (config
-;; 	`((sendmail
-;; 	   ((annotate . #t)))))))
-;;
 ;;; Code:
+
+;;;
+;;; Git.
+;;;
+;;; (service home-git-service-type
+;;; 	 (home-git-configuration
+;;; 	  (attributes
+;;; 	   '((* . text=auto)
+;;; 	     (*.sh . "text eol=lf")))
+;;; 	  (ignore
+;;; 	   '("*.so" "*.o"))
+;;; 	  (ignore-extra-content
+;;; 	   "*.dll\n*.exe\n")
+;;; 	  (config
+;;; 	   `((http "https://weak.example.com"
+;;; 		   ((ssl-verify . #f)))
+;;; 	     (gpg
+;;; 	      ((program . ,(file-append gnupg "/bin/gpg"))))
+;;; 	     (sendmail
+;;; 	      ((annotate . #t))))
+;;; 	   (config-extra-content (slurp-file-gexp
+;;;                                (local-file "./gitconfig")))))
+;;;
+;;; (simple-service
+;;;  'add-something-to-git
+;;;  home-git-service-type
+;;;  (home-git-extension
+;;;   (config
+;;; 	`((sendmail
+;;; 	   ((annotate . #t)))))))
 
 
 (define (uglify-field-name field-name)
