@@ -5,6 +5,9 @@
   #:use-module (guix gexp)
   #:use-module (guix monads)
   #:use-module (guix i18n)
+  #:use-module (guix profiles)
+  #:use-module (guix packages)
+  #:use-module (guix build-system trivial)
 
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 match)
@@ -39,6 +42,7 @@
 
             maybe-list
             optional
+            wrap-package
 
             define-enum
             enum-name
@@ -356,7 +360,32 @@ return EXPR2; if it isn't specified, return EXPR1.  Otherwise, return
 an empty list @code{'()}."
   (if expr1 (if expr2 expr2 expr1) '()))
 
-;;;
+(define (wrap-package package name gexp)
+  "Create a @code{<package>} object that is a wrapper for PACKAGE, and
+runs GEXP.  NAME is the name of the executable that will be put in the store."
+  (let ((wrapper (program-file name gexp)))
+    (package/inherit package
+      (name name)                       ; avoid collisions
+      (source wrapper)
+      (build-system trivial-build-system)
+      (arguments
+       `(#:modules
+         ((guix build utils))
+         #:builder
+         (begin
+           (use-modules (guix build utils)
+                        (srfi srfi-1))
+           (let* ((bin (string-append %output "/bin"))
+                  ;; Get the name of the wrapper
+                  ;; The user might put their store somewhere besides
+                  ;; /gnu/store/...-NAME, and NAME is not allowed to
+                  ;; contain `/', so we split the string in `/'.
+                  (wrapper (assoc-ref %build-inputs "source"))
+                  (name (substring (last (string-split wrapper #\/)) 33)))
+             (mkdir-p bin)
+             (copy-file wrapper (string-append bin "/" name)))))))))
+
+;;
 ;;; Enums.
 ;;;
 
@@ -403,3 +432,4 @@ an empty list @code{'()}."
                            (enum-name stem)
                            (syntax->datum msg)
                            val))))))))))
+
