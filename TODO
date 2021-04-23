@@ -8,13 +8,14 @@
 :END:
 ** TODO Add provenance
 To make ~guix home describe~ more informative.
-** TODO Add on-change to on-reconfigure script?
-For some apps to run some commands like restart if their configs updated
 ** TODO How to update env variables on reconfigure?
-Make them available in format suitable for shepherd services?
+Also, how to make them available in format suitable for shepherd
+services?
 ** TODO Establish testing workflow (write guideline)
 ** TODO Add copyrights to source code
 ** TODO Ensure style is correct
+https://mumble.net/~campbell/scheme/style.txt
+https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html#Development
 https://guix.gnu.org/manual/en/guix.html#Coding-Style
 ** TODO Cleanup utils module
 Split into utils and configuration related helper?
@@ -57,13 +58,14 @@ Define schedule and add the information to announce.
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** IN-PROGRESS sway
 ** Browsers
 *** TODO icecat
 *** TODO ungoogled-chromium
 - Browser extension
 *** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
+** TODO Add on-change to on-reconfigure script?
+For some apps to run some commands like restart if their configs updated
 ** TODO Implement a standard way to create common configuration file formats
 Some programs use the standard [[https://en.wikipedia.org/wiki/INI_file][INI configuration format]], e.g. XDG
 desktop entries, Notmuch.  Git uses a it's own variant of the INI
@@ -88,6 +90,7 @@ Things the user should be able to configure
 - notmuch/mu
 *** TODO SMTP client
 - msmtp/sendmail
+** DONE sway
 ** DONE Emacs
 Features:
 - xdg-flavor? :: Use ~/.config/emacs/~
