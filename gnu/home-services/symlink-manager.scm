@@ -217,5 +217,5 @@ after all nested items already listed."
 		   home-run-on-reconfigure-service-type
                    update-symlinks-gexp)))
 		(default-value #f)
-                (description "Provides create-symlinks and
+                (description "Provides create-symlinks and \
 remove-symlinks scripts.")))
