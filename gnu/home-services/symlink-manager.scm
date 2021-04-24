@@ -5,6 +5,7 @@
   #:use-module (guix monads)
   #:use-module (guix gexp)
   #:use-module (guix records)
+  #:use-module (guix build utils)
   #:use-module (ice-9 ftw)
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 match)
@@ -109,7 +110,7 @@ after all nested items already listed."
 	       (lambda (path)
 		 (and
 		  (equal? (stat:type (lstat path)) 'symlink)
-		  (string-prefix? "/gnu/store" (readlink path)))))
+		  (store-file-name? (readlink path)))))
 
 	      (backup-file
 	       (lambda (path)
