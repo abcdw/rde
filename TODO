@@ -6,6 +6,10 @@
 :PROPERTIES:
 :VISIBILITY: children
 :END:
+** TODO Do we need init action?
+It can help to ensure that basic environment variables are set and
+loaded.  Make reconfigure work only if
+~GUIX_HOME_ENVIRONMENT_DIRECTORY~ is present.
 ** TODO Add provenance
 To make ~guix home describe~ more informative.
 ** TODO How to update env variables on reconfigure?
@@ -19,7 +23,6 @@ https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html#Development
 https://guix.gnu.org/manual/en/guix.html#Coding-Style
 ** TODO Cleanup utils module
 Split into utils and configuration related helper?
-** IN-PROGRESS Establish documenting workflow (write guideline)
 ** IN-PROGRESS Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
@@ -54,6 +57,7 @@ Define schedule and add the information to announce.
 **** DONE Announce in guix-devel
 **** DONE Announce on stream
 *** DONE Discuss xdg-flavor? default to #t
+*** DONE Establish documenting workflow (write guideline)
 * ~guix home~ Backlog
 :PROPERTIES:
 :VISIBILITY: children
@@ -64,7 +68,7 @@ Define schedule and add the information to announce.
 - Browser extension
 *** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** TODO Add on-change to on-reconfigure script?
+** IN-PROGRESS Add on-change to on-reconfigure script?
 For some apps to run some commands like restart if their configs updated
 ** TODO Implement a standard way to create common configuration file formats
 Some programs use the standard [[https://en.wikipedia.org/wiki/INI_file][INI configuration format]], e.g. XDG
