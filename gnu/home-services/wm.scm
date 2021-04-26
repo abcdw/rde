@@ -103,12 +103,12 @@ where each expression is also a list, but provided value is:\n ~a") e))) )))
    ;; 		 "/etc/sway/config")))
    (sway-config
     `((include ,(file-append sway "/etc/sway/config"))))
-   "List of expressions.  Each expression is a list of terms,
-optionally ending in a list of expressions.  A term is a non-list
+   "List of expressions.  Each @dfn{expression} is a list of terms,
+optionally ending in a list of expressions.  A @dfn{term} is a non-list
 value: string, boolean, number, symbol, or gexp.
 
 There is no special syntax for CRITERIA (See @command{man 5 sway}),
-because sway's doc stays it's a string, so use string for that.
+because sway's doc states it's a string, so use a string for that.
 
 For gradual migration, the file with old config can be included as
 shown in the example below.  After that, you can start translate lines
