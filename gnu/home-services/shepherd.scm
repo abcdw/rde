@@ -70,8 +70,7 @@ as shepherd package."
                            (format #f "~a/.local/var/log" (getenv "HOME")))))
           ;; FIXME: It's a temporary semi-solution, it must be handled
           ;; somewhere around xdg service-type.
-          (use-modules (guix build utils))
-          (mkdir-p log-dir)
+          ((@@ (guix build utils) mkdir-p) log-dir)
           (system*
            #$(file-append shepherd "/bin/shepherd")
            "--logfile"
