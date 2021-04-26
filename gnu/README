@@ -1,22 +1,8 @@
 -*- mode: org -*-
 
-~guix home~'s [[https://lists.sr.ht/~abcdw/rde-discuss/%3C878s7ho4bk.fsf%40yoctocell.xyz%3E][getting started]] for very curious people.
+The project is under active development! Explore and try it on your
+own risk.
 
-The project is not ready for day to day use! Explore and try it on
-your own risk.
+Check out [[https://guix-home.trop.in/Home-Configuration.html][Home Configuration]] and the documentation at the root of rde
+project.
 
-Command, which builds and setup home-environment. Should be executed
-in the root of rde repository.
-
-#+begin_src shell
-GUILE_LOAD_PATH=./ \
-guix home reconfigure ./gnu/home/examples/home-environment.tmpl
-#+end_src
-
-If your shell configuration not managed by ~guix home~, it should have
-following code in ~~/.profile~, ~~/.bash_profile~ or ~~/.zprofile~:
-
-#+begin_src shell
-source ~/.guix-home-environment/setup-environment
-guile ~/.guix-home-environment/on-first-login
-#+end_src

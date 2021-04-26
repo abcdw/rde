@@ -1,13 +1,11 @@
 -*- mode: org -*-
 * rde
 Set of tools for managing computing environments with GNU Guix. More
-info is available on [[http://trop.in][trop.in]].
+info is available at [[http://trop.in/rde][trop.in/rde]].
 
-*Disclaimer:* project in a proof of concept stage.
+*Disclaimer:* The project is in an active development stage.
 
 *Tip:* older Nix source code is available under ~stale/~ directory.
-
-~guix home~'s [[./gnu/README][README]] for very curious people.
 
 ** Principles
 *** Main
@@ -20,27 +18,86 @@ info is available on [[http://trop.in][trop.in]].
 - Offline :: most of workflows and apps should work without network.
 - Attention-friendly :: minimal use of notification and other
   distractive things.
+
+** Usage
+rde heavily relies on Guix Home and provides a ~home-environment~,
+which can be used as follows:
+
+#+begin_src shell
+git clone https://git.sr.ht/~abcdw/rde
+cd rde
+./pre-inst-env guix home reconfigure ./rde/config.scm
+#+end_src
+
+Read more about ~home-environment~ at [[https://guix-home.trop.in/Home-Configuration.html][Home Configuration]].
+
+GNU Guix should be installed before invoking command above.
+
+Also, for now Guix Home is not a part GNU Guix and have to be
+installed manually. When it will become upstreamed the installation
+step won't be needed.
+
+*** Guix Home
+**** Option 1
+The primary way to use Guix Home now is to set ~GUILE_LOAD_PATH~ to
+the directory, where the guile code for it is located.
+~./pre-inst-env~ script in the root of rde folder is doing exactly
+that, just prefix any command with it, like:
+
+#+begin_src shell
+./pre-inst-env guix home --help
+#+end_src
+
+**** Option 2
+Another possible option is to add rde repo as a channel, but you still
+need to run at least on ~guix home reconfigure~ with correct
+~GUILE_LOAD_PATH~ as mentioned above or:
+
+#+begin_src shell
+GUILE_LOAD_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/guix/current/share/guile/site/3.0:$GUILE_LOAD_PATH
+guix home reconfigure ./PATH_TO_FILE_WITH/HOME_ENVIRONMENT.scm
+#+end_src
+
+After you installed your first home environment, your shell is
+properly configured (See [[https://guix-home.trop.in/Configuring-the-Shell.html][Configuring the Shell]]) and you did relogin or
+reboot, you should be able to use ~guix home~ without setting
+anything.
+
+** Tools
+| Purpose                | Tool      |
+|------------------------+-----------|
+| Window Manager         | Sway      |
+| Terminal               | Alacritty |
+| Login Shell            | Bash      |
+| Interactive Unix Shell | Zsh       |
+| Everything Else (:     | Emacs     |
+
 ** Community
-There are few [[https://lists.sr.ht/~abcdw][mailing lists]] you can subscribe and/or post with your
+There are a few [[https://lists.sr.ht/~abcdw][mailing lists]] you can subscribe and/or post with your
 existing email account:
 - [[https://lists.sr.ht/~abcdw/rde-announce/][~abcdw/rde-announce@lists.sr.ht]] :: for news and updates.
 - [[https://lists.sr.ht/~abcdw/rde-discuss/][~abcdw/rde-discuss@lists.sr.ht]] :: for discussions and questions.
-- [[https://lists.sr.ht/~abcdw/rde-devel/][~abcdw/rde-devel@lists.sr.ht]] :: for development and related discussion.
-** Tools
-| Purpose        | tool  |
-|----------------+-------|
-| Window Manager | Sway  |
-| Text editing   | Emacs |
+- [[https://lists.sr.ht/~abcdw/rde-devel/][~abcdw/rde-devel@lists.sr.ht]] :: for patches and development related
+  discussions.
+
+** Contributing
+*** New features, fixes or ideas
+Send mails, optionally with inline patches to rde-devel mailing list.
+
+*** Documentation
+For Guix Home documentation for now maintained in [[https://git.sr.ht/~abcdw/guix][forked Guix
+repository]] inside ~doc/guix.texi~ and deployed to
+https://guix-home.trop.in/Home-Configuration.html once in a
+while. Patches to rde-devel is a good option here too.
+
+For rde it should go to Guix Cookbook in upstream Guix repo.
+
 ** Latest screenshot
 Just a picture to catch your eye.
 #+CAPTION: Latest rde screenshot
 #+NAME:   fig:latest-screenshot
 [[https://user-images.githubusercontent.com/1218615/78423008-06bfcc80-766c-11ea-8a79-ec63f1237126.png]]
-** Usage [WIP]
 
-#+begin_src shell
-make everything
-#+end_src
 ** COMMENT Draft sections [WIP]
 *** src content
 - modules :: small configuration for one or few packages
