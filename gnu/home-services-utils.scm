@@ -31,6 +31,8 @@
             ini-config?
             generic-serialize-ini-config
             alist?
+            listof
+            listof-strings?
 
             maybe-list))
 
@@ -284,6 +286,17 @@ serialize the section and the association lists, respectively.
    "\n"))
 
 (define alist? list?)
+
+(define (listof pred?)
+  "Return a procedure that takes a list and check if all the elements of
+the list result in @code{#t} when applying PRED? on them."
+    (lambda (x)
+      (if (list? x)
+          (every pred? x)
+          #f)))
+
+(define listof-strings?
+  (listof string?))
 
 ;;;
 ;;; Miscellaneous.
