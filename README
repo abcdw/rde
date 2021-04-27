@@ -1,4 +1,6 @@
--*- mode: org -*-
+#    -*- mode: org -*-
+#+OPTIONS: toc:nil
+
 * rde
 Set of tools for managing computing environments with GNU Guix. More
 info is available at [[http://trop.in/rde][trop.in/rde]].
