@@ -63,7 +63,7 @@
 	 (layout-service
 	  (if layout
 	      (simple-service
-	       'layout-env-vars home-environment-vars-service-type
+	       'layout-env-vars home-environment-variables-service-type
 	       `(("XKB_DEFAULT_LAYOUT" . ,(keyboard-layout-name layout))
 		 ("XKB_DEFAULT_VARIANT" . ,(keyboard-layout-variant layout))
 		 ("XKB_DEFAULT_OPTIONS" . ,(string-join
@@ -86,7 +86,7 @@
        ;; It should be safe to use symlink-path as
        ;; GUIX_HOME_ENVIRONMENT_DIRECTORY, however
        ;; /var/guix/profiles/per-user/... is another option
-       (service home-environment-vars-service-type
+       (service home-environment-variables-service-type
 		`(("GUIX_HOME_ENVIRONMENT_DIRECTORY" .
 		   ,(home-environment-symlink-path he))))
 
@@ -97,7 +97,7 @@
        ;; TODO: Remove it once upstreamed.
        (simple-service
 	'make-guix-aware-of-guix-home-subcomand
-	home-environment-vars-service-type
+	home-environment-variables-service-type
 	'(("GUILE_LOAD_PATH" .
 	   "$XDG_CONFIG_HOME/guix/current/share/guile/site/3.0\
 :$GUILE_LOAD_PATH")

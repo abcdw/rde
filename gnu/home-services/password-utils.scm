@@ -29,7 +29,7 @@
 ;;;
 
 ;; None of the options will be serialized to strings, they will
-;; instead extend `home-environment-vars-service-type' with
+;; instead extend `home-environment-variables-service-type' with
 ;; environment variables.
 
 (define (serialize-string field-name val) "")
@@ -65,7 +65,7 @@ in ``@code{PASSWORD_STORE_CLIP_TIME}''."))
     ((list? val) (string-join val " "))
     (else (maybe-object->string val)))))
 
-(define (home-password-store-environment-vars-services config)
+(define (home-password-store-environment-variables-services config)
  (cons*
   `("PASSWORD_STORE_DIR"
     . ,(home-password-store-configuration-directory config))
@@ -85,8 +85,8 @@ in ``@code{PASSWORD_STORE_CLIP_TIME}''."))
   (service-type (name 'home-password-store)
                 (extensions
                  (list (service-extension
-                        home-environment-vars-service-type
-                        home-password-store-environment-vars-services)
+                        home-environment-variables-service-type
+                        home-password-store-environment-variables-services)
                        (service-extension
                         home-profile-service-type
                         home-password-store-profile)))

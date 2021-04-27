@@ -219,7 +219,7 @@ have a configuration for gpg-agent."))
    (home-gpg-agent-configuration (home-gpg-agent-configuration))
    "Configuration for the @code{gpg-agent}"))
 
-(define (home-gnupg-environment-vars-service config)
+(define (home-gnupg-environment-variables-service config)
   "Add SSH_AUTH_SOCK variable to user's environment."
   (if (home-gpg-agent-configuration-ssh-agent?
        (home-gnupg-configuration-gpg-agent-config config))
@@ -325,8 +325,8 @@ have a configuration for gpg-agent."))
                         home-run-on-reconfigure-service-type
                         home-gnupg-run-on-reconfigure-service)
 		       (service-extension
-                        home-environment-vars-service-type
-                        home-gnupg-environment-vars-service)
+                        home-environment-variables-service-type
+                        home-gnupg-environment-variables-service)
                        (service-extension
                         home-shepherd-service-type
                         home-gnupg-shepherd-service)

@@ -131,7 +131,7 @@
 	  (emacs-client-cmd "emacsclient -q -c"))
       (list
        (simple-service 'set-default-shell-to-zsh
-		       home-environment-vars-service-type
+		       home-environment-variables-service-type
 		       `(("ALTERNATE_EDITOR" .
 			  ,#~(format #f "\"~a\"" #$emacs-editor-cmd))
 			 ("VISUAL" .
@@ -163,7 +163,7 @@
   (list
    (simple-service
     'xdg-friendly-env-vars
-    home-environment-vars-service-type
+    home-environment-variables-service-type
     '(("LESSHISTFILE" . "$XDG_CACHE_HOME/.lesshst")))
    (home-generic-service
     'rde-other-packages
@@ -190,7 +190,7 @@
 (define (rde-zsh rde-config)
   (list
    (simple-service 'set-default-shell-to-zsh
-		   home-environment-vars-service-type
+		   home-environment-variables-service-type
 		   `(("SHELL" . ,(file-append zsh "/bin/zsh"))))
 
    ;; zsh-autosuggestions is very cool plugin, but a little
@@ -299,7 +299,7 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
 	       ,(local-file "../stale/dotfiles/.config/alacritty/alacritty.yml")))
     #:packages (list alacritty))
    (simple-service 'set-wayland-specific-env-vars
-		   home-environment-vars-service-type
+		   home-environment-variables-service-type
 		   '(("_JAVA_AWT_WM_NONREPARENTING" . "1")))))
 
 (use-modules (gnu packages tmux))

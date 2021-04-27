@@ -82,7 +82,7 @@ analogus to @file{/var/lib}, but for user.  It is not a part of XDG
 Base Directory Specification, but helps to make implementation of home
 services more consistent."))
 
-(define (home-xdg-base-directories-environment-vars-service config)
+(define (home-xdg-base-directories-environment-variables-service config)
   (map
    (lambda (field)
      (cons (format
@@ -95,8 +95,8 @@ services more consistent."))
   (service-type (name 'home-xdg-base-directories)
                 (extensions
                  (list (service-extension
-                        home-environment-vars-service-type
-                        home-xdg-base-directories-environment-vars-service)))
+                        home-environment-variables-service-type
+                        home-xdg-base-directories-environment-variables-service)))
                 (default-value (home-xdg-base-directories-configuration))
                 (description "Configure XDG base directories.  This
 service introduces two additional variables @env{XDG_STATE_HOME},

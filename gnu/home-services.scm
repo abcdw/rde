@@ -14,10 +14,10 @@
 
   #:export (home-service-type
 	    home-profile-service-type
-	    home-environment-vars-service-type
+	    home-environment-variables-service-type
 	    home-run-on-first-login-service-type
 	    home-run-on-reconfigure-service-type
-           fold-home-service-types)
+            fold-home-service-types)
 
   #:re-export (service
 	       service-type
@@ -131,8 +131,8 @@ export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH
                    (list "export " key "=" value "\n")))
 		vars)))))))
 
-(define home-environment-vars-service-type
-  (service-type (name 'home-environment-vars)
+(define home-environment-variables-service-type
+  (service-type (name 'home-environment-variables)
                 (extensions
                  (list (service-extension
 			home-service-type
