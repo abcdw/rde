@@ -98,7 +98,7 @@
   #~(string-append #$@(append-map serialize-git-section val)))
 
 (define (git-ignore? patterns)
-  (list? patterns))
+  (listof-strings? patterns))
 (define (serialize-git-ignore field-name val)
   (string-join val "\n" 'suffix))
 

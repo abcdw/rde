@@ -47,6 +47,8 @@
 (define (serialize-list field-name val)
   (if (null? val) "" (serialize-field field-name (string-join val " "))))
 
+(define serialize-listof-strings serialize-list)
+
 (define (serialize-alist field-name val)
   (generic-serialize-alist string-append serialize-field val))
 
@@ -128,7 +130,7 @@
    (string "*")
    "Name of the default host.")
   (user-known-hosts-file
-   (list '("~/.ssh/known_hosts"))
+   (listof-strings '("~/.ssh/known_hosts"))
    "One or more files to use for the user host key database.")
   (forward-agent
    (boolean #f)
