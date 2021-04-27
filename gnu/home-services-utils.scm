@@ -4,11 +4,13 @@
   #:use-module (guix diagnostics)
   #:use-module (guix gexp)
   #:use-module (guix monads)
+  #:use-module (guix i18n)
 
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 match)
   #:use-module (ice-9 string-fun)
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-171)
   #:use-module (srfi srfi-26)
 
@@ -307,3 +309,52 @@ the list result in @code{#t} when applying PRED? on them."
       (if (list? a)
           a
           (list a)))
+
+
+;;;
+;;; Enums.
+;;;
+
+(define-record-type <enum>
+  (make-enum name value)
+  enum?
+  (name enum-name)
+  (value enum-value))
+
+;; Copied from (gnu services configuration)
+(define-syntax-rule (id ctx parts ...)
+  "Assemble PARTS into a raw (unhygienic)  identifier."
+  (datum->syntax ctx (symbol-append (syntax->datum parts) ...)))
+
+;; (define-enum pinentry-flavor
+;;   '(emacs gtk qt ncurses tty))
+;;
+;; (pinentry-flavor? 'gtk)
+;; => #t
+;;
+;; (enum-value pinentry-flavor)
+;; => '(emacs gtk qt ncurses tty)
+;;
+;; (pinentry-flavor? 'vim)
+;; exception: `pinetry-flavor' must be one of `emacs', `gtk', `qt',
+;; `ncurses', or `tty', was given `vim'
+
+(define-syntax define-enum
+  (lambda (x)
+    (syntax-case x ()
+      ((_ stem value)
+       (with-syntax ((stem? (id #'stem #'stem #'?))
+                     (msg (list->human-readable-list
+                           (second (syntax->datum #'value))
+                           #:proc (cut format #f "`~a'" <>))))
+         #'(begin
+             (define stem (make-enum (quote stem) value))
+
+             (define (stem? val)
+               (if (member val value)
+                   #t
+                   (raise (formatted-message
+                           (G_ "`~a' must of ~a, was given: ~s")
+                           (enum-name stem)
+                           (syntax->datum msg)
+                           val))))))))))
