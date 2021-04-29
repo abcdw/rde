@@ -37,6 +37,7 @@
             listof-strings?
 
             maybe-list
+            optional
 
             define-enum
             enum-name
@@ -314,6 +315,11 @@ the list result in @code{#t} when applying PRED? on them."
           a
           (list a)))
 
+(define* (optional expr1 #:optional expr2)
+  "If EXPR1 evaluates to a non-@code{#f} value and EXPR2 is specified,
+return EXPR2; if it isn't specified, return EXPR1.  Otherwise, return
+an empty list @code{'()}."
+  (if expr1 (if expr2 expr2 expr1) '()))
 
 ;;;
 ;;; Enums.
