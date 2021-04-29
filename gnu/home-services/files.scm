@@ -47,5 +47,5 @@ directory containing FILES."
                 (compose concatenate)
                 (extend append)
 		(default-value '())
-                (description "Configuration files for programs, stored in
-@file{~/.guix-home-environment/files}.")))
+                (description "Configuration files for programs that
+will be put in @file{~/.guix-home-environment/files}.")))

@@ -156,5 +156,5 @@ input * {
 		;; (extend home-sway-extensions)
                 (default-value (home-sway-configuration))
                 (description "\
-Install and configure Sway.  Wayland compositor compatible with i3.")))
+Install and configure Sway, a Wayland compositor compatible with i3.")))
 

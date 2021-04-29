@@ -329,7 +329,8 @@ have a configuration for gpg-agent."))
                         home-profile-service-type
                         home-gnupg-profile-service)))
                 (default-value (home-gnupg-configuration))
-                (description "Install and configure gpg and gpg-agent.")))
+                (description "Install and configure GnuPG, this
+includes the @command{gpg} and @command{gpg-agent} commands.")))
 
 (define (generate-home-gnupg-documentation)
   (generate-documentation

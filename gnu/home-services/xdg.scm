@@ -101,7 +101,7 @@ services more consistent."))
                 (description "Configure XDG base directories.  This
 service introduces two additional variables @env{XDG_STATE_HOME},
 @env{XDG_LOG_HOME}.  They are not a part of XDG specification, at
-least yet, but are convinient to have, it improves a consistency
+least yet, but are convinient to have, it improves the consistency
 between different home services.")))
 
 (define (generate-home-xdg-base-directories-documentation)
@@ -434,5 +434,5 @@ that the application cannot open the specified MIME type.")
                 (compose identity)
                 (extend home-xdg-mime-applications-extension)
                 (default-value (home-xdg-mime-applications-configuration))
-                (description "\
-Configure XDG MIME applications, and XDG desktop entries.")))
+                (description
+                 "Configure XDG MIME applications, and XDG desktop entries.")))

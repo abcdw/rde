@@ -260,4 +260,5 @@ connect to it.")
 		(compose identity)
 		(extend home-emacs-extensions)
                 (default-value (home-emacs-configuration))
-                (description "Install and configure GNU Emacs.")))
+                (description "Install and configure GNU Emacs, the
+extensible, self-documenting editor.")))

@@ -68,22 +68,23 @@ packages, configuration files, activation script, and so on.")))
                 (compose concatenate)
                 (extend append)
                 (description
-                 "This is the @dfn{home profile}, available as
-@file{~/.guix-home-environment/profile}.  It contains packages that
-the user wants to be available.")))
+                 "This is the @dfn{home profile} and can be found in
+@file{~/.guix-home-environment/profile}.  It contains packages and
+configuration files that the user has declared in their
+@code{home-environment} record.")))
 
 (define (environment-variables->setup-environment-script vars)
-  "Return a file that can be sourced by bash/zsh that initialize the
-environment.  Sources home environment profile, sets default variables
-and sets variables provided in @code{vars}.  @code{vars} is a list of
-pairs (@code{(key . value)}), @code{key} is a string and @code{value}
-is a string or gexp.
+  "Return a file that can be sourced by a POSIX compliant shell which
+initializes the environment.  The file will source the home
+environment profile, set some default environment variables, and set
+environment variables provided in @code{vars}.  @code{vars} is a list
+of pairs (@code{(key . value)}), @code{key} is a string and
+@code{value} is a string or gexp.
 
 If value is @code{#f} variable will be omitted.
 If value is @code{#t} variable will be just exported.
 For any other, value variable will be set to the @code{value} and
-exported.
-"
+exported."
   (define (warn-about-duplicate-defenitions)
     (fold
      (lambda (x acc)
@@ -140,7 +141,7 @@ export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH
                 (compose concatenate)
                 (extend append)
 		(default-value '())
-                (description "Sets the environment variables.")))
+                (description "Set the environment variables.")))
 
 (define (compute-on-first-login-script _ gexps)
   (gexp->file
@@ -172,7 +173,7 @@ in the home environment directory."
                 (compose identity)
                 (extend compute-on-first-login-script)
 		(default-value #f)
-                (description "Runs gexps on first user login.  Can
+                (description "Run gexps on first user login and can \
 be extended with one gexp.")))
 
 (define (compute-on-reconfigure-script _ gexps)
@@ -194,9 +195,9 @@ in the home environment directory."
                 (compose identity)
                 (extend compute-on-reconfigure-script)
 		(default-value #f)
-                (description "Runs gexps to update current state of
-home during reconfiguration.  All gexps must be idempotent.  Can
-be extended with one gexp.")))
+                (description "Run gexps to update the current state of \
+the home directory during reconfiguration.  This service can be \
+extended with one gexp, and all gexps must be idempotent.")))
 
 
 

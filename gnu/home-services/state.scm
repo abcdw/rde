@@ -157,8 +157,8 @@ state related items like git-state, rsync-state, etc."
        (actions (list
 		 (shepherd-action
 		  (name 'sync)
-		  (documentation "\
-Sync all the state. Highly dependent on state type.")
+		  (documentation
+                   "Sync all the state. Highly dependent on state type.")
 		  (procedure
 		   #~(lambda _
 		       (map (lambda (name)

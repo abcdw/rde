@@ -119,6 +119,6 @@ as shepherd package."
 		     (append (home-shepherd-configuration-services config)
 			     extra-services)))))
 		(default-value (home-shepherd-configuration))
-                (description "Configures and installs user's shepherd.")))
+                (description "Configure and install userland Shepherd.")))
 
 

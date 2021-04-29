@@ -78,10 +78,9 @@ guile $HOME_ENVIRONMENT/on-first-login\n"
 		(compose concatenate)
 		(extend add-profile-extensions)
 		(default-value (home-shell-profile-configuration))
-                (description "\
-Create @file{~/.profile}, which is used for environment initialization
-of POSIX compatible login shells.  Can be extended with a list of strings or
-gexps.")))
+                (description " Create @file{~/.profile}, which is used
+for environment initialization of POSIX compliant login shells.  This
+service type can be extended with a list of strings or gexps.")))
 
 (define (serialize-boolean field-name val) "")
 
@@ -394,4 +393,4 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
 		(compose identity)
 		(extend home-bash-extensions)
                 (default-value (home-bash-configuration))
-                (description "Install and configure Bash.")))
+                (description "Install and configure GNU Bash.")))

@@ -37,7 +37,7 @@
 		(extend append)
                 (default-value '())
                 (description "\
-Install plugins in profile and configure Zsh to load them.")))
+Install plugins into the home profile and configure Zsh to load them.")))
 
 (define home-zsh-autosuggestions-service-type
   (service-type
@@ -60,10 +60,9 @@ Install plugins in profile and configure Zsh to load them.")))
 		 "[ -n \"$GUIX_ENVIRONMENT\" ] || ZSH_AUTOSUGGEST_USE_ASYNC=true"
 		 "ZSH_AUTOSUGGEST_STRATEGY=(history completion)")))))))
    (default-value #f)
-   (description "Enables Fish-like fast/unobtrusive autosuggestions
-for @code{zsh} and sets reasonable default values for some plugin's variables
-to improve perfomance and adjust behavior: @code{(history completion)}
-is set for strategy, manual rebind and async are enabled.")))
+   (description "Enable Fish-like fast and unobtrusive autosuggestions
+for Zsh, and set reasonable default values for some plugin's variables
+to improve perfomance.")))
 
 (define home-zsh-direnv-service-type
   (service-type
@@ -78,6 +77,5 @@ is set for strategy, manual rebind and async are enabled.")))
       (const (home-zsh-extension
 	      (zshrc (list "eval \"$(direnv hook zsh)\"")))))))
    (default-value #f)
-   (description "Enables @code{direnv} for @code{zsh}.  Adds hook to
-@file{.zshrc} and installs a package in the profile.")))
+   (description "Enable Direnv integration for Zsh.")))
 
