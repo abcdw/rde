@@ -163,7 +163,7 @@ inputs."
 
 
 (define (add-emacs-shepherd-service config)
-  (if (home-emacs-configuration-server-mode? config)
+  (optional (home-emacs-configuration-server-mode? config)
       (list (shepherd-service
              (documentation "Emacs server.  Use @code{emacsclient} to
 connect to it.")
@@ -177,9 +177,7 @@ connect to it.")
 				       (format #f "~a/.local/var/log"
 					       (getenv "HOME")))
 				   "/emacs.log")))
-             (stop #~(make-kill-destructor))))
-      '()))
-
+             (stop #~(make-kill-destructor))))))
 
 (define (add-emacs-configuration config)
   (let* ((xdg-flavor? (home-emacs-configuration-xdg-flavor? config)))
@@ -201,15 +199,14 @@ connect to it.")
 
     (define (file-if-not-empty field)
       (let ((file-name (string-append
-			(string-drop-right (symbol->string field) 3)
-			".el"))
-	    (field-obj (car (filter-fields field))))
-	(if (not (null? ((configuration-field-getter field-obj) config)))
-	    `(,(prefix-file file-name)
-	      ,(mixed-text-file
-		file-name
-		(serialize-field field)))
-	    '())))
+                        (string-drop-right (symbol->string field) 3)
+                        ".el"))
+            (field-obj (car (filter-fields field))))
+        (optional (not (null? ((configuration-field-getter field-obj) config)))
+                  `(,(prefix-file file-name)
+                    ,(mixed-text-file
+                      file-name
+                      (serialize-field field))))))
 
     (filter
      (compose not null?)

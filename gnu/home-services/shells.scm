@@ -145,35 +145,33 @@ another process for example)."))
 
     (define (file-if-not-empty field)
       (let ((file-name (symbol->string field))
-	    (field-obj (car (filter-fields field))))
-	(if (not (null? ((configuration-field-getter field-obj) config)))
-	    `(,(prefix-file file-name)
-	      ,(mixed-text-file
-		file-name
-		(serialize-field field)))
-	    '())))
+            (field-obj (car (filter-fields field))))
+        (optional (not (null? ((configuration-field-getter field-obj) config)))
+                  `(,(prefix-file file-name)
+                    ,(mixed-text-file
+                      file-name
+                      (serialize-field field))))))
 
     (filter
      (compose not null?)
-     `(,(if xdg-flavor?
-	    `("zshenv"
-	      ,(mixed-text-file
-		"auxiliary-zshenv"
-		(if xdg-flavor?
-		    "source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshenv\n"
-		    "")))
-	    '())
+     `(,(optional xdg-flavor?
+                  `("zshenv"
+                    ,(mixed-text-file
+                      "auxiliary-zshenv"
+                      (if xdg-flavor?
+                          "source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshenv\n"
+                          ""))))
        (,(prefix-file "zshenv")
-	,(mixed-text-file
-	  "zshenv"
-	  (if xdg-flavor?
-	      "export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh\n"
-	      "")
-	  (serialize-field 'zshenv)))
+        ,(mixed-text-file
+          "zshenv"
+          (if xdg-flavor?
+              "export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh\n"
+              "")
+          (serialize-field 'zshenv)))
        (,(prefix-file "zprofile")
-	,(mixed-text-file
-	  "zprofile"
-	  "\
+        ,(mixed-text-file
+          "zprofile"
+          "\
 # Setups system and user profiles and related variables
 source /etc/profile
 # Setups home environment profile

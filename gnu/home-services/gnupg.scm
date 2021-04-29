@@ -214,14 +214,13 @@ have a configuration for gpg-agent."))
 
 (define (home-gnupg-environment-variables-service config)
   "Add SSH_AUTH_SOCK variable to user's environment."
-  (if (home-gpg-agent-configuration-ssh-agent?
-       (home-gnupg-configuration-gpg-agent-config config))
-      `(("SSH_AUTH_SOCK" .
-	 ,#~(string-append
-	     "$("
-	     #$(file-append gnupg "/bin/gpgconf")
-	     " --list-dirs agent-ssh-socket)")))
-      '()))
+  (optional (home-gpg-agent-configuration-ssh-agent?
+             (home-gnupg-configuration-gpg-agent-config config))
+            `(("SSH_AUTH_SOCK" .
+               ,#~(string-append
+                   "$("
+                   #$(file-append gnupg "/bin/gpgconf")
+                   " --list-dirs agent-ssh-socket)")))))
 
 (define (home-gpg-agent-file config)
   (mixed-text-file
@@ -267,9 +266,9 @@ have a configuration for gpg-agent."))
 
 (define (home-gnupg-shepherd-service config)
   (let ((provision-list `(gpg-agent
-                          ,@(if (home-gpg-agent-configuration-ssh-agent?
-                                 (home-gnupg-configuration-gpg-agent-config config))
-                                '(ssh-agent) '()))))
+                          ,@(optional (home-gpg-agent-configuration-ssh-agent?
+                                       (home-gnupg-configuration-gpg-agent-config config))
+                                      '(ssh-agent)))))
     (list
      (shepherd-service
       (documentation "Run and control gpg-agent.")
@@ -291,8 +290,8 @@ have a configuration for gpg-agent."))
                 (string-join
                  (append
                   (list #$(file-append gnupg "/bin/gpg-agent")
-			"--daemon"
-			"--options"
+                        "--daemon"
+                        "--options"
                         #$(home-gpg-agent-file config))
                   (quote #$(home-gpg-agent-configuration-extra-options
                             (home-gnupg-configuration-gpg-agent-config config)))))))
