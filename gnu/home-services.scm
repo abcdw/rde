@@ -106,7 +106,7 @@ exported."
 	        "HOME_ENVIRONMENT="
 		(assoc-ref vars "GUIX_HOME_ENVIRONMENT_DIRECTORY")
 		"
-GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\" ; \\
+GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\"
 . \"$HOME_ENVIRONMENT/profile/etc/profile\"
 
 [[ :$XDG_DATA_DIRS: =~ :$HOME_ENVIRONMENT/profile/share: ]] || \
