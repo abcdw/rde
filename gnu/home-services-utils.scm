@@ -36,7 +36,11 @@
             listof
             listof-strings?
 
-            maybe-list))
+            maybe-list
+
+            define-enum
+            enum-name
+            enum-value))
 
 ;;;
 ;;; User's utils.
