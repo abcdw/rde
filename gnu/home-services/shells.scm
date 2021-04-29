@@ -394,3 +394,27 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
 		(extend home-bash-extensions)
                 (default-value (home-bash-configuration))
                 (description "Install and configure GNU Bash.")))
+
+
+(define (generate-home-shell-profile-documentation)
+  (generate-documentation
+   `((home-shell-profile-configuration
+      ,home-shell-profile-configuration-fields))
+   'home-shell-profile-configuration))
+
+(define (generate-home-bash-documentation)
+  (generate-documentation
+   `((home-bash-configuration
+      ,home-bash-configuration-fields))
+   'home-bash-configuration))
+
+(define (generate-home-zsh-documentation)
+  (generate-documentation
+   `((home-zsh-configuration
+      ,home-zsh-configuration-fields))
+   'home-zsh-configuration))
+
+;; (display (generate-home-shell-profile-documentation))
+;; (display (generate-home-bash-documentation))
+;; (display (generate-home-zsh-documentation))
+>>>>>>> 4b1220c (gnu: home-services: shells: Add generate documentation fns)
