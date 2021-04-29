@@ -72,7 +72,8 @@
 
 (define serialize-string serialize-field)
 
-(define %pinentry-flavors '(tty emacs gtk2 qt gnome3 rofi efl))
+(define-enum pinentry-flavor
+  '(tty emacs gtk2 qt gnome3 rofi efl))
 
 (define (serialize-pinentry-flavor field-name val)
   (let ((pinentry-program #~(string-append "pinentry-program "
@@ -86,14 +87,6 @@
                          "allow-emacs-pinentry\n"
                          "allow-loopback-pinentry\n")
         pinentry-program)))
-
-(define (pinentry-flavor? flavor)
-  (if (member flavor %pinentry-flavors)
-      #t
-      (raise (formatted-message
-              (G_ "Pinentry must be one of ~a, was given: ~s")
-              (list->human-readable-list %pinentry-flavors)
-              flavor))))
 
 (define ssh-agent? boolean?)
 (define (serialize-ssh-agent field-name val)
@@ -178,7 +171,7 @@ yields the following in @file{sshcontrol}:
    (pinentry-flavor 'gtk2)
    (string-append "Which pinentry interface to use.  Valid options are: "
                   (list->human-readable-list
-                   %pinentry-flavors
+                   (enum-value pinentry-flavor)
                    #:cumulative? #t
                    #:proc (cut format #f "``~a''" <>))))
   (extra-options
