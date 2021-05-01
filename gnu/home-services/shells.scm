@@ -417,4 +417,3 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
 ;; (display (generate-home-shell-profile-documentation))
 ;; (display (generate-home-bash-documentation))
 ;; (display (generate-home-zsh-documentation))
->>>>>>> 4b1220c (gnu: home-services: shells: Add generate documentation fns)
