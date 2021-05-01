@@ -265,13 +265,6 @@ DELIMITER interposed LS.  Support 'infix and 'suffix GRAMMAR values."
 Apply the procedure PROC on SECTION after it has been converted to a string"
   (format #f "[~a]\n" (proc section)))
 
-(define* (generic-serialize-ini-config #:key
-                                       (combine-ini string-join)
-                                       (combine-alist string-append)
-                                       (combine-section-alist string-append)
-                                       (format-section maybe-object->string)
-                                       serialize-field
-                                       fields)
 (define default-ini-format-section
   (match-lambda
     ((section subsection)
@@ -279,6 +272,15 @@ Apply the procedure PROC on SECTION after it has been converted to a string"
                     (maybe-object->string subsection)))
     (section
      (maybe-object->string section))))
+
+(define* (generic-serialize-ini-config
+          #:key
+          (combine-ini string-join)
+          (combine-alist string-append)
+          (combine-section-alist string-append)
+          (format-section default-ini-format-section)
+          serialize-field
+          fields)
   "Create an INI configuration from nested lists FIELDS.  This uses
 @code{generic-serialize-ini-config-section} and @{generic-serialize-alist} to
 serialize the section and the association lists, respectively.
