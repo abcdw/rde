@@ -32,6 +32,7 @@
             object->snake-case-string
             ini-config?
             generic-serialize-ini-config
+            generic-serialize-git-ini-config
             alist?
             listof
             listof-strings?
@@ -271,6 +272,13 @@ Apply the procedure PROC on SECTION after it has been converted to a string"
                                        (format-section maybe-object->string)
                                        serialize-field
                                        fields)
+(define default-ini-format-section
+  (match-lambda
+    ((section subsection)
+     (string-append (maybe-object->string section) " "
+                    (maybe-object->string subsection)))
+    (section
+     (maybe-object->string section))))
   "Create an INI configuration from nested lists FIELDS.  This uses
 @code{generic-serialize-ini-config-section} and @{generic-serialize-alist} to
 serialize the section and the association lists, respectively.
@@ -285,6 +293,31 @@ serialize the section and the association lists, respectively.
 @result{} \"[Application]\nkey = value\n\""
   (combine-ini
    (map (match-lambda
+          ((section alist)
+           (combine-section-alist
+            (generic-serialize-ini-config-section section format-section)
+            (generic-serialize-alist combine-alist serialize-field alist))))
+        fields)
+   "\n"))
+
+(define* (generic-serialize-git-ini-config
+          #:key
+          (combine-ini string-join)
+          (combine-alist string-append)
+          (combine-section-alist string-append)
+          (format-section default-ini-format-section)
+          serialize-field
+          fields)
+  "Like @code{generic-serialize-ini-config}, but the section can also
+have a @dfn{subsection}.  FORMAT-SECTION will take a list of two
+elements: the section and the subsection."
+  (combine-ini
+   (map (match-lambda
+          ((section subsection alist)
+           (combine-section-alist
+            (generic-serialize-ini-config-section
+             (list section subsection) format-section)
+            (generic-serialize-alist combine-alist serialize-field alist)))
           ((section alist)
            (combine-section-alist
             (generic-serialize-ini-config-section section format-section)
