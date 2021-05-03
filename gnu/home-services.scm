@@ -109,16 +109,26 @@ exported."
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\"
 . \"$HOME_ENVIRONMENT/profile/etc/profile\"
 
-[[ :$XDG_DATA_DIRS: =~ :$HOME_ENVIRONMENT/profile/share: ]] || \
-export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS
-[[ :$MANPATH: =~ :$HOME_ENVIRONMENT/profile/share/man: ]] || \
-export MANPATH=$HOME_ENVIRONMENT/profile/share/man:$MANPATH
-[[ :$INFOPATH: =~ :$HOME_ENVIRONMENT/profile/share/info: ]] || \
-export INFOPATH=$HOME_ENVIRONMENT/profile/share/info:$INFOPATH
-[[ :$XDG_CONFIG_DIRS: =~ :$HOME_ENVIRONMENT/profile/etc/xdg: ]] || \
-export XDG_CONFIG_DIRS=$HOME_ENVIRONMENT/profile/etc/xdg:$XDG_CONFIG_DIRS
-[[ :$XCURSOR_PATH: =~ :$HOME_ENVIRONMENT/profile/share/icons: ]] || \
-export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH
+case $XDG_DATA_DIRS in
+  *$HOME_ENVIRONMENT/profile/share*) ;;
+  *) export XDG_DATA_DIRS=$HOME_ENVIRONMENT/profile/share:$XDG_DATA_DIRS ;;
+esac
+case $MANPATH in
+  *$HOME_ENVIRONMENT/profile/share/man*) ;;
+  *) export MANPATH=$HOME_ENVIRONMENT/profile/share/man:$MANPATH
+esac
+case $INFOPATH in
+  *$HOME_ENVIRONMENT/profile/share/info*) ;;
+  *) export INFOPATH=$HOME_ENVIRONMENT/profile/share/info:$INFOPATH ;;
+esac
+case $XDG_CONFIG_DIRS in
+  *$HOME_ENVIRONMENT/profile/etc/xdg*) ;;
+  *) export XDG_CONFIG_DIRS=$HOME_ENVIRONMENT/profile/etc/xdg:$XDG_CONFIG_DIRS ;;
+esac
+case $XCURSOR_PATH in
+  *$HOME_ENVIRONMENT/profile/share/icons*) ;;
+  *) export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH ;;
+esac
 
 ")
 
