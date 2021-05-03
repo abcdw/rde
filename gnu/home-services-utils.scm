@@ -267,7 +267,7 @@ DELIMITER interposed LS.  Support 'infix and 'suffix GRAMMAR values."
 (define (generic-serialize-ini-config-section section proc)
   "Format a section from SECTION for an INI configuration.
 Apply the procedure PROC on SECTION after it has been converted to a string"
-  (format #f "[~a]\n" (proc section)))
+  (format #f "\n[~a]\n" (proc section)))
 
 (define default-ini-format-section
   (match-lambda
