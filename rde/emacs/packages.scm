@@ -16,7 +16,10 @@
   #:use-module (guix utils)
   #:use-module (srfi srfi-1)
   #:use-module ((guix licenses) #:prefix license:)
-  #:export (%rde-emacs-all-packages))
+  #:export (%rde-emacs-all-packages
+	    emacs-rde-use-package
+	    emacs-rde-org-roam
+	    emacs-rde-modus-themes))
 
 (define-public emacs-rde-core
   (package

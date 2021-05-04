@@ -126,7 +126,9 @@
 (use-modules (guix gexp))
 
 (define* (rde-emacs #:key (server-mode? #t))
-  (lambda (rde-config)
+  "rde-emacs docstring"
+  (define (rde-emacs-f rde-config)
+    "tmp docstring"
     (let ((emacs-editor-cmd "emacs --no-splash")
 	  (emacs-client-cmd "emacsclient -q -c"))
       (list
@@ -142,6 +144,21 @@
        ;;  (home-emacs-extension
        ;;   (elisp-packages (list emacs-treemacs))))
 
+       ;; (service home-emacs-service-type
+       ;; 		(home-emacs-configuration
+       ;; 		 (package emacs-next-pgtk)
+       ;; 		 (elisp-packages
+       ;; 		  (list
+       ;; 		   (emacs-default-el
+       ;; 		    (list emacs-rde-use-package emacs-rde-modus-themes))))
+       ;; 		 (server-mode? server-mode?)
+       ;; 		 (xdg-flavor? #f)
+       ;; 		 (init-el
+       ;; 		  '())
+       ;; 		 ;; (early-init-el
+       ;; 		 ;;  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
+       ;; 		 ;; (rebuild-elisp-packages? #t)
+       ;; 		 ))
        (service home-emacs-service-type
 		(home-emacs-configuration
 		 (package emacs-next-pgtk)
@@ -157,7 +174,9 @@
 		 (early-init-el
 		  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
 		 ;; (rebuild-elisp-packages? #t)
-		 ))))))
+		 ))
+       )))
+  rde-emacs-f)
 
 (define (rde-other-packages rde-config)
   (list
@@ -187,6 +206,7 @@
 ;; TODO: Maybe make C-m/C-j in isearch accept current candidate
 ;; instead of just closing isearch
 ;; TODO: Add completion for shepherd https://issues.guix.gnu.org/45004
+;; TODO: Add per project history using direnv?
 (define (rde-zsh rde-config)
   (list
    (simple-service 'set-default-shell-to-zsh
