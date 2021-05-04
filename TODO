@@ -6,17 +6,16 @@
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** TODO Do we need init action?
-It can help to ensure that basic environment variables are set and
-loaded.  Make reconfigure work only if
-~GUIX_HOME_ENVIRONMENT_DIRECTORY~ is present.
+** TODO on-reconfigure -> activation
+Refactor on-reconfigure service, it should be activation service,
+because this script can be called on generation switch event and not
+only on reconfigure.
 ** TODO Make fonts service
 ** TODO Add provenance
 To make ~guix home describe~ more informative.
 ** TODO How to update env variables on reconfigure?
 Also, how to make them available in format suitable for shepherd
 services? Shepherd services takes env from shepherd.
-** TODO Establish testing workflow (write guideline)
 ** TODO Ensure style is correct
 https://mumble.net/~campbell/scheme/style.txt
 https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html#Development
@@ -24,9 +23,6 @@ https://guix.gnu.org/manual/en/guix.html#Coding-Style
 Add copyrights to source code
 ** TODO Cleanup utils module
 Split into utils and configuration related helper?
-** IN-PROGRESS Create clean example configuration
-~rde/config.scm~ is a ready to use configuration, but requires few
-helpers to make it customizable by the end user.
 ** Finished
 :PROPERTIES:
 :VISIBILITY: folded
@@ -111,3 +107,7 @@ Start user-space shepherd on first user login and exit on last logout.
 - https://www.opennet.ru/base/dev/pam_linux.txt.html
 Take a look at mpd service for user-service example and /run/user/ID
 creation.
+
+*** IN-PROGRESS Create clean example configuration
+~rde/config.scm~ is a ready to use configuration, but requires few
+helpers to make it customizable by the end user.
