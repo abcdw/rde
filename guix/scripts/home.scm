@@ -152,20 +152,24 @@ resulting from command-line parsing."
          (expr   (assoc-ref opts 'expression))
          (system (assoc-ref opts 'system))
 
+	 (transform   (lambda (obj)
+                        (home-environment-with-provenance obj file)))
+
          (home-environment
-          (ensure-home-environment
-           (or file expr)
-           (cond
-            ((and expr file)
-             (leave
-              (G_ "both file and expression cannot be specified~%")))
-            (expr
-             (read/eval expr))
-            (file
-             (load* file %user-module
-                    #:on-error (assoc-ref opts 'on-error)))
-            (else
-             (leave (G_ "no configuration specified~%"))))))
+	  (transform
+           (ensure-home-environment
+            (or file expr)
+            (cond
+             ((and expr file)
+              (leave
+               (G_ "both file and expression cannot be specified~%")))
+             (expr
+              (read/eval expr))
+             (file
+              (load* file %user-module
+                     #:on-error (assoc-ref opts 'on-error)))
+             (else
+              (leave (G_ "no configuration specified~%")))))))
 
          (dry?        (assoc-ref opts 'dry-run?)))
 

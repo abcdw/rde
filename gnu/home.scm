@@ -11,10 +11,13 @@
   #:export (home-environment
 	    home-environment?
 	    this-home-environment
+
 	    home-environment-derivation
 	    home-environment-home-directory
 	    home-environment-symlink-name
-	    home-environment-symlink-path))
+	    home-environment-symlink-path
+
+	    home-environment-with-provenance))
 
 (define-record-type* <home-environment> home-environment
   make-home-environment
@@ -124,6 +127,18 @@
          (home (fold-services services
 			      #:target-type home-service-type)))
     (service-value home)))
+
+(define* (home-environment-with-provenance
+	  he
+          #:optional
+          (config-file (home-environment-configuration-file he)))
+  "Return a variant of HE that stores its own provenance information,
+including CONFIG-FILE, if available.  This is achieved by adding an instance
+of HOME-PROVENANCE-SERVICE-TYPE to its services."
+  (home-environment
+    (inherit he)
+    (services (cons (service home-provenance-service-type config-file)
+                    (home-environment-user-services he)))))
 
 ;; home-profile-service-type
 ;; home-activation-service-type
