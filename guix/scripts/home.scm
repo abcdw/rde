@@ -129,7 +129,7 @@ Some ACTIONS support additional ARGS.\n"))
 	       (switch-symlinks user-home-environment-symlink-path
 				%guix-home-environment)
 
-	       (primitive-load (string-append he-path "/on-reconfigure"))
+	       (primitive-load (string-append he-path "/activate"))
 	       (return he-path)))
             (else
              (newline)
@@ -445,7 +445,7 @@ all the home environment generations."
 SPEC.  STORE is an open connection to the store."
   (let* ((number (relative-generation-spec->number %guix-home-environment spec))
          (generation (generation-file-name %guix-home-environment number))
-         (activate (string-append generation "/on-reconfigure")))
+         (activate (string-append generation "/activate")))
     (if number
         (begin
           (switch-to-generation* %guix-home-environment number)

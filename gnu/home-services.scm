@@ -16,7 +16,7 @@
 	    home-profile-service-type
 	    home-environment-variables-service-type
 	    home-run-on-first-login-service-type
-	    home-run-on-reconfigure-service-type
+	    home-activation-service-type
             fold-home-service-types)
 
   #:re-export (service
@@ -183,31 +183,33 @@ in the home environment directory."
                 (compose identity)
                 (extend compute-on-first-login-script)
 		(default-value #f)
-                (description "Run gexps on first user login and can \
-be extended with one gexp.")))
+                (description "Run gexps on first user login and can be
+extended with one gexp.")))
 
-(define (compute-on-reconfigure-script _ gexps)
-  (gexp->file "on-reconfigure"
+(define (compute-activation-script _ gexps)
+  (gexp->file "activate"
               #~(begin #$@gexps)))
 
-(define (on-reconfigure-script-entry m-on-reconfigure)
-  "Return, as a monadic value, an entry for the on-reconfigure script
+(define (activation-script-entry m-activation)
+  "Return, as a monadic value, an entry for the activation script
 in the home environment directory."
-  (mlet %store-monad ((on-reconfigure m-on-reconfigure))
-    (return `(("on-reconfigure" ,on-reconfigure)))))
+  (mlet %store-monad ((activation m-activation))
+    (return `(("activate" ,activation)))))
 
-(define home-run-on-reconfigure-service-type
-  (service-type (name 'home-run-on-reconfigure)
+(define home-activation-service-type
+  (service-type (name 'home-activation)
                 (extensions
                  (list (service-extension
 			home-service-type
-                        on-reconfigure-script-entry)))
+                        activation-script-entry)))
                 (compose identity)
-                (extend compute-on-reconfigure-script)
+                (extend compute-activation-script)
 		(default-value #f)
-                (description "Run gexps to update the current state of \
-the home directory during reconfiguration.  This service can be \
-extended with one gexp, and all gexps must be idempotent.")))
+                (description "Run gexps to activate the current
+generation of home environment and update the state of the home
+directory.  @command{activate} script automatically called during
+reconfiguration or generation switching.  This service can be extended
+with one gexp, and all gexps must be idempotent.")))
 
 
 

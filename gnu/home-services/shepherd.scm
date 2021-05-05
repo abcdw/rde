@@ -104,7 +104,7 @@ as shepherd package."
 			home-run-on-first-login-service-type
                         launch-shepherd-gexp)
 		       (service-extension
-			home-run-on-reconfigure-service-type
+			home-activation-service-type
 			ensure-shepherd-gexp)
 		       (service-extension
 			home-profile-service-type

@@ -214,7 +214,7 @@ after all nested items already listed."
                 (extensions
                  (list
 		  (service-extension
-		   home-run-on-reconfigure-service-type
+		   home-activation-service-type
                    update-symlinks-gexp)))
 		(default-value #f)
                 (description "Provide an @code{update-symlinks}

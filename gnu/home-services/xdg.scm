@@ -164,7 +164,7 @@ pre-populated content.")
        config
        home-xdg-user-directories-configuration-fields)))))
 
-(define (home-xdg-user-directories-on-reconfigure config)
+(define (home-xdg-user-directories-activation-service config)
   (let ((dirs (map (lambda (field)
 		     ((configuration-field-getter field) config))
 		   home-xdg-user-directories-configuration-fields)))
@@ -184,8 +184,8 @@ pre-populated content.")
                         home-files-service-type
                         home-xdg-user-directories-files-service)
                        (service-extension
-                        home-run-on-reconfigure-service-type
-                        home-xdg-user-directories-on-reconfigure)))
+                        home-activation-service-type
+                        home-xdg-user-directories-activation-service)))
                 (default-value (home-xdg-user-directories-configuration))
                 (description "Configure XDG user directories.  To
 disable a directory, point it to the $HOME.")))

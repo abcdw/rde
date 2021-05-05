@@ -81,7 +81,7 @@
        ;; Will be instantiated automatically, but still explicitly
        ;; declared for clarity
        (service home-run-on-first-login-service-type)
-       (service home-run-on-reconfigure-service-type)
+       (service home-activation-service-type)
 
        ;; It should be safe to use symlink-path as
        ;; GUIX_HOME_ENVIRONMENT_DIRECTORY, however

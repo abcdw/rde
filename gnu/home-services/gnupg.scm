@@ -301,7 +301,7 @@ have a configuration for gpg-agent."))
 (define (home-gnupg-profile-service config)
   (list (home-gnupg-configuration-package config)))
 
-(define (home-gnupg-run-on-reconfigure-service config)
+(define (home-gnupg-activation-service config)
   #~(let ((gnupg-path (or (getenv "GNUPGHOME")
 			 (string-append (getenv "HOME") "/.gnupg"))))
       ;; Prevent WARNING: unsafe permissions on homedir
@@ -314,8 +314,8 @@ have a configuration for gpg-agent."))
   (service-type (name 'home-gnupg)
                 (extensions
                  (list (service-extension
-                        home-run-on-reconfigure-service-type
-                        home-gnupg-run-on-reconfigure-service)
+                        home-activation-service-type
+                        home-gnupg-activation-service)
 		       (service-extension
                         home-environment-variables-service-type
                         home-gnupg-environment-variables-service)

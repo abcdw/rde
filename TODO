@@ -6,10 +6,6 @@
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** TODO on-reconfigure -> activation
-Refactor on-reconfigure service, it should be activation service,
-because this script can be called on generation switch event and not
-only on reconfigure.
 ** TODO Make fonts service
 ** TODO Add provenance
 To make ~guix home describe~ more informative.
@@ -55,6 +51,10 @@ Define schedule and add the information to announce.
 **** DONE Announce on stream
 *** DONE Discuss xdg-flavor? default to #t
 *** DONE Establish documenting workflow (write guideline)
+*** DONE on-reconfigure -> activation
+Refactor on-reconfigure service, it should be activation service,
+because this script can be called on generation switch event and not
+only on reconfigure.
 * ~guix home~ Backlog
 :PROPERTIES:
 :VISIBILITY: children
