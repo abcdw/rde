@@ -91,12 +91,27 @@ services more consistent."))
 	   ((configuration-field-getter field) config)))
    home-xdg-base-directories-configuration-fields))
 
+(define (ensure-xdg-base-dirs-on-activation config)
+  #~(map (lambda (xdg-base-dir-variable)
+	   ((@@ (guix build utils) mkdir-p)
+	    (getenv
+	     xdg-base-dir-variable)))
+	 '#$(map (lambda (field)
+		   (format
+		    #f "XDG_~a"
+		    (object->snake-case-string
+		     (configuration-field-name field) 'upper)))
+		 home-xdg-base-directories-configuration-fields)))
+
 (define home-xdg-base-directories-service-type
   (service-type (name 'home-xdg-base-directories)
                 (extensions
                  (list (service-extension
                         home-environment-variables-service-type
-                        home-xdg-base-directories-environment-variables-service)))
+                        home-xdg-base-directories-environment-variables-service)
+		       (service-extension
+			home-activation-service-type
+			ensure-xdg-base-dirs-on-activation)))
                 (default-value (home-xdg-base-directories-configuration))
                 (description "Configure XDG base directories.  This
 service introduces two additional variables @env{XDG_STATE_HOME},
