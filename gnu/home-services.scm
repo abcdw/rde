@@ -110,6 +110,7 @@ exported."
 	       (string-append
 	        "HOME_ENVIRONMENT="
 		(assoc-ref vars "GUIX_HOME_ENVIRONMENT_DIRECTORY")
+		;; TODO: It's necessary to source ~/.guix-profile too on foreign distros
 		"
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\"
 . \"$HOME_ENVIRONMENT/profile/etc/profile\"
