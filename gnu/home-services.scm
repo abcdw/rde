@@ -159,7 +159,7 @@ esac
                 (description "Set the environment variables.")))
 
 (define (compute-on-first-login-script _ gexps)
-  (gexp->file
+  (gexp->script
    "on-first-login"
    #~(let* ((xdg-runtime-dir (or (getenv "XDG_RUNTIME_DIR")
 				 (format #f "/run/user/~a" (getuid))))
@@ -191,9 +191,9 @@ in the home environment directory."
                 (description "Run gexps on first user login and can be
 extended with one gexp.")))
 
-(define (compute-activation-script _ gexps)
-  (gexp->file "activate"
-              #~(begin #$@gexps)))
+(define (compute-activation-script init-gexp gexps)
+  (gexp->script "activate"
+		#~(begin #$init-gexp #$@gexps)))
 
 (define (activation-script-entry m-activation)
   "Return, as a monadic value, an entry for the activation script
