@@ -33,6 +33,7 @@
 	    text-config?
 	    serialize-text-config
             object->snake-case-string
+            object->camel-case-string
             ini-config?
             generic-serialize-ini-config
             generic-serialize-git-ini-config
@@ -215,6 +216,30 @@ case''.  STYLE can be three `@code{lower}', `@code{upper}', or
           ((equal? style 'upper) (string-upcase stringified))
           (else (string-capitalize stringified)))
          "-" "_"))))
+
+(define* (object->camel-case-string object #:optional (style 'lower))
+  "Convert the object OBJECT to the equivalent string in ``camel case''.
+STYLE can be three `@code{lower}', `@code{upper}', defaults to
+`@code{lower}'.
+
+@example
+(object->camel-case-string 'variable-name 'upper)
+@result{} \"VariableName\"
+@end example"
+  (if (not (member style '(lower upper)))
+      (error 'invalid-style (format #f "~a is not a valid style" style))
+      (let ((stringified (maybe-object->string object)))
+        (cond
+         ((eq? style 'upper)
+          (string-concatenate
+           (map string-capitalize
+                (string-split stringified (cut eqv? <> #\-)))))
+         ((eq? style 'lower)
+          (let ((splitted-string (string-split stringified (cut eqv? <> #\-))))
+            (string-concatenate
+             (cons (first splitted-string)
+                   (map string-capitalize
+                        (rest splitted-string))))))))))
 
 ;;;
 ;;; Serializers.
