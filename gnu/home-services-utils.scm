@@ -40,6 +40,7 @@
             listof
             listof-strings?
 
+            rest
             maybe-list
             optional
             wrap-package
@@ -347,6 +348,8 @@ the list result in @code{#t} when applying PRED? on them."
 ;;;
 ;;; Miscellaneous.
 ;;;
+
+(define rest cdr)
 
 (define (maybe-list a)
   "If A is a list, return it, otherwise return a singleton list with A."
