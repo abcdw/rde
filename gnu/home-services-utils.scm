@@ -21,6 +21,7 @@
 
 	    alist-entry->mixed-text
             boolean->yes-or-no
+            boolean->true-or-false
             list->human-readable-list
             maybe-object->string
             filter-configuration-fields
@@ -149,6 +150,15 @@ would yield
 Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
 @code{#f} by default."
   (let ((word (if (eq? bool #t) "yes" "no")))
+    (if capitalize?
+        (string-capitalize word)
+        word)))
+
+(define* (boolean->true-or-false bool #:optional (capitalize? #f))
+  "Convert a boolean BOOL to \"true\" or \"false\".
+Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
+@code{#f} by default."
+  (let ((word (if (eq? bool #t) "true" "false")))
     (if capitalize?
         (string-capitalize word)
         word)))
