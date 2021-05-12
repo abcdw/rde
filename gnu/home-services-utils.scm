@@ -375,7 +375,7 @@ elements: the section and the subsection."
 the list result in @code{#t} when applying PRED? on them."
     (lambda (x)
       (if (list? x)
-          (or (every pred? x) (null? x))
+          (every pred? x)
           #f)))
 
 (define listof-strings?
