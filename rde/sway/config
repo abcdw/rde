@@ -3,7 +3,8 @@
 # Copy this to ~/.config/sway/config and edit it to your liking.
 #
 # Read `man 5 sway` for a complete reference.
-
+# bindswitch tablet:on output eDP-1 transform 90 scale 2
+# bindswitch tablet:off output eDP-1 transform 0
 ### Variables
 #
 # Logo key. Use Mod1 for Alt.
@@ -66,18 +67,19 @@ output DP-2 scale 2
 # You can get the names of your inputs by running: swaymsg -t get_inputs
 # Read `man 5 sway-input` for more information about this section.
 
-input "*" {
-    xkb_layout us,ru
-    xkb_variant dvorak,
-    xkb_options grp:win_space_toggle,ctrl:nocaps
-}
+# input "*" {
+#     xkb_layout us,ru
+#     xkb_variant dvorak,
+#     xkb_options grp:win_space_toggle,ctrl:nocaps
+# }
 
 ### Key bindings
 #
 # Basics:
 #
     # Start a terminal
-    bindsym $mod+Shift+Return exec $term
+    bindsym $mod+Shift+Return exec emacsclient -c --eval '(eshell)'
+    bindsym $mod+Control+Shift+Return exec $term
 
     # Kill focused window
     bindsym $mod+Shift+c kill
@@ -190,6 +192,8 @@ input "*" {
 #
 # Resizing containers:
 #
+bindsym $mod+r mode "resize"
+
 mode "resize" {
     # left will shrink the containers width
     # right will grow the containers width
@@ -210,7 +214,6 @@ mode "resize" {
     bindsym Return mode "default"
     bindsym Escape mode "default"
 }
-bindsym $mod+r mode "resize"
 
 #
 # Status Bar:
