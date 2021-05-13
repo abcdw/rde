@@ -332,8 +332,37 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
     #:packages (list tmux))))
 
 (use-modules (gnu packages))
+(use-modules (gnu packages gnuzilla))
+(use-modules (gnu home-services web-browsers))
+
 (define (rde-browsers rde-config)
   (list
+   (service
+    home-icecat-service-type
+    (home-icecat-configuration
+     (profiles
+      (list (icecat-profile
+	     (default? #t)
+	     (name "default")
+	     (id 0)
+	     (settings `((browser.urlbar.shortcuts.history . #t)
+			 (browser.fullscreen.autohide . #f)
+			 (network.proxy.type . 1)
+			 (network.proxy.socks . "localhost")
+			 (network.proxy.socks_port . 8123)
+			 (some-key . ,#~#$(file-append icecat "/bin/icecat"))
+			 (some-key2 . ,(file-append icecat "/bin/icecat"))))
+	     (user-chrome "\
+#TabsToolbar { visibility: collapse !important; }")
+	     (user-content "\
+:root{ scrollbar-width: none !important; }"))
+	    ;; (icecat-profile
+	    ;;  (default? #f)
+	    ;;  (name "github")
+	    ;;  (id 1)
+	    ;;  (settings '((browser.urlbar.shortcuts.bookmarks . #f)
+	    ;; 		 (browser.fullscreen.autohide . #t))))
+	    ))))
    (home-generic-service
     'browsers
     #:packages
