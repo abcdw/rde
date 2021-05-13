@@ -6,12 +6,6 @@
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** TODO Make fonts service
-** TODO Add provenance
-To make ~guix home describe~ more informative.
-** TODO How to update env variables on reconfigure?
-Also, how to make them available in format suitable for shepherd
-services? Shepherd services takes env from shepherd.
 ** TODO Ensure style is correct
 https://mumble.net/~campbell/scheme/style.txt
 https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html#Development
@@ -55,18 +49,22 @@ Define schedule and add the information to announce.
 Refactor on-reconfigure service, it should be activation service,
 because this script can be called on generation switch event and not
 only on reconfigure.
+*** DONE Add provenance
+To make ~guix home describe~ more informative.
 * ~guix home~ Backlog
 :PROPERTIES:
 :VISIBILITY: children
 :END:
 ** Browsers
-*** TODO icecat
+*** IN-PROGRESS icecat
 *** TODO ungoogled-chromium
 - Browser extension
 *** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
 ** IN-PROGRESS Add on-change to on-reconfigure script?
 For some apps to run some commands like restart if their configs updated
+** TODO Make gtk service
+** TODO Make fonts service
 ** TODO Comprehensive Email configuration
 Things the user should be able to configure
 - IMAP and SMTP info (e.g. address, username, port)
@@ -94,7 +92,7 @@ Also browser plugins and other stuff
 :VISIBILITY: content
 :END:
 ** Extensions mechanism
-*** IN-PROGRESS Implement features -> he/os converter
+*** DONE Implement features -> he/os converter
 ** UI
 *** TODO Visually separate sway workspaces for different workflows
 - code
