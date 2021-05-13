@@ -1,0 +1,9 @@
+(use-modules (guix ci)
+	     (guix channels))
+
+(list (channel-with-substitutes-available
+       %default-guix-channel
+       "https://ci.guix.gnu.org")
+      (channel
+       (name 'rde)
+       (url "https://github.com/abcdw/rde")))
