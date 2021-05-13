@@ -80,7 +80,8 @@ HISTSIZE=5000
 SAVEHIST=$HISTSIZE
 HISTFILE=${XDG_CACHE_HOME:-$HOME/.cache}/.zhistory
 
-setopt sharehistory     # Share history across shell sessions
+setopt incappendhistory # Save history to shared file, but not read
+# setopt sharehistory     # Share history across shell sessions
 setopt histignorespace  # Ignore commands that start with space
 
 # Configuring help (M-h to call it on current command/function)

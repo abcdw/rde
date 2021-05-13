@@ -11,7 +11,7 @@
 ** Abort zsh action ~C-g~
 ** Abort command ~C-c~ or clear the input
 ** Clear the line ~C-u~ 
-** Search history ~C-r~ and ~C-s~
+** Search the history or autocompletion ~C-r~ and ~C-s~
 ** Look up manual for the current command ~M-h~
 ** Undo ~C-/~
 
