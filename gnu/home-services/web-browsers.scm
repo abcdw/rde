@@ -12,7 +12,7 @@
   #:use-module (srfi srfi-1)
 
   #:export (home-icecat-service-type
-            icecat-configuration
+            home-icecat-configuration
             icecat-profile))
 
 ;;; Commentary:
@@ -25,7 +25,7 @@
 ;;;
 ;;; IceCat.
 ;;;
-;;; (icecat-configuration
+;;; (home-icecat-configuration
 ;;;    (profiles
 ;;;     (list (icecat-profile
 ;;;            (default? #t)
@@ -78,7 +78,7 @@ details on how to customize the look and feel of IceCat.")
   (no-serialization))
 
 ;; TODO: Extensions.
-(define-configuration icecat-configuration
+(define-configuration home-icecat-configuration
   (package
     (package icecat)
     "The IceCat package to use.")
@@ -88,27 +88,34 @@ details on how to customize the look and feel of IceCat.")
   (no-serialization))
 
 (define (icecat-profile-service config)
-  (list (icecat-configuration-package config)))
+  (list (home-icecat-configuration-package config)))
 
 (define (icecat-files-service config)
   (define (serialize-field key val)
-    (let ((val (cond
-                ((boolean? val) => boolean->true-or-false)
-                (else val))))
-      (format #f "user_pref(\"~a\", ~a);\n" key val)))
+    (let ((primitive-val-str (cond
+			      ((boolean? val) (boolean->true-or-false val))
+			      ((string? val) (format #f "~s" val))
+			      ((number? val) (format #f "~a" val))
+			      (else #f))))
+      (append (list (format #f "user_pref(\"~a\", " key))
+	      (if primitive-val-str
+		  (list primitive-val-str)
+		  (list "\"" val "\""))
+	      (list ");\n"))))
 
   (define (serialize-settings settings)
-    (generic-serialize-alist string-append serialize-field settings))
+    #~(apply string-append
+	     '#$(generic-serialize-alist append serialize-field settings)))
 
   (define (check-duplicate-field field-name fields)
     (let loop ((acc '())
                (fields fields))
       (cond
-       ((null? fields) #t)
+       ((null? fields) #f)
        (else (let ((head (first fields)))
                (if (member head acc)
                    (raise (formatted-message
-                           (G_ "`icecat-configuration' cannot contain \
+                           (G_ "`home-icecat-configuration' cannot contain \
 `icecat-profile's with duplicate ~as: `~a'")
                            field-name head))
                    (loop (cons head acc) (rest fields))))))))
@@ -117,7 +124,7 @@ details on how to customize the look and feel of IceCat.")
     (if (= (length (filter identity defaults)) 1)
         #t
         (raise (formatted-message
-                (G_ "Only one `icecat-profile' in `icecat-configuration' can \
+                (G_ "Only one `icecat-profile' in `home-icecat-configuration' can \
 be the default profile.")))))
 
   ;; Return a list where the first element is a list of alists
@@ -160,7 +167,7 @@ be the default profile.")))))
                          user-content)))))))))
 
   (match config
-    (($ <icecat-configuration> location package profiles)
+    (($ <home-icecat-configuration> location package profiles)
      (begin
        (check-only-one-default (map icecat-profile-default? profiles))
        (check-duplicate-field "name" (map icecat-profile-name profiles))
