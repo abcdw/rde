@@ -159,7 +159,7 @@ Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
   "Convert a boolean BOOL to \"true\" or \"false\".
 Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
 @code{#f} by default."
-  (let ((word (if (eq? bool #t) "true" "false")))
+  (let ((word (if bool "true" "false")))
     (if capitalize?
         (string-capitalize word)
         word)))
