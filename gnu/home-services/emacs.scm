@@ -130,7 +130,7 @@ would yield something like:
 Same as @code{init-el}, but result will go to @file{early-init.el}."))
 
 
-(define ((update-emacs-argument-for-package desired-emacs) p)
+(define ((update-emacs-argument-for-package target-emacs) p)
   "Set @code{#:emacs} to EMACS-PACKAGE for package P.  To build elisp
 packages with proper GNU Emacs version."
   (if (equal?
@@ -140,16 +140,16 @@ packages with proper GNU Emacs version."
 	       (arguments
 		(substitute-keyword-arguments
 		    (package-arguments p)
-		  ((#:emacs e #f) desired-emacs))))
+		  ((#:emacs e #f) target-emacs))))
       p))
 
-(define (emacs-argument-updater desired-emacs)
+(define (emacs-argument-updater target-emacs)
   "Recursively updates @code{#:emacs} argument for package and all the
 inputs."
-  (package-mapping (update-emacs-argument-for-package desired-emacs)
+  (package-mapping (update-emacs-argument-for-package target-emacs)
 		   (lambda (p) #f)))
 
-(define (add-emacs-packages config)
+(define (updated-elisp-packages config)
   (let* ((emacs-package  (home-emacs-configuration-package config))
 	 (elisp-packages (home-emacs-configuration-elisp-packages config))
 
@@ -158,8 +158,11 @@ inputs."
 	      (map (emacs-argument-updater emacs-package)
 		   elisp-packages)
 	      elisp-packages)))
-    (cons emacs-package
-	  updated-elisp-packages)))
+    updated-elisp-packages))
+
+(define (add-emacs-packages config)
+  (cons (home-emacs-configuration-package config)
+	(updated-elisp-packages config)))
 
 
 (define (add-emacs-shepherd-service config)
