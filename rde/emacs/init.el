@@ -14,14 +14,14 @@
 (setq user-mail-address "andrew@trop.in")
 (setq message-auto-save-directory "~/.cache/mail-drafts")
 
-(load-file "~/work/gnu/guix/etc/copyright.el")
-(setq copyright-names-regexp
-      (format "%s <%s>" user-full-name user-mail-address))
+;; (load-file "~/work/gnu/guix/etc/copyright.el")
+;; (setq copyright-names-regexp
+;;       (format "%s <%s>" user-full-name user-mail-address))
 
-(require 'yasnippet)
-(yas-global-mode 1)
-(with-eval-after-load 'yasnippet
-  (add-to-list 'yas-snippet-dirs "~/work/gnu/guix/etc/snippets"))
+;; (require 'yasnippet)
+;; (yas-global-mode 1)
+;; (with-eval-after-load 'yasnippet
+;;   (add-to-list 'yas-snippet-dirs "~/work/gnu/guix/etc/snippets"))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
