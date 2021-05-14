@@ -2,6 +2,7 @@
 (use-modules (gnu home)
 	     (gnu home-services)
 	     (gnu home-services gnupg)
+	     (gnu home-services keyboard)
 	     (gnu home-services ssh)
 	     (gnu home-services version-control)
 	     (gnu home-services files)
@@ -17,10 +18,6 @@
 
 (define sample-he
   (home-environment
-   (keyboard-layout
-    (keyboard-layout "us,ru" "dvorak,"
-		     #:options '("grp:win_space_toggle" "ctrl:nocaps")))
-
    (home-directory (getenv "HOME"))
    ;; (symlink-name ".guix-home-env")
    (packages
@@ -28,6 +25,9 @@
 	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))
    (services
     (list
+     (service home-keyboard-service-type
+	      (keyboard-layout "us,ru" "dvorak,"
+		     #:options '("grp:win_space_toggle" "ctrl:nocaps")))
      (simple-service
       'set-brightness-on-first-login home-run-on-first-login-service-type
       #~(system* #$(file-append light "/bin/light") "-S" "100"))

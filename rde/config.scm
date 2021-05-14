@@ -50,7 +50,6 @@
 
 (define* (get-home-environment rde-config #:key (additional-services '()))
   (home-environment
-   (keyboard-layout (rde-config-keyboard-layout rde-config))
    (home-directory (rde-config-home-directory rde-config))
    (services
     (append
@@ -177,6 +176,13 @@
 		 ))
        )))
   rde-emacs-f)
+
+(use-modules (gnu home-services keyboard))
+(define (rde-keyboard rde-config)
+  (list
+   (service
+    home-keyboard-service-type
+    (rde-config-keyboard-layout rde-config))))
 
 (define (rde-other-packages rde-config)
   (list
@@ -400,6 +406,7 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
 
 (define rde-features
   (list
+   rde-keyboard
    rde-guix-channels
    rde-xdg
    rde-bash
