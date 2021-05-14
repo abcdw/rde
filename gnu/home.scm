@@ -9,6 +9,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (guix records)
   #:use-module (guix gexp)
+  #:use-module (guix diagnostics)
 
   #:export (home-environment
 	    home-environment?
@@ -18,6 +19,7 @@
 	    home-environment-home-directory
 	    home-environment-symlink-name
 	    home-environment-symlink-path
+	    home-environment-location
 
 	    home-environment-with-provenance))
 
@@ -26,16 +28,12 @@
   home-environment?
   this-home-environment
 
-  ;; (layout)
-  ;; (xdg-dirs)
   (packages home-environment-packages             ; list of (PACKAGE OUTPUT...)
             (default '()))
 
+  ;; TODO: move keyboard to xkb or keyboard module?
   (keyboard-layout home-environment-keyboard-layout
 		   (default #f))
-
-  ;; (xdg-base-dirs home-environment-xdg-base-dirs)
-  ;; (xdg-user-dirs home-environment-xdg-user-dirs)
 
   (essential-services home-environment-essential-services ; list of services
                       (thunked)
@@ -56,11 +54,10 @@
 		   "/"
 		   (home-environment-symlink-name this-home-environment))))
 
-  ;; (location home-environment-location             ; <location>
-  ;;           (default (and=> (current-source-location)
-  ;;                           source-properties->location))
-  ;;           (innate))
-  )
+  (location home-environment-location             ; <location>
+            (default (and=> (current-source-location)
+                            source-properties->location))
+            (innate)))
 
 
 (define (home-environment-default-essential-services he)
