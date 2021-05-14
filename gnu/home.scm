@@ -145,10 +145,7 @@ according to the content of @command{setup-environment} script."
 			      #:target-type home-service-type)))
     (service-value home)))
 
-(define* (home-environment-with-provenance
-	  he
-          #:optional
-          (config-file (home-environment-configuration-file he)))
+(define* (home-environment-with-provenance he config-file)
   "Return a variant of HE that stores its own provenance information,
 including CONFIG-FILE, if available.  This is achieved by adding an instance
 of HOME-PROVENANCE-SERVICE-TYPE to its services."
