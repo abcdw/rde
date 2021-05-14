@@ -64,4 +64,6 @@
       ("ixy-home" (rde-config-home-environment ixy-config))
       ("ixy-system" (rde-config-operating-system ixy-config)))))
 
-(dispatcher)
+;; Commented to prevent channel from throwing exception on compilation
+;; Uncomment for your personal config
+;; (dispatcher)
