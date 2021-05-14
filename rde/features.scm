@@ -2,10 +2,29 @@
   #:use-module (guix records)
   #:use-module (guix ui)
   #:use-module (gnu services)
+  #:use-module (gnu system)
   #:use-module (gnu home)
   #:use-module (gnu services configuration)
   #:use-module (srfi srfi-1)
-  #:use-module (srfi srfi-35))
+  #:use-module (srfi srfi-26)
+  #:use-module (srfi srfi-35)
+
+  #:use-module (ice-9 hash-table)
+  #:use-module (ice-9 pretty-print)
+
+  #:export (rde-config
+	    rde-config-home-environment
+	    rde-config-operating-system
+
+	    feature
+	    make-feature-values
+	    require-value
+	    get-value
+
+	    ensure-pred
+	    throw-message
+
+	    feature-user-info))
 
 (define (alist? lst)
   (every pair? lst))
@@ -13,8 +32,8 @@
 (define (list-of-maybe-services-function? fn)
   (procedure? fn))
 
-(define serialize-alist (const ""))
-(define serialize-list-of-maybe-services-function (const ""))
+;; (define serialize-alist (const ""))
+;; (define serialize-list-of-maybe-services-function (const ""))
 
 (define-configuration feature
   (name
@@ -31,7 +50,8 @@ either @code{service?} or @code{#f}. Will go to home environment.")
   (get-system-services
    (list-of-maybe-services-function (const '()))
    "Function returning a list of maybe-services.  Service can be
-either @code{service?} or @code{#f}. Will go to operating system."))
+either @code{service?} or @code{#f}. Will go to operating system.")
+  (no-serialization))
 
 (define-record-type* <rde-config> rde-config
   make-rde-config
@@ -108,73 +128,37 @@ either @code{service?} or @code{#f}. Will go to operating system."))
     ((provide-values field ...)
      `((field . ,field) ...))))
 
-(define* (f-user-info
+(define* (feature-user-info
 	  #:key user-name full-name email
 	  (home-directory (format #f "/home/~a" user-name)))
   "Provides basic information about user for all features."
   (ensure-pred string? user-name)
   (ensure-pred string? full-name)
   (ensure-pred string? email)
+  (ensure-pred string? home-directory)
   
   (feature
    (name 'user-info)
    (values (make-feature-values
 	    user-name full-name email home-directory))))
 
-(use-modules (gnu home-services gnupg))
-(define* (f-gnupg
-	  #:key gpg-primary-key
-	  (gpg-ssh-agent? #t)
-	  (pinentry-flavor 'qt))
-  "Sets up gnupg, if SSH-AGENT? specified also sets up gpg's ssh-agent
-and provides GPG-PRIMARY-KEY value for other features."
 
-  (ensure-pred string? gpg-primary-key)
-  (ensure-pred boolean? gpg-ssh-agent?)
-
-  (define (home-gnupg-services values)
-    "Return a list of home-services, required for gnupg to operate."
-    (list
-     (service home-gnupg-service-type
-	      (home-gnupg-configuration
-	       (gpg-config
-		(home-gpg-configuration
-		 (extra-config
-		  '((keyid-format . long)
-		    (with-subkey-fingerprint . #t)
-		    (keyserver . "hkps://keys.openpgp.org")))))
-	       (gpg-agent-config
-		(home-gpg-agent-configuration
-		 (ssh-agent? gpg-ssh-agent?)
-		 (pinentry-flavor pinentry-flavor)))))))
-    
-  (feature
-   (name 'gnupg)
-   (values (append
-	    (make-feature-values gpg-primary-key gpg-ssh-agent?)
-	    (if gpg-ssh-agent?
-		'((ssh-agent? . #t))
-		'())))
-   (get-home-services home-gnupg-services)))
 
 (define my-features
   (list
-   (f-user-info #:user-name "bob"
+   (feature-user-info #:user-name "bob"
 		#:full-name "Andrew Tropin"
 		#:email "andrew@trop.in")
-   (f-gnupg #:gpg-primary-key "74830A276C328EC2")
-   ;; (f-keyboard #:layout "us,ru" #:options "dvorak,")
-   ;; (f-sway)
-   ;; (f-projects #:directory "work")
-   ;; (f-emacs #:server? #t)
-   ;; (f-emacs-rss)
-   ;; (f-emacs-org-roam)
+   ;; (feature-gnupg #:gpg-primary-key "74830A276C328EC2")
+   ;; (feature-keyboard #:layout "us,ru" #:options "dvorak,")
+   ;; (feature-sway)
+   ;; (feature-projects #:directory "work")
+   ;; (feature-emacs #:server? #t)
+   ;; (feature-emacs-rss)
+   ;; (feature-emacs-org-roam)
    ))
 
-(use-modules (ice-9 hash-table))
-(use-modules (ice-9 pretty-print))
-(use-modules (srfi srfi-1))
-(use-modules (srfi srfi-26))
+
 
 (define (fold-values features)
   (let ((f-values (apply append (map feature-values features))))
@@ -218,9 +202,32 @@ to each get-home-services function."
 to each get-system-services function."
   (fold-some-services features values feature-get-system-services))
 
-(define (get-home-environment rde-config)
+(define* (get-value key config #:optional default-value)
+  "Get KEY from rde-config values."
+  (let ((handle (hash-get-handle (rde-config-values config) key)))
+    (if handle
+	(cdr handle)
+	default-value)))
+
+(define* (require-value key config #:optional (additional-msg ""))
+  (throw-message
+   (not (hash-get-handle (rde-config-values config) key))
+   (format #f "Value ~a is not provided by any feature.\n~a"
+	   key additional-msg)))
+
+(define (get-home-environment config)
+  (require-value 'home-directory config
+		 "You may want to use feature-user-info.")
   (home-environment
-   (services (rde-config-home-services rde-config))))
+   (home-directory (get-value 'home-directory config))
+   (services (rde-config-home-services config))))
+
+(define (get-operating-system config)
+  '()
+  ;; (operating-system
+  ;;  ;; (home-directory (get-value 'home-directory config))
+  ;;  (services (rde-config-system-services config)))
+  )
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)
@@ -231,20 +238,30 @@ to each get-system-services function."
   (pretty-print
    (map service-kind
 	(rde-config-home-services
+	 config)))
+  (pretty-print
+   (map service-kind
+	(rde-config-system-services
 	 config))))
 
-(pretty-print-rde-config
- (rde-config
-  (features my-features)))
+;; (pretty-print-rde-config
+;;  (rde-config
+;;   (features my-features)))
 
-(rde-config-home-environment
- (rde-config
-  (features my-features)))
+(define my-cfg
+  (rde-config
+   (features
+    (list
+     ;; (feature-user-info #:user-name "bob"
+     ;; 		  #:full-name "Andrew Tropin"
+     ;; 		  #:email "andrew@trop.in")
+     ;; (feature-gnupg #:gpg-primary-key "74830A276C328EC2")
+     ;; (feature-keyboard #:layout "us,ru" #:options "dvorak,")
+     ;; (feature-sway)
+     ;; (feature-projects #:directory "work")
+     ;; (feature-emacs #:server? #t)
+     ;; (feature-emacs-rss)
+     ;; (feature-emacs-org-roam)
+     ))))
 
-;; (use-modules (srfi srfi-69))
-;; alist->hash-table
-
-;; (general-info)
-
-;; (feature
-;;  (values '((user-name . "abcdw"))))
+(rde-config-home-environment my-cfg)
