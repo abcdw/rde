@@ -16,24 +16,21 @@
 	    rde-config-home-environment
 	    rde-config-operating-system
 
+	    pretty-print-rde-config
+
 	    feature
 	    make-feature-values
 	    require-value
 	    get-value
 
 	    ensure-pred
-	    throw-message
-
-	    feature-user-info))
+	    throw-message))
 
 (define (alist? lst)
   (every pair? lst))
 
 (define (list-of-maybe-services-function? fn)
   (procedure? fn))
-
-;; (define serialize-alist (const ""))
-;; (define serialize-list-of-maybe-services-function (const ""))
 
 (define-configuration feature
   (name
@@ -128,37 +125,6 @@ either @code{service?} or @code{#f}. Will go to operating system.")
     ((provide-values field ...)
      `((field . ,field) ...))))
 
-(define* (feature-user-info
-	  #:key user-name full-name email
-	  (home-directory (format #f "/home/~a" user-name)))
-  "Provides basic information about user for all features."
-  (ensure-pred string? user-name)
-  (ensure-pred string? full-name)
-  (ensure-pred string? email)
-  (ensure-pred string? home-directory)
-  
-  (feature
-   (name 'user-info)
-   (values (make-feature-values
-	    user-name full-name email home-directory))))
-
-
-
-(define my-features
-  (list
-   (feature-user-info #:user-name "bob"
-		#:full-name "Andrew Tropin"
-		#:email "andrew@trop.in")
-   ;; (feature-gnupg #:gpg-primary-key "74830A276C328EC2")
-   ;; (feature-keyboard #:layout "us,ru" #:options "dvorak,")
-   ;; (feature-sway)
-   ;; (feature-projects #:directory "work")
-   ;; (feature-emacs #:server? #t)
-   ;; (feature-emacs-rss)
-   ;; (feature-emacs-org-roam)
-   ))
-
-
 
 (define (fold-values features)
   (let ((f-values (apply append (map feature-values features))))
@@ -248,20 +214,4 @@ to each get-system-services function."
 ;;  (rde-config
 ;;   (features my-features)))
 
-(define my-cfg
-  (rde-config
-   (features
-    (list
-     ;; (feature-user-info #:user-name "bob"
-     ;; 		  #:full-name "Andrew Tropin"
-     ;; 		  #:email "andrew@trop.in")
-     ;; (feature-gnupg #:gpg-primary-key "74830A276C328EC2")
-     ;; (feature-keyboard #:layout "us,ru" #:options "dvorak,")
-     ;; (feature-sway)
-     ;; (feature-projects #:directory "work")
-     ;; (feature-emacs #:server? #t)
-     ;; (feature-emacs-rss)
-     ;; (feature-emacs-org-roam)
-     ))))
-
-(rde-config-home-environment my-cfg)
+;; (rde-config-home-environment my-cfg)
