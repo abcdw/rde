@@ -42,8 +42,8 @@
   (services home-environment-user-services
 	    (default '()))
 
-  (home-directory home-environment-home-directory
-		       (default #f))
+  ;; (user-name home-environment-user-name)
+  (home-directory home-environment-home-directory)
   (symlink-name home-environment-symlink-name
 		(default ".guix-home-environment"))
 
