@@ -95,7 +95,6 @@ according to the content of @command{setup-environment} script."
      (cons*
       layout-service
       (list
-       (service home-shepherd-service-type)
        (service home-symlink-manager-service-type)
 
        ;; Will be instantiated automatically, but still explicitly
