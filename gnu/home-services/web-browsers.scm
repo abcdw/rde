@@ -93,32 +93,32 @@ details on how to customize the look and feel of IceCat.")
 (define (icecat-files-service config)
   (define (serialize-field key val)
     (let ((primitive-val-str (cond
-			      ((boolean? val) (boolean->true-or-false val))
-			      ((string? val) (format #f "~s" val))
-			      ((number? val) (format #f "~a" val))
-			      (else #f))))
+                              ((boolean? val) (boolean->true-or-false val))
+                              ((string? val) (format #f "~s" val))
+                              ((number? val) (format #f "~a" val))
+                              (else #f))))
       (append (list (format #f "user_pref(\"~a\", " key))
-	      (if primitive-val-str
-		  (list primitive-val-str)
-		  (list "\"" val "\""))
-	      (list ");\n"))))
+              (if primitive-val-str
+                  (list primitive-val-str)
+                  (list "\"" val "\""))
+              (list ");\n"))))
 
   (define (serialize-settings settings)
     #~(apply string-append
-	     '#$(generic-serialize-alist append serialize-field settings)))
+             '#$(generic-serialize-alist append serialize-field settings)))
 
   (define (check-duplicate-field field-name fields)
-    (let loop ((acc '())
-               (fields fields))
-      (cond
-       ((null? fields) #f)
-       (else (let ((head (first fields)))
-               (if (member head acc)
-                   (raise (formatted-message
-                           (G_ "`home-icecat-configuration' cannot contain \
+    (fold (lambda (field acc)
+            (if (null? acc)
+                (cons field acc)
+                (if (equal? field (car acc))
+                    (raise (formatted-message
+                            (G_ "`home-icecat-configuration' cannot contain \
 `icecat-profile's with duplicate ~as: `~a'")
-                           field-name head))
-                   (loop (cons head acc) (rest fields))))))))
+                            field-name head))
+                    (cons field acc))))
+          '()
+          (sort (map maybe-object->string fields) string<)))
 
   (define (check-only-one-default defaults)
     (if (= (length (filter identity defaults)) 1)
@@ -144,27 +144,30 @@ be the default profile.")))))
                (is-relative . 1)
                (name . ,(string-capitalize name))
                (path . ,profile-path))))
-            ,(optional (not (null? settings))
-                       (list
-                        (format #f "~a/~a/user.js"
-                                %icecat-config-path profile-path)
-                        (mixed-text-file
-                         (string-append file-name "-settings")
-                         (serialize-settings settings))))
-            ,(optional (not (string=? user-chrome ""))
-                       (list
-                        (format #f "~a/~a/chrome/userChrome.css"
-                                %icecat-config-path profile-path)
-                        (mixed-text-file
-                         (string-append file-name "-user-chrome")
-                         user-chrome)))
-            ,(optional (not (string=? user-content ""))
-                       (list
-                        (format #f "~a/~a/chrome/userContent.css"
-                                %icecat-config-path profile-path)
-                        (mixed-text-file
-                         (string-append file-name "-user-content")
-                         user-content)))))))))
+            ,(if (not (null? settings))
+                 (list
+                  (format #f "~a/~a/user.js"
+                          %icecat-config-path profile-path)
+                  (mixed-text-file
+                   (string-append file-name "-settings")
+                   (serialize-settings settings)))
+                 '())
+            ,(if (not (string=? user-chrome ""))
+                 (list
+                  (format #f "~a/~a/chrome/userChrome.css"
+                          %icecat-config-path profile-path)
+                  (mixed-text-file
+                   (string-append file-name "-user-chrome")
+                   user-chrome))
+                 '())
+            ,(if (not (string=? user-content ""))
+                 (list
+                  (format #f "~a/~a/chrome/userContent.css"
+                          %icecat-config-path profile-path)
+                  (mixed-text-file
+                   (string-append file-name "-user-content")
+                   user-content))
+                 '())))))))
 
   (match config
     (($ <home-icecat-configuration> location package profiles)
@@ -187,7 +190,7 @@ be the default profile.")))))
               (generic-serialize-ini-config
                #:serialize-field serialize-field
                #:fields profile-ini)))
-           ,@(flatten (map rest configs))))))))
+           ,@(apply append (map rest configs))))))))
 
 (define home-icecat-service-type
   (service-type (name 'home-icecat)
