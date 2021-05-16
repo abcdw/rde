@@ -25,4 +25,6 @@
 			home-environment-variables-service-type
 			set-xkb-variables)))
                 (default-value #f)
-                (description "")))
+                (description "Set layouts by configuring XKB_*
+environment variables.  Service accepts an instance of
+@code{keyboard-layout} from @code{(gnu system keyboard)}.")))
