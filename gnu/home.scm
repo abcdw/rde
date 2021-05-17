@@ -4,6 +4,7 @@
   #:use-module (gnu home-services symlink-manager)
   #:use-module (gnu home-services shells)
   #:use-module (gnu home-services xdg)
+  #:use-module (gnu home-services fontutils)
   #:use-module (gnu services)
   #:use-module (srfi srfi-1)
   #:use-module (guix records)
@@ -78,11 +79,10 @@ according to the content of @command{setup-environment} script."
 
   (let* ((he-path (home-environment-symlink-path he)))
     (list
-     (service home-symlink-manager-service-type)
-
-     ;; Will be instantiated automatically, but still explicitly
-     ;; declared for clarity
      (service home-run-on-first-login-service-type)
+
+     (service home-fontconfig-service-type he-path)
+     (service home-symlink-manager-service-type)
      (service home-activation-service-type
 	      (update-environment-gexp he-path))
 
@@ -110,7 +110,7 @@ according to the content of @command{setup-environment} script."
 
      (service home-shell-profile-service-type
 	      (home-shell-profile-configuration
-	       (he-symlink-path (home-environment-symlink-path he))))
+	       (he-symlink-path he-path)))
      (service home-service-type)
      (service home-profile-service-type (home-environment-packages he)))))
 
