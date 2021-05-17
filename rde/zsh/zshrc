@@ -18,8 +18,8 @@ zstyle ':completion:*' insert-tab false
 zstyle ':completion:*' rehash true # Can have a performance penalty
 
 # Approximate completion
-zstyle ':completion:::::' completer _complete _approximate
-zstyle ':completion:*:approximate:*' max-errors 2
+# zstyle ':completion:::::' completer _complete _approximate
+# zstyle ':completion:*:approximate:*' max-errors 2
 
 # Fuzzy completion
 # https://superuser.com/questions/415650/does-a-fuzzy-matching-mode-exist-for-the-zsh-shell
@@ -101,7 +101,7 @@ zle -N edit-command-line
 bindkey "^X^E" edit-command-line
 
 alias help=run-help
-alias try='guix environment --ad-hoc man-db'
+alias try='guix environment --ad-hoc man-db coreutils'
 alias ls='ls -p --color=auto'
 alias ll='ls -l'
 alias grep='grep --color=auto'
