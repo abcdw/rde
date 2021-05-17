@@ -135,7 +135,7 @@ files."
                         (cons* "GUILE_AUTO_COMPILE=0"
                                (string-append
                                 "PATH="
-                                (getenv "GUIX_HOME_ENVIRONMENT_DIRECTORY")
+                                (getenv "GUIX_HOME_DIRECTORY")
                                 "/profile/bin")
                                (remove (cut string-prefix? "PATH=" <>)
                                        (environ)))

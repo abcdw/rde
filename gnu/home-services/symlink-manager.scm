@@ -62,13 +62,13 @@ after all nested items already listed."
 	     #f))
 
        (use-modules (guix build utils))
-       (let* ((tree-file-name "/.guix-home-environment-file-tree")
+       (let* ((tree-file-name "/.guix-home-file-tree")
 	      (config-home    (or (getenv "XDG_CONFIG_HOME")
 				  (string-append (getenv "HOME") "/.config")))
 	      (tree-file-path (string-append config-home tree-file-name))
 
-	      (he-path (or (getenv "GUIX_HOME_ENVIRONMENT_DIRECTORY")
-			   (string-append (getenv "HOME") "/.guix-home-environment")))
+	      (he-path (or (getenv "GUIX_HOME_DIRECTORY")
+			   (string-append (getenv "HOME") "/.guix-home")))
 	      (files-path (string-append he-path "/files"))
 	      ;; Leading dot is required, because files itself is symlink and
 	      ;; to make file-system-tree works it should be a directory.

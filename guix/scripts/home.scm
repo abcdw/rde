@@ -31,8 +31,8 @@
   ;; Module in which the machine description file is loaded.
   (make-user-module '((gnu home))))
 
-(define %guix-home-environment
-  (string-append %profile-directory "/guix-home-environment"))
+(define %guix-home
+  (string-append %profile-directory "/guix-home"))
 
 (define (show-help)
   (display (G_ "Usage: guix home [OPTION ...] ACTION [ARG ...] [FILE]
@@ -118,16 +118,16 @@ Some ACTIONS support additional ARGS.\n"))
 
           (case action
 	    ((reconfigure)
-	     (let* ((number (generation-number %guix-home-environment))
+	     (let* ((number (generation-number %guix-home))
                     (generation (generation-file-name
-				 %guix-home-environment (+ 1 number)))
+				 %guix-home (+ 1 number)))
 
 		    (user-home-environment-symlink-path
 		     (home-environment-symlink-path he)))
 	       (switch-symlinks generation he-path)
-	       (switch-symlinks %guix-home-environment generation)
+	       (switch-symlinks %guix-home generation)
 	       (switch-symlinks user-home-environment-symlink-path
-				%guix-home-environment)
+				%guix-home)
 
 	       (primitive-load (string-append he-path "/activate"))
 	       (return he-path)))
@@ -212,7 +212,7 @@ argument list and OPTS is the option alist."
     ((search)
      (apply search args))
     ((describe)
-     (match (generation-number %guix-home-environment)
+     (match (generation-number %guix-home)
        (0
         (error (G_ "no home environment generation, nothing to describe~%")))
        (generation
@@ -242,7 +242,7 @@ argument list and OPTS is the option alist."
                       (x (leave (G_ "wrong number of arguments~%"))))))
        (with-store*
 	store
-	(delete-matching-generations store %guix-home-environment pattern))))
+	(delete-matching-generations store %guix-home pattern))))
     (else (process-action command args opts))))
 
 (define-command (guix-home . args)
@@ -376,7 +376,7 @@ description matches REGEXPS sorted by relevance, and their score."
 
 (define* (display-home-environment-generation
 	  number
-          #:optional (profile %guix-home-environment))
+          #:optional (profile %guix-home))
   "Display a summary of home-environment generation NUMBER in a
 human-readable format."
   (define (display-channel channel)
@@ -412,7 +412,7 @@ human-readable format."
                     (file-hyperlink config-file)
                     config-file))))))
 
-(define* (list-generations pattern #:optional (profile %guix-home-environment))
+(define* (list-generations pattern #:optional (profile %guix-home))
   "Display in a human-readable format all the home environment
 generations matching PATTERN, a string.  When PATTERN is #f, display
 all the home environment generations."
@@ -447,12 +447,12 @@ all the home environment generations."
 (define (switch-to-home-environment-generation store spec)
   "Switch the home-environment profile to the generation specified by
 SPEC.  STORE is an open connection to the store."
-  (let* ((number (relative-generation-spec->number %guix-home-environment spec))
-         (generation (generation-file-name %guix-home-environment number))
+  (let* ((number (relative-generation-spec->number %guix-home spec))
+         (generation (generation-file-name %guix-home number))
          (activate (string-append generation "/activate")))
     (if number
         (begin
-          (switch-to-generation* %guix-home-environment number)
+          (switch-to-generation* %guix-home number)
           (unless-file-not-found (primitive-load activate)))
         (leave (G_ "cannot switch to home environment generation '~a'~%") spec))))
 

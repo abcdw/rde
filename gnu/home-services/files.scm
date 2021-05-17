@@ -34,7 +34,7 @@
   (file-union "files" files))
 
 (define (files-entry files)
-  "Return an entry for the @file{~/.guix-home-environment/files}
+  "Return an entry for the @file{~/.guix-home/files}
 directory containing FILES."
   (with-monad %store-monad
     (return `(("files" ,(files->files-directory files))))))
@@ -48,4 +48,4 @@ directory containing FILES."
                 (extend append)
 		(default-value '())
                 (description "Configuration files for programs that
-will be put in @file{~/.guix-home-environment/files}.")))
+will be put in @file{~/.guix-home/files}.")))

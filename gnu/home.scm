@@ -43,7 +43,7 @@
   ;; (user-name home-environment-user-name)
   (home-directory home-environment-home-directory)
   (symlink-name home-environment-symlink-name
-		(default ".guix-home-environment"))
+		(default ".guix-home"))
 
   (symlink-path home-environment-symlink-path (thunked)
 		(default
@@ -87,10 +87,10 @@ according to the content of @command{setup-environment} script."
 	      (update-environment-gexp he-path))
 
      ;; It should be safe to use symlink-path as
-     ;; GUIX_HOME_ENVIRONMENT_DIRECTORY, however
+     ;; GUIX_HOME_DIRECTORY, however
      ;; /var/guix/profiles/per-user/... is another option
      (service home-environment-variables-service-type
-	      `(("GUIX_HOME_ENVIRONMENT_DIRECTORY" . ,he-path)))
+	      `(("GUIX_HOME_DIRECTORY" . ,he-path)))
 
      ;; Make guix aware of `guix home` after first reconfigure, this
      ;; declaration must go before xdg-base-dirs.  Potentially

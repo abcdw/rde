@@ -29,12 +29,12 @@
 	       service-extension))
 
 (define (home-derivation entries mextensions)
-  "Return as a monadic value the derivation of the 'home-environment'
+  "Return as a monadic value the derivation of the 'home'
 directory containing the given entries."
   (mlet %store-monad ((extensions (mapm/accumulate-builds identity
                                                           mextensions)))
     (lower-object
-     (file-union "home-environment"
+     (file-union "home"
                  (append entries (concatenate extensions))))))
 
 (define home-service-type
@@ -74,7 +74,7 @@ packages, configuration files, activation script, and so on.")))
                 (extend append)
                 (description
                  "This is the @dfn{home profile} and can be found in
-@file{~/.guix-home-environment/profile}.  It contains packages and
+@file{~/.guix-home/profile}.  It contains packages and
 configuration files that the user has declared in their
 @code{home-environment} record.")))
 
@@ -109,7 +109,7 @@ exported."
        ,(apply mixed-text-file "setup-environment"
 	       (string-append
 	        "HOME_ENVIRONMENT="
-		(assoc-ref vars "GUIX_HOME_ENVIRONMENT_DIRECTORY")
+		(assoc-ref vars "GUIX_HOME_DIRECTORY")
 		;; TODO: It's necessary to source ~/.guix-profile too on foreign distros
 		"
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\"
@@ -337,7 +337,7 @@ when building the home environment, and its configuration file, when
 available.")))
 
 (define (sexp->home-provenance sexp)
-  "Parse SEXP, an s-expression read from ~/.guix-home-environment/provenance or
+  "Parse SEXP, an s-expression read from ~/.guix-home/provenance or
 similar, and return two values: the list of channels listed therein, and the
 HE configuration file or #f."
   (match sexp

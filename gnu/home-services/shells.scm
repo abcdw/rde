@@ -27,7 +27,7 @@
 
 (define-configuration home-shell-profile-configuration
   (he-symlink-path
-   (path "~/.guix-home-environment")
+   (path "~/.guix-home")
    "Path to home-environment symlink, which contains files that have
 to be sourced or executed by login shell.  This path will be set
 automatically by home-environment.")
