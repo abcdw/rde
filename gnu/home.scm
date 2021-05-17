@@ -16,6 +16,9 @@
 
 	    home-environment-derivation
 	    home-environment-home-directory
+	    home-environment-user-services
+	    home-environment-essential-services
+	    home-environment-services
 	    home-environment-symlink-name
 	    home-environment-symlink-path
 	    home-environment-location
@@ -87,8 +90,7 @@ according to the content of @command{setup-environment} script."
      ;; GUIX_HOME_ENVIRONMENT_DIRECTORY, however
      ;; /var/guix/profiles/per-user/... is another option
      (service home-environment-variables-service-type
-	      `(("GUIX_HOME_ENVIRONMENT_DIRECTORY" .
-		 ,he-path)))
+	      `(("GUIX_HOME_ENVIRONMENT_DIRECTORY" . ,he-path)))
 
      ;; Make guix aware of `guix home` after first reconfigure, this
      ;; declaration must go before xdg-base-dirs.  Potentially
@@ -133,16 +135,3 @@ of HOME-PROVENANCE-SERVICE-TYPE to its services."
     (inherit he)
     (services (cons (service home-provenance-service-type config-file)
                     (home-environment-user-services he)))))
-
-;; home-profile-service-type
-;; home-activation-service-type
-;; home-shepherd-services-type
-
-;; shepherd-service-type
-;; https://specifications.freedesktop.org/autostart-spec/autostart-spec-latest.html
-
-
-;; Guix home manager intro:
-;; https://lists.gnu.org/archive/html/guix-devel/2019-09/msg00218.html
-;; Service extension alternatives:
-;; https://issues.guix.gnu.org/issue/27155
