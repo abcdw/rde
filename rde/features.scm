@@ -3,6 +3,9 @@
   #:use-module (guix ui)
   #:use-module (gnu services)
   #:use-module (gnu system)
+  #:use-module (gnu system file-systems)
+  #:use-module (gnu bootloader)
+  #:use-module (gnu bootloader grub)
   #:use-module (gnu home)
   #:use-module (gnu services configuration)
   #:use-module (srfi srfi-1)
@@ -35,8 +38,7 @@
 (define-configuration feature
   (name
    (symbol)
-   "Name for feature to identify it in debug messages."
-   no-serialization)
+   "Name for feature to identify it in debug messages.")
   (values
    (alist '())
    "List of pairs avaliable to share across services.")
@@ -82,7 +84,15 @@ either @code{service?} or @code{#f}. Will go to operating system.")
      (fold-home-services
       (rde-config-features this-rde-config)
       (rde-config-values this-rde-config))))
+  (home-environment
+   rde-config-home-environment
+   (thunked)
+   (default
+     (get-home-environment this-rde-config)))
 
+  (initial-os
+   rde-config-initial-os
+   (default bare-bone-os))
   (system-services
    rde-config-system-services
    (thunked)
@@ -90,12 +100,11 @@ either @code{service?} or @code{#f}. Will go to operating system.")
      (fold-system-services
       (rde-config-features this-rde-config)
       (rde-config-values this-rde-config))))
-
-  (home-environment
-   rde-config-home-environment
+  (operating-system
+   rde-config-operating-system
    (thunked)
    (default
-     (get-home-environment this-rde-config))))
+     (get-operating-system this-rde-config))))
 
 
 (define-syntax ensure-pred
@@ -168,6 +177,7 @@ to each get-home-services function."
 to each get-system-services function."
   (fold-some-services features values feature-get-system-services))
 
+
 (define* (get-value key config #:optional default-value)
   "Get KEY from rde-config values."
   (let ((handle (hash-get-handle (rde-config-values config) key)))
@@ -188,12 +198,51 @@ to each get-system-services function."
    (home-directory (get-value 'home-directory config))
    (services (rde-config-home-services config))))
 
+(define bare-bone-os
+  (operating-system
+   (host-name "antelope")
+   (timezone  "Europe/Paris")
+   (locale  "en_US.utf8")
+   (bootloader (bootloader-configuration
+		(bootloader grub-efi-bootloader)
+		(target "/boot/efi")))
+   (file-systems %base-file-systems)))
+
 (define (get-operating-system config)
-  '()
-  ;; (operating-system
-  ;;  ;; (home-directory (get-value 'home-directory config))
-  ;;  (services (rde-config-system-services config)))
-  )
+  (let* ((initial-os (rde-config-initial-os config))
+
+	 (host-name       (get-value
+			   'host-name config
+			   (operating-system-host-name initial-os)))
+	 (timezone        (get-value
+			   'timezone config
+			   (operating-system-timezone initial-os)))
+	 (keyboard-layout (get-value
+			   'keyboard-layout config
+			   (operating-system-keyboard-layout initial-os)))
+	 (bootloader-cfg  (get-value
+			   'bootloader-configuration config
+			   (operating-system-bootloader initial-os)))
+	 (bootloader      (bootloader-configuration
+			   (inherit bootloader-cfg)
+			   (keyboard-layout keyboard-layout)))
+
+	 ;; Append or substitute?
+	 (file-systems    (append
+			   (get-value 'file-systems config '())
+			   (operating-system-file-systems initial-os)))
+	 (services        (append
+			   (rde-config-system-services config)
+			   (operating-system-file-systems initial-os))))
+
+    (operating-system
+     (inherit initial-os)
+     (host-name host-name)
+     (timezone timezone)
+     (bootloader bootloader)
+     (file-systems file-systems)
+     (keyboard-layout keyboard-layout)
+     (services services))))
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)
