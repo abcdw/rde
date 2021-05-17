@@ -38,4 +38,4 @@ and provides GPG-PRIMARY-KEY value for other features."
 	    (if gpg-ssh-agent?
 		'((ssh-agent? . #t))
 		'())))
-   (get-home-services home-gnupg-services)))
+   (home-services-getter home-gnupg-services)))

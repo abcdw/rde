@@ -1,6 +1,5 @@
 (define-module (rde features base)
   #:use-module (rde features)
-  #:use-module (gnu services)
 
   #:export (feature-user-info))
 

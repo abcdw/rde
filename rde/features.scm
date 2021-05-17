@@ -32,7 +32,7 @@
 (define (alist? lst)
   (every pair? lst))
 
-(define (list-of-maybe-services-function? fn)
+(define (services-getter? fn)
   (procedure? fn))
 
 (define-configuration feature
@@ -42,14 +42,16 @@
   (values
    (alist '())
    "List of pairs avaliable to share across services.")
-  (get-home-services
-   (list-of-maybe-services-function (const '()))
-   "Function returning a list of maybe-services.  Service can be
-either @code{service?} or @code{#f}. Will go to home environment.")
-  (get-system-services
-   (list-of-maybe-services-function (const '()))
-   "Function returning a list of maybe-services.  Service can be
-either @code{service?} or @code{#f}. Will go to operating system.")
+  (home-services-getter
+   (services-getter (const '()))
+   "Function taking one argument (@code{values}) and returning a list
+of services.  Service can be either @code{service?} or
+@code{#f}. Resulting list will be appended to home environment.")
+  (system-services-getter
+   (services-getter (const '()))
+   "Function taking one argument (@code{values}) and returning a list
+of services.  Service can be either @code{service?} or
+@code{#f}. Resulting list will be appended to operating system.")
   (no-serialization))
 
 (define-record-type* <rde-config> rde-config
@@ -160,22 +162,22 @@ The previous value was:\n~a\n")
   (hash-for-each-handle pretty-print
 			(fold-values features)))
 
-(define (fold-some-services features values getter)
+(define (fold-some-services features values services-getter)
   (filter service?
 	  (apply append
 		 (map (lambda (f)
-			((getter f) values))
+			((services-getter f) values))
 		      features))))
 
 (define (fold-home-services features values)
   "Generates a list of home-services from FEATURES by passing VALUES
-to each get-home-services function."
-  (fold-some-services features values feature-get-home-services))
+to each home-services-getter function."
+  (fold-some-services features values feature-home-services-getter))
 
 (define (fold-system-services features values)
   "Generates a list of system-services from FEATURES by passing VALUES
-to each get-system-services function."
-  (fold-some-services features values feature-get-system-services))
+to each system-services-getter function."
+  (fold-some-services features values feature-system-services-getter))
 
 
 (define* (get-value key config #:optional default-value)
@@ -226,14 +228,17 @@ to each get-system-services function."
 	 (bootloader      (bootloader-configuration
 			   (inherit bootloader-cfg)
 			   (keyboard-layout keyboard-layout)))
-
-	 ;; Append or substitute?
-	 (file-systems    (append
-			   (get-value 'file-systems config '())
+	 (file-systems    (get-value
+			   'file-systems config
 			   (operating-system-file-systems initial-os)))
-	 (services        (append
-			   (rde-config-system-services config)
-			   (operating-system-file-systems initial-os))))
+	 ;; NOTE: Can be very frustrating, when a dozen of features
+	 ;; doesn't provide any system services and next added feature
+	 ;; will provide system service and initial-os user-services
+	 ;; will be wiped.
+	 (system-services (rde-config-system-services config))
+	 (services        (if (null? system-services)
+			      (operating-system-user-services initial-os)
+			      system-services)))
 
     (operating-system
      (inherit initial-os)
