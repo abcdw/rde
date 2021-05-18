@@ -1,11 +1,9 @@
 -*- mode: org -*-
 #+STARTUP: showall
 #+TODO: TODO IN-PROGRESS | DONE
+#+TODO: QUESTION | RESOLVED
 
-* ~guix home~ Before Upstream Checklist
-:PROPERTIES:
-:VISIBILITY: children
-:END:
+* ~guix home~ Upstream Backlog
 ** TODO Ensure style is correct
 https://mumble.net/~campbell/scheme/style.txt
 https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html#Development
@@ -13,6 +11,13 @@ https://guix.gnu.org/manual/en/guix.html#Coding-Style
 Add copyrights to source code
 ** TODO Cleanup utils module
 Split into utils and configuration related helper?
+** QUESTION Add home-services to service or keep them separate?
+* ~guix home~ Before Upstream Checklist
+:PROPERTIES:
+:VISIBILITY: children
+:END:
+** TODO Make activation script create ~/.guix-home symlink
+It will also allow to make correct run-on-change implementation.
 ** Finished
 :PROPERTIES:
 :VISIBILITY: folded
@@ -56,15 +61,14 @@ To make ~guix home describe~ more informative.
 :VISIBILITY: children
 :END:
 ** Browsers
-*** IN-PROGRESS icecat
 *** TODO ungoogled-chromium
 - Browser extension
 *** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** IN-PROGRESS Add on-change to on-reconfigure script?
+** IN-PROGRESS Add on-change to activation script?
 For some apps to run some commands like restart if their configs updated
+** IN-PROGRESS Make fonts service
 ** TODO Make gtk service
-** TODO Make fonts service
 ** TODO Comprehensive Email configuration
 Things the user should be able to configure
 - IMAP and SMTP info (e.g. address, username, port)
@@ -77,15 +81,16 @@ Things the user should be able to configure
 - notmuch/mu
 *** TODO SMTP client
 - msmtp/sendmail
-** TODO Shepherd service for Sway?
-** DONE sway
-** DONE Emacs
+** Finished
+*** DONE icecat
+*** DONE sway
+*** DONE Emacs
 Features:
 - xdg-flavor? :: Use ~/.config/emacs/~
 - separate-customize? :: Move customize to state dir
 - no-init-el? :: Use default.el instead of init.el
 - server-mode? :: Create shepherd service for emacs
-** DONE pass
+*** DONE pass
 Also browser plugins and other stuff
 * ~rde~ Backlog
 :PROPERTIES:
