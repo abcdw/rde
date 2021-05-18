@@ -4,6 +4,7 @@
   #:use-module (gnu bootloader grub)
   #:use-module (gnu system)
   #:use-module (gnu system file-systems)
+  #:use-module (gnu system mapped-devices)
   #:use-module (srfi srfi-1)
 
   #:export (feature-bootloader
@@ -27,20 +28,25 @@ keyboard-layout will be overriden by feature-keyboard if it present."
 
 (define (list-of-file-systems? lst)
   (and (list? lst) (every file-system? lst)))
+(define (list-of-mapped-devices? lst)
+  (and (list? lst) (every mapped-device? lst)))
 
 (define* (feature-file-systems
 	  #:key
+	  (mapped-devices '())
 	  (file-systems '())
 	  (base-file-systems %base-file-systems))
   "Provides file systems for operating-system.  By default
 %base-file-systems will be added to the end of FILE-SYSTEMS, this
 behavior can be overriden with BASE-FILE-SYSTEM argument."
+  (ensure-pred list-of-mapped-devices? mapped-devices)
   (ensure-pred list-of-file-systems? file-systems)
+  (ensure-pred list-of-file-systems? base-file-systems)
 
   (let ((file-systems (append file-systems base-file-systems)))
     (feature
      (name 'file-systems)
-     (values (make-feature-values file-systems)))))
+     (values (make-feature-values mapped-devices file-systems)))))
 
 
 (define* (feature-host-info

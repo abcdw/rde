@@ -232,6 +232,9 @@ to each system-services-getter function."
 	 (bootloader      (bootloader-configuration
 			   (inherit bootloader-cfg)
 			   (keyboard-layout keyboard-layout)))
+	 (mapped-devices  (get-value
+			   'mapped-devices config
+			   (operating-system-mapped-devices initial-os)))
 	 (file-systems    (get-value
 			   'file-systems config
 			   (operating-system-file-systems initial-os)))
@@ -272,6 +275,7 @@ to each system-services-getter function."
       (host-name host-name)
       (timezone timezone)
       (bootloader bootloader)
+      (mapped-devices mapped-devices)
       (file-systems file-systems)
       (users users)
       (keyboard-layout keyboard-layout)
