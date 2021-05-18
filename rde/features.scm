@@ -27,7 +27,9 @@
 	    get-value
 
 	    ensure-pred
-	    throw-message))
+	    throw-message
+
+	    bare-bone-os))
 
 (define (alist? lst)
   (every pair? lst))
