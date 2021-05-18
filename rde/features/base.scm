@@ -9,19 +9,24 @@
 
   #:export (feature-user-info))
 
+(define (maybe-string? x)
+  (or (string? x) (not x)))
+
 (define* (feature-user-info
 	  #:key user-name full-name email
-	  (home-directory (format #f "/home/~a" user-name)))
+	  (home-directory (format #f "/home/~a" user-name))
+	  (user-password #f))
   "Provides basic information about user for all features."
   (ensure-pred string? user-name)
   (ensure-pred string? full-name)
   (ensure-pred string? email)
   (ensure-pred string? home-directory)
+  (ensure-pred maybe-string? user-password)
 
   (feature
    (name 'user-info)
    (values (make-feature-values
-	    user-name full-name email home-directory))))
+	    user-name full-name email home-directory user-password))))
 
 
 (define (list-of-packages? lst)
