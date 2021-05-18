@@ -121,10 +121,8 @@
    ;; This is where we specify system-wide packages.
    (packages (append
 	      (map specification->package+output
-		   '("font-iosevka" "font-dejavu" "font-gnu-unifont"
-		     ;; System packages
-		     "iwd"
-		     "grub" "glibc" "nss-certs"))
+		   '(;; System packages
+		     "nss-certs"))
 	      %base-packages-disk-utilities
 	      %base-packages))
 
