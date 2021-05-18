@@ -4,6 +4,8 @@
   #:use-module (gnu services)
   #:use-module (gnu system)
   #:use-module (gnu system file-systems)
+  #:use-module (gnu system accounts)
+  #:use-module (gnu system shadow)
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)
   #:use-module (gnu home)
@@ -233,6 +235,29 @@ to each system-services-getter function."
 	 (file-systems    (get-value
 			   'file-systems config
 			   (operating-system-file-systems initial-os)))
+
+	 (user-name       (get-value 'user-name config))
+	 (full-name       (get-value 'full-name config ""))
+	 (home-directory  (get-value
+			   'home-directory config
+			   (string-append "/home/" (or user-name "user"))))
+	 (login-shell     (get-value 'login-shell config (default-shell)))
+	 (user-password   (get-value 'user-initial-password-hash config #f))
+
+	 (users           (if user-name
+			      (cons
+			       (user-account
+				(name user-name)
+				(comment full-name)
+				(password user-password)
+				(home-directory home-directory)
+				(shell login-shell)
+				(group "users")
+				(supplementary-groups '("wheel" "netdev"
+							"audio" "video")))
+			       %base-user-accounts)
+			      (operating-system-users initial-os)))
+
 	 ;; NOTE: Can be very frustrating, when a dozen of features
 	 ;; doesn't provide any system services and next added feature
 	 ;; will provide system service and initial-os user-services
@@ -243,13 +268,14 @@ to each system-services-getter function."
 			      system-services)))
 
     (operating-system
-     (inherit initial-os)
-     (host-name host-name)
-     (timezone timezone)
-     (bootloader bootloader)
-     (file-systems file-systems)
-     (keyboard-layout keyboard-layout)
-     (services services))))
+      (inherit initial-os)
+      (host-name host-name)
+      (timezone timezone)
+      (bootloader bootloader)
+      (file-systems file-systems)
+      (users users)
+      (keyboard-layout keyboard-layout)
+      (services services))))
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)

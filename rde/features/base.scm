@@ -15,18 +15,19 @@
 (define* (feature-user-info
 	  #:key user-name full-name email
 	  (home-directory (format #f "/home/~a" user-name))
-	  (user-password #f))
+	  (user-initial-password-hash #f))
   "Provides basic information about user for all features."
   (ensure-pred string? user-name)
   (ensure-pred string? full-name)
   (ensure-pred string? email)
   (ensure-pred string? home-directory)
-  (ensure-pred maybe-string? user-password)
+  (ensure-pred maybe-string? user-initial-password-hash)
 
   (feature
    (name 'user-info)
    (values (make-feature-values
-	    user-name full-name email home-directory user-password))))
+	    user-name full-name email home-directory
+	    user-initial-password-hash))))
 
 
 (define (list-of-packages? lst)
