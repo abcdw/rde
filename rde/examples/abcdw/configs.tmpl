@@ -1,6 +1,7 @@
 (use-modules (rde features)
 	     (rde features base)
 	     (rde features gnupg)
+	     (rde features keyboard)
 	     (ice-9 match))
 
 ;; (define my-features
@@ -43,25 +44,27 @@
    ))
 
 (define %generic-features
-  (list))
+  (list
+   (feature-keyboard
+    #:keyboard-layout %dvorak-jcuken-layout)))
 
-(define %laptop-features '())
+(define %laptop-features
+  (list))
 
 (define ixy-config
   (rde-config
    (features
     (append
      %bob-features
-     %laptop-features
-     %devenv-features))))
-
-(use-modules (gnu home))
-(home-environment-location (rde-config-home-environment ixy-config))
+     %generic-features
+     %devenv-features
+     %laptop-features))))
 
 (define (dispatcher)
   (let ((rde-target (getenv "RDE_TARGET")))
     (match rde-target
       ("ixy-home" (rde-config-home-environment ixy-config))
-      ("ixy-system" (rde-config-operating-system ixy-config)))))
+      ("ixy-system" (rde-config-operating-system ixy-config))
+      (_ "no RDE_TARGET matched"))))
 
 (dispatcher)
