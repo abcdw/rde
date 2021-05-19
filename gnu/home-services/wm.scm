@@ -144,7 +144,7 @@ input * {
        (serialize-configuration config home-sway-configuration-fields)))))
 
 (define home-sway-service-type
-  (service-type (name 'home-emacs)
+  (service-type (name 'home-sway)
                 (extensions
                  (list (service-extension
 			home-profile-service-type
