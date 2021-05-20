@@ -89,7 +89,7 @@ of services.  Service can be either @code{service?} or
    (default
      (fold-home-services
       (rde-config-features this-rde-config)
-      (rde-config-values this-rde-config))))
+      this-rde-config)))
   (home-environment
    rde-config-home-environment
    (thunked)
@@ -105,7 +105,7 @@ of services.  Service can be either @code{service?} or
    (default
      (fold-system-services
       (rde-config-features this-rde-config)
-      (rde-config-values this-rde-config))))
+      this-rde-config)))
   (operating-system
    rde-config-operating-system
    (thunked)
@@ -166,36 +166,37 @@ The previous value was:\n~a\n")
   (hash-for-each-handle pretty-print
 			(fold-values features)))
 
-(define (fold-some-services features values services-getter)
+(define (fold-some-services features config services-getter)
   (filter service?
 	  (apply append
 		 (map (lambda (f)
-			((services-getter f) values))
+			((services-getter f) config))
 		      features))))
 
-(define (fold-home-services features values)
-  "Generates a list of home-services from FEATURES by passing VALUES
+(define (fold-home-services features config)
+  "Generates a list of home-services from FEATURES by passing CONFIG
 to each home-services-getter function."
-  (fold-some-services features values feature-home-services-getter))
+  (fold-some-services features config feature-home-services-getter))
 
-(define (fold-system-services features values)
-  "Generates a list of system-services from FEATURES by passing VALUES
+(define (fold-system-services features config)
+  "Generates a list of system-services from FEATURES by passing CONFIG
 to each system-services-getter function."
-  (fold-some-services features values feature-system-services-getter))
+  (fold-some-services features config feature-system-services-getter))
 
 
 (define* (get-value key config #:optional default-value)
-  "Get KEY from rde-config values."
+  "Get KEY from rde-config-values."
   (let ((handle (hash-get-handle (rde-config-values config) key)))
     (if handle
 	(cdr handle)
 	default-value)))
 
-(define* (require-value key config #:optional (additional-msg ""))
+(define* (require-value key config #:optional (additional-msg #f))
   (throw-message
    (not (hash-get-handle (rde-config-values config) key))
-   (format #f "Value ~a is not provided by any feature.\n~a"
-	   key additional-msg)))
+   (format
+    #f "Value ~a is not provided by any feature.\n~a"
+    key (or (and=> additional-msg (lambda (x) (string-append x "\n"))) ""))))
 
 (define (get-home-environment config)
   (require-value 'home-directory config
@@ -266,9 +267,9 @@ to each system-services-getter function."
 	 ;; will provide system service and initial-os user-services
 	 ;; will be wiped.
 	 (system-services (rde-config-system-services config))
-	 (services        (if (null? system-services)
-			      (operating-system-user-services initial-os)
-			      system-services)))
+	 (services        (append
+			   (operating-system-user-services initial-os)
+			   system-services)))
 
     (operating-system
       (inherit initial-os)
