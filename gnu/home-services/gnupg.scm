@@ -19,7 +19,9 @@
   #:export (home-gnupg-service-type
 	    home-gnupg-configuration
             home-gpg-configuration
-            home-gpg-agent-configuration))
+            home-gpg-agent-configuration
+
+	    pinentry-flavor?))
 
 ;;; Commentary:
 ;;
