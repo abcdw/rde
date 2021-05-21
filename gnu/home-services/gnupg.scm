@@ -259,8 +259,8 @@ have a configuration for gpg-agent."))
             ,(if (null? (home-gpg-agent-configuration-ssh-keys
                          (home-gnupg-configuration-gpg-agent-config config)))
                  '()
-                 '("gnupg/sshcontrol"
-                   (home-gpg-sshcontrol-file config)))
+                 `("gnupg/sshcontrol"
+                   ,(home-gpg-sshcontrol-file config)))
             ("gnupg/gpg.conf"
              ,(home-gpg-file config)))))
 
