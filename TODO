@@ -18,6 +18,7 @@ Split into utils and configuration related helper?
 :END:
 ** TODO Make activation script create ~/.guix-home symlink
 It will also allow to make correct run-on-change implementation.
+** TODO Make system service for Guix Home
 ** Finished
 :PROPERTIES:
 :VISIBILITY: folded
