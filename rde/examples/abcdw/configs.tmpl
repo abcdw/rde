@@ -2,69 +2,114 @@
 	     (rde features base)
 	     (rde features gnupg)
 	     (rde features keyboard)
+	     (rde features system)
+	     (rde features wm)
+	     (gnu system file-systems)
+	     (gnu system mapped-devices)
+	     (guix gexp)
 	     (ice-9 match))
 
-;; (define my-features
-;;   (list
-;;    (feature-user-info #:user-name "bob"
-;; 		#:full-name "Andrew Tropin"
-;; 		#:email "andrew@trop.in")
-;;    ;; (feature-gnupg #:gpg-primary-key "74830A276C328EC2")
-;;    ;; (feature-keyboard #:layout "us,ru" #:options "dvorak,")
-;;    ;; (feature-sway)
-;;    ;; (feature-projects #:directory "work")
-;;    ;; (feature-emacs #:server? #t)
-;;    ;; (feature-emacs-rss)
-;;    ;; (feature-emacs-org-roam)
-;;    ))
+
+;;; User-specific features
 
-(define %bob-features
+;; Initial user's password hash will be available in store, so it's
+;; use this feature with care
+;; (display (crypt "hi" "$6$abc"))
+
+(define %abcdw-features
   (list
    (feature-user-info
     #:user-name "bob"
     #:full-name "Andrew Tropin"
     #:email "andrew@trop.in")
    (feature-gnupg
-    #:gpg-primary-key "74830A276C328EC2")))
-
-(define %abcdw-features
-  (list
-   (feature-user-info
-    #:user-name "abcdw"
-    #:full-name "Andrew Tropin"
-    #:email "andrew@trop.in")
-   (feature-gnupg
-    #:gpg-primary-key "74830A276C328EC2")))
-
-(define %devenv-features
-  (list
-   ;; (feature-git
-   ;;  ;; #:gpg-sign-key ""
-   ;;  #:sign-commits? #t)
-   ))
-
-(define %generic-features
-  (list
+    #:gpg-primary-key "74830A276C328EC2"
+    #:gpg-smart-card? #t)
    (feature-keyboard
     #:keyboard-layout %dvorak-jcuken-layout)))
 
-(define %laptop-features
-  (list))
+(use-modules (gnu packages admin))
+
+(define %wayland-features
+  (list
+   ;; (feature-packages
+   ;;  #:system-packages (list htop))
+   (feature-sway
+    #:config-file (local-file "../../sway/config"))
+   (feature-sway-run-on-tty
+    #:sway-tty-number 2)))
+
+
+;;; Generic features should be applicable for various hosts/users/etc
+
+(define %generic-features
+  (list
+   ;; (feature-pipewire)
+   ;; (feature-blablabla)
+   (feature-base-packages)))
+
+
+;;; Hardware/host specifis features
+
+(define ixy-mapped-devices
+  (list (mapped-device
+         (source (uuid "0e51ee1e-49ef-45c6-b0c3-6307e9980fa9"))
+         (target "enc")
+         (type luks-device-mapping))))
+
+(define ixy-file-systems
+  (append
+   (map (match-lambda
+	  ((subvol . mount-point)
+	   (file-system
+	     (type "btrfs")
+	     (device "/dev/mapper/enc")
+	     (mount-point mount-point)
+	     (options (format #f "subvol=~a" subvol))
+	     (dependencies ixy-mapped-devices))))
+	'((root . "/")
+	  (boot . "/boot")
+	  (gnu  . "/gnu")
+	  (home . "/home")
+	  (data . "/data")
+	  (log  . "/var/log")))
+   (list
+    (file-system
+      (mount-point "/boot/efi")
+      (type "vfat")
+      (device (uuid "8C99-0704" 'fat32))))))
+
+(define %ixy-features
+  (list
+   (feature-host-info
+    #:host-name "ixy"
+    #:timezone  "Europe/Moscow")
+   ;;; Allows to declare specific bootloader configuration,
+   ;;; grub-efi-bootloader used by default
+   ;; (feature-bootloader)
+   (feature-file-systems
+    #:mapped-devices ixy-mapped-devices
+    #:file-systems   ixy-file-systems)))
+
+
+;;; rde-config and helpers for generating home-environment and
+;;; operating-system records.
 
 (define ixy-config
   (rde-config
    (features
     (append
-     %bob-features
+     %abcdw-features
+     %wayland-features
      %generic-features
-     %devenv-features
-     %laptop-features))))
+     %ixy-features))))
 
 (define (dispatcher)
   (let ((rde-target (getenv "RDE_TARGET")))
     (match rde-target
       ("ixy-home" (rde-config-home-environment ixy-config))
       ("ixy-system" (rde-config-operating-system ixy-config))
-      (_ "no RDE_TARGET matched"))))
+      (_ (rde-config-home-environment ixy-config)))))
 
+(pretty-print-rde-config ixy-config)
 (dispatcher)

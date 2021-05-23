@@ -5,9 +5,13 @@
   #:use-module (gnu system)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
+  #:use-module (gnu services)
+  #:use-module (gnu services desktop)
+  #:use-module (gnu services xorg)
   #:use-module (srfi srfi-1)
 
   #:export (feature-bootloader
+	    feature-host-info
 	    feature-file-systems))
 
 (define %default-bootloader-configuration
@@ -62,3 +66,12 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
   (feature
    (name 'host-info)
    (values (make-feature-values host-name timezone locale))))
+
+(define %rde-desktop-services
+  (remove (lambda (service)
+	    (member (service-kind service)
+		    (list gdm-service-type screen-locker-service-type)))
+	  %desktop-services))
+
+;; ((@@ (ice-9 pretty-print) pretty-print)
+;;  (map service-kind %desktop-services))

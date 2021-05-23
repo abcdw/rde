@@ -10,7 +10,7 @@
 	  #:key gpg-primary-key
 	  (gpg-ssh-agent? #t)
 	  (pinentry-flavor 'qt)
-	  (gpg-smart-card? #t))
+	  (gpg-smart-card? #f))
   "Sets up gnupg, if SSH-AGENT? specified also sets up gpg's ssh-agent
 and provides GPG-PRIMARY-KEY value for other features."
 

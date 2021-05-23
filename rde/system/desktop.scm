@@ -133,7 +133,8 @@
 	      %desktop-services)))
 
     ;; Allow resolution of '.local' host names with mDNS.
-    (name-service-switch %mdns-host-lookup-nss)))
+    ;; (name-service-switch %mdns-host-lookup-nss)
+    ))
 
 ;; (use-modules (guix store)
 ;; 	     (guix derivations))
