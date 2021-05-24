@@ -20,6 +20,8 @@
   #:export (rde-config
 	    rde-config-home-environment
 	    rde-config-operating-system
+	    rde-config-home-services
+	    rde-config-system-services
 
 	    pretty-print-rde-config
 

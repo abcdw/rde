@@ -42,14 +42,22 @@
 
 ;;; Generic features should be applicable for various hosts/users/etc
 
-(define %generic-features
+(define %base-features
   (list
    ;; (feature-pipewire)
    ;; (feature-blablabla)
-   (feature-base-packages)))
+   (feature-base-packages)
+   (feature-base-services)
+   (feature-desktop-services)))
+
+(define %laptop-features
+  (list ))
 
 
 ;;; Hardware/host specifis features
+
+;; TODO: Switch from UUIDs to partition labels For better
+;; reproducibilty and easier setup.  Grub doesn't support luks2 yet.
 
 (define ixy-mapped-devices
   (list (mapped-device
@@ -89,7 +97,8 @@
    ;; (feature-bootloader)
    (feature-file-systems
     #:mapped-devices ixy-mapped-devices
-    #:file-systems   ixy-file-systems)))
+    #:file-systems   ixy-file-systems)
+   (feature-hidpi)))
 
 
 ;;; rde-config and helpers for generating home-environment and
@@ -101,7 +110,7 @@
     (append
      %abcdw-features
      %wayland-features
-     %generic-features
+     %base-features
      %ixy-features))))
 
 (define (dispatcher)
@@ -111,5 +120,12 @@
       ("ixy-system" (rde-config-operating-system ixy-config))
       (_ (rde-config-home-environment ixy-config)))))
 
-(pretty-print-rde-config ixy-config)
+;; (pretty-print-rde-config ixy-config)
+;; (use-modules (gnu services)
+;; 	     (gnu services base))
+;; (display
+;;  (filter (lambda (x)
+;; 	   (eq? (service-kind x) console-font-service-type))
+;; 	 (rde-config-system-services ixy-config)))
+
 (dispatcher)
