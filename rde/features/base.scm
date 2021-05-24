@@ -9,6 +9,7 @@
   #:use-module (gnu home-services)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages fonts)
+  #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
 
   #:export (feature-user-info
