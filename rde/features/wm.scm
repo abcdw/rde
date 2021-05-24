@@ -1,5 +1,6 @@
 (define-module (rde features wm)
   #:use-module (rde features)
+  #:use-module (rde features predicates)
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
   #:use-module (gnu packages wm)
@@ -24,12 +25,6 @@
 	     ((xkb_layout  ,(keyboard-layout-name keyboard-layout))
 	      (xkb_variant ,(keyboard-layout-variant keyboard-layout))
 	      (xkb_options ,kb-options))))))
-
-(define (maybe-file-like? x)
-  (or (file-like? x) (not x)))
-
-(define (tty-number? x)
-  (and (integer? x) (<= 1 x 6)))
 
 (define* (feature-sway
 	  #:key

@@ -1,17 +1,13 @@
 (define-module (rde features base)
   #:use-module (rde features)
+  #:use-module (rde features predicates)
   #:use-module (gnu system)
   #:use-module (gnu services)
   #:use-module (gnu home-services)
   #:use-module (gnu packages certs)
-  #:use-module (guix packages)
-  #:use-module (srfi srfi-1)
 
   #:export (feature-user-info
 	    feature-base-packages))
-
-(define (maybe-string? x)
-  (or (string? x) (not x)))
 
 (define* (feature-user-info
 	  #:key user-name full-name email
