@@ -215,63 +215,67 @@ to each system-services-getter function."
    (bootloader (bootloader-configuration
 		(bootloader grub-efi-bootloader)
 		(target "/boot/efi")))
+   (services '())
    (file-systems %base-file-systems)))
 
 (define (get-operating-system config)
   (let* ((initial-os (rde-config-initial-os config))
 
-	 (host-name       (get-value
-			   'host-name config
-			   (operating-system-host-name initial-os)))
-	 (timezone        (get-value
-			   'timezone config
-			   (operating-system-timezone initial-os)))
-	 (keyboard-layout (get-value
-			   'keyboard-layout config
-			   (operating-system-keyboard-layout initial-os)))
-	 (bootloader-cfg  (get-value
-			   'bootloader-configuration config
-			   (operating-system-bootloader initial-os)))
-	 (bootloader      (bootloader-configuration
-			   (inherit bootloader-cfg)
-			   (keyboard-layout keyboard-layout)))
-	 (mapped-devices  (get-value
-			   'mapped-devices config
-			   (operating-system-mapped-devices initial-os)))
-	 (file-systems    (get-value
-			   'file-systems config
-			   (operating-system-file-systems initial-os)))
+	 (host-name        (get-value
+			    'host-name config
+			    (operating-system-host-name initial-os)))
+	 (timezone         (get-value
+			    'timezone config
+			    (operating-system-timezone initial-os)))
+	 (keyboard-layout  (get-value
+			    'keyboard-layout config
+			    (operating-system-keyboard-layout initial-os)))
+	 (bootloader-cfg   (get-value
+			    'bootloader-configuration config
+			    (operating-system-bootloader initial-os)))
+	 (bootloader       (bootloader-configuration
+			    (inherit bootloader-cfg)
+			    (keyboard-layout keyboard-layout)))
+	 (mapped-devices   (get-value
+			    'mapped-devices config
+			    (operating-system-mapped-devices initial-os)))
+	 (file-systems     (get-value
+			    'file-systems config
+			    (operating-system-file-systems initial-os)))
 
-	 (user-name       (get-value 'user-name config))
-	 (full-name       (get-value 'full-name config ""))
-	 (home-directory  (get-value
-			   'home-directory config
-			   (string-append "/home/" (or user-name "user"))))
-	 (login-shell     (get-value 'login-shell config (default-shell)))
-	 (user-password   (get-value 'user-initial-password-hash config #f))
+	 (user-name        (get-value 'user-name config))
+	 (full-name        (get-value 'full-name config ""))
+	 (home-directory   (get-value
+			    'home-directory config
+			    (string-append "/home/" (or user-name "user"))))
+	 (login-shell      (get-value 'login-shell config (default-shell)))
+	 (user-password    (get-value 'user-initial-password-hash config #f))
 
-	 (users           (if user-name
-			      (cons
-			       (user-account
-				(name user-name)
-				(comment full-name)
-				(password user-password)
-				(home-directory home-directory)
-				(shell login-shell)
-				(group "users")
-				(supplementary-groups '("wheel" "netdev"
-							"audio" "video")))
-			       %base-user-accounts)
-			      (operating-system-users initial-os)))
-
-	 ;; NOTE: Can be very frustrating, when a dozen of features
-	 ;; doesn't provide any system services and next added feature
-	 ;; will provide system service and initial-os user-services
-	 ;; will be wiped.
-	 (system-services (rde-config-system-services config))
-	 (services        (append
-			   (operating-system-user-services initial-os)
-			   system-services)))
+	 (users            (if user-name
+			       (cons
+			        (user-account
+			   	 (name user-name)
+			   	 (comment full-name)
+			   	 (password user-password)
+			   	 (home-directory home-directory)
+			   	 (shell login-shell)
+			   	 (group "users")
+			   	 (supplementary-groups '("wheel" "netdev"
+			   				 "audio" "video")))
+			        %base-user-accounts)
+			       (operating-system-users initial-os)))
+	 
+	 (services         (rde-config-system-services config))
+	 
+	 (kernel           (get-value
+			    'kernel config
+			    (operating-system-kernel initial-os)))
+	 (kernel-arguments (get-value
+			    'kernel-arguments config
+			    (operating-system-user-kernel-arguments initial-os)))
+	 (kernel-modules   (get-value
+			    'kernel-loadable-modules config
+			    (operating-system-kernel-loadable-modules initial-os))))
 
     (operating-system
       (inherit initial-os)
@@ -282,6 +286,9 @@ to each system-services-getter function."
       (file-systems file-systems)
       (users users)
       (keyboard-layout keyboard-layout)
+      (kernel kernel)
+      (kernel-arguments kernel-arguments)
+      (kernel-loadable-modules kernel-modules)
       (services services))))
 
 (define (pretty-print-rde-config config)

@@ -3,9 +3,14 @@
   #:use-module (gnu system)
   #:use-module (gnu services)
   #:use-module (gnu home-services)
+  #:use-module (gnu system file-systems)
+  #:use-module (gnu system mapped-devices)
+
   #:use-module (srfi srfi-1)
   #:use-module (guix packages)
-  #:use-module (guix gexp))
+  #:use-module (guix gexp)
+
+  #:re-export (package?))
 
 (define-public (maybe-string? x)
   (or (string? x) (not x)))
@@ -28,3 +33,15 @@
 
 (define-public (list-of-services? lst)
   (and (list? lst) (every service? lst)))
+
+(define-public (string-or-gexp? x)
+  (and (string? x) (gexp? x)))
+(define-public (list-of-string-or-gexps? lst)
+  (and (list? lst) (every string-or-gexp? lst)))
+
+
+(define-public (list-of-file-systems? lst)
+  (and (list? lst) (every file-system? lst)))
+(define-public (list-of-mapped-devices? lst)
+  (and (list? lst) (every mapped-device? lst)))
+

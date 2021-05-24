@@ -1,7 +1,9 @@
 (define-module (rde features system)
   #:use-module (rde features)
+  #:use-module (rde features predicates)
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)
+  #:use-module (gnu packages linux)
   #:use-module (gnu system)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
@@ -9,7 +11,24 @@
 
   #:export (feature-bootloader
 	    feature-host-info
-	    feature-file-systems))
+	    feature-file-systems
+	    feature-kernel))
+
+
+(define* (feature-host-info
+	  #:key
+	  (host-name (operating-system-host-name bare-bone-os))
+	  (timezone  (operating-system-timezone  bare-bone-os))
+	  (locale    (operating-system-locale    bare-bone-os)))
+  "Provides basic information about host."
+  (ensure-pred string? host-name)
+  (ensure-pred string? timezone)
+  (ensure-pred string? locale)
+
+  (feature
+   (name 'host-info)
+   (values (make-feature-values host-name timezone locale))))
+
 
 (define %default-bootloader-configuration
   (bootloader-configuration
@@ -26,11 +45,6 @@ keyboard-layout will be overriden by feature-keyboard if it present."
    (name 'bootloader)
    (values (make-feature-values bootloader-configuration))))
 
-
-(define (list-of-file-systems? lst)
-  (and (list? lst) (every file-system? lst)))
-(define (list-of-mapped-devices? lst)
-  (and (list? lst) (every mapped-device? lst)))
 
 (define* (feature-file-systems
 	  #:key
@@ -50,16 +64,25 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
      (values (make-feature-values mapped-devices file-systems)))))
 
 
-(define* (feature-host-info
+(define* (feature-kernel
 	  #:key
-	  (host-name (operating-system-host-name bare-bone-os))
-	  (timezone  (operating-system-timezone  bare-bone-os))
-	  (locale    (operating-system-locale    bare-bone-os)))
-  "Provides basic information about host."
-  (ensure-pred string? host-name)
-  (ensure-pred string? timezone)
-  (ensure-pred string? locale)
+	  (kernel linux-libre)
+	  (kernel-loadable-modules '())
+	  (kernel-arguments '())
+	  (default-kernel-arguments %default-kernel-arguments)
+	  (firmware '())
+	  (base-firmware %base-firmware))
+  "Provides kernel configuration."
+  (ensure-pred package? kernel)
+  (ensure-pred list-of-packages? kernel-loadable-modules)
+  (ensure-pred list-of-string-or-gexps? kernel-arguments)
+  (ensure-pred list-of-string-or-gexps? default-kernel-arguments)
+  (ensure-pred list-of-packages? firmware)
+  (ensure-pred list-of-packages? base-firmware)
 
-  (feature
-   (name 'host-info)
-   (values (make-feature-values host-name timezone locale))))
+  (let ((kernel-arguments (append kernel-arguments default-kernel-arguments))
+	(firmware         (append firmware base-firmware)))
+    (feature
+     (name 'kernel)
+     (values (make-feature-values
+	      kernel kernel-loadable-modules kernel-arguments firmware)))))
