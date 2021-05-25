@@ -20,14 +20,10 @@
 	    home-emacs-configuration
 	    home-emacs-extension))
 
-(define (packages? lst)
-  (and (list? lst) (every package? lst)))
+(define packages? (listof package?))
 
-(define elisp-packages? packages?)
-(define serialize-elisp-packages
-  (const ""))
-(define serialize-boolean
-  (const ""))
+(define serialize-packages empty-serializer)
+(define serialize-boolean empty-serializer)
 
 (define elisp-config? list?)
 (define (serialize-elisp-config field-name val)
@@ -53,7 +49,7 @@
    (package emacs)
    "Emacs package to use.")
   (elisp-packages
-   (elisp-packages '())
+   (packages '())
    "List of Emacs Lisp packages.")
   (rebuild-elisp-packages?
    (boolean #f)
@@ -220,7 +216,7 @@ connect to it.")
 
 (define-configuration home-emacs-extension
   (elisp-packages
-   (elisp-packages '())
+   (packages '())
    "List of additional Emacs Lisp packages.")
   (init-el
    (elisp-config '())
