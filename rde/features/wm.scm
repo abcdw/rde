@@ -96,7 +96,7 @@ automatically switch to SWAY-TTY-NUMBER on boot."
              (requirement '(virtual-terminal))
              (start #~(lambda ()
 			(invoke #$(file-append kbd "/bin/chvt")
-				(format #f "~a" sway-tty-number))))
+				#$(format #f "~a" sway-tty-number))))
              (respawn? #f))))))
 
   (feature
