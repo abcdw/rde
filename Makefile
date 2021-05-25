@@ -1,7 +1,3 @@
-iso:
-	guix time-machine  -C rde/guix/channels-lock -- \
-	system -L ./ image -t iso9660 rde/system/install.scm
-
 home-reconfigure:
 	GUILE_LOAD_PATH=./ guix \
 	home reconfigure ../rde/rde/config.scm
@@ -20,3 +16,7 @@ channels-pull:
 channels-update-lock:
 	guix time-machine -C rde/guix/channels -- \
 	describe -f channels > rde/guix/channels-lock
+
+iso:
+	guix time-machine  -C rde/guix/channels-lock -- \
+	system -L ./ image -t iso9660 rde/system/install.scm
