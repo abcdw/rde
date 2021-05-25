@@ -50,17 +50,20 @@
    "Emacs package to use.")
   (elisp-packages
    (packages '())
-   "List of Emacs Lisp packages.")
+   "List of Emacs Lisp packages to install.")
   (rebuild-elisp-packages?
    (boolean #f)
    "Rebuild Emacs Lisp packages with version of Emacs specified in
 PACKAGE field.")
   (server-mode?
    (boolean #f)
-   "Create a shepherd service, which starts emacs in a server-mode.")
+   "Create a shepherd service, which starts emacs in a server-mode.  Use
+can use @command{emacsclient} to connect to the server (@pxref{Emacs
+Server,,,emacs.info}).")
   (xdg-flavor?
    (boolean #t)
-   "Place all the configs to @file{$XDG_CONFIG_HOME/emacs}.")
+   "Whether to place all the configuration files in
+@file{$XDG_CONFIG_HOME/emacs}.")
   (init-el
    (elisp-config '())
    "List of expressions, each expression can be a Sexp or Gexp.
