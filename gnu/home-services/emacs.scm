@@ -265,3 +265,9 @@ connect to it.")
                 (default-value (home-emacs-configuration))
                 (description "Install and configure GNU Emacs, the
 extensible, self-documenting editor.")))
+
+(define (generate-home-emacs-documentation)
+  (generate-documentation
+   `((home-emacs-configuration
+      ,home-emacs-configuration-fields))
+   'home-emacs-configuration))

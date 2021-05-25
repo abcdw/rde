@@ -93,3 +93,9 @@ in ``@code{PASSWORD_STORE_CLIP_TIME}''."))
 		(default-value (home-password-store-configuration))
                 (description
                  "Install and configure @code{pass}, the password store.")))
+
+(define (generate-home-password-store-documentation)
+  (generate-documentation
+   `((home-password-store-configuration
+      ,home-password-store-configuration-fields))
+   'home-password-store-configuration))

@@ -202,3 +202,11 @@ be the default profile.")))))
                         home-profile-service-type
                         icecat-profile-service)))
                 (description "Install and configure IceCat.")))
+
+(define (generate-home-icecat-documentation)
+  (generate-documentation
+   `((home-icecat-configuration
+      ,home-icecat-configuration-fields
+      (icecat-profile icecat-profile))
+     (icecat-profile ,icecat-profile-fields))
+   'home-icecat-configuration))

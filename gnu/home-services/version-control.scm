@@ -227,6 +227,12 @@ of the configuration file."))
                 (default-value (home-git-configuration))
                 (description "Install and configure Git.")))
 
+(define (generate-home-git-documentation)
+  (generate-documentation
+   `((home-git-configuration
+      ,home-git-configuration-fields))
+   'home-git-configuration))
+
 
 ;;;
 ;;; Mercurial.
@@ -394,3 +400,9 @@ will turn into this:
                 (default-value (home-mercurial-configuration))
                 (description "\
 Install and configure the Mercurial version control system.")))
+
+(define (generate-home-mercurial-documentation)
+  (generate-documentation
+   `((home-mercurial-configuration
+      ,home-mercurial-configuration-fields))
+   'home-mercurial-configuration))

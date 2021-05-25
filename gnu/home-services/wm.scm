@@ -158,3 +158,8 @@ input * {
                 (description "\
 Install and configure Sway, a Wayland compositor compatible with i3.")))
 
+(define (generate-home-sway-documentation)
+  (generate-documentation
+   `((home-sway-configuration
+      ,home-sway-configuration-fields))
+   'home-sway-configuration))
