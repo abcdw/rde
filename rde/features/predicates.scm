@@ -35,7 +35,7 @@
   (and (list? lst) (every service? lst)))
 
 (define-public (string-or-gexp? x)
-  (and (string? x) (gexp? x)))
+  (or (string? x) (gexp? x)))
 (define-public (list-of-string-or-gexps? lst)
   (and (list? lst) (every string-or-gexp? lst)))
 
