@@ -1,13 +1,14 @@
-(use-modules (rde features)
-	     (rde features base)
-	     (rde features gnupg)
-	     (rde features keyboard)
-	     (rde features system)
-	     (rde features wm)
-	     (gnu system file-systems)
-	     (gnu system mapped-devices)
-	     (guix gexp)
-	     (ice-9 match))
+(define-module (rde examples abcdw configs)
+  #:use-module (rde features)
+  #:use-module (rde features base)
+  #:use-module (rde features gnupg)
+  #:use-module (rde features keyboard)
+  #:use-module (rde features system)
+  #:use-module (rde features wm)
+  #:use-module (gnu system file-systems)
+  #:use-module (gnu system mapped-devices)
+  #:use-module (guix gexp)
+  #:use-module (ice-9 match))
 
 
 ;;; User-specific features
@@ -34,10 +35,15 @@
   (list
    ;; (feature-packages
    ;;  #:system-packages (list htop))
+   ;;; TODO: Make sway depend on feature-desktop-services
    (feature-sway
     #:config-file (local-file "../../sway/config"))
    (feature-sway-run-on-tty
-    #:sway-tty-number 2)))
+    #:sway-tty-number 2)
+   (feature-desktop-services)))
+
+;;; TODO: feature-brightness, use brightnessctl, it support
+;;; systemd/elogind api for unprevileged call.
 
 
 ;;; Generic features should be applicable for various hosts/users/etc
@@ -47,8 +53,7 @@
    ;; (feature-pipewire)
    ;; (feature-blablabla)
    (feature-base-packages)
-   (feature-base-services)
-   (feature-desktop-services)))
+   (feature-base-services)))
 
 (define %laptop-features
   (list ))
@@ -104,7 +109,7 @@
 ;;; rde-config and helpers for generating home-environment and
 ;;; operating-system records.
 
-(define ixy-config
+(define-public ixy-config
   (rde-config
    (features
     (append
@@ -113,12 +118,17 @@
      %base-features
      %ixy-features))))
 
+(define ixy-os
+  (rde-config-operating-system ixy-config))
+(define ixy-he
+  (rde-config-home-environment ixy-config))
+
 (define (dispatcher)
   (let ((rde-target (getenv "RDE_TARGET")))
     (match rde-target
-      ("ixy-home" (rde-config-home-environment ixy-config))
-      ("ixy-system" (rde-config-operating-system ixy-config))
-      (_ (rde-config-home-environment ixy-config)))))
+      ("ixy-home" ixy-he)
+      ("ixy-system" ixy-os)
+      (_ ixy-he))))
 
 ;; (pretty-print-rde-config ixy-config)
 ;; (use-modules (gnu services)
@@ -127,5 +137,8 @@
 ;;  (filter (lambda (x)
 ;; 	   (eq? (service-kind x) console-font-service-type))
 ;; 	 (rde-config-system-services ixy-config)))
+
+((@@ (ice-9 pretty-print) pretty-print)
+ (map feature-name (rde-config-features ixy-config)))
 
 (dispatcher)
