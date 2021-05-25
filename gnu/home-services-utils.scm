@@ -397,11 +397,15 @@ the list result in @code{#t} when applying PRED? on them."
           a
           (list a)))
 
-(define* (optional expr1 #:optional expr2)
-  "If EXPR1 evaluates to a non-@code{#f} value and EXPR2 is specified,
-return EXPR2; if it isn't specified, return EXPR1.  Otherwise, return
-an empty list @code{'()}."
-  (if expr1 (if expr2 expr2 expr1) '()))
+;; If EXPR1 evaluates to a non-@code{#f} value and EXPR2 is specified,
+;; return EXPR2; if it isn't specified, return EXPR1.  Otherwise, return
+;; an empty list @code{'()}.
+(define-syntax optional
+  (syntax-rules ()
+    ((_ expr1)
+     (if expr1 expr1 '()))
+    ((_ expr1 expr2)
+     (if expr1 expr2 '()))))
 
 (define (wrap-package package name gexp)
   "Create a @code{<package>} object that is a wrapper for PACKAGE, and
