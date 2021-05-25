@@ -94,11 +94,10 @@ installed by system or home services."
 
 (define* (feature-base-services
 	  #:key
-	  (guix-substitute-url '())
+	  (guix-substitute-urls '())
 	  (guix-authorized-keys '())
 	  (udev-rules '())
 	  (base-services %rde-base-services))
-  
   "Provides base system services."
   (define (get-base-system-services cfg)
     (modify-services base-services
@@ -114,7 +113,7 @@ installed by system or home services."
        (guix-configuration
         (inherit config)
         (substitute-urls (append
-			  guix-substitute-url
+			  guix-substitute-urls
                           %default-substitute-urls))
         (authorized-keys (append
                           guix-authorized-keys

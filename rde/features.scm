@@ -18,6 +18,7 @@
   #:use-module (ice-9 pretty-print)
 
   #:export (rde-config
+	    rde-config-features
 	    rde-config-home-environment
 	    rde-config-operating-system
 	    rde-config-home-services
@@ -26,6 +27,11 @@
 	    pretty-print-rde-config
 
 	    feature
+	    feature-name
+	    feature-values
+	    feature-home-services-getter
+	    feature-system-services-getter
+
 	    make-feature-values
 	    require-value
 	    get-value
@@ -275,7 +281,10 @@ to each system-services-getter function."
 			    (operating-system-user-kernel-arguments initial-os)))
 	 (kernel-modules   (get-value
 			    'kernel-loadable-modules config
-			    (operating-system-kernel-loadable-modules initial-os))))
+			    (operating-system-kernel-loadable-modules initial-os)))
+	 (firmware         (get-value
+			    'firmware config
+			    (operating-system-firmware initial-os))))
 
     (operating-system
       (inherit initial-os)
@@ -289,6 +298,7 @@ to each system-services-getter function."
       (kernel kernel)
       (kernel-arguments kernel-arguments)
       (kernel-loadable-modules kernel-modules)
+      (firmware firmware)
       (services services))))
 
 (define (pretty-print-rde-config config)
