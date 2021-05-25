@@ -200,4 +200,5 @@ be the default profile.")))))
                         icecat-files-service)
                        (service-extension
                         home-profile-service-type
-                        icecat-profile-service)))))
+                        icecat-profile-service)))
+                (description "Install and configure IceCat.")))
