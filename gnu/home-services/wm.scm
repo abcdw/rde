@@ -16,6 +16,16 @@
   #:export (home-sway-service-type
 	    home-sway-configuration))
 
+;;; Commentary:
+;;;
+;;; This module contains services for window managers.
+;;;
+;;; Code:
+
+;;;
+;;; Sway.
+;;;
+
 (define sway-config? list?)
 (define (serialize-sway-config field-name val)
   (define (serialize-sway-term term)
