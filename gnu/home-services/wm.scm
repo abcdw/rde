@@ -14,7 +14,10 @@
   #:use-module (ice-9 match)
 
   #:export (home-sway-service-type
-	    home-sway-configuration))
+	    home-sway-configuration
+
+            home-xmonad-service-type
+            home-xmonad-configuration))
 
 ;;; Commentary:
 ;;;
@@ -173,3 +176,74 @@ Install and configure Sway, a Wayland compositor compatible with i3.")))
    `((home-sway-configuration
       ,home-sway-configuration-fields))
    'home-sway-configuration))
+
+
+;;;
+;;; XMonad.
+;;;
+
+(define-configuration/no-serialization home-xmonad-configuration
+  (package
+    (package xmonad)
+    "The XMonad package to use.")
+  (xmonad-contrib?
+   (boolean #f)
+   "Whether to install the @code{ghc-xmonad-contrib} package, which
+contains many third-party extensions for XMonad.")
+  (xdg-flavor?
+   (boolean #t)
+   "Whether to respect XDG base directory, this will set the relevant
+environment variables if enabled.")
+  (config
+   (text-config '())
+   "List of strings or gexps containing the XMonad configuration, see
+the @uref{https://xmonad.org/documentation.html, official XMonad
+documentation} for how to configure it."))
+
+(define xmonad-profile-service
+  (match-lambda
+    (($ <home-xmonad-configuration> _ package xmonad-contrib?)
+     (if xmonad-contrib?
+         (list package ghc-xmonad-contrib)
+         (list package)))))
+
+(define xmonad-files-service
+  (match-lambda
+    (($ <home-xmonad-configuration> _ package xmonad-contrib?
+                                    xdg-flavor? config)
+     (if (eq? config 'disabled)
+         '()
+         `((,(string-append (if xdg-flavor? "config/" "") "xmonad/xmonad.hs")
+            ,(mixed-text-file "xmonad-config"
+                              (serialize-text-config #f config))))))))
+
+(define xmonad-environment-variables-service
+  (match-lambda
+    (($ <home-xmonad-configuration> _ package xmonad-contrib?
+                                    xdg-flavor? config)
+     (optional xdg-flavor?
+               '(("XMONAD_CONFIG_DIR" . "$XDG_CONFIG_HOME/xmonad")
+                 ("XMONAD_DATA_DIR" . "$XDG_DATA_HOME/xmonad")
+                 ("XMONAD_CACHE_DIR" . "$XDG_CACHE_HOME/xmonad"))))))
+
+(define home-xmonad-service-type
+  (service-type (name 'home-xmonad)
+                (extensions
+                 ;; TODO: Extend `on-change' service.
+                 (list (service-extension
+                        home-profile-service-type
+                        xmonad-profile-service)
+                       (service-extension
+                        home-files-service-type
+                        xmonad-files-service)
+                       (service-extension
+                        home-environment-variables-service-type
+                        xmonad-environment-variables-service)))
+                (description "\
+Install and configure XMonad, a window manager written in Haskell.")))
+
+(define (generate-home-xmonad-documentation)
+  (generate-documentation
+   `((home-xmonad-configuration
+      ,home-xmonad-configuration-fields))
+   'home-xmonad-configuration))
