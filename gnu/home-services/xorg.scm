@@ -35,7 +35,9 @@
 ;;;     (Xcursor.size . 13))))
 ;;;
 
-(define-configuration/no-serializer home-xresources-configuration
+(define (serialize-alist field-name val) "")
+
+(define-configuration home-xresources-configuration
   (package
     (package xrdb)
     "Package to use for setting

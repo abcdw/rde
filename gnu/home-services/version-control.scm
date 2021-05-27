@@ -250,10 +250,13 @@ of the configuration file."))
 ;;;
 
 (define mercurial-config? list?)
+(define (serialize-ini-config field-name val) "")
+(define (serialize-mercurial-ignore field-name val) "")
 (define mercurial-ignore? list?)
 
+;; TODO: Add support for Mercurial (Python) extensions?
 ;; TODO: Add separate field for name and email?
-(define-configuration/no-serialization home-mercurial-configuration
+(define-configuration home-mercurial-configuration
   (package
     (package mercurial)
     "The Mercurial package to use.")
