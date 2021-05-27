@@ -35,7 +35,7 @@
 ;;;     (Xcursor.size . 13))))
 ;;;
 
-(define-configuration/no-serializer home-xresources-configuration
+(define-configuration/no-serialization home-xresources-configuration
   (package
     (package xrdb)
     "Package to use for setting
