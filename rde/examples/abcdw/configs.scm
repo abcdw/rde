@@ -138,7 +138,8 @@
 ;; 	   (eq? (service-kind x) console-font-service-type))
 ;; 	 (rde-config-system-services ixy-config)))
 
-((@@ (ice-9 pretty-print) pretty-print)
- (map feature-name (rde-config-features ixy-config)))
+;; (use-modules (rde features))
+;; ((@@ (ice-9 pretty-print) pretty-print)
+;;  (map feature-name (rde-config-features ixy-config)))
 
 (dispatcher)
