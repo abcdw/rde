@@ -28,17 +28,9 @@
 ;;;             (gpg-opts . ("--keyring" "~/.local/share/keyring.kbx")))))
 ;;;
 
-;; None of the options will be serialized to strings, they will
-;; instead extend `home-environment-variables-service-type' with
-;; environment variables.
-
-(define (serialize-string field-name val) "")
-(define (serialize-alist field-name val) "")
-(define (serialize-boolean field-name val) "")
-
 ;; TODO: Add proper Browserpass integration with Chromium, IceCat, and
 ;; Nyxt.
-(define-configuration home-password-store-configuration
+(define-configuration/no-serialization home-password-store-configuration
   (package
     (package password-store)
     "The password store package to use.")
