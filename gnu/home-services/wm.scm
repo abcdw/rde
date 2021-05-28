@@ -217,15 +217,6 @@ documentation} for how to configure it."))
             ,(mixed-text-file "xmonad-config"
                               (serialize-text-config #f config))))))))
 
-(define xmonad-environment-variables-service
-  (match-lambda
-    (($ <home-xmonad-configuration> _ package xmonad-contrib?
-                                    xdg-flavor? config)
-     (optional xdg-flavor?
-               '(("XMONAD_CONFIG_DIR" . "$XDG_CONFIG_HOME/xmonad")
-                 ("XMONAD_DATA_DIR" . "$XDG_DATA_HOME/xmonad")
-                 ("XMONAD_CACHE_DIR" . "$XDG_CACHE_HOME/xmonad"))))))
-
 (define home-xmonad-service-type
   (service-type (name 'home-xmonad)
                 (extensions
@@ -235,10 +226,7 @@ documentation} for how to configure it."))
                         xmonad-profile-service)
                        (service-extension
                         home-files-service-type
-                        xmonad-files-service)
-                       (service-extension
-                        home-environment-variables-service-type
-                        xmonad-environment-variables-service)))
+                        xmonad-files-service)))
                 (description "\
 Install and configure XMonad, a window manager written in Haskell.")))
 
