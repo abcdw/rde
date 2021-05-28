@@ -211,7 +211,7 @@ documentation} for how to configure it."))
   (match-lambda
     (($ <home-xmonad-configuration> _ package xmonad-contrib?
                                     xdg-flavor? config)
-     (if (eq? config 'disabled)
+     (if (null? config)
          '()
          `((,(string-append (if xdg-flavor? "config/" "") "xmonad/xmonad.hs")
             ,(mixed-text-file "xmonad-config"
