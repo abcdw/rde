@@ -62,7 +62,10 @@ installed by system or home services."
 
   (define (get-home-packages values)
     (list
-     (service home-profile-service-type home-packages)))
+     (simple-service
+      'add-base-package-to-home-profile
+      home-profile-service-type
+      home-packages)))
 
   (define (get-system-packages values)
     (list
