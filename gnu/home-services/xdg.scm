@@ -103,6 +103,11 @@ services more consistent."))
 		     (configuration-field-name field) 'upper)))
 		 home-xdg-base-directories-configuration-fields)))
 
+(define (last-extension-or-cfg config extensions)
+  "Picks configuration value from last provided extension.  If there
+are no extensions use configuration instead."
+  (or (and (not (null? extensions)) (last extensions)) config))
+
 (define home-xdg-base-directories-service-type
   (service-type (name 'home-xdg-base-directories)
                 (extensions
@@ -113,11 +118,15 @@ services more consistent."))
 			home-activation-service-type
 			ensure-xdg-base-dirs-on-activation)))
                 (default-value (home-xdg-base-directories-configuration))
+		(compose identity)
+		(extend last-extension-or-cfg)
                 (description "Configure XDG base directories.  This
 service introduces two additional variables @env{XDG_STATE_HOME},
 @env{XDG_LOG_HOME}.  They are not a part of XDG specification, at
 least yet, but are convinient to have, it improves the consistency
-between different home services.")))
+between different home services.  The services of this service-type is
+instantiated by default, to provide non-default value, extend the
+service-type (using @code{simple-service} for example).")))
 
 (define (generate-home-xdg-base-directories-documentation)
   (generate-documentation
