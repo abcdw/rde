@@ -33,7 +33,6 @@
 	 ;; FIXME: Hang up shepherd if username/password asked
 	 (let* ((port ((@@ (guix build utils) open-pipe-with-stderr)
 		       #$(file-append git "/bin/git") "clone" remote path)))
-	   ;; TODO: create a config
 	   (waitpid WAIT_ANY)
 	   (display ((@@ (ice-9 rdelim) read-delimited) "" port))
 	   (close-port port))
@@ -169,14 +168,14 @@ state related items like git-state, rsync-state, etc."
 		 (shepherd-action
 		  (name 'init)
 		  (documentation "Initialize all the state.")
-		  ;; TODO: start service for the state after init
 		  (procedure #~(lambda _
 				 (map (lambda (name)
 					(when (not (car (action name 'state-exists?)))
-					  (action name 'init)))
+					  (action name 'init)
+					  (start name)))
 				      '#$service-names)))))))))))
 
-;; TODO: add extend functionality
+
 (define home-state-service-type
   (service-type (name 'home-state)
                 (extensions
@@ -184,4 +183,6 @@ state related items like git-state, rsync-state, etc."
                         home-shepherd-service-type
                         add-shepherd-services)))
                 (default-value '())
+		(compose concatenate)
+		(extend append)
                 (description "A toolset for initializing state.")))
