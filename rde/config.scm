@@ -160,7 +160,7 @@
        ;; 		 ))
        (service home-emacs-service-type
 		(home-emacs-configuration
-		 (package emacs-next-pgtk)
+		 (package emacs-next-pgtk-latest)
 		 (elisp-packages (cons*
 				  emacs-rde-default-init
 				  emacs-yaml-mode

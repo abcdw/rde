@@ -151,8 +151,8 @@
 ;;   '(emacs-use-package))
 
 (define-public emacs-next-pgtk-latest
-  (let ((commit "565d8f57d349c19d9bbb5d5d5fdacf3c70b85d42")
-        (revision "0"))
+  (let ((commit "7085fecf53d9506b1f626e3cab1dd90e33aa9ed0")
+        (revision "1"))
     (package/inherit emacs-next
       (name "emacs-next-pgtk-latest")
       (version (git-version "28.0.50" revision commit))
@@ -165,7 +165,7 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "0y23gn2ppphx1g1x0b7gvqh3x36byphfzllsl74giybd5j6sfyx3"))))
+           "1a34iwxaf70nynw125qh3xic0bkfh66x9ad760yckdxiyccg3y34"))))
       (arguments
        (substitute-keyword-arguments (package-arguments emacs-next)
          ((#:configure-flags flags ''())
