@@ -17,6 +17,7 @@
 
   #:export (home-ssh-service-type
             home-ssh-configuration
+	    home-ssh-configuration?
             ssh-host
             ssh-match))
 
