@@ -102,6 +102,11 @@ installed by system or home services."
 	  (udev-rules '())
 	  (base-services %rde-base-services))
   "Provides base system services."
+  (ensure-pred list-of-services? base-services)
+  (ensure-pred list-of-strings? guix-substitute-urls)
+  (ensure-pred list-of-file-likes? guix-authorized-keys)
+  (ensure-pred list-of-file-likes? udev-rules)
+
   (define (get-base-system-services cfg)
     (modify-services base-services
       (console-font-service-type

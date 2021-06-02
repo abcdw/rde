@@ -15,6 +15,9 @@
 (define-public (maybe-string? x)
   (or (string? x) (not x)))
 
+(define-public (maybe-url? x)
+  (maybe-string? x))
+
 (define-public (path? x)
   (string? x))
 
@@ -28,8 +31,17 @@
 (define-public (tty-number? x)
   (and (integer? x) (<= 1 x %number-of-ttys)))
 
+(define-public (list-of-strings? lst)
+  (and (list? lst) (every string? lst)))
+
+(define-public (list-of-file-likes? lst)
+  (and (list? lst) (every file-like? lst)))
+
 (define-public (list-of-packages? lst)
   (and (list? lst) (every package? lst)))
+
+(define-public (list-of-elisp-packages? lst)
+  (list-of-packages? lst))
 
 (define-public (list-of-services? lst)
   (and (list? lst) (every service? lst)))
