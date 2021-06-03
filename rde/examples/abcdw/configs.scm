@@ -5,8 +5,17 @@
   #:use-module (rde features keyboard)
   #:use-module (rde features system)
   #:use-module (rde features wm)
+  #:use-module (rde features xdg)
+  #:use-module (rde features password-utils)
+  #:use-module (rde features version-control)
+  #:use-module (rde features fontutils)
+  #:use-module (rde features terminals)
+  #:use-module (rde features tmux)
+  #:use-module (rde features shells)
+  #:use-module (rde features ssh)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
+  #:use-module (gnu packages)
   #:use-module (guix gexp)
   #:use-module (ice-9 match))
 
@@ -26,34 +35,60 @@
    (feature-gnupg
     #:gpg-primary-key "74830A276C328EC2"
     #:gpg-smart-card? #t)
+   (feature-password-store
+    #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
    (feature-keyboard
     #:keyboard-layout %dvorak-jcuken-layout)))
 
-(use-modules (gnu packages admin))
-
-(define %wayland-features
-  (list
-   ;; (feature-packages
-   ;;  #:system-packages (list htop))
-   ;;; TODO: Make sway depend on feature-desktop-services
-   (feature-sway
-    #:config-file (local-file "../../sway/config"))
-   (feature-sway-run-on-tty
-    #:sway-tty-number 2)
-   (feature-desktop-services)))
-
 ;;; TODO: feature-brightness, use brightnessctl, it support
 ;;; systemd/elogind api for unprevileged call.
+;;; TODO: Make sway depend on feature-desktop-services
+;;; TODO: feature-wallpapers https://wallhaven.cc/
+;;; TODO: feature-battery
+;; PipeWire/iwd:
+;; https://github.com/krevedkokun/guix-config/blob/master/system/yggdrasil.scm
 
 
 ;;; Generic features should be applicable for various hosts/users/etc
 
-(define %base-features
+(define* (pkgs #:rest lst)
+  (map specification->package+output lst))
+
+(define %main-features
   (list
    ;; (feature-pipewire)
    ;; (feature-blablabla)
-   (feature-base-packages)
-   (feature-base-services)))
+
+   (feature-alacritty
+    #:config-file
+    (local-file "../../../stale/dotfiles/.config/alacritty/alacritty.yml"))
+   (feature-tmux
+    #:config-file
+    (local-file "../../../stale/dotfiles/.tmux.conf" "tmux.conf"))
+   (feature-zsh)
+
+   (feature-ssh)
+   (feature-git)
+
+   (feature-fonts)
+
+   (feature-desktop-services)
+   (feature-sway
+    #:config-file (local-file "../../sway/config"))
+   (feature-sway-run-on-tty
+    #:sway-tty-number 2)
+
+   (feature-base-services)
+   (feature-xdg-base-directories)
+   (feature-base-packages
+    #:home-packages
+    (pkgs
+     "alsa-utils" "mpv" "youtube-dl"
+     "obs" "obs-wlrobs"
+     "ungoogled-chromium-wayland" "ublock-origin-chromium"
+     "nyxt"
+     "hicolor-icon-theme" "adwaita-icon-theme"
+     "ripgrep" "curl" "make"))))
 
 (define %laptop-features
   (list ))
@@ -114,10 +149,10 @@
    (features
     (append
      %abcdw-features
-     %wayland-features
-     %base-features
+     %main-features
      %ixy-features))))
 
+;; TODISCUSS: Make rde-config-os/he to be a feature instead of getter?
 (define ixy-os
   (rde-config-operating-system ixy-config))
 (define ixy-he
