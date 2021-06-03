@@ -6,4 +6,4 @@
        "https://ci.guix.gnu.org")
       (channel
        (name 'rde)
-       (url "https://github.com/abcdw/rde")))
+       (url "https://git.sr.ht/~abcdw/rde")))
