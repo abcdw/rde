@@ -196,7 +196,7 @@
     (map specification->package+output
 	 '("make"
 	   "hicolor-icon-theme" "adwaita-icon-theme"
-	   "font-iosevka" "font-ubuntu" "font-dejavu" "font-gnu-unifont"
+	   "font-iosevka" "font-dejavu" "font-gnu-unifont"
 	   "alsa-utils"
 	   "ripgrep"
 	   "youtube-dl"
