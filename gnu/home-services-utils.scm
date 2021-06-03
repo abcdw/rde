@@ -43,7 +43,6 @@
             listof-strings?
 
             rest
-            flatten
             maybe-list
             optional
             wrap-package
@@ -386,10 +385,6 @@ the list result in @code{#t} when applying PRED? on them."
 ;;;
 
 (define rest cdr)
-
-(define (flatten lst)
-  "Flatten LST by one level."
-  (fold-right (lambda (lst acc) (append lst acc)) '() lst))
 
 (define (maybe-list a)
   "If A is a list, return it, otherwise return a singleton list with A."

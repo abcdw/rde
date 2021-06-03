@@ -59,8 +59,8 @@
       ((host name alist)
        (list
         (serialize-field host name)
-        (serialize-alist 'asdf alist)))))
-  (apply string-append (flatten (map serialize-extra-config-entry val))))
+        (serialize-alist #f alist)))))
+  (apply string-append (append-map serialize-extra-config-entry val)))
 
 ;; #t => yes, #f => no
 (define (serialize-boolean field-name val)
@@ -168,7 +168,7 @@ Host *
  (extra-config
   (list (ssh-host \"savannah\"
                   '((compression . #f)
-                    (ciphers . '(\"3des-cbc\" \"aes256-ctr\"))
+                    (ciphers . (\"3des-cbc\" \"aes256-ctr\"))
                     (identity-file . \"~/.ssh/keys.d/id_rsa\")
                     (server-alive-count-max . 3)))
         (ssh-match '(exec \"grep key secret.txt\")
