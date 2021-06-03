@@ -13,6 +13,7 @@
   #:use-module (rde features tmux)
   #:use-module (rde features shells)
   #:use-module (rde features ssh)
+  #:use-module (rde features emacs)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
@@ -77,6 +78,16 @@
     #:config-file (local-file "../../sway/config"))
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
+
+   (feature-emacs
+    #:additional-elisp-packages
+    (pkgs "emacs-guix" "emacs-telega" "emacs-pdf-tools" "emacs-yasnippet"))
+   (feature-emacs-org-mode)
+   (feature-emacs-magit)
+   (feature-emacs-faces)
+   (feature-emacs-completion)
+   (feature-emacs-org-roam
+    #:org-roam-directory "~/work/notes/notes")
 
    (feature-base-services)
    (feature-xdg-base-directories)
