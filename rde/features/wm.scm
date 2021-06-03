@@ -29,10 +29,12 @@
 (define* (feature-sway
 	  #:key
 	  config-file
+	  (package sway)
 	  (add-keyboard-layout-to-config? #t))
   "Setup and configure sway."
   (ensure-pred maybe-file-like? config-file)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
+  (ensure-pred package? package)
 
   (define (sway-home-services config)
     "Returns home services related to sway."
@@ -50,10 +52,19 @@
 		(list wofi))
        (simple-service 'set-wayland-specific-env-vars
 		       home-environment-variables-service-type
+		       ;; export MOZ_ENABLE_WAYLAND=1
+		       ;; export CLUTTER_BACKEND=wayland
+		       ;; export QT_QPA_PLATFORM=wayland-egl
+		       ;; export ECORE_EVAS_ENGINE=wayland-egl
+		       ;; export ELM_ENGINE=wayland_egl
+		       ;; export SDL_VIDEODRIVER=wayland
+		       ;; export _JAVA_AWT_WM_NONREPARENTING=1
+		       ;; export NO_AT_BRIDGE=1
 		       '(("_JAVA_AWT_WM_NONREPARENTING" . "1")))
        (service
 	home-sway-service-type
 	(home-sway-configuration
+	 (package package)
 	 (config
 	  `(,@layout-config
 	    ,@include-config)))))))

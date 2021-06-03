@@ -17,12 +17,14 @@
 
 (define* (feature-emacs
 	  #:key
+	  (package emacs-next-pgtk-latest)
 	  (emacs-server-mode? #t)
 	  (additional-elisp-packages '()))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
-  
+  (ensure-pred package? package)
+
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs."
     (require-value 'full-name config)
@@ -33,7 +35,7 @@
        (service
 	home-emacs-service-type
 	(home-emacs-configuration
-	 (package emacs-next-pgtk-latest)
+	 (package package)
 	 (elisp-packages (append
 			  additional-elisp-packages
 			  (list emacs-modus-themes)))
@@ -50,6 +52,10 @@
 	    ,#~""
 	    (load-theme 'modus-operandi t)
 	    ,#~""
+	    (setq send-mail-function 'smtpmail-send-it)
+	    (setq smtpmail-smtp-server "smtp.gmail.com")
+	    (setq smtpmail-smtp-service 25)
+
 	    (setq message-auto-save-directory
 		  (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
 			  "/emacs/mail-drafts"))

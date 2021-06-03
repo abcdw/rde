@@ -11,9 +11,11 @@
 
 (define* (feature-alacritty
 	  #:key
-	  config-file)
+	  config-file
+	  (package alacritty))
   "Configure Alacritty terminal."
   (ensure-pred maybe-file-like? config-file)
+  (ensure-pred package? package)
 
   ;; TODO: Implement home service and rewrite to it to make this
   ;; feature extendable.
@@ -26,7 +28,7 @@
       (filter list?
 	      (list (when config-file
 		      (list "config/alacritty/alacritty.yml" config-file))))
-      #:packages (list alacritty))))
+      #:packages (list package))))
 
   (feature
    (name 'alacritty)

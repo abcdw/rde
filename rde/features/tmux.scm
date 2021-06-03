@@ -11,9 +11,11 @@
 
 (define* (feature-tmux
 	  #:key
-	  config-file)
+	  config-file
+	  (package tmux))
   "Configure tmux."
   (ensure-pred maybe-file-like? config-file)
+  (ensure-pred package? package)
 
   (define (tmux-home-services config)
     "Returns home services related to tmux."
@@ -26,7 +28,7 @@
       (filter list?
 	      (list (when config-file
 		      (list "config/tmux/tmux.conf" config-file))))
-      #:packages (list tmux))))
+      #:packages (list package))))
 
   (feature
    (name 'tmux)
