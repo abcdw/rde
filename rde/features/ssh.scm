@@ -4,7 +4,11 @@
   #:use-module (gnu home-services ssh)
   #:use-module (gnu services)
 
-  #:export (feature-ssh))
+  #:export (feature-ssh)
+
+  #:re-export (home-ssh-configuration
+	       ssh-host
+	       ssh-match))
 
 
 (define* (feature-ssh
