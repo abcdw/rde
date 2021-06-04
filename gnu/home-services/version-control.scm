@@ -19,8 +19,8 @@
 	    home-git-service-type
 	    serialize-git-config
 
-            home-mercurial-configuration
-            home-mercurial-service-type))
+            home-hg-configuration
+            home-hg-service-type))
 
 ;;; Commentary:
 ;;;
@@ -237,7 +237,7 @@ of the configuration file."))
 ;;;
 ;;; Mercurial.
 ;;;
-;;; (home-mercurial-configuration
+;;; (home-hg-configuration
 ;;;   (regexp-ignore '("^\\.pc/"))
 ;;;   (glob-ignore '("*.elc" "*~"))
 ;;;   (config
@@ -249,26 +249,26 @@ of the configuration file."))
 ;;;        (log . "-v")))))
 ;;;
 
-(define mercurial-config? list?)
-(define mercurial-ignore? list?)
+(define hg-config? list?)
+(define hg-ignore? list?)
 
 ;; TODO: Add separate field for name and email?
-(define-configuration/no-serialization home-mercurial-configuration
+(define-configuration/no-serialization home-hg-configuration
   (package
     (package mercurial)
     "The Mercurial package to use.")
   (regexp-ignore
-   (mercurial-ignore '())
+   (hg-ignore '())
    "List of regular expressions to ignore globally.  The default syntax
 is Python/Perl-style regular expression (see @command{man 5 hgignore}).
 
 The @code{*-ignore} fields are equivalent to adding @code{ui.ignore =
 /file/with/ignore/rules} in your @file{hgrc}.")
   (glob-ignore
-   (mercurial-ignore '())
+   (hg-ignore '())
    "List of globs to ignore globally.")
   (rootglob-ignore
-   (mercurial-ignore '())
+   (hg-ignore '())
    "List of @dfn{rootglobs} to ignore globally.")
   (config
    (ini-config '())
@@ -299,7 +299,7 @@ will turn into this:
   incoming.email = /gnu/store/123...-email-hook
 @end example"))
 
-(define (serialize-mercurial-config config)
+(define (serialize-hg-config config)
   (define (serialize-boolean val)
     (list (if val "True" "False")))
 
@@ -325,7 +325,7 @@ will turn into this:
             #:serialize-field serialize-field
             #:fields config)))
 
-(define* (serialize-mercurial-ignores #:key regexp glob rootglob)
+(define* (serialize-hg-ignores #:key regexp glob rootglob)
   (define (add-ignore lst type)
     (if (not (null? lst))
         (string-append (format #f "syntax: ~a\n" type)
@@ -337,7 +337,7 @@ will turn into this:
                          '(regexp glob rootglob))
                "\n"))
 
-(define (home-mercurial-files-service config)
+(define (home-hg-files-service config)
   (define rest cdr)
 
   (define (compare-sections section1 section2)
@@ -362,44 +362,44 @@ will turn into this:
             '()
             sorted-config)))
 
-  (let* ((ignores (serialize-mercurial-ignores
+  (let* ((ignores (serialize-hg-ignores
                    #:regexp
-                   (home-mercurial-configuration-regexp-ignore config)
+                   (home-hg-configuration-regexp-ignore config)
                    #:glob
-                   (home-mercurial-configuration-glob-ignore config)
+                   (home-hg-configuration-glob-ignore config)
                    #:rootglob
-                   (home-mercurial-configuration-rootglob-ignore config)))
+                   (home-hg-configuration-rootglob-ignore config)))
          (final-config (merge-sections
-                        (append (home-mercurial-configuration-config config)
+                        (append (home-hg-configuration-config config)
                                 `((ui
                                    ((ignore . ,(plain-file "hg-ignores"
                                                            ignores)))))))))
     `(("config/hg/hgrc"
        ,(apply mixed-text-file
                "hgrc"
-               (serialize-mercurial-config final-config))))))
+               (serialize-hg-config final-config))))))
 
-(define (home-mercurial-profile-service config)
-  (list (home-mercurial-configuration-package config)))
+(define (home-hg-profile-service config)
+  (list (home-hg-configuration-package config)))
 
-(define home-mercurial-service-type
-  (service-type (name 'home-mercurial)
+(define home-hg-service-type
+  (service-type (name 'home-hg)
                 (extensions
                  (list (service-extension
                         home-files-service-type
-                        home-mercurial-files-service)
+                        home-hg-files-service)
                        (service-extension
                         home-profile-service-type
-                        home-mercurial-profile-service)))
+                        home-hg-profile-service)))
                 ;; TODO: Add extension mechanism
                 ;; (compose identity)
-                ;; (extend home-mercurial-extensions)
-                (default-value (home-mercurial-configuration))
+                ;; (extend home-hg-extensions)
+                (default-value (home-hg-configuration))
                 (description "\
 Install and configure the Mercurial version control system.")))
 
-(define (generate-home-mercurial-documentation)
+(define (generate-home-hg-documentation)
   (generate-documentation
-   `((home-mercurial-configuration
-      ,home-mercurial-configuration-fields))
-   'home-mercurial-configuration))
+   `((home-hg-configuration
+      ,home-hg-configuration-fields))
+   'home-hg-configuration))
