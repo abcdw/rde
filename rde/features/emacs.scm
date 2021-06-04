@@ -3,6 +3,7 @@
   #:use-module (rde features predicates)
   #:use-module (rde emacs packages)
   #:use-module (gnu home-services emacs)
+  #:use-module (gnu home-services xdg)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu services)
   #:use-module (gnu packages emacs-xyz)
@@ -13,7 +14,8 @@
 	    feature-emacs-magit
 	    feature-emacs-faces
 	    feature-emacs-completion
-	    feature-emacs-org-roam))
+	    feature-emacs-org-roam
+	    feature-emacs-message))
 
 (define* (feature-emacs
 	  #:key
@@ -50,16 +52,7 @@
 			      "/emacs/custom.el"))
 	    (load custom-file t)
 	    ,#~""
-	    (load-theme 'modus-operandi t)
-	    ,#~""
-	    (setq send-mail-function 'smtpmail-send-it)
-	    (setq smtpmail-smtp-server "smtp.gmail.com")
-	    (setq smtpmail-smtp-service 25)
-
-	    (setq message-auto-save-directory
-		  (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-			  "/emacs/mail-drafts"))
-	    ,#~""))
+	    (load-theme 'modus-operandi t)))
 	 (early-init-el
 	  `(,(slurp-file-gexp (local-file "../emacs/early-init.el"))))
 	 ;;; TODO: Rebuilding packages with emacs will be useful for
@@ -74,6 +67,63 @@
 	    '((emacs . #t))
 	    (make-feature-values emacs-server-mode?)))
    (home-services-getter emacs-home-services)))
+
+(define* (feature-emacs-message
+	  #:key
+	  (smtp-server #f)
+	  (smtp-port 587))
+  "Configure email capabilities provided by message.el for GNU Emacs."
+  (ensure-pred string? smtp-server)
+  (ensure-pred integer? smtp-port)
+
+  (define (emacs-message-home-services config)
+    "Returns home services related to message.el."
+    (let* ((configure-message
+	    (elisp-configuration-package
+	     "configure-message"
+	     `(,#~";;;###autoload"
+	       (with-eval-after-load
+		'message
+		(setq send-mail-function 'smtpmail-send-it)
+		(setq smtpmail-smtp-server smtp-server)
+		(setq smtpmail-smtp-service smtp-port)
+
+		(setq message-auto-save-directory
+		      (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+			      "/emacs/mail-drafts")))))))
+
+      (list
+       (simple-service
+	'emacs-completion-configurations
+	home-emacs-service-type
+	(home-emacs-extension
+	 (elisp-packages (list configure-message))))
+
+       (simple-service
+	'emacs-xdg-mailto-handler
+	home-xdg-mime-applications-service-type
+	(home-xdg-mime-applications-configuration
+	 (default '((x-scheme-handler/mailto . emacs-mailto.desktop)))
+	 (desktop-entries
+	  (list
+	   (xdg-desktop-entry
+	    (file "emacs-mailto")
+	    (name "Emacs (Client) [mailto:]")
+	    (type 'application)
+	    (config
+	     `((exec . ,(file-append
+			 (program-file
+			  "emacs-mailto"
+			  #~(system
+			     (string-append
+			      "emacsclient -c --eval '(browse-url-mail \""
+			      (car (cdr (command-line))) "\")'")))
+			 " %u"))))))))))))
+
+  (feature
+   (name 'emacs-message)
+   (values `((emacs-message . #t)))
+   (home-services-getter emacs-message-home-services)))
 
 (define* (feature-emacs-org-mode)
   "Configure org-mode for GNU Emacs."
