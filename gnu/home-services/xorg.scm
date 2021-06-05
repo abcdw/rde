@@ -133,6 +133,16 @@ URxvt.secondaryScroll: 0
 (define (home-xresources-profile-service config)
   (list (home-xresources-configuration-package config)))
 
+(define (home-xresources-run-on-change-service config)
+  #~("Xresources"
+     (begin
+       (display "Reloading Xresources\n")
+       (system* #$(file-append (home-xresources-configuration-package config)
+                               "/bin/xrdb")
+                "-load"
+                (string-append (home-environment-directory)
+                               "/files/Xresources")))))
+
 (define (home-xresources-extension old-config extension-configs)
   (match old-config
     (($ <home-xresources-configuration> _ package* config*)
@@ -150,7 +160,10 @@ URxvt.secondaryScroll: 0
                         home-xresources-files-service)
                        (service-extension
                         home-profile-service-type
-                        home-xresources-profile-service)))
+                        home-xresources-profile-service)
+                       (service-extension
+                        home-run-on-change-service-type
+                        home-xresources-run-on-change-service)))
                 (compose concatenate)
                 (extend home-xresources-extension)
                 (default-value (home-xresources-configuration))
