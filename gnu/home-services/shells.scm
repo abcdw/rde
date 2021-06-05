@@ -10,6 +10,7 @@
   #:use-module (guix packages)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
+  #:use-module (ice-9 match)
 
   #:export (home-shell-profile-service-type
 	    home-shell-profile-configuration
@@ -83,17 +84,31 @@ for environment initialization of POSIX compliant login shells.  This
 service type can be extended with a list of strings or gexps.")))
 
 (define (serialize-boolean field-name val) "")
+(define (serialize-alist field-name val)
+  #~(string-append
+     #$@(map
+         (match-lambda
+           ((key . #f)
+            "")
+           ((key . #t)
+            #~(string-append "export " #$key "\n"))
+           ((key . value)
+            #~(string-append "export " #$key "=" #$value "\n")))
+         val)))
 
 (define-configuration home-zsh-configuration
   (package
-   (package zsh)
-   "The Zsh package to use.")
+    (package zsh)
+    "The Zsh package to use.")
   (xdg-flavor?
    (boolean #t)
    "Place all the configs to @file{$XDG_CONFIG_HOME/zsh}.  Makes
 @file{~/.zshenv} to set @env{ZDOTDIR} to @file{$XDG_CONFIG_HOME/zsh}.
 Shell startup process will continue with
 @file{$XDG_CONFIG_HOME/zsh/.zshenv}.")
+  (environment-variables
+   (alist '())
+   "Association list of environment variables to set for the Zsh session.")
   (zshenv
    (text-config '())
    "List of strings or gexps, which will be added to @file{.zshenv}.
@@ -166,7 +181,8 @@ another process for example)."))
           (if xdg-flavor?
               "export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh\n"
               "")
-          (serialize-field 'zshenv)))
+          (serialize-field 'zshenv)
+          (serialize-field 'environment-variables)))
        (,(prefix-file "zprofile")
         ,(mixed-text-file
           "zprofile"
@@ -252,6 +268,9 @@ source ~/.profile
    (boolean #t)
    "Add sane defaults like reading @file{/etc/bashrc}, coloring output
 for @code{ls} provided by guix to @file{.bashrc}.")
+  (environment-variables
+   (alist '())
+   "Association list of environment variables to set for the Bash session.")
   (bash-profile
    (text-config '())
    "List of strings or gexps, which will be added to @file{.bash_profile}.
@@ -307,33 +326,33 @@ alias ll='ls -l'
 alias grep='grep --color=auto'\n")
 
 (define (add-bash-configuration config)
-    (define (filter-fields field)
-      (filter-configuration-fields home-bash-configuration-fields
-				   (list field)))
+  (define (filter-fields field)
+    (filter-configuration-fields home-bash-configuration-fields
+                                 (list field)))
 
-    (define (serialize-field field)
-      (serialize-configuration
-       config
-       (filter-fields field)))
+  (define (serialize-field field)
+    (serialize-configuration
+     config
+     (filter-fields field)))
 
-    (define* (file-if-not-empty field #:optional (extra-content #f))
-      (let ((file-name (symbol->string field))
-	    (field-obj (car (filter-fields field))))
-	(if (or extra-content
-		(not (null? ((configuration-field-getter field-obj) config))))
-	    `(,(object->snake-case-string file-name)
-	      ,(mixed-text-file
-		(object->snake-case-string file-name)
-		(if extra-content extra-content "")
-		(serialize-field field)))
-	    '())))
+  (define* (file-if-not-empty field #:optional (extra-content #f))
+    (let ((file-name (symbol->string field))
+          (field-obj (car (filter-fields field))))
+      (if (or extra-content
+              (not (null? ((configuration-field-getter field-obj) config))))
+          `(,(object->snake-case-string file-name)
+            ,(mixed-text-file
+              (object->snake-case-string file-name)
+              (if extra-content extra-content "")
+              (serialize-field field)))
+          '())))
 
-    (filter
-     (compose not null?)
-     `(("bash_profile"
-	,(mixed-text-file
-	  "bash_profile"
-	  "\
+  (filter
+   (compose not null?)
+   `(("bash_profile"
+      ,(mixed-text-file
+        "bash_profile"
+        "\
 # Setups system and user profiles and related variables
 # /etc/profile will be sourced by bash automatically
 # Setups home environment profile
@@ -342,14 +361,15 @@ source ~/.profile
 # Honor per-interactive-shell startup file
 if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
 "
-	  (serialize-field 'bash-profile)))
+        (serialize-field 'bash-profile)
+        (serialize-field 'environment-variables)))
 
-       ,@(list (file-if-not-empty
-		'bashrc
-		(if (home-bash-configuration-guix-defaults? config)
-		    guix-bashrc
-		    #f))
-	       (file-if-not-empty 'bash-logout)))))
+     ,@(list (file-if-not-empty
+              'bashrc
+              (if (home-bash-configuration-guix-defaults? config)
+                  guix-bashrc
+                  #f))
+             (file-if-not-empty 'bash-logout)))))
 
 (define (add-bash-packages config)
   (list (home-bash-configuration-package config)))
