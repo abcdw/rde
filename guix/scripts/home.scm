@@ -93,9 +93,9 @@ Some ACTIONS support additional ARGS.\n"))
 
 
 (define* (perform-action action he
-			 #:key
+                         #:key
                          dry-run?
-			 derivations-only?
+                         derivations-only?
                          use-substitutes?)
   "Perform ACTION for home environment. "
 
@@ -107,33 +107,43 @@ Some ACTIONS support additional ARGS.\n"))
        (drvs     (mapm/accumulate-builds lower-object (list he-drv)))
        (%        (if derivations-only?
                      (return
-		      (for-each (compose println derivation-file-name) drvs))
+                      (for-each (compose println derivation-file-name) drvs))
                      (built-derivations drvs)))
 
        (he-path -> (derivation->output-path he-drv)))
     (if (or dry-run? derivations-only?)
-	(return #f)
+        (return #f)
         (begin
           (for-each (compose println derivation->output-path) drvs)
 
           (case action
-	    ((reconfigure)
-	     (let* ((number (generation-number %guix-home))
+            ((reconfigure)
+             (let* ((number (generation-number %guix-home))
                     (generation (generation-file-name
-				 %guix-home (+ 1 number)))
+                                 %guix-home (+ 1 number)))
 
-		    (user-home-environment-symlink-path
-		     (home-environment-symlink-path he)))
-	       (switch-symlinks generation he-path)
-	       (switch-symlinks %guix-home generation)
-	       (switch-symlinks user-home-environment-symlink-path
-				%guix-home)
+                    (user-home-environment-symlink-path
+                     (home-environment-symlink-path he)))
+               (define home-environment-directory
+                 (or (getenv "GUIX_HOME_DIRECTORY")
+                     (string-append (getenv "HOME") "/.guix-home")))
+               
+               (define (generation-directory home-environment)
+                 (readlink (readlink home-environment)))
+               
+               (setenv "GUIX_HOME_PREVIOUS_GENERATION"
+                       (generation-directory home-environment-directory))
+               
+               (switch-symlinks generation he-path)
+               (switch-symlinks %guix-home generation)
+               (switch-symlinks user-home-environment-symlink-path
+                                %guix-home)
 
-	       (primitive-load (string-append he-path "/activate"))
-	       (return he-path)))
+               (primitive-load (string-append he-path "/activate"))
+               (return he-path)))
             (else
              (newline)
-	     (return he-path)))))))
+             (return he-path)))))))
 
 (define (process-action action args opts)
   "Process ACTION, a sub-command, with the arguments are listed in ARGS.

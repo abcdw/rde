@@ -1,6 +1,7 @@
 (define-module (gnu home-services)
   #:use-module (gnu services)
   #:use-module (gnu home-services-utils)
+  #:use-module (gnu packages base)
   #:use-module (guix channels)
   #:use-module (guix describe)
   #:use-module (guix monads)
@@ -15,6 +16,12 @@
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (ice-9 pretty-print)
+  ;; #:use-module (guix modules)
+  #:use-module ((guix import utils) #:select (flatten))
+
+  #:use-module (srfi srfi-1)
+  #:use-module (ice-9 match)
+  #:use-module (ice-9 popen)
 
   #:export (home-service-type
 	    home-profile-service-type
@@ -22,6 +29,8 @@
 	    home-run-on-first-login-service-type
 	    home-activation-service-type
 	    home-provenance-service-type
+            home-run-on-change-service-type
+
             fold-home-service-types)
 
   #:re-export (service
@@ -194,7 +203,15 @@ extended with one gexp.")))
 
 (define (compute-activation-script init-gexp gexps)
   (gexp->script "activate"
-		#~(begin #$init-gexp #$@gexps)))
+                #~(begin
+                    ;; Other services can provide G-exps that call
+                    ;; this procedure.
+                    (define (home-environment-directory)
+                      (or (getenv "GUIX_HOME_DIRECTORY")
+                          (string-append (getenv "HOME") "/.guix-home")))
+
+                    #$init-gexp
+                    #$@gexps)))
 
 (define (activation-script-entry m-activation)
   "Return, as a monadic value, an entry for the activation script
@@ -217,7 +234,102 @@ directory.  @command{activate} script automatically called during
 reconfiguration or generation switching.  This service can be extended
 with one gexp, and all gexps must be idempotent.")))
 
+
+;;;
+;;; On-change.
+;;;
 
+(define (compute-on-change-gexp _ gexps)
+  #~(begin
+      (use-modules (srfi srfi-1)
+                   (ice-9 popen)
+                   (ice-9 match)
+                   (rnrs io ports))
+
+      (define (load-tree path)
+        (if (file-exists? path)
+            (call-with-input-file path
+              (lambda (port)
+                (read port)))
+            #f))
+
+      (define (butlast lst)
+        (drop-right lst 1))
+
+      (define rest cdr)
+
+      ;; Copied from (guix import utils)
+      ;; TODO: Make upstream move it to (guix build utils)?
+      (define (flatten lst)
+        "Return a list that recursively concatenates all sub-lists of LST."
+        (fold-right
+         (match-lambda*
+           (((sub-list ...) memo)
+            (append (flatten sub-list) memo))
+           ((elem memo)
+            (cons elem memo)))
+         '() lst))
+
+      (let* ((gexp-tuples '#$gexps)
+             (tree-file-name "/.guix-home-file-tree")
+             (config-home    (or (getenv "XDG_CONFIG_HOME")
+                                 (string-append (getenv "HOME") "/.config")))
+             (tree-file-path (string-append config-home tree-file-name))
+             (current-generation (home-environment-directory))
+             (previous-generation (getenv "GUIX_HOME_PREVIOUS_GENERATION"))
+             (tree-file (load-tree tree-file-path)))
+        (define tree-file-files
+          (map (lambda (pair) (rest pair))
+               (filter (lambda (pair) (equal? (car pair) 'file))
+                       (flatten tree-file))))
+
+        (define (check-file file)
+          "Check Whether FILE for the current generation is identical
+to the one for the previous generation identical.  If they aren't,
+return FILE with the, otherwise, return @code{#f}."
+          (let ((old-file-full-path (string-append previous-generation
+                                                   "/files/" file))
+                (new-file-full-path (string-append current-generation
+                                                   "/files/" file)))
+            (if (file-exists? old-file-full-path)
+                (let* ((pipe (open-pipe*
+                              OPEN_READ
+                              (string-append #$diffutils "/bin/cmp")
+                              old-file-full-path
+                              new-file-full-path))
+                       (status (eof-object? (read pipe))))
+                  (close-pipe pipe)
+                  (if status #f file))
+                file)))
+
+        (define changed-files
+          (map (lambda (file) (check-file file)) tree-file-files))
+
+        (define (needed-gexps gexp-tuples)
+          (let loop ((acc '())
+                     (gexp-tuples gexp-tuples))
+            (cond
+             ((null? gexp-tuples) acc)
+             ((member (first (first gexp-tuples)) changed-files)
+              (loop (cons (second (first gexp-tuples)) acc) (rest gexp-tuples)))
+             (else (loop acc (rest gexp-tuples))))))
+
+        (for-each primitive-eval
+                  (needed-gexps gexp-tuples)))))
+
+(define home-run-on-change-service-type
+  (service-type (name 'home-run-on-change)
+                (extensions
+                 (list (service-extension
+                        home-activation-service-type
+                        identity)))
+                (compose identity)
+                (extend compute-on-change-gexp)
+                (default-value '())
+                (description "G-expression to run if the specified
+file has changed since the last generation.  The G-expression should
+be a list where the first element is the file that should be changed,
+and the second element is the G-expression to the run.")))
 
 
 ;;;
