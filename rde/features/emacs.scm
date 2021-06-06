@@ -10,10 +10,11 @@
   #:use-module (guix gexp)
 
   #:export (feature-emacs
-	    feature-emacs-org-mode
-	    feature-emacs-magit
 	    feature-emacs-faces
 	    feature-emacs-completion
+	    feature-emacs-project
+	    feature-emacs-magit
+	    feature-emacs-org-mode
 	    feature-emacs-org-roam
 	    feature-emacs-message
 	    feature-emacs-erc))
@@ -321,6 +322,34 @@
    (name 'emacs-completion)
    (values `((emacs-completion . #t)))
    (home-services-getter emacs-completion-home-services)))
+
+(define* (feature-emacs-project)
+  "Configure project.el for GNU Emacs."
+  (define (emacs-project-home-services config)
+    "Returns home services related to project.el."
+    (let* ((configure-project
+	    (elisp-configuration-package
+	     "configure-project"
+	     `((with-eval-after-load
+		'project
+		(with-eval-after-load
+		 'consult
+		 (setq consult-project-root-function
+		       (lambda ()
+			 (when-let (project (project-current))
+				   (car (project-roots project)))))))))))
+      ;; TODO: https://github.com/muffinmad/emacs-ibuffer-project
+      (list
+       (simple-service
+	'emacs-project-configurations
+	home-emacs-service-type
+	(home-emacs-extension
+	 (elisp-packages (list configure-project)))))))
+
+  (feature
+   (name 'emacs-project)
+   (values `((emacs-project . #t)))
+   (home-services-getter emacs-project-home-services)))
 
 (define* (feature-emacs-org-roam
 	  #:key
