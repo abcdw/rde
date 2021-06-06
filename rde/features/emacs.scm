@@ -15,7 +15,8 @@
 	    feature-emacs-faces
 	    feature-emacs-completion
 	    feature-emacs-org-roam
-	    feature-emacs-message))
+	    feature-emacs-message
+	    feature-emacs-erc))
 
 (define* (feature-emacs
 	  #:key
@@ -129,6 +130,72 @@
    (name 'emacs-message)
    (values `((emacs-message . #t)))
    (home-services-getter emacs-message-home-services)))
+
+(define* (feature-emacs-erc
+	  #:key
+	  ;; (emacs-client? #f)
+	  (erc-server "irc.libera.chat")
+	  (erc-port 6697)
+	  (erc-nick #f)
+	  (erc-autojoin-channels-alist '()))
+  "Configure GNU Emacs IRC client."
+  (ensure-pred string? erc-server)
+  (ensure-pred integer? erc-port)
+  (ensure-pred maybe-string? erc-nick)
+  (ensure-pred list? erc-autojoin-channels-alist)
+
+  (define (emacs-erc-home-services config)
+    "Returns home services related to ERC."
+    (let* ((emacs-command (get-value 'emacs-command config "emacs"))
+	   (configure-erc
+	    (elisp-configuration-package
+	     "configure-erc"
+	     `((with-eval-after-load
+		'erc
+		(setq erc-server ,erc-server)
+		(setq erc-port ,erc-port)
+		,@(if erc-nick `((setq erc-nick ,erc-nick)) '())
+		(setq erc-autojoin-channels-alist
+		      ',erc-autojoin-channels-alist)
+
+		(setq erc-fill-static-center 14)
+		(setq erc-fill-function 'erc-fill-static)
+		(setq erc-fill-column 86)
+
+		(setq erc-track-visibility nil)
+
+		(define-key erc-mode-map (kbd "s-b") 'erc-switch-to-buffer)
+		)))))
+
+      (list
+       (simple-service
+	'emacs-erc-configurations
+	home-emacs-service-type
+	(home-emacs-extension
+	 (elisp-packages (list configure-erc))))
+
+       (simple-service
+	'xdg-emacs-erc
+	home-xdg-mime-applications-service-type
+	(home-xdg-mime-applications-configuration
+	 (desktop-entries
+	  (list
+	   (xdg-desktop-entry
+	    (file "emacs-erc")
+	    (name "Emacs IRC client")
+	    (type 'application)
+	    (config
+	     `((exec . ,(program-file
+			 "emacs-erc"
+			 #~(system
+			    (string-append
+			     #$emacs-command
+			     " --eval '(erc-tls)'"))))))))))))))
+
+  (feature
+   (name 'emacs-erc)
+   (values `((emacs-erc . #t)))
+   (home-services-getter emacs-erc-home-services)))
 
 (define* (feature-emacs-org-mode)
   "Configure org-mode for GNU Emacs."
