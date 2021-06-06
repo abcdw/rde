@@ -204,19 +204,18 @@
     (let* ((configure-org-mode
 	    (elisp-configuration-package
 	     "configure-org-mode"
-	     `(,#~";;;###autoload"
-	       (with-eval-after-load
+	     `((with-eval-after-load
 		'org
 		(progn
 		 (setq org-adapt-indentation nil)
 		 (setq org-edit-src-content-indentation 0)
 		 (setq org-startup-indented t)))))))
-  (list
-   (simple-service
-    'emacs-org-mode-configurations
-    home-emacs-service-type
-    (home-emacs-extension
-     (elisp-packages (list emacs-org configure-org-mode)))))))
+      (list
+       (simple-service
+	'emacs-org-mode-configurations
+	home-emacs-service-type
+	(home-emacs-extension
+	 (elisp-packages (list emacs-org configure-org-mode)))))))
 
   (feature
    (name 'emacs-org-mode)
@@ -257,31 +256,30 @@
 	   (configure-faces
 	    (elisp-configuration-package
 	     "configure-faces"
-	     `(,#~";;;###autoload"
-		  (with-eval-after-load
-		   'faces
-		   (let* ((mono-fn ,(font-name font-monospace))
-			  (sans-fn ,(font-name font-sans))
-			  (mono (font-spec
-				 :name ,(font-name font-monospace)
-				 :size   ,(font-size font-monospace)
-				 :weight ',(or (font-weight font-monospace) 'normal)))
-			  ;; For people coming here years later, only
-			  ;; face which can contain size or integer
-			  ;; height is default, everything else should
-			  ;; set only family or relative height
-			  ;; (decimal value), the font-spec even
-			  ;; without height/size shouldn't be used.
-			  ;; Otherwise text-adjust and other stuff can
-			  ;; be broken.
-			  (faces `((default ((t (:font ,mono))))
-				   (fixed-pitch ((t (:family ,mono-fn))))
-				   (button ((t (:inherit (fixed-pitch)))))
-				   (variable-pitch ((t (:family ,sans-fn)))))))
-		     (dolist (face faces)
-			     (custom-set-faces face))
+	     `((with-eval-after-load
+		'faces
+		(let* ((mono-fn ,(font-name font-monospace))
+		       (sans-fn ,(font-name font-sans))
+		       (mono (font-spec
+			      :name ,(font-name font-monospace)
+			      :size   ,(font-size font-monospace)
+			      :weight ',(or (font-weight font-monospace) 'normal)))
+		       ;; For people coming here years later, only
+		       ;; face which can contain size or integer
+		       ;; height is default, everything else should
+		       ;; set only family or relative height
+		       ;; (decimal value), the font-spec even
+		       ;; without height/size shouldn't be used.
+		       ;; Otherwise text-adjust and other stuff can
+		       ;; be broken.
+		       (faces `((default ((t (:font ,mono))))
+				(fixed-pitch ((t (:family ,mono-fn))))
+				(button ((t (:inherit (fixed-pitch)))))
+				(variable-pitch ((t (:family ,sans-fn)))))))
+		  (dolist (face faces)
+			  (custom-set-faces face))
 
-		     (dolist (face faces)
+		  (dolist (face faces)
 			  (put (car face) 'saved-face nil))))))))
       
       (list
