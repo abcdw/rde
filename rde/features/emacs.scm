@@ -42,7 +42,7 @@
 			  additional-elisp-packages
 			  (list emacs-modus-themes)))
 	 (server-mode? emacs-server-mode?)
-	 (xdg-flavor? #f)
+	 (xdg-flavor? #t)
 	 (init-el
 	  `((setq user-full-name ,full-name)
 	    (setq user-mail-address ,email)
@@ -52,6 +52,7 @@
 			      "/emacs/custom.el"))
 	    (load custom-file t)
 	    ,#~""
+	    (column-number-mode 1)
 	    (load-theme 'modus-operandi t)))
 	 (early-init-el
 	  `(,(slurp-file-gexp (local-file "../emacs/early-init.el"))))
@@ -64,7 +65,10 @@
   (feature
    (name 'emacs)
    (values (append
-	    '((emacs . #t))
+	    `((emacs . #t)
+	      (emacs-command . ,(if emacs-server-mode?
+				    "emacsclient -c"
+				    "emacs")))
 	    (make-feature-values emacs-server-mode?)))
    (home-services-getter emacs-home-services)))
 
@@ -78,15 +82,15 @@
 
   (define (emacs-message-home-services config)
     "Returns home services related to message.el."
-    (let* ((configure-message
+    (let* ((emacs-command (get-value 'emacs-command config "emacs"))
+	   (configure-message
 	    (elisp-configuration-package
 	     "configure-message"
-	     `(,#~";;;###autoload"
-	       (with-eval-after-load
+	     `((with-eval-after-load
 		'message
 		(setq send-mail-function 'smtpmail-send-it)
-		(setq smtpmail-smtp-server smtp-server)
-		(setq smtpmail-smtp-service smtp-port)
+		(setq smtpmail-smtp-server ,smtp-server)
+		(setq smtpmail-smtp-service ,smtp-port)
 
 		(setq message-auto-save-directory
 		      (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
@@ -94,7 +98,7 @@
 
       (list
        (simple-service
-	'emacs-completion-configurations
+	'emacs-message-configurations
 	home-emacs-service-type
 	(home-emacs-extension
 	 (elisp-packages (list configure-message))))
@@ -116,7 +120,8 @@
 			  "emacs-mailto"
 			  #~(system
 			     (string-append
-			      "emacsclient -c --eval '(browse-url-mail \""
+			      #$emacs-command
+			      " --eval '(browse-url-mail \""
 			      (car (cdr (command-line))) "\")'")))
 			 " %u"))))))))))))
 
