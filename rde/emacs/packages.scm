@@ -182,6 +182,21 @@
 graphical toolkit to work natively on Wayland.  In addition to that, xwidgets
 also enabled and works without glitches even on X server."))))
 
+(define-public emacs-embark-next
+  (package
+    (inherit emacs-embark)
+    (name "emacs-embark-next")
+    (version "0.11")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/oantolin/embark")
+             (commit "2c3ac885252379044afb20353214115eb06a51ae")))
+       (sha256
+        (base32 "08l3i6zb2wbqiq2qn18qdsgqqf0iibx09bk2d1x89pw3j7r6xgf7"))
+       (file-name (git-file-name name version))))))
+
 (define %rde-emacs emacs-next-pgtk-latest)
 
 (define %rde-emacs-runtime-packages
