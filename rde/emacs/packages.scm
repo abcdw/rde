@@ -65,6 +65,25 @@ also enabled and works without glitches even on X server."))))
         (base32 "08l3i6zb2wbqiq2qn18qdsgqqf0iibx09bk2d1x89pw3j7r6xgf7"))
        (file-name (git-file-name name version))))))
 
+(define-public emacs-reverse-im
+  (package
+    (name "emacs-reverse-im")
+    (version "0.0.7")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/a13/reverse-im.el")
+             (commit (string-append "v" version))))
+       (sha256
+        (base32 "05k2zp2hldzq5h6nl8gx79dd8lvfn507ad4x3naichdqgn2013nn"))
+       (file-name (git-file-name name version))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/a13/reverse-im.el")
+    (synopsis "Russian layout support")
+    (description "Russian layout support.")
+    (license license:gpl3+)))
+
 (define %rde-emacs emacs-next-pgtk-latest)
 
 (define %rde-emacs-runtime-packages
