@@ -162,7 +162,6 @@
 		(home-emacs-configuration
 		 (package emacs-next-pgtk-latest)
 		 (elisp-packages (cons*
-				  emacs-rde-default-init
 				  emacs-yaml-mode
 				  %rde-additional-emacs-packages))
 		 (server-mode? server-mode?)
