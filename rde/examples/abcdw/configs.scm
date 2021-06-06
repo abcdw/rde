@@ -82,12 +82,21 @@
    (feature-emacs
     #:additional-elisp-packages
     (pkgs "emacs-guix" "emacs-telega" "emacs-pdf-tools" "emacs-yasnippet"))
+   (feature-emacs-message
+    #:smtp-server "smtp.gmail.com"
+    #:smtp-port   25)
+   (feature-emacs-erc
+    #:erc-nick "abcdw"
+    #:erc-autojoin-channels-alist
+    '(("irc.libera.chat"
+       "#guix" "#emacs" "#tropin" "#rde")))
    (feature-emacs-org-mode)
    (feature-emacs-magit)
    (feature-emacs-faces)
-   (feature-emacs-completion)
    (feature-emacs-org-roam
     #:org-roam-directory "~/work/notes/notes")
+   (feature-emacs-completion)
+   (feature-emacs-project)
 
    (feature-base-services)
    (feature-xdg-base-directories)
@@ -98,7 +107,7 @@
      "obs" "obs-wlrobs"
      "ungoogled-chromium-wayland" "ublock-origin-chromium"
      "nyxt"
-     "hicolor-icon-theme" "adwaita-icon-theme"
+     "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-standard"
      "ripgrep" "curl" "make"))))
 
 (define %laptop-features
