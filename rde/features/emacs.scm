@@ -302,21 +302,58 @@
     (let* ((configure-completion
 	    (elisp-configuration-package
 	     "configure-completion"
-	     `(,#~";;;###autoload"
-	       (with-eval-after-load
+	     `((with-eval-after-load
 		'minibuffer
+
+		(setq enable-recursive-minibuffers t)
+
+		(require 'orderless)
+		(require 'savehist)
+		(require 'vertico)
+		(require 'corfu)
+		(require 'marginalia)
+		(require 'embark)
+		(require 'consult))
+	       (with-eval-after-load
+		'orderless
 		(setq completion-styles '(orderless))
+		(setq completion-category-overrides
+		      '((file (styles . (partial-completion))))))
+
+	       (with-eval-after-load
+		'savehist
 		(setq savehist-file
 		      (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
 			      "/emacs/history"))
-		(savehist-mode 1))))))
+		(savehist-mode 1))
+
+	       (with-eval-after-load
+		'embark
+		(define-key global-map (kbd "s-e") 'embark-act))
+
+	       (with-eval-after-load
+		'consult
+		;; TODO: Move to feature-emacs-buffers
+		(define-key global-map (kbd "s-w") 'kill-current-buffer)
+		(define-key global-map (kbd "s-o") 'other-window)
+		(define-key global-map (kbd "s-b") 'consult-buffer)
+
+		(define-key global-map (kbd "M-y") 'consult-yank-pop))
+	       (with-eval-after-load 'vertico (vertico-mode 1))
+	       (with-eval-after-load 'corfu (corfu-global-mode 1))
+	       (with-eval-after-load 'marginalia (marginalia-mode 1)))
+
+	     #:elisp-packages
+	     (list emacs-orderless emacs-marginalia
+		   emacs-vertico emacs-corfu
+		   emacs-consult emacs-embark-next))))
       
       (list
        (simple-service
 	'emacs-completion-configurations
 	home-emacs-service-type
 	(home-emacs-extension
-	 (elisp-packages (list configure-completion emacs-orderless)))))))
+	 (elisp-packages (list configure-completion)))))))
 
   (feature
    (name 'emacs-completion)
