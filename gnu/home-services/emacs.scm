@@ -289,7 +289,7 @@ loaded on startup."
     (fold-right
      (lambda (e acc)
        (if (list? e)
-	   (cons* #~";;;###autoload" e acc)
+	   (cons* #~"\n;;;###autoload" e acc)
 	   (cons e acc)))
      '() elisp-expressions))
 

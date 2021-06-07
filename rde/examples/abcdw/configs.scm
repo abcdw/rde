@@ -94,6 +94,7 @@
     #:erc-autojoin-channels-alist
     '(("irc.libera.chat"
        "#guix" "#emacs" "#tropin" "#rde")))
+   (feature-emacs-telega)
    (feature-emacs-magit)
    (feature-emacs-org-mode)
 

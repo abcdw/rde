@@ -19,7 +19,8 @@
 	    feature-emacs-org-mode
 	    feature-emacs-org-roam
 	    feature-emacs-message
-	    feature-emacs-erc))
+	    feature-emacs-erc
+	    feature-emacs-telega))
 
 (define* (feature-emacs
 	  #:key
@@ -55,11 +56,6 @@
 		  (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
 			      "/emacs/custom.el"))
 	    (load custom-file t)
-	    ,#~""
-	    ;; TODO: Move to feature-telega
-	    (with-eval-after-load
-	     'telega
-	     (setq telega-completing-read-function completing-read-function))
 	    ,#~""
 	    (column-number-mode 1)
 	    (load-theme 'modus-operandi t)))
@@ -182,7 +178,6 @@ utilizing reverse-im package."
    (name 'emacs-message)
    (values `((emacs-message . #t)))
    (home-services-getter emacs-message-home-services)))
-
 (define* (feature-emacs-erc
 	  #:key
 	  ;; (emacs-client? #f)
@@ -248,6 +243,67 @@ utilizing reverse-im package."
    (name 'emacs-erc)
    (values `((emacs-erc . #t)))
    (home-services-getter emacs-erc-home-services)))
+
+(define* (feature-emacs-telega)
+  "Configure telega.el for GNU Emacs"
+
+  (define (emacs-telega-home-services config)
+    "Returns home services related to telega-el."
+    (let* ((emacs-command (get-value 'emacs-command config "emacs"))
+	   (configure-telega
+	    (elisp-configuration-package
+	     "configure-telega"
+	     `((with-eval-after-load
+		'telega
+		(define-key telega-chat-mode-map (kbd "s-b") 'telega-switch-buffer)
+		(define-key telega-root-mode-map (kbd "s-b") 'telega-switch-buffer)
+
+		(setq telega-completing-read-function completing-read-function)))
+	     #:elisp-packages (list emacs-telega))))
+
+      (list
+       (simple-service
+	'emacs-telega-configurations
+	home-emacs-service-type
+	(home-emacs-extension
+	 (elisp-packages (list configure-telega))))
+
+       (simple-service
+	'emacs-xdg-tg-handler
+	home-xdg-mime-applications-service-type
+	(home-xdg-mime-applications-configuration
+	 (default '((x-scheme-handler/tg . emacs-telega.desktop)))
+	 (desktop-entries
+	  (list
+	   (xdg-desktop-entry
+	    (file "emacs-telega")
+	    (name "Emacs (Client) [tg://]")
+	    (type 'application)
+	    (config
+	     `((exec . ,(file-append
+			 (program-file
+			  "emacs-telega"
+			  #~(system*
+			     ;; #$emacs-command
+			     "emacsclient"
+			     "-c"
+			     "--eval"
+			     (string-append
+			      "(progn
+(if (and (boundp 'telega--status) (equal telega--status \"Ready\"))
+ (telega-browse-url \"" (car (cdr (command-line))) "\")"
+"
+ (telega)
+ (add-hook 'telega-ready-hook
+  (lambda ()
+   (telega-browse-url \"" (car (cdr (command-line))) "\")))"
+"))")))
+			 " %u"))))))))))))
+
+  (feature
+   (name 'emacs-telega)
+   (values `((emacs-telega . #t)))
+   (home-services-getter emacs-telega-home-services)))
 
 (define* (feature-emacs-org-mode)
   "Configure org-mode for GNU Emacs."
