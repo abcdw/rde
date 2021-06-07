@@ -387,7 +387,13 @@ utilizing reverse-im package."
 		(define-key global-map (kbd "M-y") 'consult-yank-pop))
 	       (with-eval-after-load 'vertico (vertico-mode 1))
 	       (with-eval-after-load 'corfu (corfu-global-mode 1))
-	       (with-eval-after-load 'marginalia (marginalia-mode 1)))
+	       (with-eval-after-load
+		'marginalia
+		;; FIXME: Temporary disable annotations for describe-variables.
+		;; See: <https://github.com/masm11/emacs/issues/104>
+		(setf (alist-get 'variable marginalia-annotator-registry)
+		      '(none builtin marginalia-annotate-variable))
+		(marginalia-mode 1)))
 
 	     #:elisp-packages
 	     (list emacs-orderless emacs-marginalia
