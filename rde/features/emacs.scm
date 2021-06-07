@@ -8,10 +8,12 @@
   #:use-module (gnu services)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (guix gexp)
+  #:use-module (guix packages)
 
   #:export (feature-emacs
 	    feature-emacs-faces
 	    feature-emacs-completion
+	    feature-emacs-input-method
 	    feature-emacs-project
 	    feature-emacs-magit
 	    feature-emacs-org-mode
@@ -73,6 +75,50 @@
 				    "emacs")))
 	    (make-feature-values emacs-server-mode?)))
    (home-services-getter emacs-home-services)))
+
+(define (strip-emacs-name p)
+  (let ((name (package-name p)))
+    (string->symbol
+     (if (string-prefix? "emacs-" name)
+         (string-drop name (string-length "emacs-"))
+         name))))
+
+(define* (feature-emacs-input-method
+	  #:key
+	  (input-method "cyrillic-dvorak")
+	  (input-method-package emacs-cyrillic-dvorak-im))
+  "Configure input-method for GNU Emacs.  Allows to use other layouts
+with emacs, whithout losing ability to use keybindings.  Supported
+both Emacsy toggle-input-method (C-\\) and system layout switching by
+utilizing reverse-im package."
+
+  (define (emacs-input-method-home-services config)
+    "Returns home services related to input-method."
+    (let* ((configure-input-method
+	    (elisp-configuration-package
+	     "configure-input-method"
+	     `((with-eval-after-load
+		'mule
+		(require ',(strip-emacs-name input-method-package))
+		(setq default-input-method ,input-method)
+		(require 'reverse-im))
+	       (with-eval-after-load
+		'reverse-im
+		(setq reverse-im-input-methods ,input-method)
+		(reverse-im-mode 1)))
+	       #:elisp-packages (list emacs-reverse-im input-method-package))))
+      (list
+       (simple-service
+	'emacs-input-method-configurations
+	home-emacs-service-type
+	(home-emacs-extension
+	 (elisp-packages (list configure-input-method)))))))
+
+  (feature
+   (name 'emacs-input-method)
+   (values `((emacs-input-method . #t)))
+   (home-services-getter emacs-input-method-home-services)))
+
 
 (define* (feature-emacs-message
 	  #:key

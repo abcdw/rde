@@ -82,6 +82,10 @@
    (feature-emacs
     #:additional-elisp-packages
     (pkgs "emacs-guix" "emacs-telega" "emacs-pdf-tools" "emacs-yasnippet"))
+   (feature-emacs-faces)
+   (feature-emacs-completion)
+   (feature-emacs-project)
+   (feature-emacs-input-method)
    (feature-emacs-message
     #:smtp-server "smtp.gmail.com"
     #:smtp-port   25)
@@ -90,13 +94,11 @@
     #:erc-autojoin-channels-alist
     '(("irc.libera.chat"
        "#guix" "#emacs" "#tropin" "#rde")))
-   (feature-emacs-org-mode)
    (feature-emacs-magit)
-   (feature-emacs-faces)
+   (feature-emacs-org-mode)
+
    (feature-emacs-org-roam
     #:org-roam-directory "~/work/notes/notes")
-   (feature-emacs-completion)
-   (feature-emacs-project)
 
    (feature-base-services)
    (feature-xdg-base-directories)
