@@ -56,6 +56,11 @@
 			      "/emacs/custom.el"))
 	    (load custom-file t)
 	    ,#~""
+	    ;; TODO: Move to feature-telega
+	    (with-eval-after-load
+	     'telega
+	     (setq telega-completing-read-function completing-read-function))
+	    ,#~""
 	    (column-number-mode 1)
 	    (load-theme 'modus-operandi t)))
 	 (early-init-el
