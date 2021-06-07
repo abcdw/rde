@@ -80,9 +80,29 @@ also enabled and works without glitches even on X server."))))
        (file-name (git-file-name name version))))
     (build-system emacs-build-system)
     (home-page "https://github.com/a13/reverse-im.el")
-    (synopsis "Russian layout support")
-    (description "Russian layout support.")
+    (synopsis "Make hotkeys keep working on other input-methods")
+    (description "Make hotkeys keep working on other input-methods.")
     (license license:gpl3+)))
+
+(define-public emacs-cyrillic-dvorak-im
+  (package
+    (name "emacs-cyrillic-dvorak-im")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/xFA25E/cyrillic-dvorak-im")
+             (commit version)))
+       (sha256
+        (base32 "12adszd4p9i9glx2chasgq68i6cnxcrwbf5c268jjb5dw4q7ci0n"))
+       (file-name (git-file-name name version))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/xFA25E/cyrillic-dvorak-im")
+    (synopsis "Cyrillic input method for dvorak layout")
+    (description "Cyrillic input method for dvorak layout.")
+    (license license:gpl3+)))
+
 
 (define %rde-emacs emacs-next-pgtk-latest)
 
