@@ -14,6 +14,7 @@
   #:use-module (rde features shells)
   #:use-module (rde features ssh)
   #:use-module (rde features emacs)
+  #:use-module (rde features linux)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
@@ -41,8 +42,6 @@
    (feature-keyboard
     #:keyboard-layout %dvorak-jcuken-layout)))
 
-;;; TODO: feature-brightness, use brightnessctl, it support
-;;; systemd/elogind api for unprevileged call.
 ;;; TODO: Make sway depend on feature-desktop-services
 ;;; TODO: feature-wallpapers https://wallhaven.cc/
 ;;; TODO: feature-battery
@@ -58,7 +57,8 @@
 (define %main-features
   (list
    ;; (feature-pipewire)
-   ;; (feature-blablabla)
+
+   (feature-backlight)
 
    (feature-alacritty
     #:config-file

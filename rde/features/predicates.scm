@@ -31,6 +31,9 @@
 (define-public (tty-number? x)
   (and (integer? x) (<= 1 x %number-of-ttys)))
 
+(define-public (brightness? x)
+  (and (integer? x) (<= 0 x 100)))
+
 (define-public (list-of-strings? lst)
   (and (list? lst) (every string? lst)))
 
