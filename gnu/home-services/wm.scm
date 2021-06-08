@@ -156,6 +156,12 @@ input * {
        "sway-config"
        (serialize-configuration config home-sway-configuration-fields)))))
 
+(define (home-sway-extensions cfg extensions)
+  (home-sway-configuration
+   (inherit cfg)
+   (config
+    (append (home-sway-configuration-config cfg) extensions))))
+
 (define home-sway-service-type
   (service-type (name 'home-sway)
                 (extensions
@@ -165,8 +171,8 @@ input * {
 		       (service-extension
                         home-files-service-type
                         add-sway-configuration)))
-		;; (compose identity)
-		;; (extend home-sway-extensions)
+		(compose concatenate)
+		(extend home-sway-extensions)
                 (default-value (home-sway-configuration))
                 (description "\
 Install and configure Sway, a Wayland compositor compatible with i3.")))
