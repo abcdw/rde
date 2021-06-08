@@ -19,9 +19,11 @@
 
   #:export (home-xdg-base-directories-service-type
             home-xdg-base-directories-configuration
+            home-xdg-base-directories-configuration?
 
             home-xdg-user-directories-service-type
             home-xdg-user-directories-configuration
+            home-xdg-user-directories-configuration?
 
             xdg-desktop-action
             xdg-desktop-entry

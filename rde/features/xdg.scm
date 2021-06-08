@@ -2,47 +2,50 @@
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (gnu services)
+  #:use-module (gnu home-services)
   #:use-module (gnu home-services xdg)
+  #:use-module (gnu packages freedesktop)
 
-  #:export (feature-xdg-base-directories))
+  #:export (feature-xdg)
+
+  #:re-export (home-xdg-base-directories-configuration
+	       home-xdg-user-directories-configuration))
 
 
-(define* (feature-xdg-base-directories
+(define* (feature-xdg
 	  #:key
-	  (xdg-cache-home "$HOME/.cache")
-	  (xdg-config-home "$HOME/.config")
-	  (xdg-data-home "$HOME/.local/share")
-	  (xdg-runtime-dir "${XDG_RUNTIME_DIR:-/run/user/$UID}")
-	  (xdg-log-home "$HOME/.local/var/log")
-	  (xdg-state-home "$HOME/.local/var/lib"))
-  "Set XDG base directories and extensions."
-  (ensure-pred string? xdg-cache-home)
-  (ensure-pred string? xdg-config-home)
-  (ensure-pred string? xdg-data-home)
-  (ensure-pred string? xdg-runtime-dir)
-  (ensure-pred string? xdg-log-home)
-  (ensure-pred string? xdg-state-home)
+	  (xdg-base-directories-configuration
+	   (home-xdg-base-directories-configuration))
+	  (xdg-user-directories-configuration
+	   (home-xdg-user-directories-configuration)))
+  "Set XDG base (with a few extensions) and user directories.
 
-  (define (xdg-base-directories-home-services config)
-    (list (simple-service
-	   'substitute-xdg-base-directories-values
-	   home-xdg-base-directories-service-type
-	   (home-xdg-base-directories-configuration
-	    (cache-home xdg-cache-home)
-	    (config-home xdg-config-home)
-	    (data-home xdg-data-home)
-	    (runtime-dir xdg-runtime-dir)
-	    (log-home xdg-log-home)
-	    (state-home xdg-state-home)))))
+Set the value to \"$HOME\" for any user directory if you don't need
+it.  No other environment variables allowed in user directories."
+  (ensure-pred home-xdg-base-directories-configuration?
+	       xdg-base-directories-configuration)
+  (ensure-pred home-xdg-user-directories-configuration?
+	       xdg-user-directories-configuration)
+
+  (define (xdg-home-services config)
+    (list
+     (simple-service
+      'add-xdg-packages
+      home-profile-service-type
+      (list xdg-utils xdg-user-dirs desktop-file-utils))
+     ;; This service always present in essential services, that is why
+     ;; we need to extend it to override configuration.
+     (simple-service
+      'set-xdg-base-directories-values
+      home-xdg-base-directories-service-type
+      xdg-base-directories-configuration)
+     (service
+      home-xdg-user-directories-service-type
+      xdg-user-directories-configuration)))
 
   (feature
-   (name 'xdg-base-directories)
-   (home-services-getter xdg-base-directories-home-services)
-   (values (append
-	    '((xdg-base-directories . #t))
-	    (make-feature-values xdg-cache-home
-				 xdg-config-home
-				 xdg-data-home
-				 xdg-runtime-dir
-				 xdg-log-home
-				 xdg-state-home)))))
+   (name 'xdg)
+   (home-services-getter xdg-home-services)
+   (values
+    (make-feature-values xdg-base-directories-configuration
+			 xdg-user-directories-configuration))))

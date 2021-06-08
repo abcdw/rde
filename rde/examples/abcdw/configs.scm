@@ -102,7 +102,17 @@
     #:org-roam-directory "~/work/notes/notes")
 
    (feature-base-services)
-   (feature-xdg-base-directories)
+   (feature-xdg
+    #:xdg-user-directories-configuration
+    (home-xdg-user-directories-configuration
+     (music "$HOME/music")
+     (videos "$HOME/vids")
+     (pictures "$HOME/pics")
+     (documents "$HOME/docs")
+     (download "$HOME/dl")
+     (desktop "$HOME")
+     (publicshare "$HOME")
+     (templates "$HOME")))
    (feature-base-packages
     #:home-packages
     (pkgs
