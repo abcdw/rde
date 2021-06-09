@@ -258,6 +258,17 @@ utilizing reverse-im package."
 		(define-key telega-chat-mode-map (kbd "s-b") 'telega-switch-buffer)
 		(define-key telega-root-mode-map (kbd "s-b") 'telega-switch-buffer)
 
+                (setq telega-emoji-company-backend 'telega-company-emoji)
+                (defun my-telega-chat-mode ()
+                  (set (make-local-variable 'company-backends)
+                       (append (list telega-emoji-company-backend
+                                     'telega-company-username
+                                     'telega-company-hashtag)
+                               (when (telega-chat-bot-p telega-chatbuf--chat)
+                                 '(telega-company-botcmd))))
+                  (company-mode 1))
+                (add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
+
 		(setq telega-completing-read-function completing-read-function)))
 	     #:elisp-packages (list emacs-telega))))
 
