@@ -4,6 +4,7 @@
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
   #:use-module (gnu packages wm)
+  #:use-module (gnu packages qt)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu services)
@@ -38,6 +39,7 @@
 
   (define (sway-home-services config)
     "Returns home services related to sway."
+    ;; (require-value 'elogind config)
     (let* ((kb-layout      (get-value 'keyboard-layout config))
 	   (layout-config  (if (and add-keyboard-layout-to-config? kb-layout)
 			       (keyboard-layout-to-sway-config kb-layout)
@@ -46,21 +48,24 @@
 			       `((include ,config-file))
 			       '())))
       (list
-       ;; TODO: Move to feature-app-launcher or something like that
+       ;; TODO: Move wofi to feature-app-launcher or something like that
        (simple-service 'packages-for-sway
 		home-profile-service-type
-		(list wofi))
+		(list wofi qtwayland))
        (simple-service 'set-wayland-specific-env-vars
 		       home-environment-variables-service-type
-		       ;; export MOZ_ENABLE_WAYLAND=1
-		       ;; export CLUTTER_BACKEND=wayland
-		       ;; export QT_QPA_PLATFORM=wayland-egl
-		       ;; export ECORE_EVAS_ENGINE=wayland-egl
-		       ;; export ELM_ENGINE=wayland_egl
-		       ;; export SDL_VIDEODRIVER=wayland
-		       ;; export _JAVA_AWT_WM_NONREPARENTING=1
 		       ;; export NO_AT_BRIDGE=1
-		       '(("_JAVA_AWT_WM_NONREPARENTING" . "1")))
+		       '(("XDG_CURRENT_DESKTOP" . "sway")
+                         ("XDG_SESSION_TYPE" . "wayland")
+                         ;; FIXME: Should be in feature-pipewire
+                         ("RTC_USE_PIPEWIRE" . "true")
+                         ("SDL_VIDEODRIVER" . "wayland")
+                         ("MOZ_ENABLE_WAYLAND" . "1")
+                         ("CLUTTER_BACKEND" . "wayland")
+                         ("ELM_ENGINE" . "wayland_egl")
+                         ("ECORE_EVAS_ENGINE" . "wayland-egl")
+                         ("QT_QPA_PLATFORM" . "wayland-egl")
+			 ("_JAVA_AWT_WM_NONREPARENTING" . "1")))
        (service
 	home-sway-service-type
 	(home-sway-configuration
