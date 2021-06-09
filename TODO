@@ -19,6 +19,14 @@ Split into utils and configuration related helper?
 ** TODO Make activation script create ~/.guix-home symlink
 It will also allow to make correct run-on-change implementation.
 ** TODO Make system service for Guix Home
+** TODO Make it possible to specify the verbosity for ~guix home reconfigure~
+By default, only the path to the home environment should be shown,
+~/gnu/store/...-home~.
+** TODO Add ~guix home init~ command for migrating from ~~/.guix-profile~
+Similar to ~guix package --export-manifest~, and maybe detect existing
+config files and generate template for home services configurations.
+E.g. if ~~/.bashrc~ exists, add ~home-bash-service-type~ to ~services~
+field of ~home-environemnt~.
 ** Finished
 :PROPERTIES:
 :VISIBILITY: folded
