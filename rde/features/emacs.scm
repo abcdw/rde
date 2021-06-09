@@ -43,9 +43,7 @@
 	home-emacs-service-type
 	(home-emacs-configuration
 	 (package package)
-	 (elisp-packages (append
-			  additional-elisp-packages
-			  (list emacs-modus-themes)))
+	 (elisp-packages (cons* emacs-modus-themes additional-elisp-packages))
 	 (server-mode? emacs-server-mode?)
 	 (xdg-flavor? #t)
 	 (init-el
@@ -54,10 +52,23 @@
 	    ,#~""
 	    (setq custom-file
 		  (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-			      "/emacs/custom.el"))
+			  "/emacs/custom.el"))
 	    (load custom-file t)
 	    ,#~""
+	    (define-key global-map (kbd "M-/") 'hippie-expand)
+
 	    (column-number-mode 1)
+	    (save-place-mode 1)
+	    (show-paren-mode 1)
+
+	    (setq-default indent-tabs-mode nil)
+	    (setq save-interprogram-paste-before-kill t)
+	    (setq mouse-yank-at-point t)
+	    (setq require-final-newline t)
+
+            (add-hook 'prog-mode-hook
+                      (lambda () (setq show-trailing-whitespace t)))
+
 	    (load-theme 'modus-operandi t)))
 	 (early-init-el
 	  `(,(slurp-file-gexp (local-file "../emacs/early-init.el"))))
