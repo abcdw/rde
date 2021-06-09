@@ -56,7 +56,7 @@
 
 (define %main-features
   (list
-   ;; (feature-pipewire)
+   (feature-pipewire)
 
    (feature-backlight)
 
