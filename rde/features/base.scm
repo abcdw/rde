@@ -5,6 +5,7 @@
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (gnu services desktop)
+  #:use-module (gnu services sound)
   #:use-module (gnu services xorg)
   #:use-module (gnu home-services)
   #:use-module (gnu packages certs)
@@ -89,7 +90,8 @@ installed by system or home services."
 	    (member (service-kind service)
 		    (append
 		     (map service-kind %rde-base-services)
-		     (list gdm-service-type screen-locker-service-type))))
+		     (list gdm-service-type screen-locker-service-type
+			   pulseaudio-service-type alsa-service-type))))
 	  %desktop-services))
 
 ;; ((@@ (ice-9 pretty-print) pretty-print)
