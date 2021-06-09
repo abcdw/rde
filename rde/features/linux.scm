@@ -31,7 +31,7 @@ expected to be a brightnessctl."
       home-profile-service-type
       (list package))
      (simple-service
-      'add-backlight-control-to-sway
+      'backlight-add-brightness-control-to-sway
       home-sway-service-type
       `((bindsym XF86MonBrightnessUp exec
 		 ,(file-append brightnessctl "/bin/brightnessctl")
@@ -43,19 +43,20 @@ expected to be a brightnessctl."
   (define (backlight-system-services config)
     (list
      (simple-service
-      'set-brightness-on-startup
+      'backlight-set-brightness-on-startup
       shepherd-root-service-type
       (list (shepherd-service
              (provision '(startup-brightness))
-             (requirement '(udev))
+             (requirement '(virtual-terminal))
              (start #~(lambda ()
                         (invoke #$(file-append package "/bin/brightnessctl")
 				"set" (string-append
 				     (number->string #$default-brightness) "%"))))
              (respawn? #f))))
      (udev-rules-service
-      'backlight-udev-rules
+      'backlight-add-udev-rules
       package)))
+
   (feature
    (name 'backlight)
    (values '((backlight . #t)))
