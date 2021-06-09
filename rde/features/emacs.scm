@@ -297,7 +297,7 @@ utilizing reverse-im package."
 
   (define (emacs-telega-home-services config)
     "Returns home services related to telega-el."
-    (let* ((emacs-command (get-value 'emacs-command config "emacs"))
+    (let* ((emacs-client (get-value 'emacs-client config "emacs"))
 	   (configure-telega
 	    (elisp-configuration-package
 	     "configure-telega"
@@ -343,9 +343,8 @@ utilizing reverse-im package."
 			 (program-file
 			  "emacs-telega"
 			  #~(system*
-			     ;; #$emacs-command
-			     "emacsclient"
-			     "-c"
+                             #$emacs-client
+                             "--create-frame"
 			     "--eval"
 			     (string-append
 			      "(progn
@@ -560,6 +559,28 @@ utilizing reverse-im package."
    (values `((emacs-project . #t)))
    (home-services-getter emacs-project-home-services)))
 
+;; (define* (feature-emacs-window)
+;;   "Configure window.el for GNU Emacs."
+;;   (define (emacs-project-home-services config)
+;;     "Returns home services related to project.el."
+;;     (let* ((configure-project
+;; 	    (elisp-configuration-package
+;; 	     "configure-project"
+;; 	     `((with-eval-after-load
+;; 		'project
+;; 		)))))
+;;       (list
+;;        (simple-service
+;; 	'emacs-project-configurations
+;; 	home-emacs-service-type
+;; 	(home-emacs-extension
+;; 	 (elisp-packages (list configure-project)))))))
+
+;;   (feature
+;;    (name 'emacs-project)
+;;    (values `((emacs-project . #t)))
+;;    (home-services-getter emacs-project-home-services)))
+
 (define* (feature-emacs-org-roam
 	  #:key
 	  (org-roam-directory #f))
@@ -601,3 +622,4 @@ utilizing reverse-im package."
 ;; TODO: Fix env vars for emacs daemon
 ;; https://github.com/purcell/exec-path-from-shell
 ;; TODO: feature-emacs-epub https://depp.brause.cc/nov.el/
+;; TODO: feature-series-tracker https://github.com/MaximeWack/seriesTracker
