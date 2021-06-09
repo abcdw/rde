@@ -2,7 +2,9 @@
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (rde emacs packages)
+  #:use-module (gnu home-services)
   #:use-module (gnu home-services emacs)
+  #:use-module (gnu home-services wm)
   #:use-module (gnu home-services xdg)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu services)
@@ -96,7 +98,22 @@
 	 ;;; native-comp, but for some reason dash.el fails to build,
 	 ;;; need to investigate the issue.
 	 ;; (rebuild-elisp-packages? #t)
-	 )))))
+	 ))
+       (simple-service 'emacs-set-default-editor
+		       home-environment-variables-service-type
+		       `(("ALTERNATE_EDITOR" . ,emacs-editor)
+			 ("VISUAL" . ,emacs-client-no-wait)))
+       (when (get-value 'sway config)
+ 	 (simple-service
+	  'emacs-update-display-variable-on-sway-start
+	  home-sway-service-type
+	  `((exec
+	     ,(program-file
+	       "update-emacs-env-variables"
+	       #~(system*
+		  #$emacs-client "--eval"
+		  (string-append
+		   "(setenv \"DISPLAY\" \"" (getenv "DISPLAY") "\")"))))))))))
 
   (feature
    (name 'emacs)
