@@ -31,7 +31,8 @@
 	  #:key
 	  config-file
 	  (package sway)
-	  (add-keyboard-layout-to-config? #t))
+	  (add-keyboard-layout-to-config? #t)
+          (xwayland? #f))
   "Setup and configure sway."
   (ensure-pred maybe-file-like? config-file)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
@@ -71,8 +72,12 @@
 	(home-sway-configuration
 	 (package package)
 	 (config
-	  `(,@layout-config
-	    ,@include-config)))))))
+	  `((xwayland ,(if xwayland? 'enable 'disable))
+            (,#~"")
+            ,@layout-config
+            (,#~"")
+            ,@include-config
+	    (,#~""))))))))
 
   (define (sway-system-services _)
     "Returns system services related to sway."
@@ -83,8 +88,9 @@
 
   (feature
    (name 'sway)
-   (values '((sway . #t)
-	     (wayland . #t)))
+   (values `((sway . #t)
+	     (wayland . #t)
+             (xwayland? . ,xwayland?)))
    (home-services-getter sway-home-services)
    (system-services-getter sway-system-services)))
 
