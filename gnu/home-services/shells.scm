@@ -95,7 +95,7 @@ for environment initialization of POSIX compliant login shells.  This
 service type can be extended with a list of strings or gexps.")))
 
 (define (serialize-boolean field-name val) "")
-(define (serialize-alist field-name val)
+(define (serialize-posix-env-vars field-name val)
   #~(string-append
      #$@(map
          (match-lambda
@@ -124,7 +124,8 @@ Shell startup process will continue with
 @file{$XDG_CONFIG_HOME/zsh/.zshenv}.")
   (environment-variables
    (alist '())
-   "Association list of environment variables to set for the Zsh session.")
+   "Association list of environment variables to set for the Zsh session."
+   serialize-posix-env-vars)
   (zshenv
    (text-config '())
    "List of strings or gexps, which will be added to @file{.zshenv}.
@@ -220,7 +221,7 @@ source ~/.profile
 (define (add-zsh-packages config)
   (list (home-zsh-configuration-package config)))
 
-(define-configuration home-zsh-extension
+(define-configuration/no-serialization home-zsh-extension
   (environment-variables
    (alist '())
    "Association list of environment variables to set.")
@@ -297,7 +298,8 @@ source ~/.profile
 for @code{ls} provided by guix to @file{.bashrc}.")
   (environment-variables
    (alist '())
-   "Association list of environment variables to set for the Bash session.")
+   "Association list of environment variables to set for the Bash session."
+   serialize-posix-env-vars)
   (bash-profile
    (text-config '())
    "List of strings or gexps, which will be added to @file{.bash_profile}.
@@ -401,7 +403,7 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
 (define (add-bash-packages config)
   (list (home-bash-configuration-package config)))
 
-(define-configuration home-bash-extension
+(define-configuration/no-serialization home-bash-extension
   (environment-variables
    (alist '())
    "Association list of environment variables to set.")
