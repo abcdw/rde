@@ -123,10 +123,10 @@
 (define-configuration home-git-extension
   (attributes
    (git-attributes '())
-   "Alist of pattern attribute pairs for git/attributes.")
+   "Alist of pattern attribute pairs for @file{git/attributes.}")
   (ignore
    (git-ignore '())
-   "List of patterns for git/ignore.")
+   "List of patterns for @file{git/ignore.}")
   (config
    (git-config '())
    "List of git sections.  The same format as in
@@ -138,11 +138,11 @@
    "The Git package to use.")
   (attributes
    (git-attributes '())
-   "Alist of pattern attribute pairs for git/attributes.")
+   "Alist of pattern attribute pairs for @file{git/attributes.}")
   (attributes-extra-content
    (string-or-gexp "")
     "String or value of string-valued g-exps will be added to the end
-of the git/attributes file.")
+of the @file{git/attributes} file.")
   (ignore
    (git-ignore '())
    "List of patterns for git/ignore.")
