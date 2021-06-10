@@ -9,6 +9,7 @@
   #:use-module (gnu home-services-utils)
   #:use-module (gnu services)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages mail)
   #:use-module (guix gexp)
   #:use-module (guix packages)
 
@@ -22,7 +23,8 @@
 	    feature-emacs-org-roam
 	    feature-emacs-message
 	    feature-emacs-erc
-	    feature-emacs-telega))
+	    feature-emacs-telega
+            feature-emacs-notmuch))
 
 (define* (elisp-configuration-service
           name
@@ -546,6 +548,25 @@ utilizing reverse-im package."
 	 (define-key org-mode-map      (kbd "C-c n i") 'org-roam-insert)
 	 (setq org-roam-directory ,org-roam-directory)))
       #:elisp-packages (list emacs-org-roam))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+(define* (feature-emacs-notmuch)
+  "Configure notmuch for GNU Emacs."
+
+  (define emacs-f-name 'notmuch)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `()
+      #:elisp-packages (list notmuch))))
 
   (feature
    (name f-name)

@@ -101,6 +101,7 @@
 
    (feature-emacs-org-roam
     #:org-roam-directory "~/work/notes/notes")
+   (feature-emacs-notmuch)
 
    (feature-transmission)
 
