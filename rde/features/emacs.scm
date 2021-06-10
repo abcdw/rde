@@ -146,7 +146,8 @@
 	 ;;; need to investigate the issue.
 	 ;; (rebuild-elisp-packages? #t)
 	 ))
-       (simple-service 'emacs-set-default-editor
+
+  (simple-service 'emacs-set-default-editor
 		       home-environment-variables-service-type
 		       `(("ALTERNATE_EDITOR" . ,emacs-editor)
 			 ("VISUAL" . ,emacs-client-no-wait)))
@@ -154,13 +155,9 @@
  	 (simple-service
 	  'emacs-update-display-variable-on-sway-start
 	  home-sway-service-type
-	  `((exec
-	     ,(program-file
-	       "update-emacs-env-variables"
-	       #~(system*
-		  #$emacs-client "--eval"
-		  (string-append
-		   "(setenv \"DISPLAY\" \"" (getenv "DISPLAY") "\")"))))))))))
+	  `((for_window "[title=\".* - Emacs Client\"]"
+                        floating enable,
+                        resize set 80 ppt 80 ppt)))))))
 
   (feature
    (name 'emacs)
@@ -244,7 +241,11 @@ utilizing reverse-im package."
       "Emacs (Client) [mailto:]"
       #~(system*
          #$emacs-cmd "--eval"
-	 (string-append "(browse-url-mail \"" (cadr (command-line)) "\")"))
+	 (string-append
+          "\
+(progn
+ (set-frame-name \"Reply to Email - Emacs Client\")
+ (browse-url-mail \"" (cadr (command-line)) "\"))"))
       #:default-for '(x-scheme-handler/mailto))))
 
   (feature
@@ -313,6 +314,7 @@ utilizing reverse-im package."
          "--eval"
          (string-append
 	  "(progn
+(set-frame-name \"Telega - Emacs Client\")
 (if (and (boundp 'telega--status) (equal telega--status \"Ready\"))
  (telega-browse-url \"" (car (cdr (command-line))) "\")"
  "
@@ -344,7 +346,7 @@ utilizing reverse-im package."
 
 	 (setq telega-completing-read-function completing-read-function))))
 
-     (emacs-xdg-service emacs-f-name "Emacs (Client) [tg://]" xdg-gexp
+     (emacs-xdg-service emacs-f-name "Emacs (Client) [tg:]" xdg-gexp
                         #:default-for '(x-scheme-handler/tg))))
 
   (feature
@@ -538,7 +540,7 @@ utilizing reverse-im package."
 (define* (feature-emacs-org-roam
 	  #:key
 	  (org-roam-directory #f))
-  "Configure org-rome for GNU Emacs."
+  "Configure org-roam for GNU Emacs."
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
 
