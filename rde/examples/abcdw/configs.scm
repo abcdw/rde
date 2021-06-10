@@ -19,6 +19,7 @@
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
+  #:use-module (rde packages)
   #:use-module (guix gexp)
   #:use-module (ice-9 match))
 
@@ -119,13 +120,16 @@
      (templates "$HOME")))
    (feature-base-packages
     #:home-packages
-    (pkgs
-     "alsa-utils" "mpv" "youtube-dl"
-     "obs" "obs-wlrobs"
-     "ungoogled-chromium-wayland" "ublock-origin-chromium"
-     "nyxt"
-     "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-standard"
-     "ripgrep" "curl" "make"))))
+    (append
+     (list obs-latest)
+     (pkgs
+      "alsa-utils" "mpv" "youtube-dl"
+      ;; "obs" "obs-wlrobs"
+      "icecat"
+      "ungoogled-chromium-wayland" "ublock-origin-chromium"
+      "nyxt"
+      "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-standard"
+      "ripgrep" "curl" "make")))))
 
 (define %laptop-features
   (list ))
