@@ -24,6 +24,42 @@
 	    feature-emacs-erc
 	    feature-emacs-telega))
 
+(define* (elisp-configuration-service
+          name
+          #:optional (elisp-expressions '())
+          #:key (elisp-packages '()))
+  (let* ((configure-package
+	  (elisp-configuration-package
+	   (string-append "configure-" (symbol->string name))
+           elisp-expressions
+           #:elisp-packages elisp-packages)))
+    (simple-service
+     (symbol-append 'emacs- name '-configurations)
+     home-emacs-service-type
+     (home-emacs-extension
+      (elisp-packages (list configure-package))))))
+
+(define* (emacs-xdg-service
+          name xdg-name gexp
+          #:key (default-for '()))
+  (define file-name (string-append "emacs-" (symbol->string name)))
+  (define file-file (file-append (program-file file-name gexp) " %u"))
+  (define desktop-file (symbol-append 'emacs- name '.desktop))
+  (simple-service
+   (symbol-append 'emacs-xdg- name)
+   home-xdg-mime-applications-service-type
+   (home-xdg-mime-applications-configuration
+    (default (map (lambda (m) (cons m desktop-file)) default-for))
+    (desktop-entries
+     (list
+      (xdg-desktop-entry
+       (file file-name)
+       (name xdg-name)
+       (config `((exec . ,file-file)))
+       (type 'application)))))))
+
+
+
 (define* (feature-emacs
 	  #:key
 	  (package emacs-next-pgtk-latest)
@@ -77,7 +113,7 @@
 			  "/emacs/custom.el"))
 	    (load custom-file t)
 	    ,#~""
-	    (define-key global-map (kbd "M-/") 'hippie-expand)
+	    ;; (define-key global-map (kbd "M-/") 'hippie-expand)
 
 	    (column-number-mode 1)
 	    (save-place-mode 1)
@@ -132,6 +168,7 @@
          (string-drop name (string-length "emacs-"))
          name))))
 
+;; TODO: rename to mule
 (define* (feature-emacs-input-method
 	  #:key
 	  (input-method "cyrillic-dvorak")
@@ -141,91 +178,69 @@ with emacs, whithout losing ability to use keybindings.  Supported
 both Emacsy toggle-input-method (C-\\) and system layout switching by
 utilizing reverse-im package."
 
-  (define (emacs-input-method-home-services config)
-    "Returns home services related to input-method."
-    (let* ((configure-input-method
-	    (elisp-configuration-package
-	     "configure-input-method"
-	     `((with-eval-after-load
-		'mule
-		(require ',(strip-emacs-name input-method-package))
-		(setq default-input-method ,input-method)
-		(require 'reverse-im))
-	       (with-eval-after-load
-		'reverse-im
-		(setq reverse-im-input-methods ,input-method)
-		(reverse-im-mode 1)))
-	       #:elisp-packages (list emacs-reverse-im input-method-package))))
-      (list
-       (simple-service
-	'emacs-input-method-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list configure-input-method)))))))
+  (define emacs-f-name 'input-method)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+	 'mule
+	 (require ',(strip-emacs-name input-method-package))
+	 (setq default-input-method ,input-method)
+	 (require 'reverse-im))
+	(with-eval-after-load
+	 'reverse-im
+	 (setq reverse-im-input-methods ,input-method)
+	 (reverse-im-mode 1)))
+      #:elisp-packages (list emacs-reverse-im input-method-package))))
 
   (feature
-   (name 'emacs-input-method)
-   (values `((emacs-input-method . #t)))
-   (home-services-getter emacs-input-method-home-services)))
-
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-message
 	  #:key
 	  (smtp-server #f)
 	  (smtp-port 587))
-  "Configure email capabilities provided by message.el for GNU Emacs."
+  "Configure email sending capabilities provided by @file{message.el}."
   (ensure-pred string? smtp-server)
   (ensure-pred integer? smtp-port)
 
-  (define (emacs-message-home-services config)
-    "Returns home services related to message.el."
-    (let* ((emacs-command (get-value 'emacs-command config "emacs"))
-	   (configure-message
-	    (elisp-configuration-package
-	     "configure-message"
-	     `((with-eval-after-load
-		'message
-		(setq send-mail-function 'smtpmail-send-it)
-		(setq smtpmail-smtp-server ,smtp-server)
-		(setq smtpmail-smtp-service ,smtp-port)
+  (define emacs-f-name 'message)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
 
-		(setq message-auto-save-directory
-		      (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-			      "/emacs/mail-drafts")))))))
+  (define (get-home-services config)
+    (require-value 'emacs-client-create-frame config)
+    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+	 'message
+	 (setq send-mail-function 'smtpmail-send-it)
+	 (setq smtpmail-smtp-server ,smtp-server)
+	 (setq smtpmail-smtp-service ,smtp-port)
 
-      (list
-       (simple-service
-	'emacs-message-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list configure-message))))
+	 (setq message-auto-save-directory
+	       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		       "/emacs/mail-drafts")))))
 
-       (simple-service
-	'emacs-xdg-mailto-handler
-	home-xdg-mime-applications-service-type
-	(home-xdg-mime-applications-configuration
-	 (default '((x-scheme-handler/mailto . emacs-mailto.desktop)))
-	 (desktop-entries
-	  (list
-	   (xdg-desktop-entry
-	    (file "emacs-mailto")
-	    (name "Emacs (Client) [mailto:]")
-	    (type 'application)
-	    (config
-	     `((exec . ,(file-append
-			 (program-file
-			  "emacs-mailto"
-			  #~(system
-			     (string-append
-			      #$emacs-command
-			      " --eval '(browse-url-mail \""
-			      (car (cdr (command-line))) "\")'")))
-			 " %u"))))))))))))
+     (emacs-xdg-service
+      emacs-f-name
+      "Emacs (Client) [mailto:]"
+      #~(system*
+         #$emacs-cmd "--eval"
+	 (string-append "(browse-url-mail \"" (cadr (command-line)) "\")"))
+      #:default-for '(x-scheme-handler/mailto))))
 
   (feature
-   (name 'emacs-message)
-   (values `((emacs-message . #t)))
-   (home-services-getter emacs-message-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 (define* (feature-emacs-erc
 	  #:key
 	  ;; (emacs-client? #f)
@@ -239,171 +254,130 @@ utilizing reverse-im package."
   (ensure-pred maybe-string? erc-nick)
   (ensure-pred list? erc-autojoin-channels-alist)
 
-  (define (emacs-erc-home-services config)
-    "Returns home services related to ERC."
-    (let* ((emacs-command (get-value 'emacs-command config "emacs"))
-	   (configure-erc
-	    (elisp-configuration-package
-	     "configure-erc"
-	     `((with-eval-after-load
-		'erc
-		(setq erc-server ,erc-server)
-		(setq erc-port ,erc-port)
-		,@(if erc-nick `((setq erc-nick ,erc-nick)) '())
-		(setq erc-autojoin-channels-alist
-		      ',erc-autojoin-channels-alist)
+  (define emacs-f-name 'erc)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
 
-		(setq erc-fill-static-center 14)
-		(setq erc-fill-function 'erc-fill-static)
-		(setq erc-fill-column 86)
+  (define (get-home-services config)
+    (require-value 'emacs-client-create-frame config)
+    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+	 'erc
+	 (setq erc-server ,erc-server)
+	 (setq erc-port ,erc-port)
+	 ,@(if erc-nick `((setq erc-nick ,erc-nick)) '())
+	 (setq erc-autojoin-channels-alist
+	       ',erc-autojoin-channels-alist)
 
-		(setq erc-track-visibility nil)
+	 (setq erc-fill-static-center 14)
+	 (setq erc-fill-function 'erc-fill-static)
+	 (setq erc-fill-column 86)
 
-		(define-key erc-mode-map (kbd "s-b") 'erc-switch-to-buffer)
-		)))))
+	 (setq erc-track-visibility nil)
 
-      (list
-       (simple-service
-	'emacs-erc-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list configure-erc))))
-
-       (simple-service
-	'xdg-emacs-erc
-	home-xdg-mime-applications-service-type
-	(home-xdg-mime-applications-configuration
-	 (desktop-entries
-	  (list
-	   (xdg-desktop-entry
-	    (file "emacs-erc")
-	    (name "Emacs IRC client")
-	    (type 'application)
-	    (config
-	     `((exec . ,(program-file
-			 "emacs-erc"
-			 #~(system
-			    (string-append
-			     #$emacs-command
-			     " --eval '(erc-tls)'"))))))))))))))
+	 (define-key erc-mode-map (kbd "s-b") 'erc-switch-to-buffer))))
+     (emacs-xdg-service
+      emacs-f-name
+      "Emacs (Client) [IRC]"
+      #~(system* #$emacs-cmd "--eval" "(erc-tls)"))))
 
   (feature
-   (name 'emacs-erc)
-   (values `((emacs-erc . #t)))
-   (home-services-getter emacs-erc-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-telega)
   "Configure telega.el for GNU Emacs"
+  (define emacs-f-name 'telega)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
 
-  (define (emacs-telega-home-services config)
-    "Returns home services related to telega-el."
-    (let* ((emacs-client (get-value 'emacs-client config "emacs"))
-	   (configure-telega
-	    (elisp-configuration-package
-	     "configure-telega"
-	     `((with-eval-after-load
-		'telega
-		(define-key telega-chat-mode-map (kbd "s-b") 'telega-switch-buffer)
-		(define-key telega-root-mode-map (kbd "s-b") 'telega-switch-buffer)
-
-                (setq telega-emoji-company-backend 'telega-company-emoji)
-                (defun my-telega-chat-mode ()
-                  (set (make-local-variable 'company-backends)
-                       (append (list telega-emoji-company-backend
-                                     'telega-company-username
-                                     'telega-company-hashtag)
-                               (when (telega-chat-bot-p telega-chatbuf--chat)
-                                 '(telega-company-botcmd))))
-                  (company-mode 1))
-                (add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
-
-		(setq telega-completing-read-function completing-read-function)))
-	     #:elisp-packages (list emacs-telega))))
-
-      (list
-       (simple-service
-	'emacs-telega-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list configure-telega))))
-
-       (simple-service
-	'emacs-xdg-tg-handler
-	home-xdg-mime-applications-service-type
-	(home-xdg-mime-applications-configuration
-	 (default '((x-scheme-handler/tg . emacs-telega.desktop)))
-	 (desktop-entries
-	  (list
-	   (xdg-desktop-entry
-	    (file "emacs-telega")
-	    (name "Emacs (Client) [tg://]")
-	    (type 'application)
-	    (config
-	     `((exec . ,(file-append
-			 (program-file
-			  "emacs-telega"
-			  #~(system*
-                             #$emacs-client
-                             "--create-frame"
-			     "--eval"
-			     (string-append
-			      "(progn
+  (define (get-home-services config)
+    (require-value 'emacs-client-create-frame config)
+    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (define xdg-gexp
+      #~(system*
+         #$emacs-cmd
+         "--eval"
+         (string-append
+	  "(progn
 (if (and (boundp 'telega--status) (equal telega--status \"Ready\"))
  (telega-browse-url \"" (car (cdr (command-line))) "\")"
-"
+ "
  (telega)
  (add-hook 'telega-ready-hook
   (lambda ()
    (telega-browse-url \"" (car (cdr (command-line))) "\")))"
-"))")))
-			 " %u"))))))))))))
+   "))")))
+
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+	 'telega
+         ;; FIXME: Implement proper switch buffer function
+	 (define-key telega-chat-mode-map (kbd "s-b") 'telega-switch-buffer)
+	 (define-key telega-root-mode-map (kbd "s-b") 'telega-switch-buffer)
+
+         (setq telega-emoji-company-backend 'telega-company-emoji)
+         (defun my-telega-chat-mode ()
+           (set (make-local-variable 'company-backends)
+                (append (list telega-emoji-company-backend
+                              'telega-company-username
+                              'telega-company-hashtag)
+                        (when (telega-chat-bot-p telega-chatbuf--chat)
+                          '(telega-company-botcmd))))
+           (company-mode 1))
+         (add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
+
+	 (setq telega-completing-read-function completing-read-function))))
+
+     (emacs-xdg-service emacs-f-name "Emacs (Client) [tg://]" xdg-gexp
+                        #:default-for '(x-scheme-handler/tg))))
 
   (feature
-   (name 'emacs-telega)
-   (values `((emacs-telega . #t)))
-   (home-services-getter emacs-telega-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-org-mode)
   "Configure org-mode for GNU Emacs."
-  (define (emacs-org-mode-home-services config)
-    "Returns home services related to org-mode."
-    (let* ((configure-org-mode
-	    (elisp-configuration-package
-	     "configure-org-mode"
-	     `((with-eval-after-load
-		'org
-		(progn
-		 (setq org-adapt-indentation nil)
-		 (setq org-edit-src-content-indentation 0)
-		 (setq org-startup-indented t)))))))
-      (list
-       (simple-service
-	'emacs-org-mode-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list emacs-org configure-org-mode)))))))
+  (define emacs-f-name 'org-mode)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+         'org
+         (progn
+	  (setq org-adapt-indentation nil)
+	  (setq org-edit-src-content-indentation 0)
+	  (setq org-startup-indented t))))
+      #:elisp-packages (list emacs-org))))
 
   (feature
-   (name 'emacs-org-mode)
-   (values `((emacs-org-mode . #t)))
-   (home-services-getter emacs-org-mode-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-magit)
   "Configure Magit for GNU Emacs."
-  (define (emacs-magit-home-services config)
-    "Returns home services related to Magit."
-    (require-value 'git config)
+  (define emacs-f-name 'magit)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
     (list
-     (simple-service
-      'emacs-magit-configurations
-      home-emacs-service-type
-      (home-emacs-extension
-       (elisp-packages (list emacs-magit))))))
+     (elisp-configuration-service
+      emacs-f-name
+      #:elisp-packages (list emacs-magit))))
 
   (feature
-   (name 'emacs-magit)
-   (values `((emacs-magit . #t)))
-   (home-services-getter emacs-magit-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 
 ;; TODO: Move font record to apropriate module
@@ -413,174 +387,143 @@ utilizing reverse-im package."
 ;; environments.  For easier and faster switching.
 (define* (feature-emacs-faces)
   "Configure faces for GNU Emacs."
-  (define (emacs-faces-home-services config)
-    "Returns home services related to faces."
+
+  (define emacs-f-name 'faces)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
     (require-value 'fonts config)
-    (let* ((font-monospace      (get-value 'font-monospace config))
-	   (font-sans           (get-value 'font-sans config))
+    (define font-monospace (get-value 'font-monospace config))
+    (define font-sans      (get-value 'font-sans config))
 
-	   (configure-faces
-	    (elisp-configuration-package
-	     "configure-faces"
-	     `((with-eval-after-load
-		'faces
-		(let* ((mono-fn ,(font-name font-monospace))
-		       (sans-fn ,(font-name font-sans))
-		       (mono (font-spec
-			      :name ,(font-name font-monospace)
-			      :size   ,(font-size font-monospace)
-			      :weight ',(or (font-weight font-monospace) 'normal)))
-		       ;; For people coming here years later, only
-		       ;; face which can contain size or integer
-		       ;; height is default, everything else should
-		       ;; set only family or relative height
-		       ;; (decimal value), the font-spec even
-		       ;; without height/size shouldn't be used.
-		       ;; Otherwise text-adjust and other stuff can
-		       ;; be broken.
-		       (faces `((default ((t (:font ,mono))))
-				(fixed-pitch ((t (:family ,mono-fn))))
-				(button ((t (:inherit (fixed-pitch)))))
-				(variable-pitch ((t (:family ,sans-fn)))))))
-		  (dolist (face faces)
-			  (custom-set-faces face))
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+	 'faces
+	 (let* ((mono-fn ,(font-name font-monospace))
+		(sans-fn ,(font-name font-sans))
+		(mono (font-spec
+		       :name ,(font-name font-monospace)
+		       :size   ,(font-size font-monospace)
+		       :weight ',(or (font-weight font-monospace) 'normal)))
+		;; For people coming here years later, only
+		;; face which can contain size or integer
+		;; height is default, everything else should
+		;; set only family or relative height
+		;; (decimal value), the font-spec even
+		;; without height/size shouldn't be used.
+		;; Otherwise text-adjust and other stuff can
+		;; be broken.
+		(faces `((default ((t (:font ,mono))))
+			 (fixed-pitch ((t (:family ,mono-fn))))
+			 (button ((t (:inherit (fixed-pitch)))))
+			 (variable-pitch ((t (:family ,sans-fn)))))))
+	   (dolist (face faces)
+		   (custom-set-faces face))
 
-		  (dolist (face faces)
-			  (put (car face) 'saved-face nil))))))))
-      
-      (list
-       (simple-service
-	'emacs-fonts-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list configure-faces)))))))
+	   (dolist (face faces)
+		   (put (car face) 'saved-face nil))))))))
 
   (feature
-   (name 'emacs-faces)
-   (values `((emacs-faces . #t)))
-   (home-services-getter emacs-faces-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
+;; TODO: Remove corfu, rename to minibuffer
 (define* (feature-emacs-completion)
   "Configure completion system for GNU Emacs."
-  (define (emacs-completion-home-services config)
-    "Returns home services related to Emacs completion system."
-    (let* ((configure-completion
-	    (elisp-configuration-package
-	     "configure-completion"
-	     `((with-eval-after-load
-		'minibuffer
+  (define emacs-f-name 'completion)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
 
-		(setq enable-recursive-minibuffers t)
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+	 'minibuffer
 
-		(require 'orderless)
-		(require 'savehist)
-		(require 'vertico)
-		(require 'corfu)
-		(require 'marginalia)
-		(require 'embark)
-		(require 'consult))
-	       (with-eval-after-load
-		'orderless
-		(setq completion-styles '(orderless))
-		(setq completion-category-overrides
-		      '((file (styles . (partial-completion))))))
+	 (setq enable-recursive-minibuffers t)
 
-	       (with-eval-after-load
-		'savehist
-		(setq savehist-file
-		      (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-			      "/emacs/history"))
-		(savehist-mode 1))
+	 (require 'orderless)
+	 (require 'savehist)
+	 (require 'vertico)
+	 (require 'corfu)
+	 (require 'marginalia)
+	 (require 'embark)
+	 (require 'consult))
 
-	       (with-eval-after-load
-		'embark
-		(define-key global-map (kbd "s-e") 'embark-act))
+	(with-eval-after-load
+	 'orderless
+	 (setq completion-styles '(orderless))
+	 (setq completion-category-overrides
+	       '((file (styles . (partial-completion))))))
 
-	       (with-eval-after-load
-		'consult
-		;; TODO: Move to feature-emacs-buffers
-		(define-key global-map (kbd "s-w") 'kill-current-buffer)
-		(define-key global-map (kbd "s-o") 'other-window)
-		(define-key global-map (kbd "s-b") 'consult-buffer)
+	(with-eval-after-load
+	 'savehist
+	 (setq savehist-file
+	       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		       "/emacs/history"))
+	 (savehist-mode 1))
 
-		(define-key global-map (kbd "M-y") 'consult-yank-pop))
-	       (with-eval-after-load 'vertico (vertico-mode 1))
-	       (with-eval-after-load 'corfu (corfu-global-mode 1))
-	       (with-eval-after-load
-		'marginalia
-		;; FIXME: Temporary disable annotations for describe-variables.
-		;; See: <https://github.com/masm11/emacs/issues/104>
-		(setf (alist-get 'variable marginalia-annotator-registry)
-		      '(none builtin marginalia-annotate-variable))
-		(marginalia-mode 1)))
+	(with-eval-after-load
+	 'embark
+	 (define-key global-map (kbd "s-e") 'embark-act))
 
-	     #:elisp-packages
-	     (list emacs-orderless emacs-marginalia
-		   emacs-vertico emacs-corfu
-		   emacs-consult emacs-embark-next))))
-      
-      (list
-       (simple-service
-	'emacs-completion-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list configure-completion)))))))
+	(with-eval-after-load
+	 'consult
+	 ;; TODO: Move to feature-emacs-buffers
+	 (define-key global-map (kbd "s-w") 'kill-current-buffer)
+	 (define-key global-map (kbd "s-o") 'other-window)
+	 (define-key global-map (kbd "s-b") 'consult-buffer)
+	 (define-key global-map (kbd "s-B") 'consult-buffer)
+
+	 (define-key global-map (kbd "M-y") 'consult-yank-pop))
+
+	(with-eval-after-load 'vertico (vertico-mode 1))
+	(with-eval-after-load 'corfu (corfu-global-mode 1))
+	(with-eval-after-load
+	 'marginalia
+	 ;; FIXME: Temporary disable annotations for describe-variables.
+	 ;; See: <https://github.com/masm11/emacs/issues/104>
+	 (setf (alist-get 'variable marginalia-annotator-registry)
+	       '(none builtin marginalia-annotate-variable))
+	 (marginalia-mode 1)))
+      #:elisp-packages  (list emacs-orderless emacs-marginalia
+		              emacs-vertico emacs-corfu
+		              emacs-consult emacs-embark-next))))
 
   (feature
-   (name 'emacs-completion)
-   (values `((emacs-completion . #t)))
-   (home-services-getter emacs-completion-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-project)
   "Configure project.el for GNU Emacs."
-  (define (emacs-project-home-services config)
-    "Returns home services related to project.el."
-    (let* ((configure-project
-	    (elisp-configuration-package
-	     "configure-project"
-	     `((with-eval-after-load
-		'project
-		(with-eval-after-load
-		 'consult
-		 (setq consult-project-root-function
-		       (lambda ()
-			 (when-let (project (project-current))
-				   (car (project-roots project)))))))))))
+
+  (define emacs-f-name 'project)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
       ;; TODO: https://github.com/muffinmad/emacs-ibuffer-project
-      (list
-       (simple-service
-	'emacs-project-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list configure-project)))))))
+      `((with-eval-after-load
+	 'project
+	 (with-eval-after-load
+	  'consult
+	  (setq consult-project-root-function
+		(lambda ()
+		  (when-let (project (project-current))
+			    (car (project-roots project)))))))))))
 
   (feature
-   (name 'emacs-project)
-   (values `((emacs-project . #t)))
-   (home-services-getter emacs-project-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
-;; (define* (feature-emacs-window)
-;;   "Configure window.el for GNU Emacs."
-;;   (define (emacs-project-home-services config)
-;;     "Returns home services related to project.el."
-;;     (let* ((configure-project
-;; 	    (elisp-configuration-package
-;; 	     "configure-project"
-;; 	     `((with-eval-after-load
-;; 		'project
-;; 		)))))
-;;       (list
-;;        (simple-service
-;; 	'emacs-project-configurations
-;; 	home-emacs-service-type
-;; 	(home-emacs-extension
-;; 	 (elisp-packages (list configure-project)))))))
-
-;;   (feature
-;;    (name 'emacs-project)
-;;    (values `((emacs-project . #t)))
-;;    (home-services-getter emacs-project-home-services)))
-
+;; TODO: rewrite to states
 (define* (feature-emacs-org-roam
 	  #:key
 	  (org-roam-directory #f))
@@ -588,36 +531,28 @@ utilizing reverse-im package."
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
 
-  (define (emacs-org-roam-home-services config)
-    "Returns home services related to org-roam."
-    (let* ((configure-org-roam
-	    (elisp-configuration-package
-	     "configure-org-roam"
-	     `(,#~";;;###autoload"
-	       (progn
-		(add-hook 'after-init-hook 'org-roam-mode)
-		(with-eval-after-load
-		 'org-roam
-		 (define-key org-roam-mode-map
-		   (kbd "C-c n n") 'org-roam)
-		 (define-key org-roam-mode-map
-		   (kbd "C-c n f") 'org-roam-find-file)
-		 (define-key org-mode-map
-		   (kbd "C-c n i") 'org-roam-insert)
-		 (setq org-roam-directory ,org-roam-directory)))))))
-      
-      (list
-       (simple-service
-	'emacs-completion-configurations
-	home-emacs-service-type
-	(home-emacs-extension
-	 (elisp-packages (list configure-org-roam emacs-org-roam)))))))
+  (define emacs-f-name 'org-roam)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((add-hook 'after-init-hook 'org-roam-mode)
+	(with-eval-after-load
+	 'org-roam
+	 (define-key org-roam-mode-map (kbd "C-c n n") 'org-roam)
+	 (define-key org-roam-mode-map (kbd "C-c n f") 'org-roam-find-file)
+	 (define-key org-mode-map      (kbd "C-c n i") 'org-roam-insert)
+	 (setq org-roam-directory ,org-roam-directory)))
+      #:elisp-packages (list emacs-org-roam))))
 
   (feature
-   (name 'emacs-org-roam)
-   (values `((emacs-org-roam . #t)))
-   (home-services-getter emacs-org-roam-home-services)))
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
+;; TODO: feature-emacs-monocole
 ;; TODO: feature-emacs-reasonable-keybindings
 ;; TODO: Fix env vars for emacs daemon
 ;; https://github.com/purcell/exec-path-from-shell
