@@ -23,6 +23,17 @@
 	    home-zsh-configuration
 	    home-zsh-extension))
 
+;;; Commentary:
+;;;
+;;; This module contains shell related services like Zsh.
+;;;
+;;; Code:
+
+
+;;;
+;;; Shell profile.
+;;;
+
 (define path? string?)
 (define (serialize-path field-name val) val)
 
@@ -95,6 +106,11 @@ service type can be extended with a list of strings or gexps.")))
            ((key . value)
             #~(string-append "export " #$key "=" #$value "\n")))
          val)))
+
+
+;;;
+;;; Zsh.
+;;;
 
 (define-configuration home-zsh-configuration
   (package
@@ -266,6 +282,10 @@ source ~/.profile
                 (default-value (home-zsh-configuration))
                 (description "Install and configure Zsh.")))
 
+
+;;;
+;;; Bash.
+;;;
 
 (define-configuration home-bash-configuration
   (package
