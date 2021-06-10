@@ -10,7 +10,8 @@
 	  #:key gpg-primary-key
 	  (gpg-ssh-agent? #t)
 	  (pinentry-flavor 'qt)
-	  (gpg-smart-card? #f))
+	  (gpg-smart-card? #f)
+          (default-ttl 86400))
   "Sets up gnupg, if SSH-AGENT? specified also sets up gpg's ssh-agent
 and provides GPG-PRIMARY-KEY value for other features."
 
@@ -18,7 +19,7 @@ and provides GPG-PRIMARY-KEY value for other features."
   (ensure-pred boolean? gpg-ssh-agent?)
   (ensure-pred boolean? gpg-smart-card?)
   (ensure-pred pinentry-flavor? pinentry-flavor)
-  ;; TODO: check pinentry flavor
+  (ensure-pred integer? default-ttl)
 
   (define (home-gnupg-services _)
     "Return a list of home-services, required for gnupg to operate."
@@ -33,6 +34,14 @@ and provides GPG-PRIMARY-KEY value for other features."
 		    (keyserver . "hkps://keys.openpgp.org")))))
 	       (gpg-agent-config
 		(home-gpg-agent-configuration
+		 (extra-config
+                  ;; TTL for smart-cards doesn't make sense
+                  `(,@(if (not gpg-smart-card?)
+                          `((default-cache-ttl . ,default-ttl)
+                            (default-cache-ttl-ssh . ,default-ttl)
+                            (max-cache-ttl . ,default-ttl)
+                            (max-cache-ttl-ssh . ,default-ttl))
+                          '())))
 		 (ssh-agent? gpg-ssh-agent?)
 		 (pinentry-flavor pinentry-flavor)))))))
 
