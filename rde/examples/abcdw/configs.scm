@@ -105,6 +105,8 @@
    (feature-emacs-notmuch)
 
    (feature-transmission)
+   (feature-emacs-transmission)
+
 
    (feature-base-services)
    (feature-xdg

@@ -24,6 +24,7 @@
 	    feature-emacs-message
 	    feature-emacs-erc
 	    feature-emacs-telega
+            feature-emacs-transmission
             feature-emacs-notmuch))
 
 (define* (elisp-configuration-service
@@ -554,6 +555,39 @@ utilizing reverse-im package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define* (feature-emacs-transmission)
+  "Configure transmission.el."
+
+  (define emacs-f-name 'transmission)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (require-value 'emacs-client-create-frame config)
+    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((define-key global-map (kbd "C-c T t") 'transmission))
+      #:elisp-packages (list emacs-transmission))
+
+     (emacs-xdg-service
+      emacs-f-name "Emacs (Client) [magnet:]"
+      #~(system*
+         #$emacs-cmd "--eval"
+	 (string-append "\
+(progn
+ (set-frame-name \"Transmission - Emacs Client\")
+ (transmission)
+ (delete-other-windows)
+ (transmission-add \"" (cadr (command-line)) "\")
+ (revert-buffer))"))
+      #:default-for '(x-scheme-handler/magnet))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-notmuch)
   "Configure notmuch for GNU Emacs."
