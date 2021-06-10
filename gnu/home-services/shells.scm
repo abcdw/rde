@@ -13,15 +13,19 @@
   #:use-module (ice-9 match)
 
   #:export (home-shell-profile-service-type
-	    home-shell-profile-configuration
+            home-shell-profile-configuration
 
-	    home-bash-service-type
-	    home-bash-configuration
-	    home-bash-extension
+            home-bash-service-type
+            home-bash-configuration
+            home-bash-extension
 
-	    home-zsh-service-type
-	    home-zsh-configuration
-	    home-zsh-extension))
+            home-zsh-service-type
+            home-zsh-configuration
+            home-zsh-extension
+
+            home-fish-service-type
+            home-fish-configuration
+            home-fish-extension))
 
 ;;; Commentary:
 ;;;
@@ -452,6 +456,127 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
                 (description "Install and configure GNU Bash.")))
 
 
+
+
+;;;
+;;; Fish.
+;;;
+
+(define (serialize-fish-aliases field-name val)
+  #~(string-append
+     #$@(map (match-lambda
+               ((key . value)
+                #~(string-append "alias " #$key " \"" #$value "\"\n"))
+               (_ ""))
+             val)))
+
+(define (serialize-fish-abbreviations field-name val)
+  #~(string-append
+     #$@(map (match-lambda
+               ((key . value)
+                #~(string-append "abbr --add " #$key " " #$value "\n"))
+               (_ ""))
+             val)))
+
+(define (serialize-fish-env-vars field-name val)
+  #~(string-append
+     #$@(map (match-lambda
+               ((key . #f)
+                "")
+               ((key . #t)
+                #~(string-append "set " #$key "\n"))
+               ((key . value)
+                #~(string-append "set " #$key " "  #$value "\n")))
+             val)))
+
+(define-configuration home-fish-configuration
+  (package
+    (package fish)
+    "The Fish package to use.")
+  (config
+   (text-config '())
+   "List of strings or gexps, which will be added to
+@file{$XDG_CONFIG_HOME/fish/config.fish}.")
+  (environment-variables
+   (alist '())
+   "Association list of environment variables to set in Fish."
+   serialize-fish-env-vars)
+  (aliases
+   (alist '())
+   "Association list of aliases for Fish, both the key and the value
+should be a string.  An alias is just a simple function that wraps a
+command, If you want something more akin to @dfn{aliases} in POSIX
+shells, see the @code{abbreviations} field."
+   serialize-fish-aliases)
+  (abbreviations
+   (alist '())
+   "Association list of abbreviations for Fish.  These are words that,
+when typed in the shell, will automatically expand to the full text."
+   serialize-fish-abbreviations))
+
+(define (fish-files-service config)
+  `(("config/fish/config.fish"
+    ,(mixed-text-file
+      "fish-config"
+      (serialize-configuration
+       config
+       home-fish-configuration-fields)))))
+
+(define (fish-profile-service config)
+  (list (home-fish-configuration-package config)))
+
+(define-configuration/no-serialization home-fish-extension
+  (config
+   (text-config '())
+   "List of strings or gexps for extending the Fish initialization file.")
+  (environment-variables
+   (alist '())
+   "Association list of environment variables to set.")
+  (aliases
+   (alist '())
+   "Association list of Fish aliases.")
+  (abbreviations
+   (alist '())
+   "Association list of Fish abbreviations."))
+
+(define (home-fish-extensions original-config extension-configs)
+  (home-fish-configuration
+   (inherit original-config)
+   (config
+    (append (home-fish-configuration-config original-config)
+            (append-map
+             home-fish-extension-config extension-configs)))
+   (environment-variables
+    (append (home-fish-configuration-environment-variables original-config)
+            (append-map
+             home-fish-extension-environment-variables extension-configs)))
+   (aliases
+    (append (home-fish-configuration-aliases original-config)
+            (append-map
+             home-fish-extension-aliases extension-configs)))
+   (abbreviations
+    (append (home-fish-configuration-abbreviations original-config)
+            (append-map
+             home-fish-extension-abbreviations extension-configs)))))
+
+;; TODO: Support for generating completion files
+;; TODO: Support for installing plugins
+(define home-fish-service-type
+  (service-type (name 'home-fish)
+                (extensions
+                 (list (service-extension
+                        home-files-service-type
+                        fish-files-service)
+                       (service-extension
+                        home-profile-service-type
+                        fish-profile-service)))
+                (compose identity)
+                (extend home-fish-extensions)
+                (default-value (home-fish-configuration))
+                (description "\
+Install and configure Fish, the friendly interactive shell.")))
+
+
 (define (generate-home-shell-profile-documentation)
   (generate-documentation
    `((home-shell-profile-configuration
@@ -469,6 +594,18 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
    `((home-zsh-configuration
       ,home-zsh-configuration-fields))
    'home-zsh-configuration))
+
+(define (generate-home-fish-documentation)
+  (string-append
+   (generate-documentation
+    `((home-fish-configuration
+       ,home-fish-configuration-fields))
+    'home-fish-configuration)
+   "\n\n"
+   (generate-documentation
+    `((home-fish-extension
+       ,home-fish-extension-fields))
+    'home-fish-extension)))
 
 ;; (display (generate-home-shell-profile-documentation))
 ;; (display (generate-home-bash-documentation))
