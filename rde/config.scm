@@ -380,7 +380,10 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
   (with-output-to-string
     (lambda ()
       ((@@ (ice-9 pretty-print) pretty-print)
-       '(cons*
+       '(use-modules (guix ci)
+		     (guix channels)))
+      ((@@ (ice-9 pretty-print) pretty-print)
+       '(list
 	 (channel
 	  (name 'rde)
 	  (url "https://git.sr.ht/~abcdw/rde")
@@ -389,7 +392,9 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))))
 	    "257cebd587b66e4d865b3537a9a88cccd7107c95"
 	    (openpgp-fingerprint
 	     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
-	 %default-channels)))))
+	 (channel-with-substitutes-available
+	  %default-guix-channel
+	  "https://ci.guix.gnu.org"))))))
 
 (use-modules (guix gexp))
 (define (rde-guix-channels rde-config)
