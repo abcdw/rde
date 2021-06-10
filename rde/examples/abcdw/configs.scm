@@ -15,6 +15,7 @@
   #:use-module (rde features ssh)
   #:use-module (rde features emacs)
   #:use-module (rde features linux)
+  #:use-module (rde features bittorrent)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
@@ -100,6 +101,8 @@
 
    (feature-emacs-org-roam
     #:org-roam-directory "~/work/notes/notes")
+
+   (feature-transmission)
 
    (feature-base-services)
    (feature-xdg
