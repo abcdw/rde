@@ -3,6 +3,7 @@
   #:use-module (rde features predicates)
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
+  #:use-module (rde packages)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages linux)
@@ -52,7 +53,8 @@
        ;; TODO: Move wofi to feature-app-launcher or something like that
        (simple-service 'packages-for-sway
 		home-profile-service-type
-		(list wofi qtwayland))
+		(list wofi qtwayland
+                      xdg-desktop-portal-latest xdg-desktop-portal-wlr-latest))
        (simple-service 'set-wayland-specific-env-vars
 		       home-environment-variables-service-type
 		       ;; export NO_AT_BRIDGE=1

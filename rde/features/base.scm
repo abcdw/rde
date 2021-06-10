@@ -8,6 +8,7 @@
   #:use-module (gnu services sound)
   #:use-module (gnu services xorg)
   #:use-module (gnu home-services)
+  #:use-module (gnu home-services shepherd)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages fonts)
   #:use-module (srfi srfi-1)
@@ -144,14 +145,38 @@ installed by system or home services."
 
 (define* (feature-desktop-services)
   "Provides desktop system services."
-  (define (get-desktop-system-services _)
+  (define (get-home-services _)
+    (list
+     ;; TODO: Make home-dbus-service-type
+     (simple-service 'dbus-set-some-env-vars
+		     home-environment-variables-service-type
+		     '(("DBUS_SESSION_BUS_ADDRESS"
+                        . "unix:path=$XDG_RUNTIME_DIR/dbus.sock")))
+     (simple-service
+      'dbus-add-shepherd-daemon
+      home-shepherd-service-type
+      (list
+       (shepherd-service
+        (provision '(dbus-home))
+        (stop  #~(make-kill-destructor))
+        (start #~(make-forkexec-constructor
+                  (list #$(file-append (@@ (gnu packages glib) dbus)
+                                       "/bin/dbus-daemon")
+                        "--nofork"
+                        "--session"
+                        (string-append
+                         "--address=" "unix:path="
+                         (getenv "XDG_RUNTIME_DIR") "/dbus.sock"))
+                  )))))))
+  (define (get-system-services _)
     %rde-desktop-services)
 
   (feature
    (name 'desktop-services)
    (values '((desktop-services . #t)
 	     (elogind . #t)))
-   (system-services-getter get-desktop-system-services)))
+   (home-services-getter get-home-services)
+   (system-services-getter get-system-services)))
 
 
 (define* (feature-hidpi

@@ -102,12 +102,9 @@ ctl_type.pipewire {
 }
 ")))))
 
-     (simple-service 'dbus-set-some-env-vars
-		     home-environment-variables-service-type
-		     '(("DBUS_SESSION_BUS_ADDRESS"
-                        . "unix:path=$XDG_RUNTIME_DIR/dbus.sock")))
+
      (simple-service
-      'dbus-add-shepherd-daemon
+      'pipewire-add-shepherd-daemons
       home-shepherd-service-type
       (list
        (shepherd-service
@@ -127,25 +124,12 @@ ctl_type.pipewire {
         (provision '(pipewire-pulse))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list #$(file-append package "/bin/pipewire-pulse")))))
-       (shepherd-service
-        (provision '(dbus-home))
-        (stop  #~(make-kill-destructor))
-        (start #~(make-forkexec-constructor
-                  (list #$(file-append (@@ (gnu packages glib) dbus)
-                                       "/bin/dbus-daemon")
-                        "--session"
-                        (string-append
-                         "--address="
-                         "unix:path="
-                         (getenv "XDG_RUNTIME_DIR")
-                         "/dbus.sock")))))))
+                  (list #$(file-append package "/bin/pipewire-pulse")))))))
      (simple-service
       'pipewire-add-packages
       home-profile-service-type
       (append
        ;; TODO: Should be in feature-sway
-       (list xdg-desktop-portal-latest xdg-desktop-portal-wlr-latest)
        (list package)))))
 
   (define (system-pipewire-services _)
