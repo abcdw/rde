@@ -37,7 +37,8 @@
 	   (with-output-to-string
 	     (lambda ()
 	       ((@@ (ice-9 pretty-print) pretty-print)
-		'#$elem)))
+		'#$elem
+                #:max-expr-width 79)))
 	   #\newline))))
 
   #~(string-append
