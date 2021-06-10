@@ -115,6 +115,14 @@
 		  (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
 			  "/emacs/custom.el"))
 	    (load custom-file t)
+            ,#~""
+            (defun rde/display-load-time ()
+              (interactive)
+              (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
+
+            ;; (setq inhibit-splash-screen t)
+            (defun display-startup-echo-area-message ()
+              (rde/display-load-time))
 	    ,#~""
 	    ;; (define-key global-map (kbd "M-/") 'hippie-expand)
 
