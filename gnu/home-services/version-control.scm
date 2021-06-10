@@ -20,6 +20,7 @@
 	    serialize-git-config
 
             home-hg-configuration
+            home-hg-extension
             home-hg-service-type))
 
 ;;; Commentary:
@@ -249,26 +250,23 @@ of the configuration file."))
 ;;;        (log . "-v")))))
 ;;;
 
-(define hg-config? list?)
-(define hg-ignore? list?)
-
 ;; TODO: Add separate field for name and email?
 (define-configuration/no-serialization home-hg-configuration
   (package
     (package mercurial)
     "The Mercurial package to use.")
   (regexp-ignore
-   (hg-ignore '())
+   (listof-strings '())
    "List of regular expressions to ignore globally.  The default syntax
 is Python/Perl-style regular expression (see @command{man 5 hgignore}).
 
 The @code{*-ignore} fields are equivalent to adding @code{ui.ignore =
 /file/with/ignore/rules} in your @file{hgrc}.")
   (glob-ignore
-   (hg-ignore '())
+   (listof-strings '())
    "List of globs to ignore globally.")
   (rootglob-ignore
-   (hg-ignore '())
+   (listof-strings '())
    "List of @dfn{rootglobs} to ignore globally.")
   (config
    (ini-config '())
@@ -379,6 +377,40 @@ will turn into this:
                "hgrc"
                (serialize-hg-config final-config))))))
 
+(define-configuration/no-serialization home-hg-extension
+  (regexp-ignore
+   (listof-strings '())
+   "List of regular expressions to ignore globally.")
+  (glob-ignore
+   (listof-strings '())
+   "List of glob expressions to ignore globally.")
+  (rootglob-ignore
+   (listof-strings '())
+   "List of @dfn{rootglobs} to ignore globally.")
+  (config
+   (ini-config '())
+   "List of lists representing the contents of the @file{hgrc} file."))
+
+(define (home-hg-extensions original-config extension-configs)
+  (home-hg-configuration
+   (inherit original-config)
+   (regexp-ignore
+    (append (home-hg-configuration-regexp-ignore original-config)
+            (append-map
+             home-hg-extension-regexp-ignore extension-configs)))
+   (glob-ignore
+    (append (home-hg-configuration-glob-ignore original-config)
+            (append-map
+             home-hg-extension-glob-ignore extension-configs)))
+   (rootglob-ignore
+    (append (home-hg-configuration-rootglob-ignore original-config)
+            (append-map
+             home-hg-extension-rootglob-ignore extension-configs)))
+   (config
+    (append (home-hg-configuration-config original-config)
+            (append-map
+             home-hg-extension-config extension-configs)))))
+
 (define (home-hg-profile-service config)
   (list (home-hg-configuration-package config)))
 
@@ -391,15 +423,20 @@ will turn into this:
                        (service-extension
                         home-profile-service-type
                         home-hg-profile-service)))
-                ;; TODO: Add extension mechanism
-                ;; (compose identity)
-                ;; (extend home-hg-extensions)
+                (compose identity)
+                (extend home-hg-extensions)
                 (default-value (home-hg-configuration))
                 (description "\
 Install and configure the Mercurial version control system.")))
 
 (define (generate-home-hg-documentation)
-  (generate-documentation
-   `((home-hg-configuration
-      ,home-hg-configuration-fields))
-   'home-hg-configuration))
+  (string-append
+   (generate-documentation
+    `((home-hg-configuration
+       ,home-hg-configuration-fields))
+    'home-hg-configuration)
+   "\n\n"
+   (generate-documentation
+    `((home-hg-extension
+       ,home-hg-extension-fields))
+    'home-hg-extension)))
