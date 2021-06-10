@@ -2,7 +2,9 @@
   #:use-module (rde features)
   #:use-module (gnu services)
   #:use-module (gnu home-services gnupg)
+  #:use-module (gnu home-services wm)
   #:use-module (gnu services security-token)
+  #:use-module (guix gexp)
 
   #:export (feature-gnupg))
 
@@ -21,9 +23,16 @@ and provides GPG-PRIMARY-KEY value for other features."
   (ensure-pred pinentry-flavor? pinentry-flavor)
   (ensure-pred integer? default-ttl)
 
-  (define (home-gnupg-services _)
+  (define (home-gnupg-services config)
     "Return a list of home-services, required for gnupg to operate."
     (list
+     (when (get-value 'sway config)
+       (simple-service
+	'gnupg-updatestartuptty-on-sway-launch
+	home-sway-service-type
+	`((exec gpg-connect-agent updatestartuptty /bye >/dev/null)
+          (,#~""))))
+
      (service home-gnupg-service-type
 	      (home-gnupg-configuration
 	       (gpg-config

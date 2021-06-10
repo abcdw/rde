@@ -21,7 +21,7 @@ set $term alacritty
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-exec gpg-connect-agent updatestartuptty /bye >/dev/null
+# exec gpg-connect-agent updatestartuptty /bye >/dev/null
 set $menu wofi --show=drun
 # dmenu_path | dmenu | xargs swaymsg exec --
 default_border pixel
