@@ -1,10 +1,11 @@
-home-reconfigure:
+home:
+	RDE_TARGET=ixy-home \
 	GUILE_LOAD_PATH=./ guix \
-	home reconfigure ../rde/rde/config.scm
+	home reconfigure ./rde/examples/abcdw/configs.scm
 
-home-reconfigure-local:
-	GUILE_LOAD_PATH=./ ../gnu/guix/pre-inst-env guix \
-	home reconfigure ../rde/rde/config.scm
+# home-reconfigure-local:
+# 	GUILE_LOAD_PATH=./ ../gnu/guix/pre-inst-env guix \
+# 	home reconfigure ../rde/rde/config.scm
 
 env:
 	guix time-machine -C rde/guix/channels-lock -- \
