@@ -205,6 +205,9 @@ source ~/.profile
   (list (home-zsh-configuration-package config)))
 
 (define-configuration home-zsh-extension
+  (environment-variables
+   (alist '())
+   "Association list of environment variables to set.")
   (zshrc
    (text-config '())
    "List of strings or gexps.")
@@ -224,6 +227,10 @@ source ~/.profile
 (define (home-zsh-extensions original-config extension-configs)
   (home-zsh-configuration
    (inherit original-config)
+   (environment-variables
+    (append (home-zsh-configuration-environment-variables original-config)
+	    (append-map
+	     home-zsh-extension-environment-variables extension-configs)))
    (zshrc
     (append (home-zsh-configuration-zshrc original-config)
 	    (append-map
@@ -375,6 +382,9 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
   (list (home-bash-configuration-package config)))
 
 (define-configuration home-bash-extension
+  (environment-variables
+   (alist '())
+   "Association list of environment variables to set.")
   (bash-profile
    (text-config '())
    "List of strings or gexps.")
@@ -388,6 +398,10 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
 (define (home-bash-extensions original-config extension-configs)
   (home-bash-configuration
    (inherit original-config)
+   (environment-variables
+    (append (home-bash-configuration-environment-variables original-config)
+	    (append-map
+	     home-bash-extension-environment-variables extension-configs)))
    (bash-profile
     (append (home-bash-configuration-bash-profile original-config)
 	    (append-map
