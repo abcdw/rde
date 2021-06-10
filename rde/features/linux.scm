@@ -12,7 +12,7 @@
   #:use-module (gnu home-services shepherd)
   #:use-module (gnu home-services wm)
   #:use-module (guix gexp)
-  
+
   #:export (feature-backlight
 	    feature-pipewire))
 
@@ -32,7 +32,7 @@ expected to be a brightnessctl."
   (define (backlight-home-services config)
     (list
      (simple-service
-      'add-backlight
+      'backlight-add-packages
       home-profile-service-type
       (list package))
      (simple-service
@@ -56,8 +56,8 @@ expected to be a brightnessctl."
              (start #~(lambda ()
                         (invoke #$(file-append package "/bin/brightnessctl")
 				"set" (string-append
-				     (number->string #$default-brightness) "%"))))
-             (respawn? #f))))
+				       (number->string #$default-brightness) "%"))))
+             (one-shot? #t))))
      (udev-rules-service
       'backlight-add-udev-rules
       package)))
@@ -102,13 +102,10 @@ ctl_type.pipewire {
 }
 ")))))
 
-     (simple-service 'pipewire-set-some-env-vars
+     (simple-service 'dbus-set-some-env-vars
 		     home-environment-variables-service-type
-
 		     '(("DBUS_SESSION_BUS_ADDRESS"
-                        . "unix:path=$XDG_RUNTIME_DIR/dbus.sock")
-                       ;; ("RTC_USE_PIPEWIRE" . "true")
-                       ))
+                        . "unix:path=$XDG_RUNTIME_DIR/dbus.sock")))
      (simple-service
       'dbus-add-shepherd-daemon
       home-shepherd-service-type
@@ -116,20 +113,24 @@ ctl_type.pipewire {
        (shepherd-service
         (requirement '(dbus-home))
         (provision '(pipewire))
+        (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
                   (list #$(file-append package "/bin/pipewire")))))
        (shepherd-service
         (requirement '(pipewire))
         (provision '(pipewire-media-session))
+        (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
                   (list #$(file-append package "/bin/pipewire-media-session")))))
        (shepherd-service
         (requirement '(pipewire))
         (provision '(pipewire-pulse))
+        (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
                   (list #$(file-append package "/bin/pipewire-pulse")))))
        (shepherd-service
         (provision '(dbus-home))
+        (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
                   (list #$(file-append (@@ (gnu packages glib) dbus)
                                        "/bin/dbus-daemon")

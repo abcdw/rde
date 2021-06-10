@@ -113,7 +113,7 @@ automatically switch to SWAY-TTY-NUMBER on boot."
              (start #~(lambda ()
 			(invoke #$(file-append kbd "/bin/chvt")
 				#$(format #f "~a" sway-tty-number))))
-             (respawn? #f))))))
+             (one-shot? #t))))))
 
   (feature
    (name 'sway-run-on-tty)
