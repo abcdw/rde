@@ -219,7 +219,8 @@ mode "resize" {
 # Status Bar:
 #
 # Read `man 5 sway-bar` for more information about this section.
-bindsym $mod+Shift+b bar mode toggle
+# bindsym $mod+Shift+b bar mode toggle
+
 bar {
     # mode invisible
     position top
@@ -235,4 +236,4 @@ bar {
     }
 }
 
-# xwayland disable
+xwayland disable
