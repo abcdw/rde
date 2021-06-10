@@ -516,11 +516,25 @@ when typed in the shell, will automatically expand to the full text."
 
 (define (fish-files-service config)
   `(("config/fish/config.fish"
-    ,(mixed-text-file
-      "fish-config"
-      (serialize-configuration
-       config
-       home-fish-configuration-fields)))))
+     ,(mixed-text-file
+       "fish-config"
+       #~(string-append "\
+# if we haven't sourced the login config, do it
+status --is-login; and not set -q __fish_login_config_sourced
+and begin
+
+  set --prepend fish_function_path "
+                        #$fish-foreign-env
+                        "/share/fish/functions
+  fenv source $HOME/.profile
+  set -e fish_function_path[1]
+
+  set -g __fish_login_config_sourced 1
+
+end\n\n")
+       (serialize-configuration
+        config
+        home-fish-configuration-fields)))))
 
 (define (fish-profile-service config)
   (list (home-fish-configuration-package config)))
