@@ -62,13 +62,21 @@ after all nested items already listed."
 	     #f))
 
        (use-modules (guix build utils))
+
+       (let* ((he-path (string-append (getenv "HOME") "/.guix-home"))
+              (new-he-tmp-path (string-append he-path ".new"))
+              (new-home (getenv "GUIX_NEW_HOME")))
+         (symlink new-home new-he-tmp-path)
+         (rename-file new-he-tmp-path he-path))
+
+       ;; TODO: Move generation of files tree to home-files-service-type
+       ;; It can be a part of -home store item.
        (let* ((tree-file-name "/.guix-home-file-tree")
 	      (config-home    (or (getenv "XDG_CONFIG_HOME")
 				  (string-append (getenv "HOME") "/.config")))
 	      (tree-file-path (string-append config-home tree-file-name))
 
-	      (he-path (or (getenv "GUIX_HOME_DIRECTORY")
-			   (string-append (getenv "HOME") "/.guix-home")))
+	      (he-path (string-append (getenv "HOME") "/.guix-home"))
 	      (files-path (string-append he-path "/files"))
 	      ;; Leading dot is required, because files itself is symlink and
 	      ;; to make file-system-tree works it should be a directory.

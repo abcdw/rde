@@ -90,7 +90,7 @@ of services.  Service can be either @code{service?} or
      (apply append
 	    (map feature-values
 		 (rde-config-features this-rde-config)))))
-  
+
   (home-services
    rde-config-home-services
    (thunked)
@@ -210,7 +210,6 @@ to each system-services-getter function."
   (require-value 'home-directory config
 		 "You may want to use feature-user-info.")
   (home-environment
-   (home-directory (get-value 'home-directory config))
    (services (rde-config-home-services config))))
 
 (define bare-bone-os

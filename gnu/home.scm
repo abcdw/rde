@@ -41,16 +41,19 @@
 	    (default '()))
 
   ;; (user-name home-environment-user-name)
-  (home-directory home-environment-home-directory)
+  ;; TODO: Remove these three fields before upstream
+  (home-directory home-environment-home-directory
+                  (default "$HOME")) ;; Ignored
   (symlink-name home-environment-symlink-name
-		(default ".guix-home"))
-
+		(default ".guix-home")) ;; Ignored
   (symlink-path home-environment-symlink-path (thunked)
 		(default
-		  (string-append
-		   (home-environment-home-directory this-home-environment)
-		   "/"
-		   (home-environment-symlink-name this-home-environment))))
+                  "$HOME/.guix-home"
+		  ;; (string-append
+		  ;;  (home-environment-home-directory this-home-environment)
+		  ;;  "/"
+		  ;;  (home-environment-symlink-name this-home-environment))
+                  ))
 
   (location home-environment-location             ; <location>
             (default (and=> (current-source-location)

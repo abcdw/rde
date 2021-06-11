@@ -202,16 +202,44 @@ in the home environment directory."
 extended with one gexp.")))
 
 (define (compute-activation-script init-gexp gexps)
-  (gexp->script "activate"
-                #~(begin
-                    ;; Other services can provide G-exps that call
-                    ;; this procedure.
-                    (define (home-environment-directory)
-                      (or (getenv "GUIX_HOME_DIRECTORY")
-                          (string-append (getenv "HOME") "/.guix-home")))
+  (gexp->script
+   "activate"
+   #~(begin
+       ;; MAYBE: If cwd used, make sure that activation script was
+       ;; called from -home store item
+       (let* ((he-init-file (lambda (he) (string-append he "/setup-environment")))
+              (he-path (string-append (getenv "HOME") "/.guix-home"))
+              (new-home-env (getenv "GUIX_NEW_HOME"))
+              (new-home (or new-home-env
+                            ;; Path of the activation file if called interactively
+                            (dirname (car (command-line)))))
+              (old-home-env (getenv "GUIX_OLD_HOME"))
+              (old-home (or old-home-env
+                            (if (file-exists? (he-init-file he-path))
+                                (readlink he-path)
+                                #f))))
+         (if (file-exists? (he-init-file new-home))
+             (begin
+               ;; Calling init-gexp before setenvs prevents accidential
+               ;; GUIX_*_HOME set from setup-environment script
+               #$init-gexp
 
-                    #$init-gexp
-                    #$@gexps)))
+               (setenv "GUIX_NEW_HOME" new-home)
+               (setenv "GUIX_OLD_HOME" old-home)
+
+               ;; Atomically make HOME current.
+
+               #$@gexps
+
+               ;; Do not unset env variable if it was set outside.
+               (unless new-home-env (setenv "GUIX_NEW_HOME" #f))
+               (unless old-home-env (setenv "GUIX_OLD_HOME" #f)))
+             (format #t "\
+Activation script was either called or loaded by file from this direcotry:
+~a
+It doesn't seem that home environment is somewhere around.
+Make sure that you call ./activate by symlink from -home store item.\n"
+                     new-home))))))
 
 (define (activation-script-entry m-activation)
   "Return, as a monadic value, an entry for the activation script
@@ -232,7 +260,7 @@ in the home environment directory."
 generation of home environment and update the state of the home
 directory.  @command{activate} script automatically called during
 reconfiguration or generation switching.  This service can be extended
-with one gexp, and all gexps must be idempotent.")))
+with one gexp, but many times, and all gexps must be idempotent.")))
 
 
 ;;;

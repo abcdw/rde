@@ -91,7 +91,6 @@ Some ACTIONS support additional ARGS.\n"))
     (graft? . #t)
     (debug . 0)))
 
-
 (define* (perform-action action he
                          #:key
                          dry-run?
@@ -120,17 +119,13 @@ Some ACTIONS support additional ARGS.\n"))
             ((reconfigure)
              (let* ((number (generation-number %guix-home))
                     (generation (generation-file-name
-                                 %guix-home (+ 1 number)))
-
-                    (user-home-environment-symlink-path
-                     (home-environment-symlink-path he)))
+                                 %guix-home (+ 1 number))))
 
                (switch-symlinks generation he-out-path)
                (switch-symlinks %guix-home generation)
-               (switch-symlinks user-home-environment-symlink-path
-                                %guix-home)
-
+               (setenv "GUIX_NEW_HOME" he-out-path)
                (primitive-load (string-append he-out-path "/activate"))
+               (setenv "GUIX_NEW_HOME" #f)
                (return he-out-path)))
             (else
              (newline)
@@ -453,8 +448,10 @@ SPEC.  STORE is an open connection to the store."
          (activate (string-append generation "/activate")))
     (if number
         (begin
+          (setenv "GUIX_NEW_HOME" (readlink generation))
           (switch-to-generation* %guix-home number)
-          (unless-file-not-found (primitive-load activate)))
+          (unless-file-not-found (primitive-load activate))
+          (setenv "GUIX_NEW_HOME" #f))
         (leave (G_ "cannot switch to home environment generation '~a'~%") spec))))
 
 
