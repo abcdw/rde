@@ -1,6 +1,5 @@
 (define-module (gnu home)
   #:use-module (gnu home-services)
-  #:use-module (gnu home-services shepherd)
   #:use-module (gnu home-services symlink-manager)
   #:use-module (gnu home-services shells)
   #:use-module (gnu home-services xdg)

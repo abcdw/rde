@@ -21,6 +21,8 @@
   home-shepherd-configuration?
   (shepherd home-shepherd-configuration-shepherd
             (default shepherd)) ; package
+  (auto-start? home-shepherd-configuration-auto-start?
+               (default #t))
   (services home-shepherd-configuration-services
             (default '())))
 
@@ -65,20 +67,22 @@ as shepherd package."
 (define (launch-shepherd-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
          (services (home-shepherd-configuration-services config)))
-    (with-imported-modules '((guix build utils))
-      #~(let ((log-dir (or (getenv "XDG_LOG_HOME")
-                           (format #f "~a/.local/var/log" (getenv "HOME")))))
-          ;; FIXME: It's a temporary semi-solution, it must be handled
-          ;; somewhere around xdg service-type.
-          ((@@ (guix build utils) mkdir-p) log-dir)
-          (system*
-           #$(file-append shepherd "/bin/shepherd")
-           "--logfile"
-           (string-append
-            log-dir
-            "/shepherd.log")
-           "--config"
-           #$(home-shepherd-configuration-file services shepherd))))))
+    (if (home-shepherd-configuration-auto-start? config)
+        (with-imported-modules '((guix build utils))
+          #~(let ((log-dir (or (getenv "XDG_LOG_HOME")
+                               (format #f "~a/.local/var/log" (getenv "HOME")))))
+              ;; FIXME: It's a temporary semi-solution, it must be handled
+              ;; somewhere around xdg service-type.
+              ((@@ (guix build utils) mkdir-p) log-dir)
+              (system*
+               #$(file-append shepherd "/bin/shepherd")
+               "--logfile"
+               (string-append
+                log-dir
+                "/shepherd.log")
+               "--config"
+               #$(home-shepherd-configuration-file services shepherd))))
+        #~"")))
 
 (define (reload-configuration-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))

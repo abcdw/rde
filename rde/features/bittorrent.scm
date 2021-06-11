@@ -10,7 +10,9 @@
   #:export (feature-transmission))
 
 (define* (feature-transmission
-          #:key (package transmission))
+          #:key
+          (package transmission)
+          (auto-start? #t))
   "Setup and configure Transmission"
 
   (define (transmission-home-services _)
@@ -22,6 +24,7 @@
        ;; TODO: Make home-transmission service for Guix Home
        (shepherd-service
         (provision '(transmission))
+        (auto-start? auto-start?)
         (start #~(make-forkexec-constructor
                   (list #$(file-append package "/bin/transmission-daemon")
                         "--foreground")))
