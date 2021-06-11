@@ -336,20 +336,21 @@ return FILE with the, otherwise, return @code{#f}."
                 file)))
 
         (when (and previous-generation (file-exists? previous-generation))
-          (define changed-files
-            (map (lambda (file) (check-file file)) tree-file-files))
+          (let* ((changed-files
+                  (map (lambda (file) (check-file file)) tree-file-files))
+                 (needed-gexps
+                  (lambda (gexp-tuples)
+                    (let loop ((acc '())
+                               (gexp-tuples gexp-tuples))
+                      (cond
+                       ((null? gexp-tuples) acc)
+                       ((member (first (first gexp-tuples)) changed-files)
+                        (loop (cons (second (first gexp-tuples)) acc)
+                              (rest gexp-tuples)))
+                       (else (loop acc (rest gexp-tuples))))))))
 
-          (define (needed-gexps gexp-tuples)
-            (let loop ((acc '())
-                       (gexp-tuples gexp-tuples))
-              (cond
-               ((null? gexp-tuples) acc)
-               ((member (first (first gexp-tuples)) changed-files)
-                (loop (cons (second (first gexp-tuples)) acc) (rest gexp-tuples)))
-               (else (loop acc (rest gexp-tuples))))))
-
-          (for-each primitive-eval
-                    (needed-gexps gexp-tuples))))))
+                 (for-each primitive-eval
+                           (needed-gexps gexp-tuples)))))))
 
 (define home-run-on-change-service-type
   (service-type (name 'home-run-on-change)
