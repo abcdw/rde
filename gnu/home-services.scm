@@ -200,13 +200,11 @@ in the home environment directory."
                 (description "Run gexps on first user login and can be
 extended with one gexp.")))
 
+
 (define (compute-activation-script init-gexp gexps)
   (gexp->script
    "activate"
-   #~(begin
-       ;; MAYBE: If cwd used, make sure that activation script was
-       ;; called from -home store item
-       (let* ((he-init-file (lambda (he) (string-append he "/setup-environment")))
+   #~(let* ((he-init-file (lambda (he) (string-append he "/setup-environment")))
               (he-path (string-append (getenv "HOME") "/.guix-home"))
               (new-home-env (getenv "GUIX_NEW_HOME"))
               (new-home (or new-home-env
@@ -218,10 +216,19 @@ extended with one gexp.")))
                                 (readlink he-path)
                                 #f))))
          (if (file-exists? (he-init-file new-home))
-             (begin
-               ;; Calling init-gexp before setenvs prevents accidential
-               ;; GUIX_*_HOME set from setup-environment script
-               #$init-gexp
+             (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
+		             (format #f "source ~a && env"
+                                     (he-init-file new-home))))
+	            (result ((@@ (ice-9 rdelim) read-delimited) "" port))
+	            (vars (map (lambda (x)
+                                 (let ((si (string-index x #\=)))
+                                   (cons (string-take x si)
+                                         (string-drop x (1+ si)))))
+			       ((@@ (srfi srfi-1) remove)
+			        string-null?
+                                (string-split result #\newline)))))
+	       (close-port port)
+	       (map (lambda (x) (setenv (car x) (cdr x))) vars)
 
                (setenv "GUIX_NEW_HOME" new-home)
                (setenv "GUIX_OLD_HOME" old-home)
@@ -238,7 +245,7 @@ Activation script was either called or loaded by file from this direcotry:
 ~a
 It doesn't seem that home environment is somewhere around.
 Make sure that you call ./activate by symlink from -home store item.\n"
-                     new-home))))))
+                     new-home)))))
 
 (define (activation-script-entry m-activation)
   "Return, as a monadic value, an entry for the activation script
