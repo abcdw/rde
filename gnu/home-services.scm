@@ -292,17 +292,13 @@ with one gexp, but many times, and all gexps must be idempotent.")))
 
       (define rest cdr)
 
-      ;; Copied from (guix import utils)
-      ;; TODO: Make upstream move it to (guix build utils)?
-      (define (flatten lst)
+      (define (flatten . lst)
         "Return a list that recursively concatenates all sub-lists of LST."
-        (fold-right
-         (match-lambda*
-           (((sub-list ...) memo)
-            (append (flatten sub-list) memo))
-           ((elem memo)
-            (cons elem memo)))
-         '() lst))
+        (define (flatten1 head out)
+          (if (list? head)
+              (fold-right flatten1 out head)
+              (cons head out)))
+        (fold-right flatten1 '() lst))
 
       (let* ((gexp-tuples '#$gexps)
              (tree-file-name "/.guix-home-file-tree")
@@ -349,8 +345,8 @@ return FILE with the, otherwise, return @code{#f}."
                               (rest gexp-tuples)))
                        (else (loop acc (rest gexp-tuples))))))))
 
-                 (for-each primitive-eval
-                           (needed-gexps gexp-tuples)))))))
+            (for-each primitive-eval
+                      (needed-gexps gexp-tuples)))))))
 
 (define home-run-on-change-service-type
   (service-type (name 'home-run-on-change)
