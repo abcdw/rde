@@ -124,16 +124,7 @@ Some ACTIONS support additional ARGS.\n"))
 
                     (user-home-environment-symlink-path
                      (home-environment-symlink-path he)))
-               (define home-environment-directory
-                 (or (getenv "GUIX_HOME_DIRECTORY")
-                     (string-append (getenv "HOME") "/.guix-home")))
-               
-               (define (generation-directory home-environment)
-                 (readlink (readlink home-environment)))
-               
-               (setenv "GUIX_HOME_PREVIOUS_GENERATION"
-                       (generation-directory home-environment-directory))
-               
+
                (switch-symlinks generation he-path)
                (switch-symlinks %guix-home generation)
                (switch-symlinks user-home-environment-symlink-path
