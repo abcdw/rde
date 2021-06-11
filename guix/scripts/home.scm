@@ -110,7 +110,7 @@ Some ACTIONS support additional ARGS.\n"))
                       (for-each (compose println derivation-file-name) drvs))
                      (built-derivations drvs)))
 
-       (he-path -> (derivation->output-path he-drv)))
+       (he-out-path -> (derivation->output-path he-drv)))
     (if (or dry-run? derivations-only?)
         (return #f)
         (begin
@@ -125,16 +125,16 @@ Some ACTIONS support additional ARGS.\n"))
                     (user-home-environment-symlink-path
                      (home-environment-symlink-path he)))
 
-               (switch-symlinks generation he-path)
+               (switch-symlinks generation he-out-path)
                (switch-symlinks %guix-home generation)
                (switch-symlinks user-home-environment-symlink-path
                                 %guix-home)
 
-               (primitive-load (string-append he-path "/activate"))
-               (return he-path)))
+               (primitive-load (string-append he-out-path "/activate"))
+               (return he-out-path)))
             (else
              (newline)
-             (return he-path)))))))
+             (return he-out-path)))))))
 
 (define (process-action action args opts)
   "Process ACTION, a sub-command, with the arguments are listed in ARGS.
