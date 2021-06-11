@@ -58,7 +58,6 @@
                             source-properties->location))
             (innate)))
 
-
 (define (home-environment-default-essential-services he)
   "Return the list of essential services for home environment."
 
@@ -69,12 +68,15 @@ according to the content of @command{setup-environment} script."
 		      (string-append "source " #$home-environment-path
 				     "/setup-environment && env")))
 	     (result ((@@ (ice-9 rdelim) read-delimited) "" port))
-	     (vars (map (lambda (x) (string-split x #\=))
+	     (vars (map (lambda (x)
+                          (let ((si (string-index x #\=)))
+                            (cons (string-take x si)
+                                  (string-drop x (1+ si)))))
 			((@@ (srfi srfi-1) remove)
 			 string-null? (string-split result #\newline)))))
 	(close-port port)
 	(map (lambda (x)
-	       (setenv (car x) (cadr x)))
+	       (setenv (car x) (cdr x)))
 	     vars)))
 
   (let* ((he-path (home-environment-symlink-path he)))
