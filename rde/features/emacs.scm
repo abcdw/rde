@@ -147,15 +147,35 @@
 	 ;; (rebuild-elisp-packages? #t)
 	 ))
 
-  (simple-service 'emacs-set-default-editor
+       (simple-service 'emacs-set-default-editor
 		       home-environment-variables-service-type
 		       `(("ALTERNATE_EDITOR" . ,emacs-editor)
 			 ("VISUAL" . ,emacs-client-no-wait)))
        (when (get-value 'sway config)
  	 (simple-service
-	  'emacs-update-display-variable-on-sway-start
+	  'emacs-update-environment-variables-on-sway-start
 	  home-sway-service-type
-	  `((for_window "[title=\".* - Emacs Client\"]"
+	  `((exec
+	     ,(program-file
+	       "update-emacs-env-variables"
+	       #~(system*
+		  #$emacs-client "--eval"
+		  (string-append
+                   "(mapcar (lambda (lst) (apply #'setenv lst)) '"
+                   (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
+		                   (string-append "env")))
+	                  (result ((@@ (ice-9 rdelim) read-delimited) "" port))
+	                  (vars (map (lambda (x)
+                                       (let ((si (string-index x #\=)))
+                                         (list (string-take x si)
+                                               (string-drop x (+ 1 si)))))
+			             ((@@ (srfi srfi-1) remove)
+			              string-null? (string-split
+                                                    result #\newline)))))
+	             (close-port port)
+	             (format #f "~s" vars))
+                   ")"))))
+            (for_window "[title=\".* - Emacs Client\"]"
                         floating enable,
                         resize set 80 ppt 80 ppt)))))))
 
