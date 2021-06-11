@@ -131,14 +131,6 @@ files."
                          ,@%default-modules))
               (start #~(make-forkexec-constructor
                         (list #$(file-append mcron "/bin/mcron") #$@files)
-                        #:environment-variables
-                        (cons* "GUILE_AUTO_COMPILE=0"
-                               (string-append
-                                "PATH="
-                                (getenv "GUIX_HOME_DIRECTORY")
-                                "/profile/bin")
-                               (remove (cut string-prefix? "PATH=" <>)
-                                       (environ)))
                         #:log-file (string-append
 				    (or (getenv "XDG_LOG_HOME")
 					(format #f "~a/.local/var/log"

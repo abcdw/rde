@@ -87,16 +87,14 @@ according to the content of @command{setup-environment} script."
     (list
      (service home-run-on-first-login-service-type)
 
-     (service home-fontconfig-service-type he-path)
+     ;; MAYBE: move out of essential-services
+     (service home-fontconfig-service-type)
+
      (service home-symlink-manager-service-type)
      (service home-activation-service-type
 	      (update-environment-gexp he-path))
 
-     ;; It should be safe to use symlink-path as
-     ;; GUIX_HOME_DIRECTORY, however
-     ;; /var/guix/profiles/per-user/... is another option
-     (service home-environment-variables-service-type
-	      `(("GUIX_HOME_DIRECTORY" . ,he-path)))
+     (service home-environment-variables-service-type)
 
      ;; Make guix aware of `guix home` after first reconfigure, this
      ;; declaration must go before xdg-base-dirs.  Potentially
@@ -114,9 +112,7 @@ according to the content of @command{setup-environment} script."
 :$GUILE_LOAD_COMPILED_PATH")))
      (service home-xdg-base-directories-service-type)
 
-     (service home-shell-profile-service-type
-	      (home-shell-profile-configuration
-	       (he-symlink-path he-path)))
+     (service home-shell-profile-service-type)
      (service home-service-type)
      (service home-profile-service-type (home-environment-packages he)))))
 

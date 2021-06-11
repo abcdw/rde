@@ -19,12 +19,11 @@
   `(("config/fontconfig/fonts.conf"
      ,(mixed-text-file
        "fonts.conf"
-       (format #f
-	       "<?xml version='1.0'?>
+       "<?xml version='1.0'?>
 <!DOCTYPE fontconfig SYSTEM 'fonts.dtd'>
 <fontconfig>
-  <dir>~a/profile/share/fonts</dir>
-</fontconfig>" he-symlink-path)))))
+  <dir>~/.guix-home/profile/share/fonts</dir>
+</fontconfig>"))))
 
 ;; TODO: fc-cache -f is too slow, it can be called only on-change or
 ;; workarounded some other way.

@@ -116,11 +116,10 @@ exported."
    (return
     `(("setup-environment"
        ,(apply mixed-text-file "setup-environment"
-	       (string-append
-	        "HOME_ENVIRONMENT="
-		(assoc-ref vars "GUIX_HOME_DIRECTORY")
-		;; TODO: It's necessary to source ~/.guix-profile too on foreign distros
-		"
+		;; TODO: It's necessary to source ~/.guix-profile too
+		;; on foreign distros
+		"\
+HOME_ENVIRONMENT=$HOME/.guix-home
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\"
 . \"$HOME_ENVIRONMENT/profile/etc/profile\"
 
@@ -145,7 +144,7 @@ case $XCURSOR_PATH in
   *) export XCURSOR_PATH=$HOME_ENVIRONMENT/profile/share/icons:$XCURSOR_PATH ;;
 esac
 
-")
+"
 
 	       (append-map
 		(match-lambda
@@ -303,13 +302,12 @@ with one gexp, but many times, and all gexps must be idempotent.")))
              (config-home    (or (getenv "XDG_CONFIG_HOME")
                                  (string-append (getenv "HOME") "/.config")))
              (tree-file-path (string-append config-home tree-file-name))
-             (current-generation (home-environment-directory))
-             (previous-generation (getenv "GUIX_HOME_PREVIOUS_GENERATION"))
+             (current-generation (getenv "GUIX_NEW_HOME"))
+             (previous-generation (getenv "GUIX_OLD_HOME"))
              (tree-file (load-tree tree-file-path)))
         (define tree-file-files
-          (map (lambda (pair) (rest pair))
-               (filter (lambda (pair) (equal? (car pair) 'file))
-                       (flatten tree-file))))
+          (map cdr (filter (lambda (pair) (equal? (car pair) 'file))
+                           (flatten tree-file))))
 
         (define (check-file file)
           "Check Whether FILE for the current generation is identical
@@ -330,20 +328,21 @@ return FILE with the, otherwise, return @code{#f}."
                   (if status #f file))
                 file)))
 
-        (define changed-files
-          (map (lambda (file) (check-file file)) tree-file-files))
+        (when (and previous-generation (file-exists? previous-generation))
+          (define changed-files
+            (map (lambda (file) (check-file file)) tree-file-files))
 
-        (define (needed-gexps gexp-tuples)
-          (let loop ((acc '())
-                     (gexp-tuples gexp-tuples))
-            (cond
-             ((null? gexp-tuples) acc)
-             ((member (first (first gexp-tuples)) changed-files)
-              (loop (cons (second (first gexp-tuples)) acc) (rest gexp-tuples)))
-             (else (loop acc (rest gexp-tuples))))))
+          (define (needed-gexps gexp-tuples)
+            (let loop ((acc '())
+                       (gexp-tuples gexp-tuples))
+              (cond
+               ((null? gexp-tuples) acc)
+               ((member (first (first gexp-tuples)) changed-files)
+                (loop (cons (second (first gexp-tuples)) acc) (rest gexp-tuples)))
+               (else (loop acc (rest gexp-tuples))))))
 
-        (for-each primitive-eval
-                  (needed-gexps gexp-tuples)))))
+          (for-each primitive-eval
+                    (needed-gexps gexp-tuples))))))
 
 (define home-run-on-change-service-type
   (service-type (name 'home-run-on-change)

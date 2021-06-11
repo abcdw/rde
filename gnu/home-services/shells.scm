@@ -42,11 +42,6 @@
 (define (serialize-path field-name val) val)
 
 (define-configuration home-shell-profile-configuration
-  (he-symlink-path
-   (path "~/.guix-home")
-   "Path to home-environment symlink, which contains files that have
-to be sourced or executed by login shell.  This path will be set
-automatically by home-environment.")
   (profile
    (text-config '())
    "\
@@ -68,11 +63,10 @@ really know what you do."))
   `(("profile"
      ,(mixed-text-file
        "shell-profile"
-       (format #f "\
-HOME_ENVIRONMENT=\"~a\"
+       "\
+HOME_ENVIRONMENT=$HOME/.guix-home
 . $HOME_ENVIRONMENT/setup-environment
 $HOME_ENVIRONMENT/on-first-login\n"
-	       (home-shell-profile-configuration-he-symlink-path config))
        (serialize-configuration
 	config
 	(filter-configuration-fields
@@ -94,7 +88,7 @@ $HOME_ENVIRONMENT/on-first-login\n"
 		(compose concatenate)
 		(extend add-profile-extensions)
 		(default-value (home-shell-profile-configuration))
-                (description " Create @file{~/.profile}, which is used
+                (description "Create @file{~/.profile}, which is used
 for environment initialization of POSIX compliant login shells.  This
 service type can be extended with a list of strings or gexps.")))
 
