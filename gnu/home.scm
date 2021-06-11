@@ -63,7 +63,9 @@
   (define (update-environment-gexp home-environment-path)
     "Return G-Expression, which sets environment variable values
 according to the content of @command{setup-environment} script."
-    #~(let* ((port   ((@@ (ice-9 popen) open-input-pipe)
+    #~(when (file-exists? (string-append #$home-environment-path
+                                         "/setup-environment"))
+       (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
 		      (string-append "source " #$home-environment-path
 				     "/setup-environment && env")))
 	     (result ((@@ (ice-9 rdelim) read-delimited) "" port))
@@ -76,7 +78,7 @@ according to the content of @command{setup-environment} script."
 	(close-port port)
 	(map (lambda (x)
 	       (setenv (car x) (cdr x)))
-	     vars)))
+	     vars))))
 
   (let* ((he-path (home-environment-symlink-path he)))
     (list
