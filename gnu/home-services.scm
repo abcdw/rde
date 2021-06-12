@@ -280,13 +280,6 @@ with one gexp, but many times, and all gexps must be idempotent.")))
                    (ice-9 match)
                    (rnrs io ports))
 
-      (define (load-tree path)
-        (if (file-exists? path)
-            (call-with-input-file path
-              (lambda (port)
-                (read port)))
-            #f))
-
       (define (butlast lst)
         (drop-right lst 1))
 
@@ -298,17 +291,10 @@ with one gexp, but many times, and all gexps must be idempotent.")))
               (cons head out)))
         (fold-right flatten1 '() lst))
 
-      (let* ((gexp-tuples '#$gexps)
-             (tree-file-name "/.guix-home-file-tree")
-             (config-home    (or (getenv "XDG_CONFIG_HOME")
-                                 (string-append (getenv "HOME") "/.config")))
-             (tree-file-path (string-append config-home tree-file-name))
-             (new-generation (getenv "GUIX_NEW_HOME"))
-             (old-generation (getenv "GUIX_OLD_HOME"))
-             (tree-file (load-tree tree-file-path)))
-        (define tree-file-files
-          (map cdr (filter (lambda (pair) (equal? (car pair) 'file))
-                           (flatten tree-file))))
+      (let ((gexp-tuples '#$gexps)
+            (new-generation (getenv "GUIX_NEW_HOME"))
+            (old-generation (getenv "GUIX_OLD_HOME")))
+        (define files-to-check (map car gexp-tuples))
 
         (define (symlink? file)
           (let ((file-info (lstat file)))
