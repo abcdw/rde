@@ -37,29 +37,40 @@
 (define* (serialize-field field-name val #:key (toplevel? #f))
   (cond
    ((boolean? val) (serialize-boolean field-name val))
-   ((list? val) (serialize-list field-name val))
+   ((list? val) (serialize-list field-name val #:toplevel? toplevel?))
    (else 
     (let ((field-name (uglify-field-name field-name)))
-      (if (or (member field-name '("Host" "Match"))
-              toplevel?)
-          (format #f "~a ~a\n" field-name val)
-          (format #f "  ~a ~a\n" field-name val))))))
+      (cond
+       ((or (member field-name '("Host" "Match"))
+            toplevel?)
+        #~(format #f "\n~a ~a\n" #$field-name #$val))
+       (else
+        #~(format #f "  ~a ~a\n" #$field-name #$val)))))))
 
-;; '(first second) => first second
-(define (serialize-list field-name val)
-  (if (null? val) "" (serialize-field field-name (string-join val " "))))
-
-(define serialize-listof-strings serialize-list)
+(define* (serialize-list field-name val #:key (toplevel? #f))
+  (if (null? val)
+      ""
+      #~(string-append
+         #$(if toplevel? "" "  ")
+         #$(if field-name (uglify-field-name field-name) "")
+         #$@(map (lambda (val)
+                   #~(format #f " ~a" #$val))
+                  val)
+          "\n")))
 
 (define (serialize-alist field-name val)
-  (generic-serialize-alist string-append serialize-field val))
+  #~(string-append
+     #$@(map (match-lambda
+            ((field-name . val)
+             (serialize-field field-name val)))
+          val)))
 
 (define (serialize-toplevel-alist field-name val)
-  (generic-serialize-alist
-   string-append
-   (lambda (field-name val)
-     (serialize-field field-name val #:toplevel? #t))
-   val))
+  #~(string-append
+     #$@(map (match-lambda
+            ((field-name . val)
+             (serialize-field field-name val #:toplevel? #t)))
+          val)))
 
 (define (serialize-extra-config field-name val)
   (define serialize-extra-config-entry
@@ -68,7 +79,7 @@
        (list
         (serialize-field host name)
         (serialize-alist #f alist)))))
-  (apply string-append (append-map serialize-extra-config-entry val)))
+  #~(string-append #$@(append-map serialize-extra-config-entry val)))
 
 ;; #t => yes, #f => no
 (define (serialize-boolean field-name val)
@@ -108,24 +119,24 @@
 (define serialize-ssh-host
   (match-lambda
     (($ <ssh-host> host options)
-     (string-append
-      (serialize-field 'host host)
-      (serialize-alist #f options)))))
+     #~(string-append
+      #$(serialize-field 'host host)
+      #$(serialize-alist #f options)))))
 
 (define serialize-ssh-match
   (match-lambda
     (($ <ssh-match> match options)
      (when (validate-match-block match)
-       (string-append
-        (serialize-field 'match
+       #~(string-append
+        #$(serialize-field 'match
                          (if (member (car match) %ssh-standalone-keywords)
-                             (format #f "~a" (car match))
-                             (format #f "~a \"~a\"" (car match) (cadr match))))
-        (serialize-alist #f options))))))
+                             #~(format #f "~a" #$(car match))
+                             #~(format #f "~a \"~a\"" #$(car match) #$(cadr match))))
+        #$(serialize-alist #f options))))))
 
 (define (serialize-ssh-host-or-ssh-match field-name val)
-  (apply string-append
-         (map (lambda (entry)
+  #~(string-append
+         #$@(map (lambda (entry)
                 (if (ssh-host? entry)
                     (serialize-ssh-host entry)
                     (serialize-ssh-match entry)))
