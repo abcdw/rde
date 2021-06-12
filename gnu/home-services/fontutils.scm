@@ -28,7 +28,11 @@
 ;; TODO: fc-cache -f is too slow, it can be called only on-change or
 ;; workarounded some other way.
 (define (regenerate-font-cache-gexp _)
-  #~(system* "fc-cache" "-f"))
+  #~("/profile/share/fonts"
+      (begin
+        (system* #$(file-append fontconfig
+                                "/bin/fc-cache")
+                 "-fv"))))
 
 (define home-fontconfig-service-type
   (service-type (name 'home-fontconfig)
@@ -37,7 +41,7 @@
                         home-files-service-type
                         add-fontconfig-config-file)
                        (service-extension
-                        home-activation-service-type
+                        home-run-on-change-service-type
                         regenerate-font-cache-gexp)
                        (service-extension
                         home-profile-service-type
