@@ -1,4 +1,4 @@
-#    -*- mode: org -*-
+# -*- mode: org; org-html-head-include-scripts: nil; -*-
 #+OPTIONS: toc:nil
 
 * rde
@@ -64,6 +64,21 @@ After you installed your first home environment, your shell is
 properly configured (See [[https://guix-home.trop.in/Configuring-the-Shell.html][Configuring the Shell]]) and you did relogin or
 reboot, you should be able to use ~guix home~ without setting
 anything.
+** Channel introduction
+In case you want to use rde as a channel, add the following code to
+your ~~/.config/guix/channels.scm~, and call ~guix pull~.
+#+begin_src scheme
+(cons*
+ (channel
+  (name 'rde)
+  (url "https://git.sr.ht/~abcdw/rde")
+  (introduction
+   (make-channel-introduction
+    "257cebd587b66e4d865b3537a9a88cccd7107c95"
+    (openpgp-fingerprint
+     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
+ %default-channels)
+#+end_src
 
 ** Tools
 | Purpose                | Tool      |
@@ -126,16 +141,3 @@ Read [[https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.h
 | security | password manager | pass      |        |
 |          | encryption tool  | gpg2      |        |
 |          | backup           | borg      |        |
-** COMMENT Channel introduction
-#+begin_src scheme
-(cons*
- (channel
-  (name 'rde)
-  (url "https://git.sr.ht/~abcdw/rde")
-  (introduction
-   (make-channel-introduction
-    "257cebd587b66e4d865b3537a9a88cccd7107c95"
-    (openpgp-fingerprint
-     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
- %default-channels)
-#+end_src
