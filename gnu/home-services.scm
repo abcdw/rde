@@ -278,6 +278,7 @@ with one gexp, but many times, and all gexps must be idempotent.")))
       (use-modules (srfi srfi-1)
                    (ice-9 popen)
                    (ice-9 match)
+                   (ice-9 ftw)
                    (rnrs io ports))
 
       (define (butlast lst)
@@ -306,10 +307,44 @@ with one gexp, but many times, and all gexps must be idempotent.")))
            ((not (symlink? file)) file)
            (else (readlink* (readlink file)))))
 
+        (define (check-directory dir)
+          "Traverse DIR and check whether all the files in DIR are
+identical to the ones for the old generation."
+          ;; We have DIR, which is
+          ;;
+          ;; /gnu/store/...-home/some/path/to/dir
+          ;;
+          ;; and we want to extract /some/path/to/dir.  If DIR has in
+          ;; fact changed we just want to return /some/path/to/dir and
+          ;; not the full path DIR because /some/path/to/dir is what
+          ;; is specified as the path in `gexp-tuples'.
+          (define path-from-generation-dir
+            (let ((dir-length (string-length new-generation)))
+              (string-drop dir dir-length)))
+
+          (define (filter-file-tree-node node)
+            (if (eq? (car node) 'dir)
+                '()
+                (cdr node)))
+
+          (define (parent-or-current-dir dir)
+            (or (string=? dir ".")
+                (string=? dir "..")))
+
+          (let ((children (map (lambda (dir)
+                                 (string-append
+                                  path-from-generation-dir "/" dir))
+                               (filter (compose not parent-or-current-dir)
+                                       (scandir dir)))))
+            (if (any identity (flatten (map check-file children)))
+                path-from-generation-dir
+                #f)))
+
         (define (check-file file)
-          "Check Whether FILE for the current generation is identical
-to the one for the previous generation identical.  If they aren't,
-return FILE with the, otherwise, return @code{#f}."
+          "Check Whether FILE for the current generation is identical to the one
+for the old generation.  If they aren't, return FILE with
+the, otherwise, return @code{#f}.  This also works if the FILE is a
+directory and the directory itself is a symlink to the store."
           (let ((new-file (string-append new-generation file))
                 (old-file (string-append old-generation file)))
             (cond
@@ -325,11 +360,16 @@ return FILE with the, otherwise, return @code{#f}."
               file)
              ;; If the file exists in both generations, check for
              ;; identity.
-             (else
+             ((symlink? new-file)
               (if (string=? (readlink* old-file)
                             (readlink* new-file))
                   #f
-                  file)))))
+                  file))
+             (else
+              (begin
+                (newline)
+
+                (check-directory new-file))))))
 
         (when (and old-generation (file-exists? old-generation))
           (let* ((changed-files
