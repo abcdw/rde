@@ -34,13 +34,14 @@
   (let ((str (symbol->string field-name)))
     (apply string-append (map string-capitalize (string-split str #\-)))))
 
-(define (serialize-field field-name val)
+(define* (serialize-field field-name val #:key (toplevel? #f))
   (cond
    ((boolean? val) (serialize-boolean field-name val))
    ((list? val) (serialize-list field-name val))
    (else 
     (let ((field-name (uglify-field-name field-name)))
-      (if (member field-name '("Host" "Match"))
+      (if (or (member field-name '("Host" "Match"))
+              toplevel?)
           (format #f "~a ~a\n" field-name val)
           (format #f "  ~a ~a\n" field-name val))))))
 
@@ -52,6 +53,13 @@
 
 (define (serialize-alist field-name val)
   (generic-serialize-alist string-append serialize-field val))
+
+(define (serialize-toplevel-alist field-name val)
+  (generic-serialize-alist
+   string-append
+   (lambda (field-name val)
+     (serialize-field field-name val #:toplevel? #t))
+   val))
 
 (define (serialize-extra-config field-name val)
   (define serialize-extra-config-entry
@@ -159,6 +167,22 @@ Host *
   AddKeysToAgent yes
   AddressFamily inet
 @end example")
+  (toplevel-options
+   (alist '())
+   "Association list of toplevel configuration options.  The configuration below:
+
+@lisp
+(home-ssh-configuration
+  (toplevel-options
+    '((include . \"/some/path/to/file\"))))
+@end lisp
+
+would this:
+
+@example
+Include /some/path/to/file
+@end example"
+   serialize-toplevel-alist)
   (extra-config
    (ssh-host-or-ssh-match '())
    "List of configurations for other hosts.  Something like this:
