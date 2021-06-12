@@ -101,7 +101,7 @@
   (match ssh-match-match)
   (options ssh-match-options))
 
-(define %ssh-match-keywords
+(define-enum ssh-match-keywords
   '(all canonical final exec host originalhost user localuser))
 
 (define %ssh-standalone-keywords
@@ -110,7 +110,7 @@
 (define validate-match-block
   (match-lambda
     ((keyword rest ...)
-     (if (member keyword %ssh-match-keywords)
+     (if (ssh-match-keywords? keyword)
          #t
          (raise (formatted-message
                  (G_ "Match keyword must be one of the following ~a")
@@ -129,7 +129,7 @@
      (when (validate-match-block match)
        #~(string-append
         #$(serialize-field 'match
-                         (if (member (car match) %ssh-standalone-keywords)
+                           (ssh-match-keywords? (car match)
                              #~(format #f "~a" #$(car match))
                              #~(format #f "~a \"~a\"" #$(car match) #$(cadr match))))
         #$(serialize-alist #f options))))))
