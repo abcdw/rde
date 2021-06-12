@@ -290,8 +290,6 @@ with one gexp, but many times, and all gexps must be idempotent.")))
       (define (butlast lst)
         (drop-right lst 1))
 
-      (define rest cdr)
-
       (define (flatten . lst)
         "Return a list that recursively concatenates all sub-lists of LST."
         (define (flatten1 head out)
@@ -305,45 +303,61 @@ with one gexp, but many times, and all gexps must be idempotent.")))
              (config-home    (or (getenv "XDG_CONFIG_HOME")
                                  (string-append (getenv "HOME") "/.config")))
              (tree-file-path (string-append config-home tree-file-name))
-             (current-generation (getenv "GUIX_NEW_HOME"))
-             (previous-generation (getenv "GUIX_OLD_HOME"))
+             (new-generation (getenv "GUIX_NEW_HOME"))
+             (old-generation (getenv "GUIX_OLD_HOME"))
              (tree-file (load-tree tree-file-path)))
         (define tree-file-files
           (map cdr (filter (lambda (pair) (equal? (car pair) 'file))
                            (flatten tree-file))))
 
+        (define (symlink? file)
+          (let ((file-info (lstat file)))
+            (eq? (vector-ref file-info 13) 'symlink)))
+
+        (define (readlink* file)
+          "Like @code{readlink}, but recursive."
+          (cond
+           ((not (symlink? file)) file)
+           (else (readlink* (readlink file)))))
+
         (define (check-file file)
           "Check Whether FILE for the current generation is identical
 to the one for the previous generation identical.  If they aren't,
 return FILE with the, otherwise, return @code{#f}."
-          (let ((old-file-full-path (string-append previous-generation
-                                                   "/files/" file))
-                (new-file-full-path (string-append current-generation
-                                                   "/files/" file)))
-            (if (file-exists? old-file-full-path)
-                (let* ((pipe (open-pipe*
-                              OPEN_READ
-                              (string-append #$diffutils "/bin/cmp")
-                              old-file-full-path
-                              new-file-full-path))
-                       (status (eof-object? (read pipe))))
-                  (close-pipe pipe)
-                  (if status #f file))
-                file)))
+          (let ((new-file (string-append new-generation file))
+                (old-file (string-append old-generation file)))
+            (cond
+             ;; If the files don't exist in either generation, don't
+             ;; do anything.
+             ((and (not (file-exists? new-file))
+                   (not (file-exists? old-file)))
+              #f)
+             ;; If the file exists in one of the generations,
+             ;; something has definitely changed.
+             ((or (and (not (file-exists? old-file)) (file-exists? new-file))
+                  (and (file-exists? old-file) (not (file-exists? new-file))))
+              file)
+             ;; If the file exists in both generations, check for
+             ;; identity.
+             (else
+              (if (string=? (readlink* old-file)
+                            (readlink* new-file))
+                  #f
+                  file)))))
 
-        (when (and previous-generation (file-exists? previous-generation))
+        (when (and old-generation (file-exists? old-generation))
           (let* ((changed-files
-                  (map (lambda (file) (check-file file)) tree-file-files))
+                  (map check-file files-to-check))
                  (needed-gexps
                   (lambda (gexp-tuples)
                     (let loop ((acc '())
                                (gexp-tuples gexp-tuples))
                       (cond
                        ((null? gexp-tuples) acc)
-                       ((member (first (first gexp-tuples)) changed-files)
-                        (loop (cons (second (first gexp-tuples)) acc)
-                              (rest gexp-tuples)))
-                       (else (loop acc (rest gexp-tuples))))))))
+                       ((member (caar gexp-tuples) changed-files)
+                        (loop (cons (cadar gexp-tuples) acc)
+                              (cdr gexp-tuples)))
+                       (else (loop acc (cdr gexp-tuples))))))))
 
             (for-each primitive-eval
                       (needed-gexps gexp-tuples)))))))
