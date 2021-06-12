@@ -27,7 +27,6 @@
 ;;;
 ;;; Code:
 
-;; symbol-name => SymbolName
 (define (uglify-field-name field-name)
   "Convert symbol FIELD-NAME to an upper camel case string.
 @code{symbol-name} => \"@code{SymbolName}\"."
@@ -58,18 +57,11 @@
                   val)
           "\n")))
 
-(define (serialize-alist field-name val)
+(define* (serialize-alist field-name val #:key (toplevel? #f))
   #~(string-append
      #$@(map (match-lambda
             ((field-name . val)
-             (serialize-field field-name val)))
-          val)))
-
-(define (serialize-toplevel-alist field-name val)
-  #~(string-append
-     #$@(map (match-lambda
-            ((field-name . val)
-             (serialize-field field-name val #:toplevel? #t)))
+             (serialize-field field-name val #:toplevel? toplevel?)))
           val)))
 
 (define (serialize-extra-config field-name val)
@@ -81,25 +73,14 @@
         (serialize-alist #f alist)))))
   #~(string-append #$@(append-map serialize-extra-config-entry val)))
 
-;; #t => yes, #f => no
 (define (serialize-boolean field-name val)
   (serialize-field field-name (boolean->yes-or-no val)))
 
 (define serialize-string serialize-field)
-(define ssh-host-or-ssh-match? list?)
-
-;; TODO: Add docs for these records
-(define-record-type <ssh-host>
-  (ssh-host host options)
-  ssh-host?
-  (host ssh-host-host)
-  (options ssh-host-options))
-
-(define-record-type <ssh-match>
-  (ssh-match match options)
-  ssh-match?
-  (match ssh-match-match)
-  (options ssh-match-options))
+(define (listof-ssh-host-or-ssh-match? val)
+  (listof (lambda (val)
+            (or (ssh-host? val)
+                (ssh-match? val)))))
 
 (define-enum ssh-match-keywords
   '(all canonical final exec host originalhost user localuser))
@@ -107,34 +88,55 @@
 (define %ssh-standalone-keywords
   '(all canonical final))
 
-(define validate-match-block
+(define match-block?
   (match-lambda
     ((keyword rest ...)
-     (if (ssh-match-keywords? keyword)
-         #t
-         (raise (formatted-message
-                 (G_ "Match keyword must be one of the following ~a")
-                 %ssh-match-keywords))))))
+     (ssh-match-keywords? keyword))))
+
+(define-configuration/no-serialization ssh-host
+  (host
+   (string)
+   "A pattern to match one or multiple hosts.")
+  (options
+   (alist)
+   "An association list key and value pairs that contain the
+configuration options for the host.  This has the same format as the
+@code{default-options} field in @code{home-ssh-configuration}."))
+
+(define-configuration/no-serialization ssh-match
+  (match
+   (match-block)
+   "A list where the first element is one of @code{ssh-match-keywords}
+and the rest of the elements are arguments for the keyword.")
+  (options
+   (alist)
+   "An association list key and value pairs that contain the
+configuration options for the matched hosts.  This has the same format
+as the @code{default-options} field in @code{home-ssh-configuration}."))
 
 (define serialize-ssh-host
   (match-lambda
-    (($ <ssh-host> host options)
+    (($ <ssh-host> _ host options)
      #~(string-append
       #$(serialize-field 'host host)
       #$(serialize-alist #f options)))))
 
 (define serialize-ssh-match
   (match-lambda
-    (($ <ssh-match> match options)
-     (when (validate-match-block match)
-       #~(string-append
-        #$(serialize-field 'match
-                           (ssh-match-keywords? (car match)
-                             #~(format #f "~a" #$(car match))
-                             #~(format #f "~a \"~a\"" #$(car match) #$(cadr match))))
-        #$(serialize-alist #f options))))))
+    (($ <ssh-match> _ match options)
+     #~(string-append
+        #$(serialize-field
+           'match
+           (if (ssh-match-keywords? (car match))
+               #~(format #f "~a~a"
+                         '#$(car match)
+                         #$(serialize-list #f (cdr match) #:toplevel? #t))
+               (raise (formatted-message
+                       (G_ "Match keyword must be one of the following ~a")
+                       ssh-match-keywords))))
+        #$(serialize-alist #f options)))))
 
-(define (serialize-ssh-host-or-ssh-match field-name val)
+(define (serialize-listof-ssh-host-or-ssh-match field-name val)
   #~(string-append
          #$@(map (lambda (entry)
                 (if (ssh-host? entry)
@@ -146,12 +148,14 @@
   (package
     (package openssh)
     "The SSH package to use.")
-  (host
+  (default-host
    (string "*")
-   "Name of the default host.")
+   "The name of the default host."
+   (lambda (field-name val) (serialize-field 'host val)))
   (user-known-hosts-file
    (listof-strings '("~/.ssh/known_hosts"))
-   "One or more files to use for the user host key database.")
+   "One or more files to use for the user host key database."
+   serialize-list)
   (forward-agent
    (boolean #f)
    "Whether the connection to the authentication agent will be forwarded
@@ -193,9 +197,10 @@ would this:
 @example
 Include /some/path/to/file
 @end example"
-   serialize-toplevel-alist)
+   (lambda (field-name val)
+     (serialize-alist field-name val #:toplevel? #f)))
   (extra-config
-   (ssh-host-or-ssh-match '())
+   (listof-ssh-host-or-ssh-match '())
    "List of configurations for other hosts.  Something like this:
 
 @lisp
