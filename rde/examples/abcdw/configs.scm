@@ -80,6 +80,7 @@
     #:config-file (local-file "../../sway/config"))
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
+   (feature-sway-screenshot)
 
    (feature-emacs
     #:additional-elisp-packages

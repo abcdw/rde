@@ -5,6 +5,8 @@
   #:use-module (gnu system keyboard)
   #:use-module (rde packages)
   #:use-module (gnu packages wm)
+  #:use-module (gnu packages image)
+  #:use-module (gnu packages web)
   #:use-module (gnu packages qt)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages xdisorg)
@@ -16,7 +18,8 @@
   #:use-module (gnu home-services shells)
   #:use-module (guix gexp)
   #:export (feature-sway
-	    feature-sway-run-on-tty))
+	    feature-sway-run-on-tty
+            feature-sway-screenshot))
 
 ;; https://github.com/jjquin/dotfiles/tree/master/sway/.config/sway/config.d
 
@@ -90,7 +93,7 @@
 
   (feature
    (name 'sway)
-   (values `((sway . #t)
+   (values `((sway . ,package)
 	     (wayland . #t)
              (xwayland? . ,xwayland?)))
    (home-services-getter sway-home-services)
@@ -129,6 +132,59 @@ automatically switch to SWAY-TTY-NUMBER on boot."
    (home-services-getter sway-run-on-tty-home-services)
    (system-services-getter sway-run-on-tty-system-services)))
 
+(define* (feature-sway-screenshot)
+  "Configure slurp, grim and other tools for screenshot capabilities."
+
+  (define sway-f-name 'screenshot)
+  (define f-name (symbol-append 'sway- sway-f-name))
+
+  (define (get-home-services config)
+    (require-value 'sway config)
+    (define subject-output
+      #~(format #f "~a -t get_outputs | ~a -r '.[] | select(.focused) | .name'"
+                #$(file-append (get-value 'sway config) "/bin/swaymsg")
+                #$(file-append jq "/bin/jq")))
+    (define subject-window-or-selection
+      #~(format #f
+"~a -t get_tree | ~a -r '.. | select(.pid? and .visible?) | .rect | \"\\(.x),\\(.y) \\(.width)x\\(.height)\"' | ~a -b ~a -B ~a"
+                #$(file-append (get-value 'sway config) "/bin/swaymsg")
+                #$(file-append jq "/bin/jq")
+                ;; TODO: Move to slurp-cmd
+                #$(file-append slurp "/bin/slurp")
+                "303030AA"
+                "303030AA"))
+
+    (define* (shot-script subject #:key output geom (file "-"))
+      (program-file
+       (string-append "sway-shot-" subject)
+       #~(system
+          (format #f "~a ~a~a~a | ~a"
+                  #$(file-append grim "/bin/grim")
+                  #$(if output #~(string-append "-o \"$(" #$output ")\" ") "")
+                  #$(if geom #~(string-append "-g \"$(" #$geom ")\" ") "")
+                  #$file
+                  #$(file-append wl-clipboard "/bin/wl-copy")))))
+
+    (define shot-output
+      (shot-script "output" #:output subject-output))
+    (define shot-window-or-selection
+      (shot-script "window-or-selection" #:geom subject-window-or-selection))
+    (list
+     (simple-service
+      'sway-screenshot-packages
+      home-profile-service-type
+      (list slurp grim wl-clipboard jq))
+
+     (simple-service
+      'sway-screenshot
+      home-sway-service-type
+      `((bindsym $mod+Print exec ,shot-output)
+        (bindsym $mod+Shift+Print exec ,shot-window-or-selection)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 ;; [X] feature-sway-run-on-tty
 ;; [ ] feature-sway-lock-idle-sleep
