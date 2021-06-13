@@ -402,13 +402,16 @@ the list result in @code{#t} when applying PRED? on them."
     ((_ expr1 expr2)
      (if expr1 expr2 '()))))
 
-(define (wrap-package package name gexp)
+(define (wrap-package pkg executable-name gexp)
   "Create a @code{<package>} object that is a wrapper for PACKAGE, and
 runs GEXP.  NAME is the name of the executable that will be put in the store."
-  (let ((wrapper (program-file name gexp)))
-    (package/inherit package
-      (name name)                       ; avoid collisions
+  (let* ((wrapper-name (string-append executable-name "wrapper"))
+         (wrapper (program-file wrapper-name gexp)))
+    (package
+      (inherit pkg)
+      (name wrapper-name)
       (source wrapper)
+      (propagated-inputs `((,(package-name pkg) ,pkg)))
       (build-system trivial-build-system)
       (arguments
        `(#:modules
@@ -418,14 +421,9 @@ runs GEXP.  NAME is the name of the executable that will be put in the store."
            (use-modules (guix build utils)
                         (srfi srfi-1))
            (let* ((bin (string-append %output "/bin"))
-                  ;; Get the name of the wrapper
-                  ;; The user might put their store somewhere besides
-                  ;; /gnu/store/...-NAME, and NAME is not allowed to
-                  ;; contain `/', so we split the string in `/'.
-                  (wrapper (assoc-ref %build-inputs "source"))
-                  (name (substring (last (string-split wrapper #\/)) 33)))
+                  (wrapper (assoc-ref %build-inputs "source")))
              (mkdir-p bin)
-             (copy-file wrapper (string-append bin "/" name)))))))))
+             (copy-file wrapper (string-append bin "/" ,executable-name)))))))))
 
 ;;
 ;;; Enums.
