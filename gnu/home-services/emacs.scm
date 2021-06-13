@@ -162,8 +162,10 @@ inputs."
     updated-elisp-packages))
 
 (define (add-emacs-packages config)
-  (cons (home-emacs-configuration-package config)
-	(updated-elisp-packages config)))
+  (append (updated-elisp-packages config)
+          ;; It's important for packages to go first to override
+          ;; built-in emacs packages in case of collisions
+	  (list (home-emacs-configuration-package config))))
 
 
 (define (add-emacs-shepherd-service config)
