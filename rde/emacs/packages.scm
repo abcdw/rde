@@ -19,8 +19,8 @@
   #:export (%rde-emacs-all-packages))
 
 (define-public emacs-next-pgtk-latest
-  (let ((commit "ce7a78d0a8e033f04978b0c0762378ba13d3fa64")
-        (revision "2"))
+  (let ((commit "7d5e94bada09e642a8bfc4f66804f7948bad40bc")
+        (revision "3"))
     (package/inherit emacs-next
       (name "emacs-next-pgtk-latest")
       (version (git-version "28.0.50" revision commit))
@@ -33,7 +33,7 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "06psn92zrv6j3w5daj4w4iz652w5xd6zjg6a5y4j7az5s3v39ivc"))))
+           "0p1bsjblb6m2agchsazmccrk9jx9n7fr97r472f6rxxhs4q953pb"))))
       (arguments
        (substitute-keyword-arguments (package-arguments emacs-next)
          ((#:configure-flags flags ''())
@@ -64,25 +64,6 @@ also enabled and works without glitches even on X server."))))
        (sha256
         (base32 "08l3i6zb2wbqiq2qn18qdsgqqf0iibx09bk2d1x89pw3j7r6xgf7"))
        (file-name (git-file-name name version))))))
-
-(define-public emacs-reverse-im
-  (package
-    (name "emacs-reverse-im")
-    (version "0.0.7")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/a13/reverse-im.el")
-             (commit (string-append "v" version))))
-       (sha256
-        (base32 "05k2zp2hldzq5h6nl8gx79dd8lvfn507ad4x3naichdqgn2013nn"))
-       (file-name (git-file-name name version))))
-    (build-system emacs-build-system)
-    (home-page "https://github.com/a13/reverse-im.el")
-    (synopsis "Make hotkeys keep working on other input-methods")
-    (description "Make hotkeys keep working on other input-methods.")
-    (license license:gpl3+)))
 
 (define-public emacs-cyrillic-dvorak-im
   (package
