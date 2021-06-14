@@ -89,6 +89,7 @@
    (feature-emacs-completion)
    (feature-emacs-project)
    (feature-emacs-input-method)
+   (feature-emacs-eshell)
    (feature-emacs-message
     #:smtp-server "smtp.gmail.com"
     #:smtp-port   25)

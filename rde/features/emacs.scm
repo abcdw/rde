@@ -19,6 +19,7 @@
 	    feature-emacs-input-method
 	    feature-emacs-project
 	    feature-emacs-magit
+	    feature-emacs-eshell
 	    feature-emacs-org-mode
 	    feature-emacs-org-roam
 	    feature-emacs-message
@@ -196,7 +197,6 @@
          (string-drop name (string-length "emacs-"))
          name))))
 
-;; TODO: rename to mule
 (define* (feature-emacs-input-method
 	  #:key
 	  (input-method "cyrillic-dvorak")
@@ -374,6 +374,34 @@ utilizing reverse-im package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define* (feature-emacs-eshell)
+  "Configure org-mode for GNU Emacs."
+  (define emacs-f-name 'eshell)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((global-set-key (kbd "s-e") 'eshell)
+        (with-eval-after-load
+         'eshell
+         (add-hook
+          'eshell-hist-mode-hook
+          (lambda ()
+            (with-eval-after-load
+             'consult
+             (define-key eshell-hist-mode-map (kbd "M-r") 'consult-history))))
+         (add-hook
+          'eshell-mode-hook
+          (lambda ()
+            (define-key eshell-mode-map (kbd "s-e") 'switch-to-prev-buffer))))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 (define* (feature-emacs-org-mode)
   "Configure org-mode for GNU Emacs."
   (define emacs-f-name 'org-mode)
@@ -501,7 +529,7 @@ utilizing reverse-im package."
 
 	(with-eval-after-load
 	 'embark
-	 (define-key global-map (kbd "s-e") 'embark-act))
+	 (define-key global-map (kbd "s-.") 'embark-act))
 
 	(with-eval-after-load
 	 'consult
