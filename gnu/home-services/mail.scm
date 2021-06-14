@@ -44,8 +44,9 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
    "AList of pairs, each pair is a String and String or Gexp."))
 
 (define (add-isync-package config)
-  (list
-   (if (home-isync-configuration-xdg-flavor? config)
+  (if (home-isync-configuration-xdg-flavor? config)
+      (list
+       (home-isync-configuration-package config)
        (wrap-package
         (home-isync-configuration-package config)
         "mbsync"
@@ -56,12 +57,12 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
                             "/bin/mbsync")
              (if (or (member "-c" (command-line))
                      (member "--config" (command-line)))
-                 (command-line)
+                 (cdr (command-line))
                  (append
                   (list "--config"
                         "${XDG_CONFIG_HOME:-$HOME/.config}/isync/mbsyncrc")
-                  (command-line)))))))
-       (home-isync-configuration-package config))))
+                  (cdr (command-line)))))))))
+      (list (home-isync-configuration-package config))))
 
 (define (add-isync-configuration config)
   `((,(if (home-isync-configuration-xdg-flavor? config)
