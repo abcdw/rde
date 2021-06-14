@@ -18,18 +18,15 @@
   (define (serialize-term term)
     (match term
       ((? symbol? e) (symbol->string e))
+      ((? string? e) (format #f "~s" e))
       (e e)))
   (define (serialize-item entry)
     (match entry
       ((? gexp? e) e)
-      ((field val)
-       #~(string-append #$(serialize-term field)
-                        " "
-                        #$(serialize-term val)))))
+      ((? list lst)
+       #~(string-join '#$(map serialize-term lst)))))
 
-  #~(string-append #$@(interpose
-                       (map serialize-item val)
-                       "\n" 'suffix)))
+  #~(string-append #$@(interpose (map serialize-item val) "\n" 'suffix)))
 
 (define-configuration/no-serialization home-isync-configuration
   (package
@@ -78,6 +75,7 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
    (inherit cfg)
    (config (append (home-isync-configuration-config cfg) extensions))))
 
+;; TODO: create dirs on-change?
 (define home-isync-service-type
   (service-type (name 'home-isync)
                 (extensions
