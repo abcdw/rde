@@ -53,6 +53,11 @@
 			       `((include ,config-file))
 			       '())))
       (list
+       (simple-service
+        'sway-reload-config-on-change
+        (@@ (gnu home-services) home-run-on-change-service-type)
+        `("files/config/sway/config"
+          ,#~(system* #$(file-append package "/bin/swaymsg") "reload")))
        ;; TODO: Move wofi to feature-app-launcher or something like that
        (simple-service 'packages-for-sway
 		home-profile-service-type
@@ -145,8 +150,8 @@ automatically switch to SWAY-TTY-NUMBER on boot."
                 #$(file-append (get-value 'sway config) "/bin/swaymsg")
                 #$(file-append jq "/bin/jq")))
     (define subject-window-or-selection
-      #~(format #f
-"~a -t get_tree | ~a -r '.. | select(.pid? and .visible?) | .rect | \"\\(.x),\\(.y) \\(.width)x\\(.height)\"' | ~a -b ~a -B ~a"
+      #~(format #f "~a -t get_tree | ~a -r '.. | select(.pid? and .visible?) \
+| .rect | \"\\(.x),\\(.y) \\(.width)x\\(.height)\"' | ~a -b ~a -B ~a"
                 #$(file-append (get-value 'sway config) "/bin/swaymsg")
                 #$(file-append jq "/bin/jq")
                 ;; TODO: Move to slurp-cmd
@@ -170,10 +175,10 @@ automatically switch to SWAY-TTY-NUMBER on boot."
     (define shot-window-or-selection
       (shot-script "window-or-selection" #:geom subject-window-or-selection))
     (list
-     (simple-service
-      'sway-screenshot-packages
-      home-profile-service-type
-      (list slurp grim wl-clipboard jq))
+     ;; (simple-service
+     ;;  'sway-screenshot-packages
+     ;;  home-profile-service-type
+     ;;  (list slurp grim wl-clipboard jq))
 
      (simple-service
       'sway-screenshot
