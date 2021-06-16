@@ -34,6 +34,9 @@
 (define-public (brightness? x)
   (and (integer? x) (<= 0 x 100)))
 
+(define-public (maybe-list? lst)
+  (or (list? lst) (not lst)))
+
 (define-public (list-of-strings? lst)
   (and (list? lst) (every string? lst)))
 
