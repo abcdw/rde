@@ -301,11 +301,20 @@ with one gexp, but many times, and all gexps must be idempotent.")))
           (let ((file-info (lstat file)))
             (eq? (vector-ref file-info 13) 'symlink)))
 
-        (define (readlink* file)
-          "Like @code{readlink}, but recursive."
+        (define* (readlink* file #:optional (acc 1))
+          "Like @code{readlink}, but recursive.  ACC is an accumulator, it is
+used to keep track of the number of symlinks that have been followed,
+this is to prevent infinite loops.
+
+@example
+/path/to/foo -> /path/to/bar
+/path/to/bar -> /path/to/baz
+/path/to/baz -> /path/to/foo
+@end example"
           (cond
-           ((not (symlink? file)) file)
-           (else (readlink* (readlink file)))))
+           ;; I think 10 is a reasonable number, might change in the future.
+           ((or (= acc 10) (not (symlink? file))) file)
+           (else (readlink* (readlink file) (+ acc 1)))))
 
         (define (check-directory dir)
           "Traverse DIR and check whether all the files in DIR are
