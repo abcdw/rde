@@ -15,6 +15,7 @@
             mail-account-id
             mail-account-type
             mail-account-user
+            mail-account-synchronizer
             mail-account-get-pass-cmd))
 
 
@@ -28,6 +29,9 @@
    (symbol 'generic)
    "Type of the mail account.  Will be used in different serialization
 scenarios, during generation of @file{mbsyncrc} for example.")
+  (synchronizer
+   (symbol 'isync)
+   "Type of application to obtain emails.")
   (user
    (string #f)
    "Email. @code{\"someone@example.com\"} for example.")
@@ -41,7 +45,7 @@ scenarios, during generation of @file{mbsyncrc} for example.")
       (string-append "pass show mail/" (mail-account-user mail-account))))
 
 (define (list-of-mail-accounts? lst)
-  (and (list? lst) (any mail-account? lst)))
+  (and (list? lst) (not (null? lst)) (any mail-account? lst)))
 
 (define (default-mail-directory-fn config)
   (string-append (get-value 'home-directory config)
@@ -59,8 +63,9 @@ features."
   (ensure-pred procedure? mail-directory-fn)
 
   (feature
-   (name 'mail-accounts)
-   (values `((mail-accounts . ,mail-accounts)
+   (name 'mail-settings)
+   (values `((mail-settings . #t)
+             (mail-accounts . ,mail-accounts)
              (mail-directory-fn . ,mail-directory-fn)))))
 
 
@@ -108,6 +113,7 @@ features."
         ,@(isync-group-with-channels id folders-mapping))))
   isync-settings)
 
+;; Directory names has lowercased spelling to match notmuch tags
 (define gmail-folder-mapping
   '(("inbox"  . "INBOX")
     ("sent"   . "[Gmail]/Sent Mail")
@@ -136,9 +142,11 @@ features."
           #:key
           (mail-account-ids #f)
           (isync-global-settings default-isync-global-settings)
-          (isync-serializers %default-isync-serializers))
+          (isync-serializers %default-isync-serializers)
+          (isync-verbose #f))
   "Setup and configure isync.  If MAIL-ACCOUNT-IDS not provided use all
-mail accounts."
+mail accounts.  ISYNC-VERBOSE controls output verboseness of
+@file{mbsync}."
   (ensure-pred maybe-list? mail-account-ids)
   (ensure-pred list? isync-serializers)
   (ensure-pred list? isync-global-settings)
@@ -152,14 +160,10 @@ mail accounts."
   (define (get-home-services config)
     (require-value 'mail-accounts config
                    "feature-isync can't operate without mail-accounts.")
-    (let* ((mail-accounts-value (get-value 'mail-accounts config))
-           (mail-accounts
-            (if mail-account-ids
-                (filter
-                 (lambda (x) (member (mail-account-id x) mail-account-ids))
-                 mail-accounts-value)
-                mail-accounts-value))
 
+    (let* ((mail-accounts
+            (filter (lambda (x) (eq? (mail-account-synchronizer x) 'isync))
+                    (get-value 'mail-accounts config)))
            (mail-directory-fn (get-value 'mail-directory-fn config))
            (mail-directory    (mail-directory-fn config)))
 
@@ -176,9 +180,17 @@ mail accounts."
            isync-global-settings
            (append-map serialize-mail-acc mail-accounts))))))))
 
+  ;; MAYBE: Wrap it in a program-file to make it possible to call it
+  ;; with system*
+  (define (isync-synchronize-cmd-fn mail-acc)
+    (string-append "mbsync "
+                   (if isync-verbose "-V " "")
+                   (symbol->string (mail-account-id mail-acc))))
+
   (feature
    (name 'isync)
-   (values '((isync . #t)))
+   (values `((isync . #t)
+             (isync-synchronize-cmd-fn . ,isync-synchronize-cmd-fn)))
    (home-services-getter get-home-services)))
 
 
