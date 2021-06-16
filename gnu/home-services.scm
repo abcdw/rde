@@ -329,7 +329,8 @@ identical to the ones for the old generation."
           ;; is specified as the path in `gexp-tuples'.
           (define path-from-generation-dir
             (let ((dir-length (string-length new-generation)))
-              (string-drop dir dir-length)))
+              ;; Also drop starting "/"
+              (string-drop dir (+ dir-length 1))))
 
           (define (filter-file-tree-node node)
             (if (eq? (car node) 'dir)
@@ -354,8 +355,8 @@ identical to the ones for the old generation."
 for the old generation.  If they aren't, return FILE with
 the, otherwise, return @code{#f}.  This also works if the FILE is a
 directory and the directory itself is a symlink to the store."
-          (let ((new-file (string-append new-generation file))
-                (old-file (string-append old-generation file)))
+          (let ((new-file (string-append new-generation "/" file))
+                (old-file (string-append old-generation "/" file)))
             (cond
              ;; If the files don't exist in either generation, don't
              ;; do anything.
@@ -375,10 +376,7 @@ directory and the directory itself is a symlink to the store."
                   #f
                   file))
              (else
-              (begin
-                (newline)
-
-                (check-directory new-file))))))
+              (check-directory new-file)))))
 
         (when (and old-generation (file-exists? old-generation))
           (let* ((changed-files

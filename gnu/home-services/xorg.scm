@@ -134,7 +134,7 @@ URxvt.secondaryScroll: 0
   (list (home-xresources-configuration-package config)))
 
 (define (home-xresources-run-on-change-service config)
-  #~("/files/Xresources"
+  #~("files/Xresources"
      (begin
        (display "Reloading Xresources\n")
        (system* #$(file-append (home-xresources-configuration-package config)

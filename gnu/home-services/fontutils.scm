@@ -28,7 +28,7 @@
 ;; TODO: fc-cache -f is too slow, it can be called only on-change or
 ;; workarounded some other way.
 (define (regenerate-font-cache-gexp _)
-  #~("/profile/share/fonts"
+  #~("profile/share/fonts"
       (begin
         (system* #$(file-append fontconfig
                                 "/bin/fc-cache")
