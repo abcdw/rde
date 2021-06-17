@@ -12,7 +12,10 @@
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:export (home-isync-service-type
-	    home-isync-configuration))
+	    home-isync-configuration
+
+            home-notmuch-service-type
+	    home-notmuch-configuration))
 
 (define (serialize-isync-config field-name val)
   (define (serialize-term term)
@@ -89,3 +92,56 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
 		(extend home-isync-extensions)
                 (default-value (home-isync-configuration))
                 (description "Install and configure isync.")))
+
+(define-configuration/no-serialization home-notmuch-configuration
+  (package
+   (package notmuch)
+   "notmuch package to use.")
+  (xdg-flavor?
+   (boolean #t)
+   "Whether to use the {$XDG_CONFIG_HOME/notmuch/default/config}
+configuration file or not.")
+  (config
+   (ini-config '())
+   "AList of pairs, each pair is a String and String or Gexp.")
+  (hooks
+   (list '())
+   "List of lists, each nested list contains hook name and file-object."))
+
+
+(define (add-notmuch-package config)
+  (list (home-notmuch-configuration-package config)))
+
+(define (add-notmuch-configuration config)
+  (define (serialize-field key val)
+    (let ((val (cond
+                ((list? val) (string-join (map maybe-object->string val) ";"))
+                (else val))))
+      (format #f "~a=~a\n" key val)))
+
+  (define (prepend-hook x)
+    (cons (string-append "config/notmuch/default/hooks/" (car x)) (cdr x)))
+
+  `(,@(map prepend-hook (home-notmuch-configuration-hooks config))
+    (,(if (home-notmuch-configuration-xdg-flavor? config)
+          "config/notmuch/default/config"
+          "notmuch-config")
+     ,(mixed-text-file
+       "notmuch-config"
+       (generic-serialize-ini-config
+        #:serialize-field serialize-field
+        #:fields (home-notmuch-configuration-config config))))))
+
+(define home-notmuch-service-type
+  (service-type (name 'home-notmuch)
+                (extensions
+                 (list (service-extension
+			home-profile-service-type
+			add-notmuch-package)
+		       (service-extension
+                        home-files-service-type
+                        add-notmuch-configuration)))
+		;; (compose concatenate)
+		;; (extend home-isync-extensions)
+                (default-value (home-notmuch-configuration))
+                (description "Install and configure notmuch.")))
