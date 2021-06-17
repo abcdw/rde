@@ -198,7 +198,7 @@ would this:
 Include /some/path/to/file
 @end example"
    (lambda (field-name val)
-     (serialize-alist field-name val #:toplevel? #f)))
+     (serialize-alist field-name val #:toplevel? #t)))
   (extra-config
    (listof-ssh-host-or-ssh-match '())
    "List of configurations for other hosts.  Something like this:
