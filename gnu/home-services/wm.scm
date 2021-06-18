@@ -223,6 +223,15 @@ documentation} for how to configure it."))
             ,(mixed-text-file "xmonad-config"
                               (serialize-text-config #f config))))))))
 
+(define xmonad-run-on-change-service
+  (match-lambda
+    (($ <home-xmonad-configuration> _ package xmonad-contrib?
+                                    xdg-flavor? config)
+     #~(#$(if xdg-flavor? "files/config/xmonad/xmonad.hs" "files/xmonad/xmonad.hs")
+        (let ((executable #$(file-append package "/bin/xmonad")))
+          (system* executable"--recompile")
+          (system* executable "--restart"))))))
+
 (define home-xmonad-service-type
   (service-type (name 'home-xmonad)
                 (extensions
@@ -230,6 +239,9 @@ documentation} for how to configure it."))
                  (list (service-extension
                         home-profile-service-type
                         xmonad-profile-service)
+                       (service-extension
+                        home-run-on-change-service-type
+                        xmonad-run-on-change-service)
                        (service-extension
                         home-files-service-type
                         xmonad-files-service)))
