@@ -21,7 +21,7 @@
 	    home-emacs-extension
 	    elisp-configuration-package))
 
-(define packages? (listof package?))
+(define packages? (list-of package?))
 
 (define serialize-packages empty-serializer)
 (define serialize-boolean empty-serializer)

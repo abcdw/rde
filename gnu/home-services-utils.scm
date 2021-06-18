@@ -39,8 +39,8 @@
             generic-serialize-ini-config
             generic-serialize-git-ini-config
             alist?
-            listof
-            listof-strings?
+            list-of
+            list-of-strings?
 
             rest
             maybe-list
@@ -369,7 +369,7 @@ elements: the section and the subsection."
 
 (define alist? list?)
 
-(define (listof pred?)
+(define (list-of pred?)
   "Return a procedure that takes a list and check if all the elements of
 the list result in @code{#t} when applying PRED? on them."
     (lambda (x)
@@ -377,8 +377,8 @@ the list result in @code{#t} when applying PRED? on them."
           (every pred? x)
           #f)))
 
-(define listof-strings?
-  (listof string?))
+(define list-of-strings?
+  (list-of string?))
 
 ;;;
 ;;; Miscellaneous.

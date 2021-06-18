@@ -77,8 +77,8 @@
   (serialize-field field-name (boolean->yes-or-no val)))
 
 (define serialize-string serialize-field)
-(define (listof-ssh-host-or-ssh-match? val)
-  (listof (lambda (val)
+(define (list-of-ssh-host-or-ssh-match? val)
+  (list-of (lambda (val)
             (or (ssh-host? val)
                 (ssh-match? val)))))
 
@@ -136,7 +136,7 @@ as the @code{default-options} field in @code{home-ssh-configuration}."))
                        ssh-match-keywords))))
         #$(serialize-alist #f options)))))
 
-(define (serialize-listof-ssh-host-or-ssh-match field-name val)
+(define (serialize-list-of-ssh-host-or-ssh-match field-name val)
   #~(string-append
          #$@(map (lambda (entry)
                 (if (ssh-host? entry)
@@ -153,7 +153,7 @@ as the @code{default-options} field in @code{home-ssh-configuration}."))
    "The name of the default host."
    (lambda (field-name val) (serialize-field 'host val)))
   (user-known-hosts-file
-   (listof-strings '("~/.ssh/known_hosts"))
+   (list-of-strings '("~/.ssh/known_hosts"))
    "One or more files to use for the user host key database."
    serialize-list)
   (forward-agent
@@ -200,7 +200,7 @@ Include /some/path/to/file
    (lambda (field-name val)
      (serialize-alist field-name val #:toplevel? #t)))
   (extra-config
-   (listof-ssh-host-or-ssh-match '())
+   (list-of-ssh-host-or-ssh-match '())
    "List of configurations for other hosts.  Something like this:
 
 @lisp

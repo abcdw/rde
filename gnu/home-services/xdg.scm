@@ -341,7 +341,7 @@ The value of an XDG MIME entry must be a list, string or symbol, was given ~a")
   (actions xdg-desktop-entry-actions    ; list of <xdg-desktop-action>
            (default '())))
 
-(define desktop-entries? (listof xdg-desktop-entry?))
+(define desktop-entries? (list-of xdg-desktop-entry?))
 (define (serialize-desktop-entries field-name val) "")
 
 (define (serialize-xdg-desktop-entry entry)

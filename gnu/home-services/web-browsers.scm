@@ -46,8 +46,8 @@
 ;;;
 
 (define %icecat-config-path "mozilla/icecat")
-(define (listof-icecat-profile? val)
-  (listof icecat-profile?))
+(define (list-of-icecat-profile? val)
+  (list-of icecat-profile?))
 
 (define-configuration icecat-profile
   (default?
@@ -83,7 +83,7 @@ details on how to customize the look and feel of IceCat.")
     (package icecat)
     "The IceCat package to use.")
   (profiles
-   (listof-icecat-profile '())
+   (list-of-icecat-profile '())
    "List of IceCat profiles.")
   (no-serialization))
 

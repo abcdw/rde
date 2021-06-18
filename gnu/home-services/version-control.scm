@@ -105,7 +105,7 @@
   #~(string-append #$@(append-map serialize-git-section val)))
 
 (define (git-ignore? patterns)
-  (listof-strings? patterns))
+  (list-of-strings? patterns))
 (define (serialize-git-ignore field-name val)
   (string-join val "\n" 'suffix))
 
@@ -256,17 +256,17 @@ of the configuration file."))
     (package mercurial)
     "The Mercurial package to use.")
   (regexp-ignore
-   (listof-strings '())
+   (list-of-strings '())
    "List of regular expressions to ignore globally.  The default syntax
 is Python/Perl-style regular expression (see @command{man 5 hgignore}).
 
 The @code{*-ignore} fields are equivalent to adding @code{ui.ignore =
 /file/with/ignore/rules} in your @file{hgrc}.")
   (glob-ignore
-   (listof-strings '())
+   (list-of-strings '())
    "List of globs to ignore globally.")
   (rootglob-ignore
-   (listof-strings '())
+   (list-of-strings '())
    "List of @dfn{rootglobs} to ignore globally.")
   (config
    (ini-config '())
@@ -379,13 +379,13 @@ will turn into this:
 
 (define-configuration/no-serialization home-hg-extension
   (regexp-ignore
-   (listof-strings '())
+   (list-of-strings '())
    "List of regular expressions to ignore globally.")
   (glob-ignore
-   (listof-strings '())
+   (list-of-strings '())
    "List of glob expressions to ignore globally.")
   (rootglob-ignore
-   (listof-strings '())
+   (list-of-strings '())
    "List of @dfn{rootglobs} to ignore globally.")
   (config
    (ini-config '())
