@@ -15,7 +15,8 @@
 	    home-isync-configuration
 
             home-notmuch-service-type
-	    home-notmuch-configuration))
+	    home-notmuch-configuration
+            home-notmuch-extension))
 
 (define (serialize-isync-config field-name val)
   (define (serialize-term term)
@@ -73,12 +74,10 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
        (serialize-isync-config #f (home-isync-configuration-config config))))))
 
 (define (home-isync-extensions cfg extensions)
-  (display extensions)
   (home-isync-configuration
    (inherit cfg)
    (config (append (home-isync-configuration-config cfg) extensions))))
 
-;; TODO: create dirs on-change?
 (define home-isync-service-type
   (service-type (name 'home-isync)
                 (extensions
@@ -93,6 +92,9 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
                 (default-value (home-isync-configuration))
                 (description "Install and configure isync.")))
 
+(define (list-of-gexps? lst)
+  (and (list? lst) (every gexp? lst)))
+
 (define-configuration/no-serialization home-notmuch-configuration
   (package
    (package notmuch)
@@ -104,10 +106,35 @@ configuration file or not.")
   (config
    (ini-config '())
    "AList of pairs, each pair is a String and String or Gexp.")
-  (hooks
-   (list '())
-   "List of lists, each nested list contains hook name and file-object."))
+  (pre-new
+   (list-of-gexps '())
+   "List of gexp to add in @file{pre-new} hook. Read @code{man
+notmuch-hooks} for more information.")
+  (post-new
+   (list-of-gexps '())
+   "List of gexp to add in @file{post-new} hook. Read @code{man
+notmuch-hooks} for more information.")
+  (post-insert
+   (list-of-gexps '())
+   "List of gexp to add in @file{post-insert} hook. Read @code{man
+notmuch-hooks} for more information."))
 
+(define-configuration/no-serialization home-notmuch-extension
+  (config
+   (ini-config '())
+   "AList of pairs, each pair is a String and String or Gexp.")
+  (pre-new
+   (list-of-gexps '())
+   "List of gexp to add in @file{pre-new} hook. Read @code{man
+notmuch-hooks} for more information.")
+  (post-new
+   (list-of-gexps '())
+   "List of gexp to add in @file{post-new} hook. Read @code{man
+notmuch-hooks} for more information.")
+  (post-insert
+   (list-of-gexps '())
+   "List of gexp to add in @file{post-insert} hook. Read @code{man
+notmuch-hooks} for more information."))
 
 (define (add-notmuch-package config)
   (list (home-notmuch-configuration-package config)))
@@ -119,10 +146,23 @@ configuration file or not.")
                 (else val))))
       (format #f "~a=~a\n" key val)))
 
-  (define (prepend-hook x)
-    (cons (string-append "config/notmuch/default/hooks/" (car x)) (cdr x)))
+  (define (filter-fields field)
+    (filter-configuration-fields home-notmuch-configuration-fields
+				 (list field)))
 
-  `(,@(map prepend-hook (home-notmuch-configuration-hooks config))
+  (define (hook-file hook gexps)
+    (list (string-append "config/notmuch/default/hooks/" hook)
+          (program-file (string-append "notmuch-" hook) #~(begin #$@gexps))))
+
+  (define (get-hook hook)
+    (let* ((field-obj (car (filter-fields (string->symbol hook))))
+           (gexps ((configuration-field-getter field-obj) config)))
+      (if (not (null? gexps))
+          (hook-file hook gexps)
+          '())))
+
+  (remove null?
+  `(,@(map get-hook '("pre-new" "post-new" "post-insert"))
     (,(if (home-notmuch-configuration-xdg-flavor? config)
           "config/notmuch/default/config"
           "notmuch-config")
@@ -130,7 +170,23 @@ configuration file or not.")
        "notmuch-config"
        (generic-serialize-ini-config
         #:serialize-field serialize-field
-        #:fields (home-notmuch-configuration-config config))))))
+        #:fields (home-notmuch-configuration-config config)))))))
+
+(define (home-notmuch-extensions cfg extensions)
+  (home-notmuch-configuration
+   (inherit cfg)
+   (config
+    (append (home-notmuch-configuration-config cfg)
+            (append-map home-notmuch-extension-config extensions)))
+   (pre-new
+    (append (home-notmuch-configuration-pre-new cfg)
+            (append-map home-notmuch-extension-pre-new extensions)))
+   (post-new
+    (append (home-notmuch-configuration-post-new cfg)
+            (append-map home-notmuch-extension-post-new extensions)))
+   (post-insert
+    (append (home-notmuch-configuration-post-insert cfg)
+            (append-map home-notmuch-extension-post-insert extensions)))))
 
 (define home-notmuch-service-type
   (service-type (name 'home-notmuch)
@@ -141,7 +197,7 @@ configuration file or not.")
 		       (service-extension
                         home-files-service-type
                         add-notmuch-configuration)))
-		;; (compose concatenate)
-		;; (extend home-isync-extensions)
+		(compose identity)
+		(extend home-notmuch-extensions)
                 (default-value (home-notmuch-configuration))
                 (description "Install and configure notmuch.")))
