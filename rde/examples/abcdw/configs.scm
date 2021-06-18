@@ -16,6 +16,7 @@
   #:use-module (rde features emacs)
   #:use-module (rde features linux)
   #:use-module (rde features bittorrent)
+  #:use-module (rde features mail)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
@@ -56,6 +57,14 @@
 (define* (pkgs #:rest lst)
   (map specification->package+output lst))
 
+(define* (mail-acc id user #:optional (type 'gmail))
+  "Make simple mail-account with gmail type by default."
+  (mail-account
+   (id   id)
+   (user user)
+   (type type)))
+
+;; TODO: feature-icecat
 (define %main-features
   (list
    (feature-pipewire)
@@ -84,7 +93,10 @@
 
    (feature-emacs
     #:additional-elisp-packages
-    (pkgs "emacs-guix" "emacs-telega" "emacs-pdf-tools" "emacs-yasnippet"))
+    (append
+     ;; (list emacs-mini-frame)
+     (pkgs "emacs-guix" "emacs-pdf-tools" "emacs-yasnippet" "emacs-elfeed"
+           "emacs-olivetti")))
    (feature-emacs-faces)
    (feature-emacs-completion)
    (feature-emacs-project)
@@ -101,12 +113,18 @@
    (feature-emacs-telega)
    (feature-emacs-magit)
    (feature-emacs-org-mode)
-
    (feature-emacs-org-roam
     #:org-roam-directory "~/work/notes/notes")
-   (feature-emacs-notmuch)
 
-   (feature-transmission)
+   (feature-mail-settings
+    #:mail-accounts (list (mail-acc 'work     "andrew@trop.in")
+                          ;; (mail-acc 'personal "andrewtropin@gmail.com")
+                          ))
+   (feature-isync
+    #:isync-verbose #t)
+   (feature-notmuch)
+
+   (feature-transmission #:auto-start? #f)
    (feature-emacs-transmission)
 
 

@@ -26,7 +26,9 @@
 	    feature-emacs-erc
 	    feature-emacs-telega
             feature-emacs-transmission
-            feature-emacs-notmuch))
+
+            elisp-configuration-service
+            emacs-xdg-service))
 
 (define* (elisp-configuration-service
           name
@@ -135,7 +137,6 @@
 	    (setq save-interprogram-paste-before-kill t)
 	    (setq mouse-yank-at-point t)
 	    (setq require-final-newline t)
-
             (add-hook 'prog-mode-hook
                       (lambda () (setq show-trailing-whitespace t)))
 
@@ -364,7 +365,8 @@ utilizing reverse-im package."
            (company-mode 1))
          (add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
 
-	 (setq telega-completing-read-function completing-read-function))))
+	 (setq telega-completing-read-function completing-read-function)))
+      #:elisp-packages (list emacs-telega))
 
      (emacs-xdg-service emacs-f-name "Emacs (Client) [tg:]" xdg-gexp
                         #:default-for '(x-scheme-handler/tg))))
@@ -647,23 +649,6 @@ utilizing reverse-im package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-notmuch)
-  "Configure notmuch for GNU Emacs."
-
-  (define emacs-f-name 'notmuch)
-  (define f-name (symbol-append 'emacs- emacs-f-name))
-
-  (define (get-home-services config)
-    (list
-     (elisp-configuration-service
-      emacs-f-name
-      `()
-      #:elisp-packages (list notmuch))))
-
-  (feature
-   (name f-name)
-   (values `((,f-name . #t)))
-   (home-services-getter get-home-services)))
 
 ;; TODO: feature-emacs-monocole
 ;; TODO: feature-emacs-reasonable-keybindings
