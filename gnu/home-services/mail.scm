@@ -11,12 +11,20 @@
 
   #:use-module (guix packages)
   #:use-module (guix gexp)
+  #:use-module (guix diagnostics)
+  #:use-module (guix i18n)
+  #:use-module ((guix import utils) #:select (flatten))
+
   #:export (home-isync-service-type
 	    home-isync-configuration
 
             home-notmuch-service-type
 	    home-notmuch-configuration
-            home-notmuch-extension))
+            home-notmuch-extension
+
+            home-l2md-service-type
+            home-l2md-configuration
+            l2md-repo))
 
 (define (serialize-isync-config field-name val)
   (define (serialize-term term)
@@ -202,3 +210,132 @@ notmuch-hooks} for more information."))
 		(extend home-notmuch-extensions)
                 (default-value (home-notmuch-configuration))
                 (description "Install and configure notmuch.")))
+
+
+
+;;;
+;;; L2md.
+;;;
+
+(define (string-or-list-of-strings? val)
+  (or (string? val) (listof-strings? val)))
+
+(define-configuration/no-serialization l2md-repo
+  (name
+   (string)
+   "The name of the public-inbox repository.")
+  (urls
+   (string-or-list-of-strings)
+   "A list of URLs to fetch the public-inbox repository from.")
+  (maildir
+   (string "")
+   "The maildir corresponding to the public-inbox repository.  This is
+optional, an external MDA like Procmail can be used instead to filter
+the messages, see the @code{pipe} field.")
+  (pipe
+   (string-or-gexp "")
+   "A command to pipe the messages to for further filtering.  This is
+mutually exclusive with the @code{maildir} field.")
+  (initial-import
+   (integer 0)
+   "The number of messages to import initially, if @code{0}, import all
+the messages.")
+  (sync-enabled?
+   (boolean #t)
+   "Whether to sync this repository or not."))
+
+(define list-of-l2md-repos? (listof l2md-repo?))
+
+(define-configuration/no-serialization home-l2md-configuration
+  (package
+    (package l2md)
+    "The L2md package to use.")
+  (period
+   (integer 180)
+   "The number of seconds between each round of fetching Git
+repositories.")
+  (maildir
+   (string "")
+   "The maildir to which messages should be delivered.  This can also be
+set on a per-list basis using the using the @code{maildir} field in
+the @code{<l2md-repo>} record.")
+  (pipe
+   (string-or-gexp "")
+   "A command to pipe the messages to for further filtering.  This is
+mutually exclusive with the @code{maildir} field.  This can also be
+set on a per-list basis using the @code{<l2md-repo>} record.")
+  (base
+   (string (string-append (getenv "XDG_DATA_HOME") "/public-inbox"))
+   "The directory where L2md stores Git repositories and other
+metadata.")
+  (repos
+   (list-of-l2md-repos '())
+   "List of @code{l2md-repo} records, representing the configuration for
+a particular public-inbox repository."))
+
+(define (serialize-l2md-configuration config)
+  (define (serialize-field field-name val)
+    (let ((val (cond
+                ((boolean? val) (if val "1" "0"))
+                (else (maybe-object->string val)))))
+      (if (string= val "")
+          '()
+          (list "\t" (object->snake-case-string field-name) " = " val "\n"))))
+
+  (define (check-maildir-and-pipe maildir pipe record)
+    (when (and (string= maildir "") (string= pipe ""))
+      (raise (formatted-message
+              (G_ "One of `maildir' or `pipe' must not be an empty string in \
+`~a'.")
+              record))))
+  
+  (define (l2md-repo->alist repos)
+    (match repos
+      (($ <l2md-repo> _ name urls maildir pipe initial-import sync-enabled?)
+       (begin
+         (check-maildir-and-pipe maildir pipe 'l2md-repo)
+         `(repo ,name
+                (,@(map (lambda (url)
+                          `(url . ,url))
+                        (maybe-list urls))
+                 (maildir . ,maildir)
+                 (pipe . ,pipe)
+                 (initial-import . ,initial-import)
+                 (sync-enabled . ,sync-enabled?)))))))
+
+  (match config
+    (($ <home-l2md-configuration> _ package period maildir pipe base repos)
+     (begin
+       (check-maildir-and-pipe maildir pipe 'home-l2md-configuration)
+       (generic-serialize-git-ini-config
+        #:combine-ini (compose flatten list)
+        #:combine-alist append
+        #:combine-section-alist cons*
+        #:serialize-field serialize-field
+        #:fields
+        `((general
+           ((period . ,period)
+            ,@(optional (not (string= maildir "")) `((maildir . ,maildir)))
+            ,@(optional (not (string= pipe "")) `((pipe . ,pipe)))
+            (base . ,base)))
+          ,@(map l2md-repo->alist repos)))))))
+
+(define (l2md-files-service config)
+  `(("l2mdconfig"
+     ,(apply mixed-text-file
+             "l2md-config"
+             (serialize-l2md-configuration config)))))
+
+(define (l2md-profile-service config)
+  (list (home-l2md-configuration-package config)))
+
+(define home-l2md-service-type
+  (service-type (name 'home-l2md)
+                (extensions
+                 (list (service-extension
+                        home-files-service-type
+                        l2md-files-service)
+                       (service-extension
+                        home-profile-service-type
+                        l2md-profile-service)))
+                (description "Install and configure L2md.")))
