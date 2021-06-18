@@ -405,7 +405,7 @@ the list result in @code{#t} when applying PRED? on them."
 (define (wrap-package pkg executable-name gexp)
   "Create a @code{<package>} object that is a wrapper for PACKAGE, and
 runs GEXP.  NAME is the name of the executable that will be put in the store."
-  (let* ((wrapper-name (string-append executable-name "wrapper"))
+  (let* ((wrapper-name (string-append executable-name "-wrapper"))
          (wrapper (program-file wrapper-name gexp)))
     (package
       (inherit pkg)
