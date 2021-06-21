@@ -265,7 +265,7 @@ the @code{<l2md-repo>} record.")
 mutually exclusive with the @code{maildir} field.  This can also be
 set on a per-list basis using the @code{<l2md-repo>} record.")
   (base
-   (string (string-append (getenv "XDG_DATA_HOME") "/public-inbox"))
+   (string "${XDG_STATE_HOME:-$HOME}/l2md")
    "The directory where L2md stores Git repositories and other
 metadata.")
   (repos
@@ -288,12 +288,12 @@ a particular public-inbox repository."))
               (G_ "One of `maildir' or `pipe' must not be an empty string in \
 `~a'.")
               record))))
-  
+
   (define (l2md-repo->alist repos)
     (match repos
       (($ <l2md-repo> _ name urls maildir pipe initial-import sync-enabled?)
        (begin
-         (check-maildir-and-pipe maildir pipe 'l2md-repo)
+         ;; (check-maildir-and-pipe maildir pipe 'l2md-repo)
          `(repo ,name
                 (,@(map (lambda (url)
                           `(url . ,url))
@@ -306,7 +306,7 @@ a particular public-inbox repository."))
   (match config
     (($ <home-l2md-configuration> _ package period maildir pipe base repos)
      (begin
-       (check-maildir-and-pipe maildir pipe 'home-l2md-configuration)
+       ;; (check-maildir-and-pipe maildir pipe 'home-l2md-configuration)
        (generic-serialize-git-ini-config
         #:combine-ini (compose flatten list)
         #:combine-alist append
