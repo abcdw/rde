@@ -22,6 +22,7 @@
   (define (serialize-term term)
     (match term
       ((? symbol? e) (symbol->string e))
+      ((? number? e) (format #f "~a" e))
       ((? string? e) (format #f "~s" e))
       (e e)))
   (define (serialize-item entry)
