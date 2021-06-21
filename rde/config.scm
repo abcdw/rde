@@ -50,7 +50,6 @@
 
 (define* (get-home-environment rde-config #:key (additional-services '()))
   (home-environment
-   (home-directory (rde-config-home-directory rde-config))
    (services
     (append
      additional-services
