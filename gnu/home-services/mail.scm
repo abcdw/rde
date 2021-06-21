@@ -218,7 +218,7 @@ notmuch-hooks} for more information."))
 ;;;
 
 (define (string-or-list-of-strings? val)
-  (or (string? val) (listof-strings? val)))
+  (or (string? val) (list-of-strings? val)))
 
 (define-configuration/no-serialization l2md-repo
   (name
@@ -244,7 +244,7 @@ the messages.")
    (boolean #t)
    "Whether to sync this repository or not."))
 
-(define list-of-l2md-repos? (listof l2md-repo?))
+(define list-of-l2md-repos? (list-of l2md-repo?))
 
 (define-configuration/no-serialization home-l2md-configuration
   (package
