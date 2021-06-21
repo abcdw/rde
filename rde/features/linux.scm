@@ -71,7 +71,7 @@ expected to be a brightnessctl."
 
 (define* (feature-pipewire
           #:key
-          (package pipewire-latest))
+          (package pipewire-0.3))
   ""
   (define (home-pipewire-services _)
     (list

@@ -10,6 +10,7 @@
   #:use-module (gnu packages qt)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages xdisorg)
+  #:use-module (gnu packages freedesktop)
   #:use-module (gnu services)
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
@@ -62,7 +63,7 @@
        (simple-service 'packages-for-sway
 		home-profile-service-type
 		(list wofi qtwayland
-                      xdg-desktop-portal-latest xdg-desktop-portal-wlr-latest))
+                      xdg-desktop-portal xdg-desktop-portal-wlr))
        (simple-service 'set-wayland-specific-env-vars
 		       home-environment-variables-service-type
 		       ;; export NO_AT_BRIDGE=1
