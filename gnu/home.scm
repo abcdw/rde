@@ -15,12 +15,9 @@
 	    this-home-environment
 
 	    home-environment-derivation
-	    home-environment-home-directory
 	    home-environment-user-services
 	    home-environment-essential-services
 	    home-environment-services
-	    home-environment-symlink-name
-	    home-environment-symlink-path
 	    home-environment-location
 
 	    home-environment-with-provenance))
@@ -39,21 +36,6 @@
                                 this-home-environment)))
   (services home-environment-user-services
 	    (default '()))
-
-  ;; (user-name home-environment-user-name)
-  ;; TODO: Remove these three fields before upstream
-  (home-directory home-environment-home-directory
-                  (default "$HOME")) ;; Ignored
-  (symlink-name home-environment-symlink-name
-		(default ".guix-home")) ;; Ignored
-  (symlink-path home-environment-symlink-path (thunked)
-		(default
-                  "$HOME/.guix-home"
-		  ;; (string-append
-		  ;;  (home-environment-home-directory this-home-environment)
-		  ;;  "/"
-		  ;;  (home-environment-symlink-name this-home-environment))
-                  ))
 
   (location home-environment-location             ; <location>
             (default (and=> (current-source-location)
