@@ -59,7 +59,7 @@ Some ACTIONS support additional ARGS.\n"))
   (display (G_ "\
    build              build the home environment without installing anything\n"))
   (display (G_ "\
-   import             print a home environment file for a profile"))
+   import             generates a home environment definition from .guix-profile\n"))
 
   ;; (show-build-options-help)
   (newline)
@@ -485,6 +485,7 @@ STORE is an open connection to the store."
 ;;;
 
 ;; Based on `manifest->code' from (guix profiles)
+;; MAYBE: Upstream it?
 (define* (manifest->code manifest
                          #:key
                          (entry-package-version (const ""))
@@ -542,7 +543,7 @@ available."
                ,(home-environment-template #:specs specs))
             `(begin
                (use-modules (gnu packages))
-               
+
                (specifications->manifest
                 (list ,@specs)))))
       (let* ((transform (lambda (options exp)
@@ -595,16 +596,15 @@ available."
   "Return an S-exp containing a <home-environment> declaration
 containing PACKAGES, or SPECS (package specifications)."
   `(home-environment
-     (home-directory ,(getenv "HOME"))
      (packages
       ,@(if packages
             `((list ,@packages))
             `((map specification->package
                (list ,@specs)))))))
 
-;; TODO: Read ~/ and generate service configurations
-(define* (import-manifest manifest
-                             #:optional (port (current-output-port)))
+(define* (import-manifest
+          manifest
+          #:optional (port (current-output-port)))
   "Write to PORT a <home-environment> corresponding to MANIFEST."
   (define (version-spec entry)
     (let ((name (manifest-entry-name entry)))
