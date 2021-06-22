@@ -282,18 +282,10 @@ a particular public-inbox repository."))
           '()
           (list "\t" (object->snake-case-string field-name) " = " val "\n"))))
 
-  (define (check-maildir-and-pipe maildir pipe record)
-    (when (and (string= maildir "") (string= pipe ""))
-      (raise (formatted-message
-              (G_ "One of `maildir' or `pipe' must not be an empty string in \
-`~a'.")
-              record))))
-
   (define (l2md-repo->alist repos)
     (match repos
       (($ <l2md-repo> _ name urls maildir pipe initial-import sync-enabled?)
        (begin
-         ;; (check-maildir-and-pipe maildir pipe 'l2md-repo)
          `(repo ,name
                 (,@(map (lambda (url)
                           `(url . ,url))
@@ -306,7 +298,6 @@ a particular public-inbox repository."))
   (match config
     (($ <home-l2md-configuration> _ package period maildir pipe base repos)
      (begin
-       ;; (check-maildir-and-pipe maildir pipe 'home-l2md-configuration)
        (generic-serialize-git-ini-config
         #:combine-ini (compose flatten list)
         #:combine-alist append
