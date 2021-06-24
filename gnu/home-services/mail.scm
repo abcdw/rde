@@ -220,6 +220,9 @@ notmuch-hooks} for more information."))
 (define (string-or-list-of-strings? val)
   (or (string? val) (list-of-strings? val)))
 
+(define-maybe/no-serialization string)
+(define-maybe/no-serialization string-or-gexp)
+
 (define-configuration/no-serialization l2md-repo
   (name
    (string)
@@ -228,12 +231,12 @@ notmuch-hooks} for more information."))
    (string-or-list-of-strings)
    "A list of URLs to fetch the public-inbox repository from.")
   (maildir
-   (string "")
+   (maybe-string 'disabled)
    "The maildir corresponding to the public-inbox repository.  This is
 optional, an external MDA like Procmail can be used instead to filter
 the messages, see the @code{pipe} field.")
   (pipe
-   (string-or-gexp "")
+   (maybe-string-or-gexp 'disabled)
    "A command to pipe the messages to for further filtering.  This is
 mutually exclusive with the @code{maildir} field.")
   (initial-import
@@ -258,12 +261,12 @@ the messages.")
    "The number of seconds between each round of fetching Git
 repositories.")
   (maildir
-   (string "")
+   (maybe-string 'disabled)
    "The maildir to which messages should be delivered.  This can also be
 set on a per-list basis using the using the @code{maildir} field in
 the @code{<l2md-repo>} record.")
   (pipe
-   (string-or-gexp "")
+   (maybe-string-or-gexp 'disabled)
    "A command to pipe the messages to for further filtering.  This is
 mutually exclusive with the @code{maildir} field.  This can also be
 set on a per-list basis using the @code{<l2md-repo>} record.")
@@ -309,8 +312,8 @@ a particular public-inbox repository."))
         #:fields
         `((general
            ((period . ,period)
-            ,@(optional (not (string= maildir "")) `((maildir . ,maildir)))
-            ,@(optional (not (string= pipe "")) `((pipe . ,pipe)))
+            ,@(optional (not (eq? maildir 'disabled)) `((maildir . ,maildir)))
+            ,@(optional (not (eq? pipe 'disabled)) `((pipe . ,pipe)))
             (base . ,base)))
           ,@(map l2md-repo->alist repos)))))))
 
