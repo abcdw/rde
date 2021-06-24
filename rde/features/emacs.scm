@@ -12,6 +12,7 @@
   #:use-module (gnu packages mail)
   #:use-module (guix gexp)
   #:use-module (guix packages)
+  #:use-module (guix transformations)
 
   #:export (feature-emacs
 	    feature-emacs-faces
@@ -606,13 +607,21 @@ git-link, git-timemachine."
 	 'embark
 	 (define-key global-map (kbd "s-.") 'embark-act))
 
+        (autoload 'consult-customize "consult" "" nil 'macro)
 	(with-eval-after-load
 	 'consult
+         (consult-customize consult-line :inherit-input-method t)
+         (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
+         (define-key global-map (kbd "C-S-s") 'consult-line)
 	 ;; TODO: Move to feature-emacs-buffers
 	 (define-key global-map (kbd "s-w") 'kill-current-buffer)
 	 (define-key global-map (kbd "s-o") 'other-window)
-	 (define-key global-map (kbd "s-b") 'consult-buffer)
-	 (define-key global-map (kbd "s-B") 'consult-buffer)
+
+         ;; Jumps to previous buffer
+         (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
+         ;; consult-buffer has strange ordering (maybe cause of emacsclient)
+         (define-key global-map (kbd "s-b") 'switch-to-buffer)
+	 (define-key global-map (kbd "s-B") 'switch-to-buffer)
 
 	 (define-key global-map (kbd "M-y") 'consult-yank-pop))
 
@@ -625,9 +634,14 @@ git-link, git-timemachine."
 	 (setf (alist-get 'variable marginalia-annotator-registry)
 	       '(none builtin marginalia-annotate-variable))
 	 (marginalia-mode 1)))
-      #:elisp-packages  (list emacs-orderless emacs-marginalia
-		              emacs-vertico emacs-corfu
-		              emacs-consult emacs-embark-next))))
+      #:elisp-packages
+      (map
+       ;; For inherit-input-method for consult-line
+       (options->transformation
+        '((with-commit . "emacs-consult=0.9")))
+       (list emacs-orderless emacs-marginalia
+	     emacs-vertico emacs-corfu
+             emacs-consult emacs-embark-next)))))
 
   (feature
    (name f-name)
