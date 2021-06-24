@@ -18,7 +18,7 @@
 	    feature-emacs-completion
 	    feature-emacs-input-method
 	    feature-emacs-project
-	    feature-emacs-magit
+	    feature-emacs-git
 	    feature-emacs-eshell
 	    feature-emacs-org-mode
 	    feature-emacs-org-roam
@@ -451,16 +451,17 @@ utilizing reverse-im package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-magit)
-  "Configure Magit for GNU Emacs."
-  (define emacs-f-name 'magit)
+(define* (feature-emacs-git)
+  "Configure git-related utilities for GNU Emacs, including magit,
+git-link, git-timemachine."
+  (define emacs-f-name 'git)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
     (list
      (elisp-configuration-service
       emacs-f-name
-      #:elisp-packages (list emacs-magit))))
+      #:elisp-packages (list emacs-magit emacs-git-link emacs-git-timemachine))))
 
   (feature
    (name f-name)

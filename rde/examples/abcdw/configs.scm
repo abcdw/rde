@@ -111,7 +111,7 @@
     '(("irc.libera.chat"
        "#guix" "#emacs" "#tropin" "#rde")))
    (feature-emacs-telega)
-   (feature-emacs-magit)
+   (feature-emacs-git)
    (feature-emacs-org-mode)
    (feature-emacs-org-roam
     #:org-roam-directory "~/work/notes/notes")
