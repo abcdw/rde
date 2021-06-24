@@ -659,7 +659,11 @@ git-link, git-timemachine."
      (elisp-configuration-service
       emacs-f-name
       ;; TODO: https://github.com/muffinmad/emacs-ibuffer-project
-      `((with-eval-after-load
+      ;; MAYBE: Rework the binding approach
+      `((add-hook 'after-init-hook
+                  (lambda ()
+                    (define-key global-map (kbd "s-p") project-prefix-map)))
+        (with-eval-after-load
 	 'project
 	 (with-eval-after-load
 	  'consult
