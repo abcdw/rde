@@ -108,8 +108,8 @@
    (feature-emacs-erc
     #:erc-nick "abcdw"
     #:erc-autojoin-channels-alist
-    '(("irc.libera.chat"
-       "#guix" "#emacs" "#tropin" "#rde")))
+    '(("irc.libera.chat" "#guix" "#emacs" "#tropin" "#rde")
+      ("irc.oftc.net"    "#pipewire" "#wayland")))
    (feature-emacs-telega)
    (feature-emacs-git)
    (feature-emacs-org-mode)
@@ -118,10 +118,8 @@
 
    (feature-mail-settings
     #:mail-accounts (list (mail-acc 'work     "andrew@trop.in")
-                          ;; (mail-acc 'personal "andrewtropin@gmail.com")
-                          ))
-   (feature-isync
-    #:isync-verbose #t)
+                          (mail-acc 'personal "andrewtropin@gmail.com")))
+   (feature-isync #:isync-verbose #t)
    (feature-notmuch)
 
    (feature-transmission #:auto-start? #f)
@@ -146,7 +144,7 @@
      (list obs-latest)
      (pkgs
       "alsa-utils" "mpv" "youtube-dl"
-      ;; "obs" "obs-wlrobs"
+      "obs-wlrobs"
       "icecat"
       "ungoogled-chromium-wayland" "ublock-origin-chromium"
       "nyxt"
