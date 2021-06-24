@@ -690,7 +690,7 @@ git-link, git-timemachine."
       `((add-hook 'after-init-hook 'org-roam-mode)
 	(with-eval-after-load
 	 'org-roam
-	 (define-key org-roam-mode-map (kbd "C-c n n") 'org-roam)
+	 (define-key org-roam-mode-map (kbd "C-c n n") 'org-roam-jump-to-index)
 	 (define-key org-roam-mode-map (kbd "C-c n f") 'org-roam-find-file)
 	 (define-key org-mode-map      (kbd "C-c n i") 'org-roam-insert)
 	 (setq org-roam-directory ,org-roam-directory)))
@@ -714,7 +714,7 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((define-key global-map (kbd "C-c T t") 'transmission))
+      `((define-key global-map (kbd "C-c a t") 'transmission))
       #:elisp-packages (list emacs-transmission))
 
      (emacs-xdg-service
