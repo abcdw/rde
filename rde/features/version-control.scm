@@ -43,7 +43,7 @@
 	     (,@(if sign-commits?
 		    '((gpgsign . #t))
 		    '())))
-	    (sendmail
+	    (sendemail
 	     ((annotate . #t))))))))))
 
   (feature
