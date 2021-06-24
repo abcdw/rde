@@ -345,9 +345,7 @@ utilizing reverse-im package."
 	 (setq erc-fill-function 'erc-fill-static)
 	 (setq erc-fill-column 86)
 
-	 (setq erc-track-visibility nil)
-
-	 (define-key erc-mode-map (kbd "s-b") 'erc-switch-to-buffer))))
+	 (setq erc-track-visibility nil))))
      (emacs-xdg-service
       emacs-f-name
       "Emacs (Client) [IRC]"
@@ -387,9 +385,6 @@ utilizing reverse-im package."
       emacs-f-name
       `((with-eval-after-load
 	 'telega
-         ;; FIXME: Implement proper switch buffer function
-	 (define-key telega-chat-mode-map (kbd "s-b") 'telega-switch-buffer)
-	 (define-key telega-root-mode-map (kbd "s-b") 'telega-switch-buffer)
 
          (setq telega-emoji-company-backend 'telega-company-emoji)
          (defun my-telega-chat-mode ()
