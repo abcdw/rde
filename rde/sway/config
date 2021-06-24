@@ -24,7 +24,10 @@ set $term alacritty
 # exec gpg-connect-agent updatestartuptty /bye >/dev/null
 set $menu wofi --show=drun
 # dmenu_path | dmenu | xargs swaymsg exec --
+
 default_border pixel
+default_floating_border pixel
+
 gaps inner 10
 ### Output configuration
 #
