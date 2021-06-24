@@ -110,7 +110,9 @@
 	home-emacs-service-type
 	(home-emacs-configuration
 	 (package package)
-	 (elisp-packages (cons* emacs-modus-themes additional-elisp-packages))
+	 (elisp-packages (cons* emacs-modus-themes
+                                emacs-expand-region
+                                additional-elisp-packages))
 	 (server-mode? emacs-server-mode?)
 	 (xdg-flavor? #t)
 	 (init-el
@@ -122,6 +124,8 @@
 			  "/emacs/custom.el"))
 	    (load custom-file t)
             ,#~""
+            (define-key global-map (kbd "C-=") 'er/expand-region)
+
             (defun rde/display-load-time ()
               (interactive)
               (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
