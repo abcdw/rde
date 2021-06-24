@@ -33,26 +33,40 @@ and provides GPG-PRIMARY-KEY value for other features."
 	`((exec gpg-connect-agent updatestartuptty /bye >/dev/null)
           (,#~""))))
 
-     (service home-gnupg-service-type
-	      (home-gnupg-configuration
-	       (gpg-config
-		(home-gpg-configuration
-		 (extra-config
-		  '((keyid-format . long)
-		    (with-subkey-fingerprint . #t)
-		    (keyserver . "hkps://keys.openpgp.org")))))
-	       (gpg-agent-config
-		(home-gpg-agent-configuration
-		 (extra-config
-                  ;; TTL for smart-cards doesn't make sense
-                  `(,@(if (not gpg-smart-card?)
-                          `((default-cache-ttl . ,default-ttl)
-                            (default-cache-ttl-ssh . ,default-ttl)
-                            (max-cache-ttl . ,default-ttl)
-                            (max-cache-ttl-ssh . ,default-ttl))
-                          '())))
-		 (ssh-agent? gpg-ssh-agent?)
-		 (pinentry-flavor pinentry-flavor)))))))
+     ;; <https://github.com/drduh/YubiKey-Guide#harden-configuration>
+     ;; <https://raw.githubusercontent.com/drduh/config/master/gpg.conf>
+     (service
+      home-gnupg-service-type
+      (home-gnupg-configuration
+       (gpg-config
+	(home-gpg-configuration
+	 (extra-config
+	  '((keyid-format . long)
+            (personal-cipher-preferences . (AES256 AES192 AES))
+            (personal-digest-preferences . (SHA512 SHA384 SHA256))
+            (personal-compress-preferences . (ZLIB BZIP2 ZIP Uncompressed))
+            (default-preference-list . (SHA512 SHA384 SHA256
+                                        AES256 AES192 AES
+                                        ZLIB BZIP2 ZIP Uncompressed))
+            (cert-digest-algo . SHA512)
+            (s2k-digest-algo . SHA512)
+            (s2k-cipher-algo . AES256)
+            (charset . utf-8)
+
+	    (with-subkey-fingerprint . #t)
+	    (keyserver . "hkps://keys.openpgp.org")))))
+       (gpg-agent-config
+	(home-gpg-agent-configuration
+	 (extra-config
+          ;; TTL for smart-cards doesn't make sense
+          `(,@(if (not gpg-smart-card?)
+                  `((default-cache-ttl . ,default-ttl)
+                    (default-cache-ttl-ssh . ,default-ttl)
+                    (max-cache-ttl . ,default-ttl)
+                    (max-cache-ttl-ssh . ,default-ttl))
+                  '())))
+	 (ssh-agent? gpg-ssh-agent?)
+	 (pinentry-flavor pinentry-flavor)))))))
 
   (define (system-gnupg-services _)
     "Return a list of home-services, required for gnupg to operate."
