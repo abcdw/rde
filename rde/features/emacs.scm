@@ -385,7 +385,7 @@ utilizing reverse-im package."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((global-set-key (kbd "s-e") 'eshell)
+      `((define-key global-map (kbd "s-e") 'eshell)
         (with-eval-after-load
          'eshell
          (add-hook
@@ -397,6 +397,14 @@ utilizing reverse-im package."
          (add-hook
           'eshell-mode-hook
           (lambda ()
+            (setenv "PAGER" "")
+
+            (eshell/alias "e" "find-file $1")
+            (eshell/alias "ee" "find-file-other-window $1")
+            (eshell/alias "d" "dired $1")
+            (with-eval-after-load
+             'magit (eshell/alias "gd" "magit-diff-unstaged"))
+
             (define-key eshell-mode-map (kbd "s-e") 'switch-to-prev-buffer))))))))
 
   (feature
