@@ -57,8 +57,13 @@
    ((boolean? val) (serialize-boolean field-name val))
    (else (format #f "~a ~a~%" field-name val))))
 
+(define (serialize-val val)
+  (format #f "~a" val))
+
 (define (serialize-list field-name lst)
-  (serialize-field field-name (format #f "~a" (string-join lst))))
+  (serialize-field
+   field-name
+   (format #f "~a" (string-join (map serialize-val lst)))))
 
 (define (serialize-boolean field-name boolean)
   (let* ((stringified (maybe-object->string field-name))
