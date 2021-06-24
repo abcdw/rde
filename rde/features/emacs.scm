@@ -497,6 +497,24 @@ git-link, git-timemachine."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define* (feature-emacs-which-key)
+  "Configure which-key."
+  (define emacs-f-name 'which-key)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      '((which-key-mode 1)
+        (define-key global-map (kbd "C-h C-k") 'which-key-show-top-level))
+      #:elisp-packages (list emacs-which-key))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 
 ;; TODO: Move font record to apropriate module
 (use-modules (rde features fontutils))
