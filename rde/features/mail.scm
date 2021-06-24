@@ -109,7 +109,7 @@ features."
         (Account ,id)
         ,#~""
         (MaildirStore ,(symbol-append id '-local))
-        (Subfolders Verbatim)
+        (SubFolders Verbatim)
         (Path ,(string-append mail-directory "/" user "/"))
         (Inbox ,(string-append mail-directory "/" user "/inbox"))
         ,#~""
@@ -230,6 +230,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
       "notmuch tag +sent  -- path:/.*\\/sent/"
       "notmuch tag +trash -- path:/.*\\/trash/"
       "notmuch tag +spam  -- path:/.*\\/spam/"
+      "notmuch tag +list  -- path:/lists\\/.*/"
       ;; If file was moved out of folder on server remove respective tag
       "notmuch tag -inbox -- not path:/.*\\/inbox/ and tag:inbox"
       "notmuch tag -trash -- not path:/.*\\/trash/ and tag:trash"
@@ -244,7 +245,8 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
     "If tag was removed -> move out of the related folder."
     (format #f "for f in $(notmuch search --output=files \
 'path:/.*\\/~a/ and not tag:~a' | grep '/~a/'); \
-do mv -v $f $(echo $f | sed 's;/~a/;/all/;' | sed 's/,U=[0-9]*:/:/'); done"
+do mv -v $f \
+$(echo $f | sed 's;/~a/;/all/;' | sed 's/,U=[0-9]*:/:/'); done"
             tag tag tag tag))
 
   (define* (move-in-tagged-messages
@@ -252,14 +254,18 @@ do mv -v $f $(echo $f | sed 's;/~a/;/all/;' | sed 's/,U=[0-9]*:/:/'); done"
             #:optional (exclude-dir "nothing-will-match-this"))
     (format #f "for f in $(notmuch search --output=files \
 'not path:/.*\\/~a/ and tag:~a' | grep -v \"/~a/\"); \
-do mv -v $f $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
+do mv -v $f \
+$(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
             tag tag exclude-dir tag))
+  (define delete-deleted-messages
+    "for f in $(notmuch search --output=files tag:deleted); do rm -v $f; done")
 
   (define move-rules
     (append
      (map move-out-untagged-messages '(inbox trash spam))
      (map move-in-tagged-messages '(trash spam))
-     (list (move-in-tagged-messages 'inbox "all"))))
+     (list (move-in-tagged-messages 'inbox "all")
+           delete-deleted-messages)))
 
   (home-notmuch-extension
    (pre-new
