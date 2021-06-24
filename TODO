@@ -16,17 +16,10 @@ Split into utils and configuration related helper?
 :PROPERTIES:
 :VISIBILITY: children
 :END:
-** TODO Make activation script create ~/.guix-home symlink
-It will also allow to make correct run-on-change implementation.
 ** TODO Make system service for Guix Home
 ** TODO Make it possible to specify the verbosity for ~guix home reconfigure~
 By default, only the path to the home environment should be shown,
 ~/gnu/store/...-home~.
-** TODO Add ~guix home init~ command for migrating from ~~/.guix-profile~
-Similar to ~guix package --export-manifest~, and maybe detect existing
-config files and generate template for home services configurations.
-E.g. if ~~/.bashrc~ exists, add ~home-bash-service-type~ to ~services~
-field of ~home-environemnt~.
 ** Finished
 :PROPERTIES:
 :VISIBILITY: folded
@@ -65,6 +58,13 @@ because this script can be called on generation switch event and not
 only on reconfigure.
 *** DONE Add provenance
 To make ~guix home describe~ more informative.
+*** DONE Make activation script create ~/.guix-home symlink
+It will also allow to make correct run-on-change implementation.
+*** DONE Add ~guix home init~ command for migrating from ~~/.guix-profile~
+Similar to ~guix package --export-manifest~, and maybe detect existing
+config files and generate template for home services configurations.
+E.g. if ~~/.bashrc~ exists, add ~home-bash-service-type~ to ~services~
+field of ~home-environemnt~.
 * ~guix home~ Backlog
 :PROPERTIES:
 :VISIBILITY: children
@@ -74,21 +74,11 @@ To make ~guix home describe~ more informative.
 - Browser extension
 *** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** IN-PROGRESS Add on-change to activation script?
+** DONE Add on-change to activation script?
 For some apps to run some commands like restart if their configs updated
-** IN-PROGRESS Make fonts service
+** DONE Make fonts service
 ** TODO Make gtk service
-** TODO Comprehensive Email configuration
-Things the user should be able to configure
-- IMAP and SMTP info (e.g. address, username, port)
-- PGP key
-*** TODO Implement mail sync service
-- isync/offlineimap/fetchmail/getmail
-- Guix System already has a service for getmail, ~(gnu services getmail)~
-- Integrate with mcron/state service
-*** TODO Mail indexer
-- notmuch/mu
-*** TODO SMTP client
+** TODO SMTP client
 - msmtp/sendmail
 ** Finished
 *** DONE icecat
@@ -101,6 +91,16 @@ Features:
 - server-mode? :: Create shepherd service for emacs
 *** DONE pass
 Also browser plugins and other stuff
+*** DONE Comprehensive Email configuration
+Things the user should be able to configure
+- IMAP and SMTP info (e.g. address, username, port)
+- PGP key
+**** DONE Implement mail sync service
+- isync/offlineimap/fetchmail/getmail
+- Guix System already has a service for getmail, ~(gnu services getmail)~
+- Integrate with mcron/state service
+**** DONE Mail indexer
+- notmuch/mu
 * ~rde~ Backlog
 :PROPERTIES:
 :VISIBILITY: content
@@ -120,6 +120,7 @@ Start user-space shepherd on first user login and exit on last logout.
 Take a look at mpd service for user-service example and /run/user/ID
 creation.
 
-*** IN-PROGRESS Create clean example configuration
+*** TODO Remove previous rde implementation
+*** DONE Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
