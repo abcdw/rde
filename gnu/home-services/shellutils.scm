@@ -44,9 +44,7 @@ Install plugins into the home profile and configure Zsh to load them.")))
    (name 'home-zsh-autosuggestions)
    (extensions
     (list
-     (service-extension
-      home-zsh-plugin-manager-service-type
-      (const (list zsh-autosuggestions)))
+     (service-extension home-zsh-plugin-manager-service-type list)
      (service-extension
       home-zsh-service-type
       (const
@@ -55,11 +53,9 @@ Install plugins into the home profile and configure Zsh to load them.")))
 	;; interactive shell.
 	(zshrc '("# Improve the behavior and perfomance of auto suggestions"
 		 "ZSH_AUTOSUGGEST_MANUAL_REBIND=true"
-		 ;; Workaround for
-		 ;; https://github.com/zsh-users/zsh-autosuggestions/issues/364#issuecomment-819255627
-		 "[ -n \"$GUIX_ENVIRONMENT\" ] || ZSH_AUTOSUGGEST_USE_ASYNC=true"
+		 "ZSH_AUTOSUGGEST_USE_ASYNC=true"
 		 "ZSH_AUTOSUGGEST_STRATEGY=(history completion)")))))))
-   (default-value #f)
+   (default-value zsh-autosuggestions)
    (description "Enable Fish-like fast and unobtrusive autosuggestions
 for Zsh, and set reasonable default values for some plugin's variables
 to improve perfomance.")))
