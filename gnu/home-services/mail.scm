@@ -250,6 +250,9 @@ the messages.")
   (package
     (package l2md)
     "The L2md package to use.")
+  (autostart?
+   (boolean #f)
+   "Whether to autostart L2md on login.")
   (period
    (integer 180)
    "The number of seconds between each round of fetching Git
@@ -296,7 +299,7 @@ a particular public-inbox repository."))
                  (sync-enabled . ,sync-enabled?)))))))
 
   (match config
-    (($ <home-l2md-configuration> _ package period maildir pipe base repos)
+    (($ <home-l2md-configuration> _ package autostart? period maildir pipe base repos)
      (begin
        (generic-serialize-git-ini-config
         #:combine-ini (compose flatten list)
@@ -317,6 +320,24 @@ a particular public-inbox repository."))
              "l2md-config"
              (serialize-l2md-configuration config)))))
 
+(define l2md-shepherd-service
+  (match-lambda
+    (($ <home-l2md-configuration> _ package autostart?)
+     (optional autostart?
+               (list (shepherd-service
+                      (documentation
+                       "L2md service for downloading public-inbox archives.")
+                      (provision '(l2md))
+                      (start #~(make-forkexec-constructor
+                                (list #$(file-append package "/bin/l2md"))
+                                #:log-file (string-append
+                                            (or (getenv "XDG_LOG_HOME")
+                                                (string-append
+                                                 (getenv "HOME")
+                                                 "/.local/var/log"))
+                                            "/l2md.log")))
+                      (stop #~(make-kill-destructor))))))))
+
 (define (l2md-profile-service config)
   (list (home-l2md-configuration-package config)))
 
@@ -326,6 +347,9 @@ a particular public-inbox repository."))
                  (list (service-extension
                         home-files-service-type
                         l2md-files-service)
+                       (service-extension
+                        home-shepherd-service-type
+                        l2md-shepherd-service)
                        (service-extension
                         home-profile-service-type
                         l2md-profile-service)))
