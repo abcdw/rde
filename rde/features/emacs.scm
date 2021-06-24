@@ -33,12 +33,15 @@
 (define* (elisp-configuration-service
           name
           #:optional (elisp-expressions '())
-          #:key (elisp-packages '()))
+          #:key
+          (elisp-packages '())
+          (autoloads? #t))
   (let* ((configure-package
 	  (elisp-configuration-package
 	   (string-append "configure-" (symbol->string name))
            elisp-expressions
-           #:elisp-packages elisp-packages)))
+           #:elisp-packages elisp-packages
+           #:autoloads? autoloads?)))
     (simple-service
      (symbol-append 'emacs- name '-configurations)
      home-emacs-service-type
@@ -377,7 +380,7 @@ utilizing reverse-im package."
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-eshell)
-  "Configure org-mode for GNU Emacs."
+  "Configure Eshell, the Emacs shell."
   (define emacs-f-name 'eshell)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
