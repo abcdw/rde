@@ -70,6 +70,24 @@
    ;;    (files '("lib/obs-plugins")))))
    ))
 
+(use-modules (gnu packages emacs))
+(define-public emacs-next-pgtk-latest
+  (let ((commit "7d5e94bada09e642a8bfc4f66804f7948bad40bc")
+        (revision "3"))
+    (package
+      (inherit emacs-next-pgtk)
+      (name "emacs-next-pgtk-latest")
+      (version (git-version "28.0.50" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://git.savannah.gnu.org/git/emacs.git/")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "0p1bsjblb6m2agchsazmccrk9jx9n7fr97r472f6rxxhs4q953pb")))))))
 
 
 ;; xdg-desktop-portal-latest
