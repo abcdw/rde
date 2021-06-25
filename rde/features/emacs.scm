@@ -139,6 +139,13 @@
 	    ,#~""
 	    ;; (define-key global-map (kbd "M-/") 'hippie-expand)
 
+            (defun rde-compilation-colorizer ()
+              "Prevent color escape sequences to popup in compilation buffer."
+              (ansi-color-apply-on-region compilation-filter-start (point)))
+            (add-hook 'compilation-filter-hook 'rde-compilation-colorizer)
+            (add-hook 'eshell-preoutput-filter-functions
+                      'ansi-color-filter-apply)
+
             ;; <https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/>
             ;; Actually there is M-m for back-to-indentation
             (defun smarter-move-beginning-of-line (arg)
