@@ -1,7 +1,0 @@
-" let g:python_host_prog = $HOME.'/.vim/venv/bin/python'
-let g:python_host_prog = '/usr/bin/python'
-" let g:ycm_path_to_python_interpreter = $HOME.'/.vim/venv/bin/python'
-" let g:pyenv#python_exec = $HOME.'/.vim/venv/bin/python'
-
-" Source vanilla Vim settings
-source $HOME/.vimrc

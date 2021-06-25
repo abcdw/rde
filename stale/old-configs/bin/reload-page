@@ -1,8 +1,0 @@
-#!/bin/bash
-
-BROWSER=Chromium
-
-MYWINDOW=$(xdotool getactivewindow)
-xdotool search --onlyvisible --class ${BROWSER} windowfocus key --clearmodifiers 'F5'
-xdotool windowfocus --sync ${MYWINDOW}
-xdotool windowactivate --sync ${MYWINDOW}
