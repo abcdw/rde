@@ -21,6 +21,7 @@
 
             home-hg-configuration
             home-hg-extension
+            serialize-hg-config
             home-hg-service-type))
 
 ;;; Commentary:

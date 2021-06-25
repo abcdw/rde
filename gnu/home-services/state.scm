@@ -17,9 +17,32 @@
   #:export (home-state-service-type
 	    state-generic
 	    state-git
+            state-hg
 	    state-rsync))
 
 (use-modules (gnu packages version-control))
+(define* (state-hg path remote #:key (config #f))
+  (state-generic
+   path
+   #:init-gexp
+   #~(lambda* (_ self)
+       (let* ((meta (car (action self 'metadata)))
+              (path (assoc-ref meta 'path))
+              (remote (assoc-ref meta 'remote)))
+         (format #t "Initializing ~a.\n" self)
+         (let* ((port ((@@ (guix build utils) open-pipe-with-stderr)
+                       #$(file-append mercurial "/bin/hg") "clone" remote path)))
+           (waitpid WAIT_ANY)
+           (display ((@@ (ice-9 rdelim) read-delimited) "" port))
+           (close-port port))
+
+         (when '#$config
+           (call-with-output-file (string-append path "/.hg/hgrc")
+             (lambda (port) (display (string-append
+                                      #$@(serialize-hg-config config)) port))))))
+   #:additional-metadata `((remote . ,remote)
+                           (general-sync? . #f))))
+
 (define* (state-git path remote #:key (config #f))
   (state-generic
    path
