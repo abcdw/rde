@@ -7,17 +7,18 @@ home:
 # 	GUILE_LOAD_PATH=./ ../gnu/guix/pre-inst-env guix \
 # 	home reconfigure ../rde/rde/config.scm
 
+# Rewrite to glakes
 env:
-	guix time-machine -C rde/guix/channels-lock -- \
+	guix time-machine -C stale/guix-related/guix/channels-lock -- \
 	environment --ad-hoc make
 
 channels-pull:
-	guix pull -C rde/guix/channels-lock
+	guix pull -C stale/guix-related/guix/channels-lock
 
 channels-update-lock:
-	guix time-machine -C rde/guix/channels -- \
-	describe -f channels > rde/guix/channels-lock
+	guix time-machine -C stale/guix-related/guix/channels -- \
+	describe -f channels > stale/guix-related/guix/channels-lock
 
 iso:
-	guix time-machine  -C rde/guix/channels-lock -- \
-	system -L ./ image -t iso9660 rde/system/install.scm
+	guix time-machine  -C stale/guix-related/guix/channels-lock -- \
+	system -L ./ image -t iso9660 stale/guix-related/system/install.scm
