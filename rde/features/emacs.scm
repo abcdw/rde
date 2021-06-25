@@ -612,6 +612,7 @@ git-link, git-timemachine."
 	 (define-key global-map (kbd "s-.") 'embark-act))
 
         (autoload 'consult-customize "consult" "" nil 'macro)
+        (setq completion-in-region-function 'consult-completion-in-region)
 	(with-eval-after-load
 	 'consult
          (consult-customize consult-line :inherit-input-method t)
