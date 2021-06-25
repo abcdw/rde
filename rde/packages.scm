@@ -89,5 +89,27 @@
           (base32
            "0p1bsjblb6m2agchsazmccrk9jx9n7fr97r472f6rxxhs4q953pb")))))))
 
+(use-modules (gnu packages emacs-xyz)
+             (guix build-system emacs))
+
+(define-public emacs-cyrillic-dvorak-im
+  (package
+    (name "emacs-cyrillic-dvorak-im")
+    (version "0.1.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/xFA25E/cyrillic-dvorak-im")
+             (commit version)))
+       (sha256
+        (base32 "12adszd4p9i9glx2chasgq68i6cnxcrwbf5c268jjb5dw4q7ci0n"))
+       (file-name (git-file-name name version))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/xFA25E/cyrillic-dvorak-im")
+    (synopsis "Cyrillic input method for dvorak layout")
+    (description "Cyrillic input method for dvorak layout.")
+    (license license:gpl3+)))
+
 
 ;; xdg-desktop-portal-latest
