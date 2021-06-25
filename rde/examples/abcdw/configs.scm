@@ -86,7 +86,7 @@
 
    (feature-desktop-services)
    (feature-sway
-    #:config-file (local-file "../../sway/config"))
+    #:config-file (local-file "../../features/sway/config"))
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
    (feature-sway-screenshot)

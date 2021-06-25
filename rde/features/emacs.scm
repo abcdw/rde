@@ -1,15 +1,17 @@
 (define-module (rde features emacs)
   #:use-module (rde features)
   #:use-module (rde features predicates)
-  #:use-module (rde emacs packages)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services emacs)
   #:use-module (gnu home-services wm)
   #:use-module (gnu home-services xdg)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu services)
+
+  #:use-module (rde packages)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages mail)
+
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (guix transformations)
@@ -179,7 +181,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 	    (load-theme 'modus-operandi t)))
 	 (early-init-el
-	  `(,(slurp-file-gexp (local-file "../emacs/early-init.el"))))
+	  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
 	 ;;; TODO: Rebuilding packages with emacs will be useful for
 	 ;;; native-comp, but for some reason dash.el fails to build,
 	 ;;; need to investigate the issue.
@@ -580,7 +582,7 @@ git-link, git-timemachine."
 	 (require 'orderless)
 	 (require 'savehist)
 	 (require 'vertico)
-	 (require 'corfu)
+	 ;; (require 'corfu)
 	 (require 'marginalia)
 	 (require 'embark)
 	 (require 'consult))
@@ -621,7 +623,7 @@ git-link, git-timemachine."
 	 (define-key global-map (kbd "M-y") 'consult-yank-pop))
 
 	(with-eval-after-load 'vertico (vertico-mode 1))
-	(with-eval-after-load 'corfu (corfu-global-mode 1))
+	;; (with-eval-after-load 'corfu (corfu-global-mode 1))
 	(with-eval-after-load
 	 'marginalia
 	 ;; FIXME: Temporary disable annotations for describe-variables.
@@ -633,10 +635,11 @@ git-link, git-timemachine."
       (map
        ;; For inherit-input-method for consult-line
        (options->transformation
-        '((with-commit . "emacs-consult=0.9")))
+        '((with-commit . "emacs-consult=ee58941308d83a717728f056ea753e80f68cfbc0")
+          (with-commit . "emacs-embark=2c3ac885252379044afb20353214115eb06a51ae")))
        (list emacs-orderless emacs-marginalia
-	     emacs-vertico emacs-corfu
-             emacs-consult emacs-embark-next)))))
+	     emacs-vertico ;; emacs-corfu
+             emacs-consult emacs-embark)))))
 
   (feature
    (name f-name)

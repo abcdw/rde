@@ -1,4 +1,5 @@
 (define-module (rde features shells)
+  #:use-module (rde packages)
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (gnu home-services)
@@ -44,7 +45,7 @@
        (package package)
        (zshrc
 	(list
-	 (slurp-file-gexp (local-file "../zsh/zshrc"))
+	 (slurp-file-gexp (local-file "./zsh/zshrc"))
 	 "alias state-sync='herd sync state && pass git push origin master'"))))))
 
   (feature

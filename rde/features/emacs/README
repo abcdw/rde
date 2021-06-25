@@ -1,8 +1,7 @@
--*- mode: org -*-
+# -*- mode: org -*-
 
 * rde emacs
 Set of reasonable configurations for emacs & packages.
-
 
 ** Principles
 In addition to rde principles:
