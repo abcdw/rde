@@ -26,6 +26,17 @@
             home-l2md-configuration
             l2md-repo))
 
+;;; Commentary:
+;;;
+;;; This modules contains mail-related services.
+;;;
+;;; Code:
+
+
+;;;
+;;; Isync.
+;;;
+
 (define (serialize-isync-config field-name val)
   (define (serialize-term term)
     (match term
@@ -103,6 +114,11 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
 
 (define (list-of-gexps? lst)
   (and (list? lst) (every gexp? lst)))
+
+
+;;;
+;;; Notmuch.
+;;;
 
 (define-configuration/no-serialization home-notmuch-configuration
   (package
