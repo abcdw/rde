@@ -252,5 +252,9 @@ Match exec \"grep key secret.txt\"
 (define (generate-home-ssh-documentation)
   (generate-documentation
    `((home-ssh-configuration
-      ,home-ssh-configuration-fields))
+      ,home-ssh-configuration-fields
+      (ssh-host ssh-host)
+      (ssh-match ssh-match))
+     (ssh-host ,ssh-host-fields)
+     (ssh-match ,ssh-match-fields))
    'home-ssh-configuration))

@@ -115,6 +115,12 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
 (define (list-of-gexps? lst)
   (and (list? lst) (every gexp? lst)))
 
+(define (generate-home-isync-documentation)
+  (generate-documentation
+   `((home-isync-configuration
+      ,home-isync-configuration-fields))
+   'home-isync-configuration))
+
 
 ;;;
 ;;; Notmuch.
@@ -227,6 +233,11 @@ notmuch-hooks} for more information."))
                 (default-value (home-notmuch-configuration))
                 (description "Install and configure notmuch.")))
 
+(define (generate-home-notmuch-documentation)
+  (generate-documentation
+   `((home-notmuch-configuration
+      ,home-notmuch-configuration-fields))
+   'home-notmuch-configuration))
 
 
 ;;;
@@ -373,3 +384,12 @@ a particular public-inbox repository."))
                         home-profile-service-type
                         l2md-profile-service)))
                 (description "Install and configure L2md.")))
+
+(define (generate-home-l2md-documentation)
+  (generate-documentation
+   `((home-l2md-configuration
+      ,home-l2md-configuration-fields
+      (l2md-repo l2md-repo))
+     (l2md-repo ,l2md-repo-fields))
+   'home-l2md-configuration))
+      
