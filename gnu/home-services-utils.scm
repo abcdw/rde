@@ -198,8 +198,8 @@ yields:"
 
 (define* (filter-configuration-fields configuration-fields fields
 				      #:optional negate?)
-  "Retrieve the fields FIELDS from CONFIGURATION.
-If NEGATE? is @code{#t}, retrieve the FIELDS that are not in CONFIGURATION."
+  "Retrieve the fields FIELDS from CONFIGURATION-FIELDS.
+If NEGATE? is @code{#t}, retrieve the FIELDS that are not in CONFIGURATION-FIELDS."
   (filter (lambda (field)
             (let ((membership? (member (configuration-field-name field)
                                        fields)))
