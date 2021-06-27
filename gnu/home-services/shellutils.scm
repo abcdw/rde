@@ -12,7 +12,8 @@
 
   #:export (home-zsh-plugin-manager-service-type
 	    home-zsh-autosuggestions-service-type
-	    home-zsh-direnv-service-type))
+	    home-zsh-direnv-service-type
+            home-bash-direnv-service-type))
 
 (define (add-zsh-plugins-load-command packages)
   (home-zsh-extension
@@ -75,3 +76,17 @@ to improve perfomance.")))
    (default-value #f)
    (description "Enable Direnv integration for Zsh.")))
 
+(define home-bash-direnv-service-type
+  (service-type
+   (name 'home-bash-direnv)
+   (extensions
+    (list
+     (service-extension
+      home-profile-service-type
+      (const (list direnv)))
+     (service-extension
+      home-bash-service-type
+      (const (home-bash-extension
+              (bashrc (list "eval \"$(direnv hook bash)\"")))))))
+   (default-value #f)
+   (description "Enable Direnv integration for bash.")))
