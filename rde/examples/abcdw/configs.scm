@@ -55,8 +55,9 @@
    (feature-keyboard
     #:keyboard-layout %dvorak-layout)))
 
-;;; TODO: Make sway depend on feature-desktop-services
 ;;; TODO: feature-wallpapers https://wallhaven.cc/
+;;; TODO: feature-icecat
+;;; TODO: feature-bash?
 ;;; TODO: feature-battery
 ;; PipeWire/iwd:
 ;; https://github.com/krevedkokun/guix-config/blob/master/system/yggdrasil.scm
@@ -67,27 +68,28 @@
 (define* (pkgs #:rest lst)
   (map specification->package+output lst))
 
-;; TODO: feature-icecat
+;;; WARNING: The order can be important for features extending
+;;; services of other features.  Be careful changing it.
 (define %main-features
   (list
-   (feature-pipewire)
+   (feature-base-services)
+   (feature-desktop-services)
 
+   (feature-tmux
+    #:config-file
+    (local-file "../../../stale/dotfiles/.tmux.conf" "tmux.conf"))
+   (feature-zsh)
+   (feature-ssh)
+   (feature-git)
+
+   (feature-fonts)
+   (feature-pipewire)
    (feature-backlight)
 
    (feature-alacritty
     #:config-file
     (local-file "../../../stale/dotfiles/.config/alacritty/alacritty.yml"))
-   (feature-tmux
-    #:config-file
-    (local-file "../../../stale/dotfiles/.tmux.conf" "tmux.conf"))
-   (feature-zsh)
 
-   (feature-ssh)
-   (feature-git)
-
-   (feature-fonts)
-
-   (feature-desktop-services)
    (feature-sway
     #:config-file (local-file "../../features/sway/config"))
    (feature-sway-run-on-tty
@@ -97,15 +99,15 @@
    (feature-emacs
     #:additional-elisp-packages
     (append
-     ;; (list emacs-mini-frame)
      (pkgs "emacs-guix" "emacs-pdf-tools" "emacs-yasnippet" "emacs-elfeed"
-           "emacs-olivetti")))
+           "emacs-olivetti" "emacs-elpher")))
    (feature-emacs-faces)
    (feature-emacs-completion)
    (feature-emacs-project)
    (feature-emacs-input-method)
    (feature-emacs-eshell)
    (feature-emacs-message
+    ;; TODO: Take those values from email type
     #:smtp-server "smtp.gmail.com"
     #:smtp-port   25)
    (feature-emacs-erc
@@ -117,15 +119,17 @@
    (feature-emacs-git)
    (feature-emacs-org-mode)
    (feature-emacs-org-roam
+    ;; TODO: Rewrite to states
     #:org-roam-directory "~/work/notes/notes")
 
    (feature-isync #:isync-verbose #t)
-   (feature-notmuch)
+   (feature-notmuch
+    #:notmuch-saved-searches
+    (cons* '(:name "Work Inbox" :query "tag:work and tag:inbox" :key "W")
+           %rde-notmuch-saved-searches))
 
    (feature-transmission #:auto-start? #f)
 
-
-   (feature-base-services)
    (feature-xdg
     #:xdg-user-directories-configuration
     (home-xdg-user-directories-configuration
