@@ -1,4 +1,5 @@
 (define-module (rde features mail)
+  #:use-module (rde packages)
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (rde features emacs)
@@ -433,8 +434,10 @@ message together with all its descendents."
                    ("tags" . "(%s)")))
 
            (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
-           (setq notmuch-show-logo nil)))
-        #:elisp-packages (list notmuch)))))
+           (setq notmuch-show-logo nil))
+
+          (with-eval-after-load 'magit (require 'git-email-magit)))
+        #:elisp-packages (list notmuch emacs-git-email-latest)))))
 
   (feature
    (name f-name)

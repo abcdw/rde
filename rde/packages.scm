@@ -116,5 +116,47 @@
              (base32
               "0yghz9pdjsm9v6lbjckm6c5h9ak7iylx8sqgyjwl6nihkpvv4jyp"))))))
 
+(use-modules (guix build-system emacs)
+             (gnu packages mail)
+             (gnu packages texinfo))
+(define-public emacs-git-email-latest
+  (let* ((commit "b5ebade3a48dc0ce0c85699f25800808233c73be")
+         (revision "0"))
+    (package
+      (name "emacs-git-email")
+      (version (git-version "0.2.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://git.sr.ht/~yoctocell/git-email")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1lk1yds7idgawnair8l3s72rgjmh80qmy4kl5wrnqvpmjrmdgvnx"))))
+      (build-system emacs-build-system)
+      (arguments
+       `(#:phases
+         (modify-phases %standard-phases
+           ;; piem is not yet packaged in Guix.
+           (add-after 'unpack 'remove-piem
+             (lambda _
+               (delete-file "git-email-piem.el")
+               (delete-file "git-email-gnus.el")
+               (delete-file "git-email-mu4e.el")))
+           (add-before 'install 'makeinfo
+             (lambda _
+               (invoke "makeinfo" "doc/git-email.texi"))))))
+      (native-inputs
+       `(("texinfo" ,texinfo)))
+      (inputs
+       `(("emacs-magit" ,emacs-magit)
+         ("notmuch" ,notmuch)))
+      (license license:gpl3+)
+      (home-page "https://sr.ht/~yoctocell/git-email")
+      (synopsis "Format and send Git patches in Emacs")
+      (description "This package provides utilities for formatting and
+sending Git patches via Email, without leaving Emacs."))))
 
 ;; xdg-desktop-portal-latest
