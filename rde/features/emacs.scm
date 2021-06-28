@@ -118,6 +118,7 @@
 	(home-emacs-configuration
 	 (package package)
 	 (elisp-packages (cons* emacs-modus-themes
+                                emacs-guix
                                 emacs-expand-region
                                 additional-elisp-packages))
 	 (server-mode? emacs-server-mode?)
@@ -180,6 +181,7 @@ point reaches the beginning or end of the buffer, stop there."
 	    (column-number-mode 1)
 	    (save-place-mode 1)
 	    (show-paren-mode 1)
+            (global-guix-prettify-mode)
 
 	    (setq-default indent-tabs-mode nil)
 	    (setq save-interprogram-paste-before-kill t)

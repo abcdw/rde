@@ -101,7 +101,7 @@
    (feature-emacs
     #:additional-elisp-packages
     (append
-     (pkgs "emacs-guix" "emacs-pdf-tools" "emacs-yasnippet" "emacs-elfeed"
+     (pkgs "emacs-pdf-tools" "emacs-yasnippet" "emacs-elfeed"
            "emacs-olivetti" "emacs-elpher")))
    (feature-emacs-faces)
    (feature-emacs-completion)
