@@ -1,5 +1,6 @@
 (define-module (rde features gnupg)
   #:use-module (rde features)
+  #:use-module (gnu packages gnupg)
   #:use-module (gnu services)
   #:use-module (gnu home-services gnupg)
   #:use-module (gnu home-services wm)
@@ -10,6 +11,7 @@
 
 (define* (feature-gnupg
 	  #:key gpg-primary-key
+          (package gnupg)
 	  (gpg-ssh-agent? #t)
 	  (pinentry-flavor 'qt)
 	  (gpg-smart-card? #f)
@@ -30,7 +32,8 @@ and provides GPG-PRIMARY-KEY value for other features."
        (simple-service
 	'gnupg-updatestartuptty-on-sway-launch
 	home-sway-service-type
-	`((exec gpg-connect-agent updatestartuptty /bye >/dev/null)
+	`((exec ,(file-append gnupg "/bin/gpg-connect-agent")
+                updatestartuptty /bye >/dev/null)
           (,#~""))))
 
      ;; <https://github.com/drduh/YubiKey-Guide#harden-configuration>
