@@ -11,16 +11,6 @@
   #:use-module (guix build-system meson)
   #:use-module ((guix licenses) #:prefix license:))
 
-
-;; (define-module (rde obs)
-;;   #:use-module (gnu packages)
-;;   #:use-module (gnu packages video)
-;;   #:use-module (guix packages)
-;;   #:use-module (guix git-download)
-;;   #:use-module (guix build-system cmake)
-;;   #:use-module (guix gexp)
-;;   #:use-module ((guix licenses) #:prefix license:))
-
 (use-modules (gnu packages video)
              (gnu packages glib))
 (define-public obs-latest
@@ -72,8 +62,8 @@
 
 (use-modules (gnu packages emacs))
 (define-public emacs-next-pgtk-latest
-  (let ((commit "7d5e94bada09e642a8bfc4f66804f7948bad40bc")
-        (revision "3"))
+  (let ((commit "01b0a909b5ca858a09484821cc866127652f4153")
+        (revision "4"))
     (package
       (inherit emacs-next-pgtk)
       (name "emacs-next-pgtk-latest")
@@ -87,7 +77,7 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "0p1bsjblb6m2agchsazmccrk9jx9n7fr97r472f6rxxhs4q953pb")))))))
+           "1agfssdllfvjpq3vcwn5hi6cb7il042phl41y79b17gjg612qc6b")))))))
 
 (use-modules (gnu packages emacs-xyz)
              (guix build-system emacs))
@@ -110,6 +100,21 @@
     (synopsis "Cyrillic input method for dvorak layout")
     (description "Cyrillic input method for dvorak layout.")
     (license license:gpl3+)))
+
+(define-public emacs-mini-frame
+  (package
+   (inherit emacs-unfill)
+   (name "emacs-mini-frame")
+   (version "1.0.0")
+   (source (origin
+            (method git-fetch)
+            (uri (git-reference
+                  (url "https://github.com/muffinmad/emacs-mini-frame.git")
+                  (commit "41afb3d79cd269726e955ef0896dc077562de0f5")))
+            (file-name (git-file-name name version))
+            (sha256
+             (base32
+              "0yghz9pdjsm9v6lbjckm6c5h9ak7iylx8sqgyjwl6nihkpvv4jyp"))))))
 
 
 ;; xdg-desktop-portal-latest
