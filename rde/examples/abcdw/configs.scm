@@ -120,7 +120,7 @@
       ("irc.oftc.net"    "#pipewire" "#wayland")))
    (feature-emacs-telega)
    (feature-emacs-git)
-   (feature-emacs-org-mode)
+   (feature-emacs-org)
    (feature-emacs-org-roam
     ;; TODO: Rewrite to states
     #:org-roam-directory "~/work/notes/notes")

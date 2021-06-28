@@ -23,7 +23,7 @@
 	    feature-emacs-project
 	    feature-emacs-git
 	    feature-emacs-eshell
-	    feature-emacs-org-mode
+	    feature-emacs-org
 	    feature-emacs-org-roam
 	    feature-emacs-message
 	    feature-emacs-erc
@@ -453,9 +453,9 @@ utilizing reverse-im package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-org-mode)
+(define* (feature-emacs-org)
   "Configure org-mode for GNU Emacs."
-  (define emacs-f-name 'org-mode)
+  (define emacs-f-name 'org)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
