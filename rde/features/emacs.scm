@@ -609,6 +609,32 @@ git-link, git-timemachine."
 	 'minibuffer
 
 	 (setq enable-recursive-minibuffers t)
+         (setq resize-mini-windows nil)
+
+         ;; Move modeline to the top
+         (setq-default header-line-format mode-line-format)
+         (setq-default mode-line-format nil)
+
+         (require 'mini-frame)
+         (add-hook 'after-init-hook 'mini-frame-mode)
+
+         (with-eval-after-load
+          'mini-frame
+          (custom-set-faces
+           '(child-frame-border
+             ;; TODO: inherit ,(face-attribute 'default :foreground)
+             ((t (:background "#000000")))))
+          (put 'child-frame-border 'saved-face nil)
+
+          (custom-set-variables
+           '(mini-frame-show-parameters
+             '((top . 0.2)
+               (width . 0.8)
+               (left . 0.5)
+               (child-frame-border-width . 1)))
+           '(mini-frame-detach-on-hide nil)
+           '(mini-frame-color-shift-step 0)
+           '(mini-frame-ignore-commands '())))
 
 	 (require 'orderless)
 	 (require 'savehist)
@@ -670,7 +696,7 @@ git-link, git-timemachine."
         '((with-commit . "emacs-consult=ee58941308d83a717728f056ea753e80f68cfbc0")
           (with-commit . "emacs-embark=2c3ac885252379044afb20353214115eb06a51ae")))
        (list emacs-orderless emacs-marginalia
-	     emacs-vertico ;; emacs-corfu
+	     emacs-vertico emacs-mini-frame
              emacs-consult emacs-embark)))))
 
   (feature
