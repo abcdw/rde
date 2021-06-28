@@ -147,8 +147,6 @@
               "Prevent color escape sequences to popup in compilation buffer."
               (ansi-color-apply-on-region compilation-filter-start (point)))
             (add-hook 'compilation-filter-hook 'rde-compilation-colorizer)
-            (add-hook 'eshell-preoutput-filter-functions
-                      'ansi-color-filter-apply)
 
             ;; <https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/>
             ;; Actually there is M-m for back-to-indentation
@@ -439,6 +437,10 @@ utilizing reverse-im package."
             (with-eval-after-load
              'consult
              (define-key eshell-hist-mode-map (kbd "M-r") 'consult-history))))
+
+         ;;; <https://www.emacswiki.org/emacs/AnsiColor#h5o-2>
+         (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
+
          (add-hook
           'eshell-mode-hook
           (lambda ()
