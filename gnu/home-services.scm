@@ -121,7 +121,8 @@ exported."
 		"\
 HOME_ENVIRONMENT=$HOME/.guix-home
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\"
-. \"$HOME_ENVIRONMENT/profile/etc/profile\"
+PROFILE_FILE=\"$HOME_ENVIRONMENT/profile/etc/profile\"
+[ -f $PROFILE_FILE ] && . $PROFILE_FILE
 
 case $XDG_DATA_DIRS in
   *$HOME_ENVIRONMENT/profile/share*) ;;
