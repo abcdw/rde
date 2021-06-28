@@ -93,7 +93,7 @@
    (feature-sway
     #:extra-config
     `((include ~/work/rde/tmp/swaycfg)
-      (include ,(local-file "../../features/sway/config"))))
+      (include ,(local-file "./config/sway/config"))))
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
    (feature-sway-screenshot)
