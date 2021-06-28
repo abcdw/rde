@@ -77,7 +77,7 @@
 
    (feature-tmux
     #:config-file
-    (local-file "../../../stale/dotfiles/.tmux.conf" "tmux.conf"))
+    (local-file "./config/tmux/tmux.conf"))
    (feature-zsh)
    (feature-ssh)
    (feature-git)
