@@ -1,6 +1,6 @@
 (define-module (guix scripts home)
   #:use-module (gnu packages admin)
-  #:use-module (gnu services)
+  #:use-module ((gnu services) #:hide (delete))
   #:use-module (gnu packages)
   #:use-module (gnu home)
   #:use-module (gnu home-services)
