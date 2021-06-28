@@ -17,7 +17,9 @@
 	    home-sway-configuration
 
             home-xmonad-service-type
-            home-xmonad-configuration))
+            home-xmonad-configuration
+
+            sway-config?))
 
 ;;; Commentary:
 ;;;

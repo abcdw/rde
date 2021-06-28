@@ -36,14 +36,14 @@
 
 (define* (feature-sway
 	  #:key
-	  config-file
+	  (extra-config '())
 	  (package sway)
           ;; Logo key. Use Mod1 for Alt.
           (sway-mod 'Mod4)
 	  (add-keyboard-layout-to-config? #t)
           (xwayland? #f))
   "Setup and configure sway."
-  (ensure-pred maybe-file-like? config-file)
+  (ensure-pred sway-config? extra-config)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
   (ensure-pred package? package)
 
@@ -53,9 +53,6 @@
     (let* ((kb-layout      (get-value 'keyboard-layout config))
 	   (layout-config  (if (and add-keyboard-layout-to-config? kb-layout)
 			       (keyboard-layout-to-sway-config kb-layout)
-			       '()))
-	   (include-config (if config-file
-			       `((include ,config-file))
 			       '()))
 
            (default-terminal
@@ -82,8 +79,7 @@
        (simple-service
 	'sway-configuration
 	home-sway-service-type
-        `(,@include-config
-          (include ~/work/rde/tmp/swaycfg)
+        `(,@extra-config
 	  (,#~"")))
 
        (simple-service

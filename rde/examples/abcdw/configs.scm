@@ -91,7 +91,9 @@
     (local-file "../../../stale/dotfiles/.config/alacritty/alacritty.yml"))
 
    (feature-sway
-    #:config-file (local-file "../../features/sway/config"))
+    #:extra-config
+    `((include ~/work/rde/tmp/swaycfg)
+      (include ,(local-file "../../features/sway/config"))))
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
    (feature-sway-screenshot)
