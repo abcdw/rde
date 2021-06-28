@@ -408,7 +408,7 @@ runs GEXP.  NAME is the name of the executable that will be put in the store."
       (inherit pkg)
       (name wrapper-name)
       (source wrapper)
-      ;; (propagated-inputs `((,(package-name pkg) ,pkg)))
+      (propagated-inputs `((,(package-name pkg) ,pkg)))
       (build-system trivial-build-system)
       (arguments
        `(#:modules

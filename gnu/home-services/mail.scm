@@ -65,25 +65,25 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
    "AList of pairs, each pair is a String and String or Gexp."))
 
 (define (add-isync-package config)
-  (if (home-isync-configuration-xdg-flavor? config)
-      (list
-       (home-isync-configuration-package config)
+  (define wrapper-gexp
+    #~(system
+       (string-join
+        (cons
+         #$(file-append (home-isync-configuration-package config)
+                        "/bin/mbsync")
+         (if (or (member "-c" (command-line))
+                 (member "--config" (command-line)))
+             (cdr (command-line))
+             (append
+              (list "--config"
+                    "${XDG_CONFIG_HOME:-$HOME/.config}/isync/mbsyncrc")
+              (cdr (command-line))))))))
+  (list
+   (if (home-isync-configuration-xdg-flavor? config)
        (wrap-package
         (home-isync-configuration-package config)
-        "mbsync"
-        #~(system
-           (string-join
-            (cons
-             #$(file-append (home-isync-configuration-package config)
-                            "/bin/mbsync")
-             (if (or (member "-c" (command-line))
-                     (member "--config" (command-line)))
-                 (cdr (command-line))
-                 (append
-                  (list "--config"
-                        "${XDG_CONFIG_HOME:-$HOME/.config}/isync/mbsyncrc")
-                  (cdr (command-line)))))))))
-      (list (home-isync-configuration-package config))))
+        "mbsync" wrapper-gexp)
+       (home-isync-configuration-package config))))
 
 (define (add-isync-configuration config)
   `((,(if (home-isync-configuration-xdg-flavor? config)
