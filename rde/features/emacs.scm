@@ -639,10 +639,10 @@ git-link, git-timemachine."
 	 (require 'orderless)
 	 (require 'savehist)
 	 (require 'vertico)
-	 ;; (require 'corfu)
 	 (require 'marginalia)
 	 (require 'embark)
-	 (require 'consult))
+	 (require 'consult)
+         (require 'embark-consult))
 
 	(with-eval-after-load
 	 'orderless
@@ -652,49 +652,53 @@ git-link, git-timemachine."
 
 	(with-eval-after-load
 	 'savehist
-	 (setq savehist-file
-	       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		       "/emacs/history"))
+	 (custom-set-variables
+          '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		                   "/emacs/history")))
 	 (savehist-mode 1))
 
 	(with-eval-after-load
 	 'embark
+         ;;; TODO: Enable it when user-rde-unexperienced?
+         ;; (setq embark-prompter 'embark-completing-read-prompter)
 	 (define-key global-map (kbd "s-.") 'embark-act))
 
         (autoload 'consult-customize "consult" "" nil 'macro)
         (setq completion-in-region-function 'consult-completion-in-region)
-	(with-eval-after-load
+
+        (with-eval-after-load
 	 'consult
-         (consult-customize consult-line :inherit-input-method t)
-         (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
-         (define-key global-map (kbd "C-S-s") 'consult-line)
-	 ;; TODO: Move to feature-emacs-buffers
+         ;; TODO: Move to feature-emacs-buffers
 	 (define-key global-map (kbd "s-w") 'kill-current-buffer)
 	 (define-key global-map (kbd "s-o") 'other-window)
 
          ;; Jumps to previous buffer
          (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
          ;; consult-buffer has strange ordering (maybe cause of emacsclient)
-         (define-key global-map (kbd "s-b") 'switch-to-buffer)
+         (define-key global-map (kbd "s-b") 'consult-buffer)
 	 (define-key global-map (kbd "s-B") 'switch-to-buffer)
+
+
+         (consult-customize consult-line :inherit-input-method t)
+         (define-key global-map (kbd "C-S-s") 'consult-line)
+
+         (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
+
 
 	 (define-key global-map (kbd "M-y") 'consult-yank-pop))
 
-	(with-eval-after-load 'vertico (vertico-mode 1))
-	;; (with-eval-after-load 'corfu (corfu-global-mode 1))
+        (add-hook 'after-init-hook 'vertico-mode)
 	(with-eval-after-load
-	 'marginalia
-	 ;; FIXME: Temporary disable annotations for describe-variables.
-	 ;; See: <https://github.com/masm11/emacs/issues/104>
-	 (setf (alist-get 'variable marginalia-annotator-registry)
-	       '(none builtin marginalia-annotate-variable))
-	 (marginalia-mode 1)))
+         'vertico
+         (custom-set-variables '(vertico-cycle t)))
+
+        (add-hook 'after-init-hook 'marginalia-mode))
       #:elisp-packages
       (map
        ;; For inherit-input-method for consult-line
        (options->transformation
-        '((with-commit . "emacs-consult=ee58941308d83a717728f056ea753e80f68cfbc0")
-          (with-commit . "emacs-embark=2c3ac885252379044afb20353214115eb06a51ae")))
+        '((with-commit . "emacs-consult=5cef041e001548874dd1aa98e2764e0518d9a92d")
+          (with-commit . "emacs-embark=acbe1cba548832d295449da348719f69b9685c6f")))
        (list emacs-orderless emacs-marginalia
 	     emacs-vertico emacs-mini-frame
              emacs-consult emacs-embark)))))
