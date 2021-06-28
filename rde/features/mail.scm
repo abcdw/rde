@@ -387,6 +387,23 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
                (notmuch-search-add-tag rde-notmuch-todo-tags)
                (notmuch-tree-next-message)))
 
+
+           (defun rde-notmuch-show-view-html-part ()
+             "Open the text/html part of the current message using
+`notmuch-show-view-part'."
+             (interactive)
+             (save-excursion
+              (goto-char
+               (prop-match-beginning
+                (text-property-search-forward
+                 :notmuch-part
+                 "text/html"
+                 (lambda (value notmuch-part)
+                   (equal (plist-get notmuch-part :content-type) value)))))
+              (notmuch-show-view-part)))
+           (define-key notmuch-show-part-map "h" 'rde-notmuch-show-view-html-part)
+
+
            ;; (advice-remove 'notmuch-tree-insert-tree #'rde-notmuch-tree-insert-tree)
            ;; Remove leading arrows for mails without threads
            (defun rde-notmuch-tree-insert-tree (tree depth tree-status first last)
