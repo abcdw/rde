@@ -49,7 +49,11 @@
      (symbol-append 'emacs- name '-configurations)
      home-emacs-service-type
      (home-emacs-extension
-      (elisp-packages (list configure-package))))))
+      ;; It's necessary to explicitly add elisp-packages here, because
+      ;; we want to overwrite builtin emacs packages.  Propagated
+      ;; inputs have lowest priority on collisions, that's why we have
+      ;; to list those package here in addition to propagated-inputs.
+      (elisp-packages (append elisp-packages (list configure-package)))))))
 
 (define* (emacs-xdg-service
           name xdg-name gexp
