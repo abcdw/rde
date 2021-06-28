@@ -20,7 +20,9 @@
             mail-account-type
             mail-account-user
             mail-account-synchronizer
-            mail-account-get-pass-cmd))
+            mail-account-get-pass-cmd
+
+            %rde-notmuch-saved-searches))
 
 
 (define-configuration/no-serialization mail-account
@@ -300,8 +302,19 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
       (new ((tags . new)
             (ignore . (.mbsyncstate .uidvalidity))))))))
 
+(define %rde-notmuch-saved-searches
+  '((:name "TODO" :query "tag:todo" :key "t")
+    (:name "Inbox" :query "tag:inbox" :key "i")
+    (:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "w")
+    (:name "Drafts" :query "tag:draft" :key "d")
+    (:name "Flagged" :query "tag:flagged" :key "f")
+    (:name "Sent" :query "tag:sent" :key "s")
+    (:name "All mail" :query "*" :key "a")))
+
 (define* (feature-notmuch
-          #:key (get-notmuch-configuration default-get-notmuch-configuration))
+          #:key
+          (get-notmuch-configuration default-get-notmuch-configuration)
+          (notmuch-saved-searches %rde-notmuch-saved-searches))
   "Configure notmuch and Emacs UI for it if emacs enabled."
   (ensure-pred procedure? get-notmuch-configuration)
 
@@ -325,6 +338,9 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
         ;; https://protesilaos.com/dotemacs/#h:a196812e-1644-4536-84ba-687366867def
         ;; TODO: Try pipe message to git am
         `((define-key global-map (kbd "C-c a n") 'notmuch)
+          (define-key global-map (kbd "s-m") 'notmuch-jump-search)
+          (setq notmuch-saved-searches ',notmuch-saved-searches)
+          (setq notmuch-search-oldest-first nil)
           (with-eval-after-load
            'notmuch
            (setq notmuch-fcc-dirs ',fcc-dirs)
