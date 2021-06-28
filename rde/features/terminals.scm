@@ -12,7 +12,8 @@
 (define* (feature-alacritty
 	  #:key
 	  config-file
-	  (package alacritty))
+	  (package alacritty)
+          (default-terminal? #t))
   "Configure Alacritty terminal."
   (ensure-pred maybe-file-like? config-file)
   (ensure-pred package? package)
@@ -32,5 +33,8 @@
 
   (feature
    (name 'alacritty)
-   (values `((terminal . #t) (alacritty . #t)))
+   (values `((alacritty . ,package)
+             ,@(when default-terminal?
+                 `((default-terminal . ,(file-append package "/bin/alacritty")))
+                 '())))
    (home-services-getter alacritty-home-services)))
