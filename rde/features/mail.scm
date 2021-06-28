@@ -351,12 +351,44 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
                      ("subject" . "%s"))
                     . " %-80s ")
                    ("tags" . "(%s)")))
+           (setq rde-notmuch-todo-tags '("+todo" "-inbox"))
+           (setq rde-notmuch-spam-tags '("+spam" "-inbox"))
+           (setq rde-notmuch-trash-tags '("+trash" "-inbox" "-draft"))
+           (setq rde-notmuch-delete-tags '("+deleted" "-inbox" "-draft"))
+           (setq notmuch-archive-tags '("-inbox" "-todo"))
            (setq notmuch-tagging-keys
                  '(("a" notmuch-archive-tags "Archive")
-                   ("u" notmuch-show-mark-read-tags "Mark read")
-                   ("f" ("+flagged") "Flag")
-                   ("s" ("+spam" "-inbox") "Mark as spam")
-                   ("d" ("+trash" "-inbox") "Delete (trash)")))
+                   ("r" notmuch-show-mark-read-tags "Mark read")
+                   ("f" ("+flagged") "Flag (favorite)")
+                   ;; ("w" ("+watch") "Watch")
+                   ("t" rde-notmuch-todo-tags "Mark as todo")
+                   ("s" rde-notmuch-spam-tags "Mark as spam")
+                   ("d" rde-notmuch-trash-tags "Trash")
+                   ("D" rde-notmuch-delete-tags "Delete")))
+           (define-key notmuch-search-mode-map "w"
+             (lambda ()
+               (interactive)
+               (notmuch-tag
+                (concat
+                 "id:" (car (notmuch-query-get-message-ids
+                             (notmuch-search-find-thread-id))))
+                (list "+watch"))
+               (notmuch-tree-next-message)))
+           (define-key notmuch-search-mode-map "d"
+             (lambda ()
+               (interactive)
+               (notmuch-search-add-tag rde-notmuch-trash-tags)
+               (notmuch-tree-next-message)))
+           (define-key notmuch-search-mode-map "D"
+             (lambda ()
+               (interactive)
+               (notmuch-search-add-tag rde-notmuch-delete-tags)
+               (notmuch-tree-next-message)))
+           (define-key notmuch-search-mode-map "T"
+             (lambda ()
+               (interactive)
+               (notmuch-search-add-tag rde-notmuch-todo-tags)
+               (notmuch-tree-next-message)))
 
            ;; (advice-remove 'notmuch-tree-insert-tree #'rde-notmuch-tree-insert-tree)
            ;; Remove leading arrows for mails without threads
