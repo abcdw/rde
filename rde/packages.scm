@@ -116,6 +116,28 @@
              (base32
               "0yghz9pdjsm9v6lbjckm6c5h9ak7iylx8sqgyjwl6nihkpvv4jyp"))))))
 
+(use-modules (gnu packages shellutils)
+             (guix utils))
+(define-public zsh-autosuggestions-latest
+  (package
+   (inherit zsh-autosuggestions)
+   (name "zsh-autosuggestions")
+   (version "0.7.0")
+   (arguments
+    (substitute-keyword-arguments (package-arguments zsh-autosuggestions)
+      ((#:phases phases)
+       `(modify-phases ,phases
+        (delete 'check)))))
+   (source (origin
+            (method git-fetch)
+            (uri (git-reference
+                  (url "https://github.com/zsh-users/zsh-autosuggestions")
+                  (commit (string-append "v" version))))
+            (file-name (git-file-name name version))
+            (sha256
+             (base32
+              "1g3pij5qn2j7v7jjac2a63lxd97mcsgw6xq6k5p7835q9fjiid98"))))))
+
 (use-modules (guix build-system emacs)
              (gnu packages mail)
              (gnu packages texinfo))

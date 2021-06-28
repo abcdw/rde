@@ -34,7 +34,8 @@
      ;; distractive, I find it a little against Attention-friendly
      ;; principle
      (when enable-zsh-autosuggestions?
-       (service home-zsh-autosuggestions-service-type))
+       (service home-zsh-autosuggestions-service-type
+                zsh-autosuggestions-latest))
 
      ;; https://github.com/purcell/envrc
      ;; home-zsh-direnv-service
