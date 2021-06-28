@@ -1,7 +1,10 @@
+# pipefail is not POSIX complaint
 home:
+	set -o pipefail; \
 	RDE_TARGET=ixy-home \
-	GUILE_LOAD_PATH=./ guix \
-	home reconfigure ./rde/examples/abcdw/configs.scm
+	GUILE_LOAD_PATH=./ \
+	guix home reconfigure ./rde/examples/abcdw/configs.scm \
+	3>&2 2>&1 1>&3- | grep -v "^;;;" 3>&2 2>&1 1>&3-
 
 # home-reconfigure-local:
 # 	GUILE_LOAD_PATH=./ ../gnu/guix/pre-inst-env guix \
