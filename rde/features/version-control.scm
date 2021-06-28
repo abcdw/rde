@@ -18,7 +18,6 @@
     "Returns home services related to Git."
     (require-value 'full-name config)
     (require-value 'email config)
-    (require-value 'ssh config)
 
     (let ((gpg-sign-key (or git-gpg-sign-key
 			    (get-value 'gpg-primary-key config))))
