@@ -11,6 +11,7 @@
   #:use-module (gnu packages linux)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages freedesktop)
+  #:use-module (gnu packages terminals)
   #:use-module (gnu services)
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
@@ -23,6 +24,7 @@
             feature-sway-screenshot))
 
 ;; https://github.com/jjquin/dotfiles/tree/master/sway/.config/sway/config.d
+;; https://nixos.wiki/wiki/Sway
 
 (define (keyboard-layout-to-sway-config keyboard-layout)
   (let ((kb-options (string-join
@@ -36,6 +38,8 @@
 	  #:key
 	  config-file
 	  (package sway)
+          ;; Logo key. Use Mod1 for Alt.
+          (sway-mod 'Mod4)
 	  (add-keyboard-layout-to-config? #t)
           (xwayland? #f))
   "Setup and configure sway."
@@ -52,8 +56,36 @@
 			       '()))
 	   (include-config (if config-file
 			       `((include ,config-file))
-			       '())))
+			       '()))
+
+           (default-terminal
+             (get-value 'default-terminal config
+                        (file-append alacritty "/bin/alacritty")))
+           (default-app-launcher
+             (get-value 'default-app-launcher config
+                        (file-append wofi "/bin/wofi --show=drun"))))
       (list
+       (service
+	home-sway-service-type
+	(home-sway-configuration
+	 (package package)
+	 (config
+	  `((xwayland ,(if xwayland? 'enable 'disable))
+            (,#~"")
+            ,@layout-config
+            (,#~"")
+            (set $mod ,sway-mod)
+            (set $term ,default-terminal)
+            (set $menu ,default-app-launcher)
+	    (,#~"")))))
+
+       (simple-service
+	'sway-configuration
+	home-sway-service-type
+        `(,@include-config
+          (include ~/work/rde/tmp/swaycfg)
+	  (,#~"")))
+
        (simple-service
         'sway-reload-config-on-change
         (@@ (gnu home-services) home-run-on-change-service-type)
@@ -61,9 +93,9 @@
           ,#~(system* #$(file-append package "/bin/swaymsg") "reload")))
        ;; TODO: Move wofi to feature-app-launcher or something like that
        (simple-service 'packages-for-sway
-		home-profile-service-type
-		(list wofi qtwayland
-                      xdg-desktop-portal xdg-desktop-portal-wlr))
+	               home-profile-service-type
+	               (list wofi qtwayland
+                             xdg-desktop-portal xdg-desktop-portal-wlr))
        (simple-service 'set-wayland-specific-env-vars
 		       home-environment-variables-service-type
 		       ;; export NO_AT_BRIDGE=1
@@ -77,18 +109,7 @@
                          ("ELM_ENGINE" . "wayland_egl")
                          ("ECORE_EVAS_ENGINE" . "wayland-egl")
                          ("QT_QPA_PLATFORM" . "wayland-egl")
-			 ("_JAVA_AWT_WM_NONREPARENTING" . "1")))
-       (service
-	home-sway-service-type
-	(home-sway-configuration
-	 (package package)
-	 (config
-	  `((xwayland ,(if xwayland? 'enable 'disable))
-            (,#~"")
-            ,@layout-config
-            (,#~"")
-            ,@include-config
-	    (,#~""))))))))
+			 ("_JAVA_AWT_WM_NONREPARENTING" . "1"))))))
 
   (define (sway-system-services _)
     "Returns system services related to sway."
@@ -193,11 +214,11 @@ automatically switch to SWAY-TTY-NUMBER on boot."
    (home-services-getter get-home-services)))
 
 ;; [X] feature-sway-run-on-tty
+;; [X] feature-sway-screenshot
 ;; [ ] feature-sway-lock-idle-sleep
 ;; [ ] feature-sway-input
 ;; [ ] feature-sway-keybindings
 ;; [ ] feature-sway-media-keys
-;; [ ] feature-sway-screenshot (+ color picker)
 ;; [ ] feature-sway-outputs (kanshi, workspaces, displays)
 
 ;; [ ] feature-wayland-appearance (sway, gtk, qt themes)

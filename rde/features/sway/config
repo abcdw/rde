@@ -1,20 +1,6 @@
-# Default config for sway
-#
-# Copy this to ~/.config/sway/config and edit it to your liking.
-#
 # Read `man 5 sway` for a complete reference.
 # bindswitch tablet:on output eDP-1 transform 90 scale 2
 # bindswitch tablet:off output eDP-1 transform 0
-### Variables
-#
-# Logo key. Use Mod1 for Alt.
-set $mod Mod4
-# Home row direction keys, like vim
-
-# set $left h
-# set $down j
-# set $up k
-# set $right l
 
 # Your preferred terminal emulator
 set $term alacritty
@@ -22,20 +8,20 @@ set $term alacritty
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
 # exec gpg-connect-agent updatestartuptty /bye >/dev/null
-set $menu wofi --show=drun
+# set $menu wofi --show=drun
 # dmenu_path | dmenu | xargs swaymsg exec --
 
 default_border pixel
 default_floating_border pixel
 
-gaps inner 10
+gaps inner 14
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/share/backgrounds/sway/)
 # output * bg /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 # output eDP-1 res 1920x1080
-output HDMI-A-1 res 1920x1080 scale 1.5
-output DP-2 scale 2
+# output HDMI-A-1 res 1920x1080 scale 1.5
+output DP-2 scale 2 disable
 #
 # Example configuration:
 #
@@ -88,7 +74,7 @@ output DP-2 scale 2
     bindsym $mod+Shift+c kill
 
     # Start your launcher
-    bindsym $mod+Shift+d exec $menu
+    bindsym --to-code $mod+Shift+d exec $menu
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.
@@ -195,7 +181,7 @@ output DP-2 scale 2
 #
 # Resizing containers:
 #
-bindsym $mod+r mode "resize"
+# bindsym $mod+r mode "resize"
 
 mode "resize" {
     # left will shrink the containers width
