@@ -341,16 +341,11 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
           (define-key global-map (kbd "s-m") 'notmuch-jump-search)
           (setq notmuch-saved-searches ',notmuch-saved-searches)
           (setq notmuch-search-oldest-first nil)
+
           (with-eval-after-load
            'notmuch
            (setq notmuch-fcc-dirs ',fcc-dirs)
-           (setq notmuch-tree-result-format
-                 '(("date" . "%12s  ")
-                   ("authors" . "%-20s")
-                   ((("tree" . "%s")
-                     ("subject" . "%s"))
-                    . " %-80s ")
-                   ("tags" . "(%s)")))
+
            (setq rde-notmuch-todo-tags '("+todo" "-inbox"))
            (setq rde-notmuch-spam-tags '("+spam" "-inbox"))
            (setq rde-notmuch-trash-tags '("+trash" "-inbox" "-draft"))
@@ -365,6 +360,7 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
                    ("s" rde-notmuch-spam-tags "Mark as spam")
                    ("d" rde-notmuch-trash-tags "Trash")
                    ("D" rde-notmuch-delete-tags "Delete")))
+
            (define-key notmuch-search-mode-map "w"
              (lambda ()
                (interactive)
@@ -392,7 +388,7 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
 
            ;; (advice-remove 'notmuch-tree-insert-tree #'rde-notmuch-tree-insert-tree)
            ;; Remove leading arrows for mails without threads
-           (defun rde-notmuch-tree-insert-tree (orig-f tree depth tree-status first last)
+           (defun rde-notmuch-tree-insert-tree (tree depth tree-status first last)
              "Insert the message tree TREE at depth DEPTH in the current thread.
 
 A message tree is another name for a single sub-thread: i.e., a
@@ -426,12 +422,17 @@ message together with all its descendents."
 	           (push " " tree-status)
                    (push "│" tree-status))
                (notmuch-tree-insert-thread replies (+ 1 depth) tree-status)))
-
-
-           (advice-add 'notmuch-tree-insert-tree :around 'rde-notmuch-tree-insert-tree)
+           (advice-add 'notmuch-tree-insert-tree :override
+                       'rde-notmuch-tree-insert-tree)
+           (setq notmuch-tree-result-format
+                 '(("date" . "%12s  ")
+                   ("authors" . "%-20s")
+                   ((("tree" . "%s")
+                     ("subject" . "%s"))
+                    . " %-80s ")
+                   ("tags" . "(%s)")))
 
            (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
-           (setq-default notmuch-search-oldest-first nil)
            (setq notmuch-show-logo nil)))
         #:elisp-packages (list notmuch)))))
 
