@@ -107,7 +107,7 @@
    (feature-emacs-completion)
    (feature-emacs-project)
    (feature-emacs-which-key)
-   (feature-emacs-input-method)
+   (feature-emacs-input-methods)
    (feature-emacs-eshell)
    (feature-emacs-message
     ;; TODO: Take those values from email type

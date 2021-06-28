@@ -19,7 +19,7 @@
   #:export (feature-emacs
 	    feature-emacs-faces
 	    feature-emacs-completion
-	    feature-emacs-input-method
+	    feature-emacs-input-methods
 	    feature-emacs-project
 	    feature-emacs-git
 	    feature-emacs-eshell
@@ -254,10 +254,10 @@ point reaches the beginning or end of the buffer, stop there."
          (string-drop name (string-length "emacs-"))
          name))))
 
-(define* (feature-emacs-input-method
+(define* (feature-emacs-input-methods
 	  #:key
-	  (input-method "cyrillic-dvorak")
-	  (input-method-package emacs-cyrillic-dvorak-im))
+	  (default-input-method "cyrillic-dvorak")
+	  (input-method-packages (list emacs-cyrillic-dvorak-im)))
   "Configure input-method for GNU Emacs.  Allows to use other layouts
 with emacs, whithout losing ability to use keybindings.  Supported
 both Emacsy toggle-input-method (C-\\) and system layout switching by
@@ -272,14 +272,20 @@ utilizing reverse-im package."
       emacs-f-name
       `((with-eval-after-load
 	 'mule
-	 (require ',(strip-emacs-name input-method-package))
-	 (setq default-input-method ,input-method)
+
+         ,@(map (lambda (x) `(require ',(strip-emacs-name x)))
+                input-method-packages)
+
+	 (setq default-input-method ,default-input-method)
+         (define-key global-map (kbd "s-SPC") 'toggle-input-method)
+
 	 (require 'reverse-im))
+
 	(with-eval-after-load
 	 'reverse-im
-	 (setq reverse-im-input-methods ,input-method)
+	 (setq reverse-im-input-methods ,default-input-method)
 	 (reverse-im-mode 1)))
-      #:elisp-packages (list emacs-reverse-im input-method-package))))
+      #:elisp-packages (cons emacs-reverse-im input-method-packages))))
 
   (feature
    (name f-name)
