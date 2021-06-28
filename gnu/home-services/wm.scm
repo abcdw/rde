@@ -160,7 +160,8 @@ input * {
   (home-sway-configuration
    (inherit cfg)
    (config
-    (append (home-sway-configuration-config cfg) extensions))))
+    (append (home-sway-configuration-config cfg)
+            (append-map identity (reverse extensions))))))
 
 (define home-sway-service-type
   (service-type (name 'home-sway)
@@ -171,7 +172,7 @@ input * {
 		       (service-extension
                         home-files-service-type
                         add-sway-configuration)))
-		(compose concatenate)
+		(compose identity)
 		(extend home-sway-extensions)
                 (default-value (home-sway-configuration))
                 (description "\
