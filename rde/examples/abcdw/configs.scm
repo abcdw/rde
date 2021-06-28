@@ -31,6 +31,13 @@
 ;; use this feature with care
 ;; (display (crypt "hi" "$6$abc"))
 
+(define* (mail-acc id user #:optional (type 'gmail))
+  "Make simple mail-account with gmail type by default."
+  (mail-account
+   (id   id)
+   (user user)
+   (type type)))
+
 (define %abcdw-features
   (list
    (feature-user-info
@@ -42,6 +49,9 @@
     #:gpg-smart-card? #t)
    (feature-password-store
     #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
+   (feature-mail-settings
+    #:mail-accounts (list (mail-acc 'work     "andrew@trop.in")
+                          (mail-acc 'personal "andrewtropin@gmail.com")))
    (feature-keyboard
     #:keyboard-layout %dvorak-jcuken-layout)))
 
@@ -56,13 +66,6 @@
 
 (define* (pkgs #:rest lst)
   (map specification->package+output lst))
-
-(define* (mail-acc id user #:optional (type 'gmail))
-  "Make simple mail-account with gmail type by default."
-  (mail-account
-   (id   id)
-   (user user)
-   (type type)))
 
 ;; TODO: feature-icecat
 (define %main-features
@@ -116,9 +119,6 @@
    (feature-emacs-org-roam
     #:org-roam-directory "~/work/notes/notes")
 
-   (feature-mail-settings
-    #:mail-accounts (list (mail-acc 'work     "andrew@trop.in")
-                          (mail-acc 'personal "andrewtropin@gmail.com")))
    (feature-isync #:isync-verbose #t)
    (feature-notmuch)
 
