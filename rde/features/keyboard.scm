@@ -4,9 +4,13 @@
   #:use-module (gnu services)
   #:use-module (gnu home-services keyboard)
   #:export (feature-keyboard
+	    %dvorak-layout
 	    %dvorak-jcuken-layout))
 
 ;; Example of multi-layer layout: https://neo-layout.org/index_en.html
+
+(define %dvorak-layout
+  (keyboard-layout "us" "dvorak" #:options '("ctrl:nocaps")))
 
 (define %dvorak-jcuken-layout
   (keyboard-layout

@@ -53,7 +53,7 @@
     #:mail-accounts (list (mail-acc 'work     "andrew@trop.in")
                           (mail-acc 'personal "andrewtropin@gmail.com")))
    (feature-keyboard
-    #:keyboard-layout %dvorak-jcuken-layout)))
+    #:keyboard-layout %dvorak-layout)))
 
 ;;; TODO: Make sway depend on feature-desktop-services
 ;;; TODO: feature-wallpapers https://wallhaven.cc/
