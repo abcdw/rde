@@ -28,6 +28,7 @@
 	    feature-emacs-message
 	    feature-emacs-erc
 	    feature-emacs-telega
+            feature-emacs-which-key
 
             elisp-configuration-service
             emacs-xdg-service))
@@ -510,7 +511,8 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      '((which-key-mode 1)
+      '((require 'which-key)
+        (which-key-mode 1)
         (define-key global-map (kbd "C-h C-k") 'which-key-show-top-level))
       #:elisp-packages (list emacs-which-key))))
 

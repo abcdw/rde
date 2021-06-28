@@ -104,6 +104,7 @@
    (feature-emacs-faces)
    (feature-emacs-completion)
    (feature-emacs-project)
+   (feature-emacs-which-key)
    (feature-emacs-input-method)
    (feature-emacs-eshell)
    (feature-emacs-message
