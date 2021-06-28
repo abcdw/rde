@@ -213,7 +213,7 @@ point reaches the beginning or end of the buffer, stop there."
  	 (simple-service
 	  'emacs-update-environment-variables-on-sway-start
 	  home-sway-service-type
-	  `((exec
+	  `((exec_always
 	     ,(program-file
 	       "update-emacs-env-variables"
 	       #~(system*
