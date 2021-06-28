@@ -240,6 +240,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
       "notmuch tag +trash -- path:/.*\\/trash/"
       "notmuch tag +spam  -- path:/.*\\/spam/"
       "notmuch tag +list  -- path:/lists\\/.*/"
+      "notmuch tag +todo -inbox -sent  -- tag:inbox and tag:sent"
       ;; If file was moved out of folder on server remove respective tag
       "notmuch tag -inbox -- not path:/.*\\/inbox/ and tag:inbox"
       "notmuch tag -trash -- not path:/.*\\/trash/ and tag:trash"
