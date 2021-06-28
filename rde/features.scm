@@ -207,8 +207,6 @@ to each system-services-getter function."
     key (or (and=> additional-msg (lambda (x) (string-append x "\n"))) ""))))
 
 (define (get-home-environment config)
-  (require-value 'home-directory config
-		 "You may want to use feature-user-info.")
   (home-environment
    (services (rde-config-home-services config))))
 
