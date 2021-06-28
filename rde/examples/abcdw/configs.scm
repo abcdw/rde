@@ -123,7 +123,6 @@
    (feature-notmuch)
 
    (feature-transmission #:auto-start? #f)
-   (feature-emacs-transmission)
 
 
    (feature-base-services)
