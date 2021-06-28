@@ -5,6 +5,7 @@
   #:use-module (gnu packages mail)
   #:use-module (gnu services)
   #:use-module (gnu services configuration)
+  #:use-module (gnu home-services files)
   #:use-module (gnu home-services mail)
 
   #:use-module (srfi srfi-1)
@@ -65,8 +66,16 @@ features."
   (ensure-pred list-of-mail-accounts? mail-accounts)
   (ensure-pred procedure? mail-directory-fn)
 
+  (define (get-home-services config)
+    (list
+     (simple-service
+      'mail-settings-add-mailcap-file
+      home-files-service-type
+      `(("mailcap" ,(plain-file "mailcap" "text/*; xdg-open %s\n"))))))
+
   (feature
    (name 'mail-settings)
+   (home-services-getter get-home-services)
    (values `((mail-settings . #t)
              (mail-accounts . ,mail-accounts)
              (mail-directory-fn . ,mail-directory-fn)))))
