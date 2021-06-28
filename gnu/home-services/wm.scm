@@ -220,7 +220,7 @@ documentation} for how to configure it."))
      (if (null? config)
          '()
          `((,(string-append (if xdg-flavor? "config/" "") "xmonad/xmonad.hs")
-            ,(mixed-text-file "xmonad-config"
+            ,(mixed-text-file "xmonad-xmonad.hs"
                               (serialize-text-config #f config))))))))
 
 (define xmonad-run-on-change-service

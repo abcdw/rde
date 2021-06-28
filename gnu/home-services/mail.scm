@@ -347,7 +347,7 @@ a particular public-inbox repository."))
 (define (l2md-files-service config)
   `(("l2mdconfig"
      ,(apply mixed-text-file
-             "l2md-config"
+             "l2mdconfig"
              (serialize-l2md-configuration config)))))
 
 (define l2md-shepherd-service

@@ -231,7 +231,7 @@ have a configuration for gpg-agent."))
 
 (define (home-gpg-agent-file config)
   (mixed-text-file
-       "gpg-agent.conf"
+       "gnupg-gpg-agent.conf"
        (serialize-configuration
         (home-gnupg-configuration-gpg-agent-config config)
         (filter-configuration-fields home-gpg-agent-configuration-fields
@@ -242,7 +242,7 @@ have a configuration for gpg-agent."))
 
 (define (home-gpg-sshcontrol-file config)
   (mixed-text-file
-         "sshcontrol"
+         "gnupg-sshcontrol"
          (serialize-configuration
           (home-gnupg-configuration-gpg-agent-config config)
           (filter-configuration-fields home-gpg-agent-configuration-fields
@@ -250,7 +250,7 @@ have a configuration for gpg-agent."))
 
 (define (home-gpg-file config)
   (mixed-text-file
-       "gpg.conf"
+       "gnupg-gpg.conf"
        (serialize-configuration
         (home-gnupg-configuration-gpg-config config)
         home-gpg-configuration-fields)

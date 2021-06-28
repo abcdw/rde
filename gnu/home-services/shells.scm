@@ -511,7 +511,7 @@ when typed in the shell, will automatically expand to the full text."
 (define (fish-files-service config)
   `(("config/fish/config.fish"
      ,(mixed-text-file
-       "fish-config"
+       "fish-config.fish"
        #~(string-append "\
 # if we haven't sourced the login config, do it
 status --is-login; and not set -q __fish_login_config_sourced
