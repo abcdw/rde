@@ -198,14 +198,11 @@ yields:"
 
 (define* (filter-configuration-fields configuration-fields fields
 				      #:optional negate?)
-  "Retrieve the fields FIELDS from CONFIGURATION-FIELDS.
-If NEGATE? is @code{#t}, retrieve the FIELDS that are not in CONFIGURATION-FIELDS."
+  "Retrieve the fields listed in FIELDS from CONFIGURATION-FIELDS.
+If NEGATE? is @code{#t}, retrieve all fields except FIELDS."
   (filter (lambda (field)
-            (let ((membership? (member (configuration-field-name field)
-                                       fields)))
-              (if (not negate?)
-                  membership?
-                  (not membership?))))
+            (let ((member? (member (configuration-field-name field) fields)))
+              (if (not negate?) member? (not member?))))
           configuration-fields))
 
 ;; Snake case: <https://en.wikipedia.org/wiki/Snake_case>
