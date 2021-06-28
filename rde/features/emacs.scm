@@ -190,6 +190,12 @@ point reaches the beginning or end of the buffer, stop there."
             (add-hook 'prog-mode-hook
                       (lambda () (setq show-trailing-whitespace t)))
 
+            ;; MAYBE: Move to dired
+            (dolist (mode-hook '(prog-mode-hook dired-mode-hook
+                                 compilation-mode-hook))
+                    (add-hook mode-hook (lambda () (setq truncate-lines t))))
+	    (define-key global-map (kbd "s-r") 'recompile)
+
 	    (load-theme 'modus-operandi t)))
 	 (early-init-el
 	  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
