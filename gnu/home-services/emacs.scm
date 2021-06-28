@@ -137,11 +137,11 @@ packages with proper GNU Emacs version."
   (if (equal?
        (package-build-system p)
        emacs-build-system)
-      (package (inherit p)
-	       (arguments
-		(substitute-keyword-arguments
-		    (package-arguments p)
-		  ((#:emacs e #f) target-emacs))))
+      (package
+        (inherit p)
+	(arguments
+	 (substitute-keyword-arguments (package-arguments p)
+	   ((#:emacs e #f) target-emacs))))
       p))
 
 (define (emacs-argument-updater target-emacs)
