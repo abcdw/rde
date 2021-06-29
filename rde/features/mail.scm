@@ -299,7 +299,7 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
       (database ((path . ,mail-directory)
                  (mail_root . ,mail-directory)))
       (maildir ((synchronize_flags . true)))
-      (search ((exclude_tags . (trash spam))))
+      (search ((exclude_tags . (trash spam deleted))))
       (new ((tags . new)
             (ignore . (.mbsyncstate .uidvalidity))))))))
 
