@@ -17,6 +17,8 @@ Split into utils and configuration related helper?
 :VISIBILITY: children
 :END:
 ** TODO Make system service for Guix Home
+Allows to make home-environment a part of operating-system and thus
+use without ~guix home~ subcommand.
 ** TODO Make it possible to specify the verbosity for ~guix home reconfigure~
 By default, only the path to the home environment should be shown,
 ~/gnu/store/...-home~.
