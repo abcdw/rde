@@ -608,16 +608,19 @@ git-link, git-timemachine."
       `((with-eval-after-load
 	 'minibuffer
 
+         (setq completion-styles '(orderless))
+	 (setq completion-category-overrides
+	       '((file (styles . (partial-completion)))))
+         (setq completion-in-region-function 'consult-completion-in-region)
 	 (setq enable-recursive-minibuffers t)
-         (setq resize-mini-windows nil)
 
          ;; Move modeline to the top
          (setq-default header-line-format mode-line-format)
          (setq-default mode-line-format nil)
 
-         (require 'mini-frame)
-         (add-hook 'after-init-hook 'mini-frame-mode)
+         (setq resize-mini-windows nil)
 
+         (add-hook 'after-init-hook 'mini-frame-mode)
          (with-eval-after-load
           'mini-frame
           (custom-set-faces
@@ -634,65 +637,43 @@ git-link, git-timemachine."
                (child-frame-border-width . 1)))
            '(mini-frame-detach-on-hide nil)
            '(mini-frame-color-shift-step 0)
-           '(mini-frame-ignore-commands '())))
+           '(mini-frame-ignore-commands '()))))
 
-	 (require 'orderless)
-	 (require 'savehist)
-	 (require 'vertico)
-	 (require 'marginalia)
-	 (require 'embark)
-	 (require 'consult)
-         (require 'embark-consult))
+	(custom-set-variables
+         '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		                 "/emacs/history")))
+	(add-hook 'after-init-hook 'savehist-mode)
 
-	(with-eval-after-load
-	 'orderless
-	 (setq completion-styles '(orderless))
-	 (setq completion-category-overrides
-	       '((file (styles . (partial-completion))))))
-
-	(with-eval-after-load
-	 'savehist
-	 (custom-set-variables
-          '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		                   "/emacs/history")))
-	 (savehist-mode 1))
-
+        (define-key global-map (kbd "s-.") 'embark-act)
 	(with-eval-after-load
 	 'embark
          ;;; TODO: Enable it when user-rde-unexperienced?
          ;; (setq embark-prompter 'embark-completing-read-prompter)
-	 (define-key global-map (kbd "s-.") 'embark-act))
+         (require 'embark-consult))
 
         (autoload 'consult-customize "consult" "" nil 'macro)
-        (setq completion-in-region-function 'consult-completion-in-region)
+
+        (progn
+         (define-key global-map (kbd "C-S-s") 'consult-line)
+         (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
+	 (define-key global-map (kbd "M-y") 'consult-yank-pop)
+         (define-key global-map (kbd "s-b") 'consult-buffer)
+         (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
+
+         ;; MAYBE: Move to feature-emacs-buffers/windows
+         (define-key global-map (kbd "s-B") 'switch-to-buffer)
+         (define-key global-map (kbd "s-w") 'kill-current-buffer)
+	 (define-key global-map (kbd "s-o") 'other-window))
 
         (with-eval-after-load
 	 'consult
-         ;; TODO: Move to feature-emacs-buffers
-	 (define-key global-map (kbd "s-w") 'kill-current-buffer)
-	 (define-key global-map (kbd "s-o") 'other-window)
+         (consult-customize consult-line :inherit-input-method t))
 
-         ;; Jumps to previous buffer
-         (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
-         ;; consult-buffer has strange ordering (maybe cause of emacsclient)
-         (define-key global-map (kbd "s-b") 'consult-buffer)
-	 (define-key global-map (kbd "s-B") 'switch-to-buffer)
-
-
-         (consult-customize consult-line :inherit-input-method t)
-         (define-key global-map (kbd "C-S-s") 'consult-line)
-
-         (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
-
-
-	 (define-key global-map (kbd "M-y") 'consult-yank-pop))
-
+        (add-hook 'after-init-hook 'marginalia-mode)
         (add-hook 'after-init-hook 'vertico-mode)
 	(with-eval-after-load
          'vertico
-         (custom-set-variables '(vertico-cycle t)))
-
-        (add-hook 'after-init-hook 'marginalia-mode))
+         (custom-set-variables '(vertico-cycle t))))
       #:elisp-packages
       (map
        ;; For inherit-input-method for consult-line
