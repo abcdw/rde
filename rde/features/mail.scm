@@ -346,6 +346,8 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
           (with-eval-after-load
            'notmuch
            (setq notmuch-fcc-dirs ',fcc-dirs)
+           (setq notmuch-address-use-company nil)
+           (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
 
            (setq rde-notmuch-todo-tags '("+todo" "-inbox"))
            (setq rde-notmuch-spam-tags '("+spam" "-inbox"))
@@ -450,7 +452,6 @@ message together with all its descendents."
                     . " %-80s ")
                    ("tags" . "(%s)")))
 
-           (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
            (setq notmuch-show-logo nil))
 
           (with-eval-after-load 'magit (require 'git-email-magit)))
