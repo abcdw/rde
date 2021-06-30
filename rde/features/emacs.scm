@@ -639,6 +639,9 @@ git-link, git-timemachine."
                (child-frame-border-width . 1)))
            '(mini-frame-detach-on-hide nil)
            '(mini-frame-color-shift-step 0)
+           '(mini-frame-advice-functions '(read-from-minibuffer
+                                           read-string save-some-buffers
+                                           yes-or-no-p))
            '(mini-frame-ignore-commands '()))))
 
 	(custom-set-variables
