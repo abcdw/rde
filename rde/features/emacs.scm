@@ -488,21 +488,22 @@ utilizing reverse-im package."
       emacs-f-name
       `((with-eval-after-load
          'org
-         (progn
-	  (setq org-adapt-indentation nil)
-	  (setq org-edit-src-content-indentation 0)
-	  (setq org-startup-indented t)
+	 (setq org-adapt-indentation nil)
+	 (setq org-edit-src-content-indentation 0)
+	 (setq org-startup-indented t)
 
-          (setq org-outline-path-complete-in-steps nil)
-          (setq org-refile-use-outline-path t)
-          (setq org-refile-targets `((nil . (:maxlevel . 3))))
+         (setq org-outline-path-complete-in-steps nil)
+         (setq org-refile-use-outline-path t)
+         (setq org-refile-targets `((nil . (:maxlevel . 3))))
 
-          (setq org-ellipsis "⤵")
-          (set-face-attribute 'org-ellipsis nil
-		              :inherit '(font-lock-comment-face default)
-		              :weight 'normal)
-          (setq org-hide-emphasis-markers t))))
-      #:elisp-packages (list emacs-org))))
+         (setq org-ellipsis "⤵")
+         (set-face-attribute 'org-ellipsis nil
+		             :inherit '(font-lock-comment-face default)
+		             :weight 'normal)
+         (setq org-hide-emphasis-markers t)
+
+         (with-eval-after-load 'notmuch (require 'ol-notmuch))))
+      #:elisp-packages (list emacs-org emacs-org-contrib))))
 
   (feature
    (name f-name)
