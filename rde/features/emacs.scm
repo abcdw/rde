@@ -664,6 +664,8 @@ git-link, git-timemachine."
 	 (define-key global-map (kbd "M-y") 'consult-yank-pop)
          (define-key global-map (kbd "s-b") 'consult-buffer)
          (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
+         (define-key minibuffer-local-map (kbd "s-B") 'embark-become)
+         (define-key global-map (kbd "M-.") 'embark-dwim)
 
          ;; MAYBE: Move to feature-emacs-buffers/windows
          (define-key global-map (kbd "s-B") 'switch-to-buffer)
