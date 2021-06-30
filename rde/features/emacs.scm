@@ -453,9 +453,8 @@ utilizing reverse-im package."
          (add-hook
           'eshell-hist-mode-hook
           (lambda ()
-            (with-eval-after-load
-             'consult
-             (define-key eshell-hist-mode-map (kbd "M-r") 'consult-history))))
+            (when (fboundp 'consult-history)
+              (define-key eshell-hist-mode-map (kbd "M-r") 'consult-history))))
 
          ;;; <https://www.emacswiki.org/emacs/AnsiColor#h5o-2>
          (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
