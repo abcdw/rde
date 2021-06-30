@@ -102,6 +102,8 @@ https://user-images.githubusercontent.com/1218615/123433280-f2028800-d5d3-11eb-8
 | Terminal               | Alacritty |
 | Login Shell            | Bash      |
 | Interactive Unix Shell | Zsh       |
+| Service Manager/Init   | Shepherd  |
+| Filesystem             | Btrfs     |
 | Everything Else (:     | Emacs     |
 
 ** Community
