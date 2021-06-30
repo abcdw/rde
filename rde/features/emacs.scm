@@ -314,6 +314,8 @@ utilizing reverse-im package."
 	 (setq send-mail-function 'smtpmail-send-it)
 	 (setq smtpmail-smtp-server ,smtp-server)
 	 (setq smtpmail-smtp-service ,smtp-port)
+         (setq message-kill-buffer-on-exit t)
+         (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
 
 	 (setq message-auto-save-directory
 	       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
