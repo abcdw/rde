@@ -539,6 +539,11 @@ git-link, git-timemachine."
          'git-gutter
          (require 'git-gutter-fringe)
 
+         ;; (add-to-list 'git-gutter:update-commands 'other-window)
+
+         (add-hook 'magit-post-stage-hook 'git-gutter:update-all-windows)
+         (add-hook 'magit-post-unstage-hook 'git-gutter:update-all-windows)
+
          (defun yes-or-no-p->-y-or-n-p (orig-fun &rest r)
            (cl-letf (((symbol-function 'yes-or-no-p) 'y-or-n-p))
                     (apply orig-fun r)))
@@ -548,7 +553,7 @@ git-link, git-timemachine."
 
          (dolist (fringe '(git-gutter-fr:added
                            git-gutter-fr:modified))
-                 (define-firnge-bitmap fringe (vector 8) nil nil '(top repeat)))
+                 (define-fringe-bitmap fringe (vector 8) nil nil '(top repeat)))
          (define-fringe-bitmap 'git-gutter-fr:deleted (vector 128 192 224 240)
            nil nil 'bottom)
 
