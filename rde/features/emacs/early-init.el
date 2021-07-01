@@ -24,5 +24,5 @@
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 
-;; (setq use-dialog-box nil)
-;; (setq use-file-dialog nil)
+(setq use-dialog-box nil)
+(setq use-file-dialog nil)
