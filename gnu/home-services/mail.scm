@@ -287,6 +287,10 @@ the messages.")
    (integer 180)
    "The number of seconds between each round of fetching Git
 repositories.")
+  (oneshot
+   (integer 0)
+   "@code{0} to watch for new emails every PERIOD seconds, @code{1} to
+sync once and exit.")
   (maildir
    (maybe-string 'disabled)
    "The maildir to which messages should be delivered.  This can also be
@@ -329,7 +333,7 @@ a particular public-inbox repository."))
                  (sync-enabled . ,sync-enabled?)))))))
 
   (match config
-    (($ <home-l2md-configuration> _ package autostart? period maildir pipe base repos)
+    (($ <home-l2md-configuration> _ package autostart? period oneshot maildir pipe base repos)
      (begin
        (generic-serialize-git-ini-config
         #:combine-ini (compose flatten list)
@@ -341,6 +345,7 @@ a particular public-inbox repository."))
            ((period . ,period)
             ,@(optional (not (eq? maildir 'disabled)) `((maildir . ,maildir)))
             ,@(optional (not (eq? pipe 'disabled)) `((pipe . ,pipe)))
+            (oneshot . ,oneshot)
             (base . ,base)))
           ,@(map l2md-repo->alist repos)))))))
 
