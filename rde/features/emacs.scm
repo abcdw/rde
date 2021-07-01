@@ -521,7 +521,37 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      #:elisp-packages (list emacs-magit emacs-git-link emacs-git-timemachine))))
+      `((custom-set-variables '(git-link-use-commit t)
+                              '(git-gutter:lighter " GG"))
+
+        (setq-default fringes-outside-margins t)
+        (define-key global-map (kbd "C-c t g") 'git-gutter-mode)
+        (with-eval-after-load
+         'git-gutter
+         (require 'git-gutter-fringe)
+
+         (defun yes-or-no-p->-y-or-n-p (orig-fun &rest r)
+           (cl-letf (((symbol-function 'yes-or-no-p) 'y-or-n-p))
+                    (apply orig-fun r)))
+
+         (dolist (fn '(git-gutter:stage-hunk git-gutter:revert-hunk))
+                 (advice-add fn :around 'yes-or-no-p->-y-or-n-p))
+
+         (dolist (fringe '(git-gutter-fr:added
+                           git-gutter-fr:modified))
+                 (define-firnge-bitmap fringe (vector 8) nil nil '(top repeat)))
+         (define-fringe-bitmap 'git-gutter-fr:deleted (vector 128 192 224 240)
+           nil nil 'bottom)
+
+         ;; TODO: Move to feature-modus-themes
+         (set-face-foreground 'git-gutter-fr:modified "blue")
+         (set-face-background 'git-gutter-fr:modified "white")
+         (set-face-foreground 'git-gutter-fr:added    "green")
+         (set-face-background 'git-gutter-fr:added    "white")
+         (set-face-foreground 'git-gutter-fr:deleted  "red")
+         (set-face-background 'git-gutter-fr:deleted  "white")))
+      #:elisp-packages (list emacs-magit emacs-git-link emacs-git-timemachine
+                             emacs-git-gutter emacs-git-gutter-fringe))))
 
   (feature
    (name f-name)
