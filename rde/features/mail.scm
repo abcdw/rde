@@ -305,7 +305,8 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
 
 (define %rde-notmuch-saved-searches
   '((:name "TODO" :query "tag:todo" :key "t")
-    (:name "Inbox" :query "tag:inbox" :key "i")
+    (:name "Inbox" :query "tag:inbox" :key "i"
+     :query "tag:inbox and tag:unread" :sort-order oldest-first)
     (:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "w")
     (:name "Drafts" :query "tag:draft" :key "d")
     (:name "Flagged" :query "tag:flagged" :key "f")

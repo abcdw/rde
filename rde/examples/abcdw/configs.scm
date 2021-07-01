@@ -125,7 +125,9 @@
    (feature-isync #:isync-verbose #t)
    (feature-notmuch
     #:notmuch-saved-searches
-    (cons* '(:name "Work Inbox" :query "tag:work and tag:inbox" :key "W")
+    (cons* '(:name "Work Inbox" :query "tag:work and tag:inbox"
+             :count "tag:work and tag:inbox and tag:unread"
+             :sort-order oldest-first :key "W")
            %rde-notmuch-saved-searches))
 
    (feature-transmission #:auto-start? #f)
