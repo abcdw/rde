@@ -1,7 +1,24 @@
+;;; GNU Guix --- Functional package management for GNU
+;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;;
+;;; This file is part of GNU Guix.
+;;;
+;;; GNU Guix is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3 of the License, or (at
+;;; your option) any later version.
+;;;
+;;; GNU Guix is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (gnu home-services)
   #:use-module (gnu services)
-  #:use-module (gnu home-services-utils)
-  #:use-module (gnu packages base)
   #:use-module (guix channels)
   #:use-module (guix describe)
   #:use-module (guix monads)
@@ -16,8 +33,6 @@
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (ice-9 pretty-print)
-  ;; #:use-module (guix modules)
-  #:use-module ((guix import utils) #:select (flatten))
 
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
@@ -36,6 +51,18 @@
   #:re-export (service
 	       service-type
 	       service-extension))
+
+;;; Comment:
+;;;
+;;; This module is similar to (gnu system services) module, but
+;;; provides Home Services, which are supposed to be used for building
+;;; home-environment.
+;;;
+;;; Home Services use the same extension as System Services.  Consult
+;;; (gnu system services) module or manual for more information.
+;;;
+;;; Code:
+
 
 (define (home-derivation entries mextensions)
   "Return as a monadic value the derivation of the 'home'
