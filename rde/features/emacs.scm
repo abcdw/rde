@@ -120,6 +120,7 @@
 	 (elisp-packages (cons* emacs-modus-themes
                                 emacs-guix
                                 emacs-expand-region
+                                emacs-pdf-tools
                                 additional-elisp-packages))
 	 (server-mode? emacs-server-mode?)
 	 (xdg-flavor? #t)
@@ -134,6 +135,14 @@
             ,#~""
             (define-key global-map (kbd "C-=") 'er/expand-region)
 
+            (custom-set-variables '(pdf-view-use-scaling t))
+
+            (autoload 'pdf-view-mode "pdf-view" "")
+            (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
+            (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
+            (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
+
+            ,#~""
             (defun rde/display-load-time ()
               (interactive)
               (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
