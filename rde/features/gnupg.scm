@@ -15,7 +15,9 @@
 	  (gpg-ssh-agent? #t)
 	  (pinentry-flavor 'qt)
 	  (gpg-smart-card? #f)
-          (default-ttl 86400))
+          (default-ttl 86400)
+          (gpg-extra-config '())
+          (gpg-agent-extra-config '()))
   "Sets up gnupg, if SSH-AGENT? specified also sets up gpg's ssh-agent
 and provides GPG-PRIMARY-KEY value for other features."
 
@@ -24,6 +26,8 @@ and provides GPG-PRIMARY-KEY value for other features."
   (ensure-pred boolean? gpg-smart-card?)
   (ensure-pred pinentry-flavor? pinentry-flavor)
   (ensure-pred integer? default-ttl)
+  (ensure-pred list? gpg-extra-config)
+  (ensure-pred list? gpg-agent-extra-config)
 
   (define (home-gnupg-services config)
     "Return a list of home-services, required for gnupg to operate."
@@ -44,7 +48,7 @@ and provides GPG-PRIMARY-KEY value for other features."
        (gpg-config
 	(home-gpg-configuration
 	 (extra-config
-	  '((keyid-format . long)
+	  `((keyid-format . long)
             (personal-cipher-preferences . (AES256 AES192 AES))
             (personal-digest-preferences . (SHA512 SHA384 SHA256))
             (personal-compress-preferences . (ZLIB BZIP2 ZIP Uncompressed))
@@ -57,7 +61,9 @@ and provides GPG-PRIMARY-KEY value for other features."
             (charset . utf-8)
 
 	    (with-subkey-fingerprint . #t)
-	    (keyserver . "hkps://keys.openpgp.org")))))
+	    (keyserver . "hkps://keys.openpgp.org")
+
+            ,@gpg-extra-config))))
        (gpg-agent-config
 	(home-gpg-agent-configuration
 	 (extra-config
@@ -67,7 +73,8 @@ and provides GPG-PRIMARY-KEY value for other features."
                     (default-cache-ttl-ssh . ,default-ttl)
                     (max-cache-ttl . ,default-ttl)
                     (max-cache-ttl-ssh . ,default-ttl))
-                  '())))
+                  '())
+            ,@gpg-agent-extra-config))
 	 (ssh-agent? gpg-ssh-agent?)
 	 (pinentry-flavor pinentry-flavor)))))))
 
