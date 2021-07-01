@@ -75,20 +75,17 @@
    (feature-base-services)
    (feature-desktop-services)
 
-   (feature-tmux
-    #:config-file
-    (local-file "./config/tmux/tmux.conf"))
-   (feature-zsh)
-   (feature-ssh)
-   (feature-git)
-
    (feature-fonts)
    (feature-pipewire)
    (feature-backlight)
 
    (feature-alacritty
-    #:config-file
-    (local-file "../../../stale/dotfiles/.config/alacritty/alacritty.yml"))
+    #:config-file (local-file "./config/alacritty/alacritty.yml"))
+   (feature-tmux
+    #:config-file (local-file "./config/tmux/tmux.conf"))
+   (feature-zsh)
+   (feature-ssh)
+   (feature-git)
 
    (feature-sway
     #:extra-config
