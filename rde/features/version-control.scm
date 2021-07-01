@@ -9,10 +9,12 @@
 (define* (feature-git
 	  #:key
 	  (sign-commits? #t)
-	  (git-gpg-sign-key #f))
+	  (git-gpg-sign-key #f)
+          (extra-config '()))
   "Setup and configure Git."
   (ensure-pred maybe-string? git-gpg-sign-key)
   (ensure-pred boolean? sign-commits?)
+  (ensure-pred list? extra-config)
 
   (define (git-home-services config)
     "Returns home services related to Git."
@@ -43,7 +45,9 @@
 		    '((gpgsign . #t))
 		    '())))
 	    (sendemail
-	     ((annotate . #t))))))))))
+	     ((annotate . #t)))
+
+            ,@extra-config)))))))
 
   (feature
    (name 'git)
