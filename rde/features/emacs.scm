@@ -534,7 +534,7 @@ git-link, git-timemachine."
                               '(git-gutter:lighter " GG"))
 
         (setq-default fringes-outside-margins t)
-        (define-key global-map (kbd "C-c t g") 'git-gutter-mode)
+        (define-key global-map (kbd "C-c t g") 'global-git-gutter-mode)
         (with-eval-after-load
          'git-gutter
          (require 'git-gutter-fringe)
