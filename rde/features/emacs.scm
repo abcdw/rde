@@ -415,6 +415,7 @@ utilizing reverse-im package."
 
          (define-key telega-chat-mode-map (kbd "s-B") 'telega-chat-with)
 	 (define-key telega-root-mode-map (kbd "s-B") 'telega-chat-with)
+         (define-key global-map (kbd "C-c a t") 'telega)
 
          (setq telega-emoji-company-backend 'telega-company-emoji)
          (defun my-telega-chat-mode ()

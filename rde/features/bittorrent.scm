@@ -26,7 +26,7 @@
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((define-key global-map (kbd "C-c a t") 'transmission))
+      `((define-key global-map (kbd "C-c a T") 'transmission))
       #:elisp-packages (list emacs-transmission))
 
      (emacs-xdg-service
