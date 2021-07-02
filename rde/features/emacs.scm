@@ -678,15 +678,16 @@ git-link, git-timemachine."
 
           (custom-set-variables
            '(mini-frame-show-parameters
-             '((top . 0.2)
-               (width . 0.8)
-               (left . 0.5)
-               (child-frame-border-width . 1)))
+             (lambda ()
+               `((top . 0.2)
+                 (width . 0.8)
+                 (left . 0.5)
+                 (child-frame-border-width . 1))))
            '(mini-frame-detach-on-hide nil)
            '(mini-frame-color-shift-step 0)
            '(mini-frame-advice-functions '(read-from-minibuffer
-                                           read-string save-some-buffers
-                                           yes-or-no-p))
+                                           ;; read-string
+                                           save-some-buffers yes-or-no-p))
            '(mini-frame-ignore-commands '()))))
 
 	(custom-set-variables
