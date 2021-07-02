@@ -20,23 +20,13 @@
 (define-module (gnu home-services)
   #:use-module (gnu services)
   #:use-module (guix channels)
-  #:use-module (guix describe)
   #:use-module (guix monads)
   #:use-module (guix store)
   #:use-module (guix gexp)
   #:use-module (guix profiles)
-  #:use-module (guix diagnostics)
-  #:use-module (guix discovery)
-  #:use-module (guix ui)
-  #:autoload   (guix openpgp) (openpgp-format-fingerprint)
 
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
-  #:use-module (ice-9 pretty-print)
-
-  #:use-module (srfi srfi-1)
-  #:use-module (ice-9 match)
-  #:use-module (ice-9 popen)
 
   #:export (home-service-type
 	    home-profile-service-type
@@ -101,6 +91,9 @@ packages, configuration files, activation script, and so on.")))
                            (content (packages->manifest
                                      (delete-duplicates packages eq?)))))))))
 
+;; TODO: Add a list of transformations for packages, it should be here
+;; to prevent conflicts, when other packages relies on non-transformed
+;; version of package.
 (define home-profile-service-type
   (service-type (name 'home-profile)
                 (extensions
@@ -233,16 +226,16 @@ extended with one gexp.")))
   (gexp->script
    "activate"
    #~(let* ((he-init-file (lambda (he) (string-append he "/setup-environment")))
-              (he-path (string-append (getenv "HOME") "/.guix-home"))
-              (new-home-env (getenv "GUIX_NEW_HOME"))
-              (new-home (or new-home-env
-                            ;; Path of the activation file if called interactively
-                            (dirname (car (command-line)))))
-              (old-home-env (getenv "GUIX_OLD_HOME"))
-              (old-home (or old-home-env
-                            (if (file-exists? (he-init-file he-path))
-                                (readlink he-path)
-                                #f))))
+            (he-path (string-append (getenv "HOME") "/.guix-home"))
+            (new-home-env (getenv "GUIX_NEW_HOME"))
+            (new-home (or new-home-env
+                          ;; Path of the activation file if called interactively
+                          (dirname (car (command-line)))))
+            (old-home-env (getenv "GUIX_OLD_HOME"))
+            (old-home (or old-home-env
+                          (if (file-exists? (he-init-file he-path))
+                              (readlink he-path)
+                              #f))))
          (if (file-exists? (he-init-file new-home))
              (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
 		             (format #f "source ~a && env"
@@ -442,117 +435,21 @@ and the second element is the G-expression to the run.")))
 ;;; Provenance tracking.
 ;;;
 
-;; TODO: Import all provenance functions from services.scm
-
-(define (object->pretty-string obj)
-  "Like 'object->string', but using 'pretty-print'."
-  (call-with-output-string
-    (lambda (port)
-      (pretty-print obj port))))
-
-(define (channel->code channel)
-  "Return code to build CHANNEL, ready to be dropped in a 'channels.scm'
-file."
-  ;; Since the 'introduction' field is backward-incompatible, and since it's
-  ;; optional when using the "official" 'guix channel, include it if and only
-  ;; if we're referring to a different channel.
-  (let ((intro (and (not (equal? (list channel) %default-channels))
-                    (channel-introduction channel))))
-    `(channel (name ',(channel-name channel))
-              (url ,(channel-url channel))
-              (branch ,(channel-branch channel))
-              (commit ,(channel-commit channel))
-              ,@(if intro
-                    `((introduction
-                       (make-channel-introduction
-                        ,(channel-introduction-first-signed-commit intro)
-                        (openpgp-fingerprint
-                         ,(openpgp-format-fingerprint
-                           (channel-introduction-first-commit-signer
-                            intro))))))
-                    '()))))
-
-(define (channel->sexp channel)
-  "Return an sexp describing CHANNEL.  The sexp is _not_ code and is meant to
-be parsed by tools; it's potentially more future-proof than code."
-  ;; TODO: Add CHANNEL's introduction.  Currently we can't do that because
-  ;; older 'guix system describe' expect exactly name/url/branch/commit
-  ;; without any additional fields.
-  `(channel (name ,(channel-name channel))
-            (url ,(channel-url channel))
-            (branch ,(channel-branch channel))
-            (commit ,(channel-commit channel))))
-
-(define (sexp->channel sexp)
-  "Return the channel corresponding to SEXP, an sexp as found in the
-\"provenance\" file produced by 'provenance-service-type'."
-  (match sexp
-    (('channel ('name name)
-               ('url url)
-               ('branch branch)
-               ('commit commit)
-               rest ...)
-     ;; XXX: In the future REST may include a channel introduction.
-     (channel (name name) (url url)
-              (branch branch) (commit commit)))))
-
-(define (provenance-file channels config-file)
-  "Return a 'provenance' file describing CHANNELS, a list of channels, and
-CONFIG-FILE, which can be either #f or a <local-file> containing the OS
-configuration being used."
-  (scheme-file "provenance"
-               #~(provenance
-                  (version 0)
-                  (channels #+@(if channels
-                                   (map channel->sexp channels)
-                                   '()))
-                  (configuration-file #+config-file))))
-
-(define (provenance-entry config-file)
-  "Return system entries describing the operating system provenance: the
-channels in use and CONFIG-FILE, if it is true."
-  (define profile
-    (current-profile))
-
-  (define channels
-    (and=> profile profile-channels))
-
-  (mbegin %store-monad
-    (let ((config-file (cond ((string? config-file)
-                              ;; CONFIG-FILE has been passed typically via
-                              ;; 'guix system reconfigure CONFIG-FILE' so we
-                              ;; can assume it's valid: tell 'local-file' to
-                              ;; not emit a warning.
-                              (local-file (assume-valid-file-name config-file)
-                                          "configuration.scm"))
-                             ((not config-file)
-                              #f)
-                             (else
-                              config-file))))
-      (return `(("provenance" ,(provenance-file channels config-file))
-                ,@(if channels
-                      `(("channels.scm"
-                         ,(plain-file "channels.scm"
-                                      (object->pretty-string
-                                       `(list
-                                         ,@(map channel->code channels))))))
-                      '())
-                ,@(if config-file
-                      `(("configuration.scm" ,config-file))
-                      '()))))))
-
-
 (define home-provenance-service-type
-  (service-type (name 'home-provenance)
-                (extensions
-                 (list (service-extension home-service-type
-                                          provenance-entry)))
-                (default-value #f)                ;the HE config file
-                (description
-                 "Store provenance information about the
+  (service-type
+   (name 'home-provenance)
+   (extensions
+    (list (service-extension
+           home-service-type
+           (service-extension-compute
+            (first (service-type-extensions provenance-service-type))))))
+   (default-value #f)                ;the HE config file
+   (description
+    "Store provenance information about the
 home environment in the home environment itself: the channels used
 when building the home environment, and its configuration file, when
 available.")))
+
 
 (define (sexp->home-provenance sexp)
   "Parse SEXP, an s-expression read from ~/.guix-home/provenance or
