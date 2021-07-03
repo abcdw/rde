@@ -181,4 +181,20 @@
       (description "This package provides utilities for formatting and
 sending Git patches via Email, without leaving Emacs."))))
 
-;; xdg-desktop-portal-latest
+(define-public emacs-git-gutter-transient
+  (package
+   (name "emacs-git-gutter-transient")
+   (version "0.1.0")
+   (source
+    (local-file "./features/emacs/git-gutter-transient" #:recursive? #t))
+   (build-system emacs-build-system)
+   (inputs
+    `(("emacs-magit" ,emacs-magit)))
+   (propagated-inputs
+    `(("emacs-git-gutter" ,emacs-git-gutter)
+      ("emacs-transient" ,emacs-transient)))
+   (license license:gpl3+)
+   (home-page "https://sr.ht/~abcdw/git-gutter-transient")
+   (synopsis "Navigate, stage and revert hunks with ease")
+   (description "This package provides transient interface for git-gutter function
+to manipulate and navigate hunks.")))
