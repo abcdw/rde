@@ -139,10 +139,10 @@ exported."
    %store-monad
    (return
     `(("setup-environment"
+       ;; TODO: It's necessary to source ~/.guix-profile too
+       ;; on foreign distros
        ,(apply mixed-text-file "setup-environment"
-		;; TODO: It's necessary to source ~/.guix-profile too
-		;; on foreign distros
-		"\
+	       "\
 HOME_ENVIRONMENT=$HOME/.guix-home
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\"
 PROFILE_FILE=\"$HOME_ENVIRONMENT/profile/etc/profile\"
@@ -222,8 +222,7 @@ in the home environment directory."
                 (compose identity)
                 (extend compute-on-first-login-script)
 		(default-value #f)
-                (description "Run gexps on first user login and can be
-extended with one gexp.")))
+                (description "Run gexps on first user login.  Can be extended with one gexp.")))
 
 
 (define (compute-activation-script init-gexp gexps)
@@ -240,37 +239,35 @@ extended with one gexp.")))
                           (if (file-exists? (he-init-file he-path))
                               (readlink he-path)
                               #f))))
-         (if (file-exists? (he-init-file new-home))
-             (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
-		             (format #f "source ~a && env"
-                                     (he-init-file new-home))))
-	            (result ((@@ (ice-9 rdelim) read-delimited) "" port))
-	            (vars (map (lambda (x)
-                                 (let ((si (string-index x #\=)))
-                                   (cons (string-take x si)
-                                         (string-drop x (1+ si)))))
-			       ((@@ (srfi srfi-1) remove)
-			        string-null?
-                                (string-split result #\newline)))))
-	       (close-port port)
-	       (map (lambda (x) (setenv (car x) (cdr x))) vars)
+       (if (file-exists? (he-init-file new-home))
+           (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
+		           (format #f "source ~a && env"
+                                   (he-init-file new-home))))
+	          (result ((@@ (ice-9 rdelim) read-delimited) "" port))
+	          (vars (map (lambda (x)
+                               (let ((si (string-index x #\=)))
+                                 (cons (string-take x si)
+                                       (string-drop x (1+ si)))))
+			     ((@@ (srfi srfi-1) remove)
+			      string-null?
+                              (string-split result #\newline)))))
+	     (close-port port)
+	     (map (lambda (x) (setenv (car x) (cdr x))) vars)
 
-               (setenv "GUIX_NEW_HOME" new-home)
-               (setenv "GUIX_OLD_HOME" old-home)
+             (setenv "GUIX_NEW_HOME" new-home)
+             (setenv "GUIX_OLD_HOME" old-home)
 
-               ;; Atomically make HOME current.
+             #$@gexps
 
-               #$@gexps
-
-               ;; Do not unset env variable if it was set outside.
-               (unless new-home-env (setenv "GUIX_NEW_HOME" #f))
-               (unless old-home-env (setenv "GUIX_OLD_HOME" #f)))
-             (format #t "\
+             ;; Do not unset env variable if it was set outside.
+             (unless new-home-env (setenv "GUIX_NEW_HOME" #f))
+             (unless old-home-env (setenv "GUIX_OLD_HOME" #f)))
+           (format #t "\
 Activation script was either called or loaded by file from this direcotry:
 ~a
 It doesn't seem that home environment is somewhere around.
 Make sure that you call ./activate by symlink from -home store item.\n"
-                     new-home)))))
+                   new-home)))))
 
 (define (activation-script-entry m-activation)
   "Return, as a monadic value, an entry for the activation script
