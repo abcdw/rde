@@ -24,6 +24,8 @@
   #:use-module (guix store)
   #:use-module (guix gexp)
   #:use-module (guix profiles)
+  #:use-module (guix ui)
+  #:use-module (guix discovery)
 
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
@@ -32,9 +34,9 @@
 	    home-profile-service-type
 	    home-environment-variables-service-type
 	    home-run-on-first-login-service-type
-	    home-activation-service-type
-	    home-provenance-service-type
             home-run-on-change-service-type
+            home-activation-service-type
+	    home-provenance-service-type
 
             fold-home-service-types)
 
@@ -60,13 +62,12 @@ directory containing the given entries."
   (mlet %store-monad ((extensions (mapm/accumulate-builds identity
                                                           mextensions)))
     (lower-object
-     (file-union "home"
-                 (append entries (concatenate extensions))))))
+     (file-union "home" (append entries (concatenate extensions))))))
 
 (define home-service-type
-  ;; This is the ultimate service type, the root of the service DAG.
-  ;; The service of this type is extended by monadic name/item pairs.
-  ;; These items end up in the "home-environment directory" as
+  ;; This is the ultimate service type, the root of the home service
+  ;; DAG.  The service of this type is extended by monadic name/item
+  ;; pairs.  These items end up in the "home-environment directory" as
   ;; returned by 'home-environment-derivation'.
   (service-type (name 'home)
                 (extensions '())
@@ -89,11 +90,14 @@ packages, configuration files, activation script, and so on.")))
   (mlet %store-monad ((_ (current-target-system)))
     (return `(("profile" ,(profile
                            (content (packages->manifest
-                                     (delete-duplicates packages eq?)))))))))
+                                     (map identity
+                                     ;;(options->transformation transformations)
+                                     (delete-duplicates packages eq?))))))))))
 
-;; TODO: Add a list of transformations for packages, it should be here
-;; to prevent conflicts, when other packages relies on non-transformed
-;; version of package.
+;; MAYBE: Add a list of transformations for packages.  It's better to
+;; place it in home-profile-service-type to affect all profile
+;; packages and prevent conflicts, when other packages relies on
+;; non-transformed version of package.
 (define home-profile-service-type
   (service-type (name 'home-profile)
                 (extensions
