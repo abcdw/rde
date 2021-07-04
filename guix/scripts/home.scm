@@ -4,6 +4,8 @@
   #:use-module (gnu packages)
   #:use-module (gnu home)
   #:use-module (gnu home-services)
+  #:use-module ((gnu home-services-utils) #:select (optional))
+  #:use-module (guix home-services-import)
   #:use-module (guix channels)
   #:autoload   (guix scripts pull) (channel-commit-hyperlink)
   #:use-module (guix derivations)
@@ -537,10 +539,14 @@ available."
                                                    ":" output))))
                         (manifest-entries manifest))))
         (if home-environment?
-            `(begin
+            (let ((modules+configurations (modules+configurations)))
+              `(begin
                (use-modules (gnu home)
-                            (gnu packages))
-               ,(home-environment-template #:specs specs))
+                            (gnu packages)
+                            ,@(map first modules+configurations))
+               ,(home-environment-template
+                 #:specs specs
+                 #:services (map second modules+configurations))))
             `(begin
                (use-modules (gnu packages))
 
@@ -575,14 +581,18 @@ available."
                              (options->transformation ',options))))
                        transformation-procedures)))
         (if home-environment?
-            `(begin
-               (use-modules (guix transformations)
-                            (gnu home)
-                            (gnu packages))
+            (let ((modules+configurations (modules+configurations)))
+              `(begin
+                 (use-modules (guix transformations)
+                              (gnu home)
+                              (gnu packages)
+                              ,@(map first modules+configurations))
 
-               ,@transformations
+                 ,@transformations
 
-               ,(home-environment-template #:packages packages))
+                 ,(home-environment-template
+                   #:packages packages
+                   #:services (map second modules+configurations))))
             `(begin
                (use-modules (guix transformations)
                             (gnu packages))
@@ -592,15 +602,16 @@ available."
                 (packages->manifest
                  (list ,@packages)))))))
 
-(define* (home-environment-template #:key (packages #f) (specs #f))
+(define* (home-environment-template #:key (packages #f) (specs #f) services)
   "Return an S-exp containing a <home-environment> declaration
-containing PACKAGES, or SPECS (package specifications)."
+containing PACKAGES, or SPECS (package specifications), and SERVICES."
   `(home-environment
      (packages
       ,@(if packages
             `((list ,@packages))
             `((map specification->package
-               (list ,@specs)))))))
+                   (list ,@specs)))))
+     (services (list ,@services))))
 
 (define* (import-manifest
           manifest
