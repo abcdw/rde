@@ -280,15 +280,15 @@ extended with one gexp.")))
                               (readlink he-path)
                               #f))))
        (if (file-exists? (he-init-file new-home))
-           (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
+           (let* ((port   ((@ (ice-9 popen) open-input-pipe)
 		           (format #f "source ~a && env"
                                    (he-init-file new-home))))
-	          (result ((@@ (ice-9 rdelim) read-delimited) "" port))
+	          (result ((@ (ice-9 rdelim) read-delimited) "" port))
 	          (vars (map (lambda (x)
                                (let ((si (string-index x #\=)))
                                  (cons (string-take x si)
                                        (string-drop x (1+ si)))))
-			     ((@@ (srfi srfi-1) remove)
+			     ((@ (srfi srfi-1) remove)
 			      string-null?
                               (string-split result #\newline)))))
 	     (close-port port)
@@ -340,7 +340,7 @@ with one gexp, but many times, and all gexps must be idempotent.")))
       (define (equal-regulars? file1 file2)
         "Check if FILE1 and FILE2 are bit for bit identical."
         (let* ((cmp-binary #$(file-append
-                              (@@ (gnu packages base) diffutils) "/bin/cmp"))
+                              (@ (gnu packages base) diffutils) "/bin/cmp"))
                (status (system* cmp-binary file1 file2)))
           (= status 0)))
 
