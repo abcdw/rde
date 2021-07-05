@@ -437,40 +437,13 @@ changed, and the second element is the G-expression to be evaluated.")))
            (service-extension-compute
             (first (service-type-extensions provenance-service-type))))))
    (default-value #f)                ;the HE config file
-   (description
-    "Store provenance information about the
-home environment in the home environment itself: the channels used
-when building the home environment, and its configuration file, when
-available.")))
+   (description "\
+Store provenance information about the home environment in the home
+environment itself: the channels used when building the home
+environment, and its configuration file, when available.")))
 
-
-(define (sexp->home-provenance sexp)
-  "Parse SEXP, an s-expression read from ~/.guix-home/provenance or
-similar, and return two values: the list of channels listed therein, and the
-HE configuration file or #f."
-  (match sexp
-    (('provenance ('version 0)
-                  ('channels channels ...)
-                  ('configuration-file config-file))
-     (values (map sexp->channel channels)
-             config-file))
-    (_
-     (values '() #f))))
-
-(define (home-provenance home-environment)
-  "Given HOME-ENVIRONMENT, the file name of a system generation,
-return two values: the list of channels HOME-ENVIRONMENT is built
-from, and its configuration file.  If that information is missing,
-return the empty list (for channels) and possibly #false (for the
-configuration file)."
-  (catch 'system-error
-    (lambda ()
-      (sexp->home-provenance
-       (call-with-input-file (string-append home-environment "/provenance")
-         read)))
-    (lambda _
-      (values '() #f))))
-
+(define sexp->home-provenance sexp->system-provenance)
+(define home-provenance system-provenance)
 
 
 ;;;
