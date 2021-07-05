@@ -146,10 +146,9 @@
    (feature-base-packages
     #:home-packages
     (append
-     (list obs-latest)
      (pkgs
       "alsa-utils" "mpv" "youtube-dl"
-      "obs-wlrobs"
+      "obs" "obs-wlrobs"
       "icecat"
       "ungoogled-chromium-wayland" "ublock-origin-chromium"
       "nyxt"

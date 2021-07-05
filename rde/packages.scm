@@ -11,55 +11,6 @@
   #:use-module (guix build-system meson)
   #:use-module ((guix licenses) #:prefix license:))
 
-(use-modules (gnu packages video)
-             (gnu packages glib))
-(define-public obs-latest
-  (package
-   (inherit obs)
-   (name "obs")
-   (version "27.0.0")
-   (source (origin
-            (method git-fetch)
-            (uri (git-reference
-                  (url "https://github.com/obsproject/obs-studio")
-                  (commit version)))
-            (file-name (git-file-name name version))
-            (sha256
-             (base32
-              "1sy58mg9dris261ia6l6xaswl4ks76xh4fcsj81i2hfg1sjy1vxv"))
-            (patches
-             (search-patches "obs-modules-location.patch"))))
-   (inputs (append
-            (package-inputs obs)
-            `(("wayland" ,wayland)
-              ("pipewire" ,pipewire-0.3)
-              ("glib" ,glib)
-              ("wayland-protocols" ,wayland-protocols))))
-   (arguments
-    `(#:configure-flags
-      (list (string-append "-DOBS_VERSION_OVERRIDE=" ,version)
-            "-DENABLE_UNIT_TESTS=TRUE"
-            "-DBUILD_BROWSER=FALSE"
-            "-DBUILD_VST=FALSE")
-      #:phases
-      (modify-phases %standard-phases
-        (add-after 'install 'wrap-executable
-          (lambda* (#:key outputs #:allow-other-keys)
-            (let ((out (assoc-ref outputs "out"))
-                  (plugin-path (getenv "QT_PLUGIN_PATH")))
-              (wrap-program (string-append out "/bin/obs")
-                `("QT_PLUGIN_PATH" ":" prefix (,plugin-path))))
-            #t)))))
-   ;; (native-search-paths
-   ;;  (list
-   ;;   (search-path-specification
-   ;;    (variable "OBS_PLUGINS_DATA_PATH")
-   ;;    (files '("share/obs/obs-plugins")))
-   ;;   (search-path-specification
-   ;;    (variable "OBS_PLUGINS_PATH")
-   ;;    (files '("lib/obs-plugins")))))
-   ))
-
 (use-modules (gnu packages emacs))
 (define-public emacs-next-pgtk-latest
   (let ((commit "01b0a909b5ca858a09484821cc866127652f4153")
