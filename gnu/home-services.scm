@@ -335,127 +335,78 @@ with one gexp, but many times, and all gexps must be idempotent.")))
 ;;; On-change.
 ;;;
 
-(define (compute-on-change-gexp _ gexps)
+(define (compute-on-change-gexp eval-gexps? pattern-gexp-tuples)
   #~(begin
-      (use-modules (srfi srfi-1)
-                   (ice-9 popen)
-                   (ice-9 match)
-                   (ice-9 ftw)
-                   (rnrs io ports))
+      (define (equal-regulars? file1 file2)
+        "Check if FILE1 and FILE2 are bit for bit identical."
+        (let* ((cmp-binary #$(file-append
+                              (@@ (gnu packages base) diffutils) "/bin/cmp"))
+               (status (system* cmp-binary file1 file2)))
+          (= status 0)))
 
-      (define (butlast lst)
-        (drop-right lst 1))
+      (define (equal-symlinks? symlink1 symlink2)
+        "Check if SYMLINK1 and SYMLINK2 are pointing to the same target."
+        (string=? (readlink symlink1) (readlink symlink2)))
 
-      (define (flatten . lst)
-        "Return a list that recursively concatenates all sub-lists of LST."
-        (define (flatten1 head out)
-          (if (list? head)
-              (fold-right flatten1 out head)
-              (cons head out)))
-        (fold-right flatten1 '() lst))
+      (define (equal-directories? dir1 dir2)
+        "Check if DIR1 and DIR2 have the same content."
+        (define (ordinary-file file)
+          (not (or (string=? file ".")
+                   (string=? file ".."))))
+        (let* ((files1 (scandir dir1 ordinary-file))
+               (files2 (scandir dir2 ordinary-file)))
+          (if (equal? files1 files2)
+              (map (lambda (file)
+                     (equal-files?
+                      (string-append dir1 "/" file)
+                      (string-append dir2 "/" file)))
+                   files1)
+              #f)))
 
-      (let ((gexp-tuples '#$gexps)
-            (new-generation (getenv "GUIX_NEW_HOME"))
-            (old-generation (getenv "GUIX_OLD_HOME")))
-        (define files-to-check (map car gexp-tuples))
+      (define (equal-files? file1 file2)
+        "Compares files, symlinks or directories of the same type."
+        (case (file-type file1)
+          ((directory) (equal-directories? file1 file2))
+          ((symlink) (equal-symlinks? file1 file2))
+          ((regular) (equal-regulars? file1 file2))
+          (else
+           (display "The file type is unsupported by on-change service.\n")
+           #f)))
 
-        (define (symlink? file)
-          (let ((file-info (lstat file)))
-            (eq? (vector-ref file-info 13) 'symlink)))
+      (define (file-type file)
+        (stat:type (lstat file)))
 
-        (define* (readlink* file #:optional (acc 1))
-          "Like @code{readlink}, but recursive.  ACC is an accumulator, it is
-used to keep track of the number of symlinks that have been followed,
-this is to prevent infinite loops.
+      (define (something-changed? file1 file2)
+        (cond
+         ((and (not (file-exists? file1))
+               (not (file-exists? file2))) #f)
+         ((or  (not (file-exists? file1))
+               (not (file-exists? file2))) #t)
 
-@example
-/path/to/foo -> /path/to/bar
-/path/to/bar -> /path/to/baz
-/path/to/baz -> /path/to/foo
-@end example"
-          (cond
-           ;; I think 10 is a reasonable number, might change in the future.
-           ((or (= acc 10) (not (symlink? file))) file)
-           (else (readlink* (readlink file) (+ acc 1)))))
+         ((not (eq? (file-type file1) (file-type file2))) #t)
 
-        (define (check-directory dir)
-          "Traverse DIR and check whether all the files in DIR are
-identical to the ones for the old generation."
-          ;; We have DIR, which is
-          ;;
-          ;; /gnu/store/...-home/some/path/to/dir
-          ;;
-          ;; and we want to extract /some/path/to/dir.  If DIR has in
-          ;; fact changed we just want to return /some/path/to/dir and
-          ;; not the full path DIR because /some/path/to/dir is what
-          ;; is specified as the path in `gexp-tuples'.
-          (define path-from-generation-dir
-            (let ((dir-length (string-length new-generation)))
-              ;; Also drop starting "/"
-              (string-drop dir (+ dir-length 1))))
+         (else
+          (not (equal-files? file1 file2)))))
 
-          (define (filter-file-tree-node node)
-            (if (eq? (car node) 'dir)
-                '()
-                (cdr node)))
+      (define expressions-to-eval
+        (map
+         (lambda (x)
+           (let* ((file1 (string-append (getenv "GUIX_OLD_HOME") "/" (car x)))
+                  (file2 (string-append (getenv "GUIX_NEW_HOME") "/" (car x)))
+                  (_ (format #t "Comparing ~a and\n~10t~a..." file1 file2))
+                  (any-changes? (something-changed? file1 file2))
+                  (_ (format #t " done (~a)\n"
+                             (if any-changes? "changed" "same"))))
+             (if any-changes? (cadr x) "")))
+         '#$pattern-gexp-tuples))
 
-          (define (parent-or-current-dir dir)
-            (or (string=? dir ".")
-                (string=? dir "..")))
-
-          (let ((children (map (lambda (dir)
-                                 (string-append
-                                  path-from-generation-dir "/" dir))
-                               (filter (compose not parent-or-current-dir)
-                                       (scandir dir)))))
-            (if (any identity (flatten (map check-file children)))
-                path-from-generation-dir
-                #f)))
-
-        (define (check-file file)
-          "Check Whether FILE for the current generation is identical to the one
-for the old generation.  If they aren't, return FILE with
-the, otherwise, return @code{#f}.  This also works if the FILE is a
-directory and the directory itself is a symlink to the store."
-          (let ((new-file (string-append new-generation "/" file))
-                (old-file (string-append old-generation "/" file)))
-            (cond
-             ;; If the files don't exist in either generation, don't
-             ;; do anything.
-             ((and (not (file-exists? new-file))
-                   (not (file-exists? old-file)))
-              #f)
-             ;; If the file exists in one of the generations,
-             ;; something has definitely changed.
-             ((or (and (not (file-exists? old-file)) (file-exists? new-file))
-                  (and (file-exists? old-file) (not (file-exists? new-file))))
-              file)
-             ;; If the file exists in both generations, check for
-             ;; identity.
-             ((symlink? new-file)
-              (if (string=? (readlink* old-file)
-                            (readlink* new-file))
-                  #f
-                  file))
-             (else
-              (check-directory new-file)))))
-
-        (when (and old-generation (file-exists? old-generation))
-          (let* ((changed-files
-                  (map check-file files-to-check))
-                 (needed-gexps
-                  (lambda (gexp-tuples)
-                    (let loop ((acc '())
-                               (gexp-tuples gexp-tuples))
-                      (cond
-                       ((null? gexp-tuples) acc)
-                       ((member (caar gexp-tuples) changed-files)
-                        (loop (cons (cadar gexp-tuples) acc)
-                              (cdr gexp-tuples)))
-                       (else (loop acc (cdr gexp-tuples))))))))
-
-            (for-each primitive-eval
-                      (needed-gexps gexp-tuples)))))))
+      (if #$eval-gexps?
+          (begin
+            (display "Evaling on-change gexps.\n\n")
+            (for-each primitive-eval expressions-to-eval)
+            (display "On-change gexps evaluation finished.\n\n"))
+          (display "\
+On-change gexps won't evaluated, disabled by service configuration.\n"))))
 
 (define home-run-on-change-service-type
   (service-type (name 'home-run-on-change)
@@ -463,13 +414,14 @@ directory and the directory itself is a symlink to the store."
                  (list (service-extension
                         home-activation-service-type
                         identity)))
-                (compose identity)
+                (compose concatenate)
                 (extend compute-on-change-gexp)
-                (default-value '())
-                (description "G-expression to run if the specified
-file has changed since the last generation.  The G-expression should
-be a list where the first element is the file that should be changed,
-and the second element is the G-expression to the run.")))
+                (default-value #t)
+                (description "\
+G-expressions to run if the specified files have changed since the
+last generation.  The extension should be a list of lists where the
+first element is the pattern for file or directory that expected to be
+changed, and the second element is the G-expression to be evaluated.")))
 
 
 ;;;

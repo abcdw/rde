@@ -85,8 +85,8 @@
        (simple-service
         'sway-reload-config-on-change
         (@@ (gnu home-services) home-run-on-change-service-type)
-        `("files/config/sway/config"
-          ,#~(system* #$(file-append package "/bin/swaymsg") "reload")))
+        `(("files/config/sway/config"
+           ,#~(system* #$(file-append package "/bin/swaymsg") "reload"))))
        ;; TODO: Move wofi to feature-app-launcher or something like that
        (simple-service 'packages-for-sway
 	               home-profile-service-type

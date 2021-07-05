@@ -55,12 +55,13 @@ as shepherd package."
 	    (lambda (file) (load file))
 	    '#$files))
 	  (action 'root 'daemonize)
-          (format #t "starting services...~%")
+          (format #t "Starting services...~%")
           (for-each
 	   (lambda (service) (start service))
            '#$(append-map shepherd-service-provision
                           (filter shepherd-service-auto-start?
-                                  services)))))
+                                  services)))
+          (newline)))
 
     (scheme-file "shepherd.conf" config)))
 
