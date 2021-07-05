@@ -24,8 +24,10 @@
   #:use-module (guix store)
   #:use-module (guix gexp)
   #:use-module (guix profiles)
+  #:use-module (guix sets)
   #:use-module (guix ui)
   #:use-module (guix discovery)
+  #:use-module (guix diagnostics)
 
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
@@ -33,9 +35,10 @@
   #:export (home-service-type
 	    home-profile-service-type
 	    home-environment-variables-service-type
+	    home-files-service-type
 	    home-run-on-first-login-service-type
-            home-run-on-change-service-type
             home-activation-service-type
+            home-run-on-change-service-type
 	    home-provenance-service-type
 
             fold-home-service-types)
@@ -192,6 +195,42 @@ esac
 		(default-value '())
                 (description "Set the environment variables.")))
 
+(define (files->files-directory files)
+  "Return a @code{files} directory that contains FILES."
+  (define (assert-no-duplicates files)
+    (let loop ((files files)
+               (seen (set)))
+      (match files
+        (() #t)
+        (((file _) rest ...)
+         (when (set-contains? seen file)
+           (raise (formatted-message (G_ "duplicate '~a' entry for files/")
+                                     file)))
+         (loop rest (set-insert file seen))))))
+
+  ;; Detect duplicates early instead of letting them through, eventually
+  ;; leading to a build failure of "files.drv".
+  (assert-no-duplicates files)
+
+  (file-union "files" files))
+
+(define (files-entry files)
+  "Return an entry for the @file{~/.guix-home/files}
+directory containing FILES."
+  (with-monad %store-monad
+    (return `(("files" ,(files->files-directory files))))))
+
+(define home-files-service-type
+  (service-type (name 'home-files)
+                (extensions
+                 (list (service-extension home-service-type
+                                          files-entry)))
+                (compose concatenate)
+                (extend append)
+		(default-value '())
+                (description "Configuration files for programs that
+will be put in @file{~/.guix-home/files}.")))
+
 (define (compute-on-first-login-script _ gexps)
   (gexp->script
    "on-first-login"
@@ -222,7 +261,8 @@ in the home environment directory."
                 (compose identity)
                 (extend compute-on-first-login-script)
 		(default-value #f)
-                (description "Run gexps on first user login.  Can be extended with one gexp.")))
+                (description "Run gexps on first user login.  Can be
+extended with one gexp.")))
 
 
 (define (compute-activation-script init-gexp gexps)
