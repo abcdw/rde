@@ -30,15 +30,16 @@
 (defun git-gutter-transient:stage-hunk (arg)
   "Stage hunk without asking and go to next ARG times."
   (interactive "p")
+  (git-gutter-transient:quit)
   (dotimes (_ arg)
     (cl-letf (((symbol-function 'yes-or-no-p) (lambda (&rest args) t))
               ((symbol-function 'y-or-n-p) (lambda (&rest args) t)))
       (git-gutter:stage-hunk))
     (git-gutter:next-hunk 1))
-  (git-gutter:popup-hunk))
+  (condition-case nil (git-gutter:popup-hunk) (error nil)))
 
 (defun git-gutter-transient:quit ()
-  "Quit"
+  "Quit git-gutter:popup-buffer."
   (interactive)
   (when-let (w (get-buffer-window git-gutter:popup-buffer))
     (quit-window t w)))
