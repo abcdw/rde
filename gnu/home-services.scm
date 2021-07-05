@@ -456,18 +456,17 @@ environment, and its configuration file, when available.")))
 
 (define %guix-home-root-directory
   ;; Absolute file name of the module hierarchy.
-  ;; TODO: Change this when merged upstream
-  (parent-directory (dirname (search-path %load-path "gnu/home.scm"))))
+  (parent-directory (dirname (search-path %load-path "gnu/home-services.scm"))))
 
 (define %service-type-path
   ;; Search path for service types.
   (make-parameter `((,%guix-home-root-directory . "gnu/home-services"))))
 
-(define (all-service-modules)
+(define (all-home-service-modules)
   "Return the default set of home-service modules."
   (cons (resolve-interface '(gnu home-services))
         (all-modules (%service-type-path)
                      #:warn warn-about-load-error)))
 
 (define* (fold-home-service-types proc seed)
-  (fold-service-types proc seed (all-service-modules)))
+  (fold-service-types proc seed (all-home-service-modules)))
