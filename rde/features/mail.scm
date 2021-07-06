@@ -347,7 +347,10 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
           (with-eval-after-load
            'notmuch
            (setq notmuch-fcc-dirs ',fcc-dirs)
+           (setq notmuch-identities nil)
            (setq notmuch-address-use-company nil)
+
+           (setq notmuch-show-empty-saved-searches t)
            (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
 
            (setq rde-notmuch-todo-tags '("+todo" "-inbox"))
@@ -445,12 +448,25 @@ message together with all its descendents."
                (notmuch-tree-insert-thread replies (+ 1 depth) tree-status)))
            (advice-add 'notmuch-tree-insert-tree :override
                        'rde-notmuch-tree-insert-tree)
+
+           (setq notmuch-search-result-format
+                 '(("date" . "%12s ")
+                   ("count" . "%-7s ")
+                   ("authors" . "%-20s ")
+                   ("subject" . "%-80s  ")
+                   ("tags" . "(%s)")))
            (setq notmuch-tree-result-format
                  '(("date" . "%12s  ")
                    ("authors" . "%-20s")
                    ((("tree" . "%s")
                      ("subject" . "%s"))
-                    . " %-80s ")
+                    . " %-88s ")
+                   ("tags" . "(%s)")))
+           (setq notmuch-unthreaded-result-format
+                 '(("date" . "%12s  ")
+                   ("authors" . "%-20s")
+                   ((("subject" . "%s"))
+                    . " %-88s ")
                    ("tags" . "(%s)")))
 
            (setq notmuch-show-logo nil))
