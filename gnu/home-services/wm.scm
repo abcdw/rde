@@ -230,10 +230,10 @@ documentation} for how to configure it."))
   (match-lambda
     (($ <home-xmonad-configuration> _ package xmonad-contrib?
                                     xdg-flavor? config)
-     #~(#$(if xdg-flavor? "files/config/xmonad/xmonad.hs" "files/xmonad/xmonad.hs")
-        (let ((executable #$(file-append package "/bin/xmonad")))
-          (system* executable"--recompile")
-          (system* executable "--restart"))))))
+     `((,(if xdg-flavor? "files/config/xmonad/xmonad.hs" "files/xmonad/xmonad.hs")
+        ,#~(let ((executable #$(file-append package "/bin/xmonad")))
+             (system* executable"--recompile")
+             (system* executable "--restart")))))))
 
 (define home-xmonad-service-type
   (service-type (name 'home-xmonad)
