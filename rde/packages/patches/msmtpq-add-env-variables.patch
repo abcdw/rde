@@ -1,0 +1,56 @@
+From 511be91b0aad2dc9bcb9ae16b4576cd01787ac34 Mon Sep 17 00:00:00 2001
+From: Andrew Tropin <andrew@trop.in>
+Date: Fri, 9 Jul 2021 08:29:19 +0300
+Subject: [PATCH] msmtpq: Allow to control queue dir, log file, etc via env
+ variables
+
+Provided variables:
+MSMTPQ_QUEUE_DIR
+MSMTPQ_LOG
+MSMTPQ_QUIET
+MSMTPQ_CONN_TEST
+---
+ scripts/msmtpq/msmtpq | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
+
+diff --git a/scripts/msmtpq/msmtpq b/scripts/msmtpq/msmtpq
+index 4b074de..fbf38f9 100755
+--- a/scripts/msmtpq/msmtpq
++++ b/scripts/msmtpq/msmtpq
+@@ -70,9 +70,9 @@ MSMTP=msmtp
+ ##            ( chmod 0700 msmtp.queue )
+ ##
+ ## the queue dir - modify this to reflect where you'd like it to be  (no quotes !!)
+-Q=~/.msmtp.queue
+-[ -d "$Q" ] || \
+-  err '' "msmtpq : can't find msmtp queue directory [ $Q ]" ''     # if not present - complain ; quit
++Q=${MSMTPQ_QUEUE_DIR:-~/.msmtp.queue}
++[ -d "$Q" ] || mkdir -p "$Q" || \
++  err '' "msmtpq : can't create msmtp queue directory [ $Q ]" ''
+ ##
+ ## set the queue log file var to the location of the msmtp queue log file
+ ##   where it is or where you'd like it to be
+@@ -84,7 +84,8 @@ Q=~/.msmtp.queue
+ ##     (doing so would be inadvisable under most conditions, however)
+ ##
+ ## the queue log file - modify (or comment out) to taste  (but no quotes !!)
+-LOG=~/log/msmtp.queue.log
++LOG=${MSMTPQ_LOG:-~/log/msmtp.queue.log}
++[ -d "$(dirname $LOG)" ] || mkdir -p "$(dirname $LOG)"
+ ## ======================================================================================
+ 
+ ## msmtpq can use the following environment variables :
+@@ -108,8 +109,8 @@ LOG=~/log/msmtp.queue.log
+ ##
+ #EMAIL_CONN_NOTEST=y                 # deprecated ; use below var
+ #EMAIL_CONN_TEST={x| |p|P|n|s}       # see settings above for EMAIL_CONN_TEST
+-EMAIL_CONN_TEST=n
+-#EMAIL_QUEUE_QUIET=t
++EMAIL_QUEUE_QUIET=${MSMTPQ_QUIET:-}
++EMAIL_CONN_TEST=${MSMTPQ_CONN_TEST:-n}
+ ## ======================================================================================
+ 
+ umask 077                            # set secure permissions on created directories and files
+-- 
+2.32.0
+

@@ -1,0 +1,40 @@
+From a1be5a9b5ebaa3941f4cb08f99482bccf52a3082 Mon Sep 17 00:00:00 2001
+From: Andrew Tropin <andrew@trop.in>
+Date: Fri, 9 Jul 2021 08:30:00 +0300
+Subject: [PATCH] msmtpq: Add --enqueue option
+
+---
+ scripts/msmtpq/msmtpq | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/scripts/msmtpq/msmtpq b/scripts/msmtpq/msmtpq
+index fbf38f9..0f127f0 100755
+--- a/scripts/msmtpq/msmtpq
++++ b/scripts/msmtpq/msmtpq
+@@ -520,11 +520,22 @@ if [ ! "$1" = '--q-mgmt' ] ; then    # msmtpq - sendmail mode
+   # write mail body text to queue .mail file
+   cat > "${FQP}.mail" || \
+     log -e "$?" "creating mail body file [ ${FQP}.mail ] : failed" # test for error
++  # remove first argument, when --engueue provided
++  if [ "$1" = '--enqueue' ] ; then
++    enqueue=t
++    shift
++  fi
+   # write msmtp command line to queue .msmtp file
+   echo "$@" > "${FQP}.msmtp" || \
+     log -e "$?" "creating msmtp cmd line file { $* }"\
+                 "           to [ ${ID}.msmtp ] : failed" # test for error
+-  send_mail "$@"                     # send the mail if possible, queue it if not
++
++  if [ -n "$enqueue" ] ; then
++    enqueue_mail "$@"                # always enqueue the mail
++  else
++    send_mail "$@"                   # send the mail if possible, queue it if not
++  fi
++
+   lock_queue -u                      # unlock here
+ else                                 # msmtp-queue - queue management mode
+   shift                              # trim off first (--q-mgmt) arg
+-- 
+2.32.0
+
