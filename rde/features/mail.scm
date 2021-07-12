@@ -22,7 +22,7 @@
             mail-account
             mail-account-id
             mail-account-type
-            mail-account-user
+            mail-account-fqda
             mail-account-synchronizer
             mail-account-get-pass-cmd
 
@@ -42,17 +42,19 @@ scenarios, during generation of @file{mbsyncrc} for example.")
   (synchronizer
    (symbol 'isync)
    "Type of application to obtain emails.")
-  (user
+  (fqda
    (string #f)
-   "Email. @code{\"someone@example.com\"} for example.")
+   "Email address. @code{\"someone@example.com\"} for example.")
   (pass-cmd
    (maybe-string #f)
-   "Command returning a password.  If value not provided @code{pass show mail/$user} will be used, where @code{$user} is a value of user field."))
+   "Command returning a password.  If value not provided @code{pass
+show mail/$fqda} will be used, where @code{$fqda} is a value of fqda
+field."))
 
 (define (mail-account-get-pass-cmd mail-account)
   (if (mail-account-pass-cmd mail-account)
       (mail-account-pass-cmd mail-account)
-      (string-append "pass show mail/" (mail-account-user mail-account))))
+      (string-append "pass show mail/" (mail-account-fqda mail-account))))
 
 (define (list-of-mail-accounts? lst)
   (and (list? lst) (not (null? lst)) (any mail-account? lst)))
@@ -250,7 +252,7 @@ features."
 (define (generate-isync-serializer host folders-mapping)
   (define (isync-settings mail-directory mail-account)
     (let* ((id       (mail-account-id mail-account))
-           (user     (mail-account-user mail-account))
+           (user     (mail-account-fqda mail-account))
            (pass-cmd (mail-account-get-pass-cmd mail-account)))
       `(,#~(string-append "# Account '" #$(symbol->string id)
                           " starts here")
@@ -358,7 +360,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
   (require-value 'full-name config)
   (define full-name (get-value 'full-name config))
   (define mail-accounts (get-value 'mail-accounts config))
-  (define emails (map mail-account-user mail-accounts))
+  (define emails (map mail-account-fqda mail-accounts))
   (define ids    (map mail-account-id   mail-accounts))
 
   (define mail-directory ((get-value 'mail-directory-fn config) config))
@@ -377,7 +379,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
     (map (lambda (x)
            (format
             #f "notmuch tag +~a -- path:accounts/~a/** and tag:new"
-            (mail-account-id x) (mail-account-user x)))
+            (mail-account-id x) (mail-account-fqda x)))
          mail-accounts))
 
   (define tag-updates-post
@@ -553,7 +555,7 @@ not appear in the pop-up buffer."
   (define f-name 'notmuch)
 
   (define (get-home-services config)
-    (define emails (map mail-account-user (get-value 'mail-accounts config)))
+    (define emails (map mail-account-fqda (get-value 'mail-accounts config)))
 
     (define fcc-dirs
       (map (lambda (x) (cons x (string-append "accounts/" x "/sent"))) emails))

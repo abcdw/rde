@@ -35,7 +35,7 @@
   "Make simple mail-account with gmail type by default."
   (mail-account
    (id   id)
-   (user user)
+   (fqda user)
    (type type)))
 
 (define %abcdw-features
