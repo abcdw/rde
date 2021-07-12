@@ -446,6 +446,91 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
       (new ((tags . new)
             (ignore . (.mbsyncstate .uidvalidity))))))))
 
+(define (notmuch-redefined-functions config)
+  ;; Remove leading arrows for mails without threads
+  ;; Make the width used by notmuch-jump prompt to be 80%
+  `((defun rde-notmuch-tree-insert-tree (tree depth tree-status first last)
+      "Insert the message tree TREE at depth DEPTH in the current thread.
+
+A message tree is another name for a single sub-thread: i.e., a
+message together with all its descendents."
+      (let ((msg (car tree))
+	    (replies (cadr tree)))
+        (cond
+         ((and (< 0 depth) (not last))
+          (push "├" tree-status))
+         ((and (< 0 depth) last)
+          (push "└" tree-status))
+         ((and (eq 0 depth) first last)
+          ;; Choice between these two variants is a matter of taste.
+          ;; (push "─" tree-status))
+          (push " " tree-status))
+         ((and (eq 0 depth) first (not last))
+          (push "┬" tree-status))
+         ((and (eq 0 depth) (not first) last)
+          (push "└" tree-status))
+         ((and (eq 0 depth) (not first) (not last))
+          (push "├" tree-status)))
+        (unless (eq 0 depth)
+          (push (concat (if replies "┬" "─") ">") tree-status))
+        (setq msg (plist-put msg :first (and first (eq 0 depth))))
+        (setq msg (plist-put msg :tree-status tree-status))
+        (setq msg (plist-put msg :orig-tags (plist-get msg :tags)))
+        (notmuch-tree-goto-and-insert-msg msg)
+        (pop tree-status)
+        (pop tree-status)
+        (if last
+	    (push " " tree-status)
+            (push "│" tree-status))
+        (notmuch-tree-insert-thread replies (+ 1 depth) tree-status)))
+    (advice-add 'notmuch-tree-insert-tree :override
+                'rde-notmuch-tree-insert-tree)
+
+    (defun rde-notmuch-jump (action-map prompt)
+      "Interactively prompt for one of the keys in ACTION-MAP.
+
+Displays a summary of all bindings in ACTION-MAP in the
+minibuffer, reads a key from the minibuffer, and performs the
+corresponding action.  The prompt can be canceled with C-g or
+RET.  PROMPT must be a string to use for the prompt.  PROMPT
+should include a space at the end.
+
+ACTION-MAP must be a list of triples of the form
+  (KEY LABEL ACTION)
+where KEY is a key binding, LABEL is a string label to display in
+the buffer, and ACTION is a nullary function to call.  LABEL may
+be null, in which case the action will still be bound, but will
+not appear in the pop-up buffer."
+      (let* ((items (notmuch-jump--format-actions action-map))
+	     ;; Format the table of bindings and the full prompt
+	     (table
+	      (with-temp-buffer
+	       (notmuch-jump--insert-items
+                (floor (* (frame-width) 0.8)) items)
+	       (buffer-string)))
+	     (full-prompt
+	      (concat table "\n\n"
+		      (propertize prompt 'face 'minibuffer-prompt)))
+	     ;; By default, the minibuffer applies the minibuffer face to
+	     ;; the entire prompt.  However, we want to clearly
+	     ;; distinguish bindings (which we put in the prompt face
+	     ;; ourselves) from their labels, so disable the minibuffer's
+	     ;; own re-face-ing.
+	     (minibuffer-prompt-properties
+	      (notmuch-plist-delete
+	       (copy-sequence minibuffer-prompt-properties)
+	       'face))
+	     ;; Build the keymap with our bindings
+	     (minibuffer-map (notmuch-jump--make-keymap action-map prompt))
+	     ;; The bindings save the the action in notmuch-jump--action
+	     (notmuch-jump--action nil))
+        ;; Read the action
+        (read-from-minibuffer full-prompt nil minibuffer-map)
+        ;; If we got an action, do it
+        (when notmuch-jump--action
+          (funcall notmuch-jump--action))))
+    (advice-add 'notmuch-jump :override 'rde-notmuch-jump)))
+
 (define %rde-notmuch-saved-searches
   '((:name "TODO" :query "tag:todo" :key "t")
     (:name "Inbox" :query "tag:inbox" :key "i"
@@ -479,9 +564,8 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
      (when (get-value 'emacs config)
        (elisp-configuration-service
         f-name
-        ;; https://github.com/SeTSeR/nixos-config/blob/master/modules/users/smakarov/emacs/modules/mail.el
         ;; https://protesilaos.com/dotemacs/#h:a196812e-1644-4536-84ba-687366867def
-        ;; TODO: Try pipe message to git am
+        ;; https://codeberg.org/jao/elibs/src/branch/main/notmuch.org
         `((define-key global-map (kbd "C-c a n") 'notmuch)
           (define-key global-map (kbd "s-m") 'notmuch-jump-search)
           (setq notmuch-saved-searches ',notmuch-saved-searches)
@@ -536,7 +620,6 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
                (notmuch-search-add-tag rde-notmuch-todo-tags)
                (notmuch-tree-next-message)))
 
-
            (defun rde-notmuch-show-view-html-part ()
              "Open the text/html part of the current message using
 `notmuch-show-view-part'."
@@ -552,45 +635,7 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
               (notmuch-show-view-part)))
            (define-key notmuch-show-part-map "h" 'rde-notmuch-show-view-html-part)
 
-
-           ;; (advice-remove 'notmuch-tree-insert-tree #'rde-notmuch-tree-insert-tree)
-           ;; Remove leading arrows for mails without threads
-           (defun rde-notmuch-tree-insert-tree (tree depth tree-status first last)
-             "Insert the message tree TREE at depth DEPTH in the current thread.
-
-A message tree is another name for a single sub-thread: i.e., a
-message together with all its descendents."
-             (let ((msg (car tree))
-	           (replies (cadr tree)))
-               (cond
-                ((and (< 0 depth) (not last))
-                 (push "├" tree-status))
-                ((and (< 0 depth) last)
-                 (push "└" tree-status))
-                ((and (eq 0 depth) first last)
-                 ;; Choice between these two variants is a matter of taste.
-                 ;; (push "─" tree-status))
-                 (push " " tree-status))
-                ((and (eq 0 depth) first (not last))
-                 (push "┬" tree-status))
-                ((and (eq 0 depth) (not first) last)
-                 (push "└" tree-status))
-                ((and (eq 0 depth) (not first) (not last))
-                 (push "├" tree-status)))
-               (unless (eq 0 depth)
-                 (push (concat (if replies "┬" "─") ">") tree-status))
-               (setq msg (plist-put msg :first (and first (eq 0 depth))))
-               (setq msg (plist-put msg :tree-status tree-status))
-               (setq msg (plist-put msg :orig-tags (plist-get msg :tags)))
-               (notmuch-tree-goto-and-insert-msg msg)
-               (pop tree-status)
-               (pop tree-status)
-               (if last
-	           (push " " tree-status)
-                   (push "│" tree-status))
-               (notmuch-tree-insert-thread replies (+ 1 depth) tree-status)))
-           (advice-add 'notmuch-tree-insert-tree :override
-                       'rde-notmuch-tree-insert-tree)
+           ,@(notmuch-redefined-functions config)
 
            (setq notmuch-search-result-format
                  '(("date" . "%12s ")
