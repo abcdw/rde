@@ -265,8 +265,8 @@ features."
         ,#~""
         (MaildirStore ,(symbol-append id '-local))
         (SubFolders Verbatim)
-        (Path ,(string-append mail-directory "/" user "/"))
-        (Inbox ,(string-append mail-directory "/" user "/inbox"))
+        (Path ,(string-append mail-directory "/accounts/" user "/"))
+        (Inbox ,(string-append mail-directory "/accounts/" user "/inbox"))
         ,#~""
         ,@(isync-group-with-channels id folders-mapping))))
   isync-settings)
@@ -375,22 +375,22 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
   (define make-id-tag
     (map (lambda (x)
            (format
-            #f "notmuch tag +~a -- path:~a/** and tag:new"
+            #f "notmuch tag +~a -- path:accounts/~a/** and tag:new"
             (mail-account-id x) (mail-account-user x)))
          mail-accounts))
 
   (define tag-updates-post
-    '("notmuch tag +inbox -- path:/.*\\/inbox/"
-      "notmuch tag +draft -- path:/.*\\/drafts/"
-      "notmuch tag +sent  -- path:/.*\\/sent/"
-      "notmuch tag +trash -- path:/.*\\/trash/"
-      "notmuch tag +spam  -- path:/.*\\/spam/"
+    '("notmuch tag +inbox -- path:/accounts\\/.*\\/inbox/"
+      "notmuch tag +draft -- path:/accounts\\/.*\\/drafts/"
+      "notmuch tag +sent  -- path:/accounts\\/.*\\/sent/"
+      "notmuch tag +trash -- path:/accounts\\/.*\\/trash/"
+      "notmuch tag +spam  -- path:/accounts\\/.*\\/spam/"
       "notmuch tag +list  -- path:/lists\\/.*/"
       "notmuch tag +todo -inbox -sent  -- tag:inbox and tag:sent"
       ;; If file was moved out of folder on server remove respective tag
-      "notmuch tag -inbox -- not path:/.*\\/inbox/ and tag:inbox"
-      "notmuch tag -trash -- not path:/.*\\/trash/ and tag:trash"
-      "notmuch tag -spam  -- not path:/.*\\/spam/  and tag:spam"
+      "notmuch tag -inbox -- not path:/accounts\\/.*\\/inbox/ and tag:inbox"
+      "notmuch tag -trash -- not path:/accounts\\/.*\\/trash/ and tag:trash"
+      "notmuch tag -spam  -- not path:/accounts\\/.*\\/spam/  and tag:spam"
 
       "notmuch tag -new -- tag:new"))
 
@@ -554,7 +554,7 @@ not appear in the pop-up buffer."
     (define emails (map mail-account-user (get-value 'mail-accounts config)))
 
     (define fcc-dirs
-      (map (lambda (x) (cons x (string-append x "/sent"))) emails))
+      (map (lambda (x) (cons x (string-append "accounts/" x "/sent"))) emails))
 
     (list
      (simple-service
