@@ -615,7 +615,7 @@ message together with all its descendents."
            (setq notmuch-show-logo nil))
 
           (with-eval-after-load 'magit (require 'git-email-magit)))
-        #:elisp-packages (list notmuch emacs-git-email-latest)))))
+        #:elisp-packages (list emacs-git-email-latest)))))
 
   (feature
    (name f-name)
