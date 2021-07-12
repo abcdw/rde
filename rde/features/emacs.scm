@@ -25,7 +25,6 @@
 	    feature-emacs-eshell
 	    feature-emacs-org
 	    feature-emacs-org-roam
-	    feature-emacs-message
 	    feature-emacs-erc
 	    feature-emacs-telega
             feature-emacs-which-key
@@ -301,51 +300,6 @@ utilizing reverse-im package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-message
-	  #:key
-	  (smtp-server #f)
-	  (smtp-port 587))
-  "Configure email sending capabilities provided by @file{message.el}."
-  (ensure-pred string? smtp-server)
-  (ensure-pred integer? smtp-port)
-
-  (define emacs-f-name 'message)
-  (define f-name (symbol-append 'emacs- emacs-f-name))
-
-  (define (get-home-services config)
-    (require-value 'emacs-client-create-frame config)
-    (define emacs-cmd (get-value 'emacs-client-create-frame config))
-    (list
-     (elisp-configuration-service
-      emacs-f-name
-      `((with-eval-after-load
-	 'message
-	 (setq send-mail-function 'smtpmail-send-it)
-	 (setq smtpmail-smtp-server ,smtp-server)
-	 (setq smtpmail-smtp-service ,smtp-port)
-         (setq message-kill-buffer-on-exit t)
-         (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
-
-	 (setq message-auto-save-directory
-	       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		       "/emacs/mail-drafts")))))
-
-     (emacs-xdg-service
-      emacs-f-name
-      "Emacs (Client) [mailto:]"
-      #~(system*
-         #$emacs-cmd "--eval"
-	 (string-append
-          "\
-(progn
- (set-frame-name \"Reply to Email - Emacs Client\")
- (browse-url-mail \"" (cadr (command-line)) "\"))"))
-      #:default-for '(x-scheme-handler/mailto))))
-
-  (feature
-   (name f-name)
-   (values `((,f-name . #t)))
-   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-erc
 	  #:key

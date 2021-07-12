@@ -6,6 +6,7 @@
   #:use-module (gnu packages mail)
   #:use-module (gnu services)
   #:use-module (gnu services configuration)
+  #:use-module (gnu home-services)
   #:use-module (gnu home-services files)
   #:use-module (gnu home-services mail)
 
@@ -13,8 +14,10 @@
   #:use-module (guix gexp)
 
   #:export (feature-mail-settings
+            feature-emacs-message
             feature-isync
             feature-notmuch
+            feature-msmtp
 
             mail-account
             mail-account-id
@@ -83,6 +86,146 @@ features."
              (mail-accounts . ,mail-accounts)
              (mail-directory-fn . ,mail-directory-fn)))))
 
+
+(define send-mail-msmtp-function
+  '((defun message-send-mail-with-msmtp ()
+     "Send off the prepared buffer with msmtp."
+     (require 'sendmail)
+     (let ((errbuf (if message-interactive
+		       (message-generate-new-buffer-clone-locals
+		        " sendmail errors")
+		       0))
+	   resend-to-addresses delimline)
+       (unwind-protect
+	(progn
+	 (let ((case-fold-search t))
+	   (save-restriction
+	    (message-narrow-to-headers)
+	    (setq resend-to-addresses (message-fetch-field "resent-to")))
+	   ;; Change header-delimiter to be what sendmail expects.
+	   (goto-char (point-min))
+	   (re-search-forward
+	    (concat "^" (regexp-quote mail-header-separator) "\n"))
+	   (replace-match "\n")
+	   (backward-char 1)
+	   (setq delimline (point-marker))
+	   (run-hooks 'message-send-mail-hook)
+	   ;; Insert an extra newline if we need it to work around
+	   ;; Sun's bug that swallows newlines.
+	   (goto-char (+ 1 delimline))
+	   (when (eval message-mailer-swallows-blank-line t)
+	     (newline))
+	   (when message-interactive
+	     (with-current-buffer errbuf
+		                  (erase-buffer))))
+	 (let* ((default-directory "/")
+		(coding-system-for-write message-send-coding-system)
+		(cpr (apply
+		      'call-process-region
+		      (append
+		       (list (point-min) (point-max) sendmail-program
+			     nil errbuf nil)
+		       message-sendmail-extra-arguments
+		       ;; Get the addresses from the message
+		       ;; unless this is a resend.
+		       ;; We must not do that for a resend
+		       ;; because we would find the original addresses.
+		       ;; For a resend, include the specific addresses.
+		       (if resend-to-addresses
+			   (list resend-to-addresses)
+			   '("-t"))))))
+	   (unless (or (null cpr) (and (numberp cpr) (zerop cpr)))
+	     (when errbuf
+	       (pop-to-buffer errbuf)
+	       (setq errbuf nil))
+	     (error "Sending...failed with exit value %d" cpr)))
+	 (when message-interactive
+	   (with-current-buffer errbuf
+	                        (goto-char (point-min))
+	                        (while (re-search-forward "\n+ *" nil t)
+		                  (replace-match "; "))
+	                        (if (not (zerop (buffer-size)))
+		                    (error "Sending...failed to %s"
+			                   (buffer-string))))))
+        (when (buffer-live-p errbuf)
+	  (kill-buffer errbuf)))))))
+
+(define* (feature-emacs-message
+	  #:key
+	  (smtp-server #f)
+	  (smtp-port 587))
+  "Configure email sending capabilities provided by @file{message.el}."
+	    feature-emacs-message
+  (ensure-pred string? smtp-server)
+  (ensure-pred integer? smtp-port)
+
+  (define emacs-f-name 'message)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (require-value 'emacs-client-create-frame config)
+    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+	 'message
+
+         ,@send-mail-msmtp-function
+	 (setq send-mail-function 'message-send-mail-with-msmtp)
+         (setq sendmail-program "msmtpq")
+         (setq message-sendmail-extra-arguments
+               '("--enqueue" "--read-envelope-from"))
+
+	 (setq smtpmail-smtp-server ,smtp-server)
+	 (setq smtpmail-smtp-service ,smtp-port)
+         (setq message-kill-buffer-on-exit t)
+         (setq mml-secure-openpgp-sign-with-sender t)
+         (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
+
+	 (setq message-auto-save-directory
+	       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		       "/emacs/mail-drafts")))))
+
+     (emacs-xdg-service
+      emacs-f-name
+      "Emacs (Client) [mailto:]"
+      #~(system*
+         #$emacs-cmd "--eval"
+	 (string-append
+          "\
+(progn
+ (set-frame-name \"Reply to Email - Emacs Client\")
+ (browse-url-mail \"" (cadr (command-line)) "\"))"))
+      #:default-for '(x-scheme-handler/mailto))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+(define* (feature-msmtp)
+  "Configure msmtp MTA."
+  (define (get-home-services config)
+    (require-value 'mail-directory-fn config)
+    (define mail-dir ((get-value 'mail-directory-fn config) config))
+    (define queue-dir (string-append mail-dir "/queue"))
+    (list
+     (simple-service
+      'msmtp-env-var-settings
+      home-environment-variables-service-type
+      `(("MSMTPQ_LOG" . "$XDG_LOG_HOME/msmtpq.log")
+        ("MSMTPQ_QUEUE_DIR" . ,queue-dir)))
+     (simple-service
+      'msmtp-packages
+      home-profile-service-type
+      (list msmtp-latest))))
+
+  (feature
+   (name 'msmtp)
+   (home-services-getter get-home-services)
+   (values `((msmtp . #t)))))
 
 (define (prep-str sym str)
   (symbol-append sym '- (string->symbol str)))
@@ -479,5 +622,4 @@ message together with all its descendents."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-;; TODO: Add feature-msmtp
 ;; Think about delayed email sending
