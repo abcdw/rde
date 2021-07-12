@@ -258,6 +258,7 @@ features."
         (Host ,host)
         (User ,user)
         (PassCmd ,pass-cmd)
+        (AuthMechs LOGIN)
         (SSLType IMAPS)
         ,#~""
         (IMAPStore ,(symbol-append id '-remote))
@@ -429,11 +430,11 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
      (with-imported-modules '((guix build utils))
        #~(begin
            (map (@@ (guix build utils) mkdir-p) '#$mail-directories)
-           (map system '#$move-rules)
-           (map system '#$sync-cmds)))))
+           (for-each system '#$move-rules)
+           (for-each system '#$sync-cmds)))))
    (post-new
     (list
-     #~(begin (map system '#$make-id-tag)
+     #~(begin (for-each system '#$make-id-tag)
               (for-each system '#$tag-updates-post))))
    (config
     `((user ((name . ,full-name)
@@ -444,7 +445,8 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
       (maildir ((synchronize_flags . true)))
       (search ((exclude_tags . (trash spam deleted))))
       (new ((tags . new)
-            (ignore . (.mbsyncstate .uidvalidity))))))))
+            (ignore . (.mbsyncstate .uidvalidity
+                       .mbsyncstate.new .mbsyncstate.journal))))))))
 
 (define (notmuch-redefined-functions config)
   ;; Remove leading arrows for mails without threads
