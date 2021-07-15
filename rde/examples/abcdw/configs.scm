@@ -32,11 +32,20 @@
 ;; (display (crypt "hi" "$6$abc"))
 
 (define* (mail-acc id user #:optional (type 'gmail))
-  "Make simple mail-account with gmail type by default."
+  "Make a simple mail-account with gmail type by default."
   (mail-account
    (id   id)
    (fqda user)
    (type type)))
+
+(define* (mail-lst id fqda urls)
+  "Make a simple mailing-list."
+  (mailing-list
+   (id   id)
+   (fqda fqda)
+   (config (l2md-repo
+            (name (symbol->string id))
+            (urls urls)))))
 
 (define %abcdw-features
   (list
@@ -49,9 +58,15 @@
     #:gpg-smart-card? #t)
    (feature-password-store
     #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
+
    (feature-mail-settings
-    #:mail-accounts (list (mail-acc 'work     "andrew@trop.in")
-                          (mail-acc 'personal "andrewtropin@gmail.com")))
+    #:mail-accounts (list (mail-acc 'work       "andrew@trop.in")
+                          (mail-acc 'personal   "andrewtropin@gmail.com"))
+    #:mailing-lists (list (mail-lst 'guix-devel "guix-devel@gnu.org"
+                                    '("https://yhetil.org/guix-devel/0"))
+                          (mail-lst 'guix-patches "guix-patches@gnu.org"
+                                    '("https://yhetil.org/guix-patches/1"))))
+
    (feature-keyboard
     #:keyboard-layout %dvorak-layout)))
 
@@ -123,6 +138,8 @@
     #:org-roam-directory "~/work/notes/notes")
 
    (feature-isync #:isync-verbose #t)
+   (feature-l2md)
+   (feature-msmtp)
    (feature-notmuch
     #:notmuch-saved-searches
     (cons* '(:name "Work Inbox" :query "tag:work and tag:inbox"
