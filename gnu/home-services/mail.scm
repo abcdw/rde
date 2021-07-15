@@ -24,7 +24,13 @@
 
             home-l2md-service-type
             home-l2md-configuration
-            l2md-repo))
+            l2md-repo
+            l2md-repo-name
+            l2md-repo-urls
+            l2md-repo-maildir
+            l2md-repo-pipe
+            l2md-repo-initial-import
+            l2md-repo-sync-enabled?))
 
 ;;; Commentary:
 ;;;
