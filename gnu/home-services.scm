@@ -341,8 +341,13 @@ with one gexp, but many times, and all gexps must be idempotent.")))
         "Check if FILE1 and FILE2 are bit for bit identical."
         (let* ((cmp-binary #$(file-append
                               (@ (gnu packages base) diffutils) "/bin/cmp"))
-               (status (system* cmp-binary file1 file2)))
-          (= status 0)))
+               (stats1     (lstat file1))
+               (stats2     (lstat file2)))
+          (cond
+           ((= (stat:ino stats1) (stat:ino stats2))         #t)
+           ((not (= (stat:size stats1) (stat:size stats2))) #f)
+
+           (else (= (system* cmp-binary file1 file2) 0)))))
 
       (define (equal-symlinks? symlink1 symlink2)
         "Check if SYMLINK1 and SYMLINK2 are pointing to the same target."
