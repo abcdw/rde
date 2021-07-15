@@ -9,6 +9,7 @@
   #:use-module (gnu home-services)
   #:use-module (gnu home-services files)
   #:use-module (gnu home-services mail)
+  #:use-module (gnu home-services mcron)
 
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
@@ -18,6 +19,7 @@
             feature-isync
             feature-notmuch
             feature-msmtp
+            feature-l2md
 
             mail-account
             mail-account-id
@@ -26,7 +28,15 @@
             mail-account-synchronizer
             mail-account-get-pass-cmd
 
-            %rde-notmuch-saved-searches))
+            mailing-list
+            mailing-list-id
+            mailing-list-fqda
+            mailing-list-synchronizer
+            mailing-list-config
+
+            %rde-notmuch-saved-searches)
+
+  #:re-export (l2md-repo))
 
 
 (define-configuration/no-serialization mail-account
@@ -56,8 +66,27 @@ field."))
       (mail-account-pass-cmd mail-account)
       (string-append "pass show mail/" (mail-account-fqda mail-account))))
 
+
+(define-configuration/no-serialization mailing-list
+  (id
+   (symbol #f)
+   "Something short to identify and distinguish a mailing lists.
+@code{'guix-devel} or @code{'guix-patches} for example.")
+  (fqda
+   (string #f)
+   "Mailing list address. @code{\"guix-devel@gnu.org\"} for example.")
+  (config
+   (record #f)
+   "Mailing list configuration. @code{(l2md-repo ...)} for example.")
+  (synchronizer
+   (symbol 'l2md)
+   "Type of application to obtain mailing list."))
+
 (define (list-of-mail-accounts? lst)
   (and (list? lst) (not (null? lst)) (any mail-account? lst)))
+
+(define (list-of-mailing-lists? lst)
+  (and (list? lst) (not (null? lst)) (any mailing-list? lst)))
 
 (define (default-mail-directory-fn config)
   (string-append (get-value 'home-directory config)
@@ -68,10 +97,12 @@ field."))
 (define* (feature-mail-settings
           #:key
           (mail-accounts #f)
+          (mailing-lists '())
           (mail-directory-fn default-mail-directory-fn))
   "Provide mail-accounts and mail-directory-fn for other mail-related
 features."
   (ensure-pred list-of-mail-accounts? mail-accounts)
+  (ensure-pred list-of-mailing-lists? mailing-lists)
   (ensure-pred procedure? mail-directory-fn)
 
   (define (get-home-services config)
@@ -86,6 +117,7 @@ features."
    (home-services-getter get-home-services)
    (values `((mail-settings . #t)
              (mail-accounts . ,mail-accounts)
+             (mailing-lists . ,mailing-lists)
              (mail-directory-fn . ,mail-directory-fn)))))
 
 
@@ -229,6 +261,43 @@ features."
    (home-services-getter get-home-services)
    (values `((msmtp . #t)))))
 
+(define* (feature-l2md)
+  "Configure l2md MDA."
+  (define (get-home-services config)
+    (require-value 'mail-directory-fn config)
+    (require-value 'mailing-lists config)
+    (define mail-dir ((get-value 'mail-directory-fn config) config))
+    (define mls (filter (lambda (x) (eq? (mailing-list-synchronizer x) 'l2md))
+                        (get-value 'mailing-lists config)))
+    (define (get-repo-config ml)
+      (let ((repo-config (mailing-list-config ml)))
+        (if (eq? (l2md-repo-maildir repo-config) 'disabled)
+            (l2md-repo
+             (inherit repo-config)
+             (maildir (string-append
+                       mail-dir "lists/" (mailing-list-fqda ml) "/all")))
+            repo-config)))
+    ;; <https://git.kernel.org/pub/scm/linux/kernel/git/dborkman/l2md.git/about/>
+    ;; Applying patches <https://git.kyleam.com/piem/about/>
+
+    (list
+     (service home-mcron-service-type
+              (home-mcron-configuration
+               (jobs (list #~(job '(next-hour)
+                                  (lambda ()
+                                    (system* "mbsync" "-a")
+                                    (system* "l2md")))))))
+     (service
+      home-l2md-service-type
+      (home-l2md-configuration
+       (oneshot 1)
+       (repos (map get-repo-config mls))))))
+
+  (feature
+   (name 'l2md)
+   (home-services-getter get-home-services)
+   (values `((l2md . #t)))))
+
 (define (prep-str sym str)
   (symbol-append sym '- (string->symbol str)))
 
@@ -260,7 +329,7 @@ features."
         (Host ,host)
         (User ,user)
         (PassCmd ,pass-cmd)
-        (AuthMechs LOGIN)
+        ;; (AuthMechs LOGIN)
         (SSLType IMAPS)
         ,#~""
         (IMAPStore ,(symbol-append id '-remote))
@@ -433,7 +502,8 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
        #~(begin
            (map (@@ (guix build utils) mkdir-p) '#$mail-directories)
            (for-each system '#$move-rules)
-           (for-each system '#$sync-cmds)))))
+           ;; (for-each system '#$sync-cmds)
+           ))))
    (post-new
     (list
      #~(begin (for-each system '#$make-id-tag)
