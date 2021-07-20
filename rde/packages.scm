@@ -180,7 +180,8 @@ to manipulate and navigate hunks.")))
              (guix build-system gnu)
              (gnu packages gnome)
              (gnu packages tls)
-             (gnu packages gsasl))
+             (gnu packages gsasl)
+             (gnu packages compression))
 
 (define-public msmtp-latest
   (package
