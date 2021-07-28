@@ -56,9 +56,12 @@
 
 (define* (emacs-xdg-service
           name xdg-name gexp
-          #:key (default-for '()))
+          #:key
+          (default-for '())
+          (exec-argument "%u"))
   (define file-name (string-append "emacs-" (symbol->string name)))
-  (define file-file (file-append (program-file file-name gexp) " %u"))
+  (define file-file (file-append (program-file file-name gexp)
+                                 (string-append " " exec-argument)))
   (define desktop-file (symbol-append 'emacs- name '.desktop))
   (simple-service
    (symbol-append 'emacs-xdg- name)
