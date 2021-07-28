@@ -33,10 +33,10 @@
   #:use-module (ice-9 match)
 
   #:export (home-service-type
-	    home-profile-service-type
-	    home-environment-variables-service-type
-	    home-files-service-type
-	    home-run-on-first-login-service-type
+            home-profile-service-type
+            home-environment-variables-service-type
+            home-files-service-type
+            home-run-on-first-login-service-type
             home-activation-service-type
             home-run-on-change-service-type
 	    home-provenance-service-type
@@ -44,8 +44,8 @@
             fold-home-service-types)
 
   #:re-export (service
-	       service-type
-	       service-extension))
+               service-type
+               service-extension))
 
 ;;; Comment:
 ;;;
@@ -76,7 +76,7 @@ directory containing the given entries."
                 (extensions '())
                 (compose identity)
                 (extend home-derivation)
-		(default-value '())
+                (default-value '())
                 (description
                  "Build the home environment top-level directory,
 which in turn refers to everything the home environment needs: its
@@ -130,12 +130,12 @@ exported."
     (fold
      (lambda (x acc)
        (when (equal? (car x) (car acc))
-	 (warning
-	  (G_ "duplicate definition for `~a' environment variable ~%") (car x)))
+         (warning
+          (G_ "duplicate definition for `~a' environment variable ~%") (car x)))
        x)
      (cons "" "")
      (sort vars (lambda (a b)
-		  (string<? (car a) (car b))))))
+                  (string<? (car a) (car b))))))
 
   (warn-about-duplicate-defenitions)
   (with-monad
@@ -145,7 +145,7 @@ exported."
        ;; TODO: It's necessary to source ~/.guix-profile too
        ;; on foreign distros
        ,(apply mixed-text-file "setup-environment"
-	       "\
+               "\
 HOME_ENVIRONMENT=$HOME/.guix-home
 GUIX_PROFILE=\"$HOME_ENVIRONMENT/profile\"
 PROFILE_FILE=\"$HOME_ENVIRONMENT/profile/etc/profile\"
@@ -174,25 +174,25 @@ esac
 
 "
 
-	       (append-map
-		(match-lambda
-		  ((key . #f)
-		   '())
-		  ((key . #t)
-		   (list "export " key "\n"))
-		  ((key . value)
+               (append-map
+                (match-lambda
+                  ((key . #f)
+                   '())
+                  ((key . #t)
+                   (list "export " key "\n"))
+                  ((key . value)
                    (list "export " key "=" value "\n")))
-		vars)))))))
+                vars)))))))
 
 (define home-environment-variables-service-type
   (service-type (name 'home-environment-variables)
                 (extensions
                  (list (service-extension
-			home-service-type
+                        home-service-type
                         environment-variables->setup-environment-script)))
                 (compose concatenate)
                 (extend append)
-		(default-value '())
+                (default-value '())
                 (description "Set the environment variables.")))
 
 (define (files->files-directory files)
@@ -227,7 +227,7 @@ directory containing FILES."
                                           files-entry)))
                 (compose concatenate)
                 (extend append)
-		(default-value '())
+                (default-value '())
                 (description "Configuration files for programs that
 will be put in @file{~/.guix-home/files}.")))
 
@@ -235,32 +235,32 @@ will be put in @file{~/.guix-home/files}.")))
   (gexp->script
    "on-first-login"
    #~(let* ((xdg-runtime-dir (or (getenv "XDG_RUNTIME_DIR")
-				 (format #f "/run/user/~a" (getuid))))
-	    (flag-file-path (string-append
-			     xdg-runtime-dir "/on-first-login-executed"))
-	    (touch (lambda (file-name)
-		     (call-with-output-file file-name (const #t)))))
+                                 (format #f "/run/user/~a" (getuid))))
+            (flag-file-path (string-append
+                             xdg-runtime-dir "/on-first-login-executed"))
+            (touch (lambda (file-name)
+                     (call-with-output-file file-name (const #t)))))
        ;; XDG_RUNTIME_DIR dissapears on logout, that means such trick
        ;; allows to launch on-first-login script on first login only
        ;; after complete logout/reboot.
        (when (not (file-exists? flag-file-path))
-	 (begin #$@gexps (touch flag-file-path))))))
+         (begin #$@gexps (touch flag-file-path))))))
 
 (define (on-first-login-script-entry m-on-first-login)
   "Return, as a monadic value, an entry for the on-first-login script
 in the home environment directory."
   (mlet %store-monad ((on-first-login m-on-first-login))
-	(return `(("on-first-login" ,on-first-login)))))
+        (return `(("on-first-login" ,on-first-login)))))
 
 (define home-run-on-first-login-service-type
   (service-type (name 'home-run-on-first-login)
                 (extensions
                  (list (service-extension
-			home-service-type
+                        home-service-type
                         on-first-login-script-entry)))
                 (compose identity)
                 (extend compute-on-first-login-script)
-		(default-value #f)
+                (default-value #f)
                 (description "Run gexps on first user login.  Can be
 extended with one gexp.")))
 
@@ -281,18 +281,18 @@ extended with one gexp.")))
                               #f))))
        (if (file-exists? (he-init-file new-home))
            (let* ((port   ((@ (ice-9 popen) open-input-pipe)
-		           (format #f "source ~a && env"
+                           (format #f "source ~a && env"
                                    (he-init-file new-home))))
-	          (result ((@ (ice-9 rdelim) read-delimited) "" port))
-	          (vars (map (lambda (x)
+                  (result ((@ (ice-9 rdelim) read-delimited) "" port))
+                  (vars (map (lambda (x)
                                (let ((si (string-index x #\=)))
                                  (cons (string-take x si)
                                        (string-drop x (1+ si)))))
-			     ((@ (srfi srfi-1) remove)
-			      string-null?
+                             ((@ (srfi srfi-1) remove)
+                              string-null?
                               (string-split result #\newline)))))
-	     (close-port port)
-	     (map (lambda (x) (setenv (car x) (cdr x))) vars)
+             (close-port port)
+             (map (lambda (x) (setenv (car x) (cdr x))) vars)
 
              (setenv "GUIX_NEW_HOME" new-home)
              (setenv "GUIX_OLD_HOME" old-home)
@@ -319,11 +319,11 @@ in the home environment directory."
   (service-type (name 'home-activation)
                 (extensions
                  (list (service-extension
-			home-service-type
+                        home-service-type
                         activation-script-entry)))
                 (compose identity)
                 (extend compute-activation-script)
-		(default-value #f)
+                (default-value #f)
                 (description "Run gexps to activate the current
 generation of home environment and update the state of the home
 directory.  @command{activate} script automatically called during
