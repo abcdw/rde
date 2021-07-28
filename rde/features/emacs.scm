@@ -27,6 +27,7 @@
 	    feature-emacs-org
 	    feature-emacs-org-roam
 	    feature-emacs-erc
+            feature-emacs-elpher
 	    feature-emacs-telega
             feature-emacs-which-key
 
@@ -505,6 +506,32 @@ utilizing reverse-im package."
 
          (with-eval-after-load 'notmuch (require 'ol-notmuch))))
       #:elisp-packages (list emacs-org emacs-org-contrib))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-elpher)
+  "Configure elpher, the Emacs' gemini and gopher browser."
+  (define emacs-f-name 'elpher)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (define xdg-gexp
+      #~(system*
+         #$emacs-cmd
+         "--eval"
+         (string-append
+	  "(elpher-go \"" (car (cdr (command-line))) "\")")))
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((autoload 'elpher-go "elpher"))
+      #:elisp-packages (list emacs-elpher))
+     (emacs-xdg-service emacs-f-name "Emacs (Client) [gemini:]" xdg-gexp
+                        #:default-for '(x-scheme-handler/gemini))))
 
   (feature
    (name f-name)
