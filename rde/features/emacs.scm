@@ -21,6 +21,7 @@
 	    feature-emacs-completion
 	    feature-emacs-input-methods
 	    feature-emacs-project
+	    feature-emacs-perspective
 	    feature-emacs-git
 	    feature-emacs-dired
             feature-emacs-eshell
@@ -783,6 +784,25 @@ git-link, git-timemachine."
 		(lambda ()
 		  (when-let (project (project-current))
 			    (car (project-roots project)))))))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-perspective)
+  "Configure perspective.el to group/isolate buffers per frames.  Make
+emacsclient feels more like a separate emacs instance."
+
+  (define emacs-f-name 'perspective)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((add-hook 'after-init-hook 'persp-mode))
+      #:elisp-packages (list emacs-perspective))))
 
   (feature
    (name f-name)
