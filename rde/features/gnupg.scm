@@ -61,7 +61,12 @@ and provides GPG-PRIMARY-KEY value for other features."
             (charset . utf-8)
 
 	    (with-subkey-fingerprint . #t)
-	    (keyserver . "hkps://keys.openpgp.org")
+            (keyserver . "hkps://keyserver.ubuntu.com:443")
+	    ;; (keyserver . "hkps://keys.openpgp.org")
+            ;; (keyserver . "hkps://pgp.mit.edu")
+            ;; (keyserver . "hkps://hkps.pool.sks-keyservers.net")
+            ;; (keyserver . "hkps://ha.pool.sks-keyservers.net")
+            ;; (keyserver . "hkps://pgp.ocf.berkeley.edu")
 
             ,@gpg-extra-config))))
        (gpg-agent-config
