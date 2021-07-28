@@ -22,7 +22,8 @@
 	    feature-emacs-input-methods
 	    feature-emacs-project
 	    feature-emacs-git
-	    feature-emacs-eshell
+	    feature-emacs-dired
+            feature-emacs-eshell
 	    feature-emacs-org
 	    feature-emacs-org-roam
 	    feature-emacs-erc
@@ -402,6 +403,36 @@ utilizing reverse-im package."
 
      (emacs-xdg-service emacs-f-name "Emacs (Client) [tg:]" xdg-gexp
                         #:default-for '(x-scheme-handler/tg))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-dired)
+  "Configure dired, the Emacs' directory browser and editor."
+  (define emacs-f-name 'dired)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (define xdg-gexp
+      #~(system*
+         #$emacs-cmd
+         "--eval"
+         (string-append
+	  "(dired \"" (car (cdr (command-line))) "\")")))
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+         'dired
+         (setq dired-dwim-target t)
+         (setq dired-listing-switches "-l --time-style=long-iso -h -AG")
+         (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+         (setq dired-hide-details-hide-symlink-targets nil))))
+     (emacs-xdg-service emacs-f-name "Emacs (Client) [file:]" xdg-gexp
+                        #:default-for '(inode/directory))))
 
   (feature
    (name f-name)
