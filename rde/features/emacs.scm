@@ -830,6 +830,7 @@ emacsclient feels more like a separate emacs instance."
 	 (define-key org-roam-mode-map (kbd "C-c n n") 'org-roam-jump-to-index)
 	 (define-key org-roam-mode-map (kbd "C-c n f") 'org-roam-find-file)
 	 (define-key org-mode-map      (kbd "C-c n i") 'org-roam-insert)
+         (setq org-roam-completion-everywhere t)
 	 (setq org-roam-directory ,org-roam-directory)))
       #:elisp-packages (list emacs-org-roam))))
 
