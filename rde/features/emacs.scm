@@ -777,13 +777,13 @@ git-link, git-timemachine."
          (define-key global-map (kbd "C-S-s") 'consult-line)
          (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
 	 (define-key global-map (kbd "M-y") 'consult-yank-pop)
-         (define-key global-map (kbd "s-b") 'consult-buffer)
+         (define-key global-map (kbd "s-B") 'consult-buffer)
          (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
          (define-key minibuffer-local-map (kbd "s-B") 'embark-become)
          ;; (define-key global-map (kbd "M-.") 'embark-dwim)
 
          ;; MAYBE: Move to feature-emacs-buffers/windows
-         (define-key global-map (kbd "s-B") 'switch-to-buffer)
+         (define-key global-map (kbd "s-b") 'switch-to-buffer)
          (define-key global-map (kbd "s-w") 'kill-current-buffer)
 	 (define-key global-map (kbd "s-o") 'other-window))
 
