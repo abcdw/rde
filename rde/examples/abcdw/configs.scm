@@ -113,13 +113,15 @@
    (feature-emacs
     #:additional-elisp-packages
     (append
-     (pkgs "emacs-yasnippet" "emacs-elfeed"
-           "emacs-olivetti" "emacs-elpher")))
+     (pkgs "emacs-yasnippet"
+           "emacs-elfeed" "emacs-olivetti" "emacs-keycast")))
    (feature-emacs-faces)
    (feature-emacs-completion)
    (feature-emacs-project)
+   (feature-emacs-perspective)
    (feature-emacs-which-key)
    (feature-emacs-input-methods)
+   (feature-emacs-dired)
    (feature-emacs-eshell)
    (feature-emacs-message
     ;; TODO: Take those values from email type
@@ -130,6 +132,7 @@
     #:erc-autojoin-channels-alist
     '(("irc.libera.chat" "#guix" "#emacs" "#tropin" "#rde")
       ("irc.oftc.net"    "#pipewire" "#wayland")))
+   (feature-emacs-elpher)
    (feature-emacs-telega)
    (feature-emacs-git)
    (feature-emacs-org)
@@ -164,7 +167,7 @@
     #:home-packages
     (append
      (pkgs
-      "alsa-utils" "mpv" "youtube-dl"
+      "alsa-utils" "mpv" "youtube-dl" "imv"
       "obs" "obs-wlrobs"
       "icecat"
       "ungoogled-chromium-wayland" "ublock-origin-chromium"
