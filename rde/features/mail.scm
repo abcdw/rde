@@ -4,6 +4,7 @@
   #:use-module (rde features predicates)
   #:use-module (rde features emacs)
   #:use-module (gnu packages mail)
+  #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu services)
   #:use-module (gnu services configuration)
   #:use-module (gnu home-services)
@@ -648,8 +649,10 @@ not appear in the pop-up buffer."
           (with-eval-after-load
            'notmuch
            (setq notmuch-fcc-dirs ',fcc-dirs)
-           (setq notmuch-identities nil)
+           (setq notmuch-identities ',emails)
            (setq notmuch-address-use-company nil)
+
+           (setq notmuch-unthreaded-show-out nil)
 
            (setq notmuch-show-empty-saved-searches t)
            (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
