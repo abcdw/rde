@@ -737,7 +737,7 @@ not appear in the pop-up buffer."
            (setq notmuch-show-logo nil))
 
           (with-eval-after-load 'magit (require 'git-email-magit)))
-        #:elisp-packages (list emacs-git-email-latest)))))
+        #:elisp-packages (list emacs-git-email-latest emacs-consult-notmuch)))))
 
   (feature
    (name f-name)
