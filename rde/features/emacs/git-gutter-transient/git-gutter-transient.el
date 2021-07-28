@@ -73,7 +73,7 @@
    [("M->" "Last" git-gutter-transient:last-hunk)]
    [("s" "Stage" git-gutter-transient:stage-hunk)]
    [("r" "Revert" git-gutter:revert-hunk)]]
-  [[("s-g" "Magit file dispatch" git-gutter-transient:magit-dispatch
+  [[("g" "Magit file dispatch" git-gutter-transient:magit-dispatch
      :transient transient--do-replace)]
    [("q" "Quit" git-gutter-transient:quit :transient transient--do-exit)]
    [("Q" "Quit and disable" git-gutter-transient:quit-and-disable
