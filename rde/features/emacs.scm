@@ -870,12 +870,13 @@ emacsclient feels more like a separate emacs instance."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((add-hook 'after-init-hook 'org-roam-mode)
+      `((setq org-roam-v2-ack t)
+        (add-hook 'after-init-hook 'org-roam-setup)
 	(with-eval-after-load
 	 'org-roam
-	 (define-key org-roam-mode-map (kbd "C-c n n") 'org-roam-jump-to-index)
-	 (define-key org-roam-mode-map (kbd "C-c n f") 'org-roam-find-file)
-	 (define-key org-mode-map      (kbd "C-c n i") 'org-roam-insert)
+	 (define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
+	 (define-key global-map (kbd "C-c n f") 'org-roam-node-find)
+	 (define-key global-map (kbd "C-c n i") 'org-roam-node-insert)
          (setq org-roam-completion-everywhere t)
 	 (setq org-roam-directory ,org-roam-directory)))
       #:elisp-packages (list emacs-org-roam))))
