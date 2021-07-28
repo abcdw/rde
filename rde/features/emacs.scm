@@ -573,11 +573,14 @@ git-link, git-timemachine."
                               '(git-gutter:lighter " GG"))
 
         (define-key global-map (kbd "C-c t g") 'global-git-gutter-mode)
+        (define-key global-map (kbd "s-g") 'git-gutter-transient)
+
         (with-eval-after-load
          'git-gutter
          (require 'git-gutter-fringe)
 
-         ;; (add-to-list 'git-gutter:update-commands 'other-window)
+         (add-to-list 'git-gutter:update-hooks 'focus-in-hook)
+         (add-to-list 'git-gutter:update-commands 'other-window)
 
          (add-hook 'magit-post-stage-hook 'git-gutter:update-all-windows)
          (add-hook 'magit-post-unstage-hook 'git-gutter:update-all-windows)
@@ -589,10 +592,15 @@ git-link, git-timemachine."
          (dolist (fn '(git-gutter:stage-hunk git-gutter:revert-hunk))
                  (advice-add fn :around 'yes-or-no-p->-y-or-n-p))
 
+         (defadvice git-gutter:stage-hunk (around auto-confirm compile activate)
+           (cl-letf (((symbol-function 'yes-or-no-p) (lambda (&rest args) t)))
+                    ad-do-it))
+
          (dolist (fringe '(git-gutter-fr:added
                            git-gutter-fr:modified))
                  (define-fringe-bitmap fringe (vector 8) nil nil '(top repeat)))
-         (define-fringe-bitmap 'git-gutter-fr:deleted (vector 128 192 224 240)
+         (define-fringe-bitmap 'git-gutter-fr:deleted
+           (vector 8 12 14 15)
            nil nil 'bottom)
 
          ;; TODO: Move to feature-modus-themes
@@ -603,7 +611,8 @@ git-link, git-timemachine."
          (set-face-foreground 'git-gutter-fr:deleted  "red")
          (set-face-background 'git-gutter-fr:deleted  "white")))
       #:elisp-packages (list emacs-magit emacs-git-link emacs-git-timemachine
-                             emacs-git-gutter emacs-git-gutter-fringe))))
+                             emacs-git-gutter emacs-git-gutter-fringe
+                             emacs-git-gutter-transient))))
 
   (feature
    (name f-name)
