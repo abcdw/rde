@@ -468,6 +468,14 @@ utilizing reverse-im package."
          ;;; <https://www.emacswiki.org/emacs/AnsiColor#h5o-2>
          (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
 
+         (defun switch-to-prev-buffer-or-eshell (arg)
+           (interactive "P")
+           (if arg
+               (eshell arg)
+               (switch-to-buffer (other-buffer (current-buffer) 1))
+               ;; (switch-to-prev-buffer)
+               ))
+
          (add-hook
           'eshell-mode-hook
           (lambda ()
@@ -479,7 +487,8 @@ utilizing reverse-im package."
             (with-eval-after-load
              'magit (eshell/alias "gd" "magit-diff-unstaged"))
 
-            (define-key eshell-mode-map (kbd "s-e") 'switch-to-prev-buffer))))))))
+            (define-key eshell-mode-map (kbd "s-e")
+              'switch-to-prev-buffer-or-eshell))))))))
 
   (feature
    (name f-name)
