@@ -277,6 +277,7 @@ point reaches the beginning or end of the buffer, stop there."
 
 (define* (feature-emacs-input-methods
 	  #:key
+          (enable-reverse-im #f)
 	  (default-input-method "cyrillic-dvorak")
 	  (input-method-packages (list emacs-cyrillic-dvorak-im)))
   "Configure input-method for GNU Emacs.  Allows to use other layouts
@@ -298,15 +299,16 @@ utilizing reverse-im package."
                 input-method-packages)
 
 	 (setq default-input-method ,default-input-method)
-         (define-key global-map (kbd "s-SPC") 'toggle-input-method)
+         (define-key global-map (kbd "s-SPC") 'toggle-input-method))
 
-	 (require 'reverse-im))
-
-	(with-eval-after-load
-	 'reverse-im
-	 (setq reverse-im-input-methods ,default-input-method)
-	 (reverse-im-mode 1)))
-      #:elisp-packages (cons emacs-reverse-im input-method-packages))))
+	,@(if enable-reverse-im
+              `((add-hook 'after-init-hook 'reverse-im-mode)
+                (with-eval-after-load
+	         'reverse-im
+	         (setq reverse-im-input-methods ,default-input-method)))
+            '()))
+      #:elisp-packages `(,@(if enable-reverse-im (list emacs-reverse-im) '())
+                         ,@input-method-packages))))
 
   (feature
    (name f-name)
