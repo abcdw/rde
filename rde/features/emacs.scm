@@ -82,7 +82,8 @@
 	  #:key
 	  (package emacs-next-pgtk-latest)
 	  (emacs-server-mode? #t)
-	  (additional-elisp-packages '()))
+	  (additional-elisp-packages '())
+          (extra-config '()))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
@@ -207,7 +208,9 @@ point reaches the beginning or end of the buffer, stop there."
                     (add-hook mode-hook (lambda () (setq truncate-lines t))))
 	    (define-key global-map (kbd "s-r") 'recompile)
 
-	    (load-theme 'modus-operandi t)))
+	    (load-theme 'modus-operandi t)
+
+            ,@extra-config))
 	 (early-init-el
 	  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
 	 ;;; TODO: Rebuilding packages with emacs will be useful for
