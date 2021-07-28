@@ -762,14 +762,10 @@ git-link, git-timemachine."
          'vertico
          (custom-set-variables '(vertico-cycle t))))
       #:elisp-packages
-      (map
-       ;; For inherit-input-method for consult-line
-       (options->transformation
-        '((with-commit . "emacs-consult=5cef041e001548874dd1aa98e2764e0518d9a92d")
-          (with-commit . "emacs-embark=acbe1cba548832d295449da348719f69b9685c6f")))
-       (list emacs-orderless emacs-marginalia
-	     emacs-vertico emacs-mini-frame
-             emacs-consult emacs-embark)))))
+      (list emacs-orderless emacs-marginalia
+	    emacs-vertico emacs-mini-frame
+            emacs-pcmpl-args
+            emacs-consult emacs-embark))))
 
   (feature
    (name f-name)
