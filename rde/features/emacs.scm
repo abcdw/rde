@@ -680,7 +680,7 @@ git-link, git-timemachine."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-;; TODO: Remove corfu, rename to minibuffer
+
 (define* (feature-emacs-completion)
   "Configure completion system for GNU Emacs."
   (define emacs-f-name 'completion)
