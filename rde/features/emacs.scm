@@ -388,13 +388,13 @@ utilizing reverse-im package."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((define-key global-map (kbd "C-c a t") 'telega)
+
+        (with-eval-after-load
 	 'telega
 
          (define-key telega-chat-mode-map (kbd "s-B") 'telega-chat-with)
 	 (define-key telega-root-mode-map (kbd "s-B") 'telega-chat-with)
-         (define-key global-map (kbd "C-c a t") 'telega)
-
          (setq telega-emoji-company-backend 'telega-company-emoji)
          (defun my-telega-chat-mode ()
            (set (make-local-variable 'company-backends)
