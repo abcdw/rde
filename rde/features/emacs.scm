@@ -30,6 +30,7 @@
 	    feature-emacs-erc
             feature-emacs-elpher
 	    feature-emacs-telega
+	    feature-emacs-pdf-tools
             feature-emacs-which-key
 
             elisp-configuration-service
@@ -126,8 +127,6 @@
 	 (elisp-packages (cons* emacs-modus-themes
                                 emacs-guix
                                 emacs-expand-region
-                                emacs-pdf-tools
-                                emacs-saveplace-pdf-view
                                 additional-elisp-packages))
 	 (server-mode? emacs-server-mode?)
 	 (xdg-flavor? #t)
@@ -141,16 +140,6 @@
 	    (load custom-file t)
             ,#~""
             (define-key global-map (kbd "C-=") 'er/expand-region)
-
-            ;; TODO: Move to feature-emacs-pdf-view
-            (custom-set-variables '(pdf-view-use-scaling t))
-            (autoload 'pdf-view-mode "pdf-view" "")
-            (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
-            (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
-            (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
-            (with-eval-after-load
-             'saveplace
-             (require 'saveplace-pdf-view))
 
             ,#~""
             (defun rde/display-load-time ()
@@ -421,6 +410,39 @@ utilizing reverse-im package."
    (name f-name)
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
+
+
+(define* (feature-emacs-pdf-tools)
+  "Configure pdf-tools, to work with pdfs inside Emacs."
+  (define emacs-f-name 'pdf-tools)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (define xdg-gexp
+      #~(system*
+         #$emacs-cmd
+         (car (cdr (command-line)))))
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((custom-set-variables '(pdf-view-use-scaling t))
+        (autoload 'pdf-view-mode "pdf-view" "")
+        (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
+        (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
+        (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
+        (with-eval-after-load
+         'saveplace
+         (require 'saveplace-pdf-view)))
+      #:elisp-packages (list emacs-pdf-tools emacs-saveplace-pdf-view))
+     (emacs-xdg-service emacs-f-name "Emacs (Client) [pdf]" xdg-gexp
+                        #:default-for '(application/pdf))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 
 (define* (feature-emacs-dired)
   "Configure dired, the Emacs' directory browser and editor."

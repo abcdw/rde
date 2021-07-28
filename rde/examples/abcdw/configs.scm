@@ -134,6 +134,7 @@
       ("irc.oftc.net"    "#pipewire" "#wayland")))
    (feature-emacs-elpher)
    (feature-emacs-telega)
+   (feature-emacs-pdf-tools)
    (feature-emacs-git)
    (feature-emacs-org)
    (feature-emacs-org-roam
