@@ -127,6 +127,7 @@
                                 emacs-guix
                                 emacs-expand-region
                                 emacs-pdf-tools
+                                emacs-saveplace-pdf-view
                                 additional-elisp-packages))
 	 (server-mode? emacs-server-mode?)
 	 (xdg-flavor? #t)
@@ -141,12 +142,15 @@
             ,#~""
             (define-key global-map (kbd "C-=") 'er/expand-region)
 
+            ;; TODO: Move to feature-emacs-pdf-view
             (custom-set-variables '(pdf-view-use-scaling t))
-
             (autoload 'pdf-view-mode "pdf-view" "")
             (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
             (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
             (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
+            (with-eval-after-load
+             'saveplace
+             (require 'saveplace-pdf-view))
 
             ,#~""
             (defun rde/display-load-time ()
