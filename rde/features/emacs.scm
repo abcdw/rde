@@ -215,6 +215,11 @@ point reaches the beginning or end of the buffer, stop there."
                     (add-hook mode-hook (lambda () (setq truncate-lines t))))
 	    (define-key global-map (kbd "s-r") 'recompile)
 
+            ;; MAYBE: Move it to appearance related feature
+            (setq-default fringes-outside-margins t)
+            (setq-default left-margin-width 1)
+            (setq-default right-margin-width 1)
+
 	    (load-theme 'modus-operandi t)
 
             ,@extra-config))
@@ -567,7 +572,6 @@ git-link, git-timemachine."
       `((custom-set-variables '(git-link-use-commit t)
                               '(git-gutter:lighter " GG"))
 
-        (setq-default fringes-outside-margins t)
         (define-key global-map (kbd "C-c t g") 'global-git-gutter-mode)
         (with-eval-after-load
          'git-gutter
