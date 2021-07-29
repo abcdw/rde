@@ -16,6 +16,7 @@
 
   #:export (feature-user-info
 	    feature-base-packages
+            feature-custom-services
 	    feature-base-services
 	    feature-desktop-services
 	    feature-hidpi
@@ -97,6 +98,26 @@ installed by system or home services."
 
 ;; ((@@ (ice-9 pretty-print) pretty-print)
 ;;  (map service-kind  %base-services))
+
+(define* (feature-custom-services
+	  #:key
+	  (system-services '())
+	  (home-services '()))
+  "Allows to specify additional System and Home Services."
+  (ensure-pred list-of-services? home-services)
+  (ensure-pred list-of-services? system-services)
+
+  (define (get-custom-home-services cfg)
+    home-services)
+
+  (define (get-custom-system-services cfg)
+    system-services)
+
+  (feature
+   (name 'custom-services)
+   (values `((custom-services . #t)))
+   (home-services-getter get-custom-home-services)
+   (system-services-getter get-custom-system-services)))
 
 (define* (feature-base-services
 	  #:key

@@ -59,6 +59,7 @@
       ;; to list those package here in addition to propagated-inputs.
       (elisp-packages (append elisp-packages (list configure-package)))))))
 
+;; MAYBE: make handler to be actions instead of desktop entries?
 (define* (emacs-xdg-service
           name xdg-name gexp
           #:key
@@ -151,7 +152,6 @@
             (defun display-startup-echo-area-message ()
               (rde/display-load-time))
 	    ,#~""
-	    ;; (define-key global-map (kbd "M-/") 'hippie-expand)
 
             (defun rde-compilation-colorizer ()
               "Prevent color escape sequences to popup in compilation buffer."
@@ -190,6 +190,7 @@ point reaches the beginning or end of the buffer, stop there."
 	    (column-number-mode 1)
 	    (save-place-mode 1)
 	    (show-paren-mode 1)
+            ;; TODO: Move to feature-emacs-guix.
             (global-guix-prettify-mode)
 
 	    (setq-default indent-tabs-mode nil)
@@ -289,7 +290,7 @@ utilizing reverse-im package."
       emacs-f-name
       `((with-eval-after-load
 	 'mule
-
+         ;; MAYBE: Change cursor color on input method change?
          ,@(map (lambda (x) `(require ',(strip-emacs-name x)))
                 input-method-packages)
 

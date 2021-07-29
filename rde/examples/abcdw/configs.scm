@@ -87,6 +87,18 @@
 ;;; services of other features.  Be careful changing it.
 (define %main-features
   (list
+   (feature-custom-services
+    #:home-services
+    (list
+     ((@ (gnu services) simple-service)
+      'extend-shell-profile
+      (@ (gnu home-services shells) home-shell-profile-service-type)
+      (list
+       #~(string-append
+          "alias superls="
+          #$(file-append (@ (gnu packages base) coreutils)
+                         "/bin/ls"))))))
+
    (feature-base-services)
    (feature-desktop-services)
 
