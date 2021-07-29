@@ -113,8 +113,7 @@
    (feature-emacs
     #:additional-elisp-packages
     (append
-     (pkgs "emacs-yasnippet"
-           "emacs-elfeed" "emacs-olivetti" "emacs-keycast")))
+     (pkgs "emacs-yasnippet" "emacs-elfeed" "emacs-keycast")))
    (feature-emacs-faces)
    (feature-emacs-completion)
    (feature-emacs-project)
@@ -123,6 +122,7 @@
    (feature-emacs-input-methods)
    (feature-emacs-dired)
    (feature-emacs-eshell)
+   (feature-emacs-monocle)
    (feature-emacs-message
     ;; TODO: Take those values from email type
     #:smtp-server "smtp.gmail.com"

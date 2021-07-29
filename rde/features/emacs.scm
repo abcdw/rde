@@ -25,6 +25,7 @@
 	    feature-emacs-git
 	    feature-emacs-dired
             feature-emacs-eshell
+	    feature-emacs-monocle
 	    feature-emacs-org
 	    feature-emacs-org-roam
 	    feature-emacs-erc
@@ -437,6 +438,63 @@ utilizing reverse-im package."
       #:elisp-packages (list emacs-pdf-tools emacs-saveplace-pdf-view))
      (emacs-xdg-service emacs-f-name "Emacs (Client) [pdf]" xdg-gexp
                         #:default-for '(application/pdf))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-monocle)
+  "Configure olivetti and helper functions for focused editing/reading."
+  (define emacs-f-name 'monocle)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((custom-set-variables '(olivetti-body-width 80))
+
+        (defun rde--match-modes (modes)
+          "Check if current mode is derived from one of the MODES."
+          (seq-filter 'derived-mode-p modes))
+
+        (defun rde--turn-on-olivetti-mode ()
+          (when (rde--match-modes
+                 '(text-mode prog-mode fundamental-mode
+                   help-mode Info-mode eshell-mode))
+            (olivetti-mode 1)))
+
+        (define-globalized-minor-mode global-olivetti-mode
+          olivetti-mode rde--turn-on-olivetti-mode
+          :require 'olivetti-mode
+          :group 'olivetti)
+
+        (defvar rde--monocle-previous-window-configuration nil
+          "Window configuration for restoring on monocle exit.")
+
+        (defun rde-toggle-monocle (arg)
+          "Make window occupy whole frame if there are many windows. Restore
+previous window layout otherwise.  With universal argument toggles
+`global-olivetti-mode'."
+          (interactive "P")
+
+          (if arg
+              (global-olivetti-mode 'toggle)
+              (if (one-window-p)
+                  (if rde--monocle-previous-window-configuration
+	              (let ((cur-buffer (current-buffer)))
+                        (set-window-configuration
+                         rde--monocle-previous-window-configuration)
+	                (setq rde--monocle-previous-window-configuration nil)
+                        (switch-to-buffer cur-buffer)))
+                  (setq rde--monocle-previous-window-configuration
+                        (current-window-configuration))
+                  (delete-other-windows))))
+
+        (define-key global-map (kbd "C-c t o") 'global-olivetti-mode)
+	(define-key global-map (kbd "s-f") 'rde-toggle-monocle))
+      #:elisp-packages (list emacs-olivetti))))
 
   (feature
    (name f-name)
