@@ -3,18 +3,11 @@
 # bindswitch tablet:off output eDP-1 transform 0
 
 # Your preferred terminal emulator
-set $term alacritty
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
 # on the original workspace that the command was run on.
-# exec gpg-connect-agent updatestartuptty /bye >/dev/null
-# set $menu wofi --show=drun
 # dmenu_path | dmenu | xargs swaymsg exec --
 
-default_border pixel
-default_floating_border pixel
-
-gaps inner 14
 ### Output configuration
 #
 # Default wallpaper (more resolutions are available in /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/share/backgrounds/sway/)

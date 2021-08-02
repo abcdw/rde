@@ -74,7 +74,11 @@
             (set $mod ,sway-mod)
             (set $term ,default-terminal)
             (set $menu ,default-app-launcher)
-	    (,#~"")))))
+	    (,#~"")
+            (default_border pixel)
+            (default_floating_border pixel)
+            (gaps inner ,(get-value 'emacs-margin config 8))
+            (,#~"")))))
 
        (simple-service
 	'sway-configuration

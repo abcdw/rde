@@ -308,7 +308,8 @@ point reaches the beginning or end of the buffer, stop there."
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((,f-name . #t)
+             (emacs-margin . ,margin)))
    (home-services-getter get-home-services)))
 
 
