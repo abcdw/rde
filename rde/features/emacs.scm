@@ -767,6 +767,8 @@ git-link, git-timemachine."
          (define-fringe-bitmap 'git-gutter-fr:deleted
            (vector 8 12 14 15)
            nil nil 'bottom)))
+      #:elisp-packages (list emacs-magit emacs-magit-todos
+                             emacs-git-link emacs-git-timemachine
                              emacs-git-gutter emacs-git-gutter-fringe
                              emacs-git-gutter-transient))))
 
