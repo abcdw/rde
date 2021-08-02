@@ -285,6 +285,16 @@ point reaches the beginning or end of the buffer, stop there."
         (setq modus-themes-scale-headings t)
 	(load-theme 'modus-operandi t)
 
+        (setq header-line-format (delete 'mode-line-modes header-line-format))
+
+        (custom-set-faces
+         `(git-gutter-fr:modified
+           ((t (:foreground "blue" :background "white"))))
+         `(git-gutter-fr:added
+           ((t (:foreground "green" :background "white"))))
+         `(git-gutter-fr:deleted
+           ((t (:foreground "red" :background "white")))))
+
         (defun rde--set-divider-faces ()
           (custom-set-faces
               `(window-divider
@@ -756,16 +766,7 @@ git-link, git-timemachine."
                  (define-fringe-bitmap fringe (vector 8) nil nil '(top repeat)))
          (define-fringe-bitmap 'git-gutter-fr:deleted
            (vector 8 12 14 15)
-           nil nil 'bottom)
-
-         ;; TODO: Move to feature-modus-themes
-         (set-face-foreground 'git-gutter-fr:modified "blue")
-         (set-face-background 'git-gutter-fr:modified "white")
-         (set-face-foreground 'git-gutter-fr:added    "green")
-         (set-face-background 'git-gutter-fr:added    "white")
-         (set-face-foreground 'git-gutter-fr:deleted  "red")
-         (set-face-background 'git-gutter-fr:deleted  "white")))
-      #:elisp-packages (list emacs-magit emacs-git-link emacs-git-timemachine
+           nil nil 'bottom)))
                              emacs-git-gutter emacs-git-gutter-fringe
                              emacs-git-gutter-transient))))
 
