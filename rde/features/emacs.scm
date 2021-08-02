@@ -958,7 +958,9 @@ emacsclient feels more like a separate emacs instance."
      (elisp-configuration-service
       emacs-f-name
       `((add-hook 'after-init-hook 'persp-mode)
-        (custom-set-variables '(persp-modestring-dividers '(" [" "]" "|"))))
+        (custom-set-variables
+         '(persp-show-modestring nil)
+         '(persp-modestring-dividers '(" [" "]" "|"))))
       #:elisp-packages (list emacs-perspective))))
 
   (feature
