@@ -33,6 +33,7 @@
 	    feature-emacs-telega
 	    feature-emacs-pdf-tools
             feature-emacs-which-key
+            feature-emacs-keycast
 
             elisp-configuration-service
             emacs-xdg-service))
@@ -954,7 +955,44 @@ emacsclient feels more like a separate emacs instance."
    (home-services-getter get-home-services)))
 
 
-;; TODO: feature-emacs-monocole
+(define* (feature-emacs-keycast)
+  "Show keybindings and related functions as you type."
+
+  (define emacs-f-name 'keycast)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+         'keycast
+         (require 'moody)
+         (setq keycast-window-predicate 'moody-window-active-p)
+         (setq keycast-separator-width 1)
+         (add-to-list 'global-mode-string mode-line-keycast))
+
+        (autoload 'keycast--update "keycast")
+        ;; <https://github.com/tarsius/keycast/issues/7#issuecomment-627604064>
+        (define-minor-mode rde-keycast-mode
+          "Show current command and its key binding in the mode line."
+          :global t
+          (if rde-keycast-mode
+              (add-hook 'pre-command-hook 'keycast--update t)
+              (progn
+               (setq keycast--this-command nil)
+               (setq keycast--this-command-keys nil)
+               (setq keycast--command-repetitions 0)
+               (remove-hook 'pre-command-hook 'keycast--update))))
+
+        (define-key global-map (kbd "C-c t k") 'rde-keycast-mode))
+      #:elisp-packages (list emacs-moody emacs-keycast))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 ;; TODO: feature-emacs-reasonable-keybindings
 ;; TODO: Fix env vars for emacs daemon
 ;; https://github.com/purcell/exec-path-from-shell

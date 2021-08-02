@@ -130,8 +130,10 @@
    (feature-emacs-completion)
    (feature-emacs-project)
    (feature-emacs-perspective)
-   (feature-emacs-which-key)
    (feature-emacs-input-methods)
+   (feature-emacs-which-key)
+   (feature-emacs-keycast)
+
    (feature-emacs-dired)
    (feature-emacs-eshell)
    (feature-emacs-monocle)
