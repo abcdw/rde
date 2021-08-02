@@ -290,7 +290,14 @@ utilizing reverse-im package."
       emacs-f-name
       `((with-eval-after-load
 	 'mule
-         ;; MAYBE: Change cursor color on input method change?
+         (setq-default mode-line-mule-info nil)
+         ;; Feels a little hacky, but mule-related hooks are
+         ;; inconsistent and cursor not changed back in some cases.
+         (add-hook 'post-command-hook
+                   '(lambda ()
+                      (set-cursor-color
+                       (if current-input-method "DarkOrange1" "black"))))
+
          ,@(map (lambda (x) `(require ',(strip-emacs-name x)))
                 input-method-packages)
 
