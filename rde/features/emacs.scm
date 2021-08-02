@@ -138,11 +138,13 @@
 	 (init-el
 	  `((setq user-full-name ,full-name)
 	    (setq user-mail-address ,email)
-	    ,#~""
+
+            ,#~""
 	    (setq custom-file
 		  (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
 			  "/emacs/custom.el"))
 	    (load custom-file t)
+
             ,#~""
             (define-key global-map (kbd "C-=") 'er/expand-region)
 
@@ -273,15 +275,11 @@ point reaches the beginning or end of the buffer, stop there."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `(
-        (setq-default fringes-outside-margins t)
-        (setq-default left-margin-width 1)
-        (setq-default right-margin-width 1)
-        (custom-set-variables '(window-divider-default-right-width ,margin))
-
-        (set-default 'cursor-type  '(bar . 1))
+      `((set-default 'cursor-type  '(bar . 1))
         (blink-cursor-mode 0)
         (setq-default cursor-in-non-selected-windows nil)
+
+        (custom-set-variables '(window-divider-default-right-width ,margin))
 
         (require 'modus-themes)
         (setq modus-themes-scale-headings t)
@@ -309,6 +307,11 @@ these UI elements early."
         (push '(tool-bar-lines . 0) default-frame-alist)
         (push '(vertical-scroll-bars) default-frame-alist)
         (push '(internal-border-width . ,margin) default-frame-alist)
+
+        ,#~""
+        (setq-default fringes-outside-margins t)
+        (setq-default left-margin-width 1)
+        (setq-default right-margin-width 1)
 
         ,#~""
         (setq use-dialog-box nil)
