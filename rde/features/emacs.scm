@@ -230,7 +230,7 @@ point reaches the beginning or end of the buffer, stop there."
  	 (simple-service
 	  'emacs-update-environment-variables-on-sway-start
 	  home-sway-service-type
-	  `((exec_always
+	  `((exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
 	     ,(program-file
 	       "update-emacs-env-variables"
 	       #~(system*
