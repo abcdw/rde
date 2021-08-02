@@ -188,6 +188,10 @@ point reaches the beginning or end of the buffer, stop there."
   [remap move-beginning-of-line]
   'smarter-move-beginning-of-line)\n"
 
+            (set-default 'cursor-type  '(bar . 1))
+            (blink-cursor-mode 0)
+            (setq cursor-in-non-selected-windows nil)
+
 	    (column-number-mode 1)
 	    (save-place-mode 1)
 	    (show-paren-mode 1)
