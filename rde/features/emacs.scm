@@ -43,6 +43,7 @@
           name
           #:optional (elisp-expressions '())
           #:key
+          (early-init '())
           (elisp-packages '())
           (autoloads? #t))
   (let* ((configure-package
@@ -55,6 +56,7 @@
      (symbol-append 'emacs- name '-configurations)
      home-emacs-service-type
      (home-emacs-extension
+      (early-init-el early-init)
       ;; It's necessary to explicitly add elisp-packages here, because
       ;; we want to overwrite builtin emacs packages.  Propagated
       ;; inputs have lowest priority on collisions, that's why we have
@@ -271,15 +273,11 @@ point reaches the beginning or end of the buffer, stop there."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((setq-default fringes-outside-margins t)
+      `(
+        (setq-default fringes-outside-margins t)
         (setq-default left-margin-width 1)
         (setq-default right-margin-width 1)
-        (push '(internal-border-width . ,margin) default-frame-alist)
         (custom-set-variables '(window-divider-default-right-width ,margin))
-
-        ;; Move modeline to the top
-        (setq-default header-line-format mode-line-format)
-        (setq-default mode-line-format nil)
 
         (set-default 'cursor-type  '(bar . 1))
         (blink-cursor-mode 0)
@@ -304,6 +302,21 @@ point reaches the beginning or end of the buffer, stop there."
                         (with-selected-frame frame (rde--set-divider-faces))))
             (rde--set-divider-faces))
         (window-divider-mode))
+      #:early-init
+      `(,#~"\n;; Prevent the glimpse of un-styled Emacs by disabling \
+these UI elements early."
+        (push '(menu-bar-lines . 0) default-frame-alist)
+        (push '(tool-bar-lines . 0) default-frame-alist)
+        (push '(vertical-scroll-bars) default-frame-alist)
+        (push '(internal-border-width . ,margin) default-frame-alist)
+
+        ,#~""
+        (setq use-dialog-box nil)
+        (setq use-file-dialog nil)
+
+        ,#~"\n;; Move modeline to the top"
+        (setq-default header-line-format mode-line-format)
+        (setq-default mode-line-format nil))
       #:elisp-packages (list emacs-modus-themes))))
 
   (feature
