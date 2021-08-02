@@ -277,6 +277,10 @@ point reaches the beginning or end of the buffer, stop there."
         (push '(internal-border-width . ,margin) default-frame-alist)
         (custom-set-variables '(window-divider-default-right-width ,margin))
 
+        ;; Move modeline to the top
+        (setq-default header-line-format mode-line-format)
+        (setq-default mode-line-format nil)
+
         (set-default 'cursor-type  '(bar . 1))
         (blink-cursor-mode 0)
         (setq-default cursor-in-non-selected-windows nil)
@@ -840,12 +844,10 @@ git-link, git-timemachine."
          (setq completion-in-region-function 'consult-completion-in-region)
 	 (setq enable-recursive-minibuffers t)
 
-         ;; Move modeline to the top
-         (setq-default header-line-format mode-line-format)
-         (setq-default mode-line-format nil)
-
          (setq resize-mini-windows nil)
 
+         ;; MAYBE: Make transient use child-frame:
+         ;; https://github.com/magit/transient/issues/102
          (add-hook 'after-init-hook 'mini-frame-mode)
          (with-eval-after-load
           'mini-frame
