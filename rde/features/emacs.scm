@@ -17,7 +17,8 @@
   #:use-module (guix transformations)
 
   #:export (feature-emacs
-	    feature-emacs-faces
+            feature-emacs-appearance
+            feature-emacs-faces
 	    feature-emacs-completion
 	    feature-emacs-input-methods
 	    feature-emacs-project
@@ -127,8 +128,7 @@
 	home-emacs-service-type
 	(home-emacs-configuration
 	 (package package)
-	 (elisp-packages (cons* emacs-modus-themes
-                                emacs-guix
+	 (elisp-packages (cons* emacs-guix
                                 emacs-expand-region
                                 additional-elisp-packages))
 	 (server-mode? emacs-server-mode?)
@@ -188,10 +188,6 @@ point reaches the beginning or end of the buffer, stop there."
   [remap move-beginning-of-line]
   'smarter-move-beginning-of-line)\n"
 
-            (set-default 'cursor-type  '(bar . 1))
-            (blink-cursor-mode 0)
-            (setq cursor-in-non-selected-windows nil)
-
 	    (column-number-mode 1)
 	    (save-place-mode 1)
 	    (show-paren-mode 1)
@@ -210,13 +206,6 @@ point reaches the beginning or end of the buffer, stop there."
                                  compilation-mode-hook))
                     (add-hook mode-hook (lambda () (setq truncate-lines t))))
 	    (define-key global-map (kbd "s-r") 'recompile)
-
-            ;; MAYBE: Move it to appearance related feature
-            (setq-default fringes-outside-margins t)
-            (setq-default left-margin-width 1)
-            (setq-default right-margin-width 1)
-
-	    (load-theme 'modus-operandi t)
 
             ,@extra-config))
 	 (early-init-el
@@ -268,6 +257,49 @@ point reaches the beginning or end of the buffer, stop there."
                                  emacs-client-no-wait
                                  emacs-server-mode?)))
    (home-services-getter emacs-home-services)))
+
+(define* (feature-emacs-appearance
+          #:key
+          (margin 8))
+  "Make Emacs looks modern and minimalistic."
+  (ensure-pred integer? margin)
+
+  (define emacs-f-name 'appearance)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((setq-default fringes-outside-margins t)
+        (setq-default left-margin-width 1)
+        (setq-default right-margin-width 1)
+        (push '(internal-border-width . ,margin) default-frame-alist)
+        (custom-set-variables '(window-divider-default-right-width ,margin))
+
+        (set-default 'cursor-type  '(bar . 1))
+        (blink-cursor-mode 0)
+        (setq-default cursor-in-non-selected-windows nil)
+
+        (require 'modus-themes)
+        (setq modus-themes-scale-headings t)
+	(load-theme 'modus-operandi t)
+
+        (custom-set-faces
+         `(window-divider
+           ((t (:foreground ,(face-background 'default)))))
+         `(window-divider-first-pixel
+           ((t (:foreground ,(face-background 'default)))))
+         `(window-divider-last-pixel
+           ((t (:foreground ,(face-background 'default))))))
+        (window-divider-mode))
+      #:elisp-packages (list emacs-modus-themes))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 
 (define (strip-emacs-name p)
   (let ((name (package-name p)))

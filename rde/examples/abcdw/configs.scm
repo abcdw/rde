@@ -125,7 +125,8 @@
    (feature-emacs
     #:additional-elisp-packages
     (append
-     (pkgs "emacs-yasnippet" "emacs-elfeed" "emacs-keycast")))
+     (pkgs "emacs-yasnippet" "emacs-elfeed" "emacs-hl-todo")))
+   (feature-emacs-appearance)
    (feature-emacs-faces)
    (feature-emacs-completion)
    (feature-emacs-project)
