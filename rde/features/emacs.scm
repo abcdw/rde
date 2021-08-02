@@ -533,7 +533,8 @@ utilizing reverse-im package."
         (defun rde--turn-on-olivetti-mode ()
           (when (rde--match-modes
                  '(text-mode prog-mode fundamental-mode
-                   help-mode Info-mode eshell-mode))
+                   help-mode Info-mode eshell-mode
+                   telega-root-mode telega-chat-mode))
             (olivetti-mode 1)))
 
         (define-globalized-minor-mode global-olivetti-mode
