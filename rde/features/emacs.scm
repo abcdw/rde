@@ -285,17 +285,20 @@ point reaches the beginning or end of the buffer, stop there."
         (setq modus-themes-scale-headings t)
 	(load-theme 'modus-operandi t)
 
-        (add-hook 'after-make-frame-functions
-          (lambda (frame)
-            (with-selected-frame
-             frame
-             (custom-set-faces
+        (defun rde--set-divider-faces ()
+          (custom-set-faces
               `(window-divider
                 ((t (:foreground ,(face-background 'default)))))
               `(window-divider-first-pixel
                 ((t (:foreground ,(face-background 'default)))))
               `(window-divider-last-pixel
-                ((t (:foreground ,(face-background 'default)))))))))
+                ((t (:foreground ,(face-background 'default)))))))
+
+        (if (daemonp)
+            (add-hook 'after-make-frame-functions
+                      (lambda (frame)
+                        (with-selected-frame frame (rde--set-divider-faces))))
+            (rde--set-divider-faces))
         (window-divider-mode))
       #:elisp-packages (list emacs-modus-themes))))
 
