@@ -313,6 +313,7 @@ these UI elements early."
         ,#~""
         (setq use-dialog-box nil)
         (setq use-file-dialog nil)
+        (setq inhibit-startup-screen t)
 
         ,#~"\n;; Move modeline to the top"
         (setq-default header-line-format mode-line-format)
