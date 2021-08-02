@@ -86,10 +86,10 @@ FILE-NAME found in %PATCH-PATH."
      (origin
        (method git-fetch)
        (uri (git-reference
-             (url "https://github.com/JonWaltman/pcmpl-args.el")
-             (commit "36139ba64f43a3d3f4090ef0118bcebfef7e20c9")))
+             (url "https://github.com/xFA25E/pcmpl-args.el")
+             (commit "fc697ba96ee356540994d286695f2dd9993e49ee")))
        (sha256
-        (base32 "1isab23shk1gfk54z4ppbnnkrm527rzb9cvbqqa47s8gv9k7zbnm"))
+        (base32 "0xky366m68fnlc6m7m86l36qg6fcnf84vk608r97kf13wiwy1svq"))
        (file-name (git-file-name name version))))
     (build-system emacs-build-system)
     (home-page "https://github.com/JonWaltman/pcmpl-args.el")
