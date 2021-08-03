@@ -115,6 +115,19 @@ both Bash and Zsh.")
              (base32
               "0yghz9pdjsm9v6lbjckm6c5h9ak7iylx8sqgyjwl6nihkpvv4jyp"))))))
 
+(define-public emacs-hide-header-line
+  (package
+   (inherit emacs-hide-mode-line)
+   (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'make-it-update-header-line
+           (lambda* (#:key outputs #:allow-other-keys)
+             (substitute* "hide-mode-line.el"
+	       ((" mode-line-format")
+                " header-line-format"))
+             #t)))))))
+
 (use-modules (gnu packages shellutils)
              (guix utils))
 (define-public zsh-autosuggestions-latest

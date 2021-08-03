@@ -539,15 +539,16 @@ utilizing reverse-im package."
       emacs-f-name
       `((custom-set-variables '(olivetti-body-width 80))
 
+        (with-eval-after-load
+         'hide-mode-line
+         (custom-set-variables '(hide-mode-line-excluded-modes '())))
+
         (defun rde--match-modes (modes)
           "Check if current mode is derived from one of the MODES."
           (seq-filter 'derived-mode-p modes))
 
         (defun rde--turn-on-olivetti-mode ()
-          (when (rde--match-modes
-                 '(text-mode prog-mode fundamental-mode
-                   help-mode Info-mode eshell-mode
-                   telega-root-mode telega-chat-mode))
+          (unless (memq major-mode '(minibuffer-mode which-key-mode))
             (olivetti-mode 1)))
 
         (define-globalized-minor-mode global-olivetti-mode
@@ -565,7 +566,13 @@ previous window layout otherwise.  With universal argument toggles
           (interactive "P")
 
           (if arg
-              (global-olivetti-mode 'toggle)
+              (if (and global-olivetti-mode global-hide-mode-line-mode)
+                  (progn
+                   (global-hide-mode-line-mode -1)
+                   (global-olivetti-mode -1))
+                  (progn
+                   (global-hide-mode-line-mode 1)
+                   (global-olivetti-mode 1)))
               (if (one-window-p)
                   (if rde--monocle-previous-window-configuration
 	              (let ((cur-buffer (current-buffer)))
@@ -578,8 +585,9 @@ previous window layout otherwise.  With universal argument toggles
                   (delete-other-windows))))
 
         (define-key global-map (kbd "C-c t o") 'global-olivetti-mode)
+        (define-key global-map (kbd "C-c t m") 'global-hide-mode-line-mode)
 	(define-key global-map (kbd "s-f") 'rde-toggle-monocle))
-      #:elisp-packages (list emacs-olivetti))))
+      #:elisp-packages (list emacs-olivetti emacs-hide-header-line))))
 
   (feature
    (name f-name)
