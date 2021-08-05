@@ -56,6 +56,49 @@
 ;;; Home Services use the same extension as System Services.  Consult
 ;;; (gnu system services) module or manual for more information.
 ;;;
+;;; home-service-type is a root of home services DAG.
+;;;
+;;; home-profile-service-type is almost the same as profile-service-type, at least
+;;; for now.
+;;;
+;;; home-environment-variables-service-type generates a @file{setup-environment}
+;;; shell script, which is expected to be sourced by login shell or other program,
+;;; which starts early and spawns all other processes.  Home services for shells
+;;; automatically add code for sourcing this file, if person do not use those home
+;;; services they have to source this script manually in their's shell *profile
+;;; file (details described in the manual).
+;;;
+;;; home-files-service-type is similar to etc-service-type, but doesn't extend
+;;; home-activation, because deploy mechanism for config files is pluggable and
+;;; can be different for different home environments: The default one is called
+;;; symlink-manager (will be introudced in a separate patch series), which creates
+;;; links for various dotfiles (like $XDG_CONFIG_HOME/$APP/...) to store, but is
+;;; possible to implement alternative approaches like read-only home from Julien's
+;;; guix-home-manager.
+;;;
+;;; home-run-on-first-login-service-type provides an @file{on-first-login} guile
+;;; script, which runs provided gexps once, when user makes first login.  It can
+;;; be used to start user's Shepherd and maybe some other process.  It relies on
+;;; assumption that /run/user/$UID will be created on login by some login
+;;; manager (elogind for example).
+;;;
+;;; home-activation-service-type provides an @file{activate} guile script, which
+;;; do three main things:
+;;;
+;;; - Sets environment variables to the values declared in
+;;; @file{setup-environment} shell script.  It's necessary, because user can set
+;;; for example XDG_CONFIG_HOME and it should be respected by activation gexp of
+;;; symlink-manager.
+;;;
+;;; - Sets GUIX_NEW_HOME and possibly GUIX_OLD_HOME vars to paths in the store.
+;;; Later those variables can be used by activation gexps, for example by
+;;; symlink-manager or run-on-change services.
+;;;
+;;; - Run all activation gexps provided by other home services.
+;;;
+;;; home-run-on-change-service-type allows to trigger actions during
+;;; activation if file or directory specified by pattern is changed.
+;;;
 ;;; Code:
 
 
