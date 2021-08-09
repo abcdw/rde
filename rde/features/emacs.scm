@@ -1037,6 +1037,8 @@ emacsclient feels more like a separate emacs instance."
          '(org-roam-completion-everywhere t)
          '(org-roam-directory ,org-roam-directory))
 
+        (with-eval-after-load 'org-roam (org-roam-setup))
+
 	(define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
 	(define-key global-map (kbd "C-c n f") 'org-roam-node-find)
 	(define-key global-map (kbd "C-c n i") 'org-roam-node-insert))
