@@ -195,7 +195,7 @@ point reaches the beginning or end of the buffer, stop there."
 	    (column-number-mode 1)
 	    (save-place-mode 1)
 	    (show-paren-mode 1)
-            (electric-pair-mode 1)
+            ;; (add-hook 'prog-mode-hook 'electric-pair-mode)
 
             ;; TODO: Move to feature-emacs-guix.
             (global-guix-prettify-mode)
