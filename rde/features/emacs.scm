@@ -689,7 +689,10 @@ previous window layout otherwise.  With universal argument toggles
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-org)
+(define* (feature-emacs-org
+          #:key
+          (org-directory "~/org")
+          (org-rename-buffer-to-title #t))
   "Configure org-mode for GNU Emacs."
   (define emacs-f-name 'org)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -705,7 +708,7 @@ previous window layout otherwise.  With universal argument toggles
 	 (setq org-startup-indented t)
 
          (setq org-outline-path-complete-in-steps nil)
-         (setq org-refile-use-outline-path t)
+         (setq org-refile-use-outline-path 'path)
          (setq org-refile-targets `((nil . (:maxlevel . 3))))
 
          (setq org-ellipsis "⤵")
@@ -713,6 +716,37 @@ previous window layout otherwise.  With universal argument toggles
 		             :inherit '(font-lock-comment-face default)
 		             :weight 'normal)
          (setq org-hide-emphasis-markers t)
+
+         (setq org-directory ,org-directory)
+         (setq org-default-notes-file (concat org-directory "/todo.org"))
+
+         ;; <https://emacs.stackexchange.com/questions/54809/rename-org-buffers-to-orgs-title-instead-of-filename>
+         (defun org+-buffer-name-to-title (&optional end)
+           "Rename buffer to value of #+TITLE:.
+If END is non-nil search for #+TITLE: at `point' and
+delimit it to END.
+Start an unlimited search at `point-min' otherwise."
+           (interactive)
+           (let ((case-fold-search t)
+                 (beg (or (and end (point))
+                          (point-min))))
+             (save-excursion
+              (when end
+                (goto-char end)
+                (setq end (line-end-position)))
+              (goto-char beg)
+              (when (re-search-forward
+                     "^[[:space:]]*#\\+TITLE:[[:space:]]*\\(.*?\\)[[:space:]]*$"
+                     end t)
+                (rename-buffer (match-string 1)))))
+           nil)
+
+         (defun org+-buffer-name-to-title-config ()
+           "Configure Org to rename buffer to value of #+TITLE:."
+           (font-lock-add-keywords nil '(org+-buffer-name-to-title)))
+
+         ,@(when org-rename-buffer-to-title
+             '((add-hook 'org-mode-hook 'org+-buffer-name-to-title-config)))
 
          (with-eval-after-load 'notmuch (require 'ol-notmuch))))
       #:elisp-packages (list emacs-org emacs-org-contrib))))
