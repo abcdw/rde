@@ -76,12 +76,7 @@ field of ~home-environemnt~.
 - Browser extension
 *** TODO nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** DONE Add on-change to activation script?
-For some apps to run some commands like restart if their configs updated
-** DONE Make fonts service
 ** TODO Make gtk service
-** TODO SMTP client
-- msmtp/sendmail
 ** Finished
 *** DONE icecat
 *** DONE sway
@@ -103,6 +98,11 @@ Things the user should be able to configure
 - Integrate with mcron/state service
 **** DONE Mail indexer
 - notmuch/mu
+*** DONE Add on-change to activation script?
+For some apps to run some commands like restart if their configs updated
+*** DONE Make fonts service
+*** DONE SMTP client
+- msmtp/sendmail
 * ~rde~ Backlog
 :PROPERTIES:
 :VISIBILITY: content
@@ -122,7 +122,7 @@ Start user-space shepherd on first user login and exit on last logout.
 Take a look at mpd service for user-service example and /run/user/ID
 creation.
 
-*** TODO Remove previous rde implementation
+*** DONE Remove previous rde implementation
 *** DONE Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
