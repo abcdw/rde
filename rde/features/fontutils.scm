@@ -18,7 +18,7 @@
   (list font-iosevka
 	font-dejavu
 	font-liberation
-	font-gnu-unifont
+        font-google-noto
 	font-fira-go))
 
 (define-record-type <font>
