@@ -276,7 +276,7 @@ features."
             (l2md-repo
              (inherit repo-config)
              (maildir (string-append
-                       mail-dir "lists/" (mailing-list-fqda ml) "/all")))
+                       mail-dir "/lists/" (mailing-list-fqda ml) "/all")))
             repo-config)))
     ;; <https://git.kernel.org/pub/scm/linux/kernel/git/dborkman/l2md.git/about/>
     ;; Applying patches <https://git.kyleam.com/piem/about/>
