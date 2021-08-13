@@ -211,9 +211,14 @@ features."
          (setq mml-secure-openpgp-sign-with-sender t)
          (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
 
-	 (setq message-auto-save-directory
-	       (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		       "/emacs/mail-drafts")))))
+         (setq message-citation-line-function
+               'message-insert-formatted-citation-line)
+
+         (custom-set-variables
+          '(message-citation-line-format "On %Y-%m-%d %R, %N wrote:\n")
+          `(message-auto-save-directory
+	       ,(concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		        "/emacs/mail-drafts"))))))
 
      (emacs-xdg-service
       emacs-f-name
