@@ -734,6 +734,17 @@ not appear in the pop-up buffer."
                     . " %-88s ")
                    ("tags" . "(%s)")))
 
+           (defun rde--notmuch-refresh-buffer (&optional _)
+             "Wrapper around `notmuch-refresh-this-buffer', which accepts
+optional arguments to use the function inside hook."
+             (notmuch-refresh-this-buffer))
+
+           (defun rde--add-notmuch-hello-hooks ()
+             "Add mode local hooks for notmuch-hello buffers."
+             (add-hook 'window-size-change-functions 'rde--notmuch-refresh-buffer))
+
+           (add-hook 'notmuch-hello-mode-hook 'rde--add-notmuch-hello-hooks)
+
            (setq notmuch-show-logo nil))
 
           (with-eval-after-load 'magit (require 'git-email-magit)))
