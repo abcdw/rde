@@ -138,10 +138,7 @@
    (feature-emacs-dired)
    (feature-emacs-eshell)
    (feature-emacs-monocle)
-   (feature-emacs-message
-    ;; TODO: Take those values from email type
-    #:smtp-server "smtp.gmail.com"
-    #:smtp-port   25)
+   (feature-emacs-message)
    (feature-emacs-erc
     #:erc-nick "abcdw"
     #:erc-autojoin-channels-alist

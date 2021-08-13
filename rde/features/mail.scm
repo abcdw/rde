@@ -185,14 +185,9 @@ features."
         (when (buffer-live-p errbuf)
 	  (kill-buffer errbuf)))))))
 
-(define* (feature-emacs-message
-	  #:key
-	  (smtp-server #f)
-	  (smtp-port 587))
+(define* (feature-emacs-message)
   "Configure email sending capabilities provided by @file{message.el}."
 	    feature-emacs-message
-  (ensure-pred string? smtp-server)
-  (ensure-pred integer? smtp-port)
 
   (define emacs-f-name 'message)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -212,8 +207,6 @@ features."
          (setq message-sendmail-extra-arguments
                '("--enqueue" "--read-envelope-from"))
 
-	 (setq smtpmail-smtp-server ,smtp-server)
-	 (setq smtpmail-smtp-service ,smtp-port)
          (setq message-kill-buffer-on-exit t)
          (setq mml-secure-openpgp-sign-with-sender t)
          (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
