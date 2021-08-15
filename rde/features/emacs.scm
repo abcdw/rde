@@ -126,6 +126,10 @@
     (let* ((full-name (get-value 'full-name config))
 	   (email     (get-value 'email config)))
       (list
+       (emacs-xdg-service 'emacs-q "Emacs (No init: -q)"
+                          #~(system* "emacs" "-q"))
+       (emacs-xdg-service 'emacs-Q "Emacs (No init, no site-lisp: -Q)"
+                          #~(system* "emacs" "-Q"))
        (service
 	home-emacs-service-type
 	(home-emacs-configuration
