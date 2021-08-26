@@ -19,15 +19,7 @@
 
 (define-module (gnu home-services symlink-manager)
   #:use-module (gnu home-services)
-  #:use-module (guix store)
-  #:use-module (guix monads)
   #:use-module (guix gexp)
-  #:use-module (guix records)
-  #:use-module (guix build utils)
-  #:use-module (ice-9 ftw)
-  #:use-module (ice-9 curried-definitions)
-  #:use-module (ice-9 match)
-  #:use-module (srfi srfi-1)
 
   #:export (home-symlink-manager-service-type))
 
@@ -38,7 +30,6 @@
        (use-modules (ice-9 ftw)
 		    (ice-9 curried-definitions)
 		    (ice-9 match)
- 		    (ice-9 pretty-print)
 		    (srfi srfi-1))
        (define ((simplify-file-tree parent) file)
          "Convert the result produced by `file-system-tree' to less
@@ -243,5 +234,5 @@ after all nested items already listed."
                    update-symlinks-gexp)))
 		(default-value #f)
                 (description "Provide an @code{update-symlinks}
-script, which create and remove symlinks on every reconfigure.  If the
+script, which create and remove symlinks on every activation.  If the
 target is occupied by a file created by user, back it up.")))
