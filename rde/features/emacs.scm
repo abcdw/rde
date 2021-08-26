@@ -726,6 +726,8 @@ previous window layout otherwise.  With universal argument toggles
          (setq org-directory ,org-directory)
          (setq org-default-notes-file (concat org-directory "/todo.org"))
 
+         (define-key org-mode-map (kbd "C-c o n") 'org-num-mode)
+
          ;; <https://emacs.stackexchange.com/questions/54809/rename-org-buffers-to-orgs-title-instead-of-filename>
          (defun org+-buffer-name-to-title (&optional end)
            "Rename buffer to value of #+TITLE:.
