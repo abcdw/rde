@@ -876,7 +876,8 @@ git-link, git-timemachine."
   (define (get-home-services config)
     (require-value 'fonts config)
     (define font-monospace (get-value 'font-monospace config))
-    (define font-sans      (get-value 'font-sans config))
+    (define font-sans      (get-value 'font-sans      config))
+    (define font-serif     (get-value 'font-serif     config))
 
     (list
      (elisp-configuration-service
@@ -885,6 +886,7 @@ git-link, git-timemachine."
 	 'faces
 	 (let* ((mono-fn ,(font-name font-monospace))
 		(sans-fn ,(font-name font-sans))
+		(serif-fn ,(font-name font-serif))
 		(mono (font-spec
 		       :name ,(font-name font-monospace)
 		       :size   ,(font-size font-monospace)
@@ -900,7 +902,7 @@ git-link, git-timemachine."
 		(faces `((default ((t (:font ,mono))))
 			 (fixed-pitch ((t (:family ,mono-fn))))
 			 (button ((t (:inherit (fixed-pitch)))))
-			 (variable-pitch ((t (:family ,sans-fn)))))))
+			 (variable-pitch ((t (:family ,serif-fn)))))))
 	   (dolist (face faces)
 		   (custom-set-faces face))
 
