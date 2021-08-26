@@ -604,8 +604,10 @@ previous window layout otherwise.  With universal argument toggles
                         (current-window-configuration))
                   (delete-other-windows))))
 
-        (define-key global-map (kbd "C-c t o") 'global-olivetti-mode)
-        (define-key global-map (kbd "C-c t m") 'global-hide-mode-line-mode)
+        (define-key global-map (kbd "C-c t o") 'olivetti-mode)
+        (define-key global-map (kbd "C-c T o") 'global-olivetti-mode)
+        (define-key global-map (kbd "C-c t m") 'hide-mode-line-mode)
+        (define-key global-map (kbd "C-c T m") 'global-hide-mode-line-mode)
 	(define-key global-map (kbd "s-f") 'rde-toggle-monocle))
       #:elisp-packages (list emacs-olivetti emacs-hide-header-line))))
 
@@ -799,7 +801,8 @@ git-link, git-timemachine."
       `((custom-set-variables '(git-link-use-commit t)
                               '(git-gutter:lighter " GG"))
 
-        (define-key global-map (kbd "C-c t g") 'global-git-gutter-mode)
+        (define-key global-map (kbd "C-c t g") 'git-gutter-mode)
+        (define-key global-map (kbd "C-c T g") 'global-git-gutter-mode)
         (define-key global-map (kbd "s-g") 'git-gutter-transient)
 
         (with-eval-after-load
@@ -1118,7 +1121,8 @@ emacsclient feels more like a separate emacs instance."
                (setq keycast--command-repetitions 0)
                (remove-hook 'pre-command-hook 'keycast--update))))
 
-        (define-key global-map (kbd "C-c t k") 'rde-keycast-mode))
+        (define-key global-map (kbd "C-c t k") 'rde-keycast-mode)
+        (define-key global-map (kbd "C-c T k") 'rde-keycast-mode))
       #:elisp-packages (list emacs-moody emacs-keycast))))
 
   (feature
