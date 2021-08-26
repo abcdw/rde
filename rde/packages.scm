@@ -78,28 +78,6 @@ FILE-NAME found in %PATCH-PATH."
     (description "Cyrillic input method for dvorak layout.")
     (license license:gpl3+)))
 
-(define-public emacs-pcmpl-args
-  (package
-    (name "emacs-pcmpl-args")
-    (version "0.1.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/xFA25E/pcmpl-args.el")
-             (commit "fc697ba96ee356540994d286695f2dd9993e49ee")))
-       (sha256
-        (base32 "0xky366m68fnlc6m7m86l36qg6fcnf84vk608r97kf13wiwy1svq"))
-       (file-name (git-file-name name version))))
-    (build-system emacs-build-system)
-    (home-page "https://github.com/JonWaltman/pcmpl-args.el")
-    (synopsis "Enhanced shell command completion")
-    (description "pcmpl-args extends option and argument completion of
-shell commands read by Emacs. It is intended to make shell completion
-in Emacs comparable to the rather excellent completion provided by
-both Bash and Zsh.")
-    (license license:gpl3+)))
-
 (define-public emacs-mini-frame
   (package
    (inherit emacs-unfill)
