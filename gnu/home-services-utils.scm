@@ -1,3 +1,22 @@
+;;; GNU Guix --- Functional package management for GNU
+;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;;
+;;; This file is part of GNU Guix.
+;;;
+;;; GNU Guix is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3 of the License, or (at
+;;; your option) any later version.
+;;;
+;;; GNU Guix is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (gnu home-services-utils)
   #:use-module (gnu services configuration)
   #:use-module (guix ui)
@@ -51,6 +70,7 @@
             enum-name
             enum-value))
 
+
 ;;;
 ;;; User's utils.
 ;;;
@@ -65,7 +85,7 @@ it as a string.  FILE must be a file-like object."
   #~(call-with-input-file #$file
 	(@@ (ice-9 textual-ports) get-string-all)))
 
-
+
 ;;;
 ;;; Configuration related helpers.
 ;;;
@@ -248,6 +268,7 @@ STYLE can be three `@code{lower}', `@code{upper}', defaults to
                    (map string-capitalize
                         (rest splitted-string))))))))))
 
+
 ;;;
 ;;; Serializers.
 ;;;
@@ -377,6 +398,7 @@ the list result in @code{#t} when applying PRED? on them."
 (define list-of-strings?
   (list-of string?))
 
+
 ;;;
 ;;; Miscellaneous.
 ;;;
@@ -422,7 +444,8 @@ runs GEXP.  NAME is the name of the executable that will be put in the store."
              (mkdir-p bin)
              (copy-file wrapper (string-append bin "/" ,executable-name)))))))))
 
-;;
+
+;;;
 ;;; Enums.
 ;;;
 
