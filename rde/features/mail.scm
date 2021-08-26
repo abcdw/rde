@@ -198,14 +198,18 @@ features."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((eval-when-compile
+         (require 'message)
+         (require 'sendmail))
+        (with-eval-after-load
 	 'message
 
          ,@send-mail-msmtp-function
-	 (setq send-mail-function 'message-send-mail-with-msmtp)
-         (setq sendmail-program "msmtpq")
-         (setq message-sendmail-extra-arguments
-               '("--enqueue" "--read-envelope-from"))
+         (custom-set-variables
+          '(send-mail-function 'message-send-mail-with-msmtp)
+          '(sendmail-program "msmtpq")
+          '(message-sendmail-extra-arguments
+            '("--enqueue" "--read-envelope-from")))
 
          (setq message-kill-buffer-on-exit t)
          (setq mml-secure-openpgp-sign-with-sender t)
