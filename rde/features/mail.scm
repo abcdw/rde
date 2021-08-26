@@ -288,6 +288,7 @@ features."
               (home-mcron-configuration
                (jobs (list #~(job '(next-hour)
                                   (lambda ()
+                                    (setenv "DISPLAY" ":0")
                                     (system* "mbsync" "-a")
                                     (system* "l2md")))))))
      (service
