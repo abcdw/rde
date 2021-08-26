@@ -1,3 +1,22 @@
+;;; GNU Guix --- Functional package management for GNU
+;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;;
+;;; This file is part of GNU Guix.
+;;;
+;;; GNU Guix is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3 of the License, or (at
+;;; your option) any later version.
+;;;
+;;; GNU Guix is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (gnu home-services xdg)
   #:use-module (gnu services configuration)
   #:use-module (gnu packages freedesktop)
@@ -39,12 +58,9 @@
 ;; - XDG user directories
 ;; - XDG MIME applications
 ;;
-;; TODO: Add proper docs for XDG
-;; TODO: Deal with state/log directories
-;;
 ;;; Code:
 
-
+
 ;;;
 ;;; XDG base directories.
 ;;;
@@ -88,22 +104,22 @@ services more consistent."))
   (map
    (lambda (field)
      (cons (format
-	    #f "XDG_~a"
-	    (object->snake-case-string (configuration-field-name field) 'upper))
-	   ((configuration-field-getter field) config)))
+            #f "XDG_~a"
+            (object->snake-case-string (configuration-field-name field) 'upper))
+           ((configuration-field-getter field) config)))
    home-xdg-base-directories-configuration-fields))
 
 (define (ensure-xdg-base-dirs-on-activation config)
   #~(map (lambda (xdg-base-dir-variable)
-	   ((@@ (guix build utils) mkdir-p)
-	    (getenv
-	     xdg-base-dir-variable)))
-	 '#$(map (lambda (field)
-		   (format
-		    #f "XDG_~a"
-		    (object->snake-case-string
-		     (configuration-field-name field) 'upper)))
-		 home-xdg-base-directories-configuration-fields)))
+           ((@@ (guix build utils) mkdir-p)
+            (getenv
+             xdg-base-dir-variable)))
+         '#$(map (lambda (field)
+                   (format
+                    #f "XDG_~a"
+                    (object->snake-case-string
+                     (configuration-field-name field) 'upper)))
+                 home-xdg-base-directories-configuration-fields)))
 
 (define (last-extension-or-cfg config extensions)
   "Picks configuration value from last provided extension.  If there
@@ -116,12 +132,12 @@ are no extensions use configuration instead."
                  (list (service-extension
                         home-environment-variables-service-type
                         home-xdg-base-directories-environment-variables-service)
-		       (service-extension
-			home-activation-service-type
-			ensure-xdg-base-dirs-on-activation)))
+                       (service-extension
+                        home-activation-service-type
+                        ensure-xdg-base-dirs-on-activation)))
                 (default-value (home-xdg-base-directories-configuration))
-		(compose identity)
-		(extend last-extension-or-cfg)
+                (compose identity)
+                (extend last-extension-or-cfg)
                 (description "Configure XDG base directories.  This
 service introduces two additional variables @env{XDG_STATE_HOME},
 @env{XDG_LOG_HOME}.  They are not a part of XDG specification, at
@@ -136,7 +152,7 @@ service-type (using @code{simple-service} for example).")))
       ,home-xdg-base-directories-configuration-fields))
    'home-xdg-base-directories-configuration))
 
-
+
 ;;;
 ;;; XDG user directories.
 ;;;
@@ -192,16 +208,16 @@ pre-populated content.")
 
 (define (home-xdg-user-directories-activation-service config)
   (let ((dirs (map (lambda (field)
-		     ((configuration-field-getter field) config))
-		   home-xdg-user-directories-configuration-fields)))
+                     ((configuration-field-getter field) config))
+                   home-xdg-user-directories-configuration-fields)))
     #~(let ((ensure-dir
-	     (lambda (path)
-	       (mkdir-p
-		((@@ (ice-9 string-fun) string-replace-substring)
-		 path "$HOME" (getenv "HOME"))))))
-	(display "Creating XDG user directories...")
-	(map ensure-dir '#$dirs)
-	(display " done\n"))))
+             (lambda (path)
+               (mkdir-p
+                ((@@ (ice-9 string-fun) string-replace-substring)
+                 path "$HOME" (getenv "HOME"))))))
+        (display "Creating XDG user directories...")
+        (map ensure-dir '#$dirs)
+        (display " done\n"))))
 
 (define home-xdg-user-directories-service-type
   (service-type (name 'home-xdg-user-directories)
@@ -222,7 +238,7 @@ disable a directory, point it to the $HOME.")))
      ,home-xdg-user-directories-configuration-fields))
    'home-xdg-user-directories-configuration))
 
-
+
 ;;;
 ;;; XDG MIME applications.
 ;;;
@@ -370,7 +386,7 @@ configuration."
                   (string-capitalize (maybe-object->string action)))
          ,(format #f "Name=~a\n" name)
          ,@(serialize-alist config)))))
-  
+
   (match entry
     (($ <xdg-desktop-entry> file name type config actions)
      (list (if (string-suffix? file ".desktop")
