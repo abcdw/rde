@@ -41,6 +41,21 @@
  		    (ice-9 pretty-print)
 		    (srfi srfi-1))
        (define ((simplify-file-tree parent) file)
+         "Convert the result produced by `file-system-tree' to less
+verbose and more suitable for further processing format.
+
+Extract dir/file info from stat and compose a relative path to the
+root of the file tree.
+
+Sample output:
+
+((dir . \".\")
+ ((dir . \"config\")
+  ((dir . \"config/fontconfig\")
+   (file . \"config/fontconfig/fonts.conf\"))
+  ((dir . \"config/isync\")
+   (file . \"config/isync/mbsyncrc\"))))
+"
 	 (match file
 	   ((name stat) `(file . ,(string-append parent name)))
 	   ((name stat children ...)
@@ -65,20 +80,6 @@ after all nested items already listed."
 	       (list (cons 'dir path))
 	       (append-map (file-tree-traverse preordering) rest))))))
 
-       (define (save-tree tree path)
-	 (call-with-output-file path
-	   (lambda (port)
-	     (display ";; Don't touch this file, it used for proper cleanup on
-;; guix home reconfigure.\n" port)
-	     (write tree port))))
-
-       (define (load-tree path)
-	 (if (file-exists? path)
-	     (call-with-input-file path
-	       (lambda (port)
-		 (read port)))
-	     #f))
-
        (use-modules (guix build utils))
 
        (let* ((he-path (string-append (getenv "HOME") "/.guix-home"))
@@ -87,33 +88,33 @@ after all nested items already listed."
          (symlink new-home new-he-tmp-path)
          (rename-file new-he-tmp-path he-path))
 
-       ;; TODO: Move generation of files tree to home-files-service-type
-       ;; It can be a part of -home store item.
-       (let* ((tree-file-name "/.guix-home-file-tree")
-	      (config-home    (or (getenv "XDG_CONFIG_HOME")
+       (let* ((config-home    (or (getenv "XDG_CONFIG_HOME")
 				  (string-append (getenv "HOME") "/.config")))
-	      (tree-file-path (string-append config-home tree-file-name))
 
 	      (he-path (string-append (getenv "HOME") "/.guix-home"))
+              (new-he-tmp-path (string-append he-path ".new"))
+
 	      (files-path (string-append he-path "/files"))
 	      ;; Leading dot is required, because files itself is symlink and
 	      ;; to make file-system-tree works it should be a directory.
 	      (files-dir-path (string-append files-path "/."))
+	      (new-files-path (string-append new-he-tmp-path "/files"))
+	      (new-files-dir-path (string-append files-path "/."))
 
 	      (home-path (getenv "HOME"))
 	      (backup-dir (string-append home-path "/"
 					 (number->string (current-time))
 					 "-guix-home-legacy-configs-backup"))
 
-	      (old-tree (load-tree tree-file-path))
+	      (old-tree (if (file-exists? files-dir-path)
+                          ((simplify-file-tree "")
+			   (file-system-tree files-dir-path))
+                          #f))
 	      (new-tree ((simplify-file-tree "")
-			 (file-system-tree files-dir-path)))
+			 (file-system-tree new-files-dir-path)))
 
 	      (get-source-path
 	       (lambda (path)
-		 ;; REVIEW: Do we need to create symlink to object in the
-		 ;; store or it's better to have symlinks pointing to
-		 ;; ~/.guix-home-enironment/files/... ?
 		 (readlink (string-append files-path "/" path))))
 
 	      (get-target-path
@@ -227,8 +228,6 @@ after all nested items already listed."
 
 	 (create-symlinks)
 
-	 (format #t "Persisting used file-tree to ~a..." tree-file-path)
-	 (save-tree new-tree tree-file-path)
 	 (display " done\nFinished updating symlinks.\n\n")))))
 
 
