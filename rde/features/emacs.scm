@@ -973,15 +973,32 @@ git-link, git-timemachine."
         (autoload 'consult-customize "consult" "" nil 'macro)
 
         (progn
-         (define-key global-map (kbd "C-S-s") 'consult-line)
          (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
 	 (define-key global-map (kbd "M-y") 'consult-yank-pop)
          (define-key global-map (kbd "s-B") 'consult-buffer)
-         (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
          (define-key minibuffer-local-map (kbd "s-B") 'embark-become)
          ;; (define-key global-map (kbd "M-.") 'embark-dwim)
 
+         (define-key global-map (kbd "M-g g") 'consult-goto-line)
+         (define-key global-map (kbd "M-g M-g") 'consult-goto-line)
+         (define-key global-map (kbd "M-g o") 'consult-outline)
+         (define-key global-map (kbd "M-g i") 'consult-imenu)
+         (define-key global-map (kbd "M-g m") 'consult-mark)
+
+         (define-key global-map (kbd "M-s f") 'consult-find)
+         (define-key global-map (kbd "M-s g") 'consult-ripgrep)
+         (define-key global-map (kbd "M-s e") 'consult-isearch)
+         (define-key global-map (kbd "M-s l") 'consult-line)
+         (define-key global-map (kbd "C-S-s") 'consult-line)
+
+         (define-key isearch-mode-map (kbd "M-e") 'consult-isearch)
+         (define-key isearch-mode-map (kbd "M-s e") 'consult-isearch)
+         (define-key isearch-mode-map (kbd "M-s l") 'consult-line)
+         (define-key isearch-mode-map (kbd "C-S-s") 'consult-line)
+
+         (define-key global-map (kbd "C-c b b") 'consult-bookmark)
          ;; MAYBE: Move to feature-emacs-buffers/windows
+         (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
          (define-key global-map (kbd "s-b") 'switch-to-buffer)
          (define-key global-map (kbd "s-w") 'kill-current-buffer)
 	 (define-key global-map (kbd "s-o") 'other-window))
