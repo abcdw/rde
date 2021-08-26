@@ -1,3 +1,21 @@
+;;; GNU Guix --- Functional package management for GNU
+;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;;
+;;; This file is part of GNU Guix.
+;;;
+;;; GNU Guix is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3 of the License, or (at
+;;; your option) any later version.
+;;;
+;;; GNU Guix is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (gnu home)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services symlink-manager)
@@ -11,16 +29,16 @@
   #:use-module (guix diagnostics)
 
   #:export (home-environment
-	    home-environment?
-	    this-home-environment
+            home-environment?
+            this-home-environment
 
-	    home-environment-derivation
-	    home-environment-user-services
-	    home-environment-essential-services
-	    home-environment-services
-	    home-environment-location
+            home-environment-derivation
+            home-environment-user-services
+            home-environment-essential-services
+            home-environment-services
+            home-environment-location
 
-	    home-environment-with-provenance))
+            home-environment-with-provenance))
 
 (define-record-type* <home-environment> home-environment
   make-home-environment
@@ -35,7 +53,7 @@
                       (default (home-environment-default-essential-services
                                 this-home-environment)))
   (services home-environment-user-services
-	    (default '()))
+            (default '()))
 
   (location home-environment-location             ; <location>
             (default (and=> (current-source-location)
@@ -47,7 +65,6 @@
   (list
    (service home-run-on-first-login-service-type)
 
-   ;; MAYBE: move out of essential-services
    (service home-fontconfig-service-type)
 
    (service home-symlink-manager-service-type)
@@ -85,7 +102,7 @@
   "Return a derivation that builds OS."
   (let* ((services         (home-environment-services he))
          (home (fold-services services
-			      #:target-type home-service-type)))
+                              #:target-type home-service-type)))
     (service-value home)))
 
 (define* (home-environment-with-provenance he config-file)
