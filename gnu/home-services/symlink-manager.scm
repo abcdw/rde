@@ -23,6 +23,16 @@
 
   #:export (home-symlink-manager-service-type))
 
+;;; Comment:
+;;;
+;;; symlink-manager cares about configuration files: it backups files
+;;; created by user, removes symlinks and directories created by
+;;; previous generation, and creates new directories and symlinks to
+;;; configs according to content of files/ directory of current home
+;;; environment generation (created by home-files-service).
+;;;
+;;; Code:
+
 (define (update-symlinks-script)
   (program-file
    "update-symlinks"
