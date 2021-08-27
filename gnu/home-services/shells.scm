@@ -1,3 +1,22 @@
+;;; GNU Guix --- Functional package management for GNU
+;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;;
+;;; This file is part of GNU Guix.
+;;;
+;;; GNU Guix is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3 of the License, or (at
+;;; your option) any later version.
+;;;
+;;; GNU Guix is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (gnu home-services shells)
   #:use-module (gnu services configuration)
   #:use-module (gnu home-services configuration)
@@ -66,26 +85,26 @@ HOME_ENVIRONMENT=$HOME/.guix-home
 . $HOME_ENVIRONMENT/setup-environment
 $HOME_ENVIRONMENT/on-first-login\n"
        (serialize-configuration
-	config
-	(filter-configuration-fields
-	 home-shell-profile-configuration-fields '(profile)))))))
+        config
+        (filter-configuration-fields
+         home-shell-profile-configuration-fields '(profile)))))))
 
 (define (add-profile-extensions config extensions)
   (home-shell-profile-configuration
    (inherit config)
    (profile
     (append (home-shell-profile-configuration-profile config)
-	    extensions))))
+            extensions))))
 
 (define home-shell-profile-service-type
   (service-type (name 'home-shell-profile)
                 (extensions
                  (list (service-extension
-			home-files-service-type
-			add-shell-profile-file)))
-		(compose concatenate)
-		(extend add-profile-extensions)
-		(default-value (home-shell-profile-configuration))
+                        home-files-service-type
+                        add-shell-profile-file)))
+                (compose concatenate)
+                (extend add-profile-extensions)
+                (default-value (home-shell-profile-configuration))
                 (description "Create @file{~/.profile}, which is used
 for environment initialization of POSIX compliant login shells.  This
 service type can be extended with a list of strings or gexps.")))
@@ -157,13 +176,13 @@ another process for example)."))
 
     (define prefix-file
       (cut string-append
-	(if xdg-flavor?
-	    "config/zsh/."
-	    "") <>))
+        (if xdg-flavor?
+            "config/zsh/."
+            "") <>))
 
     (define (filter-fields field)
       (filter-configuration-fields home-zsh-configuration-fields
-				   (list field)))
+                                   (list field)))
 
     (define (serialize-field field)
       (serialize-configuration
@@ -210,11 +229,11 @@ source ~/.profile
 # It's only necessary if zsh is a login shell, otherwise profiles will
 # be already sourced by bash
 "
-	  (serialize-field 'zprofile)))
+          (serialize-field 'zprofile)))
 
        ,@(list (file-if-not-empty 'zshrc)
-	       (file-if-not-empty 'zlogin)
-	       (file-if-not-empty 'zlogout))))))
+               (file-if-not-empty 'zlogin)
+               (file-if-not-empty 'zlogout))))))
 
 (define (add-zsh-packages config)
   (list (home-zsh-configuration-package config)))
@@ -244,28 +263,28 @@ source ~/.profile
    (inherit original-config)
    (environment-variables
     (append (home-zsh-configuration-environment-variables original-config)
-	    (append-map
-	     home-zsh-extension-environment-variables extension-configs)))
+            (append-map
+             home-zsh-extension-environment-variables extension-configs)))
    (zshrc
     (append (home-zsh-configuration-zshrc original-config)
-	    (append-map
-	     home-zsh-extension-zshrc extension-configs)))
+            (append-map
+             home-zsh-extension-zshrc extension-configs)))
    (zshenv
     (append (home-zsh-configuration-zshenv original-config)
-	    (append-map
-	     home-zsh-extension-zshenv extension-configs)))
+            (append-map
+             home-zsh-extension-zshenv extension-configs)))
    (zprofile
     (append (home-zsh-configuration-zprofile original-config)
-	    (append-map
-	     home-zsh-extension-zprofile extension-configs)))
+            (append-map
+             home-zsh-extension-zprofile extension-configs)))
    (zlogin
     (append (home-zsh-configuration-zlogin original-config)
-	    (append-map
-	     home-zsh-extension-zlogin extension-configs)))
+            (append-map
+             home-zsh-extension-zlogin extension-configs)))
    (zlogout
     (append (home-zsh-configuration-zlogout original-config)
-	    (append-map
-	     home-zsh-extension-zlogout extension-configs)))))
+            (append-map
+             home-zsh-extension-zlogout extension-configs)))))
 
 (define home-zsh-service-type
   (service-type (name 'home-zsh)
@@ -276,8 +295,8 @@ source ~/.profile
                        (service-extension
                         home-profile-service-type
                         add-zsh-packages)))
-		(compose identity)
-		(extend home-zsh-extensions)
+                (compose identity)
+                (extend home-zsh-extensions)
                 (default-value (home-zsh-configuration))
                 (description "Install and configure Zsh.")))
 
@@ -420,20 +439,20 @@ if [ -f ~/.bashrc ]; then source ~/.bashrc; fi
    (inherit original-config)
    (environment-variables
     (append (home-bash-configuration-environment-variables original-config)
-	    (append-map
-	     home-bash-extension-environment-variables extension-configs)))
+            (append-map
+             home-bash-extension-environment-variables extension-configs)))
    (bash-profile
     (append (home-bash-configuration-bash-profile original-config)
-	    (append-map
-	     home-bash-extension-bash-profile extension-configs)))
+            (append-map
+             home-bash-extension-bash-profile extension-configs)))
    (bashrc
     (append (home-bash-configuration-bashrc original-config)
-	    (append-map
-	     home-bash-extension-bashrc extension-configs)))
+            (append-map
+             home-bash-extension-bashrc extension-configs)))
    (bash-logout
     (append (home-bash-configuration-bash-logout original-config)
-	    (append-map
-	     home-bash-extension-bash-logout extension-configs)))))
+            (append-map
+             home-bash-extension-bash-logout extension-configs)))))
 
 (define home-bash-service-type
   (service-type (name 'home-bash)
@@ -444,8 +463,8 @@ if [ -f ~/.bashrc ]; then source ~/.bashrc; fi
                        (service-extension
                         home-profile-service-type
                         add-bash-packages)))
-		(compose identity)
-		(extend home-bash-extensions)
+                (compose identity)
+                (extend home-bash-extensions)
                 (default-value (home-bash-configuration))
                 (description "Install and configure GNU Bash.")))
 
