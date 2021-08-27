@@ -23,9 +23,7 @@
   #:use-module (gnu home-services xdg)
   #:use-module (gnu home-services fontutils)
   #:use-module (gnu services)
-  #:use-module (srfi srfi-1)
   #:use-module (guix records)
-  #:use-module (guix gexp)
   #:use-module (guix diagnostics)
 
   #:export (home-environment
@@ -64,31 +62,15 @@
   "Return the list of essential services for home environment."
   (list
    (service home-run-on-first-login-service-type)
-
-   (service home-fontconfig-service-type)
-
-   (service home-symlink-manager-service-type)
    (service home-activation-service-type)
-
    (service home-environment-variables-service-type)
 
-   ;; Make guix aware of `guix home` after first reconfigure, this
-   ;; declaration must go before xdg-base-dirs.  Potentially
-   ;; dangerous "fix", it makes possible for malicious channel
-   ;; expose it's own guix subcommands.
-   ;; TODO: Remove it once upstreamed.
-   (simple-service
-    'make-guix-aware-of-guix-home-subcomand
-    home-environment-variables-service-type
-    '(("GUILE_LOAD_PATH" .
-       "$XDG_CONFIG_HOME/guix/current/share/guile/site/3.0\
-:$GUILE_LOAD_PATH")
-      ("GUILE_LOAD_COMPILED_PATH" .
-       "$XDG_CONFIG_HOME/guix/current/lib/guile/3.0/site-ccache\
-:$GUILE_LOAD_COMPILED_PATH")))
-   (service home-xdg-base-directories-service-type)
+   (service home-symlink-manager-service-type)
 
+   (service home-fontconfig-service-type)
+   (service home-xdg-base-directories-service-type)
    (service home-shell-profile-service-type)
+
    (service home-service-type)
    (service home-profile-service-type (home-environment-packages he))))
 
