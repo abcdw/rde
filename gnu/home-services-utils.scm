@@ -19,6 +19,7 @@
 
 (define-module (gnu home-services-utils)
   #:use-module (gnu services configuration)
+  #:use-module (gnu home-services configuration)
   #:use-module (guix ui)
   #:use-module (guix diagnostics)
   #:use-module (guix gexp)
@@ -36,6 +37,19 @@
   #:use-module (srfi srfi-171)
   #:use-module (srfi srfi-26)
 
+  #:re-export (filter-configuration-fields
+
+               interpose
+
+               list-of
+
+               list-of-strings?
+               alist?
+               string-or-gexp?
+	       serialize-string-or-gexp
+	       text-config?
+	       serialize-text-config)
+
   #:export (slurp-file-gexp
 
 	    alist-entry->mixed-text
@@ -43,23 +57,14 @@
             boolean->true-or-false
             list->human-readable-list
             maybe-object->string
-            filter-configuration-fields
             generic-serialize-alist-entry
             generic-serialize-alist
 
-	    interpose
-	    string-or-gexp?
-	    serialize-string-or-gexp
-	    text-config?
-	    serialize-text-config
             object->snake-case-string
             object->camel-case-string
             ini-config?
             generic-serialize-ini-config
             generic-serialize-git-ini-config
-            alist?
-            list-of
-            list-of-strings?
 
             rest
             maybe-list
@@ -216,14 +221,6 @@ yields:"
                      word
                      (maybe-object->string (proc (last lst)))))))
 
-(define* (filter-configuration-fields configuration-fields fields
-				      #:optional negate?)
-  "Retrieve the fields listed in FIELDS from CONFIGURATION-FIELDS.
-If NEGATE? is @code{#t}, retrieve all fields except FIELDS."
-  (filter (lambda (field)
-            (let ((member? (member (configuration-field-name field) fields)))
-              (if (not negate?) member? (not member?))))
-          configuration-fields))
 
 ;; Snake case: <https://en.wikipedia.org/wiki/Snake_case>
 (define* (object->snake-case-string object #:optional (style 'lower))
@@ -294,29 +291,6 @@ version-control}' for an example usage.)}"
   (apply combine
          (map (generic-serialize-alist-entry serialize-field) fields)))
 
-(define (string-or-gexp? sg) (or (string? sg) (gexp? sg)))
-(define (serialize-string-or-gexp field-name val) "")
-
-(define* (interpose ls  #:optional (delimiter "\n") (grammar 'infix))
-  "Same as @code{string-join}, but without join and string, returns an
-DELIMITER interposed LS.  Support 'infix and 'suffix GRAMMAR values."
-  (when (not (member grammar '(infix suffix)))
-    (raise
-     (formatted-message
-      (G_ "The GRAMMAR value must be 'infix or 'suffix, but ~a provided.")
-      grammar)))
-  (fold-right (lambda (e acc)
-		(cons e
-		      (if (and (null? acc) (eq? grammar 'infix))
-			  acc
-			  (cons delimiter acc))))
-	      '() ls))
-
-(define (text-config? config)
-  (and (list? config) (every string-or-gexp? config)))
-(define (serialize-text-config field-name val)
-  #~(string-append #$@(interpose val "\n" 'suffix)))
-
 (define ini-config? list?)
 (define (generic-serialize-ini-config-section section proc)
   "Format a section from SECTION for an INI configuration.
@@ -384,19 +358,6 @@ elements: the section and the subsection."
             (generic-serialize-alist combine-alist serialize-field alist))))
         fields)
    "\n"))
-
-(define alist? list?)
-
-(define (list-of pred?)
-  "Return a procedure that takes a list and check if all the elements of
-the list result in @code{#t} when applying PRED? on them."
-    (lambda (x)
-      (if (list? x)
-          (every pred? x)
-          #f)))
-
-(define list-of-strings?
-  (list-of string?))
 
 
 ;;;

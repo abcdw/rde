@@ -1,12 +1,10 @@
 (define-module (gnu home-services shells)
   #:use-module (gnu services configuration)
-  #:use-module (gnu home-services-utils)
+  #:use-module (gnu home-services configuration)
   #:use-module (gnu home-services)
-  #:use-module (gnu home-services files)
   #:use-module (gnu packages shells)
   #:use-module (gnu packages bash)
   #:use-module (guix gexp)
-  #:use-module (guix records)
   #:use-module (guix packages)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
@@ -175,21 +173,23 @@ another process for example)."))
     (define (file-if-not-empty field)
       (let ((file-name (symbol->string field))
             (field-obj (car (filter-fields field))))
-        (optional (not (null? ((configuration-field-getter field-obj) config)))
-                  `(,(prefix-file file-name)
-                    ,(mixed-text-file
-                      file-name
-                      (serialize-field field))))))
+        (if (not (null? ((configuration-field-getter field-obj) config)))
+            `(,(prefix-file file-name)
+              ,(mixed-text-file
+                file-name
+                (serialize-field field)))
+            '())))
 
     (filter
      (compose not null?)
-     `(,(optional xdg-flavor?
-                  `("zshenv"
-                    ,(mixed-text-file
-                      "auxiliary-zshenv"
-                      (if xdg-flavor?
-                          "source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshenv\n"
-                          ""))))
+     `(,(if xdg-flavor?
+            `("zshenv"
+              ,(mixed-text-file
+                "auxiliary-zshenv"
+                (if xdg-flavor?
+                    "source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshenv\n"
+                    "")))
+            '())
        (,(prefix-file "zshenv")
         ,(mixed-text-file
           "zshenv"
@@ -383,10 +383,10 @@ alias grep='grep --color=auto'\n")
 # Setups system and user profiles and related variables
 # /etc/profile will be sourced by bash automatically
 # Setups home environment profile
-source ~/.profile
+if [ -f ~/.profile ]; then source ~/.profile; fi
 
 # Honor per-interactive-shell startup file
-if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
+if [ -f ~/.bashrc ]; then source ~/.bashrc; fi
 "
         (serialize-field 'bash-profile)
         (serialize-field 'environment-variables)))
@@ -448,8 +448,6 @@ if [ -f ~/.bashrc ]; then . ~/.bashrc; fi\n
 		(extend home-bash-extensions)
                 (default-value (home-bash-configuration))
                 (description "Install and configure GNU Bash.")))
-
-
 
 
 ;;;
