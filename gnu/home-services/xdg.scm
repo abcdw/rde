@@ -26,6 +26,7 @@
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (guix i18n)
+  #:use-module (guix diagnostics)
 
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
