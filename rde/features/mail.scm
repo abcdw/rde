@@ -122,69 +122,6 @@ features."
              (mail-directory-fn . ,mail-directory-fn)))))
 
 
-(define send-mail-msmtp-function
-  '((defun message-send-mail-with-msmtp ()
-     "Send off the prepared buffer with msmtp."
-     (require 'sendmail)
-     (let ((errbuf (if message-interactive
-		       (message-generate-new-buffer-clone-locals
-		        " sendmail errors")
-		       0))
-	   resend-to-addresses delimline)
-       (unwind-protect
-	(progn
-	 (let ((case-fold-search t))
-	   (save-restriction
-	    (message-narrow-to-headers)
-	    (setq resend-to-addresses (message-fetch-field "resent-to")))
-	   ;; Change header-delimiter to be what sendmail expects.
-	   (goto-char (point-min))
-	   (re-search-forward
-	    (concat "^" (regexp-quote mail-header-separator) "\n"))
-	   (replace-match "\n")
-	   (backward-char 1)
-	   (setq delimline (point-marker))
-	   (run-hooks 'message-send-mail-hook)
-	   ;; Insert an extra newline if we need it to work around
-	   ;; Sun's bug that swallows newlines.
-	   (goto-char (+ 1 delimline))
-	   (when (eval message-mailer-swallows-blank-line t)
-	     (newline))
-	   (when message-interactive
-	     (with-current-buffer errbuf
-		                  (erase-buffer))))
-	 (let* ((default-directory "/")
-		(coding-system-for-write message-send-coding-system)
-		(cpr (apply
-		      'call-process-region
-		      (append
-		       (list (point-min) (point-max) sendmail-program
-			     nil errbuf nil)
-		       message-sendmail-extra-arguments
-		       ;; Get the addresses from the message
-		       ;; unless this is a resend.
-		       ;; We must not do that for a resend
-		       ;; because we would find the original addresses.
-		       ;; For a resend, include the specific addresses.
-		       (if resend-to-addresses
-			   (list resend-to-addresses)
-			   '("-t"))))))
-	   (unless (or (null cpr) (and (numberp cpr) (zerop cpr)))
-	     (when errbuf
-	       (pop-to-buffer errbuf)
-	       (setq errbuf nil))
-	     (error "Sending...failed with exit value %d" cpr)))
-	 (when message-interactive
-	   (with-current-buffer errbuf
-	                        (goto-char (point-min))
-	                        (while (re-search-forward "\n+ *" nil t)
-		                  (replace-match "; "))
-	                        (if (not (zerop (buffer-size)))
-		                    (error "Sending...failed to %s"
-			                   (buffer-string))))))
-        (when (buffer-live-p errbuf)
-	  (kill-buffer errbuf)))))))
-
 (define* (feature-emacs-message)
   "Configure email sending capabilities provided by @file{message.el}."
 	    feature-emacs-message
@@ -195,6 +132,8 @@ features."
   (define (get-home-services config)
     (require-value 'emacs-client-create-frame config)
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (define gpg-primary-key (get-value 'gpg-primary-key config))
+
     (list
      (elisp-configuration-service
       emacs-f-name
@@ -204,16 +143,19 @@ features."
         (with-eval-after-load
 	 'message
 
-         ,@send-mail-msmtp-function
          (custom-set-variables
-          '(send-mail-function 'message-send-mail-with-msmtp)
-          '(sendmail-program "msmtpq")
-          '(message-sendmail-extra-arguments
-            '("--enqueue" "--read-envelope-from")))
+          '(sendmail-program "msmtp")
+          '(message-send-mail-function 'message-send-mail-with-sendmail)
+          '(message-sendmail-f-is-evil t)
+          '(message-sendmail-extra-arguments '("--read-envelope-from")))
 
          (setq message-kill-buffer-on-exit t)
-         (setq mml-secure-openpgp-sign-with-sender t)
-         (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
+
+         ,@(if gpg-primary-key
+             `((setq mml-secure-openpgp-signers '(,gpg-primary-key))
+               ;; (setq mml-secure-openpgp-sign-with-sender t)
+               (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime))
+             '())
 
          (setq message-citation-line-function
                'message-insert-formatted-citation-line)
