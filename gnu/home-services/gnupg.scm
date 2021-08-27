@@ -80,15 +80,18 @@
 (define serialize-string serialize-field)
 
 (define-enum pinentry-flavor
-  '(tty emacs gtk2 qt gnome3 rofi efl))
+  '(tty emacs gtk2 qt gnome3 rofi efl bemenu))
 
 (define (serialize-pinentry-flavor field-name val)
-  (let ((pinentry-program #~(string-append "pinentry-program "
-                                           #$(file-append
-                                              (specification->package
-                                               (format #f "pinentry-~a" val))
-                                              "/bin/pinentry")
-                                           "\n")))
+  (let ((pinentry-program
+         #~(string-append "pinentry-program "
+                          #$(file-append
+                             (specification->package
+                              (format #f "pinentry-~a" val))
+                             (if (equal? 'gtk2 val)
+                                 "/bin/pinentry-gtk-2"
+                                 (format #f "/bin/pinentry-~a" val)))
+                             "\n")))
     (if (equal? val 'emacs)
         #~(string-append #$pinentry-program
                          "allow-emacs-pinentry\n"
