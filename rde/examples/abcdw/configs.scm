@@ -12,6 +12,7 @@
   #:use-module (rde features terminals)
   #:use-module (rde features tmux)
   #:use-module (rde features shells)
+  #:use-module (rde features shellutils)
   #:use-module (rde features ssh)
   #:use-module (rde features emacs)
   #:use-module (rde features linux)
@@ -132,6 +133,7 @@
     #:sway-tty-number 2)
    (feature-sway-screenshot)
 
+   (feature-direnv)
    (feature-emacs
     #:additional-elisp-packages
     (append
