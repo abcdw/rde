@@ -20,6 +20,7 @@
 (define-module (gnu home-services-utils)
   #:use-module (gnu services configuration)
   #:use-module (gnu home-services configuration)
+  #:use-module (gnu home-services utils)
   #:use-module (guix ui)
   #:use-module (guix diagnostics)
   #:use-module (guix gexp)
@@ -48,7 +49,11 @@
                string-or-gexp?
 	       serialize-string-or-gexp
 	       text-config?
-	       serialize-text-config)
+	       serialize-text-config
+
+               maybe-object->string
+               object->snake-case-string
+               object->camel-case-string)
 
   #:export (slurp-file-gexp
 
@@ -56,12 +61,9 @@
             boolean->yes-or-no
             boolean->true-or-false
             list->human-readable-list
-            maybe-object->string
             generic-serialize-alist-entry
             generic-serialize-alist
 
-            object->snake-case-string
-            object->camel-case-string
             ini-config?
             generic-serialize-ini-config
             generic-serialize-git-ini-config
@@ -188,13 +190,6 @@ Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
         (string-capitalize word)
         word)))
 
-(define (maybe-object->string object)
-  "Like @code{object->string} but don't do anyting if OBJECT already is
-a string."
-  (if (string? object)
-      object
-      (object->string object)))
-
 (define* (list->human-readable-list lst
                                     #:key
                                     (cumulative? #f)
@@ -221,49 +216,6 @@ yields:"
                      word
                      (maybe-object->string (proc (last lst)))))))
 
-
-;; Snake case: <https://en.wikipedia.org/wiki/Snake_case>
-(define* (object->snake-case-string object #:optional (style 'lower))
-  "Convert the object OBJECT to the equivalent string in ``snake
-case''.  STYLE can be three `@code{lower}', `@code{upper}', or
-`@code{capitalize}', defaults to `@code{lower}'.
-
-@example
-(object->snake-case-string 'variable-name 'upper)
-@result{} \"VARIABLE_NAME\" @end example"
-  (if (not (member style '(lower upper capitalize)))
-      (error 'invalid-style (format #f "~a is not a valid style" style))
-      (let ((stringified (maybe-object->string object)))
-        (string-replace-substring
-         (cond
-          ((equal? style 'lower) stringified)
-          ((equal? style 'upper) (string-upcase stringified))
-          (else (string-capitalize stringified)))
-         "-" "_"))))
-
-(define* (object->camel-case-string object #:optional (style 'lower))
-  "Convert the object OBJECT to the equivalent string in ``camel case''.
-STYLE can be three `@code{lower}', `@code{upper}', defaults to
-`@code{lower}'.
-
-@example
-(object->camel-case-string 'variable-name 'upper)
-@result{} \"VariableName\"
-@end example"
-  (if (not (member style '(lower upper)))
-      (error 'invalid-style (format #f "~a is not a valid style" style))
-      (let ((stringified (maybe-object->string object)))
-        (cond
-         ((eq? style 'upper)
-          (string-concatenate
-           (map string-capitalize
-                (string-split stringified (cut eqv? <> #\-)))))
-         ((eq? style 'lower)
-          (let ((splitted-string (string-split stringified (cut eqv? <> #\-))))
-            (string-concatenate
-             (cons (first splitted-string)
-                   (map string-capitalize
-                        (rest splitted-string))))))))))
 
 
 ;;;
