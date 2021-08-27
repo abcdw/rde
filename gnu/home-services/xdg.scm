@@ -19,22 +19,17 @@
 
 (define-module (gnu home-services xdg)
   #:use-module (gnu services configuration)
-  #:use-module (gnu packages freedesktop)
+  #:use-module (gnu home-services configuration)
   #:use-module (gnu home-services)
-  #:use-module (gnu home-services files)
+  #:use-module (gnu packages freedesktop)
   #:use-module (gnu home-services-utils)
   #:use-module (guix gexp)
   #:use-module (guix records)
   #:use-module (guix i18n)
-  #:use-module (guix diagnostics)
-  #:use-module ((guix import utils) #:select (flatten))
-  #:use-module (ice-9 string-fun)
+
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
-  #:use-module (srfi srfi-9)
-  #:use-module (srfi srfi-26)
   #:use-module (rnrs enums)
-
 
   #:export (home-xdg-base-directories-service-type
             home-xdg-base-directories-configuration
