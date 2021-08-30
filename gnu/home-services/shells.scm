@@ -632,7 +632,3 @@ Install and configure Fish, the friendly interactive shell.")))
     `((home-fish-extension
        ,home-fish-extension-fields))
     'home-fish-extension)))
-
-;; (display (generate-home-shell-profile-documentation))
-;; (display (generate-home-bash-documentation))
-;; (display (generate-home-zsh-documentation))
