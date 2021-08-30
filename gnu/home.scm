@@ -38,6 +38,14 @@
 
             home-environment-with-provenance))
 
+;;; Comment:
+;;;
+;;; This module provides a <home-environment> record for managing
+;;; per-user packages and configuration files in the similar way as
+;;; <operating-system> do for system packages and configuration files.
+;;;
+;;; Code:
+
 (define-record-type* <home-environment> home-environment
   make-home-environment
   home-environment?
