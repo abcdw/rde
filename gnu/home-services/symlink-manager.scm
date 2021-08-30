@@ -102,7 +102,7 @@ appear only after all nested items already listed."
                                          (number->string (current-time))
                                          "-guix-home-legacy-configs-backup"))
 
-              (old-tree (if (file-exists? old-home)
+              (old-tree (if old-home
                           ((simplify-file-tree "")
                            (file-system-tree
                             (string-append old-home "/files/.")))
