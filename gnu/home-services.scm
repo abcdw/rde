@@ -324,7 +324,7 @@ extended with one gexp.")))
                               #f))))
        (if (file-exists? (he-init-file new-home))
            (let* ((port   ((@ (ice-9 popen) open-input-pipe)
-                           (format #f "source ~a && env"
+                           (format #f "source ~a && env -0"
                                    (he-init-file new-home))))
                   (result ((@ (ice-9 rdelim) read-delimited) "" port))
                   (vars (map (lambda (x)
@@ -333,7 +333,7 @@ extended with one gexp.")))
                                        (string-drop x (1+ si)))))
                              ((@ (srfi srfi-1) remove)
                               string-null?
-                              (string-split result #\newline)))))
+                              (string-split result #\nul)))))
              (close-port port)
              (map (lambda (x) (setenv (car x) (cdr x))) vars)
 
