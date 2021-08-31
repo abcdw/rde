@@ -50,6 +50,8 @@
 	       serialize-string-or-gexp
 	       text-config?
 	       serialize-text-config
+               generic-serialize-alist-entry
+               generic-serialize-alist
 
                maybe-object->string
                object->snake-case-string
@@ -61,8 +63,6 @@
             boolean->yes-or-no
             boolean->true-or-false
             list->human-readable-list
-            generic-serialize-alist-entry
-            generic-serialize-alist
 
             ini-config?
             generic-serialize-ini-config
@@ -221,27 +221,6 @@ yields:"
 ;;;
 ;;; Serializers.
 ;;;
-
-(define ((generic-serialize-alist-entry serialize-field) entry)
-  "Apply the SERIALIZE-FIELD procedure on the field and value of ENTRY."
-  (match entry
-    ((field . val) (serialize-field field val))))
-
-(define (generic-serialize-alist combine serialize-field fields)
-  "Generate a configuration from an association list FIELDS.
-
-SERIALIZE-FIELD is a procedure that takes two arguments, it will be
-applied on the fields and values of FIELDS using the
-@code{generic-serialize-alist-entry} procedure.
-
-COMBINE is a procedure that takes one or more arguments and combines
-all the alist entries into one value, @code{string-append} or
-@code{append} are usually good candidates for this.
-
-See the @code{serialize-alist} procedure in `@code{(gnu home-services
-version-control}' for an example usage.)}"
-  (apply combine
-         (map (generic-serialize-alist-entry serialize-field) fields)))
 
 (define ini-config? list?)
 (define (generic-serialize-ini-config-section section proc)

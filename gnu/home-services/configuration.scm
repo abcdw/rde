@@ -1,5 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -20,6 +21,8 @@
   #:use-module (gnu services configuration)
   #:use-module (guix gexp)
   #:use-module (srfi srfi-1)
+  #:use-module (ice-9 curried-definitions)
+  #:use-module (ice-9 match)
 
   #:export (filter-configuration-fields
 
@@ -31,7 +34,9 @@
             string-or-gexp?
 	    serialize-string-or-gexp
 	    text-config?
-            serialize-text-config))
+            serialize-text-config
+            generic-serialize-alist-entry
+            generic-serialize-alist))
 
 (define* (filter-configuration-fields configuration-fields fields
 				      #:optional negate?)
@@ -79,3 +84,24 @@ the list result in @code{#t} when applying PRED? on them."
   (and (list? config) (every string-or-gexp? config)))
 (define (serialize-text-config field-name val)
   #~(string-append #$@(interpose val "\n" 'suffix)))
+
+(define ((generic-serialize-alist-entry serialize-field) entry)
+  "Apply the SERIALIZE-FIELD procedure on the field and value of ENTRY."
+  (match entry
+    ((field . val) (serialize-field field val))))
+
+(define (generic-serialize-alist combine serialize-field fields)
+  "Generate a configuration from an association list FIELDS.
+
+SERIALIZE-FIELD is a procedure that takes two arguments, it will be
+applied on the fields and values of FIELDS using the
+@code{generic-serialize-alist-entry} procedure.
+
+COMBINE is a procedure that takes one or more arguments and combines
+all the alist entries into one value, @code{string-append} or
+@code{append} are usually good candidates for this.
+
+See the @code{serialize-alist} procedure in `@code{(gnu home-services
+version-control}' for an example usage.)}"
+  (apply combine
+         (map (generic-serialize-alist-entry serialize-field) fields)))
