@@ -448,13 +448,14 @@ with one gexp, but many times, and all gexps must be idempotent.")))
              (if any-changes? (cadr x) "")))
          '#$pattern-gexp-tuples))
 
-      (if #$eval-gexps?
+      (if (and #$eval-gexps? (getenv "GUIX_OLD_HOME"))
           (begin
             (display "Evaling on-change gexps.\n\n")
             (for-each primitive-eval expressions-to-eval)
             (display "On-change gexps evaluation finished.\n\n"))
           (display "\
-On-change gexps won't evaluated, disabled by service configuration.\n"))))
+On-change gexps won't evaluated, disabled by service configuration or
+there are no previos generations.\n"))))
 
 (define home-run-on-change-service-type
   (service-type (name 'home-run-on-change)
