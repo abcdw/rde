@@ -75,21 +75,19 @@ Some ACTIONS support additional ARGS.\n"))
 
 (define %options
   ;; Specification of the command-line options.
-  (list (option '(#\h "help") #f #f
-                (lambda args
-                  (show-help)
-                  (exit 0)))
-        (option '(#\V "version") #f #f
-                (lambda args
-                  (show-version-and-exit "guix show")))
-        (option '(#\v "verbosity") #t #f
-                (lambda (opt name arg result)
-                  (let ((level (string->number* arg)))
-                    (alist-cons 'verbosity level
-                                (alist-delete 'verbosity result)))))
-        (find (lambda (option)
-                (member "load-path" (option-names option)))
-              %standard-build-options)))
+  (cons* (option '(#\h "help") #f #f
+                 (lambda args
+                   (show-help)
+                   (exit 0)))
+         (option '(#\V "version") #f #f
+                 (lambda args
+                   (show-version-and-exit "guix show")))
+         (option '(#\v "verbosity") #t #f
+                 (lambda (opt name arg result)
+                   (let ((level (string->number* arg)))
+                     (alist-cons 'verbosity level
+                                 (alist-delete 'verbosity result)))))
+         %standard-build-options))
 
 (define %default-options
   `((substitutes? . #t)
@@ -153,11 +151,11 @@ resulting from command-line parsing."
          (expr   (assoc-ref opts 'expression))
          (system (assoc-ref opts 'system))
 
-	 (transform   (lambda (obj)
+         (transform   (lambda (obj)
                         (home-environment-with-provenance obj file)))
 
          (home-environment
-	  (transform
+          (transform
            (ensure-home-environment
             (or file expr)
             (cond
@@ -185,9 +183,9 @@ resulting from command-line parsing."
 
         (run-with-store store
           (mbegin %store-monad
-	    (set-guile-for-build (default-guile))
+            (set-guile-for-build (default-guile))
 
-	    (case action
+            (case action
               (else
                ;; (unless (eq? action 'build)
                ;;   (warn-about-old-distro #:suggested-command
@@ -196,7 +194,7 @@ resulting from command-line parsing."
                                #:dry-run? dry?
                                #:derivations-only? (assoc-ref opts 'derivations-only?)
                                #:use-substitutes? (assoc-ref opts 'substitutes?))
-	       ))))))
+               ))))))
     (warn-about-disk-space)))
 
 
@@ -267,11 +265,11 @@ argument list and OPTS is the option alist."
         (let ((action (string->symbol arg)))
           (case action
             ((build
-	      reconfigure
-	      extension-graph shepherd-graph
-	      list-generations describe
-	      delete-generations roll-back
-	      switch-generation search
+              reconfigure
+              extension-graph shepherd-graph
+              list-generations describe
+              delete-generations roll-back
+              switch-generation search
               import)
              (alist-cons 'action action result))
             (else (leave (G_ "~a: unknown action~%") action))))))
@@ -312,7 +310,7 @@ argument list and OPTS is the option alist."
 
   (with-error-handling
     (let* ((opts     (parse-command-line args %options
-					 (list %default-options)
+                                         (list %default-options)
                                          #:argument-handler
                                          parse-sub-command))
            (args     (option-arguments opts))
@@ -388,7 +386,7 @@ description matches REGEXPS sorted by relevance, and their score."
 ;;;
 
 (define* (display-home-environment-generation
-	  number
+          number
           #:optional (profile %guix-home))
   "Display a summary of home-environment generation NUMBER in a
 human-readable format."
@@ -405,8 +403,8 @@ human-readable format."
   (unless (zero? number)
     (let* ((generation  (generation-file-name profile number)))
       (define-values (channels config-file)
-	;; The function will work for home environments too, we just
-	;; need to keep provenance file.
+        ;; The function will work for home environments too, we just
+        ;; need to keep provenance file.
         (system-provenance generation))
 
       (display-generation profile number)

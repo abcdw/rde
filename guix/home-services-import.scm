@@ -3,7 +3,6 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:export (modules+configurations))
-            
 
 ;;; Commentary:
 ;;;
@@ -50,4 +49,4 @@
                          (lambda (x y)
                            (equal? (procedure-name x) (procedure-name y))))))
     (map (lambda (proc) (proc)) configurations)))
-                             
+
