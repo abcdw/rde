@@ -336,21 +336,21 @@ The value of an XDG MIME entry must be a list, string or symbol, was given ~a")
 (define-record-type* <xdg-desktop-action>
   xdg-desktop-action make-xdg-desktop-action
   xdg-desktop-action?
-  (action xdg-desktop-action-action)    ; symbol
-  (name xdg-desktop-action-name)        ; string
-  (config xdg-desktop-action-config     ; alist
-                (default '())))
+  (action xdg-desktop-action-action)  ; symbol
+  (name   xdg-desktop-action-name)    ; string
+  (config xdg-desktop-action-config   ; alist
+          (default '())))
 
 (define-record-type* <xdg-desktop-entry>
   xdg-desktop-entry make-xdg-desktop-entry
   xdg-desktop-entry?
   ;; ".desktop" will automatically be added
-  (file xdg-desktop-entry-file)         ; string
-  (name xdg-desktop-entry-name)         ; string
-  (type xdg-desktop-entry-type)         ; xdg-desktop-type
-  (config xdg-desktop-entry-config      ; alist
-                (default '()))
-  (actions xdg-desktop-entry-actions    ; list of <xdg-desktop-action>
+  (file    xdg-desktop-entry-file)    ; string
+  (name    xdg-desktop-entry-name)    ; string
+  (type    xdg-desktop-entry-type)    ; xdg-desktop-type
+  (config  xdg-desktop-entry-config   ; alist
+           (default '()))
+  (actions xdg-desktop-entry-actions  ; list of <xdg-desktop-action>
            (default '())))
 
 (define desktop-entries? (list-of xdg-desktop-entry?))
