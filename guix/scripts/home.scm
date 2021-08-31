@@ -1,3 +1,22 @@
+;;; GNU Guix --- Functional package management for GNU
+;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;;
+;;; This file is part of GNU Guix.
+;;;
+;;; GNU Guix is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3 of the License, or (at
+;;; your option) any later version.
+;;;
+;;; GNU Guix is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (guix scripts home)
   #:use-module (gnu packages admin)
   #:use-module ((gnu services) #:hide (delete))
@@ -27,6 +46,11 @@
   #:use-module (srfi srfi-37)
   #:use-module (ice-9 match)
   #:export (guix-home))
+
+
+;;;
+;;; Options.
+;;;
 
 (define %user-module
   (make-user-module '((gnu home))))
@@ -103,6 +127,11 @@ Some ACTIONS support additional ARGS.\n"))
     (multiplexed-build-output? . #t)
     (verbosity . 3)
     (debug . 0)))
+
+
+;;;
+;;; Actions.
+;;;
 
 (define* (perform-action action he
                          #:key
@@ -322,10 +351,6 @@ argument list and OPTS is the option alist."
                                          parse-sub-command))
            (args     (option-arguments opts))
            (command  (assoc-ref opts 'action)))
-      ;; (pretty-print opts)
-      ;; (pretty-print args)
-      ;; (pretty-print command)
-      ;; (pretty-print (assoc-ref opts 'graft?))
       (parameterize ((%graft? (assoc-ref opts 'graft?)))
         (with-status-verbosity (verbosity-level opts)
           (process-command command args opts))))))
@@ -485,4 +510,3 @@ SPEC.  STORE is an open connection to the store."
   "Roll back the home-environment profile to its previous generation.
 STORE is an open connection to the store."
   (switch-to-home-environment-generation store "-1"))
-
