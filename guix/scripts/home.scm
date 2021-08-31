@@ -29,7 +29,6 @@
   #:export (guix-home))
 
 (define %user-module
-  ;; Module in which the machine description file is loaded.
   (make-user-module '((gnu home))))
 
 (define %guix-home
@@ -59,9 +58,16 @@ Some ACTIONS support additional ARGS.\n"))
   (display (G_ "\
    build              build the home environment without installing anything\n"))
   (display (G_ "\
-   import             generates a home environment definition from .guix-profile\n"))
+   import             generates a home environment definition from dotfiles\n"))
 
-  ;; (show-build-options-help)
+  (show-build-options-help)
+  (display (G_ "
+  -v, --verbosity=LEVEL  use the given verbosity LEVEL"))
+  (newline)
+  (display (G_ "
+  -h, --help             display this help and exit"))
+  (display (G_ "
+  -V, --version          display version information and exit"))
   (newline)
   (show-bug-report-information))
 
@@ -88,8 +94,14 @@ Some ACTIONS support additional ARGS.\n"))
          %standard-build-options))
 
 (define %default-options
-  `((substitutes? . #t)
+  `((build-mode . ,(build-mode normal))
     (graft? . #t)
+    (substitutes? . #t)
+    (offload? . #t)
+    (print-build-trace? . #t)
+    (print-extended-build-trace? . #t)
+    (multiplexed-build-output? . #t)
+    (verbosity . 3)
     (debug . 0)))
 
 (define* (perform-action action he
@@ -185,9 +197,6 @@ resulting from command-line parsing."
 
             (case action
               (else
-               ;; (unless (eq? action 'build)
-               ;;   (warn-about-old-distro #:suggested-command
-               ;;                          "guix home reconfigure"))
                (perform-action action home-environment
                                #:dry-run? dry?
                                #:derivations-only? (assoc-ref opts 'derivations-only?)
