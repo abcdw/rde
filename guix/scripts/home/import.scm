@@ -1,5 +1,4 @@
-(define-module (guix home-services-import)
-  #:use-module (gnu home-services-utils)
+(define-module (guix scripts home import)
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:export (modules+configurations))
@@ -19,17 +18,20 @@
     `((gnu home-services bash)
       (service home-bash-service-type
                  (home-bash-configuration
-                  ,@(optional (file-exists? rc)
-                              `((bashrc
-                                 (list (slurp-file-gexp (local-file ,rc))))))
-                  ,@(optional (file-exists? profile)
-                              `((bash-profile
-                                 (list (slurp-file-gexp
-                                        (local-file ,profile))))))
-                  ,@(optional (file-exists? logout)
-                              `((bash-logout
-                                 (list (slurp-file-gexp
-                                        (local-file ,logout)))))))))))
+                  ,@(if (file-exists? rc)
+                        `((bashrc
+                           (list (slurp-file-gexp (local-file ,rc)))))
+                        '())
+                  ,@(if (file-exists? profile)
+                        `((bash-profile
+                           (list (slurp-file-gexp
+                                  (local-file ,profile)))))
+                        '())
+                  ,@(if (file-exists? logout)
+                        `((bash-logout
+                           (list (slurp-file-gexp
+                                  (local-file ,logout)))))
+                        '()))))))
 
 
 (define %files-configurations-alist
