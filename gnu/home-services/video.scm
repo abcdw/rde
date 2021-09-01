@@ -1,5 +1,4 @@
 (define-module (gnu home-services video)
-  #:use-module (gnu home-services files)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu packages video)

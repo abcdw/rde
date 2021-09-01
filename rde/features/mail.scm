@@ -8,7 +8,6 @@
   #:use-module (gnu services)
   #:use-module (gnu services configuration)
   #:use-module (gnu home-services)
-  #:use-module (gnu home-services files)
   #:use-module (gnu home-services mail)
   #:use-module (gnu home-services mcron)
 

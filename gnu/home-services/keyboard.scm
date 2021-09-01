@@ -3,7 +3,6 @@
   #:use-module (gnu services configuration)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services-utils)
-  #:use-module (gnu home-services files)
 
   #:export (home-keyboard-service-type))
 

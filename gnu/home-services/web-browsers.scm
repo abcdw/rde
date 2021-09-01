@@ -1,7 +1,6 @@
 (define-module (gnu home-services web-browsers)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services-utils)
-  #:use-module (gnu home-services files)
   #:use-module (gnu services configuration)
   #:use-module (gnu packages gnuzilla)
   #:use-module (guix packages)

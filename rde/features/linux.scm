@@ -8,7 +8,6 @@
   #:use-module (gnu services base)
   #:use-module (gnu services shepherd)
   #:use-module (gnu home-services)
-  #:use-module (gnu home-services files)
   #:use-module (gnu home-services shepherd)
   #:use-module (gnu home-services wm)
   #:use-module (guix gexp)

@@ -1,6 +1,5 @@
 (define-module (gnu home-services base)
   #:use-module (gnu home-services)
-  #:use-module (gnu home-services files)
   #:use-module (gnu services)
   #:use-module (ice-9 match)
 
