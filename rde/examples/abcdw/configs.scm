@@ -132,6 +132,7 @@
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
    (feature-sway-screenshot)
+   (feature-sway-statusbar)
 
    (feature-direnv)
    (feature-emacs

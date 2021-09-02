@@ -21,10 +21,12 @@
   #:use-module (guix gexp)
   #:export (feature-sway
 	    feature-sway-run-on-tty
-            feature-sway-screenshot))
+            feature-sway-screenshot
+            feature-sway-statusbar))
 
 ;; https://github.com/jjquin/dotfiles/tree/master/sway/.config/sway/config.d
 ;; https://nixos.wiki/wiki/Sway
+;; https://github.com/swaywm/sway/wiki/Useful-add-ons-for-sway
 
 (define (keyboard-layout-to-sway-config keyboard-layout)
   (let ((kb-options (string-join
@@ -212,6 +214,39 @@ automatically switch to SWAY-TTY-NUMBER on boot."
    (name f-name)
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
+
+;; <https://www.reddit.com/r/unixporn/comments/a2c9kl/sway_in_the_wild/>
+(define* (feature-sway-statusbar
+          #:key
+          ;; (package waybar)
+          (battery "BAT0"))
+  "Configure statusbar."
+
+  (define sway-f-name 'waybar)
+  (define f-name (symbol-append 'sway- sway-f-name))
+
+  (define (get-home-services config)
+    (require-value 'sway config)
+    (define (get-status-command)
+      (format #f
+              "while echo $(cat /sys/class/power_supply/~a/capacity)% \
+$(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
+    (list
+     (simple-service
+      'sway-waybar
+      home-sway-service-type
+      `((bar ((position top)
+              (colors ((statusline "#ffffff")
+                       (background "#323232")))
+              (status_command ,(get-status-command))))
+        ;; (bar swaybar_command ,(file-append package "/bin/waybar"))
+        ))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 
 ;; [X] feature-sway-run-on-tty
 ;; [X] feature-sway-screenshot
