@@ -32,6 +32,10 @@
 
 (define sway-config? list?)
 (define (serialize-sway-config field-name val)
+  (define (aligner nestness)
+    (apply string-append
+	   (map (const "    ") (iota nestness))))
+
   (define (serialize-sway-term term)
     ;; (format #t "finval. ~a\n" term)
     (match term
@@ -59,7 +63,8 @@ boolean, number, symbol, or gexp). Provided term is:\n ~a") lst)))
        (append
 	(list (serialize-sway-term term) " {\n")
 	(serialize-sway-subconfig expressions (1+ nestness))
-	'("}\n")))
+	`(,(aligner nestness)
+          "}\n")))
 
       ;; subexpression:
       ;; (term . rest)
@@ -81,26 +86,24 @@ optionally ending with subconfigs, but provided expression is:\n ~a")
 
   (define* (serialize-sway-subconfig
 	    subconfig #:optional (nestness 0))
-    (let ((aligner (apply string-append
-			  (map (const "    ") (iota nestness)))))
-      (match subconfig
-	;; config:
-	;; ((expr1) (expr2) (expr3))
-	(((expressions ...) ...)
-	 ;; (format #t "top.    ~a\n" expressions)
-	 (append-map
-	  ;; It was a quantum behavior, when serialize-sway-expression
-	  ;; was used directly, without wrapping it into lambda. Be aware.
-	  ;; <https://paste.sr.ht/~abcdw/8b4909fbcd0f5fece985afa5913120fd4c5e787c>
-	  ;; <https://logs.guix.gnu.org/guix/2021-04-23.log#093933>
-	  (lambda (e)
-	    (append (list aligner)
-	            (serialize-sway-expression e nestness)))
-	  expressions))
-	(e
-	 (raise (formatted-message
-		 (G_ "Sway (sub)config should be a list of expressions, \
-where each expression is also a list, but provided value is:\n ~a") e))) )))
+    (match subconfig
+      ;; config:
+      ;; ((expr1) (expr2) (expr3))
+      (((expressions ...) ...)
+       ;; (format #t "top.    ~a\n" expressions)
+       (append-map
+	;; It was a quantum behavior, when serialize-sway-expression
+	;; was used directly, without wrapping it into lambda. Be aware.
+	;; <https://paste.sr.ht/~abcdw/8b4909fbcd0f5fece985afa5913120fd4c5e787c>
+	;; <https://logs.guix.gnu.org/guix/2021-04-23.log#093933>
+	(lambda (e)
+	  (append (list (aligner nestness))
+	          (serialize-sway-expression e nestness)))
+	expressions))
+      (e
+       (raise (formatted-message
+	       (G_ "Sway (sub)config should be a list of expressions, \
+where each expression is also a list, but provided value is:\n ~a") e))) ))
 
   #~(apply string-append
 	   '#$(serialize-sway-subconfig val)))
