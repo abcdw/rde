@@ -29,7 +29,7 @@
   #:use-module (srfi srfi-1)
 
   #:re-export (shepherd-service
-	       shepherd-action))
+               shepherd-action))
 
 (define-record-type* <home-shepherd-configuration>
   home-shepherd-configuration make-home-shepherd-configuration
@@ -47,23 +47,23 @@ as shepherd package."
   (assert-valid-graph services)
 
   (let ((files (map shepherd-service-file services))
-	;; TODO: Add compilation of services, it can improve start
-	;; time.
-	;; (scm->go (cute scm->go <> shepherd))
-	)
+        ;; TODO: Add compilation of services, it can improve start
+        ;; time.
+        ;; (scm->go (cute scm->go <> shepherd))
+        )
     (define config
       #~(begin
           (use-modules (srfi srfi-34)
                        (system repl error-handling))
-	  (apply
-	   register-services
-	   (map
-	    (lambda (file) (load file))
-	    '#$files))
-	  (action 'root 'daemonize)
+          (apply
+           register-services
+           (map
+            (lambda (file) (load file))
+            '#$files))
+          (action 'root 'daemonize)
           (format #t "Starting services...~%")
           (for-each
-	   (lambda (service) (start service))
+           (lambda (service) (start service))
            '#$(append-map shepherd-service-provision
                           (filter shepherd-service-auto-start?
                                   services)))
@@ -91,7 +91,7 @@ as shepherd package."
 
 (define (reload-configuration-gexp config)
   (let* ((shepherd (home-shepherd-configuration-shepherd config))
-	 (services (home-shepherd-configuration-services config)))
+         (services (home-shepherd-configuration-services config)))
     #~(system*
        #$(file-append shepherd "/bin/herd")
        "load" "root"
@@ -99,35 +99,35 @@ as shepherd package."
 
 (define (ensure-shepherd-gexp config)
   #~(if (file-exists?
-	 (string-append
-	  (or (getenv "XDG_RUNTIME_DIR")
-	      (format #f "/run/user/~a" (getuid)))
-	  "/shepherd/socket"))
-	#$(reload-configuration-gexp config)
-	#$(launch-shepherd-gexp config)))
+         (string-append
+          (or (getenv "XDG_RUNTIME_DIR")
+              (format #f "/run/user/~a" (getuid)))
+          "/shepherd/socket"))
+        #$(reload-configuration-gexp config)
+        #$(launch-shepherd-gexp config)))
 
 (define-public home-shepherd-service-type
   (service-type (name 'home-shepherd)
                 (extensions
                  (list (service-extension
-			home-run-on-first-login-service-type
+                        home-run-on-first-login-service-type
                         launch-shepherd-gexp)
-		       (service-extension
-			home-activation-service-type
-			ensure-shepherd-gexp)
-		       (service-extension
-			home-profile-service-type
-			(lambda (config)
-			  `(,(home-shepherd-configuration-shepherd config))))))
-		(compose concatenate)
-		(extend
-		 (lambda (config extra-services)
-		   (home-shepherd-configuration
-		    (inherit config)
-		    (services
-		     (append (home-shepherd-configuration-services config)
-			     extra-services)))))
-		(default-value (home-shepherd-configuration))
+                       (service-extension
+                        home-activation-service-type
+                        ensure-shepherd-gexp)
+                       (service-extension
+                        home-profile-service-type
+                        (lambda (config)
+                          `(,(home-shepherd-configuration-shepherd config))))))
+                (compose concatenate)
+                (extend
+                 (lambda (config extra-services)
+                   (home-shepherd-configuration
+                    (inherit config)
+                    (services
+                     (append (home-shepherd-configuration-services config)
+                             extra-services)))))
+                (default-value (home-shepherd-configuration))
                 (description "Configure and install userland Shepherd.")))
 
 
