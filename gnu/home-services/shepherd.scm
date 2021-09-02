@@ -1,3 +1,22 @@
+;;; GNU Guix --- Functional package management for GNU
+;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;;
+;;; This file is part of GNU Guix.
+;;;
+;;; GNU Guix is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3 of the License, or (at
+;;; your option) any later version.
+;;;
+;;; GNU Guix is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (gnu home-services shepherd)
   #:use-module (gnu home-services)
   #:use-module (gnu packages admin)
@@ -8,10 +27,6 @@
   #:use-module (guix records)
 
   #:use-module (srfi srfi-1)
-  #:use-module (srfi srfi-9)
-  #:use-module (srfi srfi-35)
-  #:use-module (ice-9 match)
-  #:use-module (ice-9 pretty-print)
 
   #:re-export (shepherd-service
 	       shepherd-action))
@@ -40,15 +55,6 @@ as shepherd package."
       #~(begin
           (use-modules (srfi srfi-34)
                        (system repl error-handling))
-
-          ;; Specify the default environment visible to all the services.
-          ;; Without this statement, all the environment variables of PID 1
-          ;; are inherited by child services.
-          ;; (default-environment-variables
-          ;;   '("PATH=/run/current-system/profile/bin"))
-
-          ;; (default-pid-file-timeout 5)
-
 	  (apply
 	   register-services
 	   (map
@@ -72,9 +78,7 @@ as shepherd package."
         (with-imported-modules '((guix build utils))
           #~(let ((log-dir (or (getenv "XDG_LOG_HOME")
                                (format #f "~a/.local/var/log" (getenv "HOME")))))
-              ;; FIXME: It's a temporary semi-solution, it must be handled
-              ;; somewhere around xdg service-type.
-              ((@@ (guix build utils) mkdir-p) log-dir)
+              ((@ (guix build utils) mkdir-p) log-dir)
               (system*
                #$(file-append shepherd "/bin/shepherd")
                "--logfile"
