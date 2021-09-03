@@ -54,6 +54,7 @@ as shepherd package."
     (define config
       #~(begin
           (use-modules (srfi srfi-34)
+                       (guix i18n)
                        (system repl error-handling))
           (apply
            register-services
@@ -61,7 +62,7 @@ as shepherd package."
             (lambda (file) (load file))
             '#$files))
           (action 'root 'daemonize)
-          (format #t "Starting services...~%")
+          (format #t (G_ "Starting services...~%"))
           (for-each
            (lambda (service) (start service))
            '#$(append-map shepherd-service-provision
