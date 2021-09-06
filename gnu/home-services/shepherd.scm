@@ -23,7 +23,6 @@
   #:use-module (gnu services shepherd)
   #:use-module (guix sets)
   #:use-module (guix gexp)
-  #:use-module (guix i18n)
   #:use-module (guix records)
 
   #:use-module (srfi srfi-1)
@@ -54,7 +53,6 @@ as shepherd package."
     (define config
       #~(begin
           (use-modules (srfi srfi-34)
-                       (guix i18n)
                        (system repl error-handling))
           (apply
            register-services
@@ -62,7 +60,7 @@ as shepherd package."
             (lambda (file) (load file))
             '#$files))
           (action 'root 'daemonize)
-          (format #t (G_ "Starting services...~%"))
+          (format #t "Starting services...~%")
           (for-each
            (lambda (service) (start service))
            '#$(append-map shepherd-service-provision
