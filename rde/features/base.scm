@@ -25,17 +25,22 @@
 (define* (feature-user-info
 	  #:key user-name full-name email
 	  (home-directory (format #f "/home/~a" user-name))
-	  (user-initial-password-hash #f))
+	  (user-initial-password-hash #f)
+          (advanced-rde-user #f)
+          (advanced-emacs-user #f))
   "Provides basic information about user for all features."
   (ensure-pred string? user-name)
   (ensure-pred string? full-name)
   (ensure-pred string? email)
   (ensure-pred string? home-directory)
+  (ensure-pred boolean? advanced-rde-user)
+  (ensure-pred boolean? advanced-emacs-user)
   (ensure-pred maybe-string? user-initial-password-hash)
 
   (feature
    (name 'user-info)
    (values (make-feature-values
+            advanced-rde-user advanced-emacs-user
 	    user-name full-name email home-directory
 	    user-initial-password-hash))))
 
