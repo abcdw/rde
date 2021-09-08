@@ -61,6 +61,8 @@ Install plugins into the home profile and configure Zsh to load them.")))
 for Zsh, and set reasonable default values for some plugin's variables
 to improve perfomance.")))
 
+;; MAYBE: Remove this services?  They are quite unflexible without
+;; nix/rde extensions mechanism.
 (define home-zsh-direnv-service-type
   (service-type
    (name 'home-zsh-direnv)
