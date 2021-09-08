@@ -679,7 +679,9 @@ previous window layout otherwise.  With universal argument toggles
          (add-hook
           'eshell-mode-hook
           (lambda ()
-            (setenv "PAGER" "")
+            (if envrc-global-mode
+                (add-hook 'envrc-mode-hook (lambda () (setenv "PAGER" "")))
+                (setenv "PAGER" ""))
 
             (eshell/alias "e" "find-file $1")
             (eshell/alias "ee" "find-file-other-window $1")
