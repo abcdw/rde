@@ -39,7 +39,7 @@
             home-run-on-first-login-service-type
             home-activation-service-type
             home-run-on-change-service-type
-	    home-provenance-service-type
+            home-provenance-service-type
 
             fold-home-service-types)
 
@@ -439,7 +439,10 @@ with one gexp, but many times, and all gexps must be idempotent.")))
       (define expressions-to-eval
         (map
          (lambda (x)
-           (let* ((file1 (string-append (getenv "GUIX_OLD_HOME") "/" (car x)))
+           (let* ((file1 (string-append
+                          (or (getenv "GUIX_OLD_HOME")
+                              "/gnu/store/non-existing-generation")
+                          "/" (car x)))
                   (file2 (string-append (getenv "GUIX_NEW_HOME") "/" (car x)))
                   (_ (format #t "Comparing ~a and\n~10t~a..." file1 file2))
                   (any-changes? (something-changed? file1 file2))
@@ -448,14 +451,14 @@ with one gexp, but many times, and all gexps must be idempotent.")))
              (if any-changes? (cadr x) "")))
          '#$pattern-gexp-tuples))
 
-      (if (and #$eval-gexps? (getenv "GUIX_OLD_HOME"))
+      (if #$eval-gexps?
           (begin
             (display "Evaling on-change gexps.\n\n")
             (for-each primitive-eval expressions-to-eval)
             (display "On-change gexps evaluation finished.\n\n"))
           (display "\
-On-change gexps won't evaluated, disabled by service configuration or
-there are no previos generations.\n"))))
+On-change gexps won't be evaluated, disabled by service
+configuration.\n"))))
 
 (define home-run-on-change-service-type
   (service-type (name 'home-run-on-change)
