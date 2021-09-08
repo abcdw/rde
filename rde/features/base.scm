@@ -214,26 +214,3 @@ HiDPI friendly."
   (feature
    (name 'hidpi)
    (values (make-feature-values scaling-factor console-font))))
-
-
-(define* (feature-generic
-	  #:key
-	  feature-name
-	  (home-services '())
-	  (system-services '()))
-  "Allows to specify additional services for home-environment, or
-operating-system, or both."
-  (ensure-pred symbol? feature-name)
-  (ensure-pred list-of-services? home-services)
-  (ensure-pred list-of-services? system-services)
-
-  (define (get-home-services values)
-    home-services)
-
-  (define (get-system-services values)
-    system-services)
-
-  (feature
-   (name feature-name)
-   (home-services-getter get-home-services)
-   (system-services-getter get-system-services)))
