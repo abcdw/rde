@@ -167,6 +167,10 @@ input * {
     (append (home-sway-configuration-config cfg)
             (append-map identity (reverse extensions))))))
 
+;;; Alternative implementation:
+;;; https://notabug.org/jbranso/guix-config/src/master/sway-service.scm
+;;; MAYBE: Add binds/variables/other stuff to make extension more
+;;; order independent?
 (define home-sway-service-type
   (service-type (name 'home-sway)
                 (extensions
