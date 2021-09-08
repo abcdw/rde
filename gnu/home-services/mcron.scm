@@ -122,7 +122,7 @@ files."
      (let ((files (job-files mcron jobs)))
        (list (shepherd-service
               (documentation "User cron jobs.")
-              (provision '(home-mcron))
+              (provision '(mcron))
               (modules `((srfi srfi-1)
                          (srfi srfi-26)
                          (ice-9 popen)            ; for the 'schedule' action
