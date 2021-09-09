@@ -248,6 +248,7 @@ to each system-services-getter function."
 
 	 (user-name        (get-value 'user-name config))
 	 (full-name        (get-value 'full-name config ""))
+	 (user-groups      (get-value 'user-groups config '()))
 	 (home-directory   (get-value
 			    'home-directory config
 			    (string-append "/home/" (or user-name "user"))))
@@ -263,13 +264,20 @@ to each system-services-getter function."
 			   	 (home-directory home-directory)
 			   	 (shell login-shell)
 			   	 (group "users")
-			   	 (supplementary-groups '("wheel" "netdev"
-			   				 "audio" "video")))
+			   	 (supplementary-groups
+                                  (append
+                                   '("wheel" "netdev" "audio" "video")
+                                   ;; MAYBE: Reimplement user-account creation
+                                   ;; using service, to make it possible
+                                   ;; to extend it with supplimentary groups
+                                   (if (get-value 'docker config)
+                                       '("docker") '())
+                                   user-groups)))
 			        %base-user-accounts)
 			       (operating-system-users initial-os)))
-	 
+
 	 (services         (rde-config-system-services config))
-	 
+
 	 (kernel           (get-value
 			    'kernel config
 			    (operating-system-kernel initial-os)))

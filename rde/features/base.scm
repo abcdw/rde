@@ -26,6 +26,7 @@
 	  #:key user-name full-name email
 	  (home-directory (format #f "/home/~a" user-name))
 	  (user-initial-password-hash #f)
+          (user-groups '())
           (advanced-rde-user #f)
           (advanced-emacs-user #f))
   "Provides basic information about user for all features."
@@ -41,8 +42,9 @@
    (name 'user-info)
    (values (make-feature-values
             advanced-rde-user advanced-emacs-user
-	    user-name full-name email home-directory
-	    user-initial-password-hash))))
+            user-name full-name email home-directory
+	    user-groups
+            user-initial-password-hash))))
 
 
 ;; TODO: Cleanup the list of base system packages, it contains some
