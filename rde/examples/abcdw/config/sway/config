@@ -60,7 +60,7 @@ output DP-2 scale 2 disable
 # Basics:
 #
     # Start a terminal
-    bindsym $mod+Shift+Return exec emacsclient -c --eval '(eshell)'
+    bindsym $mod+Shift+Return exec emacsclient -c
     bindsym $mod+Control+Shift+Return exec $term
 
     # Kill focused window
