@@ -18,6 +18,7 @@
   #:use-module (rde features linux)
   #:use-module (rde features bittorrent)
   #:use-module (rde features mail)
+  #:use-module (rde features docker)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
@@ -112,6 +113,7 @@
 
    (feature-base-services)
    (feature-desktop-services)
+   (feature-docker)
 
    (feature-fonts)
    (feature-pipewire)
