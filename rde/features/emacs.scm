@@ -211,6 +211,10 @@ point reaches the beginning or end of the buffer, stop there."
             (add-hook 'prog-mode-hook
                       (lambda () (setq show-trailing-whitespace t)))
 
+            (setq backup-directory-alist
+                  `(,(cons "." (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		                       "/emacs/backup"))))
+
             ;; MAYBE: Move to dired
             (dolist (mode-hook '(prog-mode-hook dired-mode-hook
                                  compilation-mode-hook))
