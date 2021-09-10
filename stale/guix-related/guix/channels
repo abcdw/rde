@@ -1,3 +1,4 @@
+;; -*- mode: scheme -*-
 (use-modules (guix ci)
 	     (guix channels))
 
