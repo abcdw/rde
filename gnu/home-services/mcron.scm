@@ -61,73 +61,9 @@
   (jobs home-mcron-configuration-jobs   ; list of jobs
         (default '())))
 
-;; TODO: Export these upstream.
-;; <https://issues.guix.gnu.org/47238>
-(define (job-files mcron jobs)
-  "Return a list of file-like object for JOBS, a list of gexps."
-  (define (validated-file job)
-    ;; This procedure behaves like 'scheme-file' but it runs 'mcron
-    ;; --schedule' to detect any error in JOB.
-    (computed-file "mcron-job"
-                   (with-imported-modules '((guix build utils))
-                     #~(begin
-                         (use-modules (guix build utils))
-
-                         (call-with-output-file "prologue"
-                           (lambda (port)
-                             ;; This prologue allows 'mcron --schedule' to
-                             ;; proceed no matter what #:user option is passed
-                             ;; to 'job'.
-                             (write '(set! getpw
-                                       (const (getpwuid (getuid))))
-                                    port)))
-
-                         (call-with-output-file "job"
-                           (lambda (port)
-                             (write '#$job port)))
-
-                         (invoke #+(file-append mcron "/bin/mcron")
-                                 "--schedule=20" "prologue" "job")
-                         (copy-file "job" #$output)))
-                   #:options '(#:env-vars (("COLUMNS" . "150")))))
-
-  (map validated-file jobs))
-
-(define (shepherd-schedule-action mcron files)
-  "Return a Shepherd action that runs MCRON with '--schedule' for the given
-files."
-  (shepherd-action
-   (name 'schedule)
-   (documentation
-    "Display jobs that are going to be scheduled.")
-   (procedure
-    #~(lambda* (_ #:optional (n "5"))
-        ;; XXX: This is a global side effect.
-        (setenv "GUILE_AUTO_COMPILE" "0")
-
-        ;; Run 'mcron' in a pipe so we can explicitly redirect its output to
-        ;; 'current-output-port', which at this stage is bound to the client
-        ;; connection.
-        (let ((pipe (open-pipe* OPEN_READ
-                                #$(file-append mcron "/bin/mcron")
-                                (string-append "--schedule=" n)
-                                #$@files)))
-          (let loop ()
-            (match (read-line pipe 'concat)
-              ((? eof-object?)
-               (catch 'system-error
-                 (lambda ()
-                   (zero? (close-pipe pipe)))
-                 (lambda args
-                   ;; There's a race with the SIGCHLD handler, which
-                   ;; could call 'waitpid' before 'close-pipe' above does.  If
-                   ;; we get ECHILD, that means we lost the race, but that's
-                   ;; fine.
-                   (or (= ECHILD (system-error-errno args))
-                       (apply throw args)))))
-              (line
-               (display line)
-               (loop)))))))))
+(define job-files (@@ (gnu services mcron) job-files))
+(define shepherd-schedule-action
+  (@@ (gnu services mcron) shepherd-schedule-action))
 
 (define home-mcron-shepherd-services
   (match-lambda
