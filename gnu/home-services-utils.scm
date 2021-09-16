@@ -37,6 +37,7 @@
   #:use-module (srfi srfi-9)
   #:use-module (srfi srfi-171)
   #:use-module (srfi srfi-26)
+  #:use-module (srfi srfi-43)
 
   #:re-export (filter-configuration-fields
 
@@ -67,6 +68,9 @@
             ini-config?
             generic-serialize-ini-config
             generic-serialize-git-ini-config
+
+            yaml-config?
+            serialize-yaml-config
 
             rest
             maybe-list
@@ -289,6 +293,50 @@ elements: the section and the subsection."
             (generic-serialize-alist combine-alist serialize-field alist))))
         fields)
    "\n"))
+
+(define yaml-config? list?)
+(define (make-yaml-indent depth)
+  (make-string (* 2 depth) #\space))
+
+;; TODO: Revisit before upstream
+(define ((serialize-yaml-vector-value depth) value)
+  (let* ((depth (1+ depth))
+         (tab (make-yaml-indent depth)))
+    (cond
+     ((string? value)
+      (list (format #f "~a- '~a'\n" tab value)))
+     ((boolean? value)
+      (list (format #f "~a- ~a\n" tab (if value "true" "false"))))
+     ((alist? value)
+      (cons
+       (format #f "~a-\n" tab)
+       (serialize-yaml-config value #:depth (1+ depth))))
+     ((vector? value)
+      (cons
+       (format #f "~a-\n" tab)
+       (append-map (serialize-yaml-vector-value depth) (vector->list value))))
+     (else (format #f "~a- ~a\n" tab value)))))
+
+(define ((serialize-yaml-value depth) key value)
+  (let ((tab (make-yaml-indent depth)))
+    (cond
+     ((string? value)
+      (list (format #f "~a~a: '~a'\n" tab key value)))
+     ((boolean? value)
+      (list (format #f "~a~a: ~a\n" tab key (if value "true" "false"))))
+     ((alist? value)
+      (cons
+       (format #f "~a~a:\n" tab key)
+       (serialize-yaml-config value #:depth (1+ depth))))
+     ((vector? value)
+      (cons
+       (format #f "~a~a:\n" tab key)
+       (append-map (serialize-yaml-vector-value depth) (vector->list value))))
+     (else (list (format #f "~a~a: ~a\n" tab key value))))))
+
+(define* (serialize-yaml-config config #:key (depth 0))
+  (generic-serialize-alist append (serialize-yaml-value depth) config))
+
 
 
 ;;;
