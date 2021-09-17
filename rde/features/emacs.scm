@@ -897,7 +897,9 @@ git-link, git-timemachine."
 		(serif-fn ,(font-name font-serif))
 		(mono (font-spec
 		       :name ,(font-name font-monospace)
-		       :size   ,(font-size font-monospace)
+                       ;; For some reason pgtk emacs has much smaller
+                       ;; font than alacritty with the same size value
+		       :size   ,(+ 3 (font-size font-monospace))
 		       :weight ',(or (font-weight font-monospace) 'normal)))
 		;; For people coming here years later, only
 		;; face which can contain size or integer

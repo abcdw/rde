@@ -1,8 +1,10 @@
 (define-module (rde features terminals)
   #:use-module (rde features)
   #:use-module (rde features predicates)
+  #:use-module (rde features fontutils)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services base)
+  #:use-module (gnu home-services terminals)
   #:use-module (gnu services)
   #:use-module (gnu packages terminals)
   #:use-module (guix gexp)
@@ -22,14 +24,23 @@
   ;; feature extendable.
   (define (alacritty-home-services config)
     "Returns home services related to Alacritty."
+    (define font-mono (get-value 'font-monospace config))
     (list
-     (home-generic-service
-      'home-alacritty
-      #:files
-      (filter list?
-	      (list (when config-file
-		      (list "config/alacritty/alacritty.yml" config-file))))
-      #:packages (list package))))
+     (service
+      home-alacritty-service-type
+      (home-alacritty-configuration
+       (package package)
+       (config
+        `((window . ((padding . ((x . 10)
+                                 (y . 5)))))
+          ,@(if font-mono
+                `((font . ((normal . ((style . Semilight)
+                                      (family . ,(font-name font-mono))))
+                        (size . ,(font-size font-mono)))))
+              '())
+          ,@(if config-file
+                `((import . #(,config-file)))
+                '())))))))
 
   (feature
    (name 'alacritty)
