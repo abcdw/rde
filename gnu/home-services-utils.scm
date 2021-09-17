@@ -298,45 +298,51 @@ elements: the section and the subsection."
 (define (make-yaml-indent depth)
   (make-string (* 2 depth) #\space))
 
-;; TODO: Revisit before upstream
-(define ((serialize-yaml-vector-value depth) value)
-  (let* ((depth (1+ depth))
-         (tab (make-yaml-indent depth)))
+(define ((serialize-yaml-value depth) value)
+  (let* ((tab (make-yaml-indent depth)))
     (cond
      ((string? value)
-      (list (format #f "~a- '~a'\n" tab value)))
+      (list (format #f "'~a'" value)))
      ((boolean? value)
-      (list (format #f "~a- ~a\n" tab (if value "true" "false"))))
+      (list (format #f "~a" (if value "true" "false"))))
+     ((file-like? value)
+      (list value))
      ((alist? value)
-      (cons
-       (format #f "~a-\n" tab)
-       (serialize-yaml-config value #:depth (1+ depth))))
+      (serialize-yaml-alist value #:depth (1+ depth)))
      ((vector? value)
-      (cons
-       (format #f "~a-\n" tab)
-       (append-map (serialize-yaml-vector-value depth) (vector->list value))))
-     (else (format #f "~a- ~a\n" tab value)))))
+      (serialize-yaml-vector value #:depth depth))
+     (else (list (format #f "~a" value))))))
 
-(define ((serialize-yaml-value depth) key value)
+(define ((serialize-yaml-key depth) key)
+  (when (vector? key)
+    (raise (formatted-message
+            (G_ "Vector as key value are not supported by serializer, \
+try to avoid them. ~a") key)))
+  ((serialize-yaml-value depth) key))
+
+(define ((serialize-yaml-key-value depth) key value)
   (let ((tab (make-yaml-indent depth)))
-    (cond
-     ((string? value)
-      (list (format #f "~a~a: '~a'\n" tab key value)))
-     ((boolean? value)
-      (list (format #f "~a~a: ~a\n" tab key (if value "true" "false"))))
-     ((alist? value)
-      (cons
-       (format #f "~a~a:\n" tab key)
-       (serialize-yaml-config value #:depth (1+ depth))))
-     ((vector? value)
-      (cons
-       (format #f "~a~a:\n" tab key)
-       (append-map (serialize-yaml-vector-value depth) (vector->list value))))
-     (else (list (format #f "~a~a: ~a\n" tab key value))))))
+    `("\n"
+      ,tab
+      ,@((serialize-yaml-key depth) key) ": "
+      ,@((serialize-yaml-value depth) value))))
 
-(define* (serialize-yaml-config config #:key (depth 0))
-  (generic-serialize-alist append (serialize-yaml-value depth) config))
+(define ((serialize-yaml-vector-elem depth) elem)
+  (let ((tab (make-yaml-indent (1+ depth))))
+    (cons*
+     "\n" tab "- "
+     ((serialize-yaml-value (1+ depth)) elem))))
 
+(define* (serialize-yaml-vector vec #:key (depth 0))
+  (append-map (serialize-yaml-vector-elem depth) (vector->list vec)))
+
+(define* (serialize-yaml-alist lst #:key (depth 0))
+  (generic-serialize-alist append (serialize-yaml-key-value depth) lst))
+
+(define (serialize-yaml-config config)
+  "Simplified yaml serializer, which supports only a subset of yaml, use
+it with caution."
+  (serialize-yaml-alist config))
 
 
 ;;;
