@@ -33,7 +33,7 @@
 (define %default-bootloader-configuration
   (bootloader-configuration
    (bootloader grub-efi-bootloader)
-   (target "/boot/efi")))
+   (targets '("/boot/efi"))))
 
 (define* (feature-bootloader
 	  #:key (bootloader-configuration %default-bootloader-configuration))

@@ -217,7 +217,7 @@ to each system-services-getter function."
    (locale  "en_US.utf8")
    (bootloader (bootloader-configuration
 		(bootloader grub-efi-bootloader)
-		(target "/boot/efi")))
+		(targets '("/boot/efi"))))
    (services '())
    (file-systems %base-file-systems)))
 
