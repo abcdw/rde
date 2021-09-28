@@ -2,8 +2,9 @@
 #+OPTIONS: toc:nil
 
 * rde
-Set of tools for managing computing environments with GNU Guix. More
-info is available at [[http://trop.in/rde][trop.in/rde]].
+Set of tools for managing computing environments with GNU Guix.  Also,
+rde contains additional home services for Guix Home and packages for
+GNU Guix.  More info is available at [[http://trop.in/rde][trop.in/rde]].
 
 *Disclaimer:* The project is in an active development stage.
 
@@ -25,8 +26,8 @@ info is available at [[http://trop.in/rde][trop.in/rde]].
 rde heavily relies on Guix Home and Guix System, it's able to provide
 both a ~home-environment~ and ~operating-system~ records, which can be
 used by ~guix home~ and ~guix system~ respectively.  It's not ready for
-wider audience yet, but for very curious people I will say that my
-current [[file:rde/examples/abcdw/configs.scm][config]] is here and will write down following commands:
+wide audience yet, but for very curious people: my current [[file:rde/examples/abcdw/configs.scm][config]] is
+here and I use following commands to apply it:
 
 #+begin_src shell
 git clone https://git.sr.ht/~abcdw/rde
@@ -34,42 +35,17 @@ cd rde
 make
 #+end_src
 
-Read more about ~home-environment~ at [[https://guix-home.trop.in/Home-Configuration.html][Home Configuration]].
+Read more about ~home-environment~ at [[http://guix.gnu.org/en/manual/devel/en/guix.html#Home-Configuration][Home Configuration]].
 
-GNU Guix should be installed before invoking command above.
+GNU Guix and git should be installed before invoking commands above.
 
-Also, for now Guix Home is not a part GNU Guix and have to be
-installed manually. When it will become upstreamed the installation
-step won't be needed.
-
+The alternative and more apropriate way to use rde will be described
+later.
 ** Guix Home
-*** Installation
-**** Option 1
-The primary way to use Guix Home now is to set ~GUILE_LOAD_PATH~ to
-the directory, where the guile code for it is located.
-~./pre-inst-env~ script in the root of rde folder is doing exactly
-that, just prefix any command with it, like:
+~Guix Home~ is a part of GNU Guix now, no additional installation steps
+are required.
 
-#+begin_src shell
-./pre-inst-env guix home --help
-#+end_src
-
-**** Option 2
-Another possible option is to add rde repo as a channel, but you still
-need to run at least on ~guix home reconfigure~ with correct
-~GUILE_LOAD_PATH~ as mentioned above or:
-
-#+begin_src shell
-GUILE_LOAD_PATH=${XDG_CONFIG_HOME:-$HOME/.config}/guix/current/share/guile/site/3.0:$GUILE_LOAD_PATH
-guix home reconfigure ./PATH_TO_FILE_WITH/HOME_ENVIRONMENT.scm
-#+end_src
-
-After you installed your first home environment, your shell is
-properly configured (See [[https://guix-home.trop.in/Configuring-the-Shell.html][Configuring the Shell]]) and you did relogin or
-reboot, you should be able to use ~guix home~ without setting
-anything.
-
-*** People's configurations
+*** People's Guix Home configurations
 - [[https://hg.sr.ht/~yoctocell/guixrc/browse/yoctocell/home][yoctocell]]'s full-blown configuration with variety of software.
 - [[https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/cfg/home/asgard.scm][krevedkokun]]'s Emacs(Evil)/Wayland(Sway) compact and clean config.
 
@@ -93,7 +69,7 @@ your ~~/.config/guix/channels.scm~, and call ~guix pull~.
 A picture to catch your eye)
 #+CAPTION: Latest rde screenshot
 #+NAME:   fig:latest-screenshot
-https://user-images.githubusercontent.com/1218615/123433280-f2028800-d5d3-11eb-8836-51beb2fddc0e.png
+https://cdn.fosstodon.org/media_attachments/files/106/900/674/950/793/851/original/4b17f03528571ca0.png
 
 *** Tools
 | Purpose                | Tool      |
@@ -119,8 +95,4 @@ existing email account:
 Send mails, optionally with inline patches to rde-devel mailing list.
 
 *** Documentation
-For Guix Home documentation for now maintained in [[https://git.sr.ht/~abcdw/guix][forked Guix
-repository]] inside ~doc/guix.texi~ and deployed to
-https://guix-home.trop.in/Home-Configuration.html once in a
-while.  Patches to rde-devel is a good option here too.
-
+For Guix Home documentation maintained in [[https://git.savannah.gnu.org/cgit/guix.git/tree/doc][guix repo]].
