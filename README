@@ -47,7 +47,7 @@ are required.
 
 *** People's Guix Home configurations
 - [[https://hg.sr.ht/~yoctocell/guixrc/browse/yoctocell/home][yoctocell]]'s full-blown configuration with variety of software.
-- [[https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/cfg/home/asgard.scm][krevedkokun]]'s Emacs(Evil)/Wayland(Sway) compact and clean config.
+- [[https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/home/yggdrasil][krevedkokun]]'s Emacs(Evil)/Wayland(Sway) compact and clean config.
 
 ** Channel introduction
 In case you want to use rde as a channel, add the following code to
