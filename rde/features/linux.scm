@@ -37,10 +37,10 @@ expected to be a brightnessctl."
      (simple-service
       'backlight-add-brightness-control-to-sway
       home-sway-service-type
-      `((bindsym XF86MonBrightnessUp exec
+      `((bindsym --locked XF86MonBrightnessUp exec
 		 ,(file-append brightnessctl "/bin/brightnessctl")
 		 set ,(step->symbol '+))
-	(bindsym XF86MonBrightnessDown exec
+	(bindsym --locked XF86MonBrightnessDown exec
 		 ,(file-append brightnessctl "/bin/brightnessctl")
 		 set ,(step->symbol '-))))))
 
