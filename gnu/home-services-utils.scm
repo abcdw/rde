@@ -19,8 +19,8 @@
 
 (define-module (gnu home-services-utils)
   #:use-module (gnu services configuration)
-  #:use-module (gnu home-services configuration)
-  #:use-module (gnu home-services utils)
+  #:use-module (gnu home services configuration)
+  #:use-module (gnu home services utils)
   #:use-module (guix ui)
   #:use-module (guix diagnostics)
   #:use-module (guix gexp)
