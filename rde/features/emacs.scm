@@ -4,7 +4,7 @@
   #:use-module (gnu home-services)
   #:use-module (gnu home-services emacs)
   #:use-module (gnu home-services wm)
-  #:use-module (gnu home-services xdg)
+  #:use-module (gnu home services xdg)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu services)
 

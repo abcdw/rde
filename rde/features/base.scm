@@ -8,7 +8,7 @@
   #:use-module (gnu services sound)
   #:use-module (gnu services xorg)
   #:use-module (gnu home-services)
-  #:use-module (gnu home-services shepherd)
+  #:use-module (gnu home services shepherd)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages fonts)
   #:use-module (srfi srfi-1)

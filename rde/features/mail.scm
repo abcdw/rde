@@ -9,7 +9,7 @@
   #:use-module (gnu services configuration)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services mail)
-  #:use-module (gnu home-services mcron)
+  #:use-module (gnu home services mcron)
 
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)

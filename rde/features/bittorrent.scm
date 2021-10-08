@@ -4,7 +4,7 @@
   #:use-module (rde features predicates)
   #:use-module (gnu services)
   #:use-module (gnu home-services)
-  #:use-module (gnu home-services shepherd)
+  #:use-module (gnu home services shepherd)
   #:use-module (gnu packages bittorrent)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (guix gexp)

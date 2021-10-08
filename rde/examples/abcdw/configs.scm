@@ -105,7 +105,7 @@
 
      ((@ (gnu services) simple-service)
       'extend-shell-profile
-      (@ (gnu home-services shells) home-shell-profile-service-type)
+      (@ (gnu home services shells) home-shell-profile-service-type)
       (list
        #~(string-append
           "alias superls="

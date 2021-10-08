@@ -17,7 +17,7 @@
   #:use-module (gnu services shepherd)
   #:use-module (gnu home-services)
   #:use-module (gnu home-services wm)
-  #:use-module (gnu home-services shells)
+  #:use-module (gnu home services shells)
   #:use-module (guix gexp)
   #:export (feature-sway
 	    feature-sway-run-on-tty
