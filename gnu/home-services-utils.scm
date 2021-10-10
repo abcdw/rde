@@ -72,6 +72,9 @@
             string-or-gexp?
 	    serialize-string-or-gexp
 
+            gexp-text-config?
+	    serialize-gexp-text-config
+
             rest
             maybe-list
             optional
@@ -348,6 +351,11 @@ it with caution."
 (define (string-or-gexp? sg) (or (string? sg) (gexp? sg)))
 (define (serialize-string-or-gexp field-name val) "")
 
+;; Guix proper has a different version of text-config.
+(define (gexp-text-config? config)
+  (and (list? config) (every string-or-gexp? config)))
+(define (serialize-gexp-text-config field-name val)
+  #~(string-append #$@(interpose val "\n" 'suffix)))
 
 ;;;
 ;;; Miscellaneous.

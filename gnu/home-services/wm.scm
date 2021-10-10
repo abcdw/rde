@@ -210,7 +210,7 @@ contains many third-party extensions for XMonad.")
    "Whether to respect XDG base directory, this will set the relevant
 environment variables if enabled.")
   (config
-   (text-config '())
+   (gexp-text-config '())
    "List of strings or gexps containing the XMonad configuration, see
 the @uref{https://xmonad.org/documentation.html, official XMonad
 documentation} for how to configure it."))
