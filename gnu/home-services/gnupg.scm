@@ -1,5 +1,5 @@
 (define-module (gnu home-services gnupg)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu packages)

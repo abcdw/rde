@@ -3,7 +3,7 @@
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (rde features emacs)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home services shells)
   #:use-module (gnu home-services shellutils)
   #:use-module (gnu home-services-utils)

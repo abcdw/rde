@@ -15,7 +15,7 @@
   #:use-module (gnu services)
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services wm)
   #:use-module (gnu home services shells)
   #:use-module (guix gexp)
@@ -90,7 +90,7 @@
 
        (simple-service
         'sway-reload-config-on-change
-        (@@ (gnu home-services) home-run-on-change-service-type)
+        (@@ (gnu home services) home-run-on-change-service-type)
         `(("files/config/sway/config"
            ,#~(system* #$(file-append package "/bin/swaymsg") "reload"))))
        ;; TODO: Move wofi to feature-app-launcher or something like that

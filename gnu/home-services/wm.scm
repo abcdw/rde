@@ -1,5 +1,5 @@
 (define-module (gnu home-services wm)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu packages wm)
   #:use-module (gnu services configuration)

@@ -2,7 +2,7 @@
   #:use-module (rde features)
   #:use-module (gnu system)
   #:use-module (gnu services)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
 

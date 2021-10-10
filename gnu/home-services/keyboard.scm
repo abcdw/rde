@@ -1,7 +1,7 @@
 (define-module (gnu home-services keyboard)
   #:use-module (gnu system keyboard)
   #:use-module (gnu services configuration)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services-utils)
 
   #:export (home-keyboard-service-type))

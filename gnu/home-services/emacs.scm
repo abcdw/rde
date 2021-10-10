@@ -1,10 +1,9 @@
 (define-module (gnu home-services emacs)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu packages emacs)
   #:use-module (gnu services configuration)
-  #:use-module (gnu home services configuration)
 
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)

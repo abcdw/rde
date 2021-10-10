@@ -1,7 +1,7 @@
 (define-module (gnu home-services terminals)
   #:use-module (guix gexp)
   #:use-module (guix packages)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu packages terminals)
   #:use-module (gnu services configuration)

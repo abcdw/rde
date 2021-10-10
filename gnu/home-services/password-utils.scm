@@ -1,5 +1,5 @@
 (define-module (gnu home-services password-utils)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu packages password-utils)
   #:use-module (gnu services configuration)

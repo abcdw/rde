@@ -1,7 +1,7 @@
 (define-module (rde features fontutils)
   #:use-module (rde features)
   #:use-module (rde features predicates)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home services fontutils)
   #:use-module (gnu services)
   #:use-module (gnu packages fonts)

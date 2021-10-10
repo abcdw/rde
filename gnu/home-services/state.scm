@@ -1,7 +1,7 @@
 (define-module (gnu home-services state)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu home-services version-control)

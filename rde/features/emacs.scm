@@ -1,7 +1,7 @@
 (define-module (rde features emacs)
   #:use-module (rde features)
   #:use-module (rde features predicates)
-  #:use-module (gnu home-services)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services emacs)
   #:use-module (gnu home-services wm)
   #:use-module (gnu home services xdg)
