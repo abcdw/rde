@@ -95,7 +95,7 @@
      ;; TODO: Remove it once upstreamed.
      ((@ (gnu services) simple-service)
       'make-guix-aware-of-guix-home-subcomand
-      (@ (gnu home-services) home-environment-variables-service-type)
+      (@ (gnu home services) home-environment-variables-service-type)
       '(("GUILE_LOAD_PATH" .
          "$XDG_CONFIG_HOME/guix/current/share/guile/site/3.0\
 :$GUILE_LOAD_PATH")
@@ -105,7 +105,7 @@
 
      ((@ (gnu services) simple-service)
       'extend-shell-profile
-      (@ (gnu home services shells) home-shell-profile-service-type)
+      (@ (gnu home-services shells) home-shell-profile-service-type)
       (list
        #~(string-append
           "alias superls="
