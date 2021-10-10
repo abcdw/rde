@@ -46,8 +46,6 @@
 
                list-of-strings?
                alist?
-               string-or-gexp?
-	       serialize-string-or-gexp
 	       text-config?
 	       serialize-text-config
                generic-serialize-alist-entry
@@ -70,6 +68,9 @@
 
             yaml-config?
             serialize-yaml-config
+
+            string-or-gexp?
+	    serialize-string-or-gexp
 
             rest
             maybe-list
@@ -193,6 +194,7 @@ Setting CAPITALIZE? to @code{#t} will capitalize the word, it is set to
         (string-capitalize word)
         word)))
 
+;; TODO: Remove once upstreamed
 (define* (list->human-readable-list lst
                                     #:key
                                     (cumulative? #f)
@@ -343,6 +345,9 @@ try to avoid them. ~a") key)))
 it with caution."
   (serialize-yaml-alist config))
 
+(define (string-or-gexp? sg) (or (string? sg) (gexp? sg)))
+(define (serialize-string-or-gexp field-name val) "")
+
 
 ;;;
 ;;; Miscellaneous.
@@ -350,6 +355,7 @@ it with caution."
 
 (define rest cdr)
 
+;; Confusing with maybe-list type.
 (define (maybe-list a)
   "If A is a list, return it, otherwise return a singleton list with A."
       (if (list? a)
