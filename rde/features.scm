@@ -206,8 +206,27 @@ to each system-services-getter function."
     #f "Value ~a is not provided by any feature.\n~a"
     key (or (and=> additional-msg (lambda (x) (string-append x "\n"))) ""))))
 
+(use-modules (gnu home services)
+             (gnu home services xdg)
+             (gnu home services fontutils)
+             (gnu home services symlink-manager)
+             (gnu home-services shells))
 (define (get-home-environment config)
   (home-environment
+   (essential-services
+    (list
+     (service home-run-on-first-login-service-type)
+     (service home-activation-service-type)
+     (service home-environment-variables-service-type)
+
+     (service home-symlink-manager-service-type)
+
+     (service home-fontconfig-service-type)
+     (service home-xdg-base-directories-service-type)
+     (service home-shell-profile-service-type)
+
+     (service home-service-type)
+     (service home-profile-service-type '())))
    (services (rde-config-home-services config))))
 
 (define bare-bone-os

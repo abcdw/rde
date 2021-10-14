@@ -61,7 +61,7 @@
 
 (define-configuration home-shell-profile-configuration
   (profile
-   (text-config '())
+   (gexp-text-config '())
    "\
 @code{home-shell-profile} is instantiated automatically by
 @code{home-environment}, DO NOT create this service manually, it can
