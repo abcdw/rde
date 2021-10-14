@@ -6,7 +6,7 @@
   #:use-module (ice-9 match)
   #:use-module (gnu home services)
   #:use-module (gnu home-services-utils)
-  #:use-module (gnu services configuration)
+  #:use-module ((gnu services configuration) #:hide (interpose))
   #:use-module (gnu packages version-control)
   #:use-module (guix packages)
   #:use-module (guix gexp)
