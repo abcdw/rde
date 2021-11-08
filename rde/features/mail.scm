@@ -335,7 +335,8 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
                                   (lambda ()
                                     (setenv "DISPLAY" ":0")
                                     (system* "mbsync" "-a")
-                                    (system* "l2md")))))))
+                                    (system* "l2md"))
+                                  "mbsync")))))
      (service
       home-l2md-service-type
       (home-l2md-configuration

@@ -107,6 +107,25 @@ FILE-NAME found in %PATCH-PATH."
              (base32
               "0yghz9pdjsm9v6lbjckm6c5h9ak7iylx8sqgyjwl6nihkpvv4jyp"))))))
 
+(define-public emacs-perfect-margin
+  (package
+    (name "emacs-perfect-margin")
+    (version "0.1")
+    (home-page "https://github.com/mpwang/perfect-margin")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+              (url home-page)
+              (commit "94b055c743b1859098870c8aca3e915bd6e67d9d")))
+       (sha256
+        (base32 "02k379nig43j85wfm327pw6sh61kxrs1gwz0vgcbx9san4dp83bk"))))
+    (build-system emacs-build-system)
+    (synopsis "A global margin-making-mode, great for ultrawides")
+    (description
+     "[emacs] auto center emacs windows, work with minimap and/or linum-mode")
+    (license license:gpl3+)))
+
 (define-public emacs-hide-header-line
   (package
    (inherit emacs-hide-mode-line)
