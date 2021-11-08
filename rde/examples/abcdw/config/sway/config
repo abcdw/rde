@@ -2,6 +2,13 @@
 # bindswitch tablet:on output eDP-1 transform 90 scale 2
 # bindswitch tablet:off output eDP-1 transform 0
 
+# base16 one light colors   border   backgr.  text     indic.   child b.
+client.focused              #696c77  #696c77  #e5e5e6  #0184bc  #696c77
+client.focused_inactive     #a0a1a7  #a0a1a7  #e5e5e6  #0184bc  #a0a1a7
+client.unfocused            #e5e5e6  #e5e5e6  #696c77  #0184bc  #e5e5e6
+client.urgent               #ca1243  #ca1243  #e5e5e6  #0184bc  #ca1243
+
+
 # Your preferred terminal emulator
 # Your preferred application launcher
 # Note: pass the final command to swaymsg so that the resulting window can be opened
