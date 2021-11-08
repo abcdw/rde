@@ -8,7 +8,7 @@ targets-system = $(addsuffix -system, $(HOSTS))
 # https://www.gnu.org/software/make/manual/html_node/Automatic-Variables.html#Automatic-Variables
 %-home-build:
 	GUILE_LOAD_PATH=$(GLP) RDE_TARGET=$*-home \
-	guix home build $(CONFIG_FILE)
+	guix home build $(CONFIG_FILE) -v9
 
 %-home-reconfigure:
 	GUILE_LOAD_PATH=$(GLP) RDE_TARGET=$*-home \

@@ -10,4 +10,8 @@
       ;;   (url "file:///home/bob/work/gnu/guix"))
       (channel
        (name 'rde)
-       (url "https://git.sr.ht/~abcdw/rde")))
+       (url "https://git.sr.ht/~abcdw/rde"))
+     (channel
+      (name 'nonguix)
+      (url "https://gitlab.com/nonguix/nonguix")))
+ 

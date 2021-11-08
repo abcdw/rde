@@ -38,6 +38,8 @@ FILE-NAME found in %PATCH-PATH."
     (list (string-append %channel-root "rde/packages/patches"))
     (%patch-path))))
 
+;; https://git.savannah.gnu.org/cgit/emacs.git/log/?h=feature/pgtk
+;; NOTE misses `git' in the build process (rev-parse on something)
 (use-modules (gnu packages emacs))
 (use-modules (guix utils))
 

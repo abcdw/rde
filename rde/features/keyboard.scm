@@ -5,7 +5,8 @@
   #:use-module (gnu home-services keyboard)
   #:export (feature-keyboard
 	    %dvorak-layout
-	    %dvorak-jcuken-layout))
+	    %dvorak-jcuken-layout
+        %thinkpad-layout))
 
 ;; Example of multi-layer layout: https://neo-layout.org/index_en.html
 
@@ -16,6 +17,12 @@
   (keyboard-layout
    "us,ru" "dvorak,"
    #:options '("grp:win_space_toggle" "ctrl:nocaps")))
+
+(define %thinkpad-layout
+  (keyboard-layout
+   "us" "altgr-intl"
+   #:model "thinkpad"
+   #:options '("ctrl:nocaps")))
 
 ;; TODO: Add ability to provide custom layout package or file
 

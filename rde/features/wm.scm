@@ -44,7 +44,7 @@
     `((input *
 	     ((xkb_layout  ,(keyboard-layout-name keyboard-layout))
 	      (xkb_variant ,(keyboard-layout-variant keyboard-layout))
-	      (xkb_options ,kb-options))))))
+	      (xkb_options ,(if (string-null? kb-options) "none" kb-options)))))))
 
 (define* (feature-sway
 	  #:key
