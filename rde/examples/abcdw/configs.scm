@@ -28,6 +28,7 @@
 
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
+  #:use-module (gnu home-services ssh)
   #:use-module (gnu packages)
   #:use-module (rde packages)
   #:use-module (gnu packages fonts)
@@ -124,6 +125,10 @@
    (map get-inferior-pkg lst))
 
 
+(use-modules (gnu services)
+             (gnu services databases)
+             (gnu services desktop))
+
 ;;; WARNING: The order can be important for features extending
 ;;; services of other features.  Be careful changing it.
 (define %main-features
@@ -136,14 +141,53 @@
      )
     #:home-services
     (list
+     ;; TODO: Remove it once upstreamed.
+     ((@ (gnu services) simple-service)
+      'make-guix-aware-of-guix-home-subcomand
+      (@ (gnu home services) home-environment-variables-service-type)
+      '(("GUILE_LOAD_PATH" .
+         "$XDG_CONFIG_HOME/guix/current/share/guile/site/3.0\
+:$GUILE_LOAD_PATH")
+        ("GUILE_LOAD_COMPILED_PATH" .
+         "$XDG_CONFIG_HOME/guix/current/lib/guile/3.0/site-ccache\
+:$GUILE_LOAD_COMPILED_PATH")
+        ;; javascript sucks, npm sucks
+        ;; https://github.com/npm/npm/issues/6675#issuecomment-250318382
+        ;; https://github.com/npm/cli/issues/1451
+        ;; https://github.com/pnpm/pnpm/issues/2574
+        ;; https://github.com/rxrc/zshrc/blob/3ca83703da5bd93b015747835a8a0164160c9b83/env.zsh#L33-L928
+        ("NPM_CONFIG_USERCONFIG" . "${XDG_CONFIG_HOME}/npm/config")
+        ("NPM_CONFIG_CACHE" . "${XDG_CACHE_HOME}/npm")
+        ("NPM_CONFIG_TMP" . "${XDG_RUNTIME_DIR}/npm")
+        ("YARN_CACHE_FOLDER" . "${YARN_CACHE_FOLDER:-$XDG_CACHE_HOME/yarn}")
+        ("NODE_REPL_HISTORY" . "${NODE_REPL_HISTORY:-$XDG_CACHE_HOME/node/repl_history}")
+        ("NVM_DIR" . "${NVM_DIR:-$XDG_DATA_HOME/nvm}")
+        ("BABEL_CACHE_PATH" . "${BABEL_CACHE_PATH:-$XDG_CACHE_HOME/babel/cache.json}")
+        ("PATH" . (string-join (list "$PATH"
+                                     "$HOME/local/bin"
+                                     "${XDG_CACHE_HOME}/npm/bin")
+                               ":"))))
      ;; ((@ (gnu services) simple-service)
      ;;  'extend-shell-profile
      ;;  (@ (gnu home-services shells) home-shell-profile-service-type)
      ;;  (list
      ;;   #~(string-append
      ;;      "alias superls="
-     ;;      #$(file-append (@ (gnu packages base) coreutils) "/bin/ls"))))
-     ))
+     ;;      #$(file-append (@ (gnu packages base) coreutils) "/bin/ls")))))
+    #:system-services
+    (list (service postgresql-service-type)
+          (service postgresql-role-service-type
+                   (postgresql-role-configuration
+                    (roles (list (postgresql-role
+                                  (name "postgres")
+                                  (create-database? #t))
+                                 (postgresql-role
+                                  (name "samuel")
+                                  (create-database? #t))
+                                 (postgresql-role
+                                  (name "newstore")
+                                  (create-database? #t))))))))
+>>>>>>> 557a64c (feat: extend wm,emacs,ssh)
 
    (feature-base-services)
    (feature-desktop-services)
@@ -158,16 +202,16 @@
     #:font-packages (list font-iosevka font-fira-mono))
 
    (feature-alacritty
-    #:config-file (local-file "./config/alacritty/alacritty.yml")
-    #:default-terminal? #f
-    #:backup-terminal? #t)
-   (feature-vterm)
-   (feature-tmux
-    #:config-file (local-file "./config/tmux/tmux.conf"))
-   (feature-zsh
-    #:enable-zsh-autosuggestions? #t)
-   (feature-bash)
-   (feature-direnv)
+    #:config-file (local-file "./config/alacritty/alacritty.yml"))
+   (feature-zsh)
+   (feature-ssh
+    #:extra-config
+    (list (ssh-host
+           (host "bastion-sandbox")
+           (options '((user . "ubuntu@bastion-sandbox")
+                      (hostname . "bastion-sandbox.ssh.newstore.luminatesec.com")
+                      (port . 22)
+                      (identity-file . "~/.ssh/newstore-luminate.pem"))))))
    (feature-git)
    (feature-ssh
     #:ssh-configuration
@@ -177,6 +221,8 @@
         (pubkey-accepted-key-types . "+ssh-rsa")))))
 
    (feature-sway
+    #:opacity 0.9
+    #:wallpaper "$HOME/.cache/wallpaper.png"
     #:extra-config
     `((output DP-2 scale 2)
       (workspace 9 output DP-2)
@@ -229,7 +275,7 @@
    (feature-emacs-perfect-margin)
 
    (feature-emacs-dired)
-   (feature-emacs-eshell)
+   (feature-emacs-vterm)
    (feature-emacs-monocle)
    (feature-emacs-message)
    (feature-emacs-erc
@@ -263,6 +309,8 @@
     (string-append my-org-directory "/bib.org")
     #:bibliography-directory my-notes-directory)
 
+   (feature-emacs-es-mode)
+   (feature-emacs-restclient)
    (feature-mpv)
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
@@ -482,7 +530,7 @@
       ("live-system" live-os)
       (_ ixy-he))))
 
-;;(pretty-print-rde-config ixy-config)
+;; (pretty-print-rde-config ixy-config)
 ;; (use-modules (gnu services)
 ;; 	     (gnu services base))
 ;; (display
@@ -490,8 +538,8 @@
 ;; 	   (eq? (service-kind x) console-font-service-type))
 ;; 	 (rde-config-system-services ixy-config)))
 
- ;;(use-modules (rde features))
-;; ((@@ (ice-9 pretty-print) pretty-print)
-;;  (map feature-name (rde-config-features ixy-config)))
+;; (use-modules (rde features))
+;;  ((@@ (ice-9 pretty-print) pretty-print)
+;;   (map feature-name (rde-config-features ixy-config)))
 
 (dispatcher)

@@ -3,6 +3,7 @@
   #:use-module (rde features predicates)
   #:use-module (gnu home services)
   #:use-module (gnu home-services emacs)
+  #:use-module (gnu home-services shells)
   #:use-module (gnu home-services wm)
   #:use-module (gnu home services xdg)
   #:use-module (gnu home-services-utils)
@@ -12,6 +13,7 @@
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages mail)
+  #:use-module (rde packages)
 
   #:use-module (guix gexp)
   #:use-module (guix packages)
@@ -31,6 +33,7 @@
             feature-emacs-git
             feature-emacs-dired
             feature-emacs-eshell
+            feature-emacs-vterm
 	    feature-emacs-monocle
 	    feature-emacs-org
 	    feature-emacs-org-roam
@@ -43,6 +46,8 @@
             feature-emacs-which-key
             feature-emacs-keycast
             feature-emacs-perfect-margin
+            feature-emacs-es-mode
+            feature-emacs-restclient
 
             elisp-configuration-service
             emacs-xdg-service))
@@ -910,6 +915,102 @@ previous window layout otherwise.  With universal argument toggles
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+;; https://github.com/akermu/emacs-libvterm
+(define* (feature-emacs-vterm)
+  "Configure vterm, the Emacs libterm emulator"
+  (define emacs-f-name 'vterm)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (simple-service
+      'vterm-home-shell-configuration
+      home-shell-profile-service-type
+      (list
+       ;; oof, this sucks. when porting
+       ;; (query-replace "\\" "\\\\")  ;; literal escapes
+       ;; (query-replace "\"" "\\\"")  ;; then quotes
+       ;; https://github.com/akermu/emacs-libvterm#shell-side-configuration
+       "
+vterm_printf(){
+    if [ -n \"$TMUX\" ] && ([ \"${TERM%%-*}\" = \"tmux\" ] || [ \"${TERM%%-*}\" = \"screen\" ] ); then
+        # Tell tmux to pass the escape sequences through
+        printf \"\\ePtmux;\\e\\e]%s\\007\\e\\\\\" \"$1\"
+    elif [ \"${TERM%%-*}\" = \"screen\" ]; then
+        # GNU screen (screen, screen-256color, screen-256color-bce)
+        printf \"\\eP\\e]%s\\007\\e\\\\\" \"$1\"
+    else
+        printf \"\\e]%s\\e\\\\\" \"$1\"
+    fi
+}"
+       "
+vterm_cmd() {
+    local vterm_elisp
+    vterm_elisp=\"\"
+    while [ $# -gt 0 ]; do
+        vterm_elisp=\"$vterm_elisp\"\"$(printf '\"%s\" ' \"$(printf \"%s\" \"$1\" | sed -e 's|\\\\|\\\\\\\\|g' -e 's|\"|\\\\\"|g')\")\"
+        shift
+    done
+    vterm_printf \"51;E$vterm_elisp\"
+}"
+
+       "alias  e='vterm_cmd find-file'"
+       "alias ee='vterm_cmd find-file-other-window'"
+       "alias  d='vterm_cmd dired'"
+       "alias gd='vterm_cmd magit-diff-unstaged'"))
+
+     (elisp-configuration-service
+      emacs-f-name
+      `((define-key global-map (kbd "s-e") 'vterm)
+        (define-key global-map (kbd "C-x C-'") 'vterm)
+
+         ;; TODO move to upper `emacs-config/helpers'
+        (defun switch-to-prev-buffer-or-given-buffer (gb arg)
+          (interactive "P")
+          (message "%s" (list gb arg
+                              (current-buffer)
+                              (get-buffer (symbol-name gb))
+                              (bufferp                       (get-buffer (symbol-name gb)))
+                              (eq (current-buffer) (get-buffer (symbol-name gb)))))
+
+          (switch-to-buffer
+           (if (eq (current-buffer) (get-buffer (symbol-name gb)))
+               (other-buffer (current-buffer))
+               (or (get-buffer (symbol-name gb))
+                   (funcall gb arg)))))
+
+         (defun switch-to-prev-buffer-or-vterm (arg)
+           (interactive "P")
+           (switch-to-prev-buffer-or-given-buffer 'vterm arg))
+
+         (with-eval-after-load
+          'vterm
+
+          (mapc (lambda (c) (add-to-list 'vterm-eval-cmds c))
+                (list '("dired" dired)
+                      '("find-file-other-window" find-file-other-window)))
+
+          (with-eval-after-load
+           'magit
+           (add-to-list 'vterm-eval-cmds
+                        '("magit-diff-unstaged" magit-diff-unstaged)))
+
+          (defun vterm-complete-history ()
+            (message "oof"))
+
+          (define-key vterm-mode-map (kbd "M-r") 'vterm-complete-history)
+          ;; redef keys once vterm has loaded, so as not to maintain two ways to open
+          (define-key global-map (kbd "s-e")     'switch-to-prev-buffer-or-vterm)
+          (define-key global-map (kbd "C-x C-'") 'switch-to-prev-buffer-or-vterm))
+         )
+
+      #:elisp-packages (list emacs-vterm))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 (define default-org-directory "~/org")
 
 (define* (feature-emacs-org
@@ -932,6 +1033,7 @@ previous window layout otherwise.  With universal argument toggles
 
         (define-key mode-specific-map (kbd "c") 'org-capture)
         (setq org-directory ,org-directory)
+
         (setq org-agenda-directory ,org-agenda-directory)
 
         (with-eval-after-load
@@ -1281,14 +1383,14 @@ git-link, git-timemachine."
          ;; MAYBE: Make transient use child-frame:
          ;; https://github.com/magit/transient/issues/102
          ,@(if mini-frame?
-             `((add-hook 'after-init-hook 'mini-frame-mode)
-               (with-eval-after-load
-                'mini-frame
-                (custom-set-faces
-                 '(child-frame-border
-                   ;; TODO: inherit ,(face-attribute 'default :foreground)
-                   ((t (:background "#000000")))))
-                (put 'child-frame-border 'saved-face nil)
+               `((add-hook 'after-init-hook 'mini-frame-mode)
+                 (with-eval-after-load
+                  'mini-frame
+                  (custom-set-faces
+                   '(child-frame-border
+                     ;; TODO: inherit ,(face-attribute 'default :foreground)
+                     ((t (:background "#000000")))))
+                  (put 'child-frame-border 'saved-face nil)
 
                 (custom-set-variables
                  '(mini-frame-show-parameters
@@ -1634,8 +1736,42 @@ emacsclient feels more like a separate emacs instance."
      (elisp-configuration-service
       emacs-f-name
       `()
-
       #:elisp-packages (list emacs-perfect-margin))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-es-mode)
+  "Configure es-mode for GNU Emacs."
+  (define emacs-f-name 'es-mode)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `()
+      #:elisp-packages (list emacs-es-mode))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+(define* (feature-emacs-restclient)
+  "Configure restclient for GNU Emacs."
+  (define emacs-f-name 'restclient)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `()
+      #:elisp-packages (list emacs-restclient))))
 
   (feature
    (name f-name)

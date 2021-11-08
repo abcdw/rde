@@ -39,7 +39,15 @@ FILE-NAME found in %PATCH-PATH."
     (%patch-path))))
 
 ;; https://git.savannah.gnu.org/cgit/emacs.git/log/?h=feature/pgtk
-;; NOTE misses `git' in the build process (rev-parse on something)
+;; ((cd $HOME/git/sys/emacs) || git clone https://git.savannah.gnu.org/cgit/emacs.git $HOME/git/sys/emacs) && cd $HOME/git/sys/emacs
+;; git checkout feature/pgtk
+;; git rev-parse HEAD
+;; => b4204bdae83695089a27141602a955339df78b7a
+;; guix hash -rx .
+;; => 0drpms07231zc4w9g7gikwm5zlgrzdw8vbq853rlb7wqk3xg6gyq
+;;
+;; NOTE in the logs when building, we are missing `git' (rev-parse on something)
+
 (use-modules (gnu packages emacs))
 (use-modules (guix utils))
 
@@ -126,6 +134,38 @@ FILE-NAME found in %PATCH-PATH."
      "[emacs] auto center emacs windows, work with minimap and/or linum-mode")
     (license license:gpl3+)))
 
+(define-public emacs-es-mode
+  (package
+    (name "emacs-es-mode")
+    (version "4.3.0.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/dakrone/es-mode")
+             (commit "cde5cafcbbbd57db6d38ae7452de626305bba68d")))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "02zzwf9ykfi2dggjbspg7mk77b5x1fnkpp3bcp6rd4h95apnsjq5"))))
+    (build-system emacs-build-system)
+    (propagated-inputs
+     ;; The version of org in Emacs 24.5 is not sufficient, and causes tables
+     ;; to be rendered incorrectly
+     `(("emacs-dash" ,emacs-dash)
+       ("emacs-org" ,emacs-org)
+       ("emacs-spark" ,emacs-spark)
+       ("emacs-s" ,emacs-s)
+       ("emacs-request" ,emacs-request)))
+    (home-page "https://github.com/dakrone/es-mode")
+    (synopsis "Major mode for editing Elasticsearch queries")
+    (description "@code{es-mode} includes highlighting, completion and
+indentation support for Elasticsearch queries.  Also supported are
+@code{es-mode} blocks in @code{org-mode}, for which the results of queries can
+be processed through @code{jq}, or in the case of aggregations, can be
+rendered in to a table.  In addition, there is an @code{es-command-center}
+mode, which displays information about Elasticsearch clusters.")
+    (license license:gpl3+)))
+
 (define-public emacs-hide-header-line
   (package
    (inherit emacs-hide-mode-line)
@@ -160,6 +200,35 @@ FILE-NAME found in %PATCH-PATH."
             (sha256
              (base32
               "1g3pij5qn2j7v7jjac2a63lxd97mcsgw6xq6k5p7835q9fjiid98"))))))
+
+(define-public emacs-restclient
+  (let ((commit "49eb367dc17303c5633a69f49c6a30b18c29d62f")
+        (version "0")
+        (revision "4"))               ;Guix package revision,
+                                      ;upstream doesn't have official releases
+    (package
+      (name "emacs-restclient")
+      (version (git-version version revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/qzdl/restclient.el")
+                      (commit commit)))
+                (sha256
+                 (base32
+                  "0vrlrcggznilkm48wqanlm2z4zz2fqlvgbi28v4hfsrjjmrlsr1m"))
+                (file-name (git-file-name name version))))
+      (build-system emacs-build-system)
+      (propagated-inputs
+       `(("emacs-helm" ,emacs-helm)
+         ("emacs-jq-mode" ,emacs-jq-mode)))
+      (home-page "https://github.com/pashky/restclient.el")
+      (synopsis "Explore and test HTTP REST webservices")
+      (description
+       "This tool allows for testing and exploration of HTTP REST Web services
+from within Emacs.  Restclient runs queries from a plan-text query sheet,
+displays results pretty-printed in XML or JSON with @code{restclient-mode}")
+      (license license:public-domain))))
 
 (use-modules (guix build-system emacs)
              (gnu packages mail)
