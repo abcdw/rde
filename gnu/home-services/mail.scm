@@ -14,8 +14,13 @@
   #:use-module (guix i18n)
   #:use-module ((guix import utils) #:select (flatten))
 
+  #:use-module (rde packages)
+
   #:export (home-isync-service-type
             home-isync-configuration
+
+            home-msmtp-service-type
+            home-msmtp-configuration
 
             home-notmuch-service-type
             home-notmuch-configuration
@@ -126,6 +131,93 @@ binary.")
    `((home-isync-configuration
       ,home-isync-configuration-fields))
    'home-isync-configuration))
+
+
+
+;;;
+;;; msmtp
+;;;
+
+(define (serialize-msmtp-config field-name val)
+  (define (serialize-term term)
+    (match term
+      ((? symbol? e) (symbol->string e))
+      ((? number? e) (format #f "~a" e))
+      ((? string? e) (format #f "~s" e))
+      (e e)))
+  (define (serialize-item entry)
+    (match entry
+      ((? gexp? e) e)
+      ((? list lst)
+       #~(string-join '#$(map serialize-term lst)))))
+
+  #~(string-append #$@(interpose (map serialize-item val) "\n" 'suffix)))
+
+(define-configuration/no-serialization home-msmtp-configuration
+  (package
+   (package msmtp-latest)
+   "msmtp package to use.")
+  (xdg-flavor?
+   (boolean #t)
+   "Whether to use the {$XDG_CONFIG_HOME/msmtprc} configuration
+file or not.  If @code{#t} creates a wrapper for msmtp binary.")
+  (config
+   (list '())
+   "AList of pairs, each pair is a String and String or Gexp."))
+
+(define (add-msmtp-package config)
+  (define wrapper-gexp
+    #~(system
+       (string-join
+        (cons
+         #$(file-append (home-msmtp-configuration-package config)
+                        "/bin/msmtp")
+         (if (or (member "-C" (command-line))
+                 (member "--file=" (command-line)))
+             (cdr (command-line))
+             (append
+              (list "--file"
+                    "${XDG_CONFIG_HOME:-$HOME/.config}/msmtp/config")
+              (cdr (command-line))))))))
+  (list
+   (if (home-msmtp-configuration-xdg-flavor? config)
+       (wrap-package
+        (home-msmtp-configuration-package config)
+        "msmtp" wrapper-gexp)
+       (home-msmtp-configuration-package config))))
+
+(define (add-msmtp-configuration config)
+  `((,(if (home-msmtp-configuration-xdg-flavor? config)
+          "config/msmtp/config"
+          "msmtprc")
+     ,(mixed-text-file
+       "msmtp"
+       (serialize-msmtp-config #f (home-msmtp-configuration-config config))))))
+
+(define (home-msmtp-extensions cfg extensions)
+  (home-msmtp-configuration
+   (inherit cfg)
+   (config (append (home-msmtp-configuration-config cfg) extensions))))
+
+(define home-msmtp-service-type
+  (service-type (name 'home-msmtp)
+                (extensions
+                 (list (service-extension
+			home-profile-service-type
+			add-msmtp-package)
+		       (service-extension
+                        home-files-service-type
+                        add-msmtp-configuration)))
+		(compose concatenate)
+		(extend home-msmtp-extensions)
+                (default-value (home-msmtp-configuration))
+                (description "Install and configure msmtp.")))
+
+(define (generate-home-msmtp-documentation)
+  (generate-documentation
+   `((home-msmtp-configuration
+      ,home-msmtp-configuration-fields))
+   'home-msmtp-configuration))
 
 
 ;;;
