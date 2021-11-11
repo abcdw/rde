@@ -13,6 +13,7 @@
 	  #:key gpg-primary-key
           (package gnupg)
 	  (gpg-ssh-agent? #t)
+          (ssh-keys '())
 	  (pinentry-flavor 'qt)
 	  (gpg-smart-card? #f)
           (default-ttl 86400)
@@ -28,6 +29,7 @@ and provides GPG-PRIMARY-KEY value for other features."
   (ensure-pred integer? default-ttl)
   (ensure-pred list? gpg-extra-config)
   (ensure-pred list? gpg-agent-extra-config)
+  (ensure-pred ssh-keys-list? ssh-keys)
 
   (define (home-gnupg-services config)
     "Return a list of home-services, required for gnupg to operate."
@@ -81,6 +83,7 @@ and provides GPG-PRIMARY-KEY value for other features."
                   '())
             ,@gpg-agent-extra-config))
 	 (ssh-agent? gpg-ssh-agent?)
+         (ssh-keys ssh-keys)
 	 (pinentry-flavor pinentry-flavor)))))))
 
   (define (system-gnupg-services _)
