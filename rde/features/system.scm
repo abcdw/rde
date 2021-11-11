@@ -7,6 +7,7 @@
   #:use-module (gnu system)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
+  #:use-module (gnu system linux-initrd)
   #:use-module (srfi srfi-1)
 
   #:export (feature-bootloader
@@ -70,6 +71,9 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
 	  (kernel-loadable-modules '())
 	  (kernel-arguments '())
 	  (default-kernel-arguments %default-kernel-arguments)
+          (initrd base-initrd)
+          (initrd-modules '())
+          (base-initrd-modules %base-initrd-modules)
 	  (firmware '())
 	  (base-firmware %base-firmware))
   "Provides kernel configuration."
@@ -79,10 +83,15 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
   (ensure-pred list-of-string-or-gexps? default-kernel-arguments)
   (ensure-pred list-of-packages? firmware)
   (ensure-pred list-of-packages? base-firmware)
+  (ensure-pred procedure? initrd)
+  (ensure-pred list-of-strings? initrd-modules)
+  (ensure-pred list-of-strings? base-initrd-modules)
 
   (let ((kernel-arguments (append kernel-arguments default-kernel-arguments))
-	(firmware         (append firmware base-firmware)))
+	(firmware         (append firmware base-firmware))
+        (initrd-modules   (append initrd-modules base-initrd-modules)))
     (feature
      (name 'kernel)
      (values (make-feature-values
-	      kernel kernel-loadable-modules kernel-arguments firmware)))))
+	      kernel kernel-loadable-modules kernel-arguments
+              initrd initrd-modules firmware)))))

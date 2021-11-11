@@ -306,6 +306,12 @@ to each system-services-getter function."
 	 (kernel-modules   (get-value
 			    'kernel-loadable-modules config
 			    (operating-system-kernel-loadable-modules initial-os)))
+	 (initrd           (get-value
+			    'initrd config
+			    (operating-system-initrd initial-os)))
+	 (initrd-modules   (get-value
+			    'initrd-modules config
+			    (operating-system-initrd-modules initial-os)))
 	 (firmware         (get-value
 			    'firmware config
 			    (operating-system-firmware initial-os))))
@@ -322,6 +328,8 @@ to each system-services-getter function."
       (kernel kernel)
       (kernel-arguments kernel-arguments)
       (kernel-loadable-modules kernel-modules)
+      (initrd initrd)
+      (initrd-modules initrd-modules)
       (firmware firmware)
       (services services))))
 
