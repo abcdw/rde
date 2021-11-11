@@ -20,6 +20,8 @@
             home-gpg-configuration
             home-gpg-agent-configuration
 
+            ssh-key?
+            ssh-keys-list?
 	    pinentry-flavor?))
 
 ;;; Commentary:
