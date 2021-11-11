@@ -11,16 +11,16 @@
   #:use-module (srfi srfi-1)
 
   #:export (feature-bootloader
-	    feature-host-info
-	    feature-file-systems
-	    feature-kernel))
+            feature-host-info
+            feature-file-systems
+            feature-kernel))
 
 
 (define* (feature-host-info
-	  #:key
-	  (host-name (operating-system-host-name bare-bone-os))
-	  (timezone  (operating-system-timezone  bare-bone-os))
-	  (locale    (operating-system-locale    bare-bone-os)))
+          #:key
+          (host-name (operating-system-host-name bare-bone-os))
+          (timezone  (operating-system-timezone  bare-bone-os))
+          (locale    (operating-system-locale    bare-bone-os)))
   "Provides basic information about host."
   (ensure-pred string? host-name)
   (ensure-pred string? timezone)
@@ -37,7 +37,7 @@
    (targets '("/boot/efi"))))
 
 (define* (feature-bootloader
-	  #:key (bootloader-configuration %default-bootloader-configuration))
+          #:key (bootloader-configuration %default-bootloader-configuration))
   "Provides custom bootloader configuration for operating-system.
 keyboard-layout will be overriden by feature-keyboard if it present."
   (ensure-pred bootloader-configuration? bootloader-configuration)
@@ -48,10 +48,10 @@ keyboard-layout will be overriden by feature-keyboard if it present."
 
 
 (define* (feature-file-systems
-	  #:key
-	  (mapped-devices '())
-	  (file-systems '())
-	  (base-file-systems %base-file-systems))
+          #:key
+          (mapped-devices '())
+          (file-systems '())
+          (base-file-systems %base-file-systems))
   "Provides file systems for operating-system.  By default
 %base-file-systems will be added to the end of FILE-SYSTEMS, this
 behavior can be overriden with BASE-FILE-SYSTEM argument."
@@ -66,16 +66,16 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
 
 
 (define* (feature-kernel
-	  #:key
-	  (kernel linux-libre)
-	  (kernel-loadable-modules '())
-	  (kernel-arguments '())
-	  (default-kernel-arguments %default-kernel-arguments)
+          #:key
+          (kernel linux-libre)
+          (kernel-loadable-modules '())
+          (kernel-arguments '())
+          (default-kernel-arguments %default-kernel-arguments)
           (initrd base-initrd)
           (initrd-modules '())
           (base-initrd-modules %base-initrd-modules)
-	  (firmware '())
-	  (base-firmware %base-firmware))
+          (firmware '())
+          (base-firmware %base-firmware))
   "Provides kernel configuration."
   (ensure-pred package? kernel)
   (ensure-pred list-of-packages? kernel-loadable-modules)
@@ -88,10 +88,10 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
   (ensure-pred list-of-strings? base-initrd-modules)
 
   (let ((kernel-arguments (append kernel-arguments default-kernel-arguments))
-	(firmware         (append firmware base-firmware))
+        (firmware         (append firmware base-firmware))
         (initrd-modules   (append initrd-modules base-initrd-modules)))
     (feature
      (name 'kernel)
      (values (make-feature-values
-	      kernel kernel-loadable-modules kernel-arguments
+              kernel kernel-loadable-modules kernel-arguments
               initrd initrd-modules firmware)))))
