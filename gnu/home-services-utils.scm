@@ -54,7 +54,6 @@
                object->camel-case-string)
 
   #:export (slurp-file-gexp
-            interpose
 
 	    alist-entry->mixed-text
             boolean->yes-or-no
@@ -97,21 +96,6 @@ it as a string.  FILE must be a file-like object."
             file)))
   #~(call-with-input-file #$file
 	(@@ (ice-9 textual-ports) get-string-all)))
-
-(define* (interpose ls  #:optional (delimiter "\n") (grammar 'infix))
-  "Same as @code{string-join}, but without join and string, returns an
-DELIMITER interposed LS.  Support 'infix and 'suffix GRAMMAR values."
-  (when (not (member grammar '(infix suffix)))
-    (raise
-     (formatted-message
-      (G_ "The GRAMMAR value must be 'infix or 'suffix, but ~a provided.")
-      grammar)))
-  (fold-right (lambda (e acc)
-		(cons e
-		      (if (and (null? acc) (eq? grammar 'infix))
-			  acc
-			  (cons delimiter acc))))
-	      '() ls))
 
 
 ;;;
