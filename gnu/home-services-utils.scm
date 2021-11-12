@@ -44,8 +44,8 @@
 
                list-of-strings?
                alist?
-	       text-config?
-	       serialize-text-config
+               text-config?
+               serialize-text-config
                generic-serialize-alist-entry
                generic-serialize-alist
 
@@ -55,7 +55,7 @@
 
   #:export (slurp-file-gexp
 
-	    alist-entry->mixed-text
+            alist-entry->mixed-text
             boolean->yes-or-no
             boolean->true-or-false
             list->human-readable-list
@@ -68,10 +68,10 @@
             serialize-yaml-config
 
             string-or-gexp?
-	    serialize-string-or-gexp
+            serialize-string-or-gexp
 
             gexp-text-config?
-	    serialize-gexp-text-config
+            serialize-gexp-text-config
 
             rest
             maybe-list
@@ -95,7 +95,7 @@ it as a string.  FILE must be a file-like object."
             (G_ "~a is not a file-like object.")
             file)))
   #~(call-with-input-file #$file
-	(@@ (ice-9 textual-ports) get-string-all)))
+        (@@ (ice-9 textual-ports) get-string-all)))
 
 
 ;;;
@@ -103,7 +103,7 @@ it as a string.  FILE must be a file-like object."
 ;;;
 
 (define* ((alist-entry->mixed-text prefix sep #:optional (suffix "\n"))
-	  alist-entry)
+          alist-entry)
   "Create a list from ALIST-ENTRY, which can be used with
 @code{mixed-text-file} for example to create key-value configuration
 file or shell script.
@@ -157,18 +157,18 @@ would yield
   (match alist-entry
     ((key . value)
      (let* ((values (cond
-		    ((eq? value #f)
-		     #f)
-		    ((or (eq? value #t) (null? value))
-		     '(""))
-		    ((list? value)
-		     (if (any list? value)
-			 (raise (formatted-message
-				 (G_ "~a is not a flat list")
-				 value))
-			 value))
-		    (else
-		     (list value))))
+                    ((eq? value #f)
+                     #f)
+                    ((or (eq? value #t) (null? value))
+                     '(""))
+                    ((list? value)
+                     (if (any list? value)
+                         (raise (formatted-message
+                                 (G_ "~a is not a flat list")
+                                 value))
+                         value))
+                    (else
+                     (list value))))
            (sep (if (eq? values '(""))
                     ""
                     sep)))
