@@ -121,6 +121,14 @@
   (apply string-append (map serialize-ssh-key
                             val)))
 
+(define (file-like-or-pinentry-flavor? val)
+  (or (file-like? val) (pinentry-flavor? val)))
+
+(define (serialize-file-like-or-pinentry-flavor field-name val)
+  (if (file-like? val)
+      #~(string-append "pinentry-program " #$val "\n")
+      (serialize-pinentry-flavor field-name val)))
+
 ;; Dummy procedures, the real logic is handled in `home-gnupg-files-service'.
 (define (serialize-home-gpg-configuration field-name val) "")
 (define (serialize-home-gpg-agent-configuration field-name val) "")
@@ -179,8 +187,9 @@ yields the following in @file{sshcontrol}:
 4B62F25E277CF13D3C6BCEBFD3F85D08F0DA32VD
 @end example")
   (pinentry-flavor
-   (pinentry-flavor 'gtk2)
-   (string-append "Which pinentry interface to use.  Valid options are: "
+   (file-like-or-pinentry-flavor 'gtk2)
+   (string-append "Which pinentry interface to use.  Valid options are "
+                  "file-like objects or one of the following symbols: "
                   (list->human-readable-list
                    (enum-value pinentry-flavor)
                    #:cumulative? #t
