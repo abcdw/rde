@@ -925,7 +925,9 @@ git-link, git-timemachine."
    (home-services-getter get-home-services)))
 
 
-(define* (feature-emacs-completion)
+(define* (feature-emacs-completion
+          #:key
+          (mini-frame? #t))
   "Configure completion system for GNU Emacs."
   (define emacs-f-name 'completion)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -947,28 +949,30 @@ git-link, git-timemachine."
 
          ;; MAYBE: Make transient use child-frame:
          ;; https://github.com/magit/transient/issues/102
-         (add-hook 'after-init-hook 'mini-frame-mode)
-         (with-eval-after-load
-          'mini-frame
-          (custom-set-faces
-           '(child-frame-border
-             ;; TODO: inherit ,(face-attribute 'default :foreground)
-             ((t (:background "#000000")))))
-          (put 'child-frame-border 'saved-face nil)
+         ,@(if mini-frame?
+             `((add-hook 'after-init-hook 'mini-frame-mode)
+               (with-eval-after-load
+                'mini-frame
+                (custom-set-faces
+                 '(child-frame-border
+                   ;; TODO: inherit ,(face-attribute 'default :foreground)
+                   ((t (:background "#000000")))))
+                (put 'child-frame-border 'saved-face nil)
 
-          (custom-set-variables
-           '(mini-frame-show-parameters
-             (lambda ()
-               `((top . 0.2)
-                 (width . 0.8)
-                 (left . 0.5)
-                 (child-frame-border-width . 1))))
-           '(mini-frame-detach-on-hide nil)
-           '(mini-frame-color-shift-step 0)
-           '(mini-frame-advice-functions '(read-from-minibuffer
-                                           ;; read-string
-                                           save-some-buffers yes-or-no-p))
-           '(mini-frame-ignore-commands '()))))
+                (custom-set-variables
+                 '(mini-frame-show-parameters
+                   (lambda ()
+                     `((top . 0.2)
+                       (width . 0.8)
+                       (left . 0.5)
+                       (child-frame-border-width . 1))))
+                 '(mini-frame-detach-on-hide nil)
+                 '(mini-frame-color-shift-step 0)
+                 '(mini-frame-advice-functions '(read-from-minibuffer
+                                                 ;; read-string
+                                                 save-some-buffers yes-or-no-p))
+                 '(mini-frame-ignore-commands '()))))
+             '()))
 
 	(custom-set-variables
          '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
@@ -1025,10 +1029,14 @@ git-link, git-timemachine."
          'vertico
          (custom-set-variables '(vertico-cycle t))))
       #:elisp-packages
-      (list emacs-orderless emacs-marginalia
-	    emacs-vertico emacs-mini-frame
-            emacs-pcmpl-args
-            emacs-consult emacs-embark))))
+      (append
+       (if mini-frame?
+           (list emacs-mini-frame)
+           '())
+       (list emacs-orderless emacs-marginalia
+	     emacs-vertico
+             emacs-pcmpl-args
+             emacs-consult emacs-embark)))))
 
   (feature
    (name f-name)
