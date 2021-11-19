@@ -125,7 +125,7 @@ features."
 
 (define* (feature-emacs-message)
   "Configure email sending capabilities provided by @file{message.el}."
-	    feature-emacs-message
+            feature-emacs-message
 
   (define emacs-f-name 'message)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -142,7 +142,7 @@ features."
          (require 'message)
          (require 'sendmail))
         (with-eval-after-load
-	 'message
+         'message
 
          (custom-set-variables
           '(sendmail-program "msmtp")
@@ -164,15 +164,15 @@ features."
          (custom-set-variables
           '(message-citation-line-format "On %Y-%m-%d %R, %N wrote:\n")
           `(message-auto-save-directory
-	       ,(concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		        "/emacs/mail-drafts"))))))
+               ,(concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                        "/emacs/mail-drafts"))))))
 
      (emacs-xdg-service
       emacs-f-name
       "Emacs (Client) [mailto:]"
       #~(system*
          #$emacs-cmd "--eval"
-	 (string-append
+         (string-append
           "\
 (progn
  (set-frame-name \"Reply to Email - Emacs Client\")
@@ -476,7 +476,7 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
 A message tree is another name for a single sub-thread: i.e., a
 message together with all its descendents."
       (let ((msg (car tree))
-	    (replies (cadr tree)))
+            (replies (cadr tree)))
         (cond
          ((and (< 0 depth) (not last))
           (push "├" tree-status))
@@ -501,7 +501,7 @@ message together with all its descendents."
         (pop tree-status)
         (pop tree-status)
         (if last
-	    (push " " tree-status)
+            (push " " tree-status)
             (push "│" tree-status))
         (notmuch-tree-insert-thread replies (+ 1 depth) tree-status)))
     (advice-add 'notmuch-tree-insert-tree :override
@@ -523,28 +523,28 @@ the buffer, and ACTION is a nullary function to call.  LABEL may
 be null, in which case the action will still be bound, but will
 not appear in the pop-up buffer."
       (let* ((items (notmuch-jump--format-actions action-map))
-	     ;; Format the table of bindings and the full prompt
-	     (table
-	      (with-temp-buffer
-	       (notmuch-jump--insert-items
+             ;; Format the table of bindings and the full prompt
+             (table
+              (with-temp-buffer
+               (notmuch-jump--insert-items
                 (floor (* (frame-width) 0.8)) items)
-	       (buffer-string)))
-	     (full-prompt
-	      (concat table "\n\n"
-		      (propertize prompt 'face 'minibuffer-prompt)))
-	     ;; By default, the minibuffer applies the minibuffer face to
-	     ;; the entire prompt.  However, we want to clearly
-	     ;; distinguish bindings (which we put in the prompt face
-	     ;; ourselves) from their labels, so disable the minibuffer's
-	     ;; own re-face-ing.
-	     (minibuffer-prompt-properties
-	      (notmuch-plist-delete
-	       (copy-sequence minibuffer-prompt-properties)
-	       'face))
-	     ;; Build the keymap with our bindings
-	     (minibuffer-map (notmuch-jump--make-keymap action-map prompt))
-	     ;; The bindings save the the action in notmuch-jump--action
-	     (notmuch-jump--action nil))
+               (buffer-string)))
+             (full-prompt
+              (concat table "\n\n"
+                      (propertize prompt 'face 'minibuffer-prompt)))
+             ;; By default, the minibuffer applies the minibuffer face to
+             ;; the entire prompt.  However, we want to clearly
+             ;; distinguish bindings (which we put in the prompt face
+             ;; ourselves) from their labels, so disable the minibuffer's
+             ;; own re-face-ing.
+             (minibuffer-prompt-properties
+              (notmuch-plist-delete
+               (copy-sequence minibuffer-prompt-properties)
+               'face))
+             ;; Build the keymap with our bindings
+             (minibuffer-map (notmuch-jump--make-keymap action-map prompt))
+             ;; The bindings save the the action in notmuch-jump--action
+             (notmuch-jump--action nil))
         ;; Read the action
         (read-from-minibuffer full-prompt nil minibuffer-map)
         ;; If we got an action, do it
