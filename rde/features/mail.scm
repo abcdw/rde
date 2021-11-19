@@ -586,7 +586,9 @@ not appear in the pop-up buffer."
         f-name
         ;; https://protesilaos.com/dotemacs/#h:a196812e-1644-4536-84ba-687366867def
         ;; https://codeberg.org/jao/elibs/src/branch/main/notmuch.org
-        `((autoload 'notmuch-mua-new-mail "notmuch-mua")
+        `((eval-when-compile
+           (require 'notmuch))
+          (autoload 'notmuch-mua-new-mail "notmuch-mua")
           (define-key global-map (kbd "C-c a n") 'notmuch)
           ;; (define-key global-map (kbd "C-c m s") 'consult-notmuch-tree)
           (define-key global-map (kbd "M-s n") 'consult-notmuch-tree)
