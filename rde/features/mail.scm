@@ -303,7 +303,10 @@ features."
   (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
 
 (define (generic-isync-settings mail-directory mail-account)
-  `(,#~"# Do not know how to serialize generic accounts :("))
+  (let* ((user     (mail-account-fqda mail-account)))
+    `(,#~"# Do not know how to serialize generic accounts :("
+      ,#~(format #f "# ~a wasn't configured by rde," #$user)
+      ,#~"# Try to set another value for mail-account's type field.")))
 
 (define %default-isync-serializers
   `((gmail . ,gmail-isync-settings)
