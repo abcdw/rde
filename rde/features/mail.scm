@@ -34,6 +34,7 @@
             mailing-list-synchronizer
             mailing-list-config
 
+            generate-isync-serializer
             %rde-notmuch-saved-searches)
 
   #:re-export (l2md-repo))
