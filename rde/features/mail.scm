@@ -83,10 +83,11 @@ field."))
    "Type of application to obtain mailing list."))
 
 (define (list-of-mail-accounts? lst)
-  (and (list? lst) (not (null? lst)) (any mail-account? lst)))
+  (and (list? lst) (not (null? lst)) (every mail-account? lst)))
 
+;; TODO: Check that all ML has uniq id
 (define (list-of-mailing-lists? lst)
-  (and (list? lst) (not (null? lst)) (any mailing-list? lst)))
+  (and (list? lst) (every mailing-list? lst)))
 
 (define (default-mail-directory-fn config)
   (string-append (get-value 'home-directory config)
