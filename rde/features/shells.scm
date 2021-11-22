@@ -37,6 +37,42 @@
        (service home-zsh-autosuggestions-service-type
                 zsh-autosuggestions-latest))
 
+     (when (get-value 'wayland config)
+       (let* ((wl-clipboard (@ (gnu packages xdisorg) wl-clipboard))
+              (wl-copy      (file-append wl-clipboard "/bin/wl-copy"))
+              (wl-paste     (file-append wl-clipboard "/bin/wl-paste")))
+         (simple-service
+          'zsh-make-zle-use-system-clipboard
+          home-zsh-service-type
+          (home-zsh-extension
+           (zshrc
+            (list
+             ""
+             #~(format #f "\
+rde-copy-region-as-kill () {
+  zle copy-region-as-kill
+  print -rn $CUTBUFFER | ~a
+}
+zle -N rde-copy-region-as-kill
+
+rde-kill-region () {
+  zle kill-region
+  print -rn $CUTBUFFER | ~a
+}
+zle -N rde-kill-region
+
+rde-yank () {
+  CUTBUFFER=$(~a)
+  zle yank
+}
+zle -N rde-yank
+
+bindkey -e '\\ew' rde-copy-region-as-kill
+bindkey -e '^W' rde-kill-region
+bindkey -e '^Y' rde-yank
+
+" #$wl-copy #$wl-copy #$wl-paste)))))))
+
      ;; https://github.com/purcell/envrc
      ;; home-zsh-direnv-service
      (service
