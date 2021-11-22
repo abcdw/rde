@@ -101,7 +101,7 @@ zle -N edit-command-line
 bindkey "^X^E" edit-command-line
 
 alias help=run-help
-alias try='guix environment --ad-hoc man-db coreutils'
+alias try='guix shell man-db coreutils'
 alias ls='ls -p --color=auto'
 alias ll='ls -l'
 alias grep='grep --color=auto'
