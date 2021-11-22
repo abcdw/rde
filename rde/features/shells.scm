@@ -38,7 +38,9 @@
                 zsh-autosuggestions-latest))
 
      (when (get-value 'wayland config)
-       (let* ((wl-clipboard (@ (gnu packages xdisorg) wl-clipboard))
+       (let* ((wl-clipboard (get-value
+                             'wl-clipboard config
+                             (@ (gnu packages xdisorg) wl-clipboard)))
               (wl-copy      (file-append wl-clipboard "/bin/wl-copy"))
               (wl-paste     (file-append wl-clipboard "/bin/wl-paste")))
          (simple-service

@@ -123,6 +123,7 @@
   (feature
    (name 'sway)
    (values `((sway . ,package)
+             (wl-clipboard . ,wl-clipboard)
 	     (wayland . #t)
              (xwayland? . ,xwayland?)))
    (home-services-getter sway-home-services)
@@ -192,7 +193,8 @@ automatically switch to SWAY-TTY-NUMBER on boot."
                   #$(if output #~(string-append "-o \"$(" #$output ")\" ") "")
                   #$(if geom #~(string-append "-g \"$(" #$geom ")\" ") "")
                   #$file
-                  #$(file-append wl-clipboard "/bin/wl-copy")))))
+                  #$(file-append (get-value 'wl-clipboard config)
+                                 "/bin/wl-copy")))))
 
     (define shot-output
       (shot-script "output" #:output subject-output))
