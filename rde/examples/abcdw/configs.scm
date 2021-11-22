@@ -19,6 +19,8 @@
   #:use-module (rde features bittorrent)
   #:use-module (rde features mail)
   #:use-module (rde features docker)
+  ;; #:use-module (gnu services)
+  ;; #:use-module (gnu services nix)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
@@ -94,6 +96,10 @@
 (define %main-features
   (list
    (feature-custom-services
+    #:system-services
+    (list
+     ;; (service nix-service-type)
+     )
     #:home-services
     (list
      ;; TODO: Remove it once upstreamed.
