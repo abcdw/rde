@@ -161,11 +161,15 @@
    (feature-emacs-elpher)
    (feature-emacs-telega)
    (feature-emacs-pdf-tools)
+
+   ;; TODO: Revisit <https://en.wikipedia.org/wiki/Git-annex>
    (feature-emacs-git)
-   (feature-emacs-org)
+   ;; TODO: <https://www.labri.fr/perso/nrougier/GTD/index.html#table-of-contents>
+   (feature-emacs-org
+    #:org-directory "~/work/abcdw/notes")
    (feature-emacs-org-roam
     ;; TODO: Rewrite to states
-    #:org-roam-directory "~/work/notes/notes")
+    #:org-roam-directory "~/work/abcdw/notes/notes")
 
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
