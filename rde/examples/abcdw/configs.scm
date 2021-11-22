@@ -66,17 +66,21 @@
                           (mail-acc 'personal   "andrewtropin@gmail.com"))
     #:mailing-lists (list (mail-lst 'guix-devel "guix-devel@gnu.org"
                                     '("https://yhetil.org/guix-devel/0"))
+                          (mail-lst 'guix-bugs "guix-bugs@gnu.org"
+                                    '("https://yhetil.org/guix-bugs/0"))
                           (mail-lst 'guix-patches "guix-patches@gnu.org"
                                     '("https://yhetil.org/guix-patches/1"))))
 
    (feature-keyboard
     #:keyboard-layout %dvorak-layout)))
 
+;;; TODO: Add documentation about starting guile repl
 ;;; TODO: feature-wallpapers https://wallhaven.cc/
 ;;; TODO: feature-icecat
 ;;; TODO: feature-bash?
 ;;; TODO: feature-battery
 ;; PipeWire/iwd:
+;; https://github.com/J-Lentz/iwgtk
 ;; https://github.com/krevedkokun/guix-config/blob/master/system/yggdrasil.scm
 
 
