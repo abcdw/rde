@@ -26,6 +26,15 @@
      (simple-service
       'direnv-packages
       home-profile-service-type (list package))
+     (simple-service
+      'direnv-config
+      home-files-service-type
+      `(("config/direnv/direnvrc" ,(plain-file
+                                   "direnvrc"
+                                   "\
+use_guixs() {
+  eval \"$(guix shell \"$@\" --search-paths)\"
+}"))))
      (when (get-value 'zsh config)
        (simple-service
         'direnv-zsh-hook
