@@ -164,7 +164,7 @@
 
             (defun rde-compilation-colorizer ()
               "Prevent color escape sequences to popup in compilation buffer."
-              (ansi-color-apply-on-region compilation-filter-start (point)))
+              (ansi-color-apply-on-region (point-min) (point-max)))
             (add-hook 'compilation-filter-hook 'rde-compilation-colorizer)
 
             ;; <https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/>
