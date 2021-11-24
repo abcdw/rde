@@ -285,7 +285,8 @@ have a configuration for gpg-agent."))
              ,(home-gpg-file config)))))
 
 (define (home-gnupg-shepherd-service config)
-  (let ((provision-list `(gpg-agent
+  (let ((package (home-gnupg-configuration-package config))
+        (provision-list `(gpg-agent
                           ,@(optional (home-gpg-agent-configuration-ssh-agent?
                                        (home-gnupg-configuration-gpg-agent-config config))
                                       '(ssh-agent)))))
@@ -309,7 +310,7 @@ have a configuration for gpg-agent."))
       (start #~(make-system-constructor
                 (string-join
                  (append
-                  (list #$(file-append gnupg "/bin/gpg-agent")
+                  (list #$(file-append package "/bin/gpg-agent")
                         "--daemon"
                         "--options"
                         #$(home-gpg-agent-file config))
