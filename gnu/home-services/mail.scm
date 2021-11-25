@@ -15,10 +15,10 @@
   #:use-module ((guix import utils) #:select (flatten))
 
   #:export (home-isync-service-type
-	    home-isync-configuration
+            home-isync-configuration
 
             home-notmuch-service-type
-	    home-notmuch-configuration
+            home-notmuch-configuration
             home-notmuch-extension
 
             home-l2md-service-type
@@ -107,13 +107,13 @@ file or not.  If @code{#t} creates a wrapper for mbsync binary.")
   (service-type (name 'home-isync)
                 (extensions
                  (list (service-extension
-			home-profile-service-type
-			add-isync-package)
-		       (service-extension
+                        home-profile-service-type
+                        add-isync-package)
+                       (service-extension
                         home-files-service-type
                         add-isync-configuration)))
-		(compose concatenate)
-		(extend home-isync-extensions)
+                (compose concatenate)
+                (extend home-isync-extensions)
                 (default-value (home-isync-configuration))
                 (description "Install and configure isync.")))
 
@@ -184,7 +184,7 @@ notmuch-hooks} for more information."))
 
   (define (filter-fields field)
     (filter-configuration-fields home-notmuch-configuration-fields
-				 (list field)))
+                                 (list field)))
 
   (define (hook-file hook gexps)
     (list (string-append "config/notmuch/default/hooks/" hook)
@@ -228,13 +228,13 @@ notmuch-hooks} for more information."))
   (service-type (name 'home-notmuch)
                 (extensions
                  (list (service-extension
-			home-profile-service-type
-			add-notmuch-package)
-		       (service-extension
+                        home-profile-service-type
+                        add-notmuch-package)
+                       (service-extension
                         home-files-service-type
                         add-notmuch-configuration)))
-		(compose identity)
-		(extend home-notmuch-extensions)
+                (compose identity)
+                (extend home-notmuch-extensions)
                 (default-value (home-notmuch-configuration))
                 (description "Install and configure notmuch.")))
 
@@ -402,4 +402,4 @@ a particular public-inbox repository."))
       (l2md-repo l2md-repo))
      (l2md-repo ,l2md-repo-fields))
    'home-l2md-configuration))
-      
+
