@@ -67,6 +67,11 @@ field."))
       (mail-account-pass-cmd mail-account)
       (string-append "pass show mail/" (mail-account-fqda mail-account))))
 
+(define (mail-account-smtp-host mail-account)
+  "smtp.gmail.com")
+(define (mail-account-smtp-port mail-account)
+  587)
+
 
 (define-configuration/no-serialization mailing-list
   (id
@@ -188,20 +193,44 @@ features."
 (define* (feature-msmtp)
   "Configure msmtp MTA."
   (define (get-home-services config)
-    (require-value 'mail-directory-fn config)
-    (define mail-dir ((get-value 'mail-directory-fn config) config))
-    (define queue-dir (string-append mail-dir "/queue"))
+    (require-value 'mail-accounts config
+                   "feature-msmtp can't operate without mail-accounts.")
+
+    (define mail-accs (get-value 'mail-accounts config))
     (list
      (simple-service
-      'msmtp-env-var-settings
-      home-environment-variables-service-type
-      `(("MSMTPQ_LOG" . "$XDG_LOG_HOME/msmtpq.log")
-        ("MSMTPQ_QUEUE_DIR" . ,queue-dir)))
+      'msmtp-config
+      home-files-service-type
+      (list
+       (list
+        "config/msmtp/config"
+        ;; TODO: Try $HOME/.local/var/log expansion
+        (apply
+         mixed-text-file
+         "msmtp-config"
+         "defaults
+tls on
+auth on
+logfile \"~/.local/var/log/msmtp.log\"\n"
+          (map
+           (lambda (acc)
+             (display acc)
+             (string-append
+              "\n"
+              "account " (symbol->string (mail-account-id acc)) "\n"
+              "host " (mail-account-smtp-host acc) "\n"
+              "port " (number->string (mail-account-smtp-port acc)) "\n"
+              "from " (mail-account-fqda acc) "\n"
+              "user " (mail-account-fqda acc) "\n"
+              "passwordeval " (mail-account-get-pass-cmd acc) "\n"))
+           mail-accs))
+         )))
      (simple-service
-      'msmtp-packages
+      'msmtp-package
       home-profile-service-type
       (list msmtp-latest))))
 
+  ;; TODO: Implement config serialization or msmtp-home-service
   (feature
    (name 'msmtp)
    (home-services-getter get-home-services)
