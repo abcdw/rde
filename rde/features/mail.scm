@@ -269,6 +269,11 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
    (home-services-getter get-home-services)
    (values `((msmtp . #t)))))
 
+
+;;;
+;;; feature-l2md.
+;;;
+
 (define* (feature-l2md)
   "Configure l2md MDA."
   (define (get-home-services config)
@@ -306,6 +311,11 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
    (name 'l2md)
    (home-services-getter get-home-services)
    (values `((l2md . #t)))))
+
+
+;;;
+;;; feature-isync.
+;;;
 
 (define (prep-str sym str)
   (symbol-append sym '- (string->symbol str)))
@@ -414,6 +424,14 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
          mail-directory mail-acc))
 
       (list
+       (simple-service
+        'isync-ensure-mail-dirs-exists
+        home-activation-service-type
+        #~(map mkdir-p
+               '#$(map (lambda (acc)
+                         (string-append mail-directory "/accounts/"
+                                        (mail-account-fqda acc)))
+                       mail-accounts)))
        (service
         home-isync-service-type
         (home-isync-configuration
@@ -435,6 +453,10 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
              (isync-synchronize-cmd-fn . ,isync-synchronize-cmd-fn)))
    (home-services-getter get-home-services)))
 
+
+;;;
+;;; feature-notmuch.
+;;;
 
 (define (default-get-notmuch-configuration config)
   (require-value 'mail-settings config)
@@ -443,10 +465,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
   (define mail-accounts (get-value 'mail-accounts config))
   (define emails (map mail-account-fqda mail-accounts))
   (define ids    (map mail-account-id   mail-accounts))
-
   (define mail-directory ((get-value 'mail-directory-fn config) config))
-  (define (mail-dir email) (string-append mail-directory "/" email))
-  (define mail-directories (map mail-dir emails))
 
   (define (sync-cmd ma)
     ((get-value
@@ -491,7 +510,7 @@ $(echo $f | sed 's;/~a/;/all/;' | sed 's/,U=[0-9]*:/:/'); done"
 
   (define* (move-in-tagged-messages
             tag
-            #:optional (exclude-dir "nothing-will-match-this"))
+            #:key (exclude-dir "nothing-will-match-this"))
     (format #f "for f in $(notmuch search --output=files \
 'not path:/.*\\/~a/ and tag:~a' | grep -v \"/~a/\"); \
 do mv -v $f \
@@ -504,7 +523,7 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
     (append
      (map move-out-untagged-messages '(inbox trash spam))
      (map move-in-tagged-messages '(trash spam))
-     (list (move-in-tagged-messages 'inbox "all")
+     (list (move-in-tagged-messages 'inbox #:exclude-dir "all")
            delete-deleted-messages)))
 
   (home-notmuch-extension
@@ -512,10 +531,7 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
     (list
      (with-imported-modules '((guix build utils))
        #~(begin
-           (map (@@ (guix build utils) mkdir-p) '#$mail-directories)
-           (for-each system '#$move-rules)
-           ;; (for-each system '#$sync-cmds)
-           ))))
+           (for-each system '#$move-rules)))))
    (post-new
     (list
      #~(begin (for-each system '#$make-id-tag)
