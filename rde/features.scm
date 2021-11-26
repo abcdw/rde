@@ -1,6 +1,7 @@
 (define-module (rde features)
   #:use-module (guix records)
   #:use-module (guix ui)
+  #:use-module (guix gexp)
   #:use-module (gnu services)
   #:use-module (gnu system)
   #:use-module (gnu system file-systems)
@@ -215,6 +216,16 @@ to each system-services-getter function."
   (home-environment
    (essential-services
     (list
+     ;; MAYBE: Upstream it.
+     (simple-service
+      'consider-relogin
+      home-run-on-change-service-type
+      `(("setup-environment"
+         ,#~(display "The setup-environment script was updated.
+  Re-login to get environment variables updated.\n"))
+        ("on-first-login"
+         ,#~(display "The on-first-login script was updated.
+  Re-login to get the cahnges applied.\n"))))
      (service home-run-on-first-login-service-type)
      (service home-activation-service-type)
      (service home-environment-variables-service-type)
