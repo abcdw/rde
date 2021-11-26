@@ -63,8 +63,9 @@
    "isync package to use.")
   (xdg-flavor?
    (boolean #t)
-   "Whether to use the {$XDG_CONFIG_HOME/isync/mbsyncrc} configuration
-file or not.  If @code{#t} creates a wrapper for mbsync binary.")
+   "Whether to use the @file{$XDG_CONFIG_HOME/isync/mbsyncrc}
+configuration file or not.  If @code{#t} creates a wrapper for mbsync
+binary.")
   (config
    (list '())
    "AList of pairs, each pair is a String and String or Gexp."))
