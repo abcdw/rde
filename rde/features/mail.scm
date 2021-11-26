@@ -11,6 +11,7 @@
   #:use-module (gnu home-services mail)
   #:use-module (gnu home services mcron)
 
+  #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
 
@@ -138,18 +139,29 @@ features."
 ;;; feature-emacs-message.
 ;;;
 
-(define* (feature-emacs-message)
-  "Configure email sending capabilities provided by @file{message.el}."
-            feature-emacs-message
+
+(define-public (string-or-boolean-or-procedure? x)
+  (or (string? x) (boolean? x) (procedure? x)))
+
+(define* (feature-emacs-message
+          #:key
+          (mail-signature #t))
+  "Configure email sending capabilities provided by @file{message.el}.
+@code{mail-signature} can be @code{#t}, @code{#f}, a string or a
+function, which accepts config with rde values and returns a string."
+
+  (ensure-pred string-or-boolean-or-procedure? mail-signature)
 
   (define emacs-f-name 'message)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
     (require-value 'emacs-client-create-frame config)
+    (require-value 'full-name config)
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
     (define gpg-primary-key (get-value 'gpg-primary-key config))
     (define msmtp (get-value 'msmtp config))
+    (define full-name (get-value 'full-name config))
 
     (list
      (elisp-configuration-service
@@ -167,6 +179,13 @@ features."
                 message-sendmail-f-is-evil t
                 message-sendmail-extra-arguments '("--read-envelope-from")))
              '())
+
+         (setq mail-signature
+               ,(match mail-signature
+                 ((? procedure? e) (e config))
+                 ((? string? e) e)
+                 (#f 'nil)
+                 (_ 't)))
 
          (setq message-kill-buffer-on-exit t)
 
