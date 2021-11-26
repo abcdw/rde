@@ -40,6 +40,11 @@
   #:re-export (l2md-repo))
 
 
+
+;;;
+;;; Records.
+;;;
+
 (define-configuration/no-serialization mail-account
   (id
    (symbol #f)
@@ -67,11 +72,6 @@ field."))
       (mail-account-pass-cmd mail-account)
       (string-append "pass show mail/" (mail-account-fqda mail-account))))
 
-(define (mail-account-smtp-host mail-account)
-  "smtp.gmail.com")
-(define (mail-account-smtp-port mail-account)
-  587)
-
 
 (define-configuration/no-serialization mailing-list
   (id
@@ -87,6 +87,12 @@ field."))
   (synchronizer
    (symbol 'l2md)
    "Type of application to obtain mailing list."))
+
+
+
+;;;
+;;; feature-mail-settings.
+;;;
 
 (define (list-of-mail-accounts? lst)
   (and (list? lst) (not (null? lst)) (every mail-account? lst)))
@@ -127,6 +133,10 @@ features."
              (mailing-lists . ,mailing-lists)
              (mail-directory-fn . ,mail-directory-fn)))))
 
+
+;;;
+;;; feature-emacs-message.
+;;;
 
 (define* (feature-emacs-message)
   "Configure email sending capabilities provided by @file{message.el}."
@@ -189,8 +199,36 @@ features."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+
+;;;
+;;; feature-msmtp.
+;;;
 
-(define* (feature-msmtp)
+(define-public %default-msmtp-provider-settings
+  `((gmail . ((host . "smtp.gmail.com")
+              (port . 587)))
+    (generic . #f)))
+
+(define %default-msmtp-settings
+  "defaults
+tls on
+auth on
+logfile \"~/.local/var/log/msmtp.log\"\n")
+
+(define (default-msmtp-serializer provider-settings mail-account)
+  (let* ((account-type (mail-account-type mail-account))
+         (settings (assoc-ref provider-settings account-type)))
+    (apply
+     string-append
+     (map (lambda (p)
+            (format #f "~a ~a\n" (car p) (cdr p)))
+          settings))))
+
+(define* (feature-msmtp
+          #:key
+          (msmtp-settings %default-msmtp-settings)
+          (msmtp-provider-settings %default-msmtp-provider-settings)
+          (msmtp-serializer default-msmtp-serializer))
   "Configure msmtp MTA."
   (define (get-home-services config)
     (require-value 'mail-accounts config
@@ -208,21 +246,16 @@ features."
         (apply
          mixed-text-file
          "msmtp-config"
-         "defaults
-tls on
-auth on
-logfile \"~/.local/var/log/msmtp.log\"\n"
+         msmtp-settings
           (map
            (lambda (acc)
-             (display acc)
              (string-append
               "\n"
               "account " (symbol->string (mail-account-id acc)) "\n"
-              "host " (mail-account-smtp-host acc) "\n"
-              "port " (number->string (mail-account-smtp-port acc)) "\n"
               "from " (mail-account-fqda acc) "\n"
               "user " (mail-account-fqda acc) "\n"
-              "passwordeval " (mail-account-get-pass-cmd acc) "\n"))
+              "passwordeval " (mail-account-get-pass-cmd acc) "\n"
+              (msmtp-serializer msmtp-provider-settings acc)))
            mail-accs))
          )))
      (simple-service
