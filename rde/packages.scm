@@ -264,6 +264,11 @@ delivery.")
    (version "0.1.0")
    (source (local-file "./packages.scm"))
    (build-system trivial-build-system)
+   (arguments
+    `(#:builder
+      (let ((out (assoc-ref %outputs "out")))
+        (mkdir out)
+        #t)))
    (native-search-paths
     (list (search-path-specification
            (variable "EMACSLOADPATH")
