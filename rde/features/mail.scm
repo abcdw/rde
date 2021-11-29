@@ -149,6 +149,7 @@ features."
     (require-value 'emacs-client-create-frame config)
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
     (define gpg-primary-key (get-value 'gpg-primary-key config))
+    (define msmtp (get-value 'msmtp config))
 
     (list
      (elisp-configuration-service
@@ -159,11 +160,13 @@ features."
         (with-eval-after-load
          'message
 
-         (custom-set-variables
-          '(sendmail-program "msmtp")
-          '(message-send-mail-function 'message-send-mail-with-sendmail)
-          '(message-sendmail-f-is-evil t)
-          '(message-sendmail-extra-arguments '("--read-envelope-from")))
+         ,@(if msmtp
+             '((setq
+                sendmail-program "msmtp"
+                message-send-mail-function 'message-send-mail-with-sendmail
+                message-sendmail-f-is-evil t
+                message-sendmail-extra-arguments '("--read-envelope-from")))
+             '())
 
          (setq message-kill-buffer-on-exit t)
 
@@ -226,6 +229,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 
 (define* (feature-msmtp
           #:key
+          (msmtp msmtp-latest)
           (msmtp-settings %default-msmtp-settings)
           (msmtp-provider-settings %default-msmtp-provider-settings)
           (msmtp-serializer default-msmtp-serializer))
@@ -261,13 +265,13 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
      (simple-service
       'msmtp-package
       home-profile-service-type
-      (list msmtp-latest))))
+      (list msmtp))))
 
   ;; TODO: Implement config serialization or msmtp-home-service
   (feature
    (name 'msmtp)
    (home-services-getter get-home-services)
-   (values `((msmtp . #t)))))
+   (values `((msmtp . ,msmtp)))))
 
 
 ;;;
