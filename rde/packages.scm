@@ -257,3 +257,23 @@ an SMTP server (for example at a free mail provider) which takes care of further
 delivery.")
     (license license:gpl3+)))
 
+(define-public emacs-consumer
+  (package
+   (name "emacs-consumer")
+   (version "0.1.0")
+   (source (local-file "./packages.scm"))
+   (build-system trivial-build-system)
+   (native-search-paths
+    (list (search-path-specification
+           (variable "EMACSLOADPATH")
+           (files '("share/emacs/site-lisp")))
+          (search-path-specification
+           (variable "INFOPATH")
+           (files '("share/info")))))
+   (license license:gpl3+)
+   (home-page "https://sr.ht/~abcdw/rde")
+   (synopsis "Apropriate values for @env{EMACSLOADPATH} and @env{INFOPATH}.")
+   (description "This package helps to set environment variables, which make
+emacs packages of current profile explorable by external Emacs.")))
+
+
