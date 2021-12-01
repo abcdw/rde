@@ -35,40 +35,68 @@
 	      "/.local/var/lib/password-store")
 	     remote-password-store-url)))
 
-          ;; Configure emacs to use pass.el if feature-emacs is enabled.
           (when (get-value 'emacs config)
-            (elisp-configuration-service
-             emacs-f-name
-             #:elisp-packages (list emacs-pass
-                                    emacs-password-store
-                                    emacs-password-store-otp)))
+            (let ((emacs-embark (get-value 'emacs-embark config))
+                  (emacs-consult (get-value 'emacs-consult config)))
+              (elisp-configuration-service
+               emacs-f-name
+               `((eval-when-compile (require 'pass))
+                 ;; TODO: Fix tree view in pass.el
+                 ,@(if (get-value 'emacs-advanced-user? config)
+                       '((setq pass-show-keybindings nil))
+                       '())
+                 (add-hook 'pass-mode-hook (lambda () (setq truncate-lines t)))
+                 (define-key global-map (kbd "C-c a p") 'pass)
 
-          ;; Configure consult to search pass-store if feature-completion
-          ;; is enabled.
-          (when (get-value 'emacs-completion config)
-            (elisp-configuration-service
-             (symbol-append emacs-f-name '-completion)
-             `((define-key global-map (kbd "M-g p") 'rde-consult-pass)
-               (autoload 'password-store-dir "password-store")
-               (autoload 'password-store-list "password-store")
+                 ;; Source:
+                 ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/tools/pass/autoload/consult.el
+                 ,@(if emacs-consult
+                       `((autoload 'password-store-dir "password-store")
+                         (autoload 'password-store-list "password-store")
+                         (autoload 'consult--read "consult")
 
-               ;; Source:
-               ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/tools/pass/autoload/consult.el
-               (defun rde-consult-pass (arg pass)
-                 "Interactively search the password store."
-                 (interactive
-                  (list current-prefix-arg
-                        (progn
-                         (require 'consult)
-                         (consult--read (password-store-list)
-                                        :prompt "Pass: "
-                                        :sort nil
-                                        :require-match t
-                                        :category 'pass))))
-                 (funcall (if arg
-                              'password-store-url
-                              'password-store-copy)
-                          pass)))))))
+                         (defun rde-consult-pass (arg pass)
+                           "Interactively search the password store."
+                           (interactive
+                            (list current-prefix-arg
+                                  (consult--read (password-store-list)
+                                                 :prompt "Pass entry: "
+                                                 :sort nil
+                                                 :require-match t
+                                                 :category 'pass)))
+                           (funcall (if arg
+                                        'password-store-url
+                                        'password-store-copy)
+                                    pass))
+
+                         (define-key global-map (kbd "M-g p") 'rde-consult-pass))
+                       '())
+
+                 ,@(if emacs-embark
+                       `((eval-when-compile
+                          (require 'embark))
+
+                         (with-eval-after-load
+                          'embark
+                          (require 'password-store)
+                          (embark-define-keymap
+                           embark-pass-actions
+                           "Keymap for actions for pass entries."
+                           ("f" password-store-copy-field)
+                           ("b" password-store-url)
+                           ("e" password-store-edit)
+                           ("g" password-store-generate)
+                           ("r" password-store-rename)
+                           ("d" password-store-remove))
+
+                          (add-to-list 'embark-keymap-alist
+                                       '(pass . embark-pass-actions))))
+                       '()))
+               #:elisp-packages
+               (append
+                (list emacs-pass emacs-password-store emacs-password-store-otp)
+                (if emacs-embark (list emacs-embark) '())
+                (if emacs-consult (list emacs-consult) '())))))))
 
   (feature
    (name 'password-store)
