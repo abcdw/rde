@@ -153,13 +153,13 @@
             (define-key global-map (kbd "C-=") 'er/expand-region)
 
             ,#~""
-            (defun rde/display-load-time ()
+            (defun rde-display-load-time ()
               (interactive)
               (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
 
             ;; (setq inhibit-splash-screen t)
             (defun display-startup-echo-area-message ()
-              (rde/display-load-time))
+              (rde-display-load-time))
 	    ,#~""
 
             (defun rde-compilation-colorizer ()
