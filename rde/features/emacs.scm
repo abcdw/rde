@@ -927,7 +927,9 @@ git-link, git-timemachine."
 
 (define* (feature-emacs-completion
           #:key
-          (mini-frame? #t))
+          (mini-frame? #t)
+          (emacs-consult emacs-consult)
+          (emacs-embark emacs-embark))
   "Configure completion system for GNU Emacs."
   (define emacs-f-name 'completion)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1040,7 +1042,9 @@ git-link, git-timemachine."
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((,f-name . #t)
+             (emacs-embark . ,emacs-embark)
+             (emacs-consult . ,emacs-consult)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-project)
