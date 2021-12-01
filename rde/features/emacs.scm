@@ -292,6 +292,7 @@ point reaches the beginning or end of the buffer, stop there."
         (custom-set-variables '(window-divider-default-right-width ,margin))
 
         (require 'modus-themes)
+        (setq modus-themes-diffs 'fg-only-deuteranopia)
         (setq modus-themes-scale-headings t)
 	(load-theme 'modus-operandi t)
 
