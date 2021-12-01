@@ -10,6 +10,7 @@
   #:use-module (gnu home services)
   #:use-module (gnu home-services mail)
   #:use-module (gnu home services mcron)
+  #:use-module (gnu home-services version-control)
 
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
@@ -279,8 +280,17 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
               "user " (mail-account-fqda acc) "\n"
               "passwordeval " (mail-account-get-pass-cmd acc) "\n"
               (msmtp-serializer msmtp-provider-settings acc)))
-           mail-accs))
-         )))
+           mail-accs)))))
+
+     (when (get-value 'git-send-email? config)
+       (simple-service
+        'msmtp-set-git-send-email-cmd
+        home-git-service-type
+        (home-git-extension
+         (config
+          `((sendemail
+            ((sendmailcmd . ,(file-append msmtp "/bin/msmtp")))))))))
+
      (simple-service
       'msmtp-package
       home-profile-service-type

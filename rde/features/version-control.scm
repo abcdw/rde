@@ -12,30 +12,29 @@
 
 (define* (feature-git
 	  #:key
+          (git git)
 	  (sign-commits? #t)
 	  (git-gpg-sign-key #f)
-          (send-email? #f)
+          (git-send-email? #f)
           (extra-config '()))
   "Setup and configure Git."
+  (ensure-pred package? git)
   (ensure-pred maybe-string? git-gpg-sign-key)
   (ensure-pred boolean? sign-commits?)
-  (ensure-pred boolean? send-email?)
+  (ensure-pred boolean? git-send-email?)
   (ensure-pred list? extra-config)
 
   (define (git-home-services config)
     "Returns home services related to Git."
     (require-value 'full-name config)
     (require-value 'email config)
-    (when send-email?
-      (require-value 'msmtp config
-                     "The msmtp feature has to be enabled to configure git-sendemail."))
 
     (let ((gpg-sign-key (or git-gpg-sign-key
 			    (get-value 'gpg-primary-key config))))
       (when sign-commits?
 	(ensure-pred string? gpg-sign-key))
       (list
-       (when send-email?
+       (when git-send-email?
          (simple-service
           'git-send-email-package
           home-profile-service-type
@@ -59,16 +58,11 @@
 		    '((gpgsign . #t))
 		    '())))
 	    (sendemail
-	     ((annotate . #t)
-              ,@(if send-email?
-                    `((smtpserver . ,(file-append
-                                      (get-value 'msmtp config)
-                                      "/bin/msmtp")))
-                    '())))
+	     ((annotate . #t)))
 
             ,@extra-config)))))))
 
   (feature
    (name 'git)
-   (values '((git . #t)))
+   (values (make-feature-values git git-send-email?))
    (home-services-getter git-home-services)))
