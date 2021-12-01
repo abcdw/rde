@@ -56,7 +56,13 @@
    (feature-user-info
     #:user-name "bob"
     #:full-name "Andrew Tropin"
-    #:email "andrew@trop.in")
+    #:email "andrew@trop.in"
+
+    ;; WARNING: This option can reduce the explorability by hiding
+    ;; some helpful messages and parts of the interface for the sake
+    ;; of minimalistic, less distractive and clean look.  Generally
+    ;; it's not recommended to use it.
+    #:emacs-advanced-user? #t)
    (feature-gnupg
     #:gpg-primary-key "74830A276C328EC2"
     #:gpg-smart-card? #t)

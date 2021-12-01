@@ -27,21 +27,21 @@
 	  (home-directory (format #f "/home/~a" user-name))
 	  (user-initial-password-hash #f)
           (user-groups '())
-          (advanced-rde-user #f)
-          (advanced-emacs-user #f))
+          (rde-advanced-user? #f)
+          (emacs-advanced-user? #f))
   "Provides basic information about user for all features."
   (ensure-pred string? user-name)
   (ensure-pred string? full-name)
   (ensure-pred string? email)
   (ensure-pred string? home-directory)
-  (ensure-pred boolean? advanced-rde-user)
-  (ensure-pred boolean? advanced-emacs-user)
+  (ensure-pred boolean? rde-advanced-user?)
+  (ensure-pred boolean? emacs-advanced-user?)
   (ensure-pred maybe-string? user-initial-password-hash)
 
   (feature
    (name 'user-info)
    (values (make-feature-values
-            advanced-rde-user advanced-emacs-user
+            rde-advanced-user? emacs-advanced-user?
             user-name full-name email home-directory
 	    user-groups
             user-initial-password-hash))))
