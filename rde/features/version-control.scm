@@ -11,10 +11,10 @@
   #:export (feature-git))
 
 (define* (feature-git
-	  #:key
+          #:key
           (git git)
-	  (sign-commits? #t)
-	  (git-gpg-sign-key #f)
+          (sign-commits? #t)
+          (git-gpg-sign-key #f)
           (git-send-email? #f)
           (extra-config '()))
   "Setup and configure Git."
@@ -30,9 +30,9 @@
     (require-value 'email config)
 
     (let ((gpg-sign-key (or git-gpg-sign-key
-			    (get-value 'gpg-primary-key config))))
+                            (get-value 'gpg-primary-key config))))
       (when sign-commits?
-	(ensure-pred string? gpg-sign-key))
+        (ensure-pred string? gpg-sign-key))
       (list
        (when git-send-email?
          (simple-service
@@ -40,25 +40,25 @@
           home-profile-service-type
           (list (list git "send-email"))))
        (service
-	home-git-service-type
-	(home-git-configuration
+        home-git-service-type
+        (home-git-configuration
          (ignore
-	  '("*~"
-	    "*.\\#\\*"
-	    "*.\\#*\\#"))
-	 (config
-	  `((user
-	     ((name . ,(get-value 'full-name config))
-	      (email . ,(get-value 'email config))
-	      ,@(if sign-commits?
-		    `((signingkey . ,gpg-sign-key))
-		    '())))
-	    (commit
-	     (,@(if sign-commits?
-		    '((gpgsign . #t))
-		    '())))
-	    (sendemail
-	     ((annotate . #t)))
+          '("*~"
+            "*.\\#\\*"
+            "*.\\#*\\#"))
+         (config
+          `((user
+             ((name . ,(get-value 'full-name config))
+              (email . ,(get-value 'email config))
+              ,@(if sign-commits?
+                    `((signingkey . ,gpg-sign-key))
+                    '())))
+            (commit
+             (,@(if sign-commits?
+                    '((gpgsign . #t))
+                    '())))
+            (sendemail
+             ((annotate . #t)))
 
             ,@extra-config)))))))
 
