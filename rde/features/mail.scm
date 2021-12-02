@@ -289,7 +289,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
         (home-git-extension
          (config
           `((sendemail
-            ((sendmailcmd . ,(file-append msmtp "/bin/msmtp")))))))))
+             ((sendmailcmd . ,(file-append msmtp "/bin/msmtp --read-envelope-from")))))))))
 
      (simple-service
       'msmtp-package
