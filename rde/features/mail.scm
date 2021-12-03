@@ -704,11 +704,22 @@ not appear in the pop-up buffer."
         ;; https://codeberg.org/jao/elibs/src/branch/main/notmuch.org
         `((eval-when-compile
            (require 'notmuch))
-          (autoload 'notmuch-mua-new-mail "notmuch-mua")
+
+          (autoload 'notmuch-mua-mail "notmuch-mua")
+          ;; Copied definition from notmuch-mua becasue it's not
+          ;; available until notmuch-mua loaded.
+          (define-mail-user-agent 'notmuch-user-agent
+            'notmuch-mua-mail
+            'notmuch-mua-send-and-exit
+            'notmuch-mua-kill-buffer
+            'notmuch-mua-send-hook)
+          (setq mail-user-agent 'notmuch-user-agent)
+
+          ;; (setq url-mail-command 'notmuch-mua-new-mail)
+
           (define-key global-map (kbd "C-c a n") 'notmuch)
           ;; (define-key global-map (kbd "C-c m s") 'consult-notmuch-tree)
           (define-key global-map (kbd "M-s n") 'consult-notmuch-tree)
-          (define-key global-map (kbd "C-x m") 'notmuch-mua-new-mail)
           (define-key global-map (kbd "s-m") 'notmuch-jump-search)
           (setq notmuch-saved-searches ',notmuch-saved-searches)
           (setq notmuch-search-oldest-first nil)
