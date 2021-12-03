@@ -146,12 +146,12 @@ features."
 
 (define* (feature-emacs-message
           #:key
-          (mail-signature #t))
+          (message-signature #t))
   "Configure email sending capabilities provided by @file{message.el}.
 @code{mail-signature} can be @code{#t}, @code{#f}, a string or a
 function, which accepts config with rde values and returns a string."
 
-  (ensure-pred string-or-boolean-or-procedure? mail-signature)
+  (ensure-pred string-or-boolean-or-procedure? message-signature)
 
   (define emacs-f-name 'message)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -181,8 +181,8 @@ function, which accepts config with rde values and returns a string."
                 message-sendmail-extra-arguments '("--read-envelope-from")))
              '())
 
-         (setq mail-signature
-               ,(match mail-signature
+         (setq message-signature
+               ,(match message-signature
                  ((? procedure? e) (e config))
                  ((? string? e) e)
                  (#f 'nil)
