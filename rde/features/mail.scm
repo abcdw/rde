@@ -140,13 +140,15 @@ features."
 ;;; feature-emacs-message.
 ;;;
 
+(define (default-message-signature config)
+  (format #f "Best regards,\n~a" (get-value 'full-name config)))
 
 (define-public (string-or-boolean-or-procedure? x)
   (or (string? x) (boolean? x) (procedure? x)))
 
 (define* (feature-emacs-message
           #:key
-          (message-signature #t))
+          (message-signature default-message-signature))
   "Configure email sending capabilities provided by @file{message.el}.
 @code{mail-signature} can be @code{#t}, @code{#f}, a string or a
 function, which accepts config with rde values and returns a string."
