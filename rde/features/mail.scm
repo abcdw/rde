@@ -323,7 +323,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
             (l2md-repo
              (inherit repo-config)
              (maildir (string-append
-                       mail-dir "/lists/" (mailing-list-fqda ml) "/all")))
+                       mail-dir "/lists/" (mailing-list-fqda ml) "/archive")))
             repo-config)))
     ;; <https://git.kernel.org/pub/scm/linux/kernel/git/dborkman/l2md.git/about/>
     ;; Applying patches <https://git.kyleam.com/piem/about/>
@@ -399,12 +399,12 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 
 ;; Directory names has lowercased spelling to match notmuch tags
 (define gmail-folder-mapping
-  '(("inbox"  . "INBOX")
-    ("sent"   . "[Gmail]/Sent Mail")
-    ("drafts" . "[Gmail]/Drafts")
-    ("all"    . "[Gmail]/All Mail")
-    ("trash"  . "[Gmail]/Trash")
-    ("spam"   . "[Gmail]/Spam")))
+  '(("inbox"   . "INBOX")
+    ("sent"    . "[Gmail]/Sent Mail")
+    ("drafts"  . "[Gmail]/Drafts")
+    ("archive" . "[Gmail]/All Mail")
+    ("trash"   . "[Gmail]/Trash")
+    ("spam"    . "[Gmail]/Spam")))
 
 (define gmail-isync-settings
   (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
@@ -540,7 +540,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
     (format #f "for f in $(notmuch search --output=files \
 'path:/.*\\/~a/ and not tag:~a' | grep '/~a/'); \
 do mv -v $f \
-$(echo $f | sed 's;/~a/;/all/;' | sed 's/,U=[0-9]*:/:/'); done"
+$(echo $f | sed 's;/~a/;/archive/;' | sed 's/,U=[0-9]*:/:/'); done"
             tag tag tag tag))
 
   (define* (move-in-tagged-messages
@@ -558,7 +558,7 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
     (append
      (map move-out-untagged-messages '(inbox trash spam))
      (map move-in-tagged-messages '(trash spam))
-     (list (move-in-tagged-messages 'inbox #:exclude-dir "all")
+     (list (move-in-tagged-messages 'inbox #:exclude-dir "archive")
            delete-deleted-messages)))
 
   (home-notmuch-extension
