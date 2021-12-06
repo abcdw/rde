@@ -19,11 +19,10 @@
 	  #:key
 	  (default-brightness 100)
 	  (step 10)
-	  (package brightnessctl))
-  "Setup and configure brightness of various devices.  PACKAGE is
-expected to be a brightnessctl."
+	  (brightnessctl brightnessctl))
+  "Setup and configure brightness for various devices."
   (ensure-pred brightness? default-brightness)
-  (ensure-pred package? package)
+  (ensure-pred package? brightnessctl)
   (ensure-pred brightness? step)
 
   (define (step->symbol op)
@@ -33,7 +32,7 @@ expected to be a brightnessctl."
      (simple-service
       'backlight-add-packages
       home-profile-service-type
-      (list package))
+      (list brightnessctl))
      (simple-service
       'backlight-add-brightness-control-to-sway
       home-sway-service-type
@@ -52,18 +51,19 @@ expected to be a brightnessctl."
       (list (shepherd-service
              (provision '(startup-brightness))
              (requirement '(virtual-terminal))
-             (start #~(lambda ()
-                        (invoke #$(file-append package "/bin/brightnessctl")
-				"set" (string-append
-				       (number->string #$default-brightness) "%"))))
+             (start
+              #~(lambda ()
+                  (invoke #$(file-append brightnessctl "/bin/brightnessctl")
+			  "set" (string-append
+				 (number->string #$default-brightness) "%"))))
              (one-shot? #t))))
      (udev-rules-service
       'backlight-add-udev-rules
-      package)))
+      brightnessctl)))
 
   (feature
    (name 'backlight)
-   (values '((backlight . #t)))
+   (values `((backlight . #t)))
    (home-services-getter backlight-home-services)
    (system-services-getter backlight-system-services)))
 
