@@ -707,8 +707,11 @@ not appear in the pop-up buffer."
           ;; (setq url-mail-command 'notmuch-mua-new-mail)
 
           (define-key global-map (kbd "C-c a n") 'notmuch)
-          ;; (define-key global-map (kbd "C-c m s") 'consult-notmuch-tree)
-          (define-key global-map (kbd "M-s n") 'consult-notmuch-tree)
+
+          ,@(if (get-value 'emacs-consult config)
+                '((define-key global-map (kbd "M-s n") 'consult-notmuch-tree))
+                '())
+
           (define-key global-map (kbd "s-m") 'notmuch-jump-search)
           (setq notmuch-saved-searches ',notmuch-saved-searches)
           (setq notmuch-search-oldest-first nil)
@@ -817,12 +820,13 @@ optional arguments to use the function inside hook."
 
            (add-hook 'notmuch-hello-mode-hook 'rde--add-notmuch-hello-hooks)
 
-           (setq notmuch-show-logo nil))
-
-          ;; (with-eval-after-load 'magit (require 'git-email-magit))
-          )
-        #:elisp-packages (list ;; emacs-git-email-latest
-                               emacs-consult-notmuch)))))
+           (setq notmuch-show-logo nil)))
+        #:elisp-packages
+        (append
+         (if (get-value 'emacs-consult config)
+             (list emacs-consult-notmuch)
+             '())
+         (list emacs-notmuch))))))
 
   (feature
    (name f-name)
