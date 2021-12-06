@@ -148,7 +148,8 @@
      (pkgs "emacs-yasnippet" "emacs-elfeed" "emacs-hl-todo")))
    (feature-emacs-appearance)
    (feature-emacs-faces)
-   (feature-emacs-completion)
+   (feature-emacs-completion
+    #:mini-frame? #t)
    (feature-emacs-project)
    (feature-emacs-perspective)
    (feature-emacs-input-methods)
