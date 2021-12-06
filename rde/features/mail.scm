@@ -502,14 +502,6 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
   (define ids    (map mail-account-id   mail-accounts))
   (define mail-directory ((get-value 'mail-directory-fn config) config))
 
-  (define (sync-cmd ma)
-    ((get-value
-      (symbol-append (mail-account-synchronizer ma) '-synchronize-cmd-fn)
-      config)
-     ma))
-
-  (define sync-cmds (map sync-cmd mail-accounts))
-
   (define make-id-tag
     (map (lambda (x)
            (format
@@ -531,9 +523,6 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
       "notmuch tag -spam  -- not path:/accounts\\/.*\\/spam/  and tag:spam"
 
       "notmuch tag -new -- tag:new"))
-
-  ;; (define tag-updates-post-insert
-  ;;   "notmuch tag +sent -new -- path:/.*\\/sent/ and tag:new")
 
   (define (move-out-untagged-messages tag)
     "If tag was removed -> move out of the related folder."
