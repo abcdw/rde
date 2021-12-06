@@ -16,16 +16,16 @@
 
 (define* (feature-direnv
 	  #:key
-	  (package direnv))
+	  (direnv direnv))
   "Configure direnv and related Emacs packages."
-  (ensure-pred package? package)
+  (ensure-pred package? direnv)
 
   (define (get-home-services config)
     "Returns home services related to direnv."
     (list
      (simple-service
       'direnv-packages
-      home-profile-service-type (list package))
+      home-profile-service-type (list direnv))
      (simple-service
       'direnv-config
       home-files-service-type
@@ -55,5 +55,5 @@ use_guixs() {
 
   (feature
    (name 'direnv)
-   (values `((direnv . #t)))
+   (values `((direnv . ,direnv)))
    (home-services-getter get-home-services)))
