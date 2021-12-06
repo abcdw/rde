@@ -729,10 +729,10 @@ not appear in the pop-up buffer."
            (setq notmuch-show-empty-saved-searches t)
            (setq notmuch-mua-cite-function 'message-cite-original-without-signature)
 
-           (setq rde-notmuch-todo-tags '("+todo" "-inbox"))
-           (setq rde-notmuch-spam-tags '("+spam" "-inbox"))
-           (setq rde-notmuch-trash-tags '("+trash" "-inbox" "-draft"))
-           (setq rde-notmuch-delete-tags '("+deleted" "-inbox" "-draft"))
+           (defvar rde-notmuch-todo-tags '("+todo" "-inbox"))
+           (defvar rde-notmuch-spam-tags '("+spam" "-inbox"))
+           (defvar rde-notmuch-trash-tags '("+trash" "-inbox" "-draft"))
+           (defvar rde-notmuch-delete-tags '("+deleted" "-inbox" "-draft"))
            (setq notmuch-archive-tags '("-inbox" "-todo"))
            (setq notmuch-tagging-keys
                  '(("a" notmuch-archive-tags "Archive")
