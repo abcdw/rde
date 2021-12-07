@@ -726,7 +726,10 @@ previous window layout otherwise.  With universal argument toggles
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((eval-when-compile
+         (require 'org)
+         (require 'org-refile))
+        (with-eval-after-load
          'org
 	 (setq org-adapt-indentation nil)
 	 (setq org-edit-src-content-indentation 0)
