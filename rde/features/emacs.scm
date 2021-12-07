@@ -953,6 +953,12 @@ git-link, git-timemachine."
 
   (define (get-home-services config)
     (list
+     ;; Do we need it or better to set absolute path instead of rg in
+     ;; `consult-ripgrep-args'
+     (simple-service
+      'emacs-completion-add-ripgrep-packages
+      home-profile-service-type
+      (list (@ (gnu packages rust-apps) ripgrep)))
      (elisp-configuration-service
       emacs-f-name
       `((with-eval-after-load
@@ -1131,13 +1137,15 @@ emacsclient feels more like a separate emacs instance."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((setq org-roam-v2-ack t)
+      `((eval-when-compile
+         (let ((org-roam-v2-ack t))
+           (require 'org-roam)))
+        (setq org-roam-v2-ack t)
+        (setq org-roam-completion-everywhere t
+              org-roam-directory ,org-roam-directory)
 
-        (custom-set-variables
-         '(org-roam-completion-everywhere t)
-         '(org-roam-directory ,org-roam-directory))
-
-        (with-eval-after-load 'org-roam (org-roam-setup))
+        (autoload 'org-roam-db-autosync-enable "org-roam")
+        (with-eval-after-load 'org-roam (org-roam-db-autosync-enable))
 
 	(define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
 	(define-key global-map (kbd "C-c n f") 'org-roam-node-find)
