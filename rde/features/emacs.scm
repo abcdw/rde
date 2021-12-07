@@ -304,6 +304,7 @@ point reaches the beginning or end of the buffer, stop there."
 
         (require 'modus-themes)
         (setq modus-themes-diffs 'fg-only-deuteranopia)
+        (setq modus-themes-success-deuteranopia t)
         (setq modus-themes-scale-headings t)
 	(load-theme 'modus-operandi t)
 
