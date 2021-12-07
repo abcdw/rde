@@ -205,7 +205,10 @@
      (pkgs
       "alsa-utils" "mpv" "youtube-dl" "imv"
       "obs" "obs-wlrobs"
-      "icecat"
+      "icecat" "recutils"
+      "fheroes2"
+      ;; TODO: Enable pipewire support to chromium by default
+      ;; chrome://flags/#enable-webrtc-pipewire-capturer
       "ungoogled-chromium-wayland" "ublock-origin-chromium"
       "nyxt"
       "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-standard"
