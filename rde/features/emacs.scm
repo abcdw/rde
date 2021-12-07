@@ -1053,6 +1053,8 @@ git-link, git-timemachine."
         (add-hook 'after-init-hook 'vertico-mode)
 	(with-eval-after-load
          'vertico
+         (define-key global-map (kbd "s-s") 'vertico-repeat)
+         (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
          (custom-set-variables '(vertico-cycle t))))
       #:elisp-packages
       (append
