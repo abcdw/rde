@@ -5,6 +5,9 @@
 (list (channel-with-substitutes-available
        %default-guix-channel
        "https://ci.guix.gnu.org")
+      ;; (channel
+      ;;   (name 'guix)
+      ;;   (url "file:///home/bob/work/gnu/guix"))
       (channel
        (name 'rde)
        (url "https://git.sr.ht/~abcdw/rde")))
