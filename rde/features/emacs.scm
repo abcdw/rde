@@ -1036,6 +1036,7 @@ git-link, git-timemachine."
          (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
          (define-key global-map (kbd "s-b") 'switch-to-buffer)
          (define-key global-map (kbd "s-w") 'kill-current-buffer)
+         (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
 	 (define-key global-map (kbd "s-o") 'other-window))
 
         (with-eval-after-load

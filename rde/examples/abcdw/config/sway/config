@@ -145,7 +145,7 @@ output DP-2 scale 2 disable
 
     # Switch the current container between different layout styles
     bindsym $mod+Shift+s layout stacking
-    bindsym $mod+Shift+w layout tabbed
+    bindsym $mod+Shift+t layout tabbed
     bindsym $mod+Shift+e layout toggle split
 
     # Make the current focus fullscreen
