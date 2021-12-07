@@ -221,6 +221,17 @@ point reaches the beginning or end of the buffer, stop there."
                     (add-hook mode-hook (lambda () (setq truncate-lines t))))
 	    (define-key global-map (kbd "s-r") 'recompile)
 
+            (define-key global-map (kbd "C-c a w") 'world-clock)
+            (setq world-clock-list
+                  '(("America/Los_Angeles" "Los Angeles")
+                    ("America/Boise" "Boise")
+                    ("America/New_York" "New York")
+                    ("Europe/London" "London")
+                    ("Europe/Paris" "Paris")
+                    ("Europe/Helsinki" "Helsinki")
+                    ("Europe/Moscow" "Moscow")
+                    ("Asia/Tokyo" "Tokyo")))
+
             ,@extra-config))
 	 (early-init-el
 	  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
