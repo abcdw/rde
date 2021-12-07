@@ -219,6 +219,7 @@ point reaches the beginning or end of the buffer, stop there."
             (dolist (mode-hook '(prog-mode-hook dired-mode-hook
                                  compilation-mode-hook))
                     (add-hook mode-hook (lambda () (setq truncate-lines t))))
+            (setq compilation-scroll-output 'first-error)
 	    (define-key global-map (kbd "s-r") 'recompile)
 
             (define-key global-map (kbd "C-c a w") 'world-clock)
