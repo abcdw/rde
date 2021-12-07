@@ -744,6 +744,7 @@ previous window layout otherwise.  With universal argument toggles
 		             :inherit '(font-lock-comment-face default)
 		             :weight 'normal)
          (setq org-hide-emphasis-markers t)
+         (setq org-log-into-drawer t)
 
          (setq org-directory ,org-directory)
          (setq org-default-notes-file (concat org-directory "/todo.org"))
