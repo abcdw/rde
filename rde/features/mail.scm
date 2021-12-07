@@ -322,41 +322,20 @@ function, which accepts config with rde values and returns a string."
          msmtp-global-settings
          (append-map serialize-mail-acc mail-accounts)))))
 
-     (simple-service
-      'msmtp-config
-      home-files-service-type
-      (list
-       (list
-        "config/msmtp/config"
-        ;; TODO: Try $HOME/.local/var/log expansion
-        (apply
-         mixed-text-file
-         "msmtp-config"
-         msmtp-settings
-          (map
-           (lambda (acc)
-             (string-append
-              "\n"
-              "account " (symbol->string (mail-account-id acc)) "\n"
-              "from " (mail-account-fqda acc) "\n"
-              "user " (mail-account-fqda acc) "\n"
-              "passwordeval " (mail-account-get-pass-cmd acc) "\n"
-              (msmtp-serializer msmtp-provider-settings acc)))
-           mail-accs)))))
+     ;; (when (get-value 'git-send-email? config)
+     ;;   (simple-service
+     ;;    'msmtp-set-git-send-email-cmd
+     ;;    home-git-service-type
+     ;;    (home-git-extension
+     ;;     (config
+     ;;      `((sendemail
+     ;;         ((sendmailcmd . ,(file-append msmtp "/bin/msmtp --read-envelope-from")))))))))
 
-     (when (get-value 'git-send-email? config)
-       (simple-service
-        'msmtp-set-git-send-email-cmd
-        home-git-service-type
-        (home-git-extension
-         (config
-          `((sendemail
-             ((sendmailcmd . ,(file-append msmtp "/bin/msmtp --read-envelope-from")))))))))
-
-     (simple-service
-      'msmtp-package
-      home-profile-service-type
-      (list msmtp))))
+     ;; (simple-service
+     ;;  'msmtp-package
+     ;;  home-profile-service-type
+     ;;  (list msmtp))
+    ))
 
   ;; TODO: Implement config serialization or msmtp-home-service
   (feature

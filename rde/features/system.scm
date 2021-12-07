@@ -69,20 +69,21 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
 
 
 (define* (feature-kernel
-	  #:key
-	  (kernel linux-libre)
-	  (kernel-loadable-modules '())
-	  (kernel-arguments '())
-	  (default-kernel-arguments %default-kernel-arguments)
-          (initrd '())
-	  (firmware '())
-	  (base-firmware %base-firmware))
+          #:key
+          (kernel linux-libre)
+          (kernel-loadable-modules '())
+          (kernel-arguments '())
+          (default-kernel-arguments %default-kernel-arguments)
+          (initrd base-initrd)
+          (initrd-modules '())
+          (base-initrd-modules %base-initrd-modules)
+          (firmware '())
+          (base-firmware %base-firmware))
   "Provides kernel configuration."
   (ensure-pred any-package? kernel)
   (ensure-pred list-of-packages? kernel-loadable-modules)
   (ensure-pred list-of-string-or-gexps? kernel-arguments)
   (ensure-pred list-of-string-or-gexps? default-kernel-arguments)
-  ;(ensure-pred initrd? initrd)
   (ensure-pred list-of-packages? firmware)
   (ensure-pred list-of-packages? base-firmware)
   (ensure-pred procedure? initrd)
@@ -95,4 +96,5 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
     (feature
      (name 'kernel)
      (values (make-feature-values
-	      kernel kernel-loadable-modules kernel-arguments firmware initrd)))))
+              kernel kernel-loadable-modules kernel-arguments
+              initrd initrd-modules firmware)))))

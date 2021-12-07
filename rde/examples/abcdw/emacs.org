@@ -1,0 +1,2266 @@
+#+title: emacs config
+#+auto-tangle: yes
+#+PROPERTY: header-args    :tangle-mode (identity #o444)
+#+PROPERTY: header-args:sh :tangle-mode (identity #o755)
+
+bonk
+
+* tangling
+** noweb tangler ; root                                               :meta: 
+#+begin_src scheme :noweb yes :tangle emacs.scm :tangle-mode 
+(define-module (rde examples abcdw emacs)
+  #:export (init-el))
+
+(define init-el
+  '(
+    ;; NOWEB GENERAL START
+    <<general>>
+    ;; NOWEB GENERAL END
+
+    ;; NOWEB CONF START
+    <<conf>>
+    ;; NOWEB CONF END
+    ))
+#+end_src
+** ensure headings are sorted alphabetically :demo:
+#+begin_src emacs-lisp :tangle no
+(org-map-entries
+ (lambda ()
+   (when (org-get-heading)
+     (org-sort-entries t ?a))))
+#+end_src
+
+* configs
+** about this file
+*** slice
+#+begin_src emacs-lisp :tangle no
+(org-tags-sparse-tree)
+#+end_src
+
+**** tag
+***** ~func~                                                       :func:
+***** ~kbd~                                                         :kbd:
+***** ~meta~                                                       :meta:
+#+begin_src emacs-lisp :tangle no
+(org-tags-sparse-tree nil "meta")
+#+end_src
+
+#+RESULTS:
+
+***** ~var~                                                         :var:
+*** :tangle-mode 
+**** #o444 ; readonly
+**** #0755 ; executable
+
+** bindings                                                            :kbd:
+*** {C-c C-j} +org-goto+ -> consult-org-heading
+imenu's leaf-nodes-only display is wack and cba to find out why right now
+#+begin_src emacs-lisp :noweb-ref org
+(define-key org-mode-map (kbd "C-c C-j") 'consult-org-heading)
+#+end_src
+
+#+RESULTS:
+: consult-org-heading
+
+**** consult-org--headings                                          :demo:
+#+begin_src emacs-lisp :results drawer :tangle no
+(require 'consult)
+
+(pp (let ((h (s-join "/" (org-get-outline-path nil nil))))
+      (car (seq-filter (lambda (s)
+                         (message "%s BONK %s" h s)
+                         (s-contains? h s))
+                       (consult-org--headings nil nil nil)))))
+#+end_src
+
+#+RESULTS:
+:results:
+#("bindings/{C-c C-j} +org-goto+ -> consult-org-heading􀜋" 0 1
+(face org-level-1 consult-org--heading
+(#<marker at 1803 in emacs.org> 2 nil nil))
+1 8
+(face org-level-1)
+9 52
+(face org-level-2)
+52 53
+(consult-strip t invisible t))
+:end:
+
+
+***** assoc                                                        :demo:
+#+begin_src emacs-lisp :results drawer :tangle no
+(pp (assoc (s-join "/" (org-get-outline-path t nil))
+           (consult-org--headings nil nil nil)))
+#+end_src
+
+#+RESULTS:
+:results:
+nil
+:end:
+
+#+RESULTS:
+: bindings/{C-c C-j} +org-goto+ -> consult-org-heading/outline path ; to assoc
+
+****** org-babel-indent-block ; indent babel
+#+begin_src emacs-lisp :noweb-ref org
+(defvar qz/org-babel-indent-exclude-lang nil "org-babel languages to exclude from auto indent/format with ")
+(setq qz/org-babel-indent-exclude-lang nil)
+
+(setq qz/debug t)
+
+(defun qz/org-babel-indent-block (beg end &rest args)
+  (interactive "r")
+  (and qz/debug (message "qz/org-babel-indent-block: BEG %s END %s ARGS %s" beg end args))
+  (save-mark-and-excursion
+    (when (and (funcall-interactively 'org-babel-mark-block)
+               (not (seq-contains-p
+                     qz/org-babel-indent-exclude-lang
+                     (car (car (cdr (car (org-babel-tangle-single-block 1 t))))))))
+      (call-interactively 'indent-region))))
+
+(define-key org-mode-map (kbd "C-c C-v C-\\") 'qz/org-babel-indent-block)
+
+;; NOTE: blocks default
+;;(add-to-list 'org-ctrl-c-ctrl-c-hook 'qz/org-babel-indent-block)
+;;(setq org-ctrl-c-ctrl-c-hook nil)
+;;
+;; NOTE: not the right eval/exec fn for `{C-c C-c}'
+;;(advice-add 'org-babel-eval :before 'qz/org-babel-indent-block)
+;;(advice-remove 'org-babel-eval 'qz/org-babel-indent-block)
+;;
+;; conclusion: use `advice' so as not to block standard org-mode
+;; `{C-c C-c}' behaviour like with `org-ctrl-c-ctrl-c-hook'
+
+(qz/advice- org-babel-execute-src-block :before qz/org-babel-indent-block)
+#+end_src
+
+#+RESULTS:
+| qz/advice-enable--org-babel-execute-src-block--qz/org-babel-indent-block | qz/advice-disable--org-babel-execute-src-block--qz/org-babel-indent-block |
+
+****** org-babel-refresh-graphics
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-refresh-inline-images (&rest args)
+  (org-toggle-inline-images t)
+  (org-toggle-inline-images t))
+
+(qz/advice- org-babel-execute-src-block :after qz/org-refresh-inline-images)
+#+end_src
+
+#+RESULTS:
+| qz/advice-enable--org-babel-execute-src-block--qz/org-refresh-inline-images | qz/advice-disable--org-babel-execute-src-block--qz/org-refresh-inline-images |
+
+
+****** re-sorting to emulate initial position                     :demo:
+#+begin_src emacs-lisp :tangle no
+(let* ((c 0)
+       (cands (consult--with-increased-gc (consult-org--headings nil nil nil)))
+       (olp (s-join "/" (org-get-outline-path t nil)))
+       (current-cand (seq-find (lambda (s)
+                                 (setq c (+ 1 c))
+                                 (and qz/debug (message "%s BONK %s" olp s))
+                                 (s-contains? olp s))
+                               (consult-org--headings nil nil nil))))
+
+  (message "%s" (list current-cand c (length cands)))
+
+(append
+ (subseq cands (1- c) (length cands))
+ (subseq cands 0 (- c 2)))
+
+;;  (nth (1- c) cands)
+  ;; (message
+  ;;  "%S"
+  ;;  (mapc 'org-no-properties
+  ;;        (list
+  ;;         (nth (1- c) cands)
+  ;;         (nth c cands)
+  ;;         (nth (1+ c) cands))))
+  )
+#+end_src
+
+#+RESULTS:
+: ("bindings/{C-c C-j} +org-goto+ -> consult-org-heading/consult-org--headings/assoc/re-sorting to emulate initial position􁂽" "bindings/{C-c C-j} +org-goto+ -> consult-org-heading/consult-org-heading ; redef􁖬" "system commands􁹖")
+"bindings/{C-c C-j} +org-goto+ -> consult-org-heading/consult-org--headings/assoc/re-sorting to emulate initial position􁂽"
+"bindings/{C-c C-j} +org-goto+ -> consult-org-heading/consult-org-heading ; redef􁒉"
+"system commands􁴲")
+
+
+
+**** consult-org-heading ; redef                                    :demo:
+
+hmm. although some proxy for 'initial position' - it doesn't actually
+work so nicely.
+
+#+begin_src emacs-lisp :tangle no
+(defun consult-org-heading (&optional match scope)
+  "Jump to an Org heading.
+
+MATCH and SCOPE are as in `org-map-entries' and determine which
+entries are offered.  By default, all entries of the current
+buffer are offered."
+  (interactive (unless (derived-mode-p 'org-mode)
+                 (user-error "Must be called from an Org buffer")))
+  (let* ((c 0)
+         (prefix (not (memq scope '(nil tree region region-start-level file))))
+         (cands (consult--with-increased-gc (consult-org--headings prefix match scope)))
+         (olp (s-join "/" (org-get-outline-path t nil)))
+         (current-cand (seq-find (lambda (s)
+                                   (setq c (1+ c))
+                                   (and qz/debug (message "%s BONK %s" olp s))
+                                   (s-contains? olp s))
+                                 (consult-org--headings nil nil nil))))
+    (message "%s" c)
+    (setq consult-initial-position (- c 1))
+    (consult--read
+     (if (and nil current-cand)
+         (append
+          (cl-subseq cands (- c 1) (length cands))
+          (cl-subseq cands 0 (- c 2)))
+         cands)
+
+     :prompt "Go to heading: "
+     ;; `default' will just make some nonsense value which doesn't respect the setup (ordering, selection)
+     ;;   instead what we're going for is to
+     ;;     - make the cand list, sort
+     ;;     - jump to `default-candidate', retaining sort
+     ;;       - note that a 'jump' can be some numerical index of cands, therefore an intial-position key
+     ;;       - where relevance of candidate is given by some function of candidates
+     ;;     - a resort can emulate 'initial-position'
+     ;; `initial' will filter all other cands, which makes it totally unsuitable
+
+
+     :category 'consult-org-heading
+     :sort nil
+     :require-match t
+     :history '(:input consult-org--history)
+     :narrow (consult-org--narrow)
+     :state (consult--jump-state)
+     :group
+     (when prefix
+       (lambda (cand transform)
+         (let ((name (buffer-name
+                      (marker-buffer
+                       (car (get-text-property 0 'consult-org--heading cand))))))
+           (if transform (substring cand (1+ (length name))) name))))
+     :lookup
+     (lambda (_ candidates cand)
+       (when-let (found (member cand candidates))
+         (car (get-text-property 0 'consult-org--heading (car found))))))))
+
+(defun qz/vertico-set-initial-position()
+  (when consult-initial-position
+    (vertico-next consult-initial-position)))
+
+(setq vertico-mode-hook nil)
+
+;(add-hook 'vertico-mode-hook 'qz/vertico-set-initial-position)
+#+end_src
+
+#+RESULTS:
+| qz/vertico-set-initial-position |
+
+*** {C-x} <-> {C-u}
+
+*** {C-z} newline-above
+#+begin_src emacs-lisp :noweb yes :noweb-ref bindings
+    ;;(custom-set-variables
+    ;; '(org-disputed-keys '([(shift o)] . [(meta shift o)])))
+
+    (defun qz/newline-above ()
+      (interactive)
+      (save-excursion
+       (beginning-of-line)
+       (newline))
+      (indent-according-to-mode))
+
+    (define-key global-map (kbd "C-z") 'qz/newline-above)
+    ;;(define-key global-map (kbd "C-o") 'open-line)
+    ;;
+    ;;(org-remap org-mode-map
+    ;;           'open-line 'org-open-line)
+
+#+end_src
+
+*** {M-s-h}jkl windmove swap
+
+I don't use this very much, as it curls my whole left hand up (qwerty troubles)
+
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+(define-key global-map (kbd "M-s-h") 'windmove-swap-states-left)
+(define-key global-map (kbd "M-s-j") 'windmove-swap-states-down)
+(define-key global-map (kbd "M-s-k") 'windmove-swap-states-up)
+(define-key global-map (kbd "M-s-l") 'windmove-swap-states-right)
+#+end_src
+
+*** noweb-tangler
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+;; NOWEB KBD START
+<<kbd>>
+;; NOWEB KBD END
+#+end_src
+*** {s-h}jkl windmove
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+(define-key global-map (kbd "s-h") 'windmove-left)
+(define-key global-map (kbd "s-j") 'windmove-down)
+(define-key global-map (kbd "s-k") 'windmove-up)
+(define-key global-map (kbd "s-l") 'windmove-right)
+#+end_src
+
+*** {s-\} org-store-link
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+(define-key global-map (kbd "s-\\") 'org-store-link)
+#+end_src
+** custom
+*** noweb tangler                                                    :meta:
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+;; NOWEB CUSTOM START
+<<custom>>
+;; NOWEB CUSTOM END
+#+end_src
+
+*** org-imenu-depth                                                   :var:
+- :: help:imenu-create-index-function
+- :: help:org-imenu-get-tree
+- :: help:imenu
+- :: info:elisp#Imenu
+
+#+begin_src emacs-lisp :noweb-ref custom
+(custom-set-variables
+ '(org-imenu-depth 99))
+#+end_src
+
+#+RESULTS:
+
+(setq org-goto-interface 'outline-path-completionp)
+(setq org-outline-path-complete-in-steps nil)
+**** NOTE it would be nice to have individual headings present, not just 'leaves'
+#+begin_src emacs-lisp :results code
+(org-imenu-get-tree)
+#+end_src
+
+#+RESULTS:
+
+** es-mode
+*** choose
+**** es-choose-url
+#+begin_src emacs-lisp :noweb-ref es
+(defun qz/es-choose-url (&optional url backend env)
+  (interactive)
+  (and qz/debug (message "DEBUG qz/es-choose-url: %s"
+                         (list url backend env)))
+  (let* ((backend (qz/es-choose-backend backend))
+         (url (or url
+                  (and backend env
+                       (qz/es-choose-env env)
+                       (format qz/newstore-es-string backend env)))))
+    (message "es-default-url: %s"
+             (setq es-default-url
+                   (or url (completing-read
+                            "es-url: " qz/newstore-es-urls)))))
+  es-default-url)
+
+(defun qz/es-choose-backend (&optional backend)
+  (interactive)
+  (and qz/debug (message "DEBUG qz/es-choose-backend: %s" backend))
+  (message "qz/newstore-es-backend-current: %s"
+           (setq qz/newstore-es-backend-current
+                 (or backend (completing-read "es-backend: " qz/newstore-es-backends))))
+  qz/newstore-es-backend-current)
+
+(defun qz/es-choose-env (&optional env)
+  (interactive)
+  (and qz/debug (message "DEBUG qz/es-choose-env: %s" env))
+  (message "qz/newstore-es-env-current: %s"
+           (setq qz/newstore-es-env-current
+                 (or env (completing-read "es-env: " qz/newstore-envs))))
+  qz/newstore-es-env-current)
+
+(defun qz/test-es-ui (&optional url backend env)
+  (setq qz/newstore-es-env-current nil
+        qz/newstore-es-backend-current nil)
+  (funcall-interactively 'qz/es-choose-url url backend env)
+  (list
+   qz/newstore-es-env-current
+   qz/newstore-es-backend-current
+   es-default-url))
+
+;;(qz/test-es-ui)              ;; prompt, noset
+;;(qz/test-es-ui nil)          ;; prompt, noset
+;;(qz/test-es-ui nil nil)      ;; prompt, noset
+;;(qz/test-es-ui nil nil nil)  ;; prompt, noset
+;;(qz/test-es-ui nil 'kibana 'production)    ;; noprompt, set
+
+#+end_src
+
+#+RESULTS:
+: qz/test-es-ui
+
+**** es-choose-cookie-headers
+#+begin_src emacs-lisp :noweb-ref es
+(defun qz/es-choose-cookie-headers ()
+  "TODO"
+  (interactive)
+  (message
+   "es-default-headers: %s"
+   (setq es-default-headers `(("Content-Type" . "application/json; charset=UTF-8")
+                              ("Cookie" . ,(format "ACCEZZIOCOOKIE=%s"
+                                                   (read-from-minibuffer "es cookie: ")))))))
+#+end_src
+
+#+RESULTS:
+: qz/es-choose-cookie-headers
+
+*** noweb tangler
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+;; NOWEB ES START
+(with-eval-after-load 'restclient
+  <<es>>
+  )
+;; NOWEB ES END
+#+end_src
+
+**** settings
+#+begin_src emacs-lisp :noweb-ref es
+(setq es-default-url "https://elasticsearch-production.newstore.luminatesec.com"
+      es-default-headers nil
+      es-always-pretty-print t
+      es-default-headers
+      `(("Content-Type" . "application/json; charset=UTF-8")
+        ("Cookie" . ,(format "ACCEZZIOCOOKIE=%s"
+                             "11fdbe68-b0f3-4dd0-9894-f97afe3662dc"))))
+
+(setq qz/newstore-es-string "https://%s-%s.newstore.luminatesec.com"
+      qz/newstore-es-backends '(kibana elasticsearch)
+      qz/newstore-es-backend-current nil
+      qz/newstore-es-env-current nil
+      qz/newstore-es-urls (cl-loop for env in qz/newstore-envs
+                                   append (cl-loop for es-backend in qz/newstore-es-backends
+                                                   collect (format qz/newstore-es-string es-backend env))))
+#+end_src
+
+#+RESULTS:
+| https://kibana-sandbox.newstore.luminatesec.com | https://elasticsearch-sandbox.newstore.luminatesec.com | https://kibana-staging.newstore.luminatesec.com | https://elasticsearch-staging.newstore.luminatesec.com | https://kibana-production.newstore.luminatesec.com | https://elasticsearch-production.newstore.luminatesec.com |
+
+** general
+*** advice                                                     :func:macro:
+#+begin_src emacs-lisp :noweb-ref general
+(defmacro qz/advice- (target-fn state advice-fn)
+  (let* ((s-advice (lambda (e)
+                     (intern (format "qz/advice-%s--%s--%s"
+                                     e target-fn advice-fn))))
+         (enable (funcall s-advice 'enable))
+         (disable (funcall s-advice 'disable)))
+    `(progn
+       (defun ,enable ()
+         (interactive)
+         (advice-add ',target-fn ,state ',advice-fn))
+
+       (defun ,(funcall s-advice 'disable) ()
+         (interactive)
+         (advice-remove ',target-fn ',advice-fn))
+
+       (,enable)
+       (list ',enable ',disable))))
+#+end_src
+
+#+RESULTS:
+: qz/advice-
+
+*** TODO debug
+#+begin_src emacs-lisp :noweb-ref general
+(defvar qz/debug 0 "debugging assists")
+
+(defmacro qz/debug- (&rest body)
+  (if qz/debug
+      `(progn ,@body)))
+
+(qz/debug- (message "yo"))
+#+end_src
+
+#+RESULTS:
+: yo
+**** demo ;; what is happening here? why is message evaluated
+#+begin_src emacs-lisp :tangle no
+(view-echo-area-messages)
+(setq qz/debug 0)
+(qz/debug- (message "offffff"))
+(setq qz/debug 1)
+(qz/debug- (message "on"))
+#+end_src
+
+#+RESULTS:
+: on
+*** newstore
+
+#+begin_src emacs-lisp :noweb-ref general
+(setq qz/newstore-envs '(sandbox staging production)
+      qz/newstore-env-current nil
+      qz/newstore-envs-abbrev '((sandbox . x) (staging . s) (production . p))
+      qz/newstore-tenant-current nil
+      qz/newstore-tenants '("dodici" "windsor"
+                            "boardriders" "marine-layer"
+                            "frankandoak" "vince"))
+
+(defun qz/newstore-choose-env (&optional env)
+  (interactive)
+  (message "qz/newstore-env-current: %s"
+           (setq qz/newstore-env-current
+                 (or env (completing-read "env: " qz/newstore-envs))))
+  (qz/restclient-choose-env qz/newstore-env-current)
+  (qz/es-choose-url nil nil qz/newstore-env-current))
+
+(defun qz/newstore-choose-tenant (&optional tenant)
+  (interactive)
+  (message "qz/newstore-tenant-current: %s"
+           (setq qz/newstore-tenant-current
+                 (or tenant (completing-read "tenant: " qz/newstore-tenants))))
+  (qz/restclient-choose-tenant qz/newstore-tenant-current))
+
+(defun qz/newstore-auth-current ()
+  (message "qz/newstore-auth-cache: <for qz/newstore-env-current: %s>"
+           qz/newstore-env-current)
+  (setq qz/newstore-auth-cache
+        (qz/newstore-auth qz/newstore-env-current)))
+
+(defun qz/newstore-auth (env)
+  "get the auth (password) associated with
+a given `env' from `qz/newstore/envs'
+
+to populate, just fill a `pass' entry like so echo mypass | pass
+  insert -e newstore/production"
+  (s-trim (shell-command-to-string
+           (format "pass newstore/%s" env))))
+
+(defun qz/newstore-quick-auth ()
+  (interactive)
+  (qz/newstore-choose-tenant)
+  (qz/newstore-choose-env)
+  (org-sbe "newstore-token"))
+#+end_src
+
+#+RESULTS:
+: qz/newstore-quick-auth
+
+*** revert-buffer-no-confirm                                         :func:
+- :: http://www.emacswiki.org/emacs-en/download/misc-cmds.el
+
+#+begin_src emacs-lisp :noweb-ref general
+(defun qz/revert-buffer-no-confirm ()
+  "Revert buffer without confirmation."
+  (interactive)
+  (revert-buffer :ignore-auto :noconfirm))
+#+end_src
+*** yq-interactively
+#+begin_src emacs-lisp :noweb-ref conf
+(defun qz/yq-interactively ()
+  "haha yaml loophole"
+  (interactive)
+  (let ((jq-interactive-command "yq"))
+    (call-interactively 'jq-interactively)))
+#+end_src
+
+#+RESULTS:
+: qz/yq-interactively
+** hyperbole
+#+begin_src emacs-lisp :noweb-ref conf
+(require 'hyperbole)
+#+end_src
+** [[id:6baf4bff-d5fe-4ce0-a130-0464e49de67d][org]]
+*** agenda
+**** [[id:ec8b00b4-3bd3-458c-9777-d2581c0f6fd5][agenda-files-update]]
+#+begin_src emacs-lisp :noweb-ref agenda
+(defun qz/files-agenda ()
+  (seq-uniq (append qz/org-agenda-files (qz/project-files))))
+
+(defun qz/agenda-files-update (&rest _)
+  "Update the value of `org-agenda-files' with relevant candidates"
+  (interactive)
+  (setq org-agenda-files (qz/files-agenda)
+        qz/agenda-daily-files (qz/agenda-daily-files-f)))
+#+end_src
+
+#+RESULTS:
+: qz/agenda-files-update
+
+**** custom commands
+
+***** g ; GTD
+#+begin_src emacs-lisp :noweb-ref agenda
+(defun qz/org-agenda-gtd ()
+  (interactive)
+  (org-agenda nil "g")
+  (goto-char (point-min))
+  (org-agenda-goto-today))
+
+(setq org-agenda-custom-commands nil)
+
+(add-to-list
+ 'org-agenda-custom-commands
+ `("g" "GTD"
+   ((agenda "" ((org-agenda-span 'day) (org-deadline-warning-days 60)))
+    (tags-todo "now"
+               ((org-agenda-overriding-header "now")))
+    (tags-todo "wip"
+               ((org-agenda-overriding-header "wip")))
+    (todo "TODO"
+          ((org-agenda-overriding-header "to process")
+           (org-agenda-files '(,(format "%s/%s" org-roam-directory "inbox.org")))))
+    (todo "TODO"
+          ((org-agenda-overriding-header "daily inbox")
+           (org-agenda-files qz/agenda-daily-files)))
+    (todo "TODO"
+          ((org-agenda-overriding-header "emails")
+           (org-agenda-files '(,(format "%s/%s" org-roam-directory "emails.org")))))
+    (todo "TODO"
+          ((org-agenda-overriding-header "one-off Tasks")
+           (org-agenda-files '(,(format "%s/%s" org-roam-directory "next.org")))))
+    (todo "TODO"
+          ((org-agenda-overriding-header "to yak shave")
+           (org-agenda-files '(,(format "%s/%s" org-roam-directory "emacs.org"))))))))
+
+                                        ;(qz/pprint org-agenda-custom-commands)
+#+end_src
+
+#+RESULTS:
+| g | GTD | ((agenda  ((org-agenda-span 'day) (org-deadline-warning-days 60))) (tags-todo now ((org-agenda-overriding-header now))) (tags-todo wip ((org-agenda-overriding-header wip))) (todo TODO ((org-agenda-overriding-header to process) (org-agenda-files '(~/life//roam/inbox.org)))) (todo TODO ((org-agenda-overriding-header daily inbox) (org-agenda-files qz/agenda-daily-files))) (todo TODO ((org-agenda-overriding-header emails) (org-agenda-files '(~/life//roam/emails.org)))) (todo TODO ((org-agenda-overriding-header one-off Tasks) (org-agenda-files '(~/life//roam/next.org)))) (todo TODO ((org-agenda-overriding-header to yak shave) (org-agenda-files '(~/life//roam/emacs.org))))) |
+
+**** [[id:9b0676a9-93d3-4449-ac82-721d4e20d4d6][daily-files]] :func:var:
+#+begin_src emacs-lisp :noweb-ref agenda
+(setq qz/daily-title-regexp ".?[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.?")
+
+(defun qz/agenda-daily-files-f ()
+  (seq-filter (lambda (s) (string-match qz/daily-title-regexp s))
+              org-agenda-files))
+#+end_src
+
+#+RESULTS:
+: qz/agenda-daily-files-f
+
+**** noweb tangler
+#+begin_src emacs-lisp :noweb yes :noweb-ref org
+
+;; NOWEB AGENDA START
+<<agenda>>
+;; NOWEB AGENDA END
+
+#+end_src
+
+**** [[id:cb81cfd7-fb16-4965-af20-69129cf4fd97][project-files]]
+#+begin_src emacs-lisp :noweb-ref agenda
+(defun qz/project-files ()
+  "Return a list of note files containing Project tag."
+  (seq-map
+   'car
+   (org-roam-db-query
+    '(:select :distinct file
+              :from tags
+              :inner :join nodes
+              :on (= tags:node_id nodes:id)
+              :where (= tags:tag "project")))))
+#+end_src
+
+#+RESULTS:
+: qz/project-files
+
+**** settings
+***** org-agenda-files
+#+begin_src emacs-lisp :noweb-ref agenda
+(setq qz/org-agenda-files
+      (mapcar (lambda (f) (expand-file-name (format "%s/%s" org-roam-directory f)))
+              '("calendar-home.org" "calendar-work.org" "schedule.org")))
+#+end_src
+
+#+RESULTS:
+| /home/samuel/life/roam/calendar-home.org | /home/samuel/life/roam/calendar-work.org | /home/samuel/life/roam/schedule.org |
+
+**** visual
+***** vulpea's category agenda refinement :org:
+#+begin_src emacs-lisp :noweb-ref agenda
+(setq qz/org-agenda-prefix-length 20
+      org-agenda-prefix-format nil)
+;; '((agenda . " %i Emacs Configuration %?-12t% s")
+;;   (todo . " %i Emacs Configuration  ")
+;;   (tags . " %i Emacs Configuration  ")
+;;   (search . " %i Emacs Configuration  "))
+
+(defun vulpea-agenda-category (&optional len)
+  "Get category of item at point for agenda.
+
+Category is defined by one of the following items:
+- CATEGORY property
+- TITLE keyword
+- TITLE property
+- filename without directory and extension
+
+When LEN is a number, resulting string is padded right with
+spaces and then truncated with ... on the right if result is
+longer than LEN.
+
+Usage example:
+
+  (setq org-agenda-prefix-format
+        '((agenda . \" Emacs Configuration %?-12t %12s\")))
+
+Refer to `org-agenda-prefix-format' for more information."
+  (let* ((file-name (when buffer-file-name
+                      (file-name-sans-extension
+                       (file-name-nondirectory buffer-file-name))))
+         (title (qz/node-title))
+         (category (org-get-category))
+         (result
+          (or (if (and
+                   title
+                   (string-equal category file-name))
+                  title
+                category)
+              "")))
+    (if (numberp len)
+        (s-truncate len (s-pad-right len " " result))
+      result)))
+#+end_src
+
+#+RESULTS:
+: ((agenda .  %i Emacs Configuration %?-12t% s) (todo .  %i Emacs Configuration  ) (tags .  %i Emacs Configuration  ) (search .  %i Emacs Configuration  ))
+
+*** [[id:0213945d-cba5-4dd0-812c-9c01d6f51148][babel]]
+**** src options                                                     :var:
+#+begin_src emacs-lisp :noweb-ref org
+(setq org-confirm-babel-evaluate nil)
+(setq org-structure-template-alist
+      '(;; yp
+        ("d"  . "definition")
+        ("ee" . "example")
+        ("es" . "src es")
+        ("el" . "src emacs-lisp")
+        ("q"  . "quote")
+        ("sb" . "src shell")
+        ("se" . "src emacs-lisp")
+        ("sl" . "src scheme")
+        ("sp" . "src sql :engine postgres")
+        ("sr" . "src R")
+        ("ss" . "src")
+        ("jp" . "src jupyter-python")
+        ("jr" . "src jupyter-R")
+        ("r"  . "src restclient")))
+#+end_src
+
+#+RESULTS:
+: ((d . definition) (ee . example) (es . src es) (el . src emacs-lisp) (q . quote) (sb . src shell) (se . src emacs-lisp) (sl . src scheme) (sp . src sql :engine postgres) (sr . src R) (ss . src) (jp . src jupyter-python) (jr . src jupyter-R) (r . src restclient))
+
+**** do-load-languages
+fuck the speed my man; {M-x load-library RET ob-} is so annoying
+#+begin_src emacs-lisp :noweb-ref org
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (lisp . t)
+   ;;(jupyter . t)
+   (python . t)
+   ;;(ipython . t)
+   (scheme . t)
+   (sql . t)
+   ;;(plant-uml . t)
+   (shell . t)
+   (elasticsearch . t)
+   (restclient . t)
+   (R . t)))
+#+end_src
+
+#+RESULTS:
+
+**** library of babel
+CREATED: <2021-11-29 Mon>
+
+***** ingest-files                                             :var:func:
+CREATED: <2021-11-29 Mon>
+
+#+begin_src emacs-lisp :noweb-ref org
+(with-eval-after-load 'org-roam
+
+  (defvar qz/org-babel-lob-ingest-files
+    (list (org-roam-node-file (org-roam-node-from-title-or-alias "NewStore")))
+    "files from which named `src' blocks should be loaded")
+
+  (defun qz/org-babel-do-lob-ingest-files (&optional files)
+    (interactive)
+    (mapcar (lambda (f) (org-babel-lob-ingest f))
+            (append qz/org-babel-lob-ingest-files files)))
+
+  (qz/org-babel-do-lob-ingest-files))
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-do-lob-ingest-files
+
+***** choose babel block                                           :func:
+CREATED: <2021-11-29 Mo>n
+
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-babel-choose-block (&optional lob)
+  "choose block, insert scaffold for args.
+
+might honestly be better to generate `yas' template when we load
+blocks with `qz/org-babel-do-lob-ingest-files', but I've never used
+yas so idk"
+  (interactive)
+  (let ((lob (or lob
+                 (intern (completing-read
+                          "lob: " (mapcar 'car org-babel-library-of-babel))))))
+    (with-current-buffer (current-buffer)
+      (end-of-line)
+      (newline)
+      (insert (format "#+name: call-%s\n#+call: %s" lob lob))
+
+      (when-let
+          ((args (remove
+                  nil (cl-loop for a in (assoc lob org-babel-library-of-babel)
+                               append
+                               (when (listp a)
+                                 (cl-loop for b in a
+                                          collect
+                                          (when (eq :var (car b)) (cdr b))))))))
+        (message "%s" args)
+        (insert (format "(%s)" (s-join ", " args)))))))
+
+;;(qz/org-babel-choose-block 'newstore-get-order-by-type)
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-choose-block
+
+***** {M-l} bind choose-babel-block to insert convention            :kbd:
+CREATED: <2021-11-29 Mon>
+
+#+begin_src emacs-lisp :noweb-ref org
+(define-key org-babel-map (kbd "M-l") 'qz/org-babel-choose-block)
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-choose-block
+
+**** helpers
+***** make-table-constants                                     :func:kbd:
+#+begin_src emacs-lisp
+(defun qz/org-babel-make-table-constants ()
+  "exec from the top of a tree"
+  (interactive)
+  (let* ((hi-lock-auto-select-face t)
+         ;; above is 100x better when you patch `hi-lock-face-symbol-at-point'
+         ;; with `(or (and hi-lock-auto-select-face (hi-lock-read-face-name)) 'hi-yellow)'
+         (col '()))
+    (save-excursion
+      (org-map-tree
+       (lambda ()
+         (when-let* ((s (and (message "wtf") (org-get-heading)))
+                     (s (org-no-properties s))
+                     (i (string-match ":" s))
+                     (k (substring s 0 i))
+                     (v (substring s (+ 2 i))))
+           (message "key: %s" k)
+           (message "value: %s" v)
+           (message "col: %s" col)
+           (setq col (cons (format "%s=%s" k v) col))
+           (funcall-interactively 'highlight-phrase v))))
+      (org-back-to-heading)
+      (next-line)
+      (newline)
+      (previous-line)
+      (insert (format "#+constants: %s" (s-join " " (reverse col)))))
+    col))
+
+(define-key org-babel-map (kbd "M-d") 'qz/org-babel-make-table-constants)
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-make-table-constants
+
+
+
+
+***** list->rows                                                   :func:
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-babel--list->rows (name lst)
+  (cons (list name)
+        (cons 'hline (mapcar 'list lst))))
+#+end_src
+
+#+RESULTS:
+: qz/org-babel--list->rows
+
+*** capture
+**** helpers                                                        :func:
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-inbox-capture ()
+  (interactive)
+  "Capture a task in agenda mode."
+  (org-capture nil "i"))
+#+end_src
+
+**** templates
+these are regular [[id:6baf4bff-d5fe-4ce0-a130-0464e49de67d][org-mode]] capture templates, but we will defer to
+org-roam loading, as we use it's variables.
+- :: 'org-roam-directory
+- :: 'org-roam-dailies-directory
+
+#+begin_src emacs-lisp :noweb yes :noweb-ref roam
+;; [[file:~/.doom.d/config.org::*templates][templates]]
+(setq org-capture-templates
+      `(("i" "inbox" entry
+         (file ,(concat org-agenda-directory "/inbox.org"))
+         "* TODO %? \nCREATED: %u\nFROM: %a")
+        ;; spanish language capturing
+        ("v" "vocab; spanish" entry
+         (file+headline ,(concat org-roam-directory "/spanish_language.org") "vocab, phrases")
+         ,(s-join "\n" '("** \"%?\" :es:"
+                         "FROM: %a" ""
+                         "*** :en:" "")))
+        ;; capture link to live `org-roam' thing
+        ("n" "now, as in NOW" entry (file ,(concat org-agenda-directory "/wip.org"))
+         ,(s-join "\n" '("* TODO [#A1] %? "
+                         "DEADLINE: %T"
+                         "CREATED: %u")))
+        ;; fire directly into inbox
+        ("c" "org-protocol-capture" entry (file ,(concat org-agenda-directory "/inbox.org"))
+         ,(s-join "\n" '("* TODO [[%:link][%:description]]"
+                         "CREATED: %u" ""
+                         "#+begin_quote" ""
+                         "%i"
+                         "#+end_quote"))
+         :immediate-finish t)
+        ;; push last captured item into inbox
+        ("l" "last-capture" entry (file ,(concat org-agenda-directory "/inbox.org"))
+         (function qz/inbox-last-captured)
+         :immediate-finish t)
+        ("I" "current-roam" entry (file ,(concat org-agenda-directory "inbox.org"))
+         (function qz/current-roam-link)
+         :immediate-finish t)
+        ("w" "weekly review" entry
+         (file+datetree ,(concat org-agenda-directory "reviews.org"))
+         (file ,(concat org-agenda-directory "templates/weekly_review.org")))))
+
+
+
+
+;; [[file:~/.doom.d/config.org::*capture templates][roam capture templates]]
+
+         #+end_src
+
+#+RESULTS:
+| i | inbox | entry | (file ~/life//roam/inbox.org) | * TODO %? |
+
+*** noweb tangler                                                    :meta:
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+(with-eval-after-load 'org
+  ;; NOWEB ORG START
+  <<org>>
+  ;; NOWEB ORG END
+  )
+#+end_src
+
+*** [[id:b33372ae-f731-4482-8e3a-0c5e986ac70a][roam]]
+**** capture
+***** helpers                                                      :func:
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/org-roam-capture-current ()
+  (interactive)
+  "Capture a task in agenda mode."
+  (org-capture nil "I"))
+
+(defun qz/roam-capture-todo ()
+  (interactive)
+  "Capture a task in agenda mode."
+  (cl-destructuring-bind (thing region)
+      (qz/thing-at-point-or-region-and-region)
+    (org-roam-capture- :goto t
+                       :keys "n"
+                       :node (org-roam-node-create :title thing)
+                       :props `(:immediate-finish t :jump-to-captured nil
+                                                  :region ,region     :insert-at ,(point-marker)
+                                                  :finalize 'insert-link))
+    (qz/capture-last-captured)))
+#+end_src
+
+***** templates                                                     :var:
+#+begin_src emacs-lisp :noweb yes :noweb-ref roam
+(setq qz/org-roam-capture-head "#+title: ${title}\n")
+(setq qz/capture-title-timestamp-roam "20210813T161035Z-${slug}.org")
+(setq org-roam-capture-templates
+      `(("d" "default" plain "%?"
+         :if-new (file+head ,qz/capture-title-timestamp-roam
+                            ,qz/org-roam-capture-head)
+         :unnarrowed t)
+        ("n" "empty" plain "%?"
+         :if-new (file+head ,qz/capture-title-timestamp-roam
+                            ,qz/org-roam-capture-head)
+         :immediate-finish t)
+        ))
+#+end_src
+
+**** dailies
+***** capture                                                       :var:
+****** templates
+#+begin_src emacs-lisp :noweb-ref roam
+(setq org-roam-dailies-capture-templates
+      `(("d" "default" entry
+         ,(s-join "\n" '("* [%<%H:%M>] %?"
+                         "CREATED: <%<%Y-%m-%d %H:%M>>"
+                         "FROM: %a"))
+         :if-new (file+head+olp
+                  ,qz/org-roam-dailies-filespec
+                  ,(s-join "\n" '("#+title: <%<%Y-%m-%d>>"
+                                  "#+filetags: daily private project" ""
+                                  "%(qz/today-dateref)" ""
+
+                                  "* today, I will"))
+                  ("journal")))))
+
+(setq qz/org-roam-dailies-capture-templates--tangent
+      '("d" "default" entry
+        ,(s-join "\n" '("* TANGENT [%<%H:%M>] %?"
+                        "CREATED: <%<%Y-%m-%d %H:%M>>"
+                        "FROM: %a"))
+        :if-new (file+head+olp
+                 ,qz/org-roam-dailies-filespec
+                 ,(s-join "\n" '("#+title: <%<%Y-%m-%d>>"
+                                 "#+filetags: daily private project" ""
+                                 "%(qz/today-dateref)" ""
+                                 "* today, I will"
+                                 "* journal"
+                                 "* tangent"))
+                 ("tangent"))))
+#+end_src
+
+#+RESULTS:
+| d | default | entry | (, (s-join |
+
+****** helpers
+******* day-lookup                                                :var:
+;;; day lookup
+(defvar qz/day-lookup
+'((Mon . "[[id:d5ad0bac-e82b-43d0-960f-26eeb1daf91b][Monday]]")
+(Tue . "[[id:cb662cc6-bde2-4f9c-b3fa-62346c6df27a][Tuesday]]")
+(Wed . "[[id:411a8e5a-8d89-4886-b2ea-047a3970710a][Wednesday]]")
+(Thu . "[[id:659b9931-ae09-422b-8e91-1bf4cc58e94c][Thursday]]")
+(Fri . "[[id:b3255cd1-db37-4e07-99cf-5e60d52a2579][Friday]]")
+(Sat . "[[id:b63897c3-30cc-42eb-83b5-c8e372e5af9a][Saturday]]")
+(Sun . "[[id:2e28574b-4793-4c05-b83d-e36e9a77515b][Sunday]]"))
+"an index; get days from abbrev (assoc 'Mon qz/day-lookup)")
+******* month-lookup                                              :var:
+(defvar qz/month-lookup
+'("[[id:b92355d7-110e-467c-b7a7-d02b2043af3f][January]]"
+"[[id:7e0af966-8d3e-4e88-b53f-d074902e175a][February]]"
+"[[id:f41751f8-a2a9-4b38-ba03-2ceec2fae4cc][March]]"
+"[[id:ae0ae458-2216-4178-8073-4a26f23747d9][April]]"
+"[[id:6a680100-e842-4257-819f-8cf6cbedddbc][May]]"
+"[[id:f811621c-1b37-43f7-9d01-52bdf9f27637][June]]"
+"[[id:a4d5c8fe-3910-4483-b59e-ce50cd6699a7][July]]"
+"[[id:94e9b0a7-6cd0-4104-821e-613876fe76e3][August]]"
+"[[id:f9ad8160-cae5-4195-a85f-0160710ce8dd][September]]"
+"[[id:da9f0d53-e3f7-4f72-bc1a-d060bc2d1745][October]]"
+"[[id:a4e3a97a-dac9-4bc6-a5e9-5949f707a6de][November]]"
+"[[id:f874ca1a-0d3f-4840-8340-511ed0ac286f][December]]")
+"an index; get days from abbrev (nth 0 qz/month-lookup)")
+******* today-dateref                                            :func:
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/today-dateref (&optional time)
+  (cl-destructuring-bind (day nday month year)
+      (split-string
+       (format-time-string "%a:%d:%m:%Y" (or nil (current-time))) ":")
+    (format "%s %s %s, %s"
+            (cdr (assoc (intern day) qz/day-lookup))
+            nday
+            (nth (- (string-to-number month) 1) qz/month-lookup)
+            (or (if-let ((node (org-roam-node-from-title-or-alias year)))
+                    (org-link-make-string
+                     (concat "id:" (org-roam-node-id node))
+                     (org-roam-node-title node)))
+                year))))
+#+end_src
+******* daily-tangent-capture[fn:1]                              :func:
+so we can use it as a COMMAND. better traceability than a lambda
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/org-daily-tangent-capture ()
+  (interactive)
+  "Capture the inevitable tangent"
+  (org-capture nil "t"))
+#+end_src
+
+#+RESULTS:
+: qz/org-daily-tangent-capture
+******* today-as-dailies-file
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/today-as-daily-file ()
+  (format-time-string "private-%Y-%m-%d.org"))
+#+end_src
+
+***** dailies-filespec                                              :var:
+#+begin_src emacs-lisp :noweb-ref roam-hoist
+(setq qz/org-roam-dailies-filespec "private-%<%Y-%m-%d>.org")
+#+end_src
+
+#+RESULTS:
+: private-%<%Y-%m-%d>.org
+
+**** helpers
+***** current-roam-link
+#+begin_src emacs-lisp :noweb-ref roam
+;; [[file:~/.doom.d/config.org::*capture convenience functions][capture convenience functions]]
+(defun qz/current-roam-link ()
+  "Get link to org-roam file with title"
+  (interactive)
+  (concat "* TODO "
+          (let ((n (qz/org-roam-node-at-point)))
+            (org-link-make-string
+             (concat "id:" (org-roam-node-id n))
+             (org-roam-node-title n)))))
+#+end_src
+
+****** TODO rename this to ~qz/roam-current-node-as-link~
+
+**** noweb tangler                                                  :meta:
+#+begin_src emacs-lisp :noweb yes :noweb-ref org
+(with-eval-after-load 'org-roam
+  ;; NOWEB ROAM START
+  <<roam-hoist>>
+  <<roam>>
+  ;; NOWEB ROAM END
+  )
+#+end_src
+**** protocol (ref)
+***** capture                                                       :var:
+****** templates
+#+begin_src emacs-lisp :noweb yes :noweb-ref roam
+;;; ref capture
+(setq org-roam-capture-ref-templates
+      `(("r" "ref" plain
+         "%?"
+         :if-new (file+head ,qz/capture-title-timestamp-roam
+                            "#+title: ${title}\n")
+         :unnarrowed t)))
+#+end_src
+
+#+RESULTS:
+| r | ref | plain | %? | :if-new | (file+head 20210813T161035Z-${slug}.org #+title: ${title} |
+
+*** settings
+**** org-confirm-babel-evaluate; don't ask                           :var:
+#+begin_src emacs-lisp :noweb yes :noweb-ref org
+(setq org-confirm-babel-evaluate nil)
+#+end_src
+
+**** org-refile-targets                                              :var:
+#+begin_src emacs-lisp :noweb yes :noweb-ref org
+;; [[file:~/.doom.d/config.org::*refile][refile]]
+(setq org-refile-targets '(("reading.org" :level . 0)
+                           ("emacs.org" :level . 0)
+                           ("watching.org" :level . 0)
+                           ("learning.org" :level . 0)
+                           ("inbox.org" :level . 0)
+                           ("sample.org" :level . 0)
+                           ("wip.org" :level . 0)))
+#+end_src
+
+*** tag
+
+**** [[id:26b5040b-0883-444f-af7a-abd4e1d67c0e][my thoughts]]
+
+I'm using tags and auto-tags rather sporadically
+- person
+- private
+- daily
+
+***** TODO tag analysis (file | -> headline) ; [[id:3ec0367f-9ff5-419d-9a44-a3424656c1eb][org-roam database machinations]]
+**** org-tag-alist                                                   :var:
+CREATED: <2021-12-07 Tue 14:13>
+
+#+begin_src emacs-lisp
+(setq org-tag-alist
+      '(("@errand" . ?e)
+        ("@work" . ?w)
+        ("@home" . ?h)
+        ("@blog" . ?B)
+        (:newline)
+        ("emacs" . ?E)
+        ("task" . ?t)
+        ("CANCELLED" . ?C)
+        (:newline)
+        ("learning" . ?l)
+        ("research" . ?r)
+        (:newline)
+        ("book" . ?b)
+        ("article" . ?a)
+        ("paper" . ?p)
+        ("talk" . ?t)
+        ("film" . ?f)))
+#+end_src
+
+#+RESULTS:
+: ((@errand . 101) (@work . 119) (@home . 104) (@blog . 66) (:newline) (emacs . 69) (task . 116) (CANCELLED . 67) (:newline) (learning . 108) (research . 114) (:newline) (book . 98) (article . 97) (paper . 112) (talk . 116) (film . 102))
+
+** pdf-view
+*** midnight-minor-mode ; dark-mode filter on pdfs
+#+begin_src emacs-lisp :noweb-ref conf
+(with-eval-after-load 'pdf-view
+  (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode))
+#+end_src
+
+** restclient
+*** choose
+**** restclient-choose-env
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/restclient-environment nil)
+
+(defun qz/restclient-choose-env (&optional env)
+  (interactive)
+  (message "qz/restclient-env: %s"
+           (setq qz/restclient-env
+                 (cdr (assoc (intern (or env
+                                         (completing-read "restclient-env: " qz/newstore-envs)))
+                             qz/newstore-envs-abbrev))))
+  qz/restclient-env)
+#+end_src
+
+#+RESULTS:
+: qz/restclient-choose-env
+
+**** restclient-choose-tenant
+#+begin_src emacs-lisp :noweb-ref es
+(defvar qz/restclient-tenant nil)
+
+(defun qz/restclient-choose-tenant (&optional tenant)
+  (interactive)
+  (message "qz/restclient-tenant: %s"
+           (setq qz/restclient-tenant
+                 (or tenant (completing-read
+                             "restclient-tenant: " qz/newstore-tenants))))
+  qz/restclient-tenant)
+#+end_src
+
+#+RESULTS:
+: qz/restclient-choose-tenant
+
+*** token
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/restclient-token nil)
+(defvar qz/restclient-token-field 'access_token)
+
+(defun qz/restclient-hook ()
+  "Update token from a request."
+  ;; url is visible while the hook is running.
+  (let ((result))
+    (save-excursion
+      (cond
+       ((string-suffix-p "/token" url)
+        (condition-case nil
+            (progn
+              (setq result (cdr (assoc qz/restclient-token-field (json-read))))
+              (when (stringp result)
+                (progn
+                  (setq qz/restclient-token result)
+                  (message (concat "stored token: " qz/restclient-token)))))
+          (error (message "That wasn't cleanly handled."))))))))
+
+(add-hook 'restclient-response-loaded-hook 'qz/restclient-hook)
+(provide 'restclient-hooks)
+#+end_src
+
+#+RESULTS:
+: restclient-hooks
+
+** system commands
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+(defun qz/get-mail ()
+  (interactive)
+  (async-shell-command "mbsync -Va && notmuch new"))
+
+(defun qz/reload-config-home ()
+  (interactive)
+  (async-shell-command
+   (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
+           "&& make ixy-home-reconfigure")))
+
+(defun qz/reload-config-system ()
+  (interactive)
+  (async-shell-command
+   (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
+           "&& sudo -E make ixy-system-reconfigure")))
+
+(defun qz/reload-config-emacs ()
+  (interactive)
+  (load-file "~/.config/emacs/init.el"))
+
+(defun qz/reload-guix-pins ()
+  (interactive)
+  (async-shell-command
+   (concat "cd $HOME/git/sys/rde/ "
+           "&& make channels-update-lock && make channels-pull")))
+
+(defun qz/guix-upgrade ()
+  (interactive)
+  (async-shell-command
+   (concat "cd $HOME/git/sys/rde"
+           "&& make channels-update-lock && make channels-pull && guix upgrade && make")))
+#+end_src
+
+#+RESULTS:
+: qz/guix-upgrade
+
+** [[id:fbfebc6c-8732-4646-85da-96345218116e][tramp]]
+*** tramp-cache-read-persistent-data ; yes please
+#+begin_src emacs-lisp :noweb-ref conf
+(setq tramp-cache-read-persistent-data t)
+#+end_src
+
+#+RESULTS:
+: t
+** visual
+*** [[id:c6490b3a-4dc3-4f9a-bb21-81bb6abc6beb][emacs-perfect-margin]]
+#+begin_src emacs-lisp :noweb-ref conf
+(require 'perfect-margin)
+
+(perfect-margin-mode 1)
+(setq perfect-margin-ignore-regexps nil
+      perfect-margin-ignore-filters nil)
+#+end_src
+*** cursor
+#+begin_src emacs-lisp :noweb-ref conf
+(custom-set-variables
+ '(cursor-type 'hbar))
+#+end_src
+*** hi-lock
+
+I believe that when 'hi-lock-auto-select-face is non-nil, this should
+cycle colors automatically.
+
+#+begin_src emacs-lisp :noweb-ref conf
+(defun hi-lock-face-symbol-at-point ()
+  "Highlight each instance of the symbol at point.
+Uses the next face from `hi-lock-face-defaults' without prompting,
+unless you use a prefix argument.
+Uses `find-tag-default-as-symbol-regexp' to retrieve the symbol at point.
+
+If REGEXP contains upper case characters (excluding those preceded by `\\')
+and `search-upper-case' is non-nil, the matching is case-sensitive.
+
+This uses Font lock mode if it is enabled; otherwise it uses overlays,
+in which case the highlighting will not update as you type.  The Font
+Lock mode is considered \"enabled\" in a buffer if its `major-mode'
+causes `font-lock-specified-p' to return non-nil, which means
+the major mode specifies support for Font Lock."
+  (interactive)
+  (let* ((regexp (hi-lock-regexp-okay
+                  (find-tag-default-as-symbol-regexp)))
+         (hi-lock-auto-select-face t)
+         (face (hi-lock-read-face-name)))
+    (or (facep face)
+        (setq face (or (and hi-lock-auto-select-face (hi-lock-read-face-name))
+                       'hi-yellow)))
+    (unless hi-lock-mode (hi-lock-mode 1))
+    (hi-lock-set-pattern
+     regexp face nil nil
+     (if (and case-fold-search search-upper-case)
+         (isearch-no-upper-case-p regexp t)
+       case-fold-search))))
+#+end_src
+
+#+RESULTS:
+: hi-lock-face-symbol-at-point
+
+** wiki
+*** col-highlight.el
+#+begin_src emacs-lisp :tangle no
+;;; col-highlight.el --- Highlight the current column.
+;;
+;; Filename: col-highlight.el
+;; Description: Highlight the current column.
+;; Author: Drew Adams
+;; Maintainer: Drew Adams (concat "drew.adams" "@" "oracle" ".com")
+;; Copyright (C) 2006-2018, Drew Adams, all rights reserved.
+;; Created: Fri Sep 08 11:06:35 2006
+;; Version: 0
+;; Package-Requires: ((vline "0"))
+;; Last-Updated: Mon Jan  1 10:17:48 2018 (-0800)
+;;           By: dradams
+;;     Update #: 446
+;; URL: https://www.emacswiki.org/emacs/download/col-highlight.el
+;; Doc URL: https://emacswiki.org/emacs/HighlightCurrentColumn
+;; Keywords: faces, frames, emulation, highlight, cursor, accessibility
+;; Compatibility: GNU Emacs: 22.x, 23.x, 24.x, 25.x, 26.x
+;;
+;; Features that might be required by this library:
+;;
+;;   `vline'.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Commentary:
+;;
+;;  This library highlights the current column.  When you move the
+;;  cursor, the highlighting follows (tracks the cursor), as long as
+;;  the highlighting stays on.
+;;
+;;  Command `column-highlight-mode' toggles this highlighting on and
+;;  off.
+;;
+;;  If you use `column-highlight-mode' twice in succession (I bind it
+;;  to `C-+'), you can flash the highlighting to show you the current
+;;  column temporarily.  An alternative way to flash-highlight is to
+;;  use command `flash-column-highlight' (once).  It shows the
+;;  highlighting for just a second or two (see option
+;;  `col-highlight-period').
+;;
+;;  You can also have current-column highlighting come on
+;;  automatically, when Emacs is idle.  Command
+;;  `toggle-highlight-column-when-idle' toggles this mode.  Command
+;;  `col-highlight-set-interval' changes the number of idle seconds to
+;;  wait before highlighting.
+;;
+;;  You can use option `col-highlight-overlay-priority' to make the
+;;  vline (i.e., column) highlighting appear on top of other overlay
+;;  highlighting that might exist.
+;;
+;;  You can use option `col-highlight-show-only' to restrict
+;;  current-column highlighting to a section of text of a particular
+;;  kind: paragaph, sentence, page, defun, etc.
+;;
+;;
+;;  To use this file, you must also have library `vline.el'.
+;;  Put this in your Emacs init file (~/.emacs):
+;;
+;;    (require 'col-highlight) ; Load this file (and `vline')
+;;
+;;  If you want to turn on continual current-column highlighting by
+;;  default, then add this to your init file:
+;;
+;;    (column-highlight-mode 1)
+;;
+;;  If you want to turn on automatic idle highlighting of the current
+;;  column, then add this to your init file:
+;;
+;;    (toggle-highlight-column-when-idle 1)
+;;
+;;  If you want to use a different wait interval, before idle
+;;  highlighting begins, then set it in your init file using
+;;  `col-highlight-set-interval':
+;;
+;;    (col-highlight-set-interval 6) ; Wait 6 idle secs.
+;;
+;;  Note that `column-highlight-mode' is intentionally a global minor
+;;  mode.  If you want a local minor mode, so that highlighting
+;;  affects only a particular buffer, you can use `vline-mode' (in
+;;  `vline.el').
+;;
+;;
+;;  See also:
+;;
+;;  * Library `hl-line+.el', which offers the same functionality, but
+;;    for the current line instead of the current column.
+;;
+;;  * Library `crosshairs.el', which combines the features of
+;;    `col-highlight.el' and `hl-line+.el', providing a crosshair
+;;    highlighting effect.  It requires `col-highlight.el' and
+;;    `hl-line+.el'.
+;;
+;;  * Library `cursor-chg.el' or library `oneonone.el', to change the
+;;    cursor type when Emacs is idle.
+;;
+;;  User options defined here:
+;;
+;;    `col-highlight-period', `column-highlight-mode',
+;;    `col-highlight-overlay-priority', `col-highlight-show-only',
+;;    `col-highlight-vline-face-flag'.
+;;
+;;  Faces defined here:
+;;
+;;    `col-highlight'.
+;;
+;;  Commands defined here:
+;;
+;;    `col-highlight-flash', `col-highlight-set-interval',
+;;    `col-highlight-toggle-when-idle', `column-highlight-mode',
+;;    `flash-column-highlight', `toggle-highlight-column-when-idle'.
+;;
+;;  Non-interactive functions defined here:
+;;
+;;    `col-highlight-highlight', `col-highlight-unhighlight'.
+;;
+;;  Internal variables defined here:
+;;
+;;    `col-highlight-face', `col-highlight-idle-interval',
+;;    `col-highlight-idle-timer', `col-highlight-when-idle-p'.
+;;
+;;
+;;  ***** NOTE: The following function defined in `vline.el' has
+;;              been REDEFINED HERE:
+;;
+;;    `vline-show' - Respect options `col-highlight-overlay-priority'
+;;                   and `col-highlight-show-only'.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Change Log:
+;;
+;; 2017/05/10 dadams
+;;     vline-show: Wrap arg to make-string with abs.  Not a fix, but bypasses error from not
+;;                 handling SPC char with display property value of (space :align-to N).
+;; 2013/08/08 dadams
+;;     Added: col-highlight-show-only, redefinition of vline-show.
+;;     Removed defadvice of vline-show (replaced by redefinition).
+;; 2012/12/25 dadams
+;;     Added Package-Requires.
+;; 2012/05/18 dadams
+;;     Added: col-highlight-overlay-priority, defadvice of vline-show.
+;; 2011/01/03 dadams
+;;     Added autoload cookies for defgroup, defcustom, defface, and commands.
+;; 2008/09/03 dadams
+;;     col-highlight-highlight: Bind vline-current-window-only to t.
+;; 2008/08/08 dadams
+;;     col-highlight-(un)highlight: Added optional arg.
+;; 2008/01/21 dadams
+;;     Use vline.el instead of column-marker.el.
+;;     Added: group column-highlight, option col-highlight-vline-face-flag.
+;;     col-highlight-toggle-when-idle: col-highlight-unhighlight when turn off.
+;;     col-highlight-flash: Use col-highlight-highlight, not mode.
+;;     col-highlight-(un)highlight: Respect col-highlight-vline-face-flag.
+;;                                  Don't highlight minibuffer.
+;;     Renamed: face col-highlight-face to col-highlight.
+;;     Removed semi-support for Emacs 20.
+;; 2006/09/08 dadams
+;;     Created.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 3, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+;; Floor, Boston, MA 02110-1301, USA.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Code:
+
+(require 'vline)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;###autoload
+(defgroup column-highlight nil
+  "Highlight the current column."
+  :prefix "col-highlight-"
+  :group 'editing :group 'cursor :group 'hl-line :group 'frames
+  :link `(url-link :tag "Send Bug Report"
+          ,(concat "mailto:" "drew.adams" "@" "oracle" ".com?subject=\
+col-highlight.el bug: \
+&body=Describe bug here, starting with `emacs -q'.  \
+Don't forget to mention your Emacs and library versions."))
+  :link '(url-link :tag "Other Libraries by Drew"
+          "https://www.emacswiki.org/emacs/DrewsElispLibraries")
+  :link '(url-link :tag "Download"
+          "https://www.emacswiki.org/emacs/download/col-highlight.el"))
+
+;;;###autoload
+(defcustom col-highlight-show-only nil
+  "Non-nil means `column-highlight-mode' affects only a section of text.
+This affects `vline-mode' also.
+
+The non-nil value determines the type of text section: paragraph,
+sentence, defun, page...
+
+The actual non-nil value is a forward movement command for the given
+section type, e.g., `forward-paragraph', `end-of-defun'."
+  :type '(choice
+          (const    :tag "All text"  nil)
+          (const    :tag "Paragraph" forward-paragraph)
+          (const    :tag "Sentence"  forward-sentence)
+          (const    :tag "Page"      forward-page)
+          (const    :tag "Defun"     end-of-defun)
+          (function :tag "Forward-thing function" :value forward-paragraph))
+  :group 'column-highlight)
+
+;;;###autoload
+(defcustom col-highlight-vline-face-flag t
+  "*Non-nil means `column-highlight-mode' uses `col-highlight-face'.
+nil means that it uses `vline-face'."
+  :type 'boolean :group 'column-highlight)
+
+;;;###autoload
+(defcustom col-highlight-period 1
+  "*Number of seconds to highlight the current column."
+  :type 'integer :group 'column-highlight)
+
+;;;###autoload
+(defcustom col-highlight-overlay-priority 300
+  "*Priority to use for overlays in `vline-overlay-table'.
+A higher priority can make the vline highlighting appear on top of
+other overlays that might exist."
+  :type '(choice
+          (const   :tag "No priority (default priority)"  nil)
+          (integer :tag "Priority"  300))
+  :group 'column-highlight)
+
+;;;###autoload
+(defface col-highlight '((t (:background "SlateGray3")))
+  "*Face for current-column highlighting by `column-highlight-mode'.
+Not used if `col-highlight-vline-face-flag' is nil."
+  :group 'column-highlight :group 'faces)
+
+(defvar col-highlight-face 'col-highlight
+  "Face used for highlighting current column.
+Do NOT change this.")
+
+(defvar col-highlight-idle-interval 5
+  "Number of seconds to wait before highlighting current column.
+Do NOT change this yourself to change the wait period; instead, use
+`\\[col-highlight-set-interval]'.")
+
+(defvar col-highlight-when-idle-p nil
+  "Non-nil means highlight the current column whenever Emacs is idle.
+Do NOT change this yourself; instead, use
+`\\[toggle-highlight-column-when-idle]'.")
+
+(defvar col-highlight-idle-timer
+  (progn                              ; Cancel to prevent duplication.
+    (when (boundp 'col-highlight-idle-timer)
+      (cancel-timer col-highlight-idle-timer))
+    (run-with-idle-timer col-highlight-idle-interval t 'col-highlight-highlight))
+  "Timer used to highlight current column whenever Emacs is idle.")
+
+;; Turn it off, by default.
+;; You must use `toggle-highlight-column-when-idle' to turn it on.
+(cancel-timer col-highlight-idle-timer)
+
+
+
+;;  REPLACE ORIGINAL `vline-show' defined in `vline.el'.
+;;
+;;  1. Respect options `col-highlight-overlay-priority' and `col-highlight-show-only'.
+;;  2. Tolerate SPC char with `display' property value (space :align-to N).
+;;
+(defun vline-show (&optional point)
+  (vline-clear)
+  (save-window-excursion
+    (save-excursion
+      (if point
+          (goto-char point)
+        (setq point  (point)))
+      (let* ((column           (vline-current-column))
+             (lcolumn          (current-column))
+             (i                0)
+             (compose-p        (memq vline-style '(compose mixed)))
+             (face-p           (memq vline-style '(face mixed)))
+             (line-char        (if compose-p vline-line-char ?\   ))
+             (line-str         (make-string 1 line-char))
+             (visual-line-str  line-str)
+             (in-fringe-p      (vline-into-fringe-p))
+             (only-beg         (and col-highlight-show-only
+                                    (condition-case nil
+                                        (save-excursion
+                                          (funcall col-highlight-show-only -1)
+                                          (point))
+                                      (error nil))))
+             (only-end         (and col-highlight-show-only
+                                    (condition-case nil
+                                        (save-excursion
+                                          (funcall col-highlight-show-only 1)
+                                          (point))
+                                      (error nil)))))
+        (when face-p
+          (setq line-str (propertize line-str 'face (vline-face nil)))
+          (setq visual-line-str  (propertize visual-line-str 'face (vline-face t))))
+        (goto-char (window-end nil t))
+        (vline-forward 0)
+        (while (and (not (bobp))
+                    (not in-fringe-p)
+                    (< i (window-height))
+                    (< i (length vline-overlay-table)))
+          (let ((cur-column   (vline-move-to-column column t))
+                (cur-lcolumn  (current-column)))
+            (unless (or (= (point) point) ; Non-cursor line only (eol workaround).
+                        (and only-beg  only-end  (or (<= (point) only-beg)
+                                                     (>= (point) only-end))))
+              (when (> cur-column column)
+                (let ((lcol  (current-column)))
+                  (backward-char)
+                  (setq cur-column  (- cur-column (- lcol (current-column))))))
+              (let* ((ovr       (aref vline-overlay-table i))
+                     (visual-p  (or (< lcolumn (current-column))
+                                    (> lcolumn (+ (current-column)
+                                                  (- column cur-column)))))
+                     ;; Consider a newline, tab and wide char.
+                     (str       (concat (make-string (abs (- column cur-column)) ?\  )
+                                        (if visual-p visual-line-str line-str)))
+                     (char      (char-after)))
+                (unless ovr
+                  (setq ovr  (make-overlay 0 0))
+                  (overlay-put ovr 'rear-nonsticky t)
+                  (aset vline-overlay-table i ovr))
+                (overlay-put ovr 'face nil)
+                (overlay-put ovr 'before-string nil)
+                (overlay-put ovr 'after-string nil)
+                (overlay-put ovr 'invisible nil)
+                (overlay-put ovr 'window (and vline-current-window-only  (selected-window)))
+                (cond ((memq char vline-multiwidth-space-list) ; Multiwidth space
+                       (setq str  (concat str (make-string (- (save-excursion (forward-char)
+                                                                              (current-column))
+                                                              (current-column)
+                                                              (string-width str))
+                                                           ?\  )))
+                       (move-overlay ovr (point) (1+ (point)))
+                       (overlay-put ovr 'invisible t)
+                       (overlay-put ovr 'after-string str))
+                      ((eolp)
+                       (move-overlay ovr (point) (point))
+                       (overlay-put ovr 'after-string str)
+                       (when (and (not truncate-lines) ; Do not expand more than window width.
+                                  (>= (1+ column) (window-width))
+                                  (>= column (vline-current-column))
+                                  (not (vline-into-fringe-p)))
+                         (delete-overlay ovr)))
+                      (t
+                       (cond (compose-p
+                              (let (str)
+                                (when char
+                                  (setq str  (compose-chars char
+                                                            (cond ((= (char-width char) 1)
+                                                                   '(tc . tc))
+                                                                  ((= cur-column column)
+                                                                   '(tc . tr))
+                                                                  (t
+                                                                   '(tc . tl)))
+                                                            line-char))
+                                  (when face-p
+                                    (setq str  (propertize str 'face (vline-face visual-p))))
+                                  (move-overlay ovr (point) (1+ (point)))
+                                  (overlay-put ovr 'invisible t)
+                                  (overlay-put ovr 'after-string str))))
+                             (face-p
+                              (move-overlay ovr (point) (1+ (point)))
+                              (overlay-put ovr 'face (vline-face visual-p))))))))
+            (setq i  (1+ i))
+            (vline-forward -1))))))
+  (mapc (lambda (ov) (when (overlayp ov) ; Set overlay priority to `col-highlight-overlay-priority'.
+                  (overlay-put ov 'priority col-highlight-overlay-priority)))
+        vline-overlay-table))
+
+;;;###autoload
+(define-minor-mode column-highlight-mode
+    "Toggle highlighting the current column.
+With ARG, turn column highlighting on if and only if ARG is positive.
+
+Column-Highlight mode uses the functions
+`col-highlight-unhighlight' and `col-highlight-highlight'
+on `pre-command-hook' and `post-command-hook'."
+  :init-value nil :global t :group 'column-highlight
+  :link `(url-link :tag "Send Bug Report"
+                   ,(concat "mailto:" "drew.adams" "@" "oracle" ".com?subject=\
+col-highlight.el bug: \
+&body=Describe bug here, starting with `emacs -q'.  \
+Don't forget to mention your Emacs and library versions."))
+  :link '(url-link :tag "Other Libraries by Drew"
+          "https://www.emacswiki.org/emacs/DrewsElispLibraries")
+  :link '(url-link :tag
+          "Download" "https://www.emacswiki.org/emacs/download/col-highlight.el")
+  :link '(url-link :tag "Description"
+          "https://www.emacswiki.org/emacs/ChangingCursorDynamically")
+  :link '(emacs-commentary-link :tag "Commentary" "col-highlight")
+  (cond (column-highlight-mode
+         (add-hook 'pre-command-hook 'col-highlight-unhighlight)
+         (add-hook 'post-command-hook 'col-highlight-highlight))
+        (t
+         (col-highlight-unhighlight)
+         (remove-hook 'pre-command-hook 'col-highlight-unhighlight)
+         (remove-hook 'post-command-hook 'col-highlight-highlight))))
+
+;;;###autoload
+(defalias 'toggle-highlight-column-when-idle 'col-highlight-toggle-when-idle)
+;;;###autoload
+(defun col-highlight-toggle-when-idle (&optional arg)
+  "Turn on or off highlighting the current column when Emacs is idle.
+With prefix argument, turn on if ARG > 0; else turn off."
+  (interactive "P")
+  (setq col-highlight-when-idle-p  (if arg
+                                       (> (prefix-numeric-value arg) 0)
+                                     (not col-highlight-when-idle-p)))
+  (cond (col-highlight-when-idle-p
+         (timer-activate-when-idle col-highlight-idle-timer)
+         (add-hook 'pre-command-hook 'col-highlight-unhighlight)
+         (message "Turned ON highlighting current column when Emacs is idle."))
+        (t
+         (cancel-timer col-highlight-idle-timer)
+         (col-highlight-unhighlight)
+         (remove-hook 'pre-command-hook 'col-highlight-unhighlight)
+         (message "Turned OFF highlighting current column when Emacs is idle."))))
+
+;;;###autoload
+(defun col-highlight-set-interval (n)
+  "Set the delay before highlighting current column when Emacs is idle.
+Whenever Emacs has been idle for N seconds, the current column is
+highlighted using the face that is the value of variable
+`col-highlight-face'.
+
+To turn on or off automatically highlighting the current column
+when Emacs is idle, use `\\[toggle-highlight-column-when-idle]."
+  (interactive
+   "nSeconds to idle, before highlighting current column: ")
+  (timer-set-idle-time col-highlight-idle-timer
+                       (setq col-highlight-idle-interval  n)
+                       t))
+
+;;;###autoload
+(defalias 'flash-column-highlight 'col-highlight-flash)
+;;;###autoload
+(defun col-highlight-flash (&optional arg)
+  "Highlight the current column for `col-highlight-period' seconds.
+With a prefix ARG, highlight for that many seconds."
+  (interactive)
+  (col-highlight-highlight)
+  (let ((column-period  col-highlight-period))
+    (when current-prefix-arg
+      (setq column-period  (prefix-numeric-value current-prefix-arg)))
+    (run-at-time column-period nil 'col-highlight-unhighlight)))
+
+(defun col-highlight-highlight (&optional minibuffer-also-p)
+  "Highlight current column.
+This has no effect in the minibuffer, unless optional arg
+MINIBUFFER-ALSO-P is non-nil."
+  (unless (and (minibufferp)  (not minibuffer-also-p))
+    (let ((vline-current-window-only  t))
+      (if col-highlight-vline-face-flag
+          (let ((vline-style  'face)
+                (vline-face   col-highlight-face))
+            (vline-show))
+        (vline-show)))))
+
+(defun col-highlight-unhighlight (&optional minibuffer-also-p)
+  "Turn off highlighting of current column.
+This has no effect in the minibuffer, unless optional arg
+MINIBUFFER-ALSO-P is non-nil."
+  (unless (and (minibufferp)  (not minibuffer-also-p))
+    (if col-highlight-vline-face-flag
+        (let ((vline-style  'face)
+              (vline-face   col-highlight-face))
+          (vline-clear))
+      (vline-clear))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(provide 'col-highlight)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; col-highlight.el ends here
+#+end_src
+
+#+RESULTS:
+: col-highlight
+
+*** vline.el
+#+begin_src emacs-lisp :tangle no
+;;; vline.el --- show vertical line (column highlighting) mode.
+
+;; Copyright (C) 2002, 2008-2012 by Taiki SUGAWARA <buzz.taiki@gmail.com>
+
+;; Author: Taiki SUGAWARA <buzz.taiki@gmail.com>
+;; Maintainer: Taiki SUGAWARA <buzz.taiki@gmail.com>
+;; Keywords: faces, editing, emulating
+;; Version: 1.11
+;; Time-stamp: <2012-01-08 12:40:18 UTC taiki>
+;; URL: http://www.emacswiki.org/cgi-bin/wiki/vline.el
+;; URL: http://bitbucket.org/buzztaiki/elisp/src/tip/vline.el
+
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+
+;; put followings your .emacs
+;;   (require 'vline)
+;;
+;; if you display a vertical line, type M-x vline-mode.  `vline-mode' doesn't
+;; effect other buffers, because it is a buffer local minor mode.  if you hide
+;; a vertical line, type M-x vline-mode again.
+;;
+;; if you display a vertical line in all buffers, type M-x vline-global-mode.
+;;
+;; `vline-style' provides a display style of vertical line.  see
+;; `vline-style' docstring.
+;;
+;; if you don't want to visual line highlighting (ex.  for performance
+;; issue), please to set `vline-visual' to nil.
+;;
+;; if you don't want to use timer (ex.  you want to highlight column
+;; during moving cursors), please to set `vline-use-timer' to nil.
+
+;;; Change Log:
+
+;; 2012-01-08 taiki
+;; fix for the Lint warnings.
+
+;; 2010-02-02 taiki
+;; improve performance.
+
+;; 2009-08-26 taiki
+;; support org-mode, outline-mode
+
+;; 2009-08-18 taiki
+;; add autoload cookies.
+
+;; 2009-08-18 taiki
+;; fix last line highlighting probrem.
+
+;; 2009-08-18 taiki
+;; support visual line highlighting.
+;; - Added face vline-visual.
+;; - Added defcustom vline-visual-face.
+;; - Added defcustom vline-visual.
+;;
+;; 2009-08-17 taiki
+;; fix continuas line problem.
+;; - Don't display vline when cursor into fringe
+;; - Don't expand eol more than window width.
+;;
+;; 2008-10-22 taiki
+;; fix coding-system problem.
+;; - Added vline-multiwidth-space-list
+;; - Use ucs code-point for japanese fullwidth space.
+;;
+;; 2008-01-22 taiki
+;; applied patch from Lennart Borgman
+;; - Added :group 'vline
+;; - Added defcustom vline-current-window-only
+;; - Added header items to simplify for users
+
+;;; TODO:
+;; - track window-scroll-functions, window-size-change-functions.
+;; - consider other minor modes (using {after,before}-string overlay).
+;; - don't use {post,after}-command-hook for performance??
+
+;;; Code:
+
+(defvar vline-overlay-table-size 200)
+(defvar vline-overlay-table (make-vector vline-overlay-table-size nil))
+(defvar vline-line-char ?|)
+(defvar vline-multiwidth-space-list
+  (list
+   ?\t
+   (decode-char 'ucs #x3000)            ; japanese fullwidth space
+   ))
+(defvar vline-timer nil)
+
+(defcustom vline-style 'face
+  "This variable holds vertical line display style.
+Available values are followings:
+`face'      : use face.
+`compose'   : use composit char.
+`mixed'     : use face and composit char."
+  :type '(radio
+          (const face)
+          (const compose)
+          (const mixed))
+  :group 'vline)
+
+
+(defface vline
+  '((t (:background "light steel blue")))
+  "A default face for vertical line highlighting."
+  :group 'vline)
+
+(defface vline-visual
+  '((t (:background "gray90")))
+  "A default face for vertical line highlighting in visual lines."
+  :group 'vline)
+
+(defcustom vline-face 'vline
+  "A face for vertical line highlighting."
+  :type 'face
+  :group 'vline)
+
+(defcustom vline-visual-face 'vline-visual
+  "A face for vertical line highlighting in visual lines."
+  :type 'face
+  :group 'vline)
+
+(defcustom vline-current-window-only nil
+  "If non-nil then highlight column in current window only.
+If the buffer is shown in several windows then highlight column only
+in the currently selected window."
+  :type 'boolean
+  :group 'vline)
+
+(defcustom vline-visual t
+  "If non-nil then highlight column in visual lines.
+If you specified `force' then use force visual line highlighting even
+if `truncate-lines' is non-nil."
+  :type '(radio
+          (const nil)
+          (const t)
+          (const force))
+  :group 'vline)
+
+(defcustom vline-use-timer t
+  "If non-nil, use idle timer instead of (post|after)-command-hook."
+  :type 'boolean
+  :group 'vline)
+
+(defcustom vline-idle-time 0.02
+  "Idle time for highlighting column."
+  :type 'number
+  :group 'vline)
+
+;;;###autoload
+(define-minor-mode vline-mode
+  "Display vertical line mode."
+  :global nil
+  :lighter " VL"
+  :group 'vline
+  (if vline-mode
+      (progn
+        (add-hook 'pre-command-hook 'vline-pre-command-hook nil t)
+        (if vline-use-timer
+            (vline-set-timer)
+          (add-hook 'post-command-hook 'vline-post-command-hook nil t)))
+    (vline-cancel-timer)
+    (vline-clear)
+    (remove-hook 'pre-command-hook 'vline-pre-command-hook t)
+    (remove-hook 'post-command-hook 'vline-post-command-hook t)))
+
+;;;###autoload
+(define-global-minor-mode vline-global-mode
+  vline-mode
+  (lambda ()
+    (unless (minibufferp)
+      (vline-mode 1)))
+  :group 'vline)
+
+(defun vline-pre-command-hook ()
+  (when (and vline-mode (not (minibufferp)))
+    (vline-clear)))
+
+(defun vline-post-command-hook ()
+  (when (and vline-mode (not (minibufferp)))
+    (vline-show)))
+
+(defun vline-set-timer ()
+  (setq vline-timer
+        (run-with-idle-timer
+         vline-idle-time t 'vline-timer-callback)))
+
+(defun vline-cancel-timer ()
+  (when (timerp vline-timer)
+    (cancel-timer vline-timer)))
+
+(defun vline-timer-callback ()
+  (when (and vline-mode (not (minibufferp)))
+    (vline-show)))
+
+(defun vline-clear ()
+  (mapcar (lambda (ovr)
+            (and ovr (delete-overlay ovr)))
+          vline-overlay-table))
+
+(defsubst vline-into-fringe-p ()
+  (eq (nth 1 (posn-at-point)) 'right-fringe))
+
+(defsubst vline-visual-p ()
+  (or (eq vline-visual 'force)
+      (and (not truncate-lines)
+           vline-visual)))
+
+(defsubst vline-current-column ()
+  (if (or (not (vline-visual-p))
+          ;; margin for full-width char
+          (< (1+ (current-column)) (window-width)))
+      (current-column)
+    ;; hmm.. posn-at-point is not consider tab width.
+    (- (current-column)
+       (save-excursion
+         (vertical-motion 0)
+         (current-column)))))
+
+(defsubst vline-move-to-column (col &optional bol-p)
+  (if (or (not (vline-visual-p))
+          ;; margin for full-width char
+          (< (1+ (current-column)) (window-width)))
+      (move-to-column col)
+    (unless bol-p
+      (vertical-motion 0))
+    (let ((bol-col (current-column)))
+      (- (move-to-column (+ bol-col col))
+         bol-col))))
+
+(defsubst vline-invisible-p (pos)
+  (let ((inv (get-char-property pos 'invisible)))
+    (and inv
+         (or (eq buffer-invisibility-spec t)
+             (memq inv buffer-invisibility-spec)
+             (assq inv buffer-invisibility-spec)))))
+
+(defsubst vline-forward (n)
+  (unless (memq n '(-1 0 1))
+    (error "n(%s) must be 0 or 1" n))
+  (if (not (vline-visual-p))
+      (progn
+        (forward-line n)
+        ;; take care of org-mode, outline-mode
+        (when (and (not (bobp))
+                   (vline-invisible-p (1- (point))))
+          (goto-char (1- (point))))
+        (when (vline-invisible-p (point))
+          (if (< n 0)
+              (while (and (not (bobp)) (vline-invisible-p (point)))
+                (goto-char (previous-char-property-change (point))))
+            (while (and (not (bobp)) (vline-invisible-p (point)))
+              (goto-char (next-char-property-change (point))))
+            (forward-line 1))))
+    (vertical-motion n)))
+
+(defun vline-face (visual-p)
+  (if visual-p
+      vline-visual-face
+    vline-face))
+
+(defun vline-show (&optional point)
+  (vline-clear)
+  (save-window-excursion
+    (save-excursion
+      (if point
+          (goto-char point)
+        (setq point (point)))
+      (let* ((column (vline-current-column))
+             (lcolumn (current-column))
+             (i 0)
+             (compose-p (memq vline-style '(compose mixed)))
+             (face-p (memq vline-style '(face mixed)))
+             (line-char (if compose-p vline-line-char ? ))
+             (line-str (make-string 1 line-char))
+             (visual-line-str line-str)
+             (in-fringe-p (vline-into-fringe-p)))
+        (when face-p
+          (setq line-str (propertize line-str 'face (vline-face nil)))
+          (setq visual-line-str (propertize visual-line-str 'face (vline-face t))))
+        (goto-char (window-end nil t))
+        (vline-forward 0)
+        (while (and (not in-fringe-p)
+                    (< i (window-height))
+                    (< i (length vline-overlay-table))
+                    (not (bobp)))
+          (let ((cur-column (vline-move-to-column column t))
+                (cur-lcolumn (current-column)))
+            ;; non-cursor line only (workaround of eol probrem.
+            (unless (= (point) point)
+              ;; if column over the cursor's column (when tab or wide char is appered.
+              (when (> cur-column column)
+                (let ((lcol (current-column)))
+                  (backward-char)
+                  (setq cur-column (- cur-column (- lcol (current-column))))))
+              (let* ((ovr (aref vline-overlay-table i))
+                     (visual-p (or (< lcolumn (current-column))
+                                   (> lcolumn (+ (current-column)
+                                                 (- column cur-column)))))
+                     ;; consider a newline, tab and wide char.
+                     (str (concat (make-string (- column cur-column) ? )
+                                  (if visual-p visual-line-str line-str)))
+                     (char (char-after)))
+                ;; create overlay if not found.
+                (unless ovr
+                  (setq ovr (make-overlay 0 0))
+                  (overlay-put ovr 'rear-nonsticky t)
+                  (aset vline-overlay-table i ovr))
+
+                ;; initialize overlay.
+                (overlay-put ovr 'face nil)
+                (overlay-put ovr 'before-string nil)
+                (overlay-put ovr 'after-string nil)
+                (overlay-put ovr 'invisible nil)
+                (overlay-put ovr 'window
+                             (if vline-current-window-only
+                                 (selected-window)
+                               nil))
+
+                (cond
+                 ;; multiwidth space
+                 ((memq char vline-multiwidth-space-list)
+                  (setq str
+                        (concat str
+                                (make-string (- (save-excursion (forward-char)
+                                                                (current-column))
+                                                (current-column)
+                                                (string-width str))
+                                             ? )))
+                  (move-overlay ovr (point) (1+ (point)))
+                  (overlay-put ovr 'invisible t)
+                  (overlay-put ovr 'after-string str))
+                 ;; eol
+                 ((eolp)
+                  (move-overlay ovr (point) (point))
+                  (overlay-put ovr 'after-string str)
+                  ;; don't expand eol more than window width
+                  (when (and (not truncate-lines)
+                             (>= (1+ column) (window-width))
+                             (>= column (vline-current-column))
+                             (not (vline-into-fringe-p)))
+                    (delete-overlay ovr)))
+                 (t
+                  (cond
+                   (compose-p
+                    (let (str)
+                      (when char
+                        (setq str (compose-chars
+                                   char
+                                   (cond ((= (char-width char) 1)
+                                          '(tc . tc))
+                                         ((= cur-column column)
+                                          '(tc . tr))
+                                         (t
+                                          '(tc . tl)))
+                                   line-char))
+                        (when face-p
+                          (setq str (propertize str 'face (vline-face visual-p))))
+                        (move-overlay ovr (point) (1+ (point)))
+                        (overlay-put ovr 'invisible t)
+                        (overlay-put ovr 'after-string str))))
+                   (face-p
+                    (move-overlay ovr (point) (1+ (point)))
+                    (overlay-put ovr 'face (vline-face visual-p))))))))
+            (setq i (1+ i))
+            (vline-forward -1)))))))
+
+(provide 'vline)
+
+;;; Local Variables:
+;;; time-stamp-format: "%:y-%02m-%02d %02H:%02M:%02S %Z %u"
+;;; time-stamp-line-limit: 16
+;;; End:
+
+;;; vline.el ends here
+#+end_src
+
+#+RESULTS:
+: vline
+
+* Footnotes
+[fn:1] capture template as an interactive function so we can use it as
+a COMMAND, and consequently, bind it to a key--better traceability
+than a lambda

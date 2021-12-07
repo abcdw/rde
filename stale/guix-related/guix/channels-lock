@@ -2,17 +2,27 @@
         (name 'nonguix)
         (url "https://gitlab.com/nonguix/nonguix")
         (commit
-          "863ddcc829d098672d641cd8277d7008bd132e04"))
+          "4c367c8eb1aa0a8999119e91e6f353340c6e46f1"))
+      (channel
+        (name 'flat)
+        (url "https://github.com/flatwhatson/guix-channel.git")
+        (commit
+          "86fb7253a4384b70c77739a0e03115be75d60ad1")
+        (introduction
+          (make-channel-introduction
+            "33f86a4b48205c0dc19d7c036c85393f0766f806"
+            (openpgp-fingerprint
+              "736A C00E 1254 378B A982  7AF6 9DBE 8265 81B6 4490"))))
       (channel
         (name 'rde)
         (url "https://git.sr.ht/~abcdw/rde")
         (commit
-          "54a2ae9745862b524b9b5d9b163a3d5fc6f79ea8"))
+          "afc6725ca533eb79fb9cc6c8e719f558dbf67019"))
       (channel
         (name 'guix)
         (url "https://git.savannah.gnu.org/git/guix.git")
         (commit
-          "88d5081986bb1f78b37a11e9e24f5658f2315558")
+          "8775efe8f1adf9fcb67a5c98cb1e5f84dbda9113")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"

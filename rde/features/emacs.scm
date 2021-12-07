@@ -1777,7 +1777,7 @@ emacsclient feels more like a separate emacs instance."
      (elisp-configuration-service
       emacs-f-name
       `()
-      #:elisp-packages (list emacs-restclient))))
+      #:elisp-packages (list emacs-restclient emacs-ob-restclient))))
 
   (feature
    (name f-name)
@@ -1808,6 +1808,7 @@ emacsclient feels more like a separate emacs instance."
         (setq org-roam-completion-everywhere t
               org-roam-directory ,org-roam-directory)
         (setq org-roam-dailies-directory ,org-roam-dailies-directory)
+        (setq org-roam-directory ,org-roam-directory)
 
         (autoload 'org-roam-db-autosync-enable "org-roam")
         (with-eval-after-load 'org-roam (org-roam-db-autosync-enable))

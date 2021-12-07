@@ -21,7 +21,8 @@ client.urgent               #ca1243  #ca1243  #e5e5e6  #0184bc  #ca1243
 # output * bg /gnu/store/a8gdcipilhf6pipjgnnygmynp4hl4mmr-sway-1.5.1/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 # output eDP-1 res 1920x1080
 # output HDMI-A-1 res 1920x1080 scale 1.5
-
+#output DP-2 scale 2 disable
+output HDMI-A-1 res 5120x1440 bg ~/.cache/wallpaper.png fill
 #
 # Example configuration:
 #

@@ -201,35 +201,6 @@ mode, which displays information about Elasticsearch clusters.")
              (base32
               "1g3pij5qn2j7v7jjac2a63lxd97mcsgw6xq6k5p7835q9fjiid98"))))))
 
-(define-public emacs-restclient
-  (let ((commit "49eb367dc17303c5633a69f49c6a30b18c29d62f")
-        (version "0")
-        (revision "4"))               ;Guix package revision,
-                                      ;upstream doesn't have official releases
-    (package
-      (name "emacs-restclient")
-      (version (git-version version revision commit))
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://github.com/qzdl/restclient.el")
-                      (commit commit)))
-                (sha256
-                 (base32
-                  "0vrlrcggznilkm48wqanlm2z4zz2fqlvgbi28v4hfsrjjmrlsr1m"))
-                (file-name (git-file-name name version))))
-      (build-system emacs-build-system)
-      (propagated-inputs
-       `(("emacs-helm" ,emacs-helm)
-         ("emacs-jq-mode" ,emacs-jq-mode)))
-      (home-page "https://github.com/pashky/restclient.el")
-      (synopsis "Explore and test HTTP REST webservices")
-      (description
-       "This tool allows for testing and exploration of HTTP REST Web services
-from within Emacs.  Restclient runs queries from a plan-text query sheet,
-displays results pretty-printed in XML or JSON with @code{restclient-mode}")
-      (license license:public-domain))))
-
 (use-modules (guix build-system emacs)
              (gnu packages mail)
              (gnu packages texinfo))
