@@ -751,7 +751,7 @@ previous window layout otherwise.  With universal argument toggles
          (define-key org-mode-map (kbd "C-c o n") 'org-num-mode)
 
          ;; <https://emacs.stackexchange.com/questions/54809/rename-org-buffers-to-orgs-title-instead-of-filename>
-         (defun org+-buffer-name-to-title (&optional end)
+         (defun rde-buffer-name-to-title (&optional end)
            "Rename buffer to value of #+TITLE:.
 If END is non-nil search for #+TITLE: at `point' and
 delimit it to END.
@@ -771,12 +771,12 @@ Start an unlimited search at `point-min' otherwise."
                 (rename-buffer (match-string 1)))))
            nil)
 
-         (defun org+-buffer-name-to-title-config ()
+         (defun rde-buffer-name-to-title-config ()
            "Configure Org to rename buffer to value of #+TITLE:."
-           (font-lock-add-keywords nil '(org+-buffer-name-to-title)))
+           (font-lock-add-keywords nil '(rde-buffer-name-to-title)))
 
          ,@(when org-rename-buffer-to-title
-             '((add-hook 'org-mode-hook 'org+-buffer-name-to-title-config)))
+             '((add-hook 'org-mode-hook 'rde-buffer-name-to-title-config)))
 
          (with-eval-after-load 'notmuch (require 'ol-notmuch))))
       #:elisp-packages (list emacs-org emacs-org-contrib))))
