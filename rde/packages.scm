@@ -354,7 +354,6 @@ delivery.")
    (description "This package helps to set environment variables, which make
 emacs packages of current profile explorable by external Emacs.")))
 
-
 (define-public emacs-mct
   (package
    (name "emacs-mct")
@@ -560,3 +559,70 @@ This is a fork with added support for Wayland via layer shell protocol.")))
     (synopsis "Clipman")
     (description "GPL v3.0 2019- (C) yory8 <yory8@users.noreply.github.com>")
     (license license:gpl3)))
+
+(use-modules
+  (guix packages)
+  (guix download)
+  (guix git-download)
+  (guix build-system emacs)
+  (gnu packages emacs-xyz)
+  ((guix licenses) #:prefix license:))
+
+(define-public emacs-consult-recoll
+  (package
+   (name "emacs-consult-recoll")
+   (version "0.1")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://codeberg.org/jao/consult-recoll")
+           (commit "42dea1d40fedf7894e2515b4566a783b7b85486a")))
+     (sha256
+      (base32 "0nzch4x58vgvmcjr6p622lkzms2gvjfdgpvi6bbj5qdzkln5q23a"))))
+   (build-system emacs-build-system)
+   (propagated-inputs
+    `(("emacs-consult" ,emacs-consult)))
+   (home-page "https://codeberg.org/jao/consult-recoll")
+   (synopsis "A consulting-read interface for recoll")
+   (description
+    "A consulting-read interface for recoll")
+   (license license:gpl3+)))
+
+(use-modules
+ (guix packages)
+ (guix download)
+ (guix git-download)
+ (guix build-system emacs)
+ (gnu packages emacs-xyz)
+ ((guix licenses) #:prefix license:))
+
+(define-public emacs-consult-eglot
+  (package
+   (name "emacs-consult-eglot")
+   (version "20210905.1830")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://github.com/mohkale/consult-eglot.git")
+           (commit "f93c571dc392a8b11d35541bffde30bd9f411d30")))
+     (sha256
+      (base32 "1jqg6sg6iaqxpfn7symiy221mg9sn4y1rn0l1rw9rj9xmcnng7s0"))))
+   (build-system emacs-build-system)
+   (propagated-inputs
+    `(("emacs-eglot" ,emacs-eglot) ("emacs-consult" ,emacs-consult)))
+   (home-page "https://github.com/mohkale/consult-eglot")
+   (synopsis "A consulting-read interface for eglot")
+   (description
+    "Query workspace symbol from eglot using consult.
+
+This package provides a single command `consult-eglot-symbols' that uses the
+lsp workspace/symbol procedure to get a list of symbols exposed in the current
+workspace. This differs from the default document/symbols call, that eglot
+exposes through imenu, in that it can present symbols from multiple open files
+or even files not indirectly loaded by an open file but still used by your
+project.
+
+This code was partially adapted from the excellent consult-lsp package.")
+   (license license:expat)))
