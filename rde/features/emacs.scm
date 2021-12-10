@@ -1018,6 +1018,23 @@ add-zsh-hook -Uz chpwd (){ print -Pn \"\\e]2;%m:%2~\\a<vterm>\" }"
                       '("find-file-other-window" find-file-other-window)
                       '("magit" magit)))
 
+          (defun rde-project-vterm ()
+            "Start a `vterm' in the current project's root directory.
+If a buffer already exists for `vterm' in the project's root,
+switch to it.  Otherwise, create a new `vterm' buffer.
+With \\[universal-argument] prefix arg, create a new inferior `vterm' buffer even
+if one already exists."
+            (interactive)
+            (let* ((default-directory (project-root (project-current t)))
+                   (default-project-shell-name (project-prefixed-buffer-name "vterm"))
+                   (shell-buffer (get-buffer default-project-shell-name)))
+              (if (and shell-buffer (not current-prefix-arg))
+                  (pop-to-buffer-same-window shell-buffer)
+                  (vterm (generate-new-buffer-name default-project-shell-name)))))
+
+          (define-key project-prefix-map "s" 'rde-project-vterm)
+          (add-to-list 'project-switch-commands '(rde-project-vterm "vterm"))
+
           (with-eval-after-load
            'magit
            (add-to-list 'vterm-eval-cmds
