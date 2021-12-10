@@ -574,7 +574,12 @@ utilizing reverse-im package."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((custom-set-variables '(olivetti-body-width 80))
+      `((eval-when-compile
+         (require 'olivetti)
+         (require 'hide-mode-line))
+
+        (custom-set-variables '(olivetti-body-width 80)
+                              '(olivetti-margin-width 0))
 
         (with-eval-after-load
          'hide-mode-line
