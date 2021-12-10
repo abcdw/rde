@@ -678,7 +678,14 @@ previous window layout otherwise.  With universal argument toggles
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((define-key global-map (kbd "s-e") 'eshell)
+      `((defun rde-project-eshell-or-eshell (&optional arg)
+          "If there is a project open project-eshell"
+          (interactive "P")
+          (if (project-current)
+              (project-eshell)
+              (eshell arg)))
+
+        (define-key global-map (kbd "s-e") 'rde-project-eshell-or-eshell)
         (with-eval-after-load
          'eshell
          (add-hook
