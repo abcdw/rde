@@ -79,14 +79,14 @@
 
     ;; NOWEB CONF START
     ;; NOWEB KBD START
-    (define-key global-map (kbd "M-s-h") 'windmove-swap-states-left)
-    (define-key global-map (kbd "M-s-j") 'windmove-swap-states-down)
-    (define-key global-map (kbd "M-s-k") 'windmove-swap-states-up)
-    (define-key global-map (kbd "M-s-l") 'windmove-swap-states-right)
-    (define-key global-map (kbd "s-h") 'windmove-left)
-    (define-key global-map (kbd "s-j") 'windmove-down)
-    (define-key global-map (kbd "s-k") 'windmove-up)
-    (define-key global-map (kbd "s-l") 'windmove-right)
+    (define-key global-map (kbd "H-M-s-h") 'windmove-swap-states-left)
+    (define-key global-map (kbd "H-M-s-j") 'windmove-swap-states-down)
+    (define-key global-map (kbd "H-M-s-k") 'windmove-swap-states-up)
+    (define-key global-map (kbd "H-M-s-l") 'windmove-swap-states-right)
+    (define-key global-map (kbd "H-s-h") 'windmove-left)
+    (define-key global-map (kbd "H-s-j") 'windmove-down)
+    (define-key global-map (kbd "H-s-k") 'windmove-up)
+    (define-key global-map (kbd "H-s-l") 'windmove-right)
     (define-key global-map (kbd "s-\\") 'org-store-link)
     ;; NOWEB KBD END
     ;; NOWEB CUSTOM START
@@ -250,7 +250,6 @@
           (todo "TODO"
                 ((org-agenda-overriding-header "daily inbox")
                  (org-agenda-files qz/agenda-daily-files)))
-      
           (todo "TODO"
                 ((org-agenda-overriding-header "emails")
                  (org-agenda-files '(,(format "%s/%s" org-roam-directory "emails.org")))))
@@ -262,6 +261,8 @@
                  (org-agenda-files '(,(format "%s/%s" org-roam-directory "emacs.org"))))))))
       
                                               ;(qz/pprint org-agenda-custom-commands)
+      (setq qz/daily-title-regexp ".?[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.?")
+      
       (defun qz/agenda-daily-files-f ()
         (seq-filter (lambda (s) (string-match qz/daily-title-regexp s))
                     org-agenda-files))
@@ -270,20 +271,20 @@
         (seq-map
          'car
          (org-roam-db-query
-          [:select :distinct file
-                   :from tags
-                   :inner :join nodes
-                   :on (= tags:node_id nodes:id)
-                   :where (= tags:tag "project")])))
+          '(:select :distinct file
+                    :from tags
+                    :inner :join nodes
+                    :on (= tags:node_id nodes:id)
+                    :where (= tags:tag "project")))))
       (setq qz/org-agenda-files
             (mapcar (lambda (f) (expand-file-name (format "%s/%s" org-roam-directory f)))
                     '("calendar-home.org" "calendar-work.org" "schedule.org")))
-      (setq qz/org-agenda-prefix-length 30
-            org-agenda-prefix-format 
-            '((agenda . " %i Emacs Configuration %?-12t% s")
-              (todo . " %i Emacs Configuration  ")
-              (tags . " %i Emacs Configuration  ")
-              (search . " %i Emacs Configuration  ")))
+      (setq qz/org-agenda-prefix-length 20
+            org-agenda-prefix-format nil)
+      ;; '((agenda . " %i Emacs Configuration %?-12t% s")
+      ;;   (todo . " %i Emacs Configuration  ")
+      ;;   (tags . " %i Emacs Configuration  ")
+      ;;   (search . " %i Emacs Configuration  "))
       
       (defun vulpea-agenda-category (&optional len)
         "Get category of item at point for agenda.
@@ -538,8 +539,7 @@
         )
       (setq org-confirm-babel-evaluate nil)
       ;; [[file:~/.doom.d/config.org::*refile][refile]]
-      (setq org-refile-targets '(("next.org" :level . 0)
-                                 ("reading.org" :level . 0)
+      (setq org-refile-targets '(("reading.org" :level . 0)
                                  ("emacs.org" :level . 0)
                                  ("watching.org" :level . 0)
                                  ("learning.org" :level . 0)
@@ -584,6 +584,12 @@
     (defun qz/get-mail ()
       (interactive)
       (async-shell-command "mbsync -Va && notmuch new"))
+    
+    (defun qz/rde-sanity ()
+      (interactive)
+      (async-shell-command
+       (concat "cd $HOME/git/sys/rde"
+               "&& guix repl -L . sanity.scm")))
     
     (defun qz/reload-config-home ()
       (interactive)

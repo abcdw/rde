@@ -281,22 +281,11 @@
       '((host-key-algorithms . "+ssh-rsa")
         (pubkey-accepted-key-types . "+ssh-rsa")))))
 
+   ;; #:package sway-latest
    (feature-sway
     #:opacity 0.9
     #:wallpaper "$HOME/.cache/wallpaper.png"
-    #:extra-config
-    `((output DP-2 scale 2)
-      (workspace 9 output DP-2)
-      (workspace 10 output DP-2)
-
-      (bindsym
-       --locked $mod+Shift+p exec
-       ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
-       play-pause)
-      ;; (input type:touchpad
-      ;;            ((tap enabled)
-      ;;             (natural_scroll enabled)))
-      (bindsym $mod+Shift+Return exec emacs)))
+    #:extra-config `((include ,(local-file "./config/sway/config"))))
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
    (feature-sway-screenshot)
@@ -313,8 +302,11 @@
    (feature-emacs
     #:extra-init-el `()
     #:additional-elisp-packages
+    ;; TODO if feature-emacs-PACKAGE exists, advise its use
     (append
-     (list emacs-consult-dir)
+     (list emacs-consult-dir
+           emacs-consult-eglot
+           emacs-consult-recoll)
      (pkgs "emacs-elfeed"
            "emacs-hl-todo"
            "emacs-ytdl"
@@ -322,9 +314,7 @@
            "emacs-hyperbole"
            "emacs-ement"
            "emacs-restart-emacs"
-           "emacs-org-present"
-
-           "emacs-dimmer" "emacs-hyperbole" "emacs-org-fragtog"
+           "emacs-org-fragtog"
            "emacs-yaml-mode"
            "emacs-org-download"
            "emacs-org-edit-latex"
@@ -334,6 +324,8 @@
            "emacs-ob-async"
            ;;"emacs-es-mode"
            "emacs-org-fragtog"
+
+           "emacs-explain-pause-mode"
            ;; TODO feature-emacs-lsp
            "emacs-eglot"
            "emacs-lsp-ui"
@@ -350,14 +342,14 @@
            ;; "emacs-org-autotangle"
            ))
     #:extra-config ;; this will be much tidier collected from literate config, with each elisp block as `:noweb'
-    (append ;; this can port
-     (list #~"(define-key key-translation-map [?\\C-x] [?\\C-u])\n"
-           #~"(define-key key-translation-map [?\\C-u] [?\\C-x])\n"
-           )
-     ;;init-el
-     ))
-     ))
-   (feature-emacs-appearance #:light #f)
+    (append
+      (list #~"(define-key key-translation-map [?\\C-x] [?\\C-u])\n"
+            #~"(define-key key-translation-map [?\\C-u] [?\\C-x])\n"
+            )
+      init-el
+      ))
+
+   (feature-emacs-appearance #:light? #f)
    (feature-emacs-faces)
    (feature-emacs-completion
     #:mini-frame? #f)

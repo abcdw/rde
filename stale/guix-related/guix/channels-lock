@@ -2,7 +2,7 @@
         (name 'nonguix)
         (url "https://gitlab.com/nonguix/nonguix")
         (commit
-          "4c367c8eb1aa0a8999119e91e6f353340c6e46f1"))
+          "5b1184a103640186fd22e1c53ba64a83f7e6fc3d"))
       (channel
         (name 'flat)
         (url "https://github.com/flatwhatson/guix-channel.git")
@@ -22,7 +22,7 @@
         (name 'guix)
         (url "https://git.savannah.gnu.org/git/guix.git")
         (commit
-          "8775efe8f1adf9fcb67a5c98cb1e5f84dbda9113")
+          "37186ec462dc574477af195aa07fea3fe1ed07a2")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"

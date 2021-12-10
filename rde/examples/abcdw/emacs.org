@@ -1,3 +1,4 @@
+
 #+title: emacs config
 #+auto-tangle: yes
 #+PROPERTY: header-args    :tangle-mode (identity #o444)
@@ -281,16 +282,19 @@ buffer are offered."
 
 #+end_src
 
-*** {M-s-h}jkl windmove swap
+*** {H-M-s-h}jkl windmove swap
 
 I don't use this very much, as it curls my whole left hand up (qwerty troubles)
 
 #+begin_src emacs-lisp :noweb yes :noweb-ref kbd
-(define-key global-map (kbd "M-s-h") 'windmove-swap-states-left)
-(define-key global-map (kbd "M-s-j") 'windmove-swap-states-down)
-(define-key global-map (kbd "M-s-k") 'windmove-swap-states-up)
-(define-key global-map (kbd "M-s-l") 'windmove-swap-states-right)
+(define-key global-map (kbd "H-M-s-h") 'windmove-swap-states-left)
+(define-key global-map (kbd "H-M-s-j") 'windmove-swap-states-down)
+(define-key global-map (kbd "H-M-s-k") 'windmove-swap-states-up)
+(define-key global-map (kbd "H-M-s-l") 'windmove-swap-states-right)
 #+end_src
+
+#+RESULTS:
+: windmove-swap-states-right
 
 *** noweb-tangler
 #+begin_src emacs-lisp :noweb yes :noweb-ref conf
@@ -298,17 +302,20 @@ I don't use this very much, as it curls my whole left hand up (qwerty troubles)
 <<kbd>>
 ;; NOWEB KBD END
 #+end_src
-*** {s-h}jkl windmove
+*** {H-s-h}jkl windmove
 #+begin_src emacs-lisp :noweb yes :noweb-ref kbd
-(define-key global-map (kbd "s-h") 'windmove-left)
-(define-key global-map (kbd "s-j") 'windmove-down)
-(define-key global-map (kbd "s-k") 'windmove-up)
-(define-key global-map (kbd "s-l") 'windmove-right)
+(define-key global-map (kbd "H-s-h") 'windmove-left)
+(define-key global-map (kbd "H-s-j") 'windmove-down)
+(define-key global-map (kbd "H-s-k") 'windmove-up)
+(define-key global-map (kbd "H-s-l") 'windmove-right)
 #+end_src
+
+#+RESULTS:
+: windmove-right
 
 *** {s-\} org-store-link
 #+begin_src emacs-lisp :noweb yes :noweb-ref kbd
-(define-key global-map (kbd "s-\\") 'org-store-link)
+(define-key global-map (kbd "H-s-\\") 'org-store-link)
 #+end_src
 ** custom
 *** noweb tangler                                                    :meta:
@@ -723,6 +730,17 @@ Refer to `org-agenda-prefix-format' for more information."
 : ((agenda .  %i Emacs Configuration %?-12t% s) (todo .  %i Emacs Configuration  ) (tags .  %i Emacs Configuration  ) (search .  %i Emacs Configuration  ))
 
 *** [[id:0213945d-cba5-4dd0-812c-9c01d6f51148][babel]]
+
+**** async
+- :: [[id:4062856a-e182-4820-bc7b-817a693518a3][emacs-ob-async]]
+  
+#+begin_src emacs-lisp :noweb-ref org
+(require 'ob-async)
+#+end_src
+
+#+RESULTS:
+: ob-async
+
 **** src options                                                     :var:
 #+begin_src emacs-lisp :noweb-ref org
 (setq org-confirm-babel-evaluate nil)
@@ -886,6 +904,8 @@ CREATED: <2021-11-29 Mon>
 
 #+RESULTS:
 : qz/org-babel--list->rows
+
+
 
 *** capture
 **** helpers                                                        :func:
@@ -1272,6 +1292,12 @@ CREATED: <2021-12-07 Tue 14:13>
 (defun qz/get-mail ()
   (interactive)
   (async-shell-command "mbsync -Va && notmuch new"))
+
+(defun qz/rde-sanity ()
+  (interactive)
+  (async-shell-command
+   (concat "cd $HOME/git/sys/rde"
+           "&& guix repl -L . sanity.scm")))
 
 (defun qz/reload-config-home ()
   (interactive)
