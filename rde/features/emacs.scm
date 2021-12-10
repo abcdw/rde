@@ -1260,6 +1260,13 @@ git-link, git-timemachine."
         (define-key global-map (kbd "s-g") 'git-gutter-transient)
 
         (with-eval-after-load
+         'project
+         (with-eval-after-load
+          'magit
+          (define-key project-prefix-map "m" 'magit-project-status)
+          (add-to-list 'project-switch-commands '(magit-project-status "Magit") t)))
+
+        (with-eval-after-load
          'git-gutter
          (require 'git-gutter-fringe)
 
@@ -1727,6 +1734,8 @@ buffer should be displayed in other window use least recent one."
 
          (with-eval-after-load
           'consult
+          (define-key project-prefix-map (kbd "M-g") 'consult-ripgrep)
+          (add-to-list 'project-switch-commands '(consult-ripgrep "ripgrep") t)
           (setq consult-project-root-function
                 (lambda ()
                   (when-let (project (project-current))
