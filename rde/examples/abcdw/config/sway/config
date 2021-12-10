@@ -99,33 +99,46 @@ output HDMI-A-1 res 5120x1440 bg ~/.cache/wallpaper.png fill
     # bindsym $mod+Up focus up
     # bindsym $mod+Right focus right
 
+    # same for hjlk
+    bindsym $mod+Control+h focus left
+    bindsym $mod+Control+j focus down
+    bindsym $mod+Control+k focus up
+    bindsym $mod+Control+l focus right
+
     # Move the focused window with the same, but add Shift
     # bindsym $mod+Shift+$left move left
     # bindsym $mod+Shift+$down move down
     # bindsym $mod+Shift+$up move up
     # bindsym $mod+Shift+$right move right
     # Ditto, with arrow keys
-    # bindsym $mod+Shift+Left move left
-    # bindsym $mod+Shift+Down move down
-    # bindsym $mod+Shift+Up move up
-    # bindsym --no-warn $mod+Shift+Right move right
+    bindsym $mod+Shift+Left  move left
+    bindsym $mod+Shift+Down  move down
+    bindsym $mod+Shift+Up    move up
+    bindsym $mod+Shift+Right move right
+
+    bindsym $mod+Shift+Control+h move left
+    bindsym $mod+Shift+Control+j move down
+    bindsym $mod+Shift+Control+k move up
+    bindsym $mod+Shift+Control+l move right
+
 #
 # Workspaces:
 #
-    # output DP-2 scale 2
-    # workspace 9 output DP-2
-    # workspace 10 output DP-2
+    set $map-to-active swaymsg input type:tablet_tool map_to_output `swaymsg -t get_outputs | jq -r '.[] | select(.focused == true) | .name'`
+
+    exec $map-to-active
     # Switch to workspace
-    # bindsym $mod+1 workspace number 1
-    # bindsym $mod+2 workspace number 2
-    # bindsym $mod+3 workspace number 3
-    # bindsym $mod+4 workspace number 4
-    # bindsym $mod+5 workspace number 5
-    # bindsym $mod+6 workspace number 6
-    # bindsym $mod+7 workspace number 7
-    # bindsym $mod+8 workspace number 8
-    # bindsym $mod+9 workspace number 9
-    # bindsym $mod+0 workspace number 10
+    bindsym $mod+tab workspace back_and_forth
+    bindsym $mod+1 workspace number 1  ; exec $map-to-active
+    bindsym $mod+2 workspace number 2  ; exec $map-to-active
+    bindsym $mod+3 workspace number 3  ; exec $map-to-active
+    bindsym $mod+4 workspace number 4  ; exec $map-to-active
+    bindsym $mod+5 workspace number 5  ; exec $map-to-active
+    bindsym $mod+6 workspace number 6  ; exec $map-to-active
+    bindsym $mod+7 workspace number 7  ; exec $map-to-active
+    bindsym $mod+8 workspace number 8  ; exec $map-to-active
+    bindsym $mod+9 workspace number 9  ; exec $map-to-active
+    bindsym $mod+0 workspace number 10 ; exec $map-to-active
     # Move focused container to workspace
     # bindsym $mod+Shift+1 move container to workspace number 1
     # bindsym $mod+Shift+2 move container to workspace number 2
@@ -139,6 +152,7 @@ output HDMI-A-1 res 5120x1440 bg ~/.cache/wallpaper.png fill
     # bindsym $mod+Shift+0 move container to workspace number 10
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
+
 #
 # Layout stuff:
 #

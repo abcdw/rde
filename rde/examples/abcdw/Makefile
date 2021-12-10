@@ -13,7 +13,7 @@ targets-system = $(addsuffix -system, $(HOSTS))
 
 %-home-reconfigure:
 	GUILE_LOAD_PATH=$(GLP) RDE_TARGET=$*-home \
-	guix home reconfigure $(CONFIG_FILE)
+	guix home reconfigure $(CONFIG_FILE) --verbosity=9
 
 
 .PHONY: %-system-build %-system-reconfigure
