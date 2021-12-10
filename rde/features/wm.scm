@@ -96,6 +96,7 @@
          (config
           `((xwayland ,(if xwayland? 'enable 'disable))
             (,#~"")
+            (smart_borders on)
             ,@layout-config
 
             (,#~"\n\n# General settings:")
