@@ -7,3 +7,4 @@ stale/**
 auto-save-list
 tramp
 .\#*
+sanity.scm
