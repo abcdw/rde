@@ -283,3 +283,28 @@ delivery.")
 emacs packages of current profile explorable by external Emacs.")))
 
 
+(define-public emacs-mct
+  (package
+   (name "emacs-mct")
+   (version "0.3.0")
+   (source (origin
+            (method git-fetch)
+            (uri (git-reference
+                  (url "https://gitlab.com/protesilaos/mct.git")
+                  (commit "c76a02b43f268573ff3624aaf63d7c7cf9ea4dde"
+                          ;; version
+                          )))
+            (sha256
+             (base32 "102i6bx81brhljqz1s972rx574a8xrv5infkx5s8y8kffvcvlc84"))
+            (file-name (git-file-name name version))))
+   (build-system emacs-build-system)
+   (license license:gpl3+)
+   (home-page "https://protesilaos.com/emacs/mct")
+   (synopsis "Enhancement of the default Emacs minibuffer completion UI.")
+   (description "Minibuffer and Completions in Tandem, also known as
+mct, or mct.el, is a package that enhances the default minibuffer and
+*Completions* buffer of Emacs 27 (or higher) so that they work
+together as part of a unified framework. The idea is to make the
+presentation and overall functionality be consistent with other
+popular, vertically aligned completion UIs while leveraging built-in
+functionality.")))
