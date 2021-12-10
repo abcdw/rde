@@ -1094,6 +1094,8 @@ add-zsh-hook -Uz chpwd (){ print -Pn \"\\e]2;%m:%2~\\a<vterm>\" }"
          (define-key org-mode-map (kbd "C-M-<return>") 'org-insert-subheading)
          (define-key org-mode-map (kbd "C-M-S-<return>") 'org-insert-todo-subheading)
 
+         (define-key org-mode-map (kbd "C-c C-x i") 'org-id-get-create)
+
          ;; <https://emacs.stackexchange.com/questions/54809/rename-org-buffers-to-orgs-title-instead-of-filename>
          (defun rde-buffer-name-to-title (&optional end)
            "Rename buffer to value of #+TITLE:.
@@ -1840,14 +1842,16 @@ emacsclient feels more like a separate emacs instance."
         (autoload 'org-roam-db-autosync-enable "org-roam")
         (with-eval-after-load 'org-roam (org-roam-db-autosync-enable))
 
-        (defun +rde/search-notes ()
-          (interactive)
-          (consult-ripgrep org-roam-directory))
-
 	(define-key global-map (kbd "C-c n n")   'org-roam-buffer-toggle)
 	(define-key global-map (kbd "C-c n f")   'org-roam-node-find)
+        (define-key global-map (kbd "C-c n C-f") 'org-roam-ref-find)
 	(define-key global-map (kbd "C-c n i")   'org-roam-node-insert)
-        (define-key global-map (kbd "C-c n s")   '+rde/search-notes)
+
+        (with-eval-after-load 'consult
+          (defun rde-search-notes ()
+            (interactive)
+            (consult-ripgrep org-roam-directory))
+          (define-key global-map (kbd "C-c n s") 'rde-search-notes))
 
         (define-key global-map (kbd "C-c n a")   'org-agenda)
         (define-key global-map (kbd "C-c n C-n") 'org-capture)
