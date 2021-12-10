@@ -906,7 +906,9 @@ previous window layout otherwise.  With universal argument toggles
             (eshell/alias "ee" "find-file-other-window $1")
             (eshell/alias "d" "dired $1")
             (with-eval-after-load
-             'magit (eshell/alias "gd" "magit-diff-unstaged"))
+             'magit
+             (eshell/alias "gd" "magit-diff-unstaged")
+             (eshell/alias "gg" "magit"))
 
             (define-key eshell-mode-map (kbd "s-e")
               'switch-to-prev-buffer-or-eshell))))))))
@@ -925,14 +927,13 @@ previous window layout otherwise.  With universal argument toggles
   (define (get-home-services config)
     (list
      (simple-service
-      'vterm-home-shell-configuration
-      home-shell-profile-service-type
-      (list
-       ;; oof, this sucks. when porting
-       ;; (query-replace "\\" "\\\\")  ;; literal escapes
-       ;; (query-replace "\"" "\\\"")  ;; then quotes
-       ;; https://github.com/akermu/emacs-libvterm#shell-side-configuration
-       "
+      'zsh-emacs-vterm
+      home-zsh-service-type
+      (home-zsh-extension
+       (zshrc ;; see https://github.com/akermu/emacs-libvterm#shell-side-configuration
+        (list
+         ;; vterm_printf ; escape sequences for message passing to emacs
+         "# https://github.com/akermu/emacs-libvterm#shell-side-configuration
 vterm_printf(){
     if [ -n \"$TMUX\" ] && ([ \"${TERM%%-*}\" = \"tmux\" ] || [ \"${TERM%%-*}\" = \"screen\" ] ); then
         # Tell tmux to pass the escape sequences through
@@ -944,7 +945,9 @@ vterm_printf(){
         printf \"\\e]%s\\e\\\\\" \"$1\"
     fi
 }"
-       "
+
+         ;; message passing ; execute arbitrary list of elisp functions from 'vterm-eval-cmds'
+         "# https://github.com/akermu/emacs-libvterm#message-passing
 vterm_cmd() {
     local vterm_elisp
     vterm_elisp=\"\"
@@ -955,10 +958,32 @@ vterm_cmd() {
     vterm_printf \"51;E$vterm_elisp\"
 }"
 
-       "alias  e='vterm_cmd find-file'"
-       "alias ee='vterm_cmd find-file-other-window'"
-       "alias  d='vterm_cmd dired'"
-       "alias gd='vterm_cmd magit-diff-unstaged'"))
+         ;; use correct {C-c C-l} semantics
+         "# https://github.com/akermu/emacs-libvterm#vterm-clear-scrollback
+if [[ \"$INSIDE_EMACS\" = 'vterm' ]]; then
+    alias clear='vterm_printf \"51;Evterm-clear-scrollback\";tput clear'
+fi"
+
+         ;; directory & prompt tracking ; let emacs know of cwd (god-tier feature)
+         "# https://github.com/akermu/emacs-libvterm#directory-tracking-and-prompt-tracking
+vterm_prompt_end() {
+    vterm_printf \"51;A$(whoami)@$(hostname):$(pwd)\";
+}
+setopt PROMPT_SUBST
+PROMPT=$PROMPT'%{$(vterm_prompt_end)%}'"
+
+         ;; allow zsh to set buffer-name =HOST:PWD<vterm>=
+         "# https://github.com/akermu/emacs-libvterm#vterm-buffer-name-string
+autoload -U add-zsh-hook
+add-zsh-hook -Uz chpwd (){ print -Pn \"\\e]2;%m:%2~\\a<vterm>\" }"
+
+         ;; aliases
+         "alias  e='vterm_cmd find-file'"
+         "alias ee='vterm_cmd find-file-other-window'"
+         "alias  d='vterm_cmd dired'"
+         "alias gd='vterm_cmd magit-diff-unstaged'"
+         "alias gg='vterm_cmd magit'"
+         ))))
 
      (elisp-configuration-service
       emacs-f-name
@@ -987,9 +1012,11 @@ vterm_cmd() {
          (with-eval-after-load
           'vterm
 
+          ;; (emacs)vterm-eval-cmds <--> (shell)vterm_cmd ; execute arbitary elisp functions
           (mapc (lambda (c) (add-to-list 'vterm-eval-cmds c))
                 (list '("dired" dired)
-                      '("find-file-other-window" find-file-other-window)))
+                      '("find-file-other-window" find-file-other-window)
+                      '("magit" magit)))
 
           (with-eval-after-load
            'magit
