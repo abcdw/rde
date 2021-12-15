@@ -20,15 +20,18 @@
           #:key
           (host-name (operating-system-host-name bare-bone-os))
           (timezone  (operating-system-timezone  bare-bone-os))
-          (locale    (operating-system-locale    bare-bone-os)))
+          (locale    (operating-system-locale    bare-bone-os))
+          (issue     (operating-system-issue     bare-bone-os)))
   "Provides basic information about host."
   (ensure-pred string? host-name)
   (ensure-pred string? timezone)
   (ensure-pred string? locale)
+  (ensure-pred string? issue)
 
   (feature
    (name 'host-info)
-   (values (make-feature-values host-name timezone locale))))
+   (values (make-feature-values
+            host-name timezone locale issue))))
 
 
 (define %default-bootloader-configuration

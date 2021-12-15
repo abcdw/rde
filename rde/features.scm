@@ -248,6 +248,7 @@ to each system-services-getter function."
    (bootloader (bootloader-configuration
 		(bootloader grub-efi-bootloader)
 		(targets '("/boot/efi"))))
+   (issue "This is rde.  Welcome.\n")
    (services '())
    (file-systems %base-file-systems)))
 
@@ -260,6 +261,12 @@ to each system-services-getter function."
 	 (timezone         (get-value
 			    'timezone config
 			    (operating-system-timezone initial-os)))
+         (locale           (get-value
+			    'locale config
+			    (operating-system-locale initial-os)))
+         (issue            (get-value
+			    'issue config
+			    (operating-system-locale initial-os)))
 	 (keyboard-layout  (get-value
 			    'keyboard-layout config
 			    (operating-system-keyboard-layout initial-os)))
@@ -331,6 +338,8 @@ to each system-services-getter function."
       (inherit initial-os)
       (host-name host-name)
       (timezone timezone)
+      (locale locale)
+      (issue issue)
       (bootloader bootloader)
       (mapped-devices mapped-devices)
       (file-systems file-systems)
