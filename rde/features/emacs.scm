@@ -249,8 +249,7 @@ point reaches the beginning or end of the buffer, stop there."
 		                       "/emacs/backup"))))
 
             ;; MAYBE: Move to dired
-            (dolist (mode-hook '(prog-mode-hook dired-mode-hook
-                                 compilation-mode-hook))
+            (dolist (mode-hook '(prog-mode-hook compilation-mode-hook))
                     (add-hook mode-hook (lambda () (setq truncate-lines t))))
             (setq compilation-scroll-output 'first-error)
 	    (define-key global-map (kbd "s-r") 'recompile)
@@ -704,11 +703,13 @@ previous window layout otherwise.  With universal argument toggles
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((eval-when-compile (require 'dired))
+        (with-eval-after-load
          'dired
          (setq dired-dwim-target t)
          (setq dired-listing-switches "-l --time-style=long-iso -h -AG")
          (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+         (add-hook 'dired-mode-hook (lambda () (setq truncate-lines t)))
          (setq dired-hide-details-hide-symlink-targets nil))))
      (emacs-xdg-service emacs-f-name "Emacs (Client) [file:]" xdg-gexp
                         #:default-for '(inode/directory))))
