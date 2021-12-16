@@ -1,10 +1,7 @@
-
 #+title: emacs config
 #+auto-tangle: yes
 #+PROPERTY: header-args    :tangle-mode (identity #o444)
 #+PROPERTY: header-args:sh :tangle-mode (identity #o755)
-
-bonk
 
 * tangling
 ** noweb tangler ; root                                               :meta: 
@@ -164,11 +161,11 @@ nil
 
   (message "%s" (list current-cand c (length cands)))
 
-(append
- (subseq cands (1- c) (length cands))
- (subseq cands 0 (- c 2)))
+  (append
+   (subseq cands (1- c) (length cands))
+   (subseq cands 0 (- c 2)))
 
-;;  (nth (1- c) cands)
+  ;;  (nth (1- c) cands)
   ;; (message
   ;;  "%S"
   ;;  (mapc 'org-no-properties
@@ -217,7 +214,7 @@ buffer are offered."
          (append
           (cl-subseq cands (- c 1) (length cands))
           (cl-subseq cands 0 (- c 2)))
-         cands)
+       cands)
 
      :prompt "Go to heading: "
      ;; `default' will just make some nonsense value which doesn't respect the setup (ordering, selection)
@@ -254,7 +251,7 @@ buffer are offered."
 
 (setq vertico-mode-hook nil)
 
-;(add-hook 'vertico-mode-hook 'qz/vertico-set-initial-position)
+                                        ;(add-hook 'vertico-mode-hook 'qz/vertico-set-initial-position)
 #+end_src
 
 #+RESULTS:
@@ -263,24 +260,27 @@ buffer are offered."
 *** {C-x} <-> {C-u}
 
 *** {C-z} newline-above
-#+begin_src emacs-lisp :noweb yes :noweb-ref bindings
-    ;;(custom-set-variables
-    ;; '(org-disputed-keys '([(shift o)] . [(meta shift o)])))
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+;;(custom-set-variables
+;; '(org-disputed-keys '([(shift o)] . [(meta shift o)])))
 
-    (defun qz/newline-above ()
-      (interactive)
-      (save-excursion
-       (beginning-of-line)
-       (newline))
-      (indent-according-to-mode))
+(defun qz/newline-above ()
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (newline))
+  (indent-according-to-mode))
 
-    (define-key global-map (kbd "C-z") 'qz/newline-above)
-    ;;(define-key global-map (kbd "C-o") 'open-line)
-    ;;
-    ;;(org-remap org-mode-map
-    ;;           'open-line 'org-open-line)
+(define-key global-map (kbd "C-z") 'qz/newline-above)
+;;(define-key global-map (kbd "C-o") 'open-line)
+;;
+;;(org-remap org-mode-map
+;;           'open-line 'org-open-line)
 
 #+end_src
+
+#+RESULTS:
+: qz/newline-above
 
 *** {H-M-s-h}jkl windmove swap
 
@@ -317,6 +317,60 @@ I don't use this very much, as it curls my whole left hand up (qwerty troubles)
 #+begin_src emacs-lisp :noweb yes :noweb-ref kbd
 (define-key global-map (kbd "H-s-\\") 'org-store-link)
 #+end_src
+
+#+RESULTS:
+: org-store-link
+
+** consult
+
+*** noweb tangler
+#+begin_src emacs-lisp :noweb-ref conf :noweb yes
+;; NOWEB CONSULT START
+(with-eval-after-load 'consult
+  <<consult>>
+  )
+;; NOWEB CONSULT END
+#+end_src
+
+*** consult-ripgrep-files :func:
+
+not elegant AT ALL, but the API to ripgrep from consult uses
+'default-directory', so suck it up
+
+#+begin_src emacs-lisp :noweb-ref consult
+(defun qz/consult-ripgrep-files (files)
+  (let* ((consult-ripgrep-args (concat consult-ripgrep-args " -L"))
+         (rg-dir "/tmp/null"))
+    (f-delete rg-dir t)
+    (mkdir rg-dir t)
+    (mapcar (lambda (f)
+              (f-symlink (expand-file-name f)
+                         (format "%s/%s-%s"
+                                 rg-dir (gensym) (s-replace "/" "-" f))))
+            files)
+    (consult-ripgrep rg-dir)))
+#+end_src
+
+#+RESULTS:
+: qz/consult-ripgrep-files
+
+*** consult-ripgrep-bookmark :func:kbd:
+
+consuming
+
+#+begin_src emacs-lisp :noweb-ref consult 
+(defun qz/consult-ripgrep-bookmark ()
+  (interactive)
+  (let ((files (mapcar (lambda (b) (cdr (assoc 'filename b)))
+                       bookmark-alist)))
+    (qz/consult-ripgrep-files files)))
+
+(define-key global-map (kbd "C-c b s") 'qz/consult-ripgrep-bookmark)
+#+end_src
+
+#+RESULTS:
+: qz/consult-ripgrep-bookmark
+
 ** custom
 *** noweb tangler                                                    :meta:
 #+begin_src emacs-lisp :noweb yes :noweb-ref conf
@@ -447,6 +501,23 @@ I don't use this very much, as it curls my whole left hand up (qwerty troubles)
 
 #+RESULTS:
 | https://kibana-sandbox.newstore.luminatesec.com | https://elasticsearch-sandbox.newstore.luminatesec.com | https://kibana-staging.newstore.luminatesec.com | https://elasticsearch-staging.newstore.luminatesec.com | https://kibana-production.newstore.luminatesec.com | https://elasticsearch-production.newstore.luminatesec.com |
+
+** embark
+*** noweb tangler
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+;; NOWEB EMBARK START
+(with-eval-after-load 'embark
+  <<embark>>
+  )
+;; NOWEB EMBARK END
+#+end_src
+*** {C-.} -> embark-act :kbd:
+#+begin_src emacs-lisp :noweb-ref embark
+(define-key global-map (kbd "C-.") 'embark-act)
+#+end_src
+
+#+RESULTS:
+: embark-act
 
 ** general
 *** advice                                                     :func:macro:
@@ -796,7 +867,10 @@ CREATED: <2021-11-29 Mon>
 (with-eval-after-load 'org-roam
 
   (defvar qz/org-babel-lob-ingest-files
-    (list (org-roam-node-file (org-roam-node-from-title-or-alias "NewStore")))
+    (append (mapcar (lambda (s)
+                      (org-roam-node-file (org-roam-node-from-title-or-alias s)))
+                    '("NewStore" "kubernetes"))
+            (list ))
     "files from which named `src' blocks should be loaded")
 
   (defun qz/org-babel-do-lob-ingest-files (&optional files)
@@ -808,7 +882,6 @@ CREATED: <2021-11-29 Mon>
 #+end_src
 
 #+RESULTS:
-: qz/org-babel-do-lob-ingest-files
 
 ***** choose babel block                                           :func:
 CREATED: <2021-11-29 Mo>n
@@ -904,8 +977,6 @@ CREATED: <2021-11-29 Mon>
 
 #+RESULTS:
 : qz/org-babel--list->rows
-
-
 
 *** capture
 **** helpers                                                        :func:
@@ -1054,33 +1125,59 @@ org-roam loading, as we use it's variables.
 | d | default | entry | (, (s-join |
 
 ****** helpers
-******* day-lookup                                                :var:
+******* today's date reference as roam links             :project:func:
+:PROPERTIES:
+:ID:       24cca9c1-2a89-4de2-b840-5d2adb9180931
+:END:
+
+this is just a nice reference spec to include in the daily notes.
+
+I've used explicit lookups for day/month here, because it's quicker to =assoc= a
+small list than to hit the cache (=>2k=) or hit the database a bunch.
+
+=year= is left as a call to =(org-roam-node-from-title-or-alias "2021")= as years
+are less discrete; I haven't made all possible years, and it's infrequent to
+make a new year in this case.
+
+******** day-lookup                                              :var:
+#+begin_src emacs-lisp :noweb-ref roam
 ;;; day lookup
 (defvar qz/day-lookup
-'((Mon . "[[id:d5ad0bac-e82b-43d0-960f-26eeb1daf91b][Monday]]")
-(Tue . "[[id:cb662cc6-bde2-4f9c-b3fa-62346c6df27a][Tuesday]]")
-(Wed . "[[id:411a8e5a-8d89-4886-b2ea-047a3970710a][Wednesday]]")
-(Thu . "[[id:659b9931-ae09-422b-8e91-1bf4cc58e94c][Thursday]]")
-(Fri . "[[id:b3255cd1-db37-4e07-99cf-5e60d52a2579][Friday]]")
-(Sat . "[[id:b63897c3-30cc-42eb-83b5-c8e372e5af9a][Saturday]]")
-(Sun . "[[id:2e28574b-4793-4c05-b83d-e36e9a77515b][Sunday]]"))
-"an index; get days from abbrev (assoc 'Mon qz/day-lookup)")
-******* month-lookup                                              :var:
+  '((Mon . "[[id:d5ad0bac-e82b-43d0-960f-26eeb1daf91b][Monday]]")
+    (Tue . "[[id:cb662cc6-bde2-4f9c-b3fa-62346c6df27a][Tuesday]]")
+    (Wed . "[[id:411a8e5a-8d89-4886-b2ea-047a3970710a][Wednesday]]")
+    (Thu . "[[id:659b9931-ae09-422b-8e91-1bf4cc58e94c][Thursday]]")
+    (Fri . "[[id:b3255cd1-db37-4e07-99cf-5e60d52a2579][Friday]]")
+    (Sat . "[[id:b63897c3-30cc-42eb-83b5-c8e372e5af9a][Saturday]]")
+    (Sun . "[[id:2e28574b-4793-4c05-b83d-e36e9a77515b][Sunday]]"))
+  "an index; get days from abbrev (assoc 'Mon qz/day-lookup)")
+#+end_src
+
+#+RESULTS:
+: qz/day-lookup
+
+******** month-lookup                                            :var:
+#+begin_src emacs-lisp :noweb-ref roam
 (defvar qz/month-lookup
-'("[[id:b92355d7-110e-467c-b7a7-d02b2043af3f][January]]"
-"[[id:7e0af966-8d3e-4e88-b53f-d074902e175a][February]]"
-"[[id:f41751f8-a2a9-4b38-ba03-2ceec2fae4cc][March]]"
-"[[id:ae0ae458-2216-4178-8073-4a26f23747d9][April]]"
-"[[id:6a680100-e842-4257-819f-8cf6cbedddbc][May]]"
-"[[id:f811621c-1b37-43f7-9d01-52bdf9f27637][June]]"
-"[[id:a4d5c8fe-3910-4483-b59e-ce50cd6699a7][July]]"
-"[[id:94e9b0a7-6cd0-4104-821e-613876fe76e3][August]]"
-"[[id:f9ad8160-cae5-4195-a85f-0160710ce8dd][September]]"
-"[[id:da9f0d53-e3f7-4f72-bc1a-d060bc2d1745][October]]"
-"[[id:a4e3a97a-dac9-4bc6-a5e9-5949f707a6de][November]]"
-"[[id:f874ca1a-0d3f-4840-8340-511ed0ac286f][December]]")
-"an index; get days from abbrev (nth 0 qz/month-lookup)")
-******* today-dateref                                            :func:
+  '("[[id:b92355d7-110e-467c-b7a7-d02b2043af3f][January]]"
+    "[[id:7e0af966-8d3e-4e88-b53f-d074902e175a][February]]"
+    "[[id:f41751f8-a2a9-4b38-ba03-2ceec2fae4cc][March]]"
+    "[[id:ae0ae458-2216-4178-8073-4a26f23747d9][April]]"
+    "[[id:6a680100-e842-4257-819f-8cf6cbedddbc][May]]"
+    "[[id:f811621c-1b37-43f7-9d01-52bdf9f27637][June]]"
+    "[[id:a4d5c8fe-3910-4483-b59e-ce50cd6699a7][July]]"
+    "[[id:94e9b0a7-6cd0-4104-821e-613876fe76e3][August]]"
+    "[[id:f9ad8160-cae5-4195-a85f-0160710ce8dd][September]]"
+    "[[id:da9f0d53-e3f7-4f72-bc1a-d060bc2d1745][October]]"
+    "[[id:a4e3a97a-dac9-4bc6-a5e9-5949f707a6de][November]]"
+    "[[id:f874ca1a-0d3f-4840-8340-511ed0ac286f][December]]")
+  "an index; get days from abbrev (nth 0 qz/month-lookup)")
+#+end_src
+
+#+RESULTS:
+: qz/month-lookup
+
+******** today-dateref                                          :func:
 #+begin_src emacs-lisp :noweb-ref roam
 (defun qz/today-dateref (&optional time)
   (cl-destructuring-bind (day nday month year)
@@ -1146,6 +1243,57 @@ so we can use it as a COMMAND. better traceability than a lambda
   ;; NOWEB ROAM END
   )
 #+end_src
+
+**** hooks
+***** make metadata on node created/updated
+:PROPERTIES:
+:ID:       5aa025eb-cc43-4866-9401-bd043ecf971b
+:CREATED:  <2021-12-12 Sun 22:34>
+:END:
+
+- :: [[id:6ae36e2f-ab6d-45bc-9448-8dce233c8528][data-driven automatic actions in org roam]]
+  
+lifted from [[id:c6c1e44f-bb16-459b-9ba3-2d4657649816][Proposal for timestamping notes at time of capture (V2) ·
+Issue #1485 · org-roam/org-roam]].
+
+it is beneficial to attach to 'org-id-get-create as =:after= advice too,
+as this is my current mechanism for making a [[id:5d31286f-eef2-490a-8d44-0cded26c6475][node]] from a headline.
+
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/org-roam--insert-timestamp (&rest args)
+  (when (not (org-entry-get nil "CREATED"))
+    (org-entry-put nil "CREATED" (format-time-string "<%Y-%m-%d %a %H:%M>")))
+  (qz/org-roam--updated-timestamp))
+
+(defun qz/org-roam--updated-timestamp (&rest args)
+  (when-let* ((_ (org-roam-file-p))
+              (n (org-roam-node-at-point)))
+    (org-entry-put
+     (org-roam-node-point n) "UPDATED"
+     (format-time-string "<%Y-%m-%d %a %H:%M>"))))
+
+(add-hook 'org-roam-capture-new-node-hook 'qz/org-roam--insert-timestamp)
+(add-hook 'before-save-hook 'qz/org-roam--updated-timestamp)
+(qz/advice- org-id-get-create :after qz/org-roam--insert-timestamp)
+#+end_src
+
+#+RESULTS:
+| qz/advice-enable--org-id-get-create--qz/org-roam--insert-timestamp | qz/advice-disable--org-id-get-create--qz/org-roam--insert-timestamp |
+
+**** migrations
+
+***** #roam_key -> =:ROAM_REFS:=
+:PROPERTIES:
+:ID:       1c775b12-32d0-4531-82e3-8813d3138d9b
+:CREATED:  <2021-12-14 Tue 18:14>
+:END:
+#+roam_key: https://bonk.com
+
+a function of a node
+#+begin_src emacs-lisp
+
+#+end_src
+
 **** protocol (ref)
 ***** capture                                                       :var:
 ****** templates
@@ -1161,7 +1309,26 @@ so we can use it as a COMMAND. better traceability than a lambda
 
 #+RESULTS:
 | r | ref | plain | %? | :if-new | (file+head 20210813T161035Z-${slug}.org #+title: ${title} |
+**** visual
+***** =*org-roam*= (backlinks) buffer images should be small   :var:func:
+:PROPERTIES:
+:ID:       1a5a2369-eef1-4e73-b701-e5a91a11e22a
+:CREATED:  <2021-12-12 Sun 22:38>
+:END:
 
+so set a buffer-local value to constrain the size of images across
+their width with 'org-image-actual-width, and attach to the hook
+'org-roam-mode-hook.
+
+easy peasy, only took me 20 minutes
+
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/roam-buffer-image-width ()
+  (setq-local org-image-actual-width 150)
+  (org-redisplay-inline-images))
+
+(add-hook 'org-roam-mode-hook 'qz/roam-buffer-image-width)
+#+end_src
 *** settings
 **** org-confirm-babel-evaluate; don't ask                           :var:
 #+begin_src emacs-lisp :noweb yes :noweb-ref org
@@ -1180,6 +1347,10 @@ so we can use it as a COMMAND. better traceability than a lambda
                            ("wip.org" :level . 0)))
 #+end_src
 
+*** download :var:
+#+begin_src emacs-lisp :noweb-ref org
+(require 'org-download)
+#+end_src
 *** tag
 
 **** [[id:26b5040b-0883-444f-af7a-abd4e1d67c0e][my thoughts]]
@@ -1217,6 +1388,25 @@ CREATED: <2021-12-07 Tue 14:13>
 #+RESULTS:
 : ((@errand . 101) (@work . 119) (@home . 104) (@blog . 66) (:newline) (emacs . 69) (task . 116) (CANCELLED . 67) (:newline) (learning . 108) (research . 114) (:newline) (book . 98) (article . 97) (paper . 112) (talk . 116) (film . 102))
 
+*** visual
+
+**** use fixed size of images
+640px is a good size, at approximately 64 columns
+
+----------------------------------------------------------------
+#+DOWNLOADED: screenshot @ 2021-12-12 22:14:04
+[[file:configs/2021-12-12_22-14-04_screenshot.png]]
+
+check with (org-redisplay-inline-images)
+-----------------------------------------------------------------
+
+#+begin_src emacs-lisp :noweb-ref conf
+(setq org-image-actual-width 640)
+#+end_src
+
+#+RESULTS:
+: 640
+
 ** pdf-view
 *** midnight-minor-mode ; dark-mode filter on pdfs
 #+begin_src emacs-lisp :noweb-ref conf
@@ -1228,7 +1418,7 @@ CREATED: <2021-12-07 Tue 14:13>
 *** choose
 **** restclient-choose-env
 #+begin_src emacs-lisp :noweb-ref conf
-(defvar qz/restclient-environment nil)
+(defvar qz/restclient-env nil)
 
 (defun qz/restclient-choose-env (&optional env)
   (interactive)
@@ -1391,6 +1581,57 @@ the major mode specifies support for Font Lock."
 
 #+RESULTS:
 : hi-lock-face-symbol-at-point
+*** [[id:bdba5c2b-bcfc-429c-bd90-57aaa211de65][font]] modulation
+**** save load-time font size :var:func:
+
+this is useful for when we switch to the single-frame font-size, but
+we want to restore after, respecting the initial font-size
+
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/font-initial-size (face-attribute 'default :height))
+(defvar qz/resize-mini-windows-initial resize-mini-windows)
+(defvar qz/max-mini-window-height-initial max-mini-window-height)
+
+(defun qz/reset-visual-initial ()
+  (interactive)
+  (set-face-attribute 'default nil :height qz/font-initial-size)
+  (setq resize-mini-windows    qz/resize-mini-windows-initial
+        max-mini-window-height qz/max-mini-window-height-initial))
+#+end_src
+
+#+RESULTS:
+: qz/reset-visual-initial
+
+**** set font as big enough for comfy casual 80char emacs use       :func:
+
+#+begin_src emacs-lisp :noweb-ref conf
+(defun qz/font-big-80 ()
+  (interactive)
+  (set-face-attribute 'default nil :height 300)
+  (setq resize-mini-windows t
+        max-mini-window-height nil))
+#+end_src
+
+#+RESULTS:
+: qz/font-big-80
+*** unsplash 
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/unsplash-tags nil)
+(defun qz/unsplash ()
+  "yet another lazy shell-command wrapper; wallpaper edition"
+  (interactive)
+  (let ((tag (read-from-minibuffer
+              "unsplash tags: " (car qz/unsplash-tags))))
+    (async-shell-command
+     (format "TAGS='%s'
+mv \"$XDG_CACHE_HOME/wallpaper.png\" \"$XDG_CACHE_HOME/$(date +%%Y-%%m-%%d--%%H-%%M-%%S)-wallpaper.png\"
+curl -L \"https://source.unsplash.com/5120x1440?$TAGS\" -o \"$XDG_CACHE_HOME/wallpaper.png\"
+swaymsg output \"*\" background ~/.cache/wallpaper.png fill" tag))
+    (setq qz/unsplash-tags (seq-uniq (cons tag qz/unsplash-tags)))))
+#+end_src
+
+#+RESULTS:
+: qz/unsplash
 
 ** wiki
 *** col-highlight.el

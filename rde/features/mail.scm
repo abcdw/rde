@@ -449,12 +449,16 @@ function, which accepts config with rde values and returns a string."
   (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
 
 (define bravehost-folder-mapping
-  '(("inbox"  . "INBOX")
-    ("sent"   . "[Bravehost]/Sent Mail")
-    ("drafts" . "[Bravehost]/Drafts")
-    ("all"    . "[Bravehost]/All Mail")
-    ("trash"  . "[Bravehost]/Trash")
-    ("spam"   . "[Bravehost]/Spam")))
+  '(("inbox"  . "Inbox")
+    ("accounts" . "Inbox/Accounts")
+    ("kaggle" . "Inbox/Kaggle")
+    ("cv" . "Inbox/CV")
+    ("info" . "Inbox/info")
+    ("accounts" . "inbox/university")
+    ("sent"   . "Sent")
+    ("drafts" . "Drafts")
+    ("trash"  . "Deleted Items")
+    ("spam"   . "Spam")))
 
 ;; https://wiki.bravenet.com/Using_your_Bravenet_e-mail_account
 (define bravehost-isync-settings

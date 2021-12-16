@@ -1015,8 +1015,7 @@ add-zsh-hook -Uz chpwd (){ print -Pn \"\\e]2;%m:%2~\\a<vterm>\" }"
           ;; (emacs)vterm-eval-cmds <--> (shell)vterm_cmd ; execute arbitary elisp functions
           (mapc (lambda (c) (add-to-list 'vterm-eval-cmds c))
                 (list '("dired" dired)
-                      '("find-file-other-window" find-file-other-window)
-                      '("magit" magit)))
+                      '("find-file-other-window" find-file-other-window)))
 
           (defun rde-project-vterm ()
             "Start a `vterm' in the current project's root directory.
@@ -1037,8 +1036,9 @@ if one already exists."
 
           (with-eval-after-load
            'magit
-           (add-to-list 'vterm-eval-cmds
-                        '("magit-diff-unstaged" magit-diff-unstaged)))
+           (mapc (lambda (c) (add-to-list 'vterm-eval-cmds c))
+                 (list '("magit" magit)
+                       '("magit-diff-unstaged" magit-diff-unstaged))))
 
           (defun vterm-complete-history ()
             (message "oof"))
@@ -1086,9 +1086,11 @@ if one already exists."
 
         (with-eval-after-load
          'org
-         (setq org-adapt-indentation nil)
-         (setq org-edit-src-content-indentation 0)
-         (setq org-startup-indented t)
+         (require 'org-protocol)
+
+	 (setq org-adapt-indentation nil)
+	 (setq org-edit-src-content-indentation 0)
+	 (setq org-startup-indented t)
 
          (setq org-outline-path-complete-in-steps nil)
          (setq org-refile-use-outline-path 'full-file-path)
@@ -1143,6 +1145,7 @@ Start an unlimited search at `point-min' otherwise."
 
          (with-eval-after-load 'notmuch (require 'ol-notmuch))))
       #:elisp-packages (list emacs-org emacs-org-contrib))
+
      (emacs-xdg-service emacs-f-name "Emacs (Client) [org-protocol:]" xdg-gexp
                         #:default-for '(x-scheme-handler/org-protocol))))
 
@@ -1744,6 +1747,7 @@ buffer should be displayed in other window use least recent one."
         (add-hook 'after-init-hook
                   (lambda ()
                     (define-key global-map (kbd "s-p") project-prefix-map)))
+
         (with-eval-after-load
          'project
          (add-to-list 'project-switch-commands '(project-compile "Compile") t)
@@ -1751,8 +1755,14 @@ buffer should be displayed in other window use least recent one."
 
          (with-eval-after-load
           'consult
-          (define-key project-prefix-map (kbd "M-g") 'consult-ripgrep)
-          (add-to-list 'project-switch-commands '(consult-ripgrep "ripgrep") t)
+          (defun rde-project-consult-ripgrep ()
+            "use consult-ripgrep as a project-*-command"
+            (interactive)
+            (let ((default-directory (consult--project-root)))
+              (consult-ripgrep default-directory)))
+
+          (define-key project-prefix-map (kbd "M-g") 'rde-project-consult-ripgrep)
+          (add-to-list 'project-switch-commands '(rde-project-consult-ripgrep "ripgrep") t)
           (setq consult-project-root-function
                 (lambda ()
                   (when-let (project (project-current))
@@ -1859,6 +1869,7 @@ emacsclient feels more like a separate emacs instance."
       `((eval-when-compile
          (let ((org-roam-v2-ack t))
            (require 'org-roam)))
+
         (setq org-roam-v2-ack t)
         (setq org-roam-completion-everywhere t
               org-roam-directory ,org-roam-directory)
@@ -1866,12 +1877,17 @@ emacsclient feels more like a separate emacs instance."
         (setq org-roam-directory ,org-roam-directory)
 
         (autoload 'org-roam-db-autosync-enable "org-roam")
-        (with-eval-after-load 'org-roam (org-roam-db-autosync-enable))
+
+        (with-eval-after-load
+         'org-roam
+         (org-roam-db-autosync-enable)
+         (require 'org-roam-protocol))
 
 	(define-key global-map (kbd "C-c n n")   'org-roam-buffer-toggle)
 	(define-key global-map (kbd "C-c n f")   'org-roam-node-find)
         (define-key global-map (kbd "C-c n C-f") 'org-roam-ref-find)
 	(define-key global-map (kbd "C-c n i")   'org-roam-node-insert)
+        (define-key global-map (kbd "C-c n C-r") 'org-roam-refile)
 
         (with-eval-after-load 'consult
           (defun rde-search-notes ()
@@ -1888,8 +1904,8 @@ emacsclient feels more like a separate emacs instance."
         (define-key global-map (kbd "C-c n d d") 'org-roam-dailies-goto-date)
         (define-key global-map (kbd "C-c n d t") 'org-roam-dailies-goto-today)
         (define-key global-map (kbd "C-c n d y") 'org-roam-dailies-goto-yesterday)
-        (define-key global-map (kbd "C-c n d n") 'org-roam-dailies-goto-next)
-        (define-key global-map (kbd "C-c n d n") 'org-roam-dailies-goto-previous)
+        (define-key global-map (kbd "C-c n d n") 'org-roam-dailies-goto-next-note)
+        (define-key global-map (kbd "C-c n d p") 'org-roam-dailies-goto-previous-note)
         )
 
       #:elisp-packages (list emacs-org-roam))))

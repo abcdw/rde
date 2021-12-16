@@ -175,7 +175,7 @@ mode, which displays information about Elasticsearch clusters.")
          (add-after 'unpack 'make-it-update-header-line
            (lambda* (#:key outputs #:allow-other-keys)
              (substitute* "hide-mode-line.el"
-	       ((" mode-line-format")
+               ((" mode-line-format")
                 " header-line-format"))
              #t)))))))
 
@@ -626,3 +626,50 @@ project.
 
 This code was partially adapted from the excellent consult-lsp package.")
    (license license:expat)))
+
+(define-public emacs-iscroll
+  (package
+    (name "emacs-iscroll")
+    (version "20210128.1938")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/casouri/iscroll.git")
+             (commit "d6e11066169d232fe23c2867d44c012722ddfc5a")))
+       (sha256
+        (base32 "0pbcr5bwmw2ikwg266q2fpxaf0z5h5cl1rp3rhhn9i9yn7hlfc78"))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/casouri/iscroll")
+    (synopsis "Smooth scrolling over images")
+    (description
+     "
+Gone are the days when images jumps in and out of the window when
+scrolling! This package makes scrolling over images as if the image
+is made of many lines, instead of a single line. (Indeed, sliced
+image with default scrolling has the similar behavior as what this
+package provides.)
+
+To use this package:
+
+    M-x iscroll-mode RET
+
+This mode remaps mouse scrolling functions and `next/previous-line'.
+If you use other commands, you need to adapt them accordingly. See
+`iscroll-mode-map' and `iscroll-mode' for some inspiration.
+
+You probably don't want to enable this in programming modes because
+it is slower than normal scrolling commands.
+
+If a line is taller than double the default line height, smooth
+scrolling is triggered and Emacs will reveal one line’s height each
+time.
+
+Commands provided:
+
+- iscroll-up
+- iscroll-down
+- iscroll-next-line
+- iscroll-previous-line
+")
+    (license license:gpl3+)))

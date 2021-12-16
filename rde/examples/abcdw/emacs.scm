@@ -79,6 +79,22 @@
 
     ;; NOWEB CONF START
     ;; NOWEB KBD START
+    ;;(custom-set-variables
+    ;; '(org-disputed-keys '([(shift o)] . [(meta shift o)])))
+    
+    (defun qz/newline-above ()
+      (interactive)
+      (save-excursion
+        (beginning-of-line)
+        (newline))
+      (indent-according-to-mode))
+    
+    (define-key global-map (kbd "C-z") 'qz/newline-above)
+    ;;(define-key global-map (kbd "C-o") 'open-line)
+    ;;
+    ;;(org-remap org-mode-map
+    ;;           'open-line 'org-open-line)
+    
     (define-key global-map (kbd "H-M-s-h") 'windmove-swap-states-left)
     (define-key global-map (kbd "H-M-s-j") 'windmove-swap-states-down)
     (define-key global-map (kbd "H-M-s-k") 'windmove-swap-states-up)
@@ -87,8 +103,30 @@
     (define-key global-map (kbd "H-s-j") 'windmove-down)
     (define-key global-map (kbd "H-s-k") 'windmove-up)
     (define-key global-map (kbd "H-s-l") 'windmove-right)
-    (define-key global-map (kbd "s-\\") 'org-store-link)
+    (define-key global-map (kbd "H-s-\\") 'org-store-link)
     ;; NOWEB KBD END
+    ;; NOWEB CONSULT START
+    (with-eval-after-load 'consult
+      (defun qz/consult-ripgrep-files (files)
+        (let* ((consult-ripgrep-args (concat consult-ripgrep-args " -L"))
+               (rg-dir "/tmp/null"))
+          (f-delete rg-dir t)
+          (mkdir rg-dir t)
+          (mapcar (lambda (f)
+                    (f-symlink (expand-file-name f)
+                               (format "%s/%s-%s"
+                                       rg-dir (gensym) (s-replace "/" "-" f))))
+                  files)
+          (consult-ripgrep rg-dir)))
+      (defun qz/consult-ripgrep-bookmark ()
+        (interactive)
+        (let ((files (mapcar (lambda (b) (cdr (assoc 'filename b)))
+                             bookmark-alist)))
+          (qz/consult-ripgrep-files files)))
+      
+      (define-key global-map (kbd "C-c b s") 'qz/consult-ripgrep-bookmark)
+      )
+    ;; NOWEB CONSULT END
     ;; NOWEB CUSTOM START
     (custom-set-variables
      '(org-imenu-depth 99))
@@ -175,6 +213,11 @@
         qz/restclient-tenant)
       )
     ;; NOWEB ES END
+    ;; NOWEB EMBARK START
+    (with-eval-after-load 'embark
+      (define-key global-map (kbd "C-.") 'embark-act)
+      )
+    ;; NOWEB EMBARK END
     (defun qz/yq-interactively ()
       "haha yaml loophole"
       (interactive)
@@ -322,6 +365,7 @@
             result)))
       ;; NOWEB AGENDA END
       
+      (require 'ob-async)
       (setq org-confirm-babel-evaluate nil)
       (setq org-structure-template-alist
             '(;; yp
@@ -356,7 +400,10 @@
       (with-eval-after-load 'org-roam
       
         (defvar qz/org-babel-lob-ingest-files
-          (list (org-roam-node-file (org-roam-node-from-title-or-alias "NewStore")))
+          (append (mapcar (lambda (s)
+                            (org-roam-node-file (org-roam-node-from-title-or-alias s)))
+                          '("NewStore" "kubernetes"))
+                  (list ))
           "files from which named `src' blocks should be loaded")
       
         (defun qz/org-babel-do-lob-ingest-files (&optional files)
@@ -500,6 +547,30 @@
                                          "* journal"
                                          "* tangent"))
                          ("tangent"))))
+        ;;; day lookup
+        (defvar qz/day-lookup
+          '((Mon . "[[id:d5ad0bac-e82b-43d0-960f-26eeb1daf91b][Monday]]")
+            (Tue . "[[id:cb662cc6-bde2-4f9c-b3fa-62346c6df27a][Tuesday]]")
+            (Wed . "[[id:411a8e5a-8d89-4886-b2ea-047a3970710a][Wednesday]]")
+            (Thu . "[[id:659b9931-ae09-422b-8e91-1bf4cc58e94c][Thursday]]")
+            (Fri . "[[id:b3255cd1-db37-4e07-99cf-5e60d52a2579][Friday]]")
+            (Sat . "[[id:b63897c3-30cc-42eb-83b5-c8e372e5af9a][Saturday]]")
+            (Sun . "[[id:2e28574b-4793-4c05-b83d-e36e9a77515b][Sunday]]"))
+          "an index; get days from abbrev (assoc 'Mon qz/day-lookup)")
+        (defvar qz/month-lookup
+          '("[[id:b92355d7-110e-467c-b7a7-d02b2043af3f][January]]"
+            "[[id:7e0af966-8d3e-4e88-b53f-d074902e175a][February]]"
+            "[[id:f41751f8-a2a9-4b38-ba03-2ceec2fae4cc][March]]"
+            "[[id:ae0ae458-2216-4178-8073-4a26f23747d9][April]]"
+            "[[id:6a680100-e842-4257-819f-8cf6cbedddbc][May]]"
+            "[[id:f811621c-1b37-43f7-9d01-52bdf9f27637][June]]"
+            "[[id:a4d5c8fe-3910-4483-b59e-ce50cd6699a7][July]]"
+            "[[id:94e9b0a7-6cd0-4104-821e-613876fe76e3][August]]"
+            "[[id:f9ad8160-cae5-4195-a85f-0160710ce8dd][September]]"
+            "[[id:da9f0d53-e3f7-4f72-bc1a-d060bc2d1745][October]]"
+            "[[id:a4e3a97a-dac9-4bc6-a5e9-5949f707a6de][November]]"
+            "[[id:f874ca1a-0d3f-4840-8340-511ed0ac286f][December]]")
+          "an index; get days from abbrev (nth 0 qz/month-lookup)")
         (defun qz/today-dateref (&optional time)
           (cl-destructuring-bind (day nday month year)
               (split-string
@@ -528,6 +599,21 @@
                     (org-link-make-string
                      (concat "id:" (org-roam-node-id n))
                      (org-roam-node-title n)))))
+        (defun qz/org-roam--insert-timestamp (&rest args)
+          (when (not (org-entry-get nil "CREATED"))
+            (org-entry-put nil "CREATED" (format-time-string "<%Y-%m-%d %a %H:%M>")))
+          (qz/org-roam--updated-timestamp))
+        
+        (defun qz/org-roam--updated-timestamp (&rest args)
+          (when-let* ((_ (org-roam-file-p))
+                      (n (org-roam-node-at-point)))
+            (org-entry-put
+             (org-roam-node-point n) "UPDATED"
+             (format-time-string "<%Y-%m-%d %a %H:%M>"))))
+        
+        (add-hook 'org-roam-capture-new-node-hook 'qz/org-roam--insert-timestamp)
+        (add-hook 'before-save-hook 'qz/org-roam--updated-timestamp)
+        (qz/advice- org-id-get-create :after qz/org-roam--insert-timestamp)
         ;;; ref capture
         (setq org-roam-capture-ref-templates
               `(("r" "ref" plain
@@ -535,6 +621,11 @@
                  :if-new (file+head ,qz/capture-title-timestamp-roam
                                     "#+title: ${title}\n")
                  :unnarrowed t)))
+        (defun qz/roam-buffer-image-width ()
+          (setq-local org-image-actual-width 150)
+          (org-redisplay-inline-images))
+        
+        (add-hook 'org-roam-mode-hook 'qz/roam-buffer-image-width)
         ;; NOWEB ROAM END
         )
       (setq org-confirm-babel-evaluate nil)
@@ -546,6 +637,7 @@
                                  ("inbox.org" :level . 0)
                                  ("sample.org" :level . 0)
                                  ("wip.org" :level . 0)))
+      (require 'org-download)
       ;; NOWEB ORG END
       )
     (with-eval-after-load 'pdf-view
@@ -654,5 +746,31 @@
          (if (and case-fold-search search-upper-case)
              (isearch-no-upper-case-p regexp t)
            case-fold-search))))
+    (defvar qz/font-initial-size (face-attribute 'default :height))
+    (defvar qz/resize-mini-windows-initial resize-mini-windows)
+    (defvar qz/max-mini-window-height-initial max-mini-window-height)
+    
+    (defun qz/reset-visual-initial ()
+      (interactive)
+      (set-face-attribute 'default nil :height qz/font-initial-size)
+      (setq resize-mini-windows    qz/resize-mini-windows-initial
+            max-mini-window-height qz/max-mini-window-height-initial))
+    (defun qz/font-big-80 ()
+      (interactive)
+      (set-face-attribute 'default nil :height 300)
+      (setq resize-mini-windows t
+            max-mini-window-height nil))
+    (defvar qz/unsplash-tags nil)
+    (defun qz/unsplash ()
+      "yet another lazy shell-command wrapper; wallpaper edition"
+      (interactive)
+      (let ((tag (read-from-minibuffer
+                  "unsplash tags: " (car qz/unsplash-tags))))
+        (async-shell-command
+         (format "TAGS='%s'
+    mv \"$XDG_CACHE_HOME/wallpaper.png\" \"$XDG_CACHE_HOME/$(date +%%Y-%%m-%%d--%%H-%%M-%%S)-wallpaper.png\"
+    curl -L \"https://source.unsplash.com/5120x1440?$TAGS\" -o \"$XDG_CACHE_HOME/wallpaper.png\"
+    swaymsg output \"*\" background ~/.cache/wallpaper.png fill" tag))
+        (setq qz/unsplash-tags (seq-uniq (cons tag qz/unsplash-tags)))))
     ;; NOWEB CONF END
     ))

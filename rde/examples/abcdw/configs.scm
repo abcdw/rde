@@ -95,6 +95,10 @@
            (type 'bravehost)))
     #:mailing-lists
     (list
+     (mail-lst 'python-speed "speed@python.org"
+               '("https://mail.python.org/mailman/listinfo/speed"
+                 "https://mail.python.org/archives/list/speed@python.org/"))
+
      (mail-lst 'rde-announce "~acbdw/rde-announce@lists.sr.ht"
                '("https://lists.sr.ht/~abcdw/rde-announce/export"))
      (mail-lst 'rde-discuss "~acbdw/rde-discuss@lists.sr.ht"
@@ -201,6 +205,7 @@
                                   (create-database? #t))
                                  (postgresql-role
                                   (name "samuel")
+                                  (permissions '(superuser))
                                   (create-database? #t))
                                  (postgresql-role
                                   (name "newstore")
@@ -256,6 +261,13 @@
         (pubkey-accepted-algorithms "+ssh-rsa")))
      (extra-config
       (list (ssh-host
+             (host "qz")
+             (options '((user . "samuel")
+                        (hostname . "192.168.0.249")
+                        (port . 22)
+                        ;;(identity-file . "~/.ssh/newstore-luminate.pem")
+                        )))
+            (ssh-host
              (host "bastion-sandbox")
              (options '((user . "ubuntu@bastion-sandbox")
                         (hostname . "bastion-sandbox.ssh.newstore.luminatesec.com")
@@ -401,8 +413,8 @@
    (feature-mpv)
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
-   ;;(feature-msmtp
-   ;; #:msmtp-package msmtp-latest)
+   (feature-msmtp
+    #:msmtp-package msmtp-latest)
    (feature-notmuch
     #:extra-tag-updates-post
     '("notmuch tag +guix-home -- 'thread:\"\
@@ -512,8 +524,8 @@
    (feature-kernel
     #:kernel nongnu:linux
     #:kernel-arguments
-    '("quiet" "ipv6.disable=1" "net.ifnames=0"
-      "modprobe.blacklist=snd_hda_intel,snd_soc_skl")
+    '("quiet" "ipv6.disable=1" "net.ifnames=0")
+    ;; removed "modprobe.blacklist=snd_hda_intel,snd_soc_skl"
     #:firmware (list nongnu:linux-firmware
                      nongnu:sof-firmware)
     #:initrd nongnu-sys:microcode-initrd
