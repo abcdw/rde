@@ -39,23 +39,56 @@
             elisp-configuration-service
             emacs-xdg-service))
 
+(define autoload-each-sexp-in-configure-package? #t)
+
+(define* (rde-emacs-configuration-package
+          name
+          #:optional (elisp-expressions '())
+          #:key
+          summary authors url keywords commentary
+          (elisp-packages '())
+          (autoloads? autoload-each-sexp-in-configure-package?))
+  "Returns a package, which configures emacs.  Can be used as a
+dependency for other packages."
+    (let* ((configure-package
+	  (elisp-configuration-package
+	   (string-append "configure-" (symbol->string name))
+           elisp-expressions
+           #:elisp-packages elisp-packages
+           #:autoloads? autoloads?
+           #:summary summary
+           #:commentary commentary
+           #:keywords keywords
+           #:url (or url "https://trop.in/rde")
+           #:authors (or authors '("Andrew Tropin <andrew@trop.in>")))))
+      configure-package))
+
 (define* (elisp-configuration-service
           name
           #:optional (elisp-expressions '())
           #:key
+          summary authors url keywords commentary
           (early-init '())
           (elisp-packages '())
-          (autoloads? #t))
-  (let* ((configure-package
-	  (elisp-configuration-package
-	   (string-append "configure-" (symbol->string name))
-           elisp-expressions
+          (autoloads? autoload-each-sexp-in-configure-package?))
+  (let* ((pkg-name (symbol-append 'configure- name))
+         (configure-package
+	  (rde-emacs-configuration-package
+           name elisp-expressions
+           #:summary summary
+           #:commentary commentary
+           #:keywords keywords
+           #:url url
+           #:authors authors
            #:elisp-packages elisp-packages
            #:autoloads? autoloads?)))
     (simple-service
      (symbol-append 'emacs- name '-configurations)
      home-emacs-service-type
      (home-emacs-extension
+      (init-el (if autoload-each-sexp-in-configure-package?
+                   '()
+                   `((require ',pkg-name))))
       (early-init-el early-init)
       ;; It's necessary to explicitly add elisp-packages here, because
       ;; we want to overwrite builtin emacs packages.  Propagated
