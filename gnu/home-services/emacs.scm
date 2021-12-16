@@ -9,6 +9,7 @@
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 pretty-print)
+  #:use-module (ice-9 format)
 
   #:use-module (guix packages)
   #:use-module (guix gexp)
