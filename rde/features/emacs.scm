@@ -401,7 +401,23 @@ these UI elements early."
         ,#~"\n;; Move modeline to the top"
         (setq-default header-line-format mode-line-format)
         (setq-default mode-line-format nil))
-      #:elisp-packages (list emacs-modus-themes))))
+      #:elisp-packages (list emacs-modus-themes)
+      #:keywords '(appearance mode-line faces accessibility)
+      #:summary "\
+Sets theme, fonts, faces and provides different visual tweaks"
+      #:commentary "\
+The goal is to provide non-distractive and safe visual design.
+
+Modus operandi is light, high-contrast, calm, colorblind-friendly.
+The light colorschemes are better for productivity according to
+various researchs, more eye-friendly and works better with other apps
+and media like PDFs, web pages, etc, which are also light by default.
+Later here will be a link to rde manual with more in-depth explanation
+with references to researches.
+
+Modeline is simplified and moved to the top of the window.
+
+Almost all visual elements are disabled.")))
 
   (feature
    (name f-name)
