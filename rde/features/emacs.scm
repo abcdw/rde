@@ -29,6 +29,7 @@
 	    feature-emacs-monocle
 	    feature-emacs-org
 	    feature-emacs-org-roam
+	    feature-emacs-org-agenda
 	    feature-emacs-erc
             feature-emacs-elpher
 	    feature-emacs-telega
@@ -843,6 +844,73 @@ Start an unlimited search at `point-min' otherwise."
 
          (with-eval-after-load 'notmuch (require 'ol-notmuch))))
       #:elisp-packages (list emacs-org emacs-org-contrib))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-org-agenda
+          #:key
+          (org-agenda-files 'nil))
+  "Configure org-agenda for GNU Emacs."
+  (define emacs-f-name 'org-agenda)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (require-value 'emacs-org config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((eval-when-compile
+         (require 'org-agenda))
+        (define-key global-map (kbd "C-c a a") 'org-agenda)
+        (define-key global-map (kbd "C-x C-a") 'org-agenda)
+        (setq org-agenda-custom-commands
+              `((,(kbd "C-d") "Agenda for the day"
+                 ((agenda
+                   ""
+                   ((org-agenda-span 1)
+                    (org-deadline-warning-days 0)
+                    (org-agenda-scheduled-leaders '("" "Sched.%2dx: "))
+                    (org-agenda-block-separator nil)
+                    (org-scheduled-past-days 0)
+                    ;; We don't need the `org-agenda-date-today'
+                    ;; highlight because that only has a practical
+                    ;; utility in multi-day views.
+                    (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
+                    (org-agenda-skip-function
+                     '(org-agenda-skip-entry-if 'todo '("NEXT")))
+                    (org-agenda-format-date "%A %-e %B %Y")
+                    (org-agenda-overriding-header "Agenda\n")))
+                  (todo
+                   "NEXT"
+                   ((org-agenda-block-separator nil)
+                    (org-agenda-overriding-header "\nCurrent Tasks\n")))))
+                (,(kbd "C-o") "Overview"
+                 ;; TODO: Add A priority to the top.
+                 ((agenda
+                   ""
+                   ((org-agenda-time-grid nil)
+                    (org-agenda-start-on-weekday nil)
+                    (org-agenda-start-day "+1d")
+                    (org-agenda-span 14)
+                    (org-agenda-show-all-dates nil)
+                    (org-agenda-time-grid nil)
+                    (org-deadline-warning-days 0)
+                    (org-agenda-block-separator nil)
+                    (org-agenda-entry-types '(:deadline))
+                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                    (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")))
+                  (todo
+                   "*"
+                   ((org-agenda-block-separator nil)
+                    (org-agenda-overriding-header "Tasks\n")))))))
+
+
+        (with-eval-after-load
+         'org-agenda
+         (setq org-agenda-files ',org-agenda-files))))))
 
   (feature
    (name f-name)

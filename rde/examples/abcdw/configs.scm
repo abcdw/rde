@@ -177,6 +177,8 @@
    (feature-emacs-org-roam
     ;; TODO: Rewrite to states
     #:org-roam-directory "~/work/abcdw/notes/notes")
+   (feature-emacs-org-agenda
+    #:org-agenda-files '("~/work/abcdw/agenda/todo.org"))
 
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
