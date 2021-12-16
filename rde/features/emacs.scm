@@ -39,7 +39,7 @@
             elisp-configuration-service
             emacs-xdg-service))
 
-(define autoload-each-sexp-in-configure-package? #t)
+(define autoload-each-sexp-in-configure-package? #f)
 
 (define* (rde-emacs-configuration-package
           name
