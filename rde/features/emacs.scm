@@ -153,6 +153,16 @@ dependency for other packages."
 			   "--no-splash"
 			   (cdr (command-line)))))
 
+  (define emacs-configure-rde-keymaps
+    (rde-emacs-configuration-package
+     'rde-keymaps
+     `((defvar rde-apps nil "Prefix keymap for applications.")
+       (define-prefix-command 'rde-apps nil "rde apps")
+       (defvar rde-toggles nil "\
+Prefix keymap for various minor modes for toggling some functionalitty.")
+       (define-prefix-command 'rde-toggles nil "rde toggles"))
+     #:summary "Keymaps inteded for reuse among configure-* packages"))
+
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs."
     (require-value 'full-name config)
@@ -213,9 +223,15 @@ dependency for other packages."
                   ("Europe/Helsinki" "Helsinki")
                   ("Europe/Moscow" "Moscow")
                   ("Asia/Tokyo" "Tokyo")))
-          )
+
+          (require 'configure-rde-keymaps)
+          (define-key global-map (kbd "C-c a") 'rde-apps)
+          (define-key rde-apps (kbd "w") 'world-clock))
         #:summary "General settings"
+        #:elisp-packages (list emacs-configure-rde-keymaps)
+        ;; #:require-in-init? #f
         #:keywords '(convenience))
+
        (service
 	home-emacs-service-type
 	(home-emacs-configuration
@@ -272,8 +288,7 @@ point reaches the beginning or end of the buffer, stop there."
                     (add-hook mode-hook (lambda () (setq truncate-lines t))))
             (setq compilation-scroll-output 'first-error)
 	    (define-key global-map (kbd "s-r") 'recompile)
-
-            (define-key global-map (kbd "C-c a w") 'world-clock)
+            (require 'configure-rde-emacs)
 
             ,@extra-init-el))
 	 (early-init-el
@@ -321,6 +336,7 @@ point reaches the beginning or end of the buffer, stop there."
    (name 'emacs)
    (values (make-feature-values
             emacs emacs-editor emacs-client
+            emacs-configure-rde-keymaps
             emacs-client-create-frame
             emacs-client-no-wait
             emacs-server-mode?))
