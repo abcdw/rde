@@ -9,7 +9,6 @@
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 pretty-print)
-  #:use-module (ice-9 format)
 
   #:use-module (guix packages)
   #:use-module (guix gexp)
@@ -336,7 +335,10 @@ loaded on startup."
                            #$(string-join maintainers "\n;;             ")))
            '())
        (if url (list #~(format #f ";; URL: ~a" #$url)) '())
-       (if keywords (list #~#$(format #f ";; Keywords: ~{~s, ~}" keywords)) '())
+       (if keywords
+           (list #~#$(format #f ";; Keywords: ~a"
+                             (string-join (map object->string keywords) ", ")))
+           '())
        (if commentary
            (list #~"\n;;; Commentary:\n"
                  #~#$(string-join
