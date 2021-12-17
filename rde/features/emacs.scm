@@ -963,7 +963,9 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((custom-set-variables '(git-link-use-commit t)
+      `((eval-when-compile
+         (require 'git-gutter))
+        (custom-set-variables '(git-link-use-commit t)
                               '(git-gutter:lighter " GG"))
 
         (define-key global-map (kbd "C-c t g") 'git-gutter-mode)
