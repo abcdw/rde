@@ -47,11 +47,11 @@ use_guixs() {
      ;;        (setq Info-additional-directory-list (split-string (getenv "INFOPATH") ":"))))
      (elisp-configuration-service
       'envrc
-      `((add-hook 'after-init-hook 'envrc-global-mode)
+      `((eval-when-compile (require 'envrc))
+        (add-hook 'after-init-hook 'envrc-global-mode)
         (with-eval-after-load 'envrc
          (define-key envrc-mode-map (kbd "C-c e") 'envrc-command-map)))
-      #:elisp-packages (list emacs-envrc))
-    ))
+      #:elisp-packages (list emacs-envrc))))
 
   (feature
    (name 'direnv)
