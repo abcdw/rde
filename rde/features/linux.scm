@@ -71,7 +71,7 @@
 (define* (feature-pipewire
           #:key
           (pipewire pipewire-0.3)
-          (pipewire-media-session pipewire-media-session))
+          (wireplumber wireplumber))
   ""
   (define (home-pipewire-services _)
     (list
@@ -115,17 +115,10 @@ ctl_type.pipewire {
                   (list #$(file-append pipewire "/bin/pipewire")))))
        (shepherd-service
         (requirement '(pipewire))
-        (provision '(pipewire-media-session))
+        (provision '(wireplumber))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list
-                   #$(file-append
-                      pipewire-media-session
-                      "/bin/pipewire-media-session")
-                   "-c"
-                   #$(file-append
-                      pipewire-media-session
-                      "/share/pipewire/media-session.d/media-session.conf")))))
+                  (list #$(file-append wireplumber "/bin/wireplumber")))))
        (shepherd-service
         (requirement '(pipewire))
         (provision '(pipewire-pulse))
@@ -135,7 +128,7 @@ ctl_type.pipewire {
      (simple-service
       'pipewire-add-packages
       home-profile-service-type
-      (list pipewire))))
+      (list pipewire wireplumber))))
 
   (define (system-pipewire-services _)
     (list
@@ -145,6 +138,6 @@ ctl_type.pipewire {
 
   (feature
    (name 'pipewire)
-   (values `((pipewire . ,pipewire)))
+   (values (make-feature-values pipewire wireplumber))
    (home-services-getter home-pipewire-services)
    (system-services-getter system-pipewire-services)))
