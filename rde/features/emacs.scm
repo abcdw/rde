@@ -123,7 +123,7 @@ dependency for other packages."
 
 (define* (feature-emacs
 	  #:key
-	  (package emacs-next-pgtk-latest)
+	  (emacs emacs-next-pgtk-latest)
 	  (emacs-server-mode? #t)
 	  (additional-elisp-packages '())
           (extra-init-el '())
@@ -131,25 +131,25 @@ dependency for other packages."
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
-  (ensure-pred package? package)
+  (ensure-pred package? emacs)
 
-  (define emacs-client (file-append package "/bin/emacsclient"))
+  (define emacs-client (file-append emacs "/bin/emacsclient"))
   (define emacs-client-create-frame
     (program-file "emacs-client-create-frame"
 		  #~(apply system*
-			   #$(file-append package "/bin/emacsclient")
+			   #$(file-append emacs "/bin/emacsclient")
 			   "--create-frame"
 			   (cdr (command-line)))))
   (define emacs-client-no-wait
     (program-file "emacs-client-no-wait"
 		  #~(apply system*
-			   #$(file-append package "/bin/emacsclient")
+			   #$(file-append emacs "/bin/emacsclient")
 			   "--no-wait"
 			   (cdr (command-line)))))
   (define emacs-editor
     (program-file "emacs-editor"
 		  #~(apply system*
-			   #$(file-append package "/bin/emacs")
+			   #$(file-append emacs "/bin/emacs")
 			   "--no-splash"
 			   (cdr (command-line)))))
 
@@ -219,7 +219,7 @@ dependency for other packages."
        (service
 	home-emacs-service-type
 	(home-emacs-configuration
-	 (package package)
+	 (package emacs)
 	 (elisp-packages (cons* emacs-guix
                                 emacs-expand-region
                                 additional-elisp-packages))
@@ -319,12 +319,11 @@ point reaches the beginning or end of the buffer, stop there."
 
   (feature
    (name 'emacs)
-   (values (append
-	    `((emacs . #t))
-	    (make-feature-values emacs-editor emacs-client
-                                 emacs-client-create-frame
-                                 emacs-client-no-wait
-                                 emacs-server-mode?)))
+   (values (make-feature-values
+            emacs emacs-editor emacs-client
+            emacs-client-create-frame
+            emacs-client-no-wait
+            emacs-server-mode?))
    (home-services-getter emacs-home-services)))
 
 (define* (feature-emacs-appearance
