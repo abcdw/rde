@@ -308,3 +308,30 @@ together as part of a unified framework. The idea is to make the
 presentation and overall functionality be consistent with other
 popular, vertically aligned completion UIs while leveraging built-in
 functionality.")))
+
+(use-modules (gnu packages glib))
+(define-public pipewire-media-session
+  (package
+    (name "pipewire-media-session")
+    (version "0.4.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.freedesktop.org/pipewire/media-session")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "1gjspcgl5z19j4m3jr0771a1cxiizzvkjsw2v4rq6d92760zp7bv"))))
+    (build-system meson-build-system)
+    (native-inputs
+     (list pkg-config))
+    (inputs
+     (list pipewire-0.3
+           alsa-lib
+           dbus))
+    (home-page "https://pipewire.org/")
+    (synopsis "PipeWire Media Session")
+    (description #f)
+    (license license:expat)))

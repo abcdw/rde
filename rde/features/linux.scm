@@ -70,7 +70,8 @@
 
 (define* (feature-pipewire
           #:key
-          (package pipewire-0.3))
+          (pipewire pipewire-0.3)
+          (pipewire-media-session pipewire-media-session))
   ""
   (define (home-pipewire-services _)
     (list
@@ -84,19 +85,19 @@
            #~(string-append
               "<"
 	      #$(file-append
-                 package "/share/alsa/alsa.conf.d/50-pipewire.conf")
+                 pipewire "/share/alsa/alsa.conf.d/50-pipewire.conf")
 	      ">\n<"
 	      #$(file-append
-                 package "/share/alsa/alsa.conf.d/99-pipewire-default.conf")
+                 pipewire "/share/alsa/alsa.conf.d/99-pipewire-default.conf")
               ">\n"
               "
 pcm_type.pipewire {
-  lib " #$(file-append package "/lib/alsa-lib/libasound_module_pcm_pipewire.so")
+  lib " #$(file-append pipewire "/lib/alsa-lib/libasound_module_pcm_pipewire.so")
   "
 }
 
 ctl_type.pipewire {
-  lib " #$(file-append package "/lib/alsa-lib/libasound_module_ctl_pipewire.so")
+  lib " #$(file-append pipewire "/lib/alsa-lib/libasound_module_ctl_pipewire.so")
   "
 }
 ")))))
@@ -111,34 +112,39 @@ ctl_type.pipewire {
         (provision '(pipewire))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list #$(file-append package "/bin/pipewire")))))
+                  (list #$(file-append pipewire "/bin/pipewire")))))
        (shepherd-service
         (requirement '(pipewire))
         (provision '(pipewire-media-session))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list #$(file-append package "/bin/pipewire-media-session")))))
+                  (list
+                   #$(file-append
+                      pipewire-media-session
+                      "/bin/pipewire-media-session")
+                   "-c"
+                   #$(file-append
+                      pipewire-media-session
+                      "/share/pipewire/media-session.d/media-session.conf")))))
        (shepherd-service
         (requirement '(pipewire))
         (provision '(pipewire-pulse))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list #$(file-append package "/bin/pipewire-pulse")))))))
+                  (list #$(file-append pipewire "/bin/pipewire-pulse")))))))
      (simple-service
       'pipewire-add-packages
       home-profile-service-type
-      (append
-       ;; TODO: Should be in feature-sway
-       (list package)))))
+      (list pipewire))))
 
   (define (system-pipewire-services _)
     (list
      (udev-rules-service
       'pipewire-add-udev-rules
-      package)))
+      pipewire)))
 
   (feature
    (name 'pipewire)
-   (values `((pipewire . #t)))
+   (values `((pipewire . ,pipewire)))
    (home-services-getter home-pipewire-services)
    (system-services-getter system-pipewire-services)))
