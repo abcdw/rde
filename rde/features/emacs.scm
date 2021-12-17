@@ -164,6 +164,58 @@ dependency for other packages."
                           #~(system* "emacs" "-q"))
        (emacs-xdg-service 'emacs-Q "Emacs (No init, no site-lisp: -Q)"
                           #~(system* "emacs" "-Q"))
+       (elisp-configuration-service
+        'rde-emacs
+        `((setq user-full-name ,full-name)
+	  (setq user-mail-address ,email)
+
+          ,#~""
+	  (setq custom-file
+		(concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+			"/emacs/custom.el"))
+	  (load custom-file t)
+
+          (setq backup-directory-alist
+                `(,(cons "." (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		                     "/emacs/backup"))))
+
+          ,#~""
+          (column-number-mode 1)
+	  (save-place-mode 1)
+          ;; MAYBE: Make it buffer local?
+          (show-paren-mode 1)
+	  (setq-default indent-tabs-mode nil)
+	  (setq save-interprogram-paste-before-kill t)
+	  (setq mouse-yank-at-point t)
+	  (setq require-final-newline t)
+          (add-hook 'prog-mode-hook
+                    (lambda () (setq show-trailing-whitespace t)))
+          ,#~""
+          (define-key global-map (kbd "C-=") 'er/expand-region)
+
+          ,#~""
+          (defun rde-display-load-time ()
+            (interactive)
+            (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
+
+          (defun display-startup-echo-area-message ()
+            (rde-display-load-time))
+
+          ,#~""
+          (eval-when-compile
+           (require 'time))
+          (setq world-clock-list
+                '(("America/Los_Angeles" "Los Angeles")
+                  ("America/Boise" "Boise")
+                  ("America/New_York" "New York")
+                  ("Europe/London" "London")
+                  ("Europe/Paris" "Paris")
+                  ("Europe/Helsinki" "Helsinki")
+                  ("Europe/Moscow" "Moscow")
+                  ("Asia/Tokyo" "Tokyo")))
+          )
+        #:summary "General settings"
+        #:keywords '(convenience))
        (service
 	home-emacs-service-type
 	(home-emacs-configuration
@@ -174,26 +226,8 @@ dependency for other packages."
 	 (server-mode? emacs-server-mode?)
 	 (xdg-flavor? #t)
 	 (init-el
-	  `((setq user-full-name ,full-name)
-	    (setq user-mail-address ,email)
+	  `(
 
-            ,#~""
-	    (setq custom-file
-		  (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-			  "/emacs/custom.el"))
-	    (load custom-file t)
-
-            ,#~""
-            (define-key global-map (kbd "C-=") 'er/expand-region)
-
-            ,#~""
-            (defun rde-display-load-time ()
-              (interactive)
-              (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
-
-            ;; (setq inhibit-splash-screen t)
-            (defun display-startup-echo-area-message ()
-              (rde-display-load-time))
 	    ,#~""
 
             (defun rde-compilation-colorizer ()
@@ -230,41 +264,16 @@ point reaches the beginning or end of the buffer, stop there."
   [remap move-beginning-of-line]
   'smarter-move-beginning-of-line)\n"
 
-	    (column-number-mode 1)
-	    (save-place-mode 1)
-	    (show-paren-mode 1)
-            ;; (add-hook 'prog-mode-hook 'electric-pair-mode)
 
             ;; TODO: Move to feature-emacs-guix.
             (global-guix-prettify-mode)
 
-	    (setq-default indent-tabs-mode nil)
-	    (setq save-interprogram-paste-before-kill t)
-	    (setq mouse-yank-at-point t)
-	    (setq require-final-newline t)
-            (add-hook 'prog-mode-hook
-                      (lambda () (setq show-trailing-whitespace t)))
-
-            (setq backup-directory-alist
-                  `(,(cons "." (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		                       "/emacs/backup"))))
-
-            ;; MAYBE: Move to dired
             (dolist (mode-hook '(prog-mode-hook compilation-mode-hook))
                     (add-hook mode-hook (lambda () (setq truncate-lines t))))
             (setq compilation-scroll-output 'first-error)
 	    (define-key global-map (kbd "s-r") 'recompile)
 
             (define-key global-map (kbd "C-c a w") 'world-clock)
-            (setq world-clock-list
-                  '(("America/Los_Angeles" "Los Angeles")
-                    ("America/Boise" "Boise")
-                    ("America/New_York" "New York")
-                    ("Europe/London" "London")
-                    ("Europe/Paris" "Paris")
-                    ("Europe/Helsinki" "Helsinki")
-                    ("Europe/Moscow" "Moscow")
-                    ("Asia/Tokyo" "Tokyo")))
 
             ,@extra-init-el))
 	 (early-init-el
@@ -274,7 +283,7 @@ point reaches the beginning or end of the buffer, stop there."
 	 ;;; native-comp, but for some reason dash.el fails to build,
 	 ;;; need to investigate the issue.
 	 ;; (rebuild-elisp-packages? #t)
-	 ))
+         ))
 
        (simple-service 'emacs-set-default-editor
 		       home-environment-variables-service-type
