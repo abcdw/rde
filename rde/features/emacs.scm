@@ -174,9 +174,12 @@ Prefix keymap for various minor modes for toggling some functionalitty.")
                           #~(system* "emacs" "-q"))
        (emacs-xdg-service 'emacs-Q "Emacs (No init, no site-lisp: -Q)"
                           #~(system* "emacs" "-Q"))
+
        (elisp-configuration-service
         'rde-emacs
-        `((setq user-full-name ,full-name)
+        `((require 'configure-rde-keymaps)
+
+          (setq user-full-name ,full-name)
 	  (setq user-mail-address ,email)
 
           ,#~""
@@ -212,6 +215,20 @@ Prefix keymap for various minor modes for toggling some functionalitty.")
             (rde-display-load-time))
 
           ,#~""
+          (defun rde-compilation-colorizer ()
+            "Prevent color escape sequences to popup in compilation buffer."
+            (ansi-color-apply-on-region (point-min) (point-max)))
+          (add-hook 'compilation-filter-hook 'rde-compilation-colorizer)
+
+          (dolist (mode-hook '(prog-mode-hook compilation-mode-hook))
+                  (add-hook mode-hook (lambda () (setq truncate-lines t))))
+          (setq compilation-scroll-output 'first-error)
+	  (define-key global-map (kbd "s-r") 'recompile)
+
+          ,#~""
+          (global-guix-prettify-mode)
+
+          ,#~""
           (eval-when-compile
            (require 'time))
           (setq world-clock-list
@@ -223,74 +240,22 @@ Prefix keymap for various minor modes for toggling some functionalitty.")
                   ("Europe/Helsinki" "Helsinki")
                   ("Europe/Moscow" "Moscow")
                   ("Asia/Tokyo" "Tokyo")))
+          (define-key rde-apps (kbd "w") 'world-clock)
 
-          (require 'configure-rde-keymaps)
-          (define-key global-map (kbd "C-c a") 'rde-apps)
-          (define-key rde-apps (kbd "w") 'world-clock))
+          (define-key global-map (kbd "C-c a") 'rde-apps))
         #:summary "General settings"
-        #:elisp-packages (list emacs-configure-rde-keymaps)
-        ;; #:require-in-init? #f
+        #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
+                               emacs-expand-region emacs-guix)
         #:keywords '(convenience))
 
        (service
 	home-emacs-service-type
 	(home-emacs-configuration
 	 (package emacs)
-	 (elisp-packages (cons* emacs-guix
-                                emacs-expand-region
-                                additional-elisp-packages))
+	 (elisp-packages additional-elisp-packages)
 	 (server-mode? emacs-server-mode?)
 	 (xdg-flavor? #t)
-	 (init-el
-	  `(
-
-	    ,#~""
-
-            (defun rde-compilation-colorizer ()
-              "Prevent color escape sequences to popup in compilation buffer."
-              (ansi-color-apply-on-region (point-min) (point-max)))
-            (add-hook 'compilation-filter-hook 'rde-compilation-colorizer)
-
-            ;; <https://emacsredux.com/blog/2013/05/22/smarter-navigation-to-the-beginning-of-a-line/>
-            ;; Actually there is M-m for back-to-indentation
-            (defun smarter-move-beginning-of-line (arg)
-              "Move point back to indentation of beginning of line.
-
-Move point to the first non-whitespace character on this line.
-If point is already there, move to the beginning of the line.
-Effectively toggle between the first non-whitespace character and
-the beginning of the line.
-
-If ARG is not nil or 1, move forward ARG - 1 lines first.  If
-point reaches the beginning or end of the buffer, stop there."
-              (interactive "^p")
-              (setq arg (or arg 1))
-
-              ;; Move lines first
-              (when (/= arg 1)
-                (let ((line-move-visual nil))
-                  (forward-line (- arg 1))))
-
-              (let ((orig-point (point)))
-                (move-beginning-of-line 1)
-                (when (= orig-point (point))
-                  (back-to-indentation))))
-            ,#~"
-(define-key global-map
-  [remap move-beginning-of-line]
-  'smarter-move-beginning-of-line)\n"
-
-
-            ;; TODO: Move to feature-emacs-guix.
-            (global-guix-prettify-mode)
-
-            (dolist (mode-hook '(prog-mode-hook compilation-mode-hook))
-                    (add-hook mode-hook (lambda () (setq truncate-lines t))))
-            (setq compilation-scroll-output 'first-error)
-	    (define-key global-map (kbd "s-r") 'recompile)
-            (require 'configure-rde-emacs)
-
-            ,@extra-init-el))
+	 (init-el extra-init-el)
 	 (early-init-el
 	  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))
             ,@extra-early-init-el))
