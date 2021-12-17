@@ -225,7 +225,7 @@ to each system-services-getter function."
   Re-login to get environment variables updated.\n"))
         ("on-first-login"
          ,#~(display "The on-first-login script was updated.
-  Re-login to get the cahnges applied.\n"))))
+  Re-login to get the changes applied.\n"))))
      (service home-run-on-first-login-service-type)
      (service home-activation-service-type)
      (service home-environment-variables-service-type)
