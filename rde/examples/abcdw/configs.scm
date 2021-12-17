@@ -195,6 +195,16 @@
      ;;   #~(string-append
      ;;      "alias superls="
      ;;      #$(file-append (@ (gnu packages base) coreutils) "/bin/ls"))))
+
+     ((@ (gnu services) simple-service)
+      'notes-commit-job
+      (@ (gnu home services mcron) home-mcron-service-type)
+      (list #~(job '(next-hour)
+                   (lambda ()
+                     (system* "cd" my-org-directory)
+                     (system* "git add .")
+                     (system* "git commit -m \"auto-commit | $(date -u)\""))
+                     "notes-commit")))
      )
     #:system-services
     (list (service postgresql-service-type)
