@@ -98,6 +98,443 @@ SCHEDULED: <2022-01-21 Fri>
 *** recoll-home-service
 **** TODO mcron job ; reindexing
 
+
+** mcron
+*** trigger =herd restart= of =home services mcron= when jobs change
+- home mcron currently requires manual restart after =guix home reconfigure config.scm=
+**** repro
+set this =constants= value and =C-c C-c= the prop to set locally
+#+constants rde=$HOME/git/sys/rde
+
+***** have an RDE config
+I'm using a config based on file:./rde/examples/abcdw/configs.scm in
+my local repo, so =make= works from the root to reconfigure home.
+
+***** reconfigure to ensure current state is fresh and properly reloaded
+#+name: guix-rde-home-reconfigure
+#+begin_src shell :var RDE=(org-table-get-constant "rde") :results drawer
+cd $RDE 
+make
+#+end_src
+
+#+RESULTS: guix-rde-home-reconfigure
+:results:
+RDE_TARGET=ixy-home \
+GUILE_LOAD_PATH=./ \
+guix home reconfigure ./rde/examples/abcdw/configs.scm
+"pre-%abcdw-features"
+"post-%abcdw-features"
+"pre-%main-features"
+"post-%main-features"
+"pre-dispatch"
+/gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home
+Cleaning up symlinks from previous home-environment.
+
+Removing /home/samuel/.gnupg/gpg-agent.conf... done
+Removing /home/samuel/.gnupg/gpg.conf... done
+Skipping /home/samuel/.gnupg (not an empty directory)... done
+Removing /home/samuel/.local/share/applications/emacs-telega.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-dired.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-org.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-elpher.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-emacs-q.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-emacs-Q.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-transmission.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-erc.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-message.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-pdf-tools.desktop... done
+Skipping /home/samuel/.local/share/applications (not an empty directory)... done
+Skipping /home/samuel/.local/share (not an empty directory)... done
+Skipping /home/samuel/.local (not an empty directory)... done
+Removing /home/samuel/.config/zsh/.zprofile... done
+Removing /home/samuel/.config/zsh/.zshrc... done
+Removing /home/samuel/.config/zsh/.zshenv... done
+Removing /home/samuel/.config/zsh... done
+Removing /home/samuel/.config/msmtp/config... done
+Removing /home/samuel/.config/msmtp... done
+Removing /home/samuel/.config/fontconfig/fonts.conf... done
+Removing /home/samuel/.config/fontconfig... done
+Removing /home/samuel/.config/alsa/asoundrc... done
+Removing /home/samuel/.config/alsa... done
+Removing /home/samuel/.config/emacs/early-init.el... done
+Removing /home/samuel/.config/emacs/init.el... done
+Skipping /home/samuel/.config/emacs (not an empty directory)... done
+Removing /home/samuel/.config/direnv/direnvrc... done
+Removing /home/samuel/.config/direnv... done
+Removing /home/samuel/.config/notmuch/default/hooks/post-new... done
+Removing /home/samuel/.config/notmuch/default/hooks/pre-new... done
+Removing /home/samuel/.config/notmuch/default/hooks... done
+Removing /home/samuel/.config/notmuch/default/config... done
+Removing /home/samuel/.config/notmuch/default... done
+Removing /home/samuel/.config/notmuch... done
+Removing /home/samuel/.config/isync/mbsyncrc... done
+Removing /home/samuel/.config/isync... done
+Removing /home/samuel/.config/alacritty/alacritty.yml... done
+Removing /home/samuel/.config/alacritty... done
+Removing /home/samuel/.config/git/ignore... done
+Removing /home/samuel/.config/git/config... done
+Removing /home/samuel/.config/git/attributes... done
+Removing /home/samuel/.config/git... done
+Removing /home/samuel/.config/sway/config... done
+Skipping /home/samuel/.config/sway (not an empty directory)... done
+Removing /home/samuel/.config/user-dirs.conf... done
+Removing /home/samuel/.config/user-dirs.dirs... done
+Removing /home/samuel/.config/mimeapps.list... done
+Skipping /home/samuel/.config (not an empty directory)... done
+Removing /home/samuel/.ssh/config... done
+Skipping /home/samuel/.ssh (not an empty directory)... done
+Removing /home/samuel/.zshenv... done
+Removing /home/samuel/.mailcap... done
+Removing /home/samuel/.l2mdconfig... done
+Removing /home/samuel/.profile... done
+Cleanup finished.
+
+New symlinks to home-environment will be created soon.
+All conflicting files will go to /home/samuel/1639741513-guix-home-legacy-configs-backup.
+
+Skipping   /home/samuel/.gnupg (directory already exists)... done
+Symlinking /home/samuel/.gnupg/gpg-agent.conf -> /gnu/store/3ggaj65gdmnwdx4akl6v81ky78psyw8s-gnupg-gpg-agent.conf... done
+Symlinking /home/samuel/.gnupg/gpg.conf -> /gnu/store/li1hq0zd9vk3xrazkvmmp4qd3qbqz9bq-gnupg-gpg.conf... done
+Skipping   /home/samuel/.local (directory already exists)... done
+Skipping   /home/samuel/.local/share (directory already exists)... done
+Skipping   /home/samuel/.local/share/applications (directory already exists)... done
+Symlinking /home/samuel/.local/share/applications/emacs-telega.desktop -> /gnu/store/jlh4hzxzichdv32wk3g74i1x93nv3ay4-xdg-desktop-emacs-telega.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-dired.desktop -> /gnu/store/l5a2p5f74gfxj8d3m0k5h2mzm3bxq2k8-xdg-desktop-emacs-dired.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-org.desktop -> /gnu/store/kqla7g08ahr4m2y2q9ynsa0wmqkanzrl-xdg-desktop-emacs-org.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-elpher.desktop -> /gnu/store/4xcm6md8ssqa7m7yza7h1wpgv3i1kp7m-xdg-desktop-emacs-elpher.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-emacs-q.desktop -> /gnu/store/j3p0s7iimwb240w31mvh4i2wi6541i72-xdg-desktop-emacs-emacs-q.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-emacs-Q.desktop -> /gnu/store/my4ki7l5zcjwy23grl96gzacnv9f0zhr-xdg-desktop-emacs-emacs-Q.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-transmission.desktop -> /gnu/store/4pfacsnggf8qwaxp7r743cws31hz0wgc-xdg-desktop-emacs-transmission.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-erc.desktop -> /gnu/store/kn6bm8xdic1axqdxdf0fkr0i7pjn9d34-xdg-desktop-emacs-erc.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-message.desktop -> /gnu/store/w0chfyx2qpfg7wnsaifir5ma0dx16h84-xdg-desktop-emacs-message.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-pdf-tools.desktop -> /gnu/store/f8sbcn7c5zcp28pwqd97g3vjgp3z1m3y-xdg-desktop-emacs-pdf-tools.desktop-entry... done
+Skipping   /home/samuel/.config (directory already exists)... done
+Creating   /home/samuel/.config/zsh... done
+Symlinking /home/samuel/.config/zsh/.zprofile -> /gnu/store/8aga3dqapnfx46919z1bqi4z05s8alz0-zprofile... done
+Symlinking /home/samuel/.config/zsh/.zshrc -> /gnu/store/vwrn814v58m5wmqpajv6l3433csmwmq4-zshrc... done
+Symlinking /home/samuel/.config/zsh/.zshenv -> /gnu/store/jzssmn4839q5akj9macif9qx6w3mzmzq-zshenv... done
+Creating   /home/samuel/.config/msmtp... done
+Symlinking /home/samuel/.config/msmtp/config -> /gnu/store/nqd68xyac095nh1dwbbw3dj1v12ns0bl-msmtp... done
+Creating   /home/samuel/.config/fontconfig... done
+Symlinking /home/samuel/.config/fontconfig/fonts.conf -> /gnu/store/phj2z2iiqdhryfy7mqral0b9qz3hlva6-fonts.conf... done
+Creating   /home/samuel/.config/alsa... done
+Symlinking /home/samuel/.config/alsa/asoundrc -> /gnu/store/w9a4qkqvfd57zd3xjxnpgvk5gvydc7w5-asoundrc... done
+Skipping   /home/samuel/.config/emacs (directory already exists)... done
+Symlinking /home/samuel/.config/emacs/early-init.el -> /gnu/store/hazbapxwjxxlzniqxriv3qmqazsb9x4x-early-init.el... done
+Symlinking /home/samuel/.config/emacs/init.el -> /gnu/store/lqrwjy803sw59z0cxlcinb7h3f31l788-init.el... done
+Creating   /home/samuel/.config/direnv... done
+Symlinking /home/samuel/.config/direnv/direnvrc -> /gnu/store/kcg5fb6lswn9lf386ryaj17m4jf9via0-direnvrc... done
+Creating   /home/samuel/.config/notmuch... done
+Creating   /home/samuel/.config/notmuch/default... done
+Creating   /home/samuel/.config/notmuch/default/hooks... done
+Symlinking /home/samuel/.config/notmuch/default/hooks/post-new -> /gnu/store/1kdl14gkna8bq681w1zs8drjr2avsp7s-notmuch-post-new... done
+Symlinking /home/samuel/.config/notmuch/default/hooks/pre-new -> /gnu/store/7h8z54wm9b0n12zh0138p07j09ili64a-notmuch-pre-new... done
+Symlinking /home/samuel/.config/notmuch/default/config -> /gnu/store/vpxr31b52rj5j7vcxq7ybljb2d7n65ib-notmuch-config... done
+Creating   /home/samuel/.config/isync... done
+Symlinking /home/samuel/.config/isync/mbsyncrc -> /gnu/store/df1145fv0a2s1w0wpsgx4gwfs0qamlhj-mbsyncrc... done
+Creating   /home/samuel/.config/alacritty... done
+Symlinking /home/samuel/.config/alacritty/alacritty.yml -> /gnu/store/5v7vx6k1r83vfk7dk8smh25b4mdyqxs3-alacritty.yml... done
+Creating   /home/samuel/.config/git... done
+Symlinking /home/samuel/.config/git/ignore -> /gnu/store/k3v69xvi02nfazrw1pk6bm5rpq5ab3yq-git-ignore... done
+Symlinking /home/samuel/.config/git/config -> /gnu/store/arjjx181lgd5vlpizi6g8smwf7yx9mba-git-config... done
+Symlinking /home/samuel/.config/git/attributes -> /gnu/store/4b2r2xk249d8clwpscil9dvaki4ph51r-git-attributes... done
+Skipping   /home/samuel/.config/sway (directory already exists)... done
+Symlinking /home/samuel/.config/sway/config -> /gnu/store/1710mwlm3bbnqiwfw5vqdfw0z9cxk22j-sway-config... done
+Symlinking /home/samuel/.config/user-dirs.conf -> /gnu/store/kiyn1z6443spwd28p3pxzw25yb1zxm3g-user-dirs.conf... done
+Symlinking /home/samuel/.config/user-dirs.dirs -> /gnu/store/m6s8g1y4nmbgx66iicqkx7864jl0h57j-user-dirs.dirs... done
+Symlinking /home/samuel/.config/mimeapps.list -> /gnu/store/jbblp7w128q0nh437qa7qblilsvz5f5h-xdg-mime-appplications... done
+Skipping   /home/samuel/.ssh (directory already exists)... done
+Symlinking /home/samuel/.ssh/config -> /gnu/store/8c98jdcvs80dpm9ff5rcjx7cn1mbyjbc-ssh-config... done
+Symlinking /home/samuel/.zshenv -> /gnu/store/750lcma15p4xzmj377qrcns0p3za37m0-auxiliary-zshenv... done
+Symlinking /home/samuel/.mailcap -> /gnu/store/3788khia4241j9a6p6sa37kv607f9sng-mailcap... done
+Symlinking /home/samuel/.l2mdconfig -> /gnu/store/w34n2h10sbc15bvcffa6fcgrhrk0mc0b-l2mdconfig... done
+Symlinking /home/samuel/.profile -> /gnu/store/034kpwrpgmj3svzkx781482sr01pckcm-shell-profile... done
+ done
+Finished updating symlinks.
+
+Creating XDG user directories... done
+Updating startup tty for gpg... done
+Loading /gnu/store/h21wkxp8z75nvnhbb5hvd03mivc175sn-shepherd.conf.
+Starting services...
+
+Comparing /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/profile/share/fonts and
+          /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/profile/share/fonts... done (same)
+Comparing /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/setup-environment and
+          /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/setup-environment... done (same)
+Comparing /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/on-first-login and
+          /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/on-first-login... done (same)
+Comparing /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/files/config/sway/config and
+          /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/files/config/sway/config... done (same)
+Evaling on-change gexps.
+
+On-change gexps evaluation finished.
+
+:end:
+
+***** check =herd mcron= state
+  #+name: guix-herd-schedule-mcron
+  #+begin_src shell :results drawer
+  herd schedule mcron 1
+  #+end_src
+
+  #+RESULTS: guix-herd-schedule-mcron
+  :results:
+  Fri 17 Dec 2021 01:00:00 PM CET +0100
+  mbsync
+
+  :end:
+
+  #+RESULTS:
+  :results:
+  Fri 17 Dec 2021 01:00:00 PM CET +0100
+  mbsync
+
+  Fri 17 Dec 2021 01:00:00 PM CET +0100
+  Lambda function
+
+  Fri 17 Dec 2021 02:00:00 PM CET +0100
+  mbsync
+
+  Fri 17 Dec 2021 02:00:00 PM CET +0100
+  Lambda function
+
+  Fri 17 Dec 2021 03:00:00 PM CET +0100
+  mbsync
+
+  Fri 17 Dec 2021 03:00:00 PM CET +0100
+  Lambda function
+
+  Fri 17 Dec 2021 04:00:00 PM CET +0100
+  mbsync
+
+  Fri 17 Dec 2021 04:00:00 PM CET +0100
+  Lambda function
+
+  Fri 17 Dec 2021 05:00:00 PM CET +0100
+  mbsync
+
+  Fri 17 Dec 2021 05:00:00 PM CET +0100
+  Lambda function
+
+  :end:
+***** add a new home service
+e.g. 
+#+begin_src  scheme
+(feature-custom-services
+ #:home-services
+ ((@ (gnu services) simple-service)
+  'hello-world-job
+  (@ (gnu home services mcron) home-mcron-service-type)
+  (list #~(job '(next-hour)
+               (lambda ()
+                 (system* "echo 'hello world' >> /tmp/hello")
+                 (system* "date -u >> /tmp/hello"))
+               "my-hello-world"))))
+#+end_src
+
+***** reconfigure with additional job
+#+name: rde-reconf-with-new-job
+#+call: guix-rde-home-reconfigure()
+
+#+RESULTS: rde-reconf-with-new-job
+:results:
+RDE_TARGET=ixy-home \
+GUILE_LOAD_PATH=./ \
+guix home reconfigure ./rde/examples/abcdw/configs.scm
+"pre-%abcdw-features"
+"post-%abcdw-features"
+"pre-%main-features"
+"post-%main-features"
+"pre-dispatch"
+/gnu/store/ymx6ym0zni3cbz51h2xhnzn9kzrdn2pr-home
+Cleaning up symlinks from previous home-environment.
+
+Removing /home/samuel/.gnupg/gpg-agent.conf... done
+Removing /home/samuel/.gnupg/gpg.conf... done
+Skipping /home/samuel/.gnupg (not an empty directory)... done
+Removing /home/samuel/.local/share/applications/emacs-telega.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-dired.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-org.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-elpher.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-emacs-q.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-emacs-Q.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-transmission.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-erc.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-message.desktop... done
+Removing /home/samuel/.local/share/applications/emacs-pdf-tools.desktop... done
+Skipping /home/samuel/.local/share/applications (not an empty directory)... done
+Skipping /home/samuel/.local/share (not an empty directory)... done
+Skipping /home/samuel/.local (not an empty directory)... done
+Removing /home/samuel/.config/zsh/.zprofile... done
+Removing /home/samuel/.config/zsh/.zshrc... done
+Removing /home/samuel/.config/zsh/.zshenv... done
+Removing /home/samuel/.config/zsh... done
+Removing /home/samuel/.config/msmtp/config... done
+Removing /home/samuel/.config/msmtp... done
+Removing /home/samuel/.config/fontconfig/fonts.conf... done
+Removing /home/samuel/.config/fontconfig... done
+Removing /home/samuel/.config/alsa/asoundrc... done
+Removing /home/samuel/.config/alsa... done
+Removing /home/samuel/.config/emacs/early-init.el... done
+Removing /home/samuel/.config/emacs/init.el... done
+Skipping /home/samuel/.config/emacs (not an empty directory)... done
+Removing /home/samuel/.config/direnv/direnvrc... done
+Removing /home/samuel/.config/direnv... done
+Removing /home/samuel/.config/notmuch/default/hooks/post-new... done
+Removing /home/samuel/.config/notmuch/default/hooks/pre-new... done
+Removing /home/samuel/.config/notmuch/default/hooks... done
+Removing /home/samuel/.config/notmuch/default/config... done
+Removing /home/samuel/.config/notmuch/default... done
+Removing /home/samuel/.config/notmuch... done
+Removing /home/samuel/.config/isync/mbsyncrc... done
+Removing /home/samuel/.config/isync... done
+Removing /home/samuel/.config/alacritty/alacritty.yml... done
+Removing /home/samuel/.config/alacritty... done
+Removing /home/samuel/.config/git/ignore... done
+Removing /home/samuel/.config/git/config... done
+Removing /home/samuel/.config/git/attributes... done
+Removing /home/samuel/.config/git... done
+Removing /home/samuel/.config/sway/config... done
+Skipping /home/samuel/.config/sway (not an empty directory)... done
+Removing /home/samuel/.config/user-dirs.conf... done
+Removing /home/samuel/.config/user-dirs.dirs... done
+Removing /home/samuel/.config/mimeapps.list... done
+Skipping /home/samuel/.config (not an empty directory)... done
+Removing /home/samuel/.ssh/config... done
+Skipping /home/samuel/.ssh (not an empty directory)... done
+Removing /home/samuel/.zshenv... done
+Removing /home/samuel/.mailcap... done
+Removing /home/samuel/.l2mdconfig... done
+Removing /home/samuel/.profile... done
+Cleanup finished.
+
+New symlinks to home-environment will be created soon.
+All conflicting files will go to /home/samuel/1639741671-guix-home-legacy-configs-backup.
+
+Skipping   /home/samuel/.gnupg (directory already exists)... done
+Symlinking /home/samuel/.gnupg/gpg-agent.conf -> /gnu/store/3ggaj65gdmnwdx4akl6v81ky78psyw8s-gnupg-gpg-agent.conf... done
+Symlinking /home/samuel/.gnupg/gpg.conf -> /gnu/store/li1hq0zd9vk3xrazkvmmp4qd3qbqz9bq-gnupg-gpg.conf... done
+Skipping   /home/samuel/.local (directory already exists)... done
+Skipping   /home/samuel/.local/share (directory already exists)... done
+Skipping   /home/samuel/.local/share/applications (directory already exists)... done
+Symlinking /home/samuel/.local/share/applications/emacs-telega.desktop -> /gnu/store/jlh4hzxzichdv32wk3g74i1x93nv3ay4-xdg-desktop-emacs-telega.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-dired.desktop -> /gnu/store/l5a2p5f74gfxj8d3m0k5h2mzm3bxq2k8-xdg-desktop-emacs-dired.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-org.desktop -> /gnu/store/kqla7g08ahr4m2y2q9ynsa0wmqkanzrl-xdg-desktop-emacs-org.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-elpher.desktop -> /gnu/store/4xcm6md8ssqa7m7yza7h1wpgv3i1kp7m-xdg-desktop-emacs-elpher.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-emacs-q.desktop -> /gnu/store/j3p0s7iimwb240w31mvh4i2wi6541i72-xdg-desktop-emacs-emacs-q.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-emacs-Q.desktop -> /gnu/store/my4ki7l5zcjwy23grl96gzacnv9f0zhr-xdg-desktop-emacs-emacs-Q.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-transmission.desktop -> /gnu/store/4pfacsnggf8qwaxp7r743cws31hz0wgc-xdg-desktop-emacs-transmission.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-erc.desktop -> /gnu/store/kn6bm8xdic1axqdxdf0fkr0i7pjn9d34-xdg-desktop-emacs-erc.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-message.desktop -> /gnu/store/w0chfyx2qpfg7wnsaifir5ma0dx16h84-xdg-desktop-emacs-message.desktop-entry... done
+Symlinking /home/samuel/.local/share/applications/emacs-pdf-tools.desktop -> /gnu/store/f8sbcn7c5zcp28pwqd97g3vjgp3z1m3y-xdg-desktop-emacs-pdf-tools.desktop-entry... done
+Skipping   /home/samuel/.config (directory already exists)... done
+Creating   /home/samuel/.config/zsh... done
+Symlinking /home/samuel/.config/zsh/.zprofile -> /gnu/store/8aga3dqapnfx46919z1bqi4z05s8alz0-zprofile... done
+Symlinking /home/samuel/.config/zsh/.zshrc -> /gnu/store/vwrn814v58m5wmqpajv6l3433csmwmq4-zshrc... done
+Symlinking /home/samuel/.config/zsh/.zshenv -> /gnu/store/jzssmn4839q5akj9macif9qx6w3mzmzq-zshenv... done
+Creating   /home/samuel/.config/msmtp... done
+Symlinking /home/samuel/.config/msmtp/config -> /gnu/store/nqd68xyac095nh1dwbbw3dj1v12ns0bl-msmtp... done
+Creating   /home/samuel/.config/fontconfig... done
+Symlinking /home/samuel/.config/fontconfig/fonts.conf -> /gnu/store/phj2z2iiqdhryfy7mqral0b9qz3hlva6-fonts.conf... done
+Creating   /home/samuel/.config/alsa... done
+Symlinking /home/samuel/.config/alsa/asoundrc -> /gnu/store/w9a4qkqvfd57zd3xjxnpgvk5gvydc7w5-asoundrc... done
+Skipping   /home/samuel/.config/emacs (directory already exists)... done
+Symlinking /home/samuel/.config/emacs/early-init.el -> /gnu/store/hazbapxwjxxlzniqxriv3qmqazsb9x4x-early-init.el... done
+Symlinking /home/samuel/.config/emacs/init.el -> /gnu/store/lqrwjy803sw59z0cxlcinb7h3f31l788-init.el... done
+Creating   /home/samuel/.config/direnv... done
+Symlinking /home/samuel/.config/direnv/direnvrc -> /gnu/store/kcg5fb6lswn9lf386ryaj17m4jf9via0-direnvrc... done
+Creating   /home/samuel/.config/notmuch... done
+Creating   /home/samuel/.config/notmuch/default... done
+Creating   /home/samuel/.config/notmuch/default/hooks... done
+Symlinking /home/samuel/.config/notmuch/default/hooks/post-new -> /gnu/store/1kdl14gkna8bq681w1zs8drjr2avsp7s-notmuch-post-new... done
+Symlinking /home/samuel/.config/notmuch/default/hooks/pre-new -> /gnu/store/7h8z54wm9b0n12zh0138p07j09ili64a-notmuch-pre-new... done
+Symlinking /home/samuel/.config/notmuch/default/config -> /gnu/store/vpxr31b52rj5j7vcxq7ybljb2d7n65ib-notmuch-config... done
+Creating   /home/samuel/.config/isync... done
+Symlinking /home/samuel/.config/isync/mbsyncrc -> /gnu/store/df1145fv0a2s1w0wpsgx4gwfs0qamlhj-mbsyncrc... done
+Creating   /home/samuel/.config/alacritty... done
+Symlinking /home/samuel/.config/alacritty/alacritty.yml -> /gnu/store/5v7vx6k1r83vfk7dk8smh25b4mdyqxs3-alacritty.yml... done
+Creating   /home/samuel/.config/git... done
+Symlinking /home/samuel/.config/git/ignore -> /gnu/store/k3v69xvi02nfazrw1pk6bm5rpq5ab3yq-git-ignore... done
+Symlinking /home/samuel/.config/git/config -> /gnu/store/arjjx181lgd5vlpizi6g8smwf7yx9mba-git-config... done
+Symlinking /home/samuel/.config/git/attributes -> /gnu/store/4b2r2xk249d8clwpscil9dvaki4ph51r-git-attributes... done
+Skipping   /home/samuel/.config/sway (directory already exists)... done
+Symlinking /home/samuel/.config/sway/config -> /gnu/store/1710mwlm3bbnqiwfw5vqdfw0z9cxk22j-sway-config... done
+Symlinking /home/samuel/.config/user-dirs.conf -> /gnu/store/kiyn1z6443spwd28p3pxzw25yb1zxm3g-user-dirs.conf... done
+Symlinking /home/samuel/.config/user-dirs.dirs -> /gnu/store/m6s8g1y4nmbgx66iicqkx7864jl0h57j-user-dirs.dirs... done
+Symlinking /home/samuel/.config/mimeapps.list -> /gnu/store/jbblp7w128q0nh437qa7qblilsvz5f5h-xdg-mime-appplications... done
+Skipping   /home/samuel/.ssh (directory already exists)... done
+Symlinking /home/samuel/.ssh/config -> /gnu/store/8c98jdcvs80dpm9ff5rcjx7cn1mbyjbc-ssh-config... done
+Symlinking /home/samuel/.zshenv -> /gnu/store/750lcma15p4xzmj377qrcns0p3za37m0-auxiliary-zshenv... done
+Symlinking /home/samuel/.mailcap -> /gnu/store/3788khia4241j9a6p6sa37kv607f9sng-mailcap... done
+Symlinking /home/samuel/.l2mdconfig -> /gnu/store/w34n2h10sbc15bvcffa6fcgrhrk0mc0b-l2mdconfig... done
+Symlinking /home/samuel/.profile -> /gnu/store/034kpwrpgmj3svzkx781482sr01pckcm-shell-profile... done
+ done
+Finished updating symlinks.
+
+Creating XDG user directories... done
+Updating startup tty for gpg... done
+Loading /gnu/store/5asfjyz8v1an9bfgfmbnn617d1hx9hlq-shepherd.conf.
+Starting services...
+
+Comparing /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/profile/share/fonts and
+          /gnu/store/ymx6ym0zni3cbz51h2xhnzn9kzrdn2pr-home/profile/share/fonts... done (same)
+Comparing /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/setup-environment and
+          /gnu/store/ymx6ym0zni3cbz51h2xhnzn9kzrdn2pr-home/setup-environment... done (same)
+Comparing /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/on-first-login and
+          /gnu/store/ymx6ym0zni3cbz51h2xhnzn9kzrdn2pr-home/on-first-login... done (changed)
+Comparing /gnu/store/5iahxhq3n5s7bv9vlw8cmq75a0gafwxv-home/files/config/sway/config and
+          /gnu/store/ymx6ym0zni3cbz51h2xhnzn9kzrdn2pr-home/files/config/sway/config... done (same)
+Evaling on-change gexps.
+
+The on-first-login script was updated.
+  Re-login to get the cahnges applied.
+On-change gexps evaluation finished.
+
+:end:
+
+***** check the /supposed-to-be-updated/ herd status
+
+#+name: rde-reconf-guix-herd-schedule-mcron
+#+call: guix-herd-schedule-mcron()
+
+#+RESULTS: rde-reconf-guix-herd-schedule-mcron
+:results:
+Fri 17 Dec 2021 01:00:00 PM CET +0100
+mbsync
+
+:end:
+
+***** restart mcron
+#+name: guix-herd-restart-mcron
+#+begin_src shell :results drawer
+herd restart mcron
+#+end_src
+
+#+RESULTS: guix-herd-restart-mcron
+:results:
+Service mcron has been stopped.
+Service mcron has been started.
+:end:
+
+#+RESULTS:
+:results:
+Service mcron has been stopped.
+Service mcron has been started.
+:end:
+
+***** check the now-updated herd status
+#+name: herd-reload--guix-herd-schedule-mcron
+#+call: guix-herd-schedule-mcron()
+
+#+RESULTS: herd-reload--guix-herd-schedule-mcron
+:results:
+Fri 17 Dec 2021 01:00:00 PM CET +0100
+mbsync
+
+Fri 17 Dec 2021 01:00:00 PM CET +0100
+my-hello-world
+:end:
+
 ** Finished
 *** DONE icecat
 *** DONE sway
