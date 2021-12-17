@@ -71,7 +71,8 @@ dependency for other packages."
           summary authors url keywords commentary
           (early-init '())
           (elisp-packages '())
-          (autoloads? autoload-each-sexp-in-configure-package?))
+          (autoloads? autoload-each-sexp-in-configure-package?)
+          (require-in-init? (not autoload-each-sexp-in-configure-package?)))
   (let* ((pkg-name (symbol-append 'configure- name))
          (configure-package
 	  (rde-emacs-configuration-package
@@ -87,9 +88,7 @@ dependency for other packages."
      (symbol-append 'emacs- name '-configurations)
      home-emacs-service-type
      (home-emacs-extension
-      (init-el (if autoload-each-sexp-in-configure-package?
-                   '()
-                   `((require ',pkg-name))))
+      (init-el (if require-in-init? `((require ',pkg-name)) '()))
       (early-init-el early-init)
       ;; It's necessary to explicitly add elisp-packages here, because
       ;; we want to overwrite builtin emacs packages.  Propagated
