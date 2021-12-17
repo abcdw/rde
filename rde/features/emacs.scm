@@ -1225,17 +1225,22 @@ git-link, git-timemachine."
       emacs-f-name
       ;; TODO: https://github.com/muffinmad/emacs-ibuffer-project
       ;; MAYBE: Rework the binding approach
-      `((add-hook 'after-init-hook
+      `((eval-when-compile
+         (require 'project)
+         (require 'consult))
+        (add-hook 'after-init-hook
                   (lambda ()
                     (define-key global-map (kbd "s-p") project-prefix-map)))
         (with-eval-after-load
 	 'project
+         (add-to-list 'project-switch-commands '(project-compile "Compile") t)
 	 (with-eval-after-load
 	  'consult
 	  (setq consult-project-root-function
 		(lambda ()
 		  (when-let (project (project-current))
-			    (car (project-roots project)))))))))))
+			    (car (project-roots project))))))))
+      #:elisp-packages (list (get-value 'emacs-consult config emacs-consult)))))
 
   (feature
    (name f-name)
