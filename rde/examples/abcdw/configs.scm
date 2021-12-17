@@ -144,6 +144,7 @@
 
    (feature-direnv)
    (feature-emacs
+    #:extra-init-el `()
     #:additional-elisp-packages
     (append
      (pkgs "emacs-yasnippet" "emacs-elfeed" "emacs-hl-todo")))

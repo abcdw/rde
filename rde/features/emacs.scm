@@ -127,7 +127,8 @@ dependency for other packages."
 	  (package emacs-next-pgtk-latest)
 	  (emacs-server-mode? #t)
 	  (additional-elisp-packages '())
-          (extra-config '()))
+          (extra-init-el '())
+          (extra-early-init-el '()))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
@@ -266,9 +267,10 @@ point reaches the beginning or end of the buffer, stop there."
                     ("Europe/Moscow" "Moscow")
                     ("Asia/Tokyo" "Tokyo")))
 
-            ,@extra-config))
+            ,@extra-init-el))
 	 (early-init-el
-	  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))))
+	  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))
+            ,@extra-early-init-el))
 	 ;;; TODO: Rebuilding packages with emacs will be useful for
 	 ;;; native-comp, but for some reason dash.el fails to build,
 	 ;;; need to investigate the issue.
