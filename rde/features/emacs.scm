@@ -1310,7 +1310,8 @@ emacsclient feels more like a separate emacs instance."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((eval-when-compile (require 'keycast))
+        (with-eval-after-load
          'keycast
          (require 'moody)
          (setq keycast-window-predicate 'moody-window-active-p)
