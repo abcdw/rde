@@ -866,6 +866,10 @@ Start an unlimited search at `point-min' otherwise."
          (require 'org-agenda))
         (define-key global-map (kbd "C-c a a") 'org-agenda)
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
+        ;; Impressive agenda examples
+        ;; https://github.com/fniessen/emacs-leuven/blob/master/org-leuven-agenda-views.txt
+        ;; Clean agend view
+        ;; https://gist.github.com/rougier/ddb84c16c28f7cd75e27e50d4c3c43da
         (setq org-agenda-custom-commands
               `((,(kbd "C-d") "Agenda for the day"
                  ((agenda
@@ -882,7 +886,7 @@ Start an unlimited search at `point-min' otherwise."
                     (org-agenda-skip-function
                      '(org-agenda-skip-entry-if 'todo '("NEXT")))
                     (org-agenda-format-date "%A %-e %B %Y")
-                    (org-agenda-overriding-header "Agenda\n")))
+                    (org-agenda-overriding-header "\nAgenda for the day\n")))
                   (todo
                    "NEXT"
                    ((org-agenda-block-separator nil)
@@ -900,12 +904,18 @@ Start an unlimited search at `point-min' otherwise."
                     (org-deadline-warning-days 0)
                     (org-agenda-block-separator nil)
                     (org-agenda-entry-types '(:deadline))
-                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'todo 'done))
+                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'done))
                     (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")))
-                  (todo
+                  (agenda
                    "*"
                    ((org-agenda-block-separator nil)
-                    (org-agenda-overriding-header "Tasks\n")))))))
+                    (org-agenda-span 14)
+                    (org-agenda-overriding-header "\nAgenda\n")))
+                  (alltodo
+                   ""
+                   ((org-agenda-block-separator nil)
+                    (org-agenda-skip-function '(or (org-agenda-skip-if nil '(scheduled deadline))))
+                    (org-agenda-overriding-header "\nBacklog\n")))))))
 
 
         (with-eval-after-load
