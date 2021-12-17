@@ -704,9 +704,8 @@ not appear in the pop-up buffer."
             'notmuch-mua-send-hook)
           (setq mail-user-agent 'notmuch-user-agent)
 
-          ;; (setq url-mail-command 'notmuch-mua-new-mail)
-
-          (define-key global-map (kbd "C-c a n") 'notmuch)
+          (require 'configure-rde-keymaps)
+          (define-key rde-apps (kbd "n") 'notmuch)
 
           ,@(if (get-value 'emacs-consult config)
                 '((define-key global-map (kbd "M-s n") 'consult-notmuch-tree))
@@ -823,10 +822,10 @@ optional arguments to use the function inside hook."
            (setq notmuch-show-logo nil)))
         #:elisp-packages
         (append
+         (list (get-value 'emacs-configure-rde-keymaps config) emacs-notmuch)
          (if (get-value 'emacs-consult config)
              (list emacs-consult-notmuch)
-             '())
-         (list emacs-notmuch))))))
+             '()))))))
 
   (feature
    (name f-name)

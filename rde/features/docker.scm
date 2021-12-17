@@ -20,10 +20,14 @@
     (list
      (elisp-configuration-service
       'docker
-      `((define-key global-map (kbd "C-c a d") 'docker)
+      `((eval-when-compile (require 'configure-rde-keymaps))
+        (with-eval-after-load
+         'configure-rde-keymaps
+         (define-key rde-apps (kbd "d") 'docker))
         (add-to-list 'auto-mode-alist '(".*Dockerfile\\'" . dockerfile-mode)))
       ;; MAYBE: Add emacs-docker-tramp?
-      #:elisp-packages (list emacs-docker emacs-dockerfile-mode))))
+      #:elisp-packages (list emacs-docker emacs-dockerfile-mode
+                             (get-value 'emacs-configure-rde-keymaps config)))))
 
   (define (get-system-services config)
     (list

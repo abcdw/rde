@@ -159,7 +159,7 @@ dependency for other packages."
      `((defvar rde-apps nil "Prefix keymap for applications.")
        (define-prefix-command 'rde-apps nil "rde apps")
        (defvar rde-toggles nil "\
-Prefix keymap for various minor modes for toggling some functionalitty.")
+Prefix keymap for binding various minor modes for toggling functionalitty.")
        (define-prefix-command 'rde-toggles nil "rde toggles"))
      #:summary "Keymaps inteded for reuse among configure-* packages"))
 
@@ -242,7 +242,8 @@ Prefix keymap for various minor modes for toggling some functionalitty.")
                   ("Asia/Tokyo" "Tokyo")))
           (define-key rde-apps (kbd "w") 'world-clock)
 
-          (define-key global-map (kbd "C-c a") 'rde-apps))
+          (define-key global-map (kbd "C-c a") 'rde-apps)
+          (define-key global-map (kbd "C-c t") 'rde-toggles))
         #:summary "General settings"
         #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
                                emacs-expand-region emacs-guix)
@@ -548,7 +549,9 @@ utilizing reverse-im package."
       `((eval-when-compile
          (require 'telega)
          (require 'company))
-        (define-key global-map (kbd "C-c a t") 'telega)
+
+        (require 'configure-rde-keymaps)
+        (define-key rde-apps (kbd "t") telega-prefix-map)
 
         (with-eval-after-load
 	 'telega
@@ -571,7 +574,8 @@ utilizing reverse-im package."
          (add-hook 'telega-chat-mode-hook 'rde-telega-chat-mode)
 
 	 (setq telega-completing-read-function completing-read-function)))
-      #:elisp-packages (list emacs-telega))
+      #:elisp-packages (list emacs-telega
+                             (get-value 'emacs-configure-rde-keymaps config)))
 
      (emacs-xdg-service emacs-f-name "Emacs (Client) [tg:]" xdg-gexp
                         #:default-for '(x-scheme-handler/tg))))
@@ -674,12 +678,14 @@ previous window layout otherwise.  With universal argument toggles
                         (current-window-configuration))
                   (delete-other-windows))))
 
-        (define-key global-map (kbd "C-c t o") 'olivetti-mode)
-        (define-key global-map (kbd "C-c T o") 'global-olivetti-mode)
-        (define-key global-map (kbd "C-c t m") 'hide-mode-line-mode)
-        (define-key global-map (kbd "C-c T m") 'global-hide-mode-line-mode)
+        (require 'configure-rde-keymaps)
+        (define-key rde-toggles (kbd "o") 'olivetti-mode)
+        (define-key rde-toggles (kbd "O") 'global-olivetti-mode)
+        (define-key rde-toggles (kbd "m") 'hide-mode-line-mode)
+        (define-key rde-toggles (kbd "M") 'global-hide-mode-line-mode)
 	(define-key global-map (kbd "s-f") 'rde-toggle-monocle))
-      #:elisp-packages (list emacs-olivetti emacs-hide-header-line))))
+      #:elisp-packages (list emacs-olivetti emacs-hide-header-line
+                             (get-value 'emacs-configure-rde-keymaps config)))))
 
   (feature
    (name f-name)
@@ -861,7 +867,6 @@ Start an unlimited search at `point-min' otherwise."
       emacs-f-name
       `((eval-when-compile
          (require 'org-agenda))
-        (define-key global-map (kbd "C-c a a") 'org-agenda)
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
         ;; Impressive agenda examples
         ;; https://github.com/fniessen/emacs-leuven/blob/master/org-leuven-agenda-views.txt
@@ -965,8 +970,9 @@ git-link, git-timemachine."
         (custom-set-variables '(git-link-use-commit t)
                               '(git-gutter:lighter " GG"))
 
-        (define-key global-map (kbd "C-c t g") 'git-gutter-mode)
-        (define-key global-map (kbd "C-c T g") 'global-git-gutter-mode)
+        (require 'configure-rde-keymaps)
+        (define-key rde-toggles (kbd "g") 'git-gutter-mode)
+        (define-key rde-toggles (kbd "G") 'global-git-gutter-mode)
         (define-key global-map (kbd "s-g") 'git-gutter-transient)
 
         (with-eval-after-load
@@ -997,6 +1003,7 @@ git-link, git-timemachine."
            (vector 8 12 14 15)
            nil nil 'bottom)))
       #:elisp-packages (list emacs-magit emacs-magit-todos
+                             (get-value 'emacs-configure-rde-keymaps config)
                              emacs-git-link emacs-git-timemachine
                              emacs-git-gutter emacs-git-gutter-fringe
                              emacs-git-gutter-transient))))
@@ -1336,9 +1343,11 @@ emacsclient feels more like a separate emacs instance."
                (setq keycast--command-repetitions 0)
                (remove-hook 'pre-command-hook 'keycast--update))))
 
-        (define-key global-map (kbd "C-c t k") 'rde-keycast-mode)
-        (define-key global-map (kbd "C-c T k") 'rde-keycast-mode))
-      #:elisp-packages (list emacs-moody emacs-keycast))))
+        (require 'configure-rde-keymaps)
+        (define-key rde-toggles (kbd "k") 'rde-keycast-mode)
+        (define-key rde-toggles (kbd "K") 'rde-keycast-mode))
+      #:elisp-packages (list emacs-moody emacs-keycast
+                             (get-value 'emacs-configure-rde-keymaps config)))))
 
   (feature
    (name f-name)

@@ -46,7 +46,9 @@
                        '((setq pass-show-keybindings nil))
                        '())
                  (add-hook 'pass-mode-hook (lambda () (setq truncate-lines t)))
-                 (define-key global-map (kbd "C-c a p") 'pass)
+
+                 (require 'configure-rde-keymaps)
+                 (define-key rde-apps (kbd "p") 'pass)
 
                  ;; Source:
                  ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/tools/pass/autoload/consult.el
@@ -94,7 +96,8 @@
                        '()))
                #:elisp-packages
                (append
-                (list emacs-pass emacs-password-store emacs-password-store-otp)
+                (list emacs-pass emacs-password-store emacs-password-store-otp
+                      (get-value 'emacs-configure-rde-keymaps config))
                 (if emacs-embark (list emacs-embark) '())
                 (if emacs-consult (list emacs-consult) '())))))))
 

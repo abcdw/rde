@@ -26,8 +26,10 @@
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((define-key global-map (kbd "C-c a T") 'transmission))
-      #:elisp-packages (list emacs-transmission))
+      `((require 'configure-rde-keymaps)
+        (define-key rde-apps (kbd "T") 'transmission))
+      #:elisp-packages (list emacs-transmission
+                             (get-value 'emacs-configure-rde-keymaps config)))
 
      (emacs-xdg-service
       emacs-f-name "Emacs (Client) [magnet:]"
