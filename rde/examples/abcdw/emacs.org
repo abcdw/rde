@@ -506,18 +506,23 @@ consuming
 *** noweb tangler
 #+begin_src emacs-lisp :noweb yes :noweb-ref conf
 ;; NOWEB EMBARK START
+<<embark-hoist>>
 (with-eval-after-load 'embark
   <<embark>>
   )
 ;; NOWEB EMBARK END
 #+end_src
 *** {C-.} -> embark-act :kbd:
-#+begin_src emacs-lisp :noweb-ref embark
+#+begin_src emacs-lisp :noweb-ref embark-hoist
 (define-key global-map (kbd "C-.") 'embark-act)
 #+end_src
 
 #+RESULTS:
 : embark-act
+
+*** embark
+#+begin_src emacs-lisp :noweb-ref embark
+#+end_src
 
 ** general
 *** advice                                                     :func:macro:
@@ -663,7 +668,7 @@ to populate, just fill a `pass' entry like so echo mypass | pass
 **** custom commands
 
 ***** g ; GTD
-#+begin_src emacs-lisp :noweb-ref agenda
+#+begin_src emacs-lisp :noweb-ref roam
 (defun qz/org-agenda-gtd ()
   (interactive)
   (org-agenda nil "g")
@@ -742,7 +747,7 @@ to populate, just fill a `pass' entry like so echo mypass | pass
 
 **** settings
 ***** org-agenda-files
-#+begin_src emacs-lisp :noweb-ref agenda
+#+begin_src emacs-lisp :noweb-ref roam
 (setq qz/org-agenda-files
       (mapcar (lambda (f) (expand-file-name (format "%s/%s" org-roam-directory f)))
               '("calendar-home.org" "calendar-work.org" "schedule.org")))
@@ -863,9 +868,7 @@ CREATED: <2021-11-29 Mon>
 ***** ingest-files                                             :var:func:
 CREATED: <2021-11-29 Mon>
 
-#+begin_src emacs-lisp :noweb-ref org
-(with-eval-after-load 'org-roam
-
+#+begin_src emacs-lisp :noweb-ref roam
   (defvar qz/org-babel-lob-ingest-files
     (append (mapcar (lambda (s)
                       (org-roam-node-file (org-roam-node-from-title-or-alias s)))
@@ -878,7 +881,7 @@ CREATED: <2021-11-29 Mon>
     (mapcar (lambda (f) (org-babel-lob-ingest f))
             (append qz/org-babel-lob-ingest-files files)))
 
-  (qz/org-babel-do-lob-ingest-files))
+  (qz/org-babel-do-lob-ingest-files)
 #+end_src
 
 #+RESULTS:
@@ -1041,10 +1044,14 @@ org-roam loading, as we use it's variables.
 
 *** noweb tangler                                                    :meta:
 #+begin_src emacs-lisp :noweb yes :noweb-ref conf
+(message "pre org: %s" (shell-command-to-string "date"))
 (with-eval-after-load 'org
+  (message "mid org: %s" (
+                          shell-command-to-string "date"))
   ;; NOWEB ORG START
   <<org>>
   ;; NOWEB ORG END
+  (message "post org: %s" (shell-command-to-string "date"))
   )
 #+end_src
 
@@ -1234,14 +1241,16 @@ so we can use it as a COMMAND. better traceability than a lambda
 
 ****** TODO rename this to ~qz/roam-current-node-as-link~
 
-**** noweb tangler                                                  :meta:
+**** TODO noweb tangler                                                :meta:
 #+begin_src emacs-lisp :noweb yes :noweb-ref org
-(with-eval-after-load 'org-roam
-  ;; NOWEB ROAM START
-  <<roam-hoist>>
-  <<roam>>
-  ;; NOWEB ROAM END
-  )
+  (with-eval-after-load 'org-roam
+    ;; NOWEB ROAM START
+    (message "roam start")
+    <<roam-hoist>>
+    
+    <<roam>>
+    ;; NOWEB ROAM END
+    )
 #+end_src
 
 **** hooks
@@ -1293,6 +1302,84 @@ a function of a node
 #+begin_src emacs-lisp
 
 #+end_src
+
+***** created && updated
+e.g https://commonplace.doubleloop.net/recentchanges
+(or updated created)
+
+entry log -> created
+activity log -> (node, ?commit=HEAD) ?updated, created
+
+created -> property:created, file-name:created
+updated -> property:updated, file-name:updated
+
+#+begin_src emacs-lisp
+;; time property from last updated
+(defun qz/file-updated-as-timestamp (&optional file)
+  (let ((file (or file (buffer-file-name (current-buffer)))))
+    (format-time-string
+     "<%Y-%m-%d %H:%M:%S>"
+     (file-attribute-status-change-time (file-attributes file)))))
+
+(defun qz/file-created-as-timestamp (&optional file)
+  (when-let* ((file (or file (buffer-file-name (current-buffer))))
+              (p (string-match "-" ffile))
+              (s (substring ffile 0 p)))
+    (cond
+     ((= p 16) (let* ((td (timezone-parse-date s))
+                      (tt (timezone-parse-time (elt td 3))))
+                 (format "<%s %s>"
+                         (s-join "-" (cl-subseq td nil 3))
+                         (s-join ":" tt))))
+     ((= p 14) (let* ((yy (substring s 0 4))
+                      (mm (substring s 4 6))
+                      (dd (substring s 6 8))
+                      (hh (substring s 8 10))
+                      (MM (substring s 10 12))
+                      (ss (substring s 12 14)))
+                 (format "<%s-%s-%s %s:%s:%s>"
+                         yy mm dd
+                         hh MM ss))))))
+
+(defun qz/org-roam-node-updated (node)
+  (save-excursion
+    (let* ((pt (org-roam-node-point node))
+           (file (org-roam-node-file node))
+           (ffile (f-base file)))
+      (with-current-buffer (or (find-buffer-visiting file)
+                               (find-file-noselect file))
+        (goto-char pt)
+        (org-with-wide-buffer
+         (list (org-roam-node-title node)
+               
+                                        ;(substring ffile 0 16)
+                                        ;(substring ffile 0 14)
+
+               ;;; get UPDATED properties from filename
+               ;;(qz/file-updated-as-timestamp file)
+
+               ;;; get CREATED time properties from filename
+               ;;(qz/file-created-from-filename-as-timestamp file)
+               
+               (list (list (org-roam-get-keyword "UPDATED")
+                           (let ((v (s-join " " (org-entry-get-multivalued-property pt "UPDATED"))))
+                             (when (not (string-empty-p v)) v))
+                           (qz/file-updated-as-timestamp file))
+                     (list (org-roam-get-keyword "CREATED")
+                           (let ((v (s-join " " (org-entry-get-multivalued-property pt "CREATED")))) (and v (not (equal "" v)) v))
+                           (qz/file-created-from-filename-as-timestamp file))
+                     "hmm")
+
+               )
+         )))))
+;;(cl-subseq [1 2 3] 1 2)
+;;(car [1 2 3])
+(or (s-join "a" nil) "b")
+(qz/org-roam-node-updated (elt (org-roam-node-list) 4))
+#+end_src
+
+#+RESULTS:
+| org-roam-itemify-link-at-point | ((nil nil <2021-12-08 Wed 15:14>) (nil nil <2020-04-02 Thu 11:56>) hmm) |
 
 **** protocol (ref)
 ***** capture                                                       :var:
@@ -1478,19 +1565,30 @@ check with (org-redisplay-inline-images)
 : restclient-hooks
 
 ** system commands
+
+*** get mail
 #+begin_src emacs-lisp :noweb yes :noweb-ref conf
 (defun qz/get-mail ()
   (interactive)
   (async-shell-command "mbsync -Va && notmuch new"))
+#+end_src
 
+*** rde-sanity
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
 (defun qz/rde-sanity ()
   (interactive)
   (async-shell-command
    (concat "cd $HOME/git/sys/rde"
            "&& guix repl -L . sanity.scm")))
+#+end_src
 
+*** reload-config
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
 (defun qz/reload-config-home ()
   (interactive)
+  (org-babel-tangle-file
+   "~/git/sys/rde/rde/examples/abcdw/emacs.org")
+  (sleep-for .5)
   (async-shell-command
    (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
            "&& make ixy-home-reconfigure")))

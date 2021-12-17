@@ -214,8 +214,9 @@
       )
     ;; NOWEB ES END
     ;; NOWEB EMBARK START
+    (define-key global-map (kbd "C-.") 'embark-act)
     (with-eval-after-load 'embark
-      (define-key global-map (kbd "C-.") 'embark-act)
+      
       )
     ;; NOWEB EMBARK END
     (defun qz/yq-interactively ()
@@ -224,7 +225,10 @@
       (let ((jq-interactive-command "yq"))
         (call-interactively 'jq-interactively)))
     (require 'hyperbole)
+    (message "pre org: %s" (shell-command-to-string "date"))
     (with-eval-after-load 'org
+      (message "mid org: %s" (
+                              shell-command-to-string "date"))
       ;; NOWEB ORG START
       (define-key org-mode-map (kbd "C-c C-j") 'consult-org-heading)
       (defvar qz/org-babel-indent-exclude-lang nil "org-babel languages to exclude from auto indent/format with ")
@@ -271,39 +275,6 @@
         (interactive)
         (setq org-agenda-files (qz/files-agenda)
               qz/agenda-daily-files (qz/agenda-daily-files-f)))
-      (defun qz/org-agenda-gtd ()
-        (interactive)
-        (org-agenda nil "g")
-        (goto-char (point-min))
-        (org-agenda-goto-today))
-      
-      (setq org-agenda-custom-commands nil)
-      
-      (add-to-list
-       'org-agenda-custom-commands
-       `("g" "GTD"
-         ((agenda "" ((org-agenda-span 'day) (org-deadline-warning-days 60)))
-          (tags-todo "now"
-                     ((org-agenda-overriding-header "now")))
-          (tags-todo "wip"
-                     ((org-agenda-overriding-header "wip")))
-          (todo "TODO"
-                ((org-agenda-overriding-header "to process")
-                 (org-agenda-files '(,(format "%s/%s" org-roam-directory "inbox.org")))))
-          (todo "TODO"
-                ((org-agenda-overriding-header "daily inbox")
-                 (org-agenda-files qz/agenda-daily-files)))
-          (todo "TODO"
-                ((org-agenda-overriding-header "emails")
-                 (org-agenda-files '(,(format "%s/%s" org-roam-directory "emails.org")))))
-          (todo "TODO"
-                ((org-agenda-overriding-header "one-off Tasks")
-                 (org-agenda-files '(,(format "%s/%s" org-roam-directory "next.org")))))
-          (todo "TODO"
-                ((org-agenda-overriding-header "to yak shave")
-                 (org-agenda-files '(,(format "%s/%s" org-roam-directory "emacs.org"))))))))
-      
-                                              ;(qz/pprint org-agenda-custom-commands)
       (setq qz/daily-title-regexp ".?[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.?")
       
       (defun qz/agenda-daily-files-f ()
@@ -319,9 +290,6 @@
                     :inner :join nodes
                     :on (= tags:node_id nodes:id)
                     :where (= tags:tag "project")))))
-      (setq qz/org-agenda-files
-            (mapcar (lambda (f) (expand-file-name (format "%s/%s" org-roam-directory f)))
-                    '("calendar-home.org" "calendar-work.org" "schedule.org")))
       (setq qz/org-agenda-prefix-length 20
             org-agenda-prefix-format nil)
       ;; '((agenda . " %i Emacs Configuration %?-12t% s")
@@ -397,21 +365,6 @@
          (elasticsearch . t)
          (restclient . t)
          (R . t)))
-      (with-eval-after-load 'org-roam
-      
-        (defvar qz/org-babel-lob-ingest-files
-          (append (mapcar (lambda (s)
-                            (org-roam-node-file (org-roam-node-from-title-or-alias s)))
-                          '("NewStore" "kubernetes"))
-                  (list ))
-          "files from which named `src' blocks should be loaded")
-      
-        (defun qz/org-babel-do-lob-ingest-files (&optional files)
-          (interactive)
-          (mapcar (lambda (f) (org-babel-lob-ingest f))
-                  (append qz/org-babel-lob-ingest-files files)))
-      
-        (qz/org-babel-do-lob-ingest-files))
       (defun qz/org-babel-choose-block (&optional lob)
         "choose block, insert scaffold for args.
       
@@ -449,7 +402,58 @@
         (org-capture nil "i"))
       (with-eval-after-load 'org-roam
         ;; NOWEB ROAM START
+        (message "roam start")
         (setq qz/org-roam-dailies-filespec "private-%<%Y-%m-%d>.org")
+      
+        (defun qz/org-agenda-gtd ()
+          (interactive)
+          (org-agenda nil "g")
+          (goto-char (point-min))
+          (org-agenda-goto-today))
+        
+        (setq org-agenda-custom-commands nil)
+        
+        (add-to-list
+         'org-agenda-custom-commands
+         `("g" "GTD"
+           ((agenda "" ((org-agenda-span 'day) (org-deadline-warning-days 60)))
+            (tags-todo "now"
+                       ((org-agenda-overriding-header "now")))
+            (tags-todo "wip"
+                       ((org-agenda-overriding-header "wip")))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "to process")
+                   (org-agenda-files '(,(format "%s/%s" org-roam-directory "inbox.org")))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "daily inbox")
+                   (org-agenda-files qz/agenda-daily-files)))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "emails")
+                   (org-agenda-files '(,(format "%s/%s" org-roam-directory "emails.org")))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "one-off Tasks")
+                   (org-agenda-files '(,(format "%s/%s" org-roam-directory "next.org")))))
+            (todo "TODO"
+                  ((org-agenda-overriding-header "to yak shave")
+                   (org-agenda-files '(,(format "%s/%s" org-roam-directory "emacs.org"))))))))
+        
+                                                ;(qz/pprint org-agenda-custom-commands)
+        (setq qz/org-agenda-files
+              (mapcar (lambda (f) (expand-file-name (format "%s/%s" org-roam-directory f)))
+                      '("calendar-home.org" "calendar-work.org" "schedule.org")))
+        (defvar qz/org-babel-lob-ingest-files
+          (append (mapcar (lambda (s)
+                            (org-roam-node-file (org-roam-node-from-title-or-alias s)))
+                          '("NewStore" "kubernetes"))
+                  (list ))
+          "files from which named `src' blocks should be loaded")
+        
+        (defun qz/org-babel-do-lob-ingest-files (&optional files)
+          (interactive)
+          (mapcar (lambda (f) (org-babel-lob-ingest f))
+                  (append qz/org-babel-lob-ingest-files files)))
+        
+        (qz/org-babel-do-lob-ingest-files)
         ;; [[file:~/.doom.d/config.org::*templates][templates]]
         (setq org-capture-templates
               `(("i" "inbox" entry
@@ -639,10 +643,12 @@
                                  ("wip.org" :level . 0)))
       (require 'org-download)
       ;; NOWEB ORG END
+      (message "post org: %s" (shell-command-to-string "date"))
       )
+    (setq org-image-actual-width 640)
     (with-eval-after-load 'pdf-view
       (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode))
-    (defvar qz/restclient-environment nil)
+    (defvar qz/restclient-env nil)
     
     (defun qz/restclient-choose-env (&optional env)
       (interactive)
@@ -676,15 +682,16 @@
     (defun qz/get-mail ()
       (interactive)
       (async-shell-command "mbsync -Va && notmuch new"))
-    
     (defun qz/rde-sanity ()
       (interactive)
       (async-shell-command
        (concat "cd $HOME/git/sys/rde"
                "&& guix repl -L . sanity.scm")))
-    
     (defun qz/reload-config-home ()
       (interactive)
+      (org-babel-tangle-file
+       "~/git/sys/rde/rde/examples/abcdw/emacs.org")
+      (sleep-for .5)
       (async-shell-command
        (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
                "&& make ixy-home-reconfigure")))
