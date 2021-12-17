@@ -553,7 +553,10 @@ utilizing reverse-im package."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((define-key global-map (kbd "C-c a t") 'telega)
+      `((eval-when-compile
+         (require 'telega)
+         (require 'company))
+        (define-key global-map (kbd "C-c a t") 'telega)
 
         (with-eval-after-load
 	 'telega
@@ -561,7 +564,11 @@ utilizing reverse-im package."
          (define-key telega-chat-mode-map (kbd "s-B") 'telega-chat-with)
 	 (define-key telega-root-mode-map (kbd "s-B") 'telega-chat-with)
          (setq telega-emoji-company-backend 'telega-company-emoji)
-         (defun my-telega-chat-mode ()
+         ,@(if (get-value 'mpv config)
+               `((setq telega-video-player-command
+                       ,(file-append (get-value 'mpv config) "/bin/mpv")))
+               '())
+         (defun rde-telega-chat-mode ()
            (set (make-local-variable 'company-backends)
                 (append (list telega-emoji-company-backend
                               'telega-company-username
@@ -569,7 +576,7 @@ utilizing reverse-im package."
                         (when (telega-chat-bot-p telega-chatbuf--chat)
                           '(telega-company-botcmd))))
            (company-mode 1))
-         (add-hook 'telega-chat-mode-hook 'my-telega-chat-mode)
+         (add-hook 'telega-chat-mode-hook 'rde-telega-chat-mode)
 
 	 (setq telega-completing-read-function completing-read-function)))
       #:elisp-packages (list emacs-telega))
