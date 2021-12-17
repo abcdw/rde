@@ -19,6 +19,7 @@
   #:use-module (rde features bittorrent)
   #:use-module (rde features mail)
   #:use-module (rde features docker)
+  #:use-module (rde features video)
   ;; #:use-module (gnu services)
   ;; #:use-module (gnu services nix)
   #:use-module (gnu system file-systems)
@@ -180,6 +181,7 @@
    (feature-emacs-org-agenda
     #:org-agenda-files '("~/work/abcdw/agenda/todo.org"))
 
+   (feature-mpv)
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
    (feature-msmtp)
@@ -205,7 +207,7 @@
     #:home-packages
     (append
      (pkgs
-      "alsa-utils" "mpv" "youtube-dl" "imv"
+      "alsa-utils" "youtube-dl" "imv"
       "obs" "obs-wlrobs"
       "icecat" "recutils"
       "fheroes2"
