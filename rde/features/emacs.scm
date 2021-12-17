@@ -1164,19 +1164,20 @@ git-link, git-timemachine."
          (define-key global-map (kbd "M-g o") 'consult-outline)
          (define-key global-map (kbd "M-g i") 'consult-imenu)
          (define-key global-map (kbd "M-g m") 'consult-mark)
+         (define-key global-map (kbd "M-g M") 'consult-global-mark)
+         (define-key global-map (kbd "M-g b") 'consult-bookmark)
 
          (define-key global-map (kbd "M-s f") 'consult-find)
          (define-key global-map (kbd "M-s g") 'consult-ripgrep)
          (define-key global-map (kbd "M-s e") 'consult-isearch)
          (define-key global-map (kbd "M-s l") 'consult-line)
-         (define-key global-map (kbd "C-S-s") 'consult-line)
+         ;; (define-key global-map (kbd "C-S-s") 'consult-line)
 
          (define-key isearch-mode-map (kbd "M-e") 'consult-isearch)
          (define-key isearch-mode-map (kbd "M-s e") 'consult-isearch)
          (define-key isearch-mode-map (kbd "M-s l") 'consult-line)
-         (define-key isearch-mode-map (kbd "C-S-s") 'consult-line)
+         ;; (define-key isearch-mode-map (kbd "C-S-s") 'consult-line)
 
-         (define-key global-map (kbd "C-c b b") 'consult-bookmark)
          ;; MAYBE: Move to feature-emacs-buffers/windows
          (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
          (define-key global-map (kbd "s-b") 'switch-to-buffer)
