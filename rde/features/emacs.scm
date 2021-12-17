@@ -752,9 +752,7 @@ previous window layout otherwise.  With universal argument toggles
            (interactive "P")
            (if arg
                (eshell arg)
-               (switch-to-buffer (other-buffer (current-buffer) 1))
-               ;; (switch-to-prev-buffer)
-               ))
+               (switch-to-buffer (other-buffer (current-buffer) 1))))
 
          (add-hook
           'eshell-mode-hook
