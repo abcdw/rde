@@ -19,7 +19,7 @@
 
 
 ;;;
-;;; Mpv.
+;;; mpv.
 ;;;
 
 (define (uglify-field-name field-name)
@@ -51,11 +51,11 @@
 (define-configuration mpv-profile
   (name
    (string)
-   "The name of the Mpv profile."
+   "The name of the mpv profile."
    serialize-name)
   (options
    (alist '())
-   "An association list of options to set in the Mpv profile.  The format
+   "An association list of options to set in the mpv profile.  The format
 is the same as the @code{options} field in
 @code{home-mpv-configuration}."))
 
@@ -76,17 +76,17 @@ is the same as the @code{options} field in
 (define-configuration home-mpv-configuration
   (package
    (package mpv)
-   "The Mpv package to use.")
+   "The mpv package to use.")
   (default-options
     (alist '())
     "An assocation list of top-level configuration options to set in the
 @file{$XDG_CONFIG_HOME/mpv/mpv.conf} file.")
   (profiles
    (list-of-mpv-profiles '())
-   "A list of @code{mpv-profile} records for configuring Mpv profiles.")
+   "A list of @code{mpv-profile} records for configuring mpv profiles.")
   (bindings
    (alist '())
-   "An association list of keybindings to set for Mpv."
+   "An association list of keybindings to set for mpv."
    serialize-bindings))
 
 (define (mpv-files-service config)
@@ -115,7 +115,7 @@ is the same as the @code{options} field in
                        (service-extension
                         home-profile-service-type
                         mpv-profile-service)))
-                (description "Install and configure Mpv")))
+                (description "Install and configure mpv")))
 
 (define (generate-home-mpv-documentation)
   (generate-documentation
