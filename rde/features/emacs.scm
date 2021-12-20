@@ -211,7 +211,10 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
           ,#~""
           (defun rde-display-load-time ()
             (interactive)
-            (message "rde emacs loaded in %s, C-h r i for search in emacs manual by topic. C-h C-a for welcome screen." (emacs-init-time)))
+            (message "\
+rde emacs loaded in %s, C-h r i for search in emacs manual by topic. \
+C-h C-a to open About Emacs buffer."
+                     (emacs-init-time)))
 
           (defun display-startup-echo-area-message ()
             (rde-display-load-time))
