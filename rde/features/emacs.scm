@@ -1184,8 +1184,9 @@ git-link, git-timemachine."
          (define-key global-map (kbd "M-s l") 'consult-line)
          ;; (define-key global-map (kbd "C-S-s") 'consult-line)
 
-         (define-key isearch-mode-map (kbd "M-e") 'consult-isearch)
-         (define-key isearch-mode-map (kbd "M-s e") 'consult-isearch)
+         (autoload 'consult-isearch-history "consult")
+         (define-key isearch-mode-map (kbd "M-e") 'consult-isearch-history)
+         (define-key isearch-mode-map (kbd "M-s e") 'consult-isearch-history)
          (define-key isearch-mode-map (kbd "M-s l") 'consult-line)
          ;; (define-key isearch-mode-map (kbd "C-S-s") 'consult-line)
 
