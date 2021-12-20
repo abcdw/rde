@@ -1165,6 +1165,7 @@ git-link, git-timemachine."
 	(add-hook 'after-init-hook 'savehist-mode)
 
         (define-key global-map (kbd "s-.") 'embark-act)
+        (define-key global-map (kbd "s->") 'embark-become)
 	(with-eval-after-load
 	 'embark
          ;;; TODO: Enable it when user-rde-unexperienced?
