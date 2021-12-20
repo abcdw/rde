@@ -635,7 +635,7 @@ utilizing reverse-im package."
          (require 'olivetti)
          (require 'hide-mode-line))
 
-        (custom-set-variables '(olivetti-body-width 80)
+        (custom-set-variables '(olivetti-body-width 85)
                               '(olivetti-margin-width 0))
 
         (with-eval-after-load
