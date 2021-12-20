@@ -58,6 +58,9 @@
     #:user-name "bob"
     #:full-name "Andrew Tropin"
     #:email "andrew@trop.in"
+    #:user-initial-password-hash
+    "$6$abc$3SAZZQGdvQgAscM2gupP1tC.SqnsaLSPoAnEOb2k6jXMhzQqS1kCSplAJ/vUy2rrnpHtt6frW2Ap5l/tIvDsz."
+    ;; (crypt "bob" "$6$abc")
 
     ;; WARNING: This option can reduce the explorability by hiding
     ;; some helpful messages and parts of the interface for the sake
