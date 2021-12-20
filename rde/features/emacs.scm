@@ -21,6 +21,7 @@
             feature-emacs-faces
 	    feature-emacs-completion
 	    feature-emacs-vertico
+	    feature-emacs-mct
 	    feature-emacs-input-methods
 	    feature-emacs-project
 	    feature-emacs-perspective
@@ -1240,6 +1241,27 @@ git-link, git-timemachine."
   (feature
    (name f-name)
    (values (make-feature-values emacs-vertico))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-mct
+          #:key
+          (emacs-mct emacs-mct))
+  "Configure mct completion UI for GNU Emacs."
+  (define emacs-f-name 'mct)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((add-hook 'after-init-hook 'mct-mode)
+	(with-eval-after-load
+         'mct))
+      #:elisp-packages (list emacs-mct))))
+
+  (feature
+   (name f-name)
+   (values (make-feature-values emacs-mct))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-project)
