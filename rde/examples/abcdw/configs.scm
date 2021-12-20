@@ -152,6 +152,7 @@
    (feature-emacs-faces)
    (feature-emacs-completion
     #:mini-frame? #t)
+   (feature-emacs-vertico)
    (feature-emacs-project)
    (feature-emacs-perspective)
    (feature-emacs-input-methods)

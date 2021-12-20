@@ -20,6 +20,7 @@
             feature-emacs-appearance
             feature-emacs-faces
 	    feature-emacs-completion
+	    feature-emacs-vertico
 	    feature-emacs-input-methods
 	    feature-emacs-project
 	    feature-emacs-perspective
@@ -1113,7 +1114,6 @@ git-link, git-timemachine."
          (setq completion-styles '(orderless))
 	 (setq completion-category-overrides
 	       '((file (styles . (partial-completion)))))
-         (setq completion-in-region-function 'consult-completion-in-region)
 	 (setq enable-recursive-minibuffers t)
 
          (setq resize-mini-windows nil)
@@ -1196,20 +1196,13 @@ git-link, git-timemachine."
 	 'consult
          (consult-customize consult-line :inherit-input-method t))
 
-        (add-hook 'after-init-hook 'marginalia-mode)
-        (add-hook 'after-init-hook 'vertico-mode)
-	(with-eval-after-load
-         'vertico
-         (define-key global-map (kbd "s-s") 'vertico-repeat)
-         (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
-         (custom-set-variables '(vertico-cycle t))))
+        (add-hook 'after-init-hook 'marginalia-mode))
       #:elisp-packages
       (append
        (if mini-frame?
            (list emacs-mini-frame)
            '())
        (list emacs-orderless emacs-marginalia
-	     emacs-vertico
              emacs-pcmpl-args
              emacs-consult emacs-embark)))))
 
@@ -1218,6 +1211,35 @@ git-link, git-timemachine."
    (values `((,f-name . #t)
              (emacs-embark . ,emacs-embark)
              (emacs-consult . ,emacs-consult)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-vertico
+          #:key
+          (emacs-vertico emacs-vertico))
+  "Configure vertico completion UI for GNU Emacs."
+  (define emacs-f-name 'vertico)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+         'minibuffer
+         (setq completion-in-region-function 'consult-completion-in-region))
+
+        (with-eval-after-load
+         'vertico
+         (define-key global-map (kbd "s-s") 'vertico-repeat)
+         (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
+         (custom-set-variables '(vertico-cycle t)))
+
+	(add-hook 'after-init-hook 'vertico-mode))
+      #:elisp-packages (list emacs-vertico))))
+
+  (feature
+   (name f-name)
+   (values (make-feature-values emacs-vertico))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-project)
