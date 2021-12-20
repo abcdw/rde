@@ -501,7 +501,11 @@ utilizing reverse-im package."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((eval-when-compile
+         (require 'erc-join)
+         (require 'erc-fill)
+         (require 'erc-track))
+        (with-eval-after-load
 	 'erc
 	 (setq erc-server ,erc-server)
 	 (setq erc-port ,erc-port)
@@ -739,7 +743,12 @@ previous window layout otherwise.  With universal argument toggles
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((defun rde-project-eshell-or-eshell (&optional arg)
+      `((eval-when-compile
+         (require 'eshell)
+         (require 'em-alias)
+         (require 'em-hist)
+         (require 'project))
+        (defun rde-project-eshell-or-eshell (&optional arg)
           "If there is a project open project-eshell"
           (interactive "P")
           (if (project-current)
