@@ -336,33 +336,3 @@ functionality.")))
     (description #f)
     (license license:expat)))
 
-(use-modules (gnu packages lua))
-(define-public wireplumber
-  (package
-    (name "wireplumber")
-    (version "0.4.5")
-    (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url
-                     "https://gitlab.freedesktop.org/pipewire/wireplumber.git")
-                    (commit version)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "1k56i5cardwr03vkldg68714hyksyp1vb0b315yw1bilaj2ka30i"))))
-    (build-system meson-build-system)
-    (arguments
-     `(#:configure-flags '("-Dsystemd=disabled"
-                           "-Dsystem-lua=true")))
-    (native-inputs
-     `(("glib-bin" ,glib "bin")
-       ("pkg-config" ,pkg-config)))
-    (inputs (list dbus elogind glib lua pipewire-0.3))
-    (home-page "https://gitlab.freedesktop.org/pipewire/wireplumber")
-    (synopsis "Session / policy manager implementation for PipeWire")
-    (description "WirePlumber is a modular session / policy manager for
-PipeWire and a GObject-based high-level library that wraps PipeWire's API,
-providing convenience for writing the daemon's modules as well as external
-tools for managing PipeWire.")
-    (license license:expat)))
