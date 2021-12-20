@@ -1271,10 +1271,16 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((add-hook 'after-init-hook 'mct-mode)
-	(with-eval-after-load
-         'mct))
-      #:elisp-packages (list emacs-mct))))
+      `((autoload 'consult-preview-at-point-mode "consult")
+        (with-eval-after-load
+         'mct
+         ,@(if (get-value 'emacs-consult config)
+               `((add-hook 'completion-list-mode-hook
+                           'consult-preview-at-point-mode))
+               '()))
+	(add-hook 'after-init-hook 'mct-mode))
+      #:elisp-packages (list emacs-mct
+                             (get-value 'emacs-consult config emacs-consult)))))
 
   (feature
    (name f-name)
