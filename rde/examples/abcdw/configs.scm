@@ -20,6 +20,7 @@
   #:use-module (rde features mail)
   #:use-module (rde features docker)
   #:use-module (rde features video)
+  #:use-module (rde features markup)
   ;; #:use-module (gnu services)
   ;; #:use-module (gnu services nix)
   #:use-module (gnu system file-systems)
@@ -185,6 +186,7 @@
     #:org-roam-directory "~/work/abcdw/notes/notes")
    (feature-emacs-org-agenda
     #:org-agenda-files '("~/work/abcdw/agenda/todo.org"))
+   (feature-markdown)
 
    (feature-mpv)
    (feature-isync #:isync-verbose #t)
