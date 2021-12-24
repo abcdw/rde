@@ -231,7 +231,17 @@ C-h C-a to open About Emacs buffer."
 	  (define-key global-map (kbd "s-r") 'recompile)
 
           ,#~""
-          (global-guix-prettify-mode)
+          ;; TODO: Move it to feature-emacs-tramp
+          (eval-when-compile (require 'tramp))
+          (with-eval-after-load
+           'tramp
+           (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+
+          ,#~""
+          ;; TODO: Extend info-lookup-alist with Guix Manual nodes to
+          ;; make `C-h S' find guix services and other items.
+          (eval-when-compile (require 'guix))
+          (add-hook 'after-init-hook 'global-guix-prettify-mode)
 
           ,#~""
           (eval-when-compile
