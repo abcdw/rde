@@ -1115,7 +1115,7 @@ git-link, git-timemachine."
 
 (define* (feature-emacs-completion
           #:key
-          (mini-frame? #t)
+          (mini-frame? #f)
           (emacs-consult emacs-consult)
           (emacs-embark emacs-embark))
   "Configure completion system for GNU Emacs."
