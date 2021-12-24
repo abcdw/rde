@@ -1179,11 +1179,6 @@ git-link, git-timemachine."
 
         (define-key global-map (kbd "s-.") 'embark-act)
         (define-key global-map (kbd "s->") 'embark-become)
-	(with-eval-after-load
-	 'embark
-         ;;; TODO: Enable it when user-rde-unexperienced?
-         ;; (setq embark-prompter 'embark-completing-read-prompter)
-         (require 'embark-consult))
 
         (autoload 'consult-customize "consult" "" nil 'macro)
 
@@ -1226,6 +1221,7 @@ git-link, git-timemachine."
 
         (with-eval-after-load
 	 'consult
+         (require 'embark-consult)
          (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
 
