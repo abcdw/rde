@@ -1160,6 +1160,7 @@ git-link, git-timemachine."
              '()))
 
 	(custom-set-variables
+         '(history-length 10000)
          '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
 		                 "/emacs/history")))
 	(add-hook 'after-init-hook 'savehist-mode)
