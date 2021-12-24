@@ -1276,6 +1276,57 @@ git-link, git-timemachine."
       `((autoload 'consult-preview-at-point-mode "consult")
         (with-eval-after-load
          'mct
+         (setq mct-live-update-delay 0)
+         (setq mct-minimum-input 3)
+         (defvar rde-completion-categories-other-window
+           '(imenu)
+           "Completion categories that has to be in other window than
+current, otherwise preview functionallity will fail the party.")
+
+         (setq rde-completion-categories-other-window
+               (append
+                '(consult-location consult-grep consult-yank)
+                rde-completion-categories-other-window))
+
+         (defvar rde-completion-categories-not-show-candidates-on-setup
+           '(command variable function)
+           "Completion categories that has to be in other window than
+current, otherwise preview functionallity will fail the party.")
+
+         (defun rde-display-mct-buffer-pop-up-if-apropriate (buffer alist)
+           "Call `display-buffer-pop-up-window' if the completion category
+one of `rde-completion-categories-other-window', it will make
+sure that we don't use same window for completions, which should
+be in separate window."
+           (if (memq (mct--completion-category)
+                     rde-completion-categories-other-window)
+               (display-buffer-pop-up-window buffer alist)
+               nil))
+
+         (defun rde-display-mct-buffer-apropriate-window (buffer alist)
+           "Displays completion buffer in the same window, where completion
+was initiated (most recent one), but in case, when compeltion
+buffer should be displayed in other window use least recent one."
+           (let* ((window (if (memq (mct--completion-category)
+                                    rde-completion-categories-other-window)
+                              (get-lru-window (selected-frame) nil nil)
+                              (get-mru-window (selected-frame) nil nil))))
+             (window--display-buffer buffer window 'reuse alist)))
+
+         (setq mct-display-buffer-action
+               (quote ((display-buffer-reuse-window
+                        rde-display-mct-buffer-pop-up-if-apropriate
+                        rde-display-mct-buffer-apropriate-window))))
+
+         (defun rde-mct-show-completions ()
+           "Instantly shows completion candidates for categories listed in
+`rde-completion-categories-show-candidates-on-setup'."
+           (unless (memq (mct--completion-category)
+                         rde-completion-categories-not-show-candidates-on-setup)
+             (setq-local mct-minimum-input 0)
+             (mct--live-completions)))
+
+         (add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
          ,@(if (get-value 'emacs-consult config)
                `((add-hook 'completion-list-mode-hook
                            'consult-preview-at-point-mode))
