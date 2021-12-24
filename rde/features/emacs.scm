@@ -1139,7 +1139,8 @@ git-link, git-timemachine."
 
          (setq completion-styles '(orderless))
 	 (setq completion-category-overrides
-	       '((file (styles . (partial-completion)))))
+	       '((file (styles . (partial-completion)))
+                 (project-file (styles . (partial-completion)))))
 	 (setq enable-recursive-minibuffers t)
 
          (setq resize-mini-windows nil)
