@@ -1226,8 +1226,13 @@ git-link, git-timemachine."
 
         (with-eval-after-load
 	 'consult
+         (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
 
+        (with-eval-after-load
+         'marginalia
+         (add-to-list 'marginalia-prompt-categories
+                      '("\\<completion\\>" . consult-completion)))
         (add-hook 'after-init-hook 'marginalia-mode))
       #:elisp-packages
       (append
@@ -1281,7 +1286,8 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((eval-when-compile (require 'mct))
+        (with-eval-after-load
          'mct
          (setq mct-live-update-delay 0)
          (setq mct-minimum-input 3)
@@ -1333,7 +1339,9 @@ buffer should be displayed in other window use least recent one."
                `((autoload 'consult-preview-at-point-mode "consult")
                  (setq rde-completion-categories-other-window
                        (append
-                        '(consult-location consult-grep consult-yank)
+                        '(consult-location
+                          consult-grep consult-yank
+                          consult-history consult-completion)
                         rde-completion-categories-other-window))
                  (add-hook 'completion-list-mode-hook
                            'consult-preview-at-point-mode))
