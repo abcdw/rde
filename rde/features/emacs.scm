@@ -618,7 +618,7 @@ utilizing reverse-im package."
          'saveplace
          (require 'saveplace-pdf-view)))
       #:elisp-packages (list emacs-pdf-tools emacs-saveplace-pdf-view))
-     (emacs-xdg-service emacs-f-name "Emacs (Client) [pdf]" xdg-gexp
+     (emacs-xdg-service emacs-f-name "Emacs (Client) [PDF]" xdg-gexp
                         #:default-for '(application/pdf))))
 
   (feature
