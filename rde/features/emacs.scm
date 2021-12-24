@@ -1293,11 +1293,6 @@ git-link, git-timemachine."
            "Completion categories that has to be in other window than
 current, otherwise preview functionallity will fail the party.")
 
-         (setq rde-completion-categories-other-window
-               (append
-                '(consult-location consult-grep consult-yank)
-                rde-completion-categories-other-window))
-
          (defvar rde-completion-categories-not-show-candidates-on-setup
            '(command variable function)
            "Completion categories that has to be in other window than
@@ -1338,7 +1333,11 @@ buffer should be displayed in other window use least recent one."
 
          (add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
          ,@(if (get-value 'emacs-consult config)
-               `((add-hook 'completion-list-mode-hook
+               `((setq rde-completion-categories-other-window
+                       (append
+                        '(consult-location consult-grep consult-yank)
+                        rde-completion-categories-other-window))
+                 (add-hook 'completion-list-mode-hook
                            'consult-preview-at-point-mode))
                '()))
 	(add-hook 'after-init-hook 'mct-mode))
