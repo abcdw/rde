@@ -1135,6 +1135,8 @@ git-link, git-timemachine."
       `((with-eval-after-load
 	 'minibuffer
 
+         (setq completion-in-region-function 'consult-completion-in-region)
+
          (setq completion-styles '(orderless))
 	 (setq completion-category-overrides
 	       '((file (styles . (partial-completion)))))
@@ -1255,10 +1257,6 @@ git-link, git-timemachine."
      (elisp-configuration-service
       emacs-f-name
       `((with-eval-after-load
-         'minibuffer
-         (setq completion-in-region-function 'consult-completion-in-region))
-
-        (with-eval-after-load
          'vertico
          (define-key global-map (kbd "s-s") 'vertico-repeat)
          (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
