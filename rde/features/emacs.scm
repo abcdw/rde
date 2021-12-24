@@ -1283,8 +1283,7 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((autoload 'consult-preview-at-point-mode "consult")
-        (with-eval-after-load
+      `((with-eval-after-load
          'mct
          (setq mct-live-update-delay 0)
          (setq mct-minimum-input 3)
@@ -1333,7 +1332,8 @@ buffer should be displayed in other window use least recent one."
 
          (add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
          ,@(if (get-value 'emacs-consult config)
-               `((setq rde-completion-categories-other-window
+               `((autoload 'consult-preview-at-point-mode "consult")
+                 (setq rde-completion-categories-other-window
                        (append
                         '(consult-location consult-grep consult-yank)
                         rde-completion-categories-other-window))
