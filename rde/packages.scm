@@ -291,11 +291,11 @@ emacs packages of current profile explorable by external Emacs.")))
             (method git-fetch)
             (uri (git-reference
                   (url "https://gitlab.com/protesilaos/mct.git")
-                  (commit "c76a02b43f268573ff3624aaf63d7c7cf9ea4dde"
+                  (commit "91199f8ee9bc58803b3d10a40fd463a689d67a50"
                           ;; version
                           )))
             (sha256
-             (base32 "102i6bx81brhljqz1s972rx574a8xrv5infkx5s8y8kffvcvlc84"))
+             (base32 "16sq49zx9ym4nkl223ccd1ixk39084jbs79xxj7xchn411bbby81"))
             (file-name (git-file-name name version))))
    (build-system emacs-build-system)
    (license license:gpl3+)
