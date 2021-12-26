@@ -158,11 +158,11 @@ dependency for other packages."
   (define emacs-configure-rde-keymaps
     (rde-emacs-configuration-package
      'rde-keymaps
-     `((defvar rde-apps nil "Prefix keymap for applications.")
-       (define-prefix-command 'rde-apps nil "rde apps")
-       (defvar rde-toggles nil "\
+     `((defvar rde-app-map nil "Prefix keymap for applications.")
+       (define-prefix-command 'rde-app-map nil "rde applications")
+       (defvar rde-toggle-map nil "\
 Prefix keymap for binding various minor modes for toggling functionalitty.")
-       (define-prefix-command 'rde-toggles nil "rde toggles"))
+       (define-prefix-command 'rde-toggle-map nil "rde toggles"))
      #:summary "Keymaps inteded for reuse among configure-* packages"))
 
   (define (emacs-home-services config)
@@ -255,10 +255,10 @@ C-h C-a to open About Emacs buffer."
                   ("Europe/Helsinki" "Helsinki")
                   ("Europe/Moscow" "Moscow")
                   ("Asia/Tokyo" "Tokyo")))
-          (define-key rde-apps (kbd "w") 'world-clock)
+          (define-key rde-app-map (kbd "w") 'world-clock)
 
-          (define-key global-map (kbd "C-c a") 'rde-apps)
-          (define-key global-map (kbd "C-c t") 'rde-toggles))
+          (define-key global-map (kbd "C-c a") 'rde-app-map)
+          (define-key global-map (kbd "C-c t") 'rde-toggle-map))
         #:summary "General settings"
         #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
                                emacs-expand-region emacs-guix)
@@ -570,7 +570,7 @@ utilizing reverse-im package."
          (require 'company))
 
         (require 'configure-rde-keymaps)
-        (define-key rde-apps (kbd "t") telega-prefix-map)
+        (define-key rde-app-map (kbd "t") telega-prefix-map)
 
         (with-eval-after-load
 	 'telega
@@ -698,10 +698,10 @@ previous window layout otherwise.  With universal argument toggles
                   (delete-other-windows))))
 
         (require 'configure-rde-keymaps)
-        (define-key rde-toggles (kbd "o") 'olivetti-mode)
-        (define-key rde-toggles (kbd "O") 'global-olivetti-mode)
-        (define-key rde-toggles (kbd "m") 'hide-mode-line-mode)
-        (define-key rde-toggles (kbd "M") 'global-hide-mode-line-mode)
+        (define-key rde-toggle-map (kbd "o") 'olivetti-mode)
+        (define-key rde-toggle-map (kbd "O") 'global-olivetti-mode)
+        (define-key rde-toggle-map (kbd "m") 'hide-mode-line-mode)
+        (define-key rde-toggle-map (kbd "M") 'global-hide-mode-line-mode)
 	(define-key global-map (kbd "s-f") 'rde-toggle-monocle))
       #:elisp-packages (list emacs-olivetti emacs-hide-header-line
                              (get-value 'emacs-configure-rde-keymaps config)))))
@@ -996,8 +996,8 @@ git-link, git-timemachine."
                               '(git-gutter:lighter " GG"))
 
         (require 'configure-rde-keymaps)
-        (define-key rde-toggles (kbd "g") 'git-gutter-mode)
-        (define-key rde-toggles (kbd "G") 'global-git-gutter-mode)
+        (define-key rde-toggle-map (kbd "g") 'git-gutter-mode)
+        (define-key rde-toggle-map (kbd "G") 'global-git-gutter-mode)
         (define-key global-map (kbd "s-g") 'git-gutter-transient)
 
         (with-eval-after-load
@@ -1476,8 +1476,8 @@ emacsclient feels more like a separate emacs instance."
                (remove-hook 'pre-command-hook 'keycast--update))))
 
         (require 'configure-rde-keymaps)
-        (define-key rde-toggles (kbd "k") 'rde-keycast-mode)
-        (define-key rde-toggles (kbd "K") 'rde-keycast-mode))
+        (define-key rde-toggle-map (kbd "k") 'rde-keycast-mode)
+        (define-key rde-toggle-map (kbd "K") 'rde-keycast-mode))
       #:elisp-packages (list emacs-moody emacs-keycast
                              (get-value 'emacs-configure-rde-keymaps config)))))
 

@@ -23,7 +23,7 @@
       `((eval-when-compile (require 'configure-rde-keymaps))
         (with-eval-after-load
          'configure-rde-keymaps
-         (define-key rde-apps (kbd "d") 'docker))
+         (define-key rde-app-map (kbd "d") 'docker))
         (add-to-list 'auto-mode-alist '(".*Dockerfile\\'" . dockerfile-mode)))
       ;; MAYBE: Add emacs-docker-tramp?
       #:elisp-packages (list emacs-docker emacs-dockerfile-mode

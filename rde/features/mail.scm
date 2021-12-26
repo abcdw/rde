@@ -705,7 +705,7 @@ not appear in the pop-up buffer."
           (setq mail-user-agent 'notmuch-user-agent)
 
           (require 'configure-rde-keymaps)
-          (define-key rde-apps (kbd "n") 'notmuch)
+          (define-key rde-app-map (kbd "n") 'notmuch)
 
           ,@(if (get-value 'emacs-consult config)
                 '((define-key global-map (kbd "M-s n") 'consult-notmuch-tree))

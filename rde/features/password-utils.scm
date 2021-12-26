@@ -48,7 +48,7 @@
                  (add-hook 'pass-mode-hook (lambda () (setq truncate-lines t)))
 
                  (require 'configure-rde-keymaps)
-                 (define-key rde-apps (kbd "p") 'pass)
+                 (define-key rde-app-map (kbd "p") 'pass)
 
                  ;; Source:
                  ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/tools/pass/autoload/consult.el
