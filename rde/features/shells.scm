@@ -15,11 +15,11 @@
 
 (define* (feature-zsh
 	  #:key
-	  (package zsh)
+	  (zsh zsh)
 	  (default-shell? #t)
 	  (enable-zsh-autosuggestions? #t))
   "Configure Zsh."
-  (ensure-pred package? package)
+  (ensure-pred package? zsh)
 
   (define (zsh-home-services config)
     "Returns home services related to Zsh."
@@ -28,7 +28,7 @@
        (simple-service
 	'set-default-shell-to-zsh
 	home-environment-variables-service-type
-	`(("SHELL" . ,(file-append package "/bin/zsh")))))
+	`(("SHELL" . ,(file-append zsh "/bin/zsh")))))
 
      ;; zsh-autosuggestions is very cool plugin, but a little
      ;; distractive, I find it a little against Attention-friendly
@@ -81,7 +81,7 @@ bindkey -e '^Y' rde-yank
       home-zsh-service-type
       (home-zsh-configuration
        (xdg-flavor? #t)
-       (package package)
+       (package zsh)
        (zshrc
 	(list
 	 (slurp-file-gexp (local-file "./zsh/zshrc"))
@@ -89,5 +89,5 @@ bindkey -e '^Y' rde-yank
 
   (feature
    (name 'zsh)
-   (values `((zsh . #t)))
+   (values (make-feature-values zsh))
    (home-services-getter zsh-home-services)))
