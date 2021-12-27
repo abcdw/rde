@@ -251,7 +251,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 
 (define* (feature-msmtp
           #:key
-          (msmtp msmtp-latest)
+          (msmtp msmtp)
           (msmtp-settings %default-msmtp-settings)
           (msmtp-provider-settings %default-msmtp-provider-settings)
           (msmtp-serializer default-msmtp-serializer))
