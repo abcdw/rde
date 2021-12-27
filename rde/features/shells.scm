@@ -8,10 +8,12 @@
   #:use-module (gnu home-services-utils)
   #:use-module (gnu services)
   #:use-module (gnu packages shells)
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages shellutils)
   #:use-module (guix gexp)
 
-  #:export (feature-zsh))
+  #:export (feature-zsh
+            feature-bash))
 
 (define* (feature-zsh
 	  #:key
@@ -91,3 +93,27 @@ bindkey -e '^Y' rde-yank
    (name 'zsh)
    (values (make-feature-values zsh))
    (home-services-getter zsh-home-services)))
+
+(define* (feature-bash
+	  #:key
+	  (bash bash))
+  "Configure Bash."
+  (ensure-pred package? bash)
+
+  (define (get-home-services config)
+    "Returns home services related to Bash."
+    (list
+     (simple-service
+      'set-bash-histfile
+      home-environment-variables-service-type
+      `(("HISTFILE" . "$XDG_CACHE_HOME/.bash_history")))
+
+     (service
+      home-bash-service-type
+      (home-bash-configuration
+       (package bash)))))
+
+  (feature
+   (name 'bash)
+   (values (make-feature-values bash))
+   (home-services-getter get-home-services)))

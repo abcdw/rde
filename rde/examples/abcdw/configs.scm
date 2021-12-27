@@ -136,6 +136,7 @@
     #:config-file (local-file "./config/tmux/tmux.conf"))
    (feature-zsh)
    (feature-ssh)
+   (feature-bash)
    (feature-git)
 
    (feature-sway
