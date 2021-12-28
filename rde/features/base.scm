@@ -179,7 +179,7 @@ installed by system or home services."
      (simple-service 'dbus-set-some-env-vars
 		     home-environment-variables-service-type
 		     '(("DBUS_SESSION_BUS_ADDRESS"
-                        . "unix:path=$XDG_RUNTIME_DIR/dbus.sock")))
+                        . "unix:path=$XDG_RUNTIME_DIR/bus")))
      (simple-service
       'dbus-add-shepherd-daemon
       home-shepherd-service-type
