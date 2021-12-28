@@ -194,7 +194,7 @@ installed by system or home services."
                         "--session"
                         (string-append
                          "--address=" "unix:path="
-                         (getenv "XDG_RUNTIME_DIR") "/dbus.sock"))
+                         (getenv "XDG_RUNTIME_DIR") "/bus"))
                   )))))))
   (define (get-system-services _)
     %rde-desktop-services)
