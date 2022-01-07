@@ -95,7 +95,7 @@ it as a string.  FILE must be a file-like object."
             (G_ "~a is not a file-like object.")
             file)))
   #~(call-with-input-file #$file
-        (@@ (ice-9 textual-ports) get-string-all)))
+        (@ (ice-9 textual-ports) get-string-all)))
 
 
 ;;;
