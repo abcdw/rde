@@ -35,7 +35,7 @@ FILE-NAME found in %PATCH-PATH."
 (define %rde-patch-path
   (make-parameter
    (append
-    (list (string-append %channel-root "/rde/packages/patches"))
+    (list (string-append %channel-root "rde/packages/patches"))
     (%patch-path))))
 
 (use-modules (gnu packages emacs))
