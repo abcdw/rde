@@ -336,3 +336,19 @@ functionality.")))
     (description #f)
     (license license:expat)))
 
+(define-public emacs-vertico-latest
+  (let* ((commit "a8fe9a0b2e156e022136169a3159b4dad78b2439")
+         (revision "0"))
+    (package
+     (inherit emacs-vertico)
+     (name "emacs-vertico")
+     (version (git-version "0.18" revision commit))
+     (source
+      (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/minad/vertico")
+             (commit commit)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "17jdxjcfs5dn39wbp1rf1nar08zs1slxpgxnnj9vf2il49n5n922")))))))
