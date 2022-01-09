@@ -1,0 +1,265 @@
+\input texinfo    @c -*- texinfo -*-
+
+@c %**start of header
+@setfilename rde.info
+@settitle rde Manual
+@documentencoding UTF-8
+@documentlanguage en
+@c %**end of header
+
+@include version.texi
+@set WEB-PAGE https://trop.in/rde
+
+@copying
+This manual is for rde, version @value{VERSION}.
+
+Copyright @copyright{} 2021 Andrew Tropin@*
+@end copying
+
+@finalout
+@titlepage
+@title rde Manual
+@author The rde Developers
+
+@page
+@vskip 0pt plus 1filll
+Edition @value{EDITION} @*
+@value{UPDATED} @*
+
+@insertcopying
+@end titlepage
+
+@contents
+
+@c @ifnottex
+@node Top
+@top rde Top Node
+
+The content of top node
+@c @end ifnottex
+
+@menu
+* rde::
+
+@detailmenu
+--- The Detailed Node Listing ---
+
+rde
+
+* Principles::
+* Usage::
+* Guix Home::
+* Channel introduction::
+* Just a screenshot::
+* Community::
+* Contributing::
+
+Principles
+
+* Main::
+* Secondary::
+
+Guix Home
+
+* People's Guix Home configurations::
+
+Just a screenshot
+
+* Tools::
+
+Contributing
+
+* New features, fixes or ideas: New features fixes or ideas. 
+* Documentation::
+
+@end detailmenu
+@end menu
+
+@node rde
+@chapter rde
+
+Set of tools for managing computing environments with GNU Guix.  Also,
+rde contains additional home services for Guix Home and packages for
+GNU Guix.  More info is available at @uref{http://trop.in/rde, trop.in/rde}.
+
+@strong{Disclaimer:} The project is in an active development stage.
+
+@strong{Tip:} older Nix source code is available under @code{stale/} directory.
+
+@menu
+* Principles::
+* Usage::
+* Guix Home::
+* Channel introduction::
+* Just a screenshot::
+* Community::
+* Contributing::
+@end menu
+
+@node Principles
+@section Principles
+
+@menu
+* Main::
+* Secondary::
+@end menu
+
+@node Main
+@subsection Main
+
+@table @asis
+@item Ergonomic
+Sane keybindings, good contrast, readable fonts.
+@item Reproducible
+Setup can be easily replicated.
+@item Hackable
+Easy to throw out or modify any part of setup.
+@item Stateless
+All state must be explicit and syncable or temporary.
+@end table
+
+@node Secondary
+@subsection Secondary
+
+@table @asis
+@item Lightweight and battery efficient
+wayland, fast native apps.
+@item Offline
+most of workflows and apps should work without network.
+@item Attention-friendly
+minimal use of notification and other
+distractive things.
+@end table
+
+@node Usage
+@section Usage
+
+rde heavily relies on Guix Home and Guix System, it's able to provide
+both a @code{home-environment} and @code{operating-system} records, which can be
+used by @code{guix home} and @code{guix system} respectively.  It's not ready for
+wide audience yet, but for very curious people: my current @uref{rde/examples/abcdw/configs.scm, config} is
+here and I use following commands to apply it:
+
+@example
+git clone https://git.sr.ht/~abcdw/rde
+cd rde
+make
+@end example
+
+Read more about @code{home-environment} at @uref{http://guix.gnu.org/en/manual/devel/en/guix.html#Home-Configuration, Home Configuration}.
+
+GNU Guix and git should be installed before invoking commands above.
+
+The alternative and more apropriate way to use rde will be described
+later.
+
+@node Guix Home
+@section Guix Home
+
+@code{Guix Home} is a part of GNU Guix now, no additional installation steps
+are required.
+
+@menu
+* People's Guix Home configurations::
+@end menu
+
+@node People's Guix Home configurations
+@subsection People's Guix Home configurations
+
+@itemize
+@item
+@uref{https://hg.sr.ht/~yoctocell/guixrc/browse/yoctocell/home, yoctocell}'s full-blown configuration with variety of software.
+@item
+@uref{https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/home/yggdrasil, krevedkokun}'s Emacs(Evil)/Wayland(Sway) compact and clean config.
+@end itemize
+
+@node Channel introduction
+@section Channel introduction
+
+In case you want to use rde as a channel, add the following code to
+your @code{~/.config/guix/channels.scm}, and call @code{guix pull}.
+@example
+(cons*
+ (channel
+  (name 'rde)
+  (url "https://git.sr.ht/~abcdw/rde")
+  (introduction
+   (make-channel-introduction
+    "257cebd587b66e4d865b3537a9a88cccd7107c95"
+    (openpgp-fingerprint
+     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
+ %default-channels)
+@end example
+
+@node Just a screenshot
+@section Just a screenshot
+
+A picture to catch your eye)
+@uref{https://cdn.fosstodon.org/media_attachments/files/106/900/674/950/793/851/original/4b17f03528571ca0.png}
+
+@menu
+* Tools::
+@end menu
+
+@node Tools
+@subsection Tools
+
+@multitable {aaaaaaaaaaaaaaaaaaaaaa} {aaaaaaaaa}
+@headitem Purpose
+@tab Tool
+@item Window Manager
+@tab Sway
+@item Terminal
+@tab Alacritty
+@item Login Shell
+@tab Bash
+@item Interactive Unix Shell
+@tab Zsh
+@item Service Manager/Init
+@tab Shepherd
+@item Filesystem
+@tab Btrfs
+@item Everything Else (:
+@tab Emacs
+@end multitable
+
+@node Community
+@section Community
+
+There are a few @uref{https://lists.sr.ht/~abcdw, mailing lists} you can subscribe and/or post with your
+existing email account:
+@table @asis
+@item @uref{https://lists.sr.ht/~abcdw/rde-announce/, ~abcdw/rde-announce@@lists.sr.ht}
+for news and updates.
+@item @uref{https://lists.sr.ht/~abcdw/rde-discuss/, ~abcdw/rde-discuss@@lists.sr.ht}
+for discussions and questions.
+@item @uref{https://lists.sr.ht/~abcdw/rde-devel/, ~abcdw/rde-devel@@lists.sr.ht}
+for patches and development related
+discussions.
+@end table
+
+@node Contributing
+@section Contributing
+
+@menu
+* New features, fixes or ideas: New features fixes or ideas. 
+* Documentation::
+@end menu
+
+@node New features fixes or ideas
+@subsection New features, fixes or ideas
+
+Send mails, optionally with inline patches to rde-devel mailing list.
+
+@node Documentation
+@subsection Documentation
+
+For Guix Home documentation maintained in @uref{https://git.savannah.gnu.org/cgit/guix.git/tree/doc, guix repo}.
+
+
+Emacs how undo works
+https://casouri.github.io/note/2021/visual-undo-tree/index.html
+
+@node FAQ
+
+@bye
