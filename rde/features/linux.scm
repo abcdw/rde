@@ -112,19 +112,28 @@ ctl_type.pipewire {
         (provision '(pipewire))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list #$(file-append pipewire "/bin/pipewire")))))
+                  (list #$(file-append pipewire "/bin/pipewire"))
+                  #:environment-variables
+                  (append (list "DISABLE_RTKIT=1")
+                          (default-environment-variables)))))
        (shepherd-service
         (requirement '(pipewire))
         (provision '(wireplumber))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list #$(file-append wireplumber "/bin/wireplumber")))))
+                  (list #$(file-append wireplumber "/bin/wireplumber"))
+                  #:environment-variables
+                  (append (list "DISABLE_RTKIT=1")
+                          (default-environment-variables)))))
        (shepherd-service
         (requirement '(pipewire))
         (provision '(pipewire-pulse))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list #$(file-append pipewire "/bin/pipewire-pulse")))))))
+                  (list #$(file-append pipewire "/bin/pipewire-pulse"))
+                  #:environment-variables
+                  (append (list "DISABLE_RTKIT=1")
+                          (default-environment-variables)))))))
      (simple-service
       'pipewire-add-packages
       home-profile-service-type
