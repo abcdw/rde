@@ -1,15 +1,20 @@
 (define-module (rde features terminals)
   #:use-module (rde features)
+  #:use-module (rde features emacs)
   #:use-module (rde features predicates)
   #:use-module (rde features fontutils)
   #:use-module (gnu home services)
   #:use-module (gnu home-services base)
   #:use-module (gnu home-services terminals)
+  #:use-module (gnu home-services shells)
+  #:use-module (gnu home-services wm)
   #:use-module (gnu services)
+  #:use-module (rde packages)
   #:use-module (gnu packages terminals)
   #:use-module (guix gexp)
 
-  #:export (feature-alacritty))
+  #:export (feature-alacritty
+            feature-vterm))
 
 (define* (feature-alacritty
 	  #:key
@@ -49,3 +54,64 @@
                  `((default-terminal . ,(file-append package "/bin/alacritty")))
                  '())))
    (home-services-getter alacritty-home-services)))
+
+
+(define* (feature-vterm
+	  #:key
+	  (emacs-vterm emacs-vterm-latest))
+  "Configure Alacritty terminal."
+  (ensure-pred package? emacs-vterm)
+
+  (define (get-home-services config)
+    (require-value 'emacs config)
+    (list
+     (elisp-configuration-service
+      'vterm
+      `(,@(if (get-value 'emacs-consult config)
+              `((eval-when-compile
+                 (require 'cl-macs))
+
+                (with-eval-after-load
+                 'vterm
+                 (defun vterm-consult-yank-pop-wrapper (orig-fun &rest args)
+                   "Use `vterm-insert' instead of `insert-for-yank' if
+`major-mode' is `vterm-mode'."
+                   (interactive "p")
+                   (if (equal major-mode 'vterm-mode)
+                       (let ((inhibit-read-only t)
+                             (yank-undo-function (lambda (_s _e) (vterm-undo))))
+                         (cl-letf (((symbol-function 'insert-for-yank)
+                                    'vterm-insert))
+                                  (apply orig-fun args)))
+                       (apply orig-fun args)))
+
+                 (advice-add 'consult-yank-pop :around
+                             'vterm-consult-yank-pop-wrapper)))
+              '()))
+      #:elisp-packages `(,emacs-vterm
+                         ,@(if (get-value 'emacs-consult config)
+                               (list (get-value 'emacs-consult config))
+                               '())))
+
+     (when (get-value 'sway config)
+       (simple-service
+        'emacs-vterm-add-sway-bind
+        home-sway-service-type
+        `((bindsym $mod+Shift+Return exec
+		   ,(get-value 'emacs-client-create-frame config)
+                   "-e \"(vterm)\""))))
+
+     (when (get-value 'zsh config)
+       (simple-service
+        'emacs-vterm-zsh-configuration
+        home-zsh-service-type
+        (home-zsh-extension
+	 (zshrc
+          (list #~(format #f "source ~a"
+                          #$(local-file "./zsh/vterm" "setup-vterm")))))))))
+
+  (feature
+   (name 'vterm)
+   (values `((vterm . #t)
+             (emacs-vterm . ,emacs-vterm)))
+   (home-services-getter get-home-services)))

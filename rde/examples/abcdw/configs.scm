@@ -132,6 +132,7 @@
 
    (feature-alacritty
     #:config-file (local-file "./config/alacritty/alacritty.yml"))
+   (feature-vterm)
    (feature-tmux
     #:config-file (local-file "./config/tmux/tmux.conf"))
    (feature-zsh)
