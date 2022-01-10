@@ -59,14 +59,8 @@ output DP-2 scale 2 disable
 #
 # Basics:
 #
-    # Start a terminal
-    bindsym $mod+Control+Shift+Return exec $term
-
     # Kill focused window
     bindsym $mod+Shift+c kill
-
-    # Start your launcher
-    bindsym --to-code $mod+Shift+d exec $menu
 
     # Drag floating windows by holding down $mod and left mouse button.
     # Resize them with right mouse button + $mod.

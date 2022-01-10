@@ -72,14 +72,21 @@
 	  `((xwayland ,(if xwayland? 'enable 'disable))
             (,#~"")
             ,@layout-config
+
             (,#~"")
             (set $mod ,sway-mod)
             (set $term ,default-terminal)
             (set $menu ,default-app-launcher)
+
+            (,#~"")
+            (bindsym $mod+Control+Shift+Return exec $term)
+            (bindsym --to-code $mod+Shift+d exec $menu)
+
 	    (,#~"")
             (default_border pixel)
             (default_floating_border pixel)
             (gaps inner ,(get-value 'emacs-margin config 8))
+
             (,#~"")))))
 
        (simple-service
