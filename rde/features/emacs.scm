@@ -220,6 +220,11 @@ C-h C-a to open About Emacs buffer."
             (rde-display-load-time))
 
           ,#~""
+          ;; TODO: Move it to feature-isearch
+          (setq search-whitespace-regexp ".*?")
+
+          ,#~""
+          ;; TODO: Move it to feature-compile
           (defun rde-compilation-colorizer ()
             "Prevent color escape sequences to popup in compilation buffer."
             (ansi-color-apply-on-region (point-min) (point-max)))
