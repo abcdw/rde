@@ -246,6 +246,8 @@ C-h C-a to open About Emacs buffer."
           ;; TODO: Extend info-lookup-alist with Guix Manual nodes to
           ;; make `C-h S' find guix services and other items.
           (eval-when-compile (require 'guix))
+          (define-key rde-toggle-map (kbd "p") 'guix-prettify-mode)
+          (define-key rde-toggle-map (kbd "P") 'global-guix-prettify-mode)
           (add-hook 'after-init-hook 'global-guix-prettify-mode)
 
           ,#~""
