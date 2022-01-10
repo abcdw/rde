@@ -370,3 +370,28 @@ functionality.")))
               (sha256
                (base32
                 "0r1iz92sn2ddi11arr9s8z7cdpjli7pn55yhaswvp4sdch7chb5r")))))))
+
+(define-public emacs-consult-dir
+  (package
+   (name "emacs-consult-dir")
+   (version "0.1.0")
+   (source (origin
+            (method git-fetch)
+            (uri (git-reference
+                  (url "https://github.com/karthink/consult-dir")
+                  (commit "08f543ae6acbfc1ffe579ba1d00a5414012d5c0b")))
+            (sha256
+             (base32 "1cff4ssrn1mw2s5n090pdmwdirnfih8idg5f0ll2bi2djc4hq5kn"))
+            (file-name (git-file-name name version))))
+   (build-system emacs-build-system)
+   (license license:gpl3+)
+   (propagated-inputs (list emacs-consult))
+   (home-page "https://github.com/karthink/consult-dir")
+   (synopsis "Insert paths into minibuffer prompts in Emacs")
+   (description "Consult-dir allows you to easily insert directory
+paths into the minibuffer prompt in Emacs.
+
+When using the minibuffer, you can switch - with completion and
+filtering provided by your completion setup - to any directory you’ve
+visited recently, or to a project or bookmarked directory. The
+minibuffer prompt will be replaced with the directory you choose.")))
