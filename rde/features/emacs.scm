@@ -936,14 +936,15 @@ Start an unlimited search at `point-min' otherwise."
          ;; https://github.com/fniessen/emacs-leuven/blob/master/org-leuven-agenda-views.txt
          ;; Clean agenda view
          ;; https://gist.github.com/rougier/ddb84c16c28f7cd75e27e50d4c3c43da
+         ;; https://d12frosted.io/posts/2020-06-23-task-management-with-roam-vol1.html
          (setq org-agenda-custom-commands
                `((,(kbd "C-d") "Agenda for the day"
                   ((agenda
                     ""
                     ((org-agenda-span 1)
-                     (org-deadline-warning-days 0)
                      (org-agenda-scheduled-leaders '("" "Sched.%2dx: "))
                      (org-agenda-block-separator nil)
+                     (org-agenda-entry-types '(:scheduled :timestamp :sexp))
                      (org-scheduled-past-days 0)
                      ;; We don't need the `org-agenda-date-today'
                      ;; highlight because that only has a practical
