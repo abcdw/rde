@@ -437,7 +437,16 @@ these UI elements early."
 
         ,#~"\n;; Move modeline to the top"
         (setq-default header-line-format mode-line-format)
-        (setq-default mode-line-format nil))
+        (setq-default mode-line-format nil)
+
+        (defun rde--move-mode-line-to-header ()
+          "Moves mode-line to header-line, the function is needed for various
+modes, which setups mode-line late."
+          (setq-local header-line-format mode-line-format)
+          (setq-local mode-line-format nil))
+
+        (add-hook 'calendar-initial-window-hook
+                  'rde--move-mode-line-to-header))
       #:elisp-packages (list emacs-modus-themes)
       #:keywords '(appearance mode-line faces accessibility)
       #:summary "\
