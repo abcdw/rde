@@ -1178,8 +1178,10 @@ git-link, git-timemachine."
 
          (setq completion-styles '(orderless))
 	 (setq completion-category-overrides
-	       '((file (styles . (partial-completion)))
-                 (project-file (styles . (partial-completion)))))
+               ;; basic is required for /ssh: completion to work, but
+               ;; keep the same values for project-file too.
+	       '((file (styles . (basic partial-completion)))
+                 (project-file (styles . (basic partial-completion)))))
 	 (setq enable-recursive-minibuffers t)
 
          (setq resize-mini-windows nil)
