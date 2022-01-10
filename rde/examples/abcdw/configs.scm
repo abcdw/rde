@@ -136,8 +136,13 @@
    (feature-tmux
     #:config-file (local-file "./config/tmux/tmux.conf"))
    (feature-zsh)
-   (feature-ssh)
    (feature-bash)
+   (feature-ssh
+    #:ssh-configuration
+    (home-ssh-configuration
+     (toplevel-options
+      '((host-key-algorithms . "+ssh-rsa")
+        (pubkey-accepted-key-types . "+ssh-rsa")))))
    (feature-git)
 
    (feature-sway
