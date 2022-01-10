@@ -1300,7 +1300,7 @@ git-link, git-timemachine."
 
 (define* (feature-emacs-vertico
           #:key
-          (emacs-vertico emacs-vertico))
+          (emacs-vertico emacs-vertico-latest))
   "Configure vertico completion UI for GNU Emacs."
   (define emacs-f-name 'vertico)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1309,13 +1309,59 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((eval-when-compile
+         (require 'vertico)
+         (require 'vertico-multiform))
+        (with-eval-after-load
          'vertico
          (define-key global-map (kbd "s-s") 'vertico-repeat)
-         (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
-         (custom-set-variables '(vertico-cycle t)))
+         ;; TODO: Bind vertico-next/previous-group to more usual keys?
 
-	(add-hook 'after-init-hook 'vertico-mode))
+         (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
+         (custom-set-variables '(vertico-cycle t))
+
+         (defun rde--vertico-prepare-header-line ()
+           "The same as `rde--move-mode-line-to-header', but also increase
+vertico-count by 1 to show one more candidate, which is hidden
+otherwise because mode line is expected to be present by height
+calculation function for vertico buffer."
+           (setq-local header-line-format mode-line-format)
+           (setq-local mode-line-format nil)
+           (setq-local vertico-count (+ vertico-count 1)))
+
+         (add-hook 'minibuffer-setup-hook
+                   'rde--vertico-prepare-header-line)
+
+         (defadvice vertico-insert
+           (after vertico-insert-add-history activate)
+           "Make vertico-insert add to the minibuffer history."
+           (unless (eq minibuffer-history-variable t)
+             (add-to-history minibuffer-history-variable (minibuffer-contents))))
+
+         (setq vertico-multiform-categories
+               '((consult-grep buffer)
+                 (imenu buffer)
+                 (buffer)
+                 ;; (file buffer)
+                 ;; (project-file buffer)
+                 (info-menu buffer)
+                 (consult-history buffer)
+                 (execute-extended-command flat)
+                 (consult-location buffer)))
+
+         (setq vertico-multiform-commands
+               '((telega-chat-with buffer)
+                 ;; For some reason it doesn't have an info-menu
+                 ;; category and also setting
+                 ;; marginalia-command-categories doesn't help
+                 (Info-goto-node buffer)
+                 (info-lookup-symbol buffer)
+                 (Info-follow-reference buffer)
+                 (consult-yank-pop buffer)))
+
+         (vertico-multiform-mode))
+
+        (add-hook 'after-init-hook 'vertico-mode))
       #:elisp-packages (list emacs-vertico))))
 
   (feature
