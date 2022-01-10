@@ -264,8 +264,30 @@ C-h C-a to open About Emacs buffer."
                   ("Asia/Tokyo" "Tokyo")))
           (define-key rde-app-map (kbd "w") 'world-clock)
 
-          (define-key global-map (kbd "C-c a") 'rde-app-map)
-          (define-key global-map (kbd "C-c t") 'rde-toggle-map))
+          ;; TODO: Move to feature-sane-bindings
+          (let ((map goto-map))
+            (define-key map "L" 'find-library)
+            (define-key map "F" 'find-function)
+            (define-key map "K" 'find-function-on-key)
+            (define-key map "V" 'find-variable))
+
+          (defun kill-region-dwim (&optional count)
+            "The function kills region if mark is active, otherwise kills word.
+Prefix argument can be used to kill a few words."
+            (interactive "p")
+            (if (use-region-p)
+                (kill-region (region-beginning) (region-end) 'region)
+                (backward-kill-word count)))
+
+          ;; (define-key global-map (kbd "C-h") 'backward-delete-char-untabify)
+          (define-key global-map (kbd "M-K") 'kill-whole-line)
+          (define-key global-map (kbd "M-c") 'capitalize-dwim)
+          (define-key global-map (kbd "M-l") 'downcase-dwim)
+          (define-key global-map (kbd "M-u") 'upcase-dwim)
+          (define-key global-map (kbd "C-w") 'kill-region-dwim)
+
+          (define-key mode-specific-map (kbd "a") 'rde-app-map)
+          (define-key mode-specific-map (kbd "t") 'rde-toggle-map))
         #:summary "General settings"
         #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
                                emacs-expand-region emacs-guix)
