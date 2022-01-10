@@ -1178,6 +1178,10 @@ git-link, git-timemachine."
         (with-eval-after-load
 	 'minibuffer
 
+         (setq minibuffer-prompt-properties
+               '(read-only t cursor-intangible t face minibuffer-prompt))
+         (add-hook 'minibuffer-setup-hook 'cursor-intangible-mode)
+
          (setq completion-in-region-function 'consult-completion-in-region)
 
          (setq completion-styles '(orderless))
