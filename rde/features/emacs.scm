@@ -1171,7 +1171,11 @@ git-link, git-timemachine."
       (list (@ (gnu packages rust-apps) ripgrep)))
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((eval-when-compile
+         (require 'marginalia)
+         (require 'consult))
+
+        (with-eval-after-load
 	 'minibuffer
 
          (setq completion-in-region-function 'consult-completion-in-region)
@@ -1222,8 +1226,6 @@ git-link, git-timemachine."
         (define-key global-map (kbd "s-.") 'embark-act)
         (define-key global-map (kbd "s->") 'embark-become)
 
-        (autoload 'consult-customize "consult" "" nil 'macro)
-
         (progn
          (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
 	 (define-key global-map (kbd "M-y") 'consult-yank-pop)
@@ -1261,9 +1263,13 @@ git-link, git-timemachine."
          (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
 	 (define-key global-map (kbd "s-o") 'other-window))
 
+        (autoload 'consult-customize "consult" "" nil 'macro)
+        (autoload 'consult--customize-set "consult")
+
         (with-eval-after-load
 	 'consult
          (require 'embark-consult)
+
          (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
 
