@@ -16,7 +16,17 @@ This manual is for rde, version @value{VERSION}.
 Copyright @copyright{} 2021 Andrew Tropin@*
 @end copying
 
-@finalout
+@dircategory System administration
+@direntry
+* rde: (guix).       Manage operating systems, dotfiles and development environments.
+@end direntry
+
+@dircategory Software development
+@direntry
+* rde Emacs: (rde)Emacs.      Emacs configuration with vanilla flavor.
+@end direntry
+
+@c @finalout
 @titlepage
 @title rde Manual
 @author The rde Developers
@@ -31,178 +41,61 @@ Edition @value{EDITION} @*
 
 @contents
 
-@c @ifnottex
 @node Top
-@top rde Top Node
+@top rde
 
-The content of top node
-@c @end ifnottex
+This document describes rde version @value{VERSION}, a set of tools
+for managing development environments, home environments, and
+operating systems.
 
 @menu
-* rde::
+* Introduction::                What rde is?
+* Approaching Free Software::   How to explore, learn and use?
+* Getting Started::             Try, customize and install.   @c                 \
+* Features::                    All the parts of rde.         @c  ================\
+* Contributing::                Tips and guidelines.          @c  ================/
+* FAQ::                         Frequently asked questions.   @c                 /
+
+* Acknowledgments::             Thanks!
+* Concept Index::               Concepts.
 
 @detailmenu
---- The Detailed Node Listing ---
+ --- The Detailed Node Listing ---
 
-rde
+Introduction
 
 * Principles::
-* Usage::
-* Guix Home::
-* Channel introduction::
-* Just a screenshot::
-* Community::
-* Contributing::
+@c * Usage::
+@c * Guix Home::
 
-Principles
+@c Principles
 
-* Main::
-* Secondary::
+@c * Main::
+@c * Secondary::
 
-Guix Home
+@c Guix Home
 
-* People's Guix Home configurations::
+@c * People's Guix Home configurations::
 
-Just a screenshot
+@c Just a screenshot
 
-* Tools::
+@c * Tools::
 
-Contributing
+@c Contributing
 
-* New features, fixes or ideas: New features fixes or ideas. 
-* Documentation::
+@c * New features, fixes or ideas: New features fixes or ideas. 
+@c * Documentation::
 
 @end detailmenu
 @end menu
 
-@node rde
+@node Introduction
 @chapter rde
 
-Set of tools for managing computing environments with GNU Guix.  Also,
-rde contains additional home services for Guix Home and packages for
-GNU Guix.  More info is available at @uref{http://trop.in/rde, trop.in/rde}.
+Set of tools for managing development environments, home environments
+and operating systems.
 
 @strong{Disclaimer:} The project is in an active development stage.
-
-@strong{Tip:} older Nix source code is available under @code{stale/} directory.
-
-@menu
-* Principles::
-* Usage::
-* Guix Home::
-* Channel introduction::
-* Just a screenshot::
-* Community::
-* Contributing::
-@end menu
-
-@node Principles
-@section Principles
-
-@menu
-* Main::
-* Secondary::
-@end menu
-
-@node Main
-@subsection Main
-
-@table @asis
-@item Ergonomic
-Sane keybindings, good contrast, readable fonts.
-@item Reproducible
-Setup can be easily replicated.
-@item Hackable
-Easy to throw out or modify any part of setup.
-@item Stateless
-All state must be explicit and syncable or temporary.
-@end table
-
-@node Secondary
-@subsection Secondary
-
-@table @asis
-@item Lightweight and battery efficient
-wayland, fast native apps.
-@item Offline
-most of workflows and apps should work without network.
-@item Attention-friendly
-minimal use of notification and other
-distractive things.
-@end table
-
-@node Usage
-@section Usage
-
-rde heavily relies on Guix Home and Guix System, it's able to provide
-both a @code{home-environment} and @code{operating-system} records, which can be
-used by @code{guix home} and @code{guix system} respectively.  It's not ready for
-wide audience yet, but for very curious people: my current @uref{rde/examples/abcdw/configs.scm, config} is
-here and I use following commands to apply it:
-
-@example
-git clone https://git.sr.ht/~abcdw/rde
-cd rde
-make
-@end example
-
-Read more about @code{home-environment} at @uref{http://guix.gnu.org/en/manual/devel/en/guix.html#Home-Configuration, Home Configuration}.
-
-GNU Guix and git should be installed before invoking commands above.
-
-The alternative and more apropriate way to use rde will be described
-later.
-
-@node Guix Home
-@section Guix Home
-
-@code{Guix Home} is a part of GNU Guix now, no additional installation steps
-are required.
-
-@menu
-* People's Guix Home configurations::
-@end menu
-
-@node People's Guix Home configurations
-@subsection People's Guix Home configurations
-
-@itemize
-@item
-@uref{https://hg.sr.ht/~yoctocell/guixrc/browse/yoctocell/home, yoctocell}'s full-blown configuration with variety of software.
-@item
-@uref{https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/home/yggdrasil, krevedkokun}'s Emacs(Evil)/Wayland(Sway) compact and clean config.
-@end itemize
-
-@node Channel introduction
-@section Channel introduction
-
-In case you want to use rde as a channel, add the following code to
-your @code{~/.config/guix/channels.scm}, and call @code{guix pull}.
-@example
-(cons*
- (channel
-  (name 'rde)
-  (url "https://git.sr.ht/~abcdw/rde")
-  (introduction
-   (make-channel-introduction
-    "257cebd587b66e4d865b3537a9a88cccd7107c95"
-    (openpgp-fingerprint
-     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
- %default-channels)
-@end example
-
-@node Just a screenshot
-@section Just a screenshot
-
-A picture to catch your eye)
-@uref{https://cdn.fosstodon.org/media_attachments/files/106/900/674/950/793/851/original/4b17f03528571ca0.png}
-
-@menu
-* Tools::
-@end menu
-
-@node Tools
-@subsection Tools
 
 @multitable {aaaaaaaaaaaaaaaaaaaaaa} {aaaaaaaaa}
 @headitem Purpose
@@ -223,6 +116,117 @@ A picture to catch your eye)
 @tab Emacs
 @end multitable
 
+rde heavily relies on Guix Home and Guix System, it's able to provide
+both a @code{home-environment} and @code{operating-system} records, which can be
+used by @code{guix home} and @code{guix system} respectively.  It's not ready for
+wide audience yet, but for very curious people: my current @uref{rde/examples/abcdw/configs.scm, config} is
+here and I use following commands to apply it:
+
+@example
+git clone https://git.sr.ht/~abcdw/rde
+cd rde
+make
+@end example
+
+Read more about @code{home-environment} at @uref{http://guix.gnu.org/en/manual/devel/en/guix.html#Home-Configuration, Home Configuration}.
+
+GNU Guix and git should be installed before invoking commands above.
+
+The alternative and more apropriate way to use rde will be described
+later.
+
+@c @menu
+@c * Principles::
+@c * Usage::
+@c * Guix Home::
+@c * Channel introduction::
+@c * Just a screenshot::
+@c * Community::
+@c @end menu
+
+@node Principles
+@section Principles
+
+@c @node Main
+@subsection Main
+
+@table @asis
+@item Ergonomic
+Sane keybindings, good contrast, readable fonts.
+@item Reproducible
+Setup can be easily replicated.
+@item Hackable
+Easy to throw out or modify any part of setup.
+@item Stateless
+All state must be explicit and syncable or temporary.
+@end table
+
+@c @node Secondary
+@subsection Secondary
+
+@table @asis
+@item Lightweight and battery efficient
+wayland, fast native apps.
+@item Offline
+most of workflows and apps should work without network.
+@item Attention-friendly
+minimal use of notification and other
+distractive things.
+@end table
+
+@node Channel introduction
+@section Channel introduction
+
+In case you want to use rde as a channel, add the following code to
+your @code{~/.config/guix/channels.scm}, and call @code{guix pull}.
+@example
+(cons*
+ (channel
+  (name 'rde)
+  (url "https://git.sr.ht/~abcdw/rde")
+  (introduction
+   (make-channel-introduction
+    "257cebd587b66e4d865b3537a9a88cccd7107c95"
+    (openpgp-fingerprint
+     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
+ %default-channels)
+@end example
+
+
+@node Approaching Free Software
+@chapter Approaching Free Software
+
+The explanation will go here.
+
+@node Getting Started
+@chapter Getting Started
+
+@node Features
+@chapter rde Features
+
+@node Contributing
+@chapter Contributing
+
+@menu
+* New features, fixes or ideas: New features fixes or ideas.
+* Documentation::
+* Community::
+@end menu
+
+@node New features fixes or ideas
+@section New features, fixes or ideas
+
+Send mails, optionally with inline patches to rde-devel mailing list.
+
+@node Documentation
+@section Documentation
+
+For Guix Home documentation maintained in @uref{https://git.savannah.gnu.org/cgit/guix.git/tree/doc, guix repo}.
+
+
+Emacs how undo works
+https://casouri.github.io/note/2021/visual-undo-tree/index.html
+
 @node Community
 @section Community
 
@@ -238,28 +242,14 @@ for patches and development related
 discussions.
 @end table
 
-@node Contributing
-@section Contributing
-
-@menu
-* New features, fixes or ideas: New features fixes or ideas. 
-* Documentation::
-@end menu
-
-@node New features fixes or ideas
-@subsection New features, fixes or ideas
-
-Send mails, optionally with inline patches to rde-devel mailing list.
-
-@node Documentation
-@subsection Documentation
-
-For Guix Home documentation maintained in @uref{https://git.savannah.gnu.org/cgit/guix.git/tree/doc, guix repo}.
-
-
-Emacs how undo works
-https://casouri.github.io/note/2021/visual-undo-tree/index.html
-
 @node FAQ
+@chapter FAQ
+
+@node Acknowledgments
+@chapter Acknowledgments
+
+@node Concept Index
+@unnumbered Concept Index
+@printindex cp
 
 @bye
