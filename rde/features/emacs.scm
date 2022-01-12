@@ -379,6 +379,13 @@ and overall looks cool."
         ;; Doesn't see the effect.
         (setq modus-themes-diffs 'desaturated)
         (setq modus-themes-deuteranopia ,(if deuteranopia? 't 'nil))
+        (setq modus-themes-operandi-color-overrides
+              `((fg-window-divider-inner . "#ffffff")
+                (fg-window-divider-outer . "#ffffff")))
+        (setq modus-themes-vivendi-color-overrides
+              `((fg-window-divider-inner . "#000000")
+                (fg-window-divider-outer . "#000000")))
+
 	(load-theme 'modus-operandi t)
 
         ;; (setq header-line-format (delete 'mode-line-modes header-line-format))
@@ -405,20 +412,6 @@ mouse-3: Toggle minor modes"
          `(git-gutter-fr:deleted
            ((t (:foreground "red" :background "white")))))
 
-        (defun rde--set-divider-faces ()
-          (custom-set-faces
-              `(window-divider
-                ((t (:foreground ,(face-background 'default)))))
-              `(window-divider-first-pixel
-                ((t (:foreground ,(face-background 'default)))))
-              `(window-divider-last-pixel
-                ((t (:foreground ,(face-background 'default)))))))
-
-        (if (daemonp)
-            (add-hook 'after-make-frame-functions
-                      (lambda (frame)
-                        (with-selected-frame frame (rde--set-divider-faces))))
-            (rde--set-divider-faces))
         (window-divider-mode))
       #:early-init
       `(,#~"\n;; Prevent the glimpse of un-styled Emacs by disabling \
