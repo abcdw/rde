@@ -354,9 +354,13 @@ Prefix argument can be used to kill a few words."
 
 (define* (feature-emacs-appearance
           #:key
-          (margin 8))
-  "Make Emacs looks modern and minimalistic."
+          (margin 8)
+          (deuteranopia? #t))
+  "Make Emacs looks modern and minimalistic. `deuteranopia?' substitutes
+red/green colors with red/blue, which helps people with colorblindness
+and overall looks cool."
   (ensure-pred integer? margin)
+  (ensure-pred boolean? deuteranopia?)
 
   (define emacs-f-name 'appearance)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -372,8 +376,9 @@ Prefix argument can be used to kill a few words."
         (custom-set-variables '(window-divider-default-right-width ,margin))
 
         (require 'modus-themes)
-        (setq modus-themes-diffs 'fg-only-deuteranopia)
-        (setq modus-themes-success-deuteranopia t)
+        ;; Doesn't see the effect.
+        (setq modus-themes-diffs 'desaturated)
+        (setq modus-themes-deuteranopia ,(if deuteranopia? 't 'nil))
 	(load-theme 'modus-operandi t)
 
         ;; (setq header-line-format (delete 'mode-line-modes header-line-format))
