@@ -1,6 +1,7 @@
 # Local Variables:
 # mode: sh
 # End:
+
 # Prevent freezing output on ^s, needed for various isearches
 hash stty 2> /dev/null && stty -ixon
 
@@ -56,9 +57,10 @@ prompt_rde_setup() {
   if [ -n "$GUIX_ENVIRONMENT" ]; then
     genv_part='%F{blue}>%f'
   fi
-  exit_code_part='%(?..[%?])'
+  # exit_code_part='%(?..[%?])'
+
   PS1="$user_part$genv_part "
-  RPS1="$exit_code_part"
+  # RPS1="$exit_code_part"
 
   # Fish-like C-c behavior
   # add-zsh-hook precmd prompt_rde_precmd
@@ -68,6 +70,8 @@ prompt_rde_setup() {
 autoload -Uz promptinit && promptinit
 prompt_themes+=( rde )
 prompt rde
+
+setopt printexitvalue # Instead of using RPS1 for status code
 
 echo -en "\033[6 q" # Make a cursor to be a vertical bar
 
