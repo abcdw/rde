@@ -33,15 +33,16 @@
       'backlight-add-packages
       home-profile-service-type
       (list brightnessctl))
-     (simple-service
-      'backlight-add-brightness-control-to-sway
-      home-sway-service-type
-      `((bindsym --locked XF86MonBrightnessUp exec
-		 ,(file-append brightnessctl "/bin/brightnessctl")
-		 set ,(step->symbol '+))
-	(bindsym --locked XF86MonBrightnessDown exec
-		 ,(file-append brightnessctl "/bin/brightnessctl")
-		 set ,(step->symbol '-))))))
+     (when (get-value 'sway config)
+       (simple-service
+        'backlight-add-brightness-control-to-sway
+        home-sway-service-type
+        `((bindsym --locked XF86MonBrightnessUp exec
+		   ,(file-append brightnessctl "/bin/brightnessctl")
+		   set ,(step->symbol '+))
+	  (bindsym --locked XF86MonBrightnessDown exec
+		   ,(file-append brightnessctl "/bin/brightnessctl")
+		   set ,(step->symbol '-)))))))
 
   (define (backlight-system-services config)
     (list
