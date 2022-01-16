@@ -50,7 +50,7 @@
   (feature
    (name 'alacritty)
    (values `((alacritty . ,package)
-             ,@(when default-terminal?
+             ,@(if default-terminal?
                  `((default-terminal . ,(file-append package "/bin/alacritty")))
                  '())))
    (home-services-getter alacritty-home-services)))
