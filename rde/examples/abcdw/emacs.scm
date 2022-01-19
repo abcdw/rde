@@ -393,6 +393,34 @@
       
       ;;(qz/org-babel-choose-block 'newstore-get-order-by-type)
       (define-key org-babel-map (kbd "M-l") 'qz/org-babel-choose-block)
+      (defun qz/org-babel-make-table-constants ()
+        "exec from the top of a tree"
+        (interactive)
+        (let* ((hi-lock-auto-select-face t)
+               ;; above is 100x better when you patch `hi-lock-face-symbol-at-point'
+               ;; with `(or (and hi-lock-auto-select-face (hi-lock-read-face-name)) 'hi-yellow)'
+               (col '()))
+          (save-excursion
+            (org-map-tree
+             (lambda ()
+               (when-let* ((s (org-get-heading))
+                           (s (org-no-properties s))
+                           (i (string-match ":" s))
+                           (k (substring s 0 i))
+                           (v (substring s (+ 2 i))))
+                 (message "key: %s" k)
+                 (message "value: %s" v)
+                 (message "col: %s" col)
+                 (setq col (cons (format "%s=%s" k v) col))
+                 (funcall-interactively 'highlight-phrase v))))
+            (org-back-to-heading)
+            (next-line)
+            (newline)
+            (previous-line)
+            (insert (format "#+constants: %s" (s-join " " (reverse col)))))
+          col))
+      
+      (define-key org-babel-map (kbd "M-d") 'qz/org-babel-make-table-constants)
       (defun qz/org-babel--list->rows (name lst)
         (cons (list name)
               (cons 'hline (mapcar 'list lst))))
@@ -437,7 +465,28 @@
                   ((org-agenda-overriding-header "to yak shave")
                    (org-agenda-files '(,(format "%s/%s" org-roam-directory "emacs.org"))))))))
         
-                                                ;(qz/pprint org-agenda-custom-commands)
+        (add-to-list
+         'org-agenda-custom-commands
+         `("c" "create"
+           ((agenda "" ((org-agenda-span 'day) (org-deadline-warning-days 60)))
+            (tags-todo "diy+create+do+buy+make+wip"
+                       ((org-agenda-overriding-header "wip")))
+            (tags-todo "diy+create+do"
+                       ((org-agenda-overriding-header "create")))
+            (tags-todo "buy"
+                       ((org-agenda-overriding-header "buy")))
+            (tags-todo "make"
+                       ((org-agenda-overriding-header "make"))))))
+        
+        (add-to-list
+         'org-agenda-custom-commands
+         `("w" "work"
+           ((tags "@work+wip"
+                  ((org-agenda-overriding-header "wip")))
+            (tags-todo "@work"
+                       ((org-agenda-overriding-header "work"))))))
+        
+        ;;(pp org-agenda-custom-commands)
         (setq qz/org-agenda-files
               (mapcar (lambda (f) (expand-file-name (format "%s/%s" org-roam-directory f)))
                       '("calendar-home.org" "calendar-work.org" "schedule.org")))
@@ -630,6 +679,7 @@
           (org-redisplay-inline-images))
         
         (add-hook 'org-roam-mode-hook 'qz/roam-buffer-image-width)
+        (add-to-list 'magit-section-initial-visibility-alist (cons 'org-roam-node-section 'hide))
         ;; NOWEB ROAM END
         )
       (setq org-confirm-babel-evaluate nil)
