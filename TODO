@@ -5,60 +5,7 @@
 #+CATEGORY: rde
 #+ARCHIVE: ::* Archive
 
-* ~guix home~ Upstream Backlog
-** Archive                                                         :ARCHIVE:
-*** DONE Ensure style is correct
-https://mumble.net/~campbell/scheme/style.txt
-https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html#Development
-https://guix.gnu.org/manual/en/guix.html#Coding-Style
-Add copyrights to source code
-*** DONE Cleanup utils module
-Split into utils and configuration related helper?
-*** DONE Add home-services to service or keep them separate?
-* ~guix home~ Before Upstream Checklist
-** Archive                                                         :ARCHIVE:
-*** DONE Make symlink manager to check
-if the file is modified by user before removing it, even if it already
-under the control of guix home.
-*** DONE Rewrite on-first-login script to guile
-*** DONE Check it works on debian
-*** DONE Implement zsh home-service
-*** DONE Implement bash home-service
-*** DONE Implement gnupg home-service
-*** DONE Call on-reconfigure on reconfigure
-*** DONE Add ~guix home search~
-*** DONE Add ~list-generations~
-*** DONE Add ~guix home roll-back/switch/delete~
-*** DONE Fix environment-variables service
-It's enough to make it accept pairs, it doesn't have to be list,
-because value can be a gexp.
-*** DONE Add XDG support to home-envirnoment
-Set explicitly XDG_CONFIG_HOME and friends.
-*** DONE Run ~guix home~ on 5 early adopters
-**** DONE Establish/define support channels and schedule
-Define schedule and add the information to announce.
-- #guix IRC.
-- rde-discuss mailing list.
-- beweekly calls.
-**** DONE Announce in rde-announce
-**** DONE Announce in guix-devel
-**** DONE Announce on stream
-*** DONE Discuss xdg-flavor? default to #t
-*** DONE Establish documenting workflow (write guideline)
-*** DONE on-reconfigure -> activation
-Refactor on-reconfigure service, it should be activation service,
-because this script can be called on generation switch event and not
-only on reconfigure.
-*** DONE Add provenance
-To make ~guix home describe~ more informative.
-*** DONE Make activation script create ~/.guix-home symlink
-It will also allow to make correct run-on-change implementation.
-*** DONE Add ~guix home init~ command for migrating from ~~/.guix-profile~
-Similar to ~guix package --export-manifest~, and maybe detect existing
-config files and generate template for home services configurations.
-E.g. if ~~/.bashrc~ exists, add ~home-bash-service-type~ to ~services~
-field of ~home-environemnt~.
-* ~guix home~ Backlog                                                    :guix:
+* ~Guix Home~                                                            :guix:
 ** Browsers
 *** TODO Implement home service ungoogled-chromium
 - Browser extension
@@ -71,7 +18,62 @@ use without ~guix home~ subcommand.
 ** TODO Make it possible to specify the verbosity for ~guix home reconfigure~
 By default, only the path to the home environment should be shown,
 ~/gnu/store/...-home~.
-** Archive                                                         :ARCHIVE:
+* ~rde~                                                                   :rde:
+:PROPERTIES:
+:VISIBILITY: content
+:END:
+** First Release                                                 :release_1:
+*** TODO Place a release-tag tag
+*** DONE Add rde documentation template [2/2]
+SCHEDULED: <2022-01-13 Thu>
+[[info:texinfo#Sample Beginning][texinfo#Sample Beginning]]
+Create rde (.texi and Makefile)
+- [X] org->texinfo?  No, plain texinfo is good enough.
+- [X] info, html and pdf make targets.
+*** TODO Deploy documentation as a web page
+*** TODO Prepare rde iso
+** TODO Visually separate sway workspaces for different workflows
+- code
+- communication
+- multimedia
+** TODO Implement pam_shepherd.so
+Start user-space shepherd on first user login and exit on last logout.
+- [[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
+- https://www.opennet.ru/base/dev/pam_linux.txt.html
+Take a look at mpd service for user-service example and /run/user/ID
+creation.
+** TODO Refactor state service
+:PROPERTIES:
+:Effort:   2:00
+:END:
+- Make a state to be a record
+- Add -fn path support
+- Generate shorter state names
+- Make a bigger state include substates (hierarchy sync)
+- Move notmuch tags and mbsync to state
+** TODO Investigate Fedora XDG problem                                 :rde:
+- [[notmuch:id:ada8cf01-5eca-46ea-b0aa-efec4db9a486@www.fastmail.com][Email from Gerry Agbobada: Re: Guix home on foreign distribution; handling XDG env]]
+** TODO Make a thread on elisp serialization and use-package macro
+https://framagit.org/tyreunom/guix-home-manager/-/merge_requests/7/diffs#fde31578cd2c6e21ef33b87b3182bb9192c03a32
+** TODO Add feature-emacs-sdcv
+Dictionaries: http://download.huzheng.org/
+See also emacs-multitran
+** TODO Add feature-emacs-smartparens
+** TODO Debug screensharing and xdg portals
+** TODO Configure orderless
+https://github.com/oantolin/orderless
+https://github.com/minad/consult/wiki#minads-orderless-configuration
+** TODO Configure icecat profiles
+* Archive                                                           :ARCHIVE:
+
+** Archive                                                    :guix:ARCHIVE:
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-01-20 Thu 08:59
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~Guix Home~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_ITAGS: guix
+:END:
 *** DONE icecat
 *** DONE sway
 *** DONE Emacs
@@ -97,30 +99,80 @@ For some apps to run some commands like restart if their configs updated
 *** DONE Make fonts service
 *** DONE SMTP client
 - msmtp/sendmail
-* ~rde~ Backlog                                                           :rde:
+** DONE Create clean example configuration                             :rde:
 :PROPERTIES:
-:VISIBILITY: content
+:ARCHIVE_TIME: 2022-01-20 Thu 08:56
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~/General
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
 :END:
-** Extensions mechanism
-** UI
-*** TODO Visually separate sway workspaces for different workflows
-- code
-- communication
-- multimedia
-** General
-*** TODO Implement pam_shepherd.so
-Start user-space shepherd on first user login and exit on last logout.
-- [[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
-- https://www.opennet.ru/base/dev/pam_linux.txt.html
-Take a look at mpd service for user-service example and /run/user/ID
-creation.
-
-*** DONE Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
-
-* Archive                                                           :ARCHIVE:
-
+** ~guix home~ Before Upstream Checklist
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-01-20 Thu 08:54
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_CATEGORY: rde
+:END:
+*** Archive                                                       :ARCHIVE:
+**** DONE Make symlink manager to check
+if the file is modified by user before removing it, even if it already
+under the control of guix home.
+**** DONE Rewrite on-first-login script to guile
+**** DONE Check it works on debian
+**** DONE Implement zsh home-service
+**** DONE Implement bash home-service
+**** DONE Implement gnupg home-service
+**** DONE Call on-reconfigure on reconfigure
+**** DONE Add ~guix home search~
+**** DONE Add ~list-generations~
+**** DONE Add ~guix home roll-back/switch/delete~
+**** DONE Fix environment-variables service
+It's enough to make it accept pairs, it doesn't have to be list,
+because value can be a gexp.
+**** DONE Add XDG support to home-envirnoment
+Set explicitly XDG_CONFIG_HOME and friends.
+**** DONE Run ~guix home~ on 5 early adopters
+***** DONE Establish/define support channels and schedule
+Define schedule and add the information to announce.
+- #guix IRC.
+- rde-discuss mailing list.
+- beweekly calls.
+***** DONE Announce in rde-announce
+***** DONE Announce in guix-devel
+***** DONE Announce on stream
+**** DONE Discuss xdg-flavor? default to #t
+**** DONE Establish documenting workflow (write guideline)
+**** DONE on-reconfigure -> activation
+Refactor on-reconfigure service, it should be activation service,
+because this script can be called on generation switch event and not
+only on reconfigure.
+**** DONE Add provenance
+To make ~guix home describe~ more informative.
+**** DONE Make activation script create ~/.guix-home symlink
+It will also allow to make correct run-on-change implementation.
+**** DONE Add ~guix home init~ command for migrating from ~~/.guix-profile~
+Similar to ~guix package --export-manifest~, and maybe detect existing
+config files and generate template for home services configurations.
+E.g. if ~~/.bashrc~ exists, add ~home-bash-service-type~ to ~services~
+field of ~home-environemnt~.
+** ~guix home~ Upstream Backlog
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-01-20 Thu 08:54
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_CATEGORY: rde
+:END:
+*** Archive                                                       :ARCHIVE:
+**** DONE Ensure style is correct
+https://mumble.net/~campbell/scheme/style.txt
+https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html#Development
+https://guix.gnu.org/manual/en/guix.html#Coding-Style
+Add copyrights to source code
+**** DONE Cleanup utils module
+Split into utils and configuration related helper?
+**** DONE Add home-services to service or keep them separate?
 ** DONE Implement features -> he/os converter                          :rde:
 :PROPERTIES:
 :ARCHIVE_TIME: 2022-01-12 Wed 08:49
