@@ -1,26 +1,22 @@
--*- mode: org -*-
+# -*- mode: org; org-archive-reversed-order: t -*-
 #+STARTUP: showall
 #+TODO: TODO(t) NEXT(n) WAIT(w) | DONE(d) CANCELLED(c)
 #+TITLE: rde Tasks
 #+CATEGORY: rde
+#+ARCHIVE: ::* Archive
 
 * ~guix home~ Upstream Backlog
-** DONE Ensure style is correct
+** Archive                                                         :ARCHIVE:
+*** DONE Ensure style is correct
 https://mumble.net/~campbell/scheme/style.txt
 https://emacs-guix.gitlab.io/website/manual/latest/emacs-guix.html#Development
 https://guix.gnu.org/manual/en/guix.html#Coding-Style
 Add copyrights to source code
-** DONE Cleanup utils module
+*** DONE Cleanup utils module
 Split into utils and configuration related helper?
-** DONE Add home-services to service or keep them separate?
+*** DONE Add home-services to service or keep them separate?
 * ~guix home~ Before Upstream Checklist
-:PROPERTIES:
-:VISIBILITY: children
-:END:
-** Finished
-:PROPERTIES:
-:VISIBILITY: folded
-:END:
+** Archive                                                         :ARCHIVE:
 *** DONE Make symlink manager to check
 if the file is modified by user before removing it, even if it already
 under the control of guix home.
@@ -63,10 +59,19 @@ config files and generate template for home services configurations.
 E.g. if ~~/.bashrc~ exists, add ~home-bash-service-type~ to ~services~
 field of ~home-environemnt~.
 * ~guix home~ Backlog                                                    :guix:
-:PROPERTIES:
-:VISIBILITY: children
-:END:
-** Finished
+** Browsers
+*** TODO Implement home service ungoogled-chromium
+- Browser extension
+*** TODO Implement home service nyxt
+- Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
+** TODO Make gtk home service
+** TODO Make system service for Guix Home
+Allows to make home-environment a part of operating-system and thus
+use without ~guix home~ subcommand.
+** TODO Make it possible to specify the verbosity for ~guix home reconfigure~
+By default, only the path to the home environment should be shown,
+~/gnu/store/...-home~.
+** Archive                                                         :ARCHIVE:
 *** DONE icecat
 *** DONE sway
 *** DONE Emacs
@@ -92,24 +97,11 @@ For some apps to run some commands like restart if their configs updated
 *** DONE Make fonts service
 *** DONE SMTP client
 - msmtp/sendmail
-** Browsers
-*** TODO Implement home service ungoogled-chromium
-- Browser extension
-*** TODO Implement home service nyxt
-- Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** TODO Make gtk home service
-** TODO Make system service for Guix Home
-Allows to make home-environment a part of operating-system and thus
-use without ~guix home~ subcommand.
-** TODO Make it possible to specify the verbosity for ~guix home reconfigure~
-By default, only the path to the home environment should be shown,
-~/gnu/store/...-home~.
 * ~rde~ Backlog                                                           :rde:
 :PROPERTIES:
 :VISIBILITY: content
 :END:
 ** Extensions mechanism
-*** DONE Implement features -> he/os converter
 ** UI
 *** TODO Visually separate sway workspaces for different workflows
 - code
@@ -123,7 +115,27 @@ Start user-space shepherd on first user login and exit on last logout.
 Take a look at mpd service for user-service example and /run/user/ID
 creation.
 
-*** DONE Remove previous rde implementation
 *** DONE Create clean example configuration
 ~rde/config.scm~ is a ready to use configuration, but requires few
 helpers to make it customizable by the end user.
+
+* Archive                                                           :ARCHIVE:
+
+** DONE Implement features -> he/os converter                          :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-01-12 Wed 08:49
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~ Backlog/Extensions mechanism
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+** DONE Remove previous rde implementation                             :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-01-12 Wed 08:48
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~ Backlog/General
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
