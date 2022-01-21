@@ -16,6 +16,10 @@
   #:export (feature-alacritty
             feature-vterm))
 
+(define (font-weight->style weight)
+  "Transform kebab-cased symbols to capitalized strings without dashes."
+  (string-capitalize (string-delete #\- (symbol->string weight))))
+
 (define* (feature-alacritty
 	  #:key
 	  config-file
@@ -39,9 +43,10 @@
         `((window . ((padding . ((x . 10)
                                  (y . 5)))))
           ,@(if font-mono
-                `((font . ((normal . ((style . Semilight)
+                `((font . ((normal . ((style . , (font-weight->style
+                                                  (font-weight font-mono)))
                                       (family . ,(font-name font-mono))))
-                        (size . ,(font-size font-mono)))))
+                           (size . ,(font-size font-mono)))))
               '())
           ,@(if config-file
                 `((import . #(,config-file)))
