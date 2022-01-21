@@ -3,6 +3,7 @@
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages pulseaudio)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu services)
   #:use-module (gnu services base)
@@ -72,9 +73,10 @@
 (define* (feature-pipewire
           #:key
           (pipewire pipewire-0.3)
-          (wireplumber wireplumber))
+          (wireplumber wireplumber)
+          (pulseaudio pulseaudio))
   ""
-  (define (home-pipewire-services _)
+  (define (home-pipewire-services config)
     (list
      ;; TODO: Make home-alsa-service-type
      (simple-service
@@ -135,6 +137,28 @@ ctl_type.pipewire {
                   #:environment-variables
                   (append (list "DISABLE_RTKIT=1")
                           (default-environment-variables)))))))
+
+     (when (get-value 'sway config)
+       (simple-service
+        'pipewire-add-volume-and-player-bindings-to-sway
+        home-sway-service-type
+        `((bindsym --locked XF86AudioRaiseVolume "\\\n"
+                   exec ,(file-append pulseaudio "/bin/pactl")
+                   set-sink-mute @DEFAULT_SINK@ "false; \\\n"
+                   exec ,(file-append pulseaudio "/bin/pactl")
+                   set-sink-volume @DEFAULT_SINK@ +5%)
+          (bindsym --locked XF86AudioLowerVolume "\\\n"
+                   exec ,(file-append pulseaudio "/bin/pactl")
+                   set-sink-mute @DEFAULT_SINK@ "false; \\\n"
+                   exec ,(file-append pulseaudio "/bin/pactl")
+                   set-sink-volume @DEFAULT_SINK@ -5%)
+          (bindsym --locked XF86AudioMute exec
+                   ,(file-append pulseaudio "/bin/pactl")
+                   set-sink-mute @DEFAULT_SINK@ toggle)
+          (bindsym --locked XF86AudioMicMute exec
+                   ,(file-append pulseaudio "/bin/pactl")
+                   set-source-mute @DEFAULT_SOURCE@ toggle))))
+
      (simple-service
       'pipewire-add-packages
       home-profile-service-type
