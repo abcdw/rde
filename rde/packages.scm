@@ -297,16 +297,14 @@ emacs packages of current profile explorable by external Emacs.")))
 (define-public emacs-mct
   (package
    (name "emacs-mct")
-   (version "0.3.0")
+   (version "0.4.1")
    (source (origin
             (method git-fetch)
             (uri (git-reference
                   (url "https://gitlab.com/protesilaos/mct.git")
-                  (commit "91199f8ee9bc58803b3d10a40fd463a689d67a50"
-                          ;; version
-                          )))
+                  (commit version)))
             (sha256
-             (base32 "16sq49zx9ym4nkl223ccd1ixk39084jbs79xxj7xchn411bbby81"))
+             (base32 "0g0qzlkjzh2a9wqxyjyydp5k8hk729f9f1i1m630cb671c2lz6dd"))
             (file-name (git-file-name name version))))
    (build-system emacs-build-system)
    (license license:gpl3+)
