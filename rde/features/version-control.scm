@@ -18,7 +18,7 @@
           (git-send-email? #f)
           (extra-config '()))
   "Setup and configure Git."
-  (ensure-pred package? git)
+  (ensure-pred any-package? git)
   (ensure-pred maybe-string? git-gpg-sign-key)
   (ensure-pred boolean? sign-commits?)
   (ensure-pred boolean? git-send-email?)

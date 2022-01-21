@@ -21,7 +21,7 @@
 	  (default-shell? #t)
 	  (enable-zsh-autosuggestions? #t))
   "Configure Zsh."
-  (ensure-pred package? zsh)
+  (ensure-pred any-package? zsh)
 
   (define (zsh-home-services config)
     "Returns home services related to Zsh."
@@ -98,7 +98,7 @@ bindkey -e '^Y' rde-yank
 	  #:key
 	  (bash bash))
   "Configure Bash."
-  (ensure-pred package? bash)
+  (ensure-pred any-package? bash)
 
   (define (get-home-services config)
     "Returns home services related to Bash."

@@ -80,7 +80,7 @@ behavior can be overriden with BASE-FILE-SYSTEM argument."
           (firmware '())
           (base-firmware %base-firmware))
   "Provides kernel configuration."
-  (ensure-pred package? kernel)
+  (ensure-pred any-package? kernel)
   (ensure-pred list-of-packages? kernel-loadable-modules)
   (ensure-pred list-of-string-or-gexps? kernel-arguments)
   (ensure-pred list-of-string-or-gexps? default-kernel-arguments)

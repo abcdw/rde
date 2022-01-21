@@ -47,7 +47,7 @@
   "Setup and configure sway."
   (ensure-pred sway-config? extra-config)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
-  (ensure-pred package? package)
+  (ensure-pred any-package? package)
 
   (define (sway-home-services config)
     "Returns home services related to sway."

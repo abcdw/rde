@@ -15,7 +15,7 @@
 	  (package tmux))
   "Configure tmux."
   (ensure-pred maybe-file-like? config-file)
-  (ensure-pred package? package)
+  (ensure-pred any-package? package)
 
   (define (tmux-home-services config)
     "Returns home services related to tmux."

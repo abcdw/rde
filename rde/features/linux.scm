@@ -22,7 +22,7 @@
 	  (brightnessctl brightnessctl))
   "Setup and configure brightness for various devices."
   (ensure-pred brightness? default-brightness)
-  (ensure-pred package? brightnessctl)
+  (ensure-pred any-package? brightnessctl)
   (ensure-pred brightness? step)
 
   (define (step->symbol op)

@@ -18,7 +18,7 @@
 	  #:key
 	  (direnv direnv))
   "Configure direnv and related Emacs packages."
-  (ensure-pred package? direnv)
+  (ensure-pred any-package? direnv)
 
   (define (get-home-services config)
     "Returns home services related to direnv."

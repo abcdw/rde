@@ -12,7 +12,7 @@
           #:key
           (mpv mpv))
   "Setup and configure mpv."
-  (ensure-pred package? mpv)
+  (ensure-pred any-package? mpv)
 
   (define (get-home-services config)
     (list

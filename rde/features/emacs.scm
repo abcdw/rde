@@ -9,6 +9,7 @@
   #:use-module (gnu services)
 
   #:use-module (rde packages)
+  #:use-module (gnu packages emacs)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages mail)
 
@@ -133,7 +134,7 @@ dependency for other packages."
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
-  (ensure-pred package? emacs)
+  (ensure-pred any-package? emacs)
 
   (define emacs-client (file-append emacs "/bin/emacsclient"))
   (define emacs-client-create-frame

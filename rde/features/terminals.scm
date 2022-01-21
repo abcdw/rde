@@ -23,7 +23,7 @@
           (default-terminal? #t))
   "Configure Alacritty terminal."
   (ensure-pred maybe-file-like? config-file)
-  (ensure-pred package? package)
+  (ensure-pred any-package? package)
 
   ;; TODO: Implement home service and rewrite to it to make this
   ;; feature extendable.
@@ -60,7 +60,7 @@
 	  #:key
 	  (emacs-vterm emacs-vterm-latest))
   "Configure Alacritty terminal."
-  (ensure-pred package? emacs-vterm)
+  (ensure-pred any-package? emacs-vterm)
 
   (define (get-home-services config)
     (require-value 'emacs config)
