@@ -39,13 +39,15 @@ FILE-NAME found in %PATCH-PATH."
     (%patch-path))))
 
 (use-modules (gnu packages emacs))
+(use-modules (guix utils))
+
 (define-public emacs-next-pgtk-latest
-  (let ((commit "01b0a909b5ca858a09484821cc866127652f4153")
-        (revision "4"))
+  (let ((commit "172c055745b1eb32def7be8ddcaae975996a789f")
+        (revision "1"))
     (package
       (inherit emacs-next-pgtk)
       (name "emacs-next-pgtk-latest")
-      (version (git-version "28.0.50" revision commit))
+      (version (git-version "29.0.50" revision commit))
       (source
        (origin
          (method git-fetch)
@@ -55,7 +57,16 @@ FILE-NAME found in %PATCH-PATH."
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "1agfssdllfvjpq3vcwn5hi6cb7il042phl41y79b17gjg612qc6b")))))))
+           "00qikl80lly6nz15b7pp7gpy28iw7fci05q6k1il20fkdx27fp4x"))))
+      (arguments
+       (substitute-keyword-arguments (package-arguments emacs-next)
+         ((#:configure-flags flags ''())
+          `(cons* "--with-pgtk" ,flags))))
+      ;; (propagated-inputs
+      ;;  (list gsettings-desktop-schemas glib-networking))
+      (inputs
+       (package-inputs emacs-next))
+      )))
 
 (use-modules (gnu packages emacs-xyz)
              (guix build-system emacs))
