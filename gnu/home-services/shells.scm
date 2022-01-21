@@ -402,7 +402,7 @@ alias grep='grep --color=auto'\n")
         "\
 # Setups system and user profiles and related variables
 # /etc/profile will be sourced by bash automatically
-# Setups home environment profile
+# Read ~/.profile to setup Guix Home profile
 if [ -f ~/.profile ]; then source ~/.profile; fi
 
 # Honor per-interactive-shell startup file
