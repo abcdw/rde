@@ -21,7 +21,8 @@
       (home-mpv-configuration
        (package mpv)
        (default-options
-         '((keep-open . #t)
+         `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
+           (keep-open . #t)
            (save-position-on-quit . #t)))))))
 
   (feature
