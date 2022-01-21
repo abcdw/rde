@@ -104,7 +104,7 @@
         home-sway-service-type
         `((bindsym $mod+Shift+Return exec
 		   ,(get-value 'emacs-client-create-frame config)
-                   "-e \"(vterm)\""))))
+                   "-e \"(vterm t)\""))))
 
      (when (get-value 'zsh config)
        (simple-service
