@@ -5,6 +5,7 @@
   #:use-module (gnu home-services password-utils)
   #:use-module (gnu home-services state)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages password-utils)
   #:use-module (gnu services)
 
   #:export (feature-password-store))
@@ -12,6 +13,7 @@
 
 (define* (feature-password-store
 	  #:key
+          (password-store password-store)
 	  (remote-password-store-url #f))
   "Setup and configure password manager."
   ;; (ensure-pred maybe-url? remote-password-store-url)
@@ -23,7 +25,9 @@
     "Returns home services related to password-store."
     (require-value 'gpg-primary-key config)
     (require-value 'home-directory config)
-    (list (service home-password-store-service-type)
+    (list (service home-password-store-service-type
+                   (home-password-store-configuration
+                    (package password-store)))
 	  (simple-service
 	   'add-password-store-git-state
 	   home-state-service-type
