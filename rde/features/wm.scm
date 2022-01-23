@@ -93,6 +93,7 @@
             (,#~"")
             (bindsym $mod+Control+Shift+Return exec $term)
             (bindsym --to-code $mod+Shift+d exec $menu)
+            (bindsym $mod+Shift+l exec swaylock -c 3e3e3e)
 
 	    (,#~"")
             (default_border pixel)
