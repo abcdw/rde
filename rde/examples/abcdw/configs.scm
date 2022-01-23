@@ -181,7 +181,7 @@
    (feature-emacs-appearance)
    (feature-emacs-faces)
    (feature-emacs-completion
-    #:mini-frame? #t)
+    #:mini-frame? #f)
    (feature-emacs-vertico)
    (feature-emacs-project)
    (feature-emacs-perspective)
