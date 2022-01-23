@@ -20,33 +20,34 @@
 
   (define (transmission-home-services config)
     (define emacs-f-name 'transmission)
-    (require-value 'emacs-client-create-frame config)
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
 
     (list
-     (elisp-configuration-service
-      emacs-f-name
-      `((require 'configure-rde-keymaps)
-        (define-key rde-app-map (kbd "T") 'transmission)
-        (with-eval-after-load
-         'transmission
-         (let ((map transmission-mode-map))
-           (define-key map "R" 'transmission-move))))
-      #:elisp-packages (list emacs-transmission
-                             (get-value 'emacs-configure-rde-keymaps config)))
+     (when (get-value 'emacs config)
+       (elisp-configuration-service
+        emacs-f-name
+        `((require 'configure-rde-keymaps)
+          (define-key rde-app-map (kbd "T") 'transmission)
+          (with-eval-after-load
+           'transmission
+           (let ((map transmission-mode-map))
+             (define-key map "R" 'transmission-move))))
+        #:elisp-packages (list emacs-transmission
+                               (get-value 'emacs-configure-rde-keymaps config))))
 
-     (emacs-xdg-service
-      emacs-f-name "Emacs (Client) [BitTorrent]"
-      #~(system*
-         #$emacs-cmd "--eval"
-	 (string-append "\
+     (when emacs-cmd
+       (emacs-xdg-service
+        emacs-f-name "Emacs (Client) [BitTorrent]"
+        #~(system*
+           #$emacs-cmd "--eval"
+	   (string-append "\
 (progn
  (set-frame-name \"Transmission - Emacs Client\")
  (transmission)
  (delete-other-windows)
  (transmission-add \"" (cadr (command-line)) "\")
  (revert-buffer))"))
-      #:default-for '(x-scheme-handler/magnet application/x-bittorrent))
+        #:default-for '(x-scheme-handler/magnet application/x-bittorrent)))
 
      (simple-service
       'transmission-add-shepherd-daemon
