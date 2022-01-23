@@ -123,6 +123,7 @@
 (define %main-features
   (list
    (feature-custom-services
+    #:feature-name-prefix 'ixy
     #:system-services
     (list
      ;; (service nix-service-type)
@@ -383,6 +384,7 @@
        #:file-systems live-file-systems)
       (feature-hidpi)
       (feature-custom-services
+       #:feature-name-prefix 'live
        #:system-services
        (list
         (simple-service

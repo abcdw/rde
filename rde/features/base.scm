@@ -108,12 +108,16 @@ installed by system or home services."
 
 (define* (feature-custom-services
 	  #:key
+          (feature-name-prefix 'generic)
 	  (system-services '())
 	  (home-services '()))
-  "Allows to specify additional System and Home Services."
+  "Allows to specify additional System and Home Services.  PREFIX should
+be a symbol, which will be used to construct feature name."
+  (ensure-pred symbol? feature-name-prefix)
   (ensure-pred list-of-services? home-services)
   (ensure-pred list-of-services? system-services)
 
+  (define feature-name (symbol-append feature-name-prefix '-custom-services))
   (define (get-custom-home-services cfg)
     home-services)
 
@@ -121,8 +125,8 @@ installed by system or home services."
     system-services)
 
   (feature
-   (name 'custom-services)
-   (values `((custom-services . #t)))
+   (name feature-name)
+   (values `((,feature-name . #t)))
    (home-services-getter get-custom-home-services)
    (system-services-getter get-custom-system-services)))
 
