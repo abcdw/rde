@@ -33,7 +33,7 @@
 
 (define* (feature-fonts
 	  #:key
-	  (font-monospace (font "Iosevka" #:size 11 #:weight 'semi-light))
+	  (font-monospace (font "Iosevka" #:size 11 #:weight 'regular))
 	  (font-sans      (font "Fira Go"))
 	  (font-serif     (font "Liberation Serif"))
 	  (font-unicode   (font "Unifont"))
