@@ -170,7 +170,14 @@
 
    (feature-sway
     #:extra-config
-    `((include ,(local-file "./config/sway/config"))))
+    `((bindsym
+       --locked $mod+Shift+p exec
+       ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
+       play-pause)
+      ;; (input type:touchpad
+      ;;            ((tap enabled)
+      ;;             (natural_scroll enabled)))
+      (include ,(local-file "./config/sway/config"))))
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
    (feature-sway-screenshot)
