@@ -27,6 +27,7 @@
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
   #:use-module (rde packages)
+  #:use-module (gnu packages fonts)
   #:use-module (guix gexp)
   #:use-module (guix inferior)
   #:use-module (guix channels)
@@ -144,17 +145,24 @@
    (feature-desktop-services)
    (feature-docker)
 
-   (feature-fonts)
    (feature-pipewire)
    (feature-backlight)
 
+   (feature-fonts
+    #:font-monospace (font "Iosevka" #:size 11 #:weight 'regular)
+    ;; #:font-monospace (font "Fira Mono" #:size 14 #:weight 'semi-light)
+    #:font-packages (list font-iosevka font-fira-mono))
+
    (feature-alacritty
-    #:config-file (local-file "./config/alacritty/alacritty.yml"))
+    #:config-file (local-file "./config/alacritty/alacritty.yml")
+    #:default-terminal? #t)
    (feature-vterm)
    (feature-tmux
     #:config-file (local-file "./config/tmux/tmux.conf"))
-   (feature-zsh)
+   (feature-zsh
+    #:enable-zsh-autosuggestions? #t)
    (feature-bash)
+
    (feature-ssh
     #:ssh-configuration
     (home-ssh-configuration
