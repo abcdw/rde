@@ -162,14 +162,14 @@
    (feature-zsh
     #:enable-zsh-autosuggestions? #t)
    (feature-bash)
-
+   (feature-direnv)
+   (feature-git)
    (feature-ssh
     #:ssh-configuration
     (home-ssh-configuration
      (toplevel-options
       '((host-key-algorithms . "+ssh-rsa")
         (pubkey-accepted-key-types . "+ssh-rsa")))))
-   (feature-git)
 
    (feature-sway
     #:extra-config
@@ -180,7 +180,6 @@
    (feature-sway-statusbar
     #:use-global-fonts? #f)
 
-   (feature-direnv)
    (feature-emacs
     #:extra-init-el `()
     #:additional-elisp-packages
