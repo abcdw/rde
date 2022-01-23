@@ -238,9 +238,9 @@
    (feature-base-packages
     #:home-packages
     (append
-     (pkgs-vanilla
-      "icecat" "nyxt"
-      "ungoogled-chromium-wayland" "ublock-origin-chromium")
+     ;; (pkgs-vanilla
+     ;;  "icecat" "nyxt"
+     ;;  "ungoogled-chromium-wayland" "ublock-origin-chromium")
      (pkgs
       "alsa-utils" "youtube-dl" "imv"
       "obs" "obs-wlrobs"
