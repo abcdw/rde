@@ -227,8 +227,10 @@
    (feature-msmtp)
    (feature-notmuch
     #:notmuch-saved-searches
-    (cons* '(:name "Work Inbox" :query "tag:work and tag:inbox" :key "W")
-           %rde-notmuch-saved-searches))
+    (cons*
+     '(:name "Work Inbox" :query "tag:work and tag:inbox" :key "W")
+     '(:name "Personal Inbox" :query "tag:personal and tag:inbox" :key "P")
+     %rde-notmuch-saved-searches))
 
    (feature-transmission #:auto-start? #f)
 
