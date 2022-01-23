@@ -1,6 +1,7 @@
 (define-module (rde features wm)
   #:use-module (rde features)
   #:use-module (rde features predicates)
+  #:use-module (rde features fontutils)
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
   #:use-module (rde packages)
@@ -12,6 +13,7 @@
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages terminals)
+  #:use-module (gnu packages rust-apps)
   #:use-module (gnu services)
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
@@ -39,7 +41,12 @@
 (define* (feature-sway
 	  #:key
 	  (extra-config '())
-	  (package sway)
+	  (sway sway)
+          (swaylock swaylock)
+          (swayidle swayidle)
+          (foot foot)
+          (xdg-desktop-portal xdg-desktop-portal)
+          (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
           ;; Logo key. Use Mod1 for Alt.
           (sway-mod 'Mod4)
 	  (add-keyboard-layout-to-config? #t)
@@ -47,7 +54,12 @@
   "Setup and configure sway."
   (ensure-pred sway-config? extra-config)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
-  (ensure-pred any-package? package)
+  (ensure-pred any-package? sway)
+  (ensure-pred any-package? swaylock)
+  (ensure-pred any-package? swayidle)
+  (ensure-pred any-package? foot)
+  (ensure-pred any-package? xdg-desktop-portal)
+  (ensure-pred any-package? xdg-desktop-portal-wlr)
 
   (define (sway-home-services config)
     "Returns home services related to sway."
@@ -59,7 +71,7 @@
 
            (default-terminal
              (get-value 'default-terminal config
-                        (file-append alacritty "/bin/alacritty")))
+                        (file-append foot "/bin/foot")))
            (default-app-launcher
              (get-value 'default-app-launcher config
                         (file-append wofi "/bin/wofi --show=drun"))))
@@ -67,7 +79,7 @@
        (service
 	home-sway-service-type
 	(home-sway-configuration
-	 (package package)
+	 (package sway)
 	 (config
 	  `((xwayland ,(if xwayland? 'enable 'disable))
             (,#~"")
@@ -99,12 +111,16 @@
         'sway-reload-config-on-change
         (@@ (gnu home services) home-run-on-change-service-type)
         `(("files/config/sway/config"
-           ,#~(system* #$(file-append package "/bin/swaymsg") "reload"))))
+           ,#~(system* #$(file-append sway "/bin/swaymsg") "reload"))))
        ;; TODO: Move wofi to feature-app-launcher or something like that
-       (simple-service 'packages-for-sway
-	               home-profile-service-type
-	               (list wofi qtwayland
-                             xdg-desktop-portal xdg-desktop-portal-wlr))
+       (simple-service
+        'packages-for-sway
+	home-profile-service-type
+        (append
+         (if (get-value 'default-terminal config) '() (list foot))
+	 (list wofi qtwayland
+               swayidle swaylock
+               xdg-desktop-portal xdg-desktop-portal-wlr)))
        (simple-service 'set-wayland-specific-env-vars
 		       home-environment-variables-service-type
 		       ;; export NO_AT_BRIDGE=1
@@ -129,7 +145,7 @@
 
   (feature
    (name 'sway)
-   (values `((sway . ,package)
+   (values `((sway . ,sway)
              (wl-clipboard . ,wl-clipboard)
 	     (wayland . #t)
              (xwayland? . ,xwayland?)))
