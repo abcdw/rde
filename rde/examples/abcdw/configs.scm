@@ -28,6 +28,8 @@
   #:use-module (gnu packages)
   #:use-module (rde packages)
   #:use-module (guix gexp)
+  #:use-module (guix inferior)
+  #:use-module (guix channels)
   #:use-module (ice-9 match))
 
 
@@ -101,6 +103,22 @@
 
 (define* (pkgs #:rest lst)
   (map specification->package+output lst))
+
+(define* (pkgs-vanilla #:rest lst)
+  "Packages from guix channel."
+  (define channel-guix
+    (list (channel
+           (name 'guix)
+           (url "https://git.savannah.gnu.org/git/guix.git")
+           (commit
+            "2b6af630d61dd5b16424be55088de2b079e9fbaf"))))
+
+  (define inferior (inferior-for-channels channel-guix))
+  (define (get-inferior-pkg pkg-name)
+    (car (lookup-inferior-packages inferior pkg-name)))
+
+   (map get-inferior-pkg lst))
+
 
 ;;; WARNING: The order can be important for features extending
 ;;; services of other features.  Be careful changing it.
@@ -220,15 +238,16 @@
    (feature-base-packages
     #:home-packages
     (append
+     (pkgs-vanilla
+      "icecat" "nyxt"
+      "ungoogled-chromium-wayland" "ublock-origin-chromium")
      (pkgs
       "alsa-utils" "youtube-dl" "imv"
       "obs" "obs-wlrobs"
-      "icecat" "recutils"
+      "recutils"
       "fheroes2"
       ;; TODO: Enable pipewire support to chromium by default
       ;; chrome://flags/#enable-webrtc-pipewire-capturer
-      "ungoogled-chromium-wayland" "ublock-origin-chromium"
-      "nyxt"
       "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-standard"
       "ripgrep" "curl" "make")))))
 
