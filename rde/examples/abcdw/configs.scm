@@ -188,7 +188,10 @@
     #:extra-init-el `()
     #:additional-elisp-packages
     (append
-     (pkgs "emacs-yasnippet" "emacs-elfeed" "emacs-hl-todo")))
+     (pkgs "emacs-elfeed" "emacs-hl-todo"
+           "emacs-consult-dir"
+           "emacs-restart-emacs"
+           "emacs-org-present")))
    (feature-emacs-appearance)
    (feature-emacs-faces)
    (feature-emacs-completion
