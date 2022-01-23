@@ -228,7 +228,8 @@ automatically switch to SWAY-TTY-NUMBER on boot."
 (define* (feature-sway-statusbar
           #:key
           ;; (package waybar)
-          (battery "BAT0"))
+          (battery "BAT0")
+          (use-global-fonts? #f))
   "Configure statusbar."
 
   (define sway-f-name 'waybar)
@@ -236,6 +237,9 @@ automatically switch to SWAY-TTY-NUMBER on boot."
 
   (define (get-home-services config)
     (require-value 'sway config)
+    (when use-global-fonts?
+      (require-value 'font-monospace config))
+    (define font-mono (get-value 'font-monospace config))
     (define (get-status-command)
       (format #f
               "while echo $(cat /sys/class/power_supply/~a/capacity)% \
@@ -245,6 +249,9 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
       'sway-waybar
       home-sway-service-type
       `((bar ((position top)
+              ,@(if use-global-fonts?
+                    `((font ,(font-name font-mono)))
+                    '())
               (colors ((statusline "#ffffff")
                        (background "#323232")))
               (status_command ,(get-status-command))))

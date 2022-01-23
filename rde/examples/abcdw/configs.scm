@@ -169,7 +169,8 @@
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
    (feature-sway-screenshot)
-   (feature-sway-statusbar)
+   (feature-sway-statusbar
+    #:use-global-fonts? #f)
 
    (feature-direnv)
    (feature-emacs
