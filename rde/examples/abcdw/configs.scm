@@ -252,7 +252,8 @@
      ;;  "icecat" "nyxt"
      ;;  "ungoogled-chromium-wayland" "ublock-origin-chromium")
      (pkgs
-      "alsa-utils" "youtube-dl" "imv"
+      "alsa-utils" "youtube-dl" "imv" "cozy"
+      "pavucontrol" "wev"
       "obs" "obs-wlrobs"
       "recutils"
       "fheroes2"
