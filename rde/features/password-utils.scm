@@ -54,6 +54,11 @@
                  (require 'configure-rde-keymaps)
                  (define-key rde-app-map (kbd "p") 'pass)
 
+                 (with-eval-after-load
+                  'auth-source
+                  (require 'auth-source-pass)
+                  (add-to-list 'auth-sources 'password-store))
+
                  ;; Source:
                  ;; https://github.com/hlissner/doom-emacs/blob/develop/modules/tools/pass/autoload/consult.el
                  ,@(if emacs-consult
