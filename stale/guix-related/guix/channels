@@ -11,6 +11,7 @@
       (channel
        (name 'rde)
        (url "https://git.sr.ht/~abcdw/rde"))
+
       (channel
        (name 'flat)
        (url "https://github.com/flatwhatson/guix-channel.git")
@@ -21,7 +22,23 @@
          "33f86a4b48205c0dc19d7c036c85393f0766f806"
          (openpgp-fingerprint
           "736A C00E 1254 378B A982  7AF6 9DBE 8265 81B6 4490"))))
+
       (channel
        (name 'nonguix)
-       (url "https://gitlab.com/nonguix/nonguix")))
+       (url "https://gitlab.com/nonguix/nonguix"))
+
+      ;; (channel
+      ;;  (name 'guix-gaming-games)
+      ;;  (url "https://gitlab.com/guix-gaming-channels/games.git")
+      ;;  ;; Enable signature verification:
+      ;;  (introduction
+      ;;   (make-channel-introduction
+      ;;    "c23d64f1b8cc086659f8781b27ab6c7314c5cca5"
+      ;;    (openpgp-fingerprint
+      ;;     "50F3 3E2E 5B0C 3D90 0424  ABE8 9BDC F497 A4BB CC7F"))))
+
+      (channel
+       (name 'guix-gaming-games)
+       (url "file:///home/samuel/git/sys/guix-gaming-channels"))
+      )
 
