@@ -21,6 +21,10 @@
     
            (,enable)
            (list ',enable ',disable))))
+    (defun qz/ensure-list (s)
+      (if (listp s)
+          s
+        (list s)))
     (defvar qz/debug 0 "debugging assists")
     
     (defmacro qz/debug- (&rest body)
@@ -71,6 +75,8 @@
       (qz/newstore-choose-tenant)
       (qz/newstore-choose-env)
       (org-sbe "newstore-token"))
+    (defun qz/shell-command-to-list-of-strings (command)
+      (remove "" (s-split "\n" (shell-command-to-string command))))
     (defun qz/revert-buffer-no-confirm ()
       "Revert buffer without confirmation."
       (interactive)
@@ -267,19 +273,32 @@
       (qz/advice- org-babel-execute-src-block :after qz/org-refresh-inline-images)
       
       ;; NOWEB AGENDA START
-      (defun qz/files-agenda ()
-        (seq-uniq (append qz/org-agenda-files (qz/project-files))))
-      
       (defun qz/agenda-files-update (&rest _)
         "Update the value of `org-agenda-files' with relevant candidates"
         (interactive)
         (setq org-agenda-files (qz/files-agenda)
               qz/agenda-daily-files (qz/agenda-daily-files-f)))
+      (defun qz/agenda-files-update-clock (&rest _)
+        "An optimisation for org-clock, which is SO SLOW.
+       Returns a LIST of files that contain CLOCK, which reduces
+      processing a lot"
+        (interactive)
+        (setq org-agenda-files (qz/files-clock)))
+      (list 
+       ;; optimisation setup: setup subset of clock files 
+       (qz/advice- org-clock-resolve :before qz/agenda-files-update-clock)
+       ;; optimisation teardown: restore full set of agenda-files
+       (qz/advice- org-clock-resolve :after qz/agenda-files-update))
       (setq qz/daily-title-regexp ".?[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.?")
       
       (defun qz/agenda-daily-files-f ()
         (seq-filter (lambda (s) (string-match qz/daily-title-regexp s))
                     org-agenda-files))
+      (defun qz/clock-files ()
+        (split-string
+         (shell-command-to-string "rg CLOCK ~/life/roam/ -c | grep -v 'org#' | awk -F '[,:]' '{print $1}'")))
+      (defun qz/files-agenda ()
+        (seq-uniq (append qz/org-agenda-files (qz/project-files))))
       (defun qz/project-files ()
         "Return a list of note files containing Project tag."
         (seq-map
@@ -290,6 +309,16 @@
                     :inner :join nodes
                     :on (= tags:node_id nodes:id)
                     :where (= tags:tag "project")))))
+      (defun qz/org-roam-private-files ()
+        "Return a list of note files containing tag =private="
+        (seq-map
+         #'car
+         (org-roam-db-query
+          [:select :distinct file
+                   :from tags
+                   :inner :join nodes
+                   :on (= tags:node_id nodes:id)
+                   :where (= tags:tag "private")])))
       (setq qz/org-agenda-prefix-length 20
             org-agenda-prefix-format nil)
       ;; '((agenda . " %i Emacs Configuration %?-12t% s")
@@ -362,6 +391,7 @@
          (sql . t)
          ;;(plant-uml . t)
          (shell . t)
+         (sqlite . t)
          (elasticsearch . t)
          (restclient . t)
          (R . t)))
@@ -370,15 +400,22 @@
       
       might honestly be better to generate `yas' template when we load
       blocks with `qz/org-babel-do-lob-ingest-files', but I've never used
-      yas so idk"
+      yas so idk
+      
+      use a prefix arg to shortcut (org-table-get-constant \"bonk\"
+      "
         (interactive)
+        (message "prefix: %s" (list current-prefix-arg prefix-arg lob))
         (let ((lob (or lob
                        (intern (completing-read
                                 "lob: " (mapcar 'car org-babel-library-of-babel))))))
           (with-current-buffer (current-buffer)
             (end-of-line)
             (newline)
-            (insert (format "#+name: call-%s\n#+call: %s" lob lob))
+            (insert (format "#+name: call-%s\n#+call: %s(%s)"
+                            lob lob (or (and current-prefix-arg
+                                             "(org-table-get-constant \"bonk\")")
+                                        "")))
       
             (when-let
                 ((args (remove
@@ -433,6 +470,15 @@
         (message "roam start")
         (setq qz/org-roam-dailies-filespec "private-%<%Y-%m-%d>.org")
       
+        (defun qz/inspect-agenda-files ()
+          `((org-files-list . ,(length (org-files-list)))
+            ((org-agenda-files . ,(length (org-agenda-files)))
+             ((qz/project-files . ,(length (qz/project-files)))
+              (qz/agenda-daily-files-f . ,(length (qz/agenda-daily-files-f)))))))
+        (defun qz/inspect-agenda-updates ()
+          (mapcar (lambda (s) `(,s . (,(progn (funcall s)
+                                              (qz/inspect-agenda-files)))))
+                  '(qz/agenda-files-update qz/agenda-files-update-clock)))
         (defun qz/org-agenda-gtd ()
           (interactive)
           (org-agenda nil "g")
@@ -492,9 +538,10 @@
                       '("calendar-home.org" "calendar-work.org" "schedule.org")))
         (defvar qz/org-babel-lob-ingest-files
           (append (mapcar (lambda (s)
-                            (org-roam-node-file (org-roam-node-from-title-or-alias s)))
+                            (when-let ((n (org-roam-node-from-title-or-alias s)))
+                              (org-roam-node-file n)))
                           '("NewStore" "kubernetes"))
-                  (list ))
+                  (list nil))
           "files from which named `src' blocks should be loaded")
         
         (defun qz/org-babel-do-lob-ingest-files (&optional files)
@@ -652,6 +699,36 @@
                     (org-link-make-string
                      (concat "id:" (org-roam-node-id n))
                      (org-roam-node-title n)))))
+        (defun qz/node-tags (&optional node)
+          (or (and node (org-roam-node-tags node))
+              (save-excursion
+                (goto-char (org-roam-node-point (org-roam-node-at-point 'assert)))
+                (if (= (org-outline-level) 0)
+                    (split-string-and-unquote (or (cadr (car (org-collect-keywords '("filetags")))) ""))
+                  (org-get-tags)))))
+        
+        (defun qz/node-title (&optional node limit)
+          (or (and node (org-roam-node-title node))
+              (save-excursion
+                (goto-char (org-roam-node-point (org-roam-node-at-point 'assert)))
+                (if (= (org-outline-level) 0)
+                    (cadr (car (org-collect-keywords '("title"))))
+                  (substring-no-properties (org-get-heading t t t))))))
+        (defun qz/title->roam-id (title)
+          (org-roam-node-id (org-roam-node-from-title-or-alias title)))
+        (defun qz/ensure-tag (tagstring tag)
+          "Apply `org-roam-tag-add' for `tag' to node with existing tags
+        `tagstring'
+        
+        HACK: using `re-search-backward' to jump back to applicable
+        point (implicitly, `point-min' for file-level; :PROPERTIES: drawer for
+        entry); covering 'inherited match'.
+        
+        this could be updated to jump back, but only 'landing' final on
+        PROPERTIES with non-nil :ID:"
+          (let ((ltag (-flatten (or (and (listp tag) tag) (list tag)))))
+            (progn (message "ensuring tag for %s" ltag)
+                   (org-roam-tag-add ltag))))
         (defun qz/org-roam--insert-timestamp (&rest args)
           (when (not (org-entry-get nil "CREATED"))
             (org-entry-put nil "CREATED" (format-time-string "<%Y-%m-%d %a %H:%M>")))
@@ -667,6 +744,66 @@
         (add-hook 'org-roam-capture-new-node-hook 'qz/org-roam--insert-timestamp)
         (add-hook 'before-save-hook 'qz/org-roam--updated-timestamp)
         (qz/advice- org-id-get-create :after qz/org-roam--insert-timestamp)
+        (defun qz/hard-refresh-org-tags-in-buffer ()
+          (interactive)
+          (setq org-file-tags nil)      ; blast the cache
+          (org-set-regexps-and-options) ; regen property detection regexp
+          (org-get-tags))               ; write to cache
+        (defun qz/title-to-tag (title)
+          "Convert TITLE to tag."
+          (if (equal "@" (subseq title 0 1))
+              title
+            (concat "@" (s-replace " " "" title))))
+        (defun qz/org-roam-node-from-tag (tag)
+          (seq-map
+           #'car
+           (org-roam-db-query
+            [:select :distinct file
+                     :from tags
+                     :inner :join nodes
+                     :on (= tags:node_id nodes:id)
+                     :where (= tags:tag tag)])))
+        (defun qz/note-buffer-p (&optional node &rest _)
+          "Return non-nil if the currently visited buffer is a note."
+          (interactive)
+          (or (org-roam-node-p node)
+              (and buffer-file-name (org-roam-file-p buffer-file-name))))
+        (defun qz/is-private-p (&optional node &rest _)
+          (interactive)
+          (let ((title (qz/node-title node)))
+            (if (not title)
+                (and (message "unable to evaluate privateness; no title") nil) ; return false (not private)
+              (or (string-match-p qz/daily-title-regexp title) ; daily
+                  (string-match-p "meeting" title)             ; concerns a meeting
+                  (qz/has-link-to-p
+                   (list (qz/title->roam-id "thinkproject")
+                         (qz/title->roam-id "NewStore")))))))   ; concerns work
+        (defun qz/has-links (node)
+          "connections exist, for id of `node'"
+          (org-roam-db-query
+           [:select [source dest]
+                    :from links
+                    :where (or  (= dest $s1)
+                                (= source $s1))]
+           node))
+        
+        (defun qz/node-has-links (node)
+          "connections exist, for `node'"
+          (qz/has-links (org-roam-node-id node)))
+        (defun qz/has-link-to-p (dst &optional src)
+          "directed connection exists, from `src' to `dst'"
+          (if-let* ((nap (or src (org-roam-node-at-point)))
+                    (src (or src (org-roam-node-id nap))))
+              (org-roam-db-query
+               [:select dest
+                        :from links
+                        :where (and (= source $s1)
+                                    (IN dest $v2))]
+               src (apply 'vector (qz/ensure-list dst)))))
+        
+        (defun qz/node-has-link-to-p (dst &optional src)
+          (qz/has-link-to-p (org-roam-node-id dst)
+                            (and dst (org-roam-node-id dst))))
         ;;; ref capture
         (setq org-roam-capture-ref-templates
               `(("r" "ref" plain
@@ -691,7 +828,27 @@
                                  ("inbox.org" :level . 0)
                                  ("sample.org" :level . 0)
                                  ("wip.org" :level . 0)))
+      (setq org-log-done 'time)
       (require 'org-download)
+      (defun qz/org-choose-current-attachment ()
+        (let ((attach-dir (org-attach-dir)))
+          (if attach-dir
+              (let* ((file (pcase (org-attach-file-list attach-dir)
+                             (`(,file) file)
+                             (files (completing-read "Open attachment: "
+                                                     (mapcar #'list files) nil t))))
+                     (path (expand-file-name file attach-dir)))
+                path))))
+      
+      (defun qz/org-insert-current-attachment ()
+        (interactive)
+        (insert
+         (format "[[file:./%s]]"
+                 (dired-make-relative
+                  (qz/org-choose-current-attachment)))))
+      
+      (define-key org-mode-map (kbd "C-c M-a") 'qz/org-insert-current-attachment)
+      
       ;; NOWEB ORG END
       (message "post org: %s" (shell-command-to-string "date"))
       )
@@ -729,6 +886,46 @@
     
     (add-hook 'restclient-response-loaded-hook 'qz/restclient-hook)
     (provide 'restclient-hooks)
+    (defvar qz/aws-env nil
+      "the aws login configuration, managed through saml2aws
+    
+    to manipulate, run
+    $ saml2aws login -a PROFILE_ALIAS
+    
+    files of note
+    `$HOME/.aws/'
+    `$HOME/.saml2aws'")
+    (defun qz/choose-aws-env (&optional env)
+      (interactive)
+      (setq qz/aws-env
+            (or env (completing-read
+                     "aws-env: "
+                     (->> (shell-command-to-string
+                           "cat ~/.saml2aws | grep '^name' | cut -d'=' -f2")
+                          (s-split "\n")
+                          (remove "")))))
+      (async-shell-command (format "saml2aws login -a %s"
+                                   qz/aws-env)
+                           "*aws*"))
+    (defvar qz/kubectl-context nil
+      "the operating kubernetes context.
+    
+    to check, at a shell, run: 
+    `$ kubectl config get-contexts -o name'
+    or
+    `$ kubectl config current-context")
+    (defun qz/choose-kubectl-context (ctx)
+      (interactive)
+      (setq qz/kubectl-context
+            (or ctx (completing-read "k8s ctx: "
+                                     (qz/shell-command-to-list-of-strings
+                                      "kubectl config get-contexts -o name"))))
+      (async-shell-command (format "kubectl config use-context %s" 
+                                   qz/kubectl-context)
+                           "*kubectl*"))
+    
+    ;; optional; quality of life improvement to bury kubectl buffer
+    (add-to-list 'display-buffer-alist '("*kubectl*" display-buffer-no-window))
     (defun qz/get-mail ()
       (interactive)
       (async-shell-command "mbsync -Va && notmuch new"))
