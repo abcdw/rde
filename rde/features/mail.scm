@@ -493,7 +493,9 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
 ;;; feature-notmuch.
 ;;;
 
-(define (default-get-notmuch-configuration config)
+(define* (default-get-notmuch-configuration config
+           #:key
+           (extra-tag-updates-post '()))
   (require-value 'mail-settings config)
   (require-value 'full-name config)
   (define full-name (get-value 'full-name config))
@@ -510,19 +512,20 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
          mail-accounts))
 
   (define tag-updates-post
-    '("notmuch tag +inbox -- path:/accounts\\/.*\\/inbox/"
-      "notmuch tag +draft -- path:/accounts\\/.*\\/drafts/"
-      "notmuch tag +sent  -- path:/accounts\\/.*\\/sent/"
-      "notmuch tag +trash -- path:/accounts\\/.*\\/trash/"
-      "notmuch tag +spam  -- path:/accounts\\/.*\\/spam/"
-      "notmuch tag +list  -- path:/lists\\/.*/"
-      "notmuch tag +todo -inbox -sent  -- tag:inbox and tag:sent"
-      ;; If file was moved out of folder on server remove respective tag
-      "notmuch tag -inbox -- not path:/accounts\\/.*\\/inbox/ and tag:inbox"
-      "notmuch tag -trash -- not path:/accounts\\/.*\\/trash/ and tag:trash"
-      "notmuch tag -spam  -- not path:/accounts\\/.*\\/spam/  and tag:spam"
-
-      "notmuch tag -new -- tag:new"))
+    (append
+     '("notmuch tag +inbox -- path:/accounts\\/.*\\/inbox/"
+       "notmuch tag +draft -- path:/accounts\\/.*\\/drafts/"
+       "notmuch tag +sent  -- path:/accounts\\/.*\\/sent/"
+       "notmuch tag +trash -- path:/accounts\\/.*\\/trash/"
+       "notmuch tag +spam  -- path:/accounts\\/.*\\/spam/"
+       "notmuch tag +list  -- path:/lists\\/.*/"
+       "notmuch tag +todo -inbox -sent  -- tag:inbox and tag:sent"
+       ;; If file was moved out of folder on server remove respective tag
+       "notmuch tag -inbox -- not path:/accounts\\/.*\\/inbox/ and tag:inbox"
+       "notmuch tag -trash -- not path:/accounts\\/.*\\/trash/ and tag:trash"
+       "notmuch tag -spam  -- not path:/accounts\\/.*\\/spam/  and tag:spam")
+     extra-tag-updates-post
+     '("notmuch tag -new -- tag:new")))
 
   (define (move-out-untagged-messages tag)
     "If tag was removed -> move out of the related folder."
@@ -553,9 +556,10 @@ $(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
   (home-notmuch-extension
    (pre-new
     (list
-     (with-imported-modules '((guix build utils))
-       #~(begin
-           (for-each system '#$move-rules)))))
+     (with-imported-modules
+      '((guix build utils))
+      #~(begin
+          (for-each system '#$move-rules)))))
    (post-new
     (list
      #~(begin (for-each system '#$make-id-tag)
@@ -669,7 +673,8 @@ not appear in the pop-up buffer."
 (define* (feature-notmuch
           #:key
           (get-notmuch-configuration default-get-notmuch-configuration)
-          (notmuch-saved-searches %rde-notmuch-saved-searches))
+          (notmuch-saved-searches %rde-notmuch-saved-searches)
+          (extra-tag-updates-post '()))
   "Configure notmuch and Emacs UI for it if emacs enabled."
   (ensure-pred procedure? get-notmuch-configuration)
 
@@ -685,7 +690,9 @@ not appear in the pop-up buffer."
      (simple-service
       'notmuch-service
       home-notmuch-service-type
-      (get-notmuch-configuration config))
+      (get-notmuch-configuration
+       config
+       #:extra-tag-updates-post extra-tag-updates-post))
      (when (get-value 'emacs config)
        (elisp-configuration-service
         f-name
