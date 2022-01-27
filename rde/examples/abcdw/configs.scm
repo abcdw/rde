@@ -236,10 +236,14 @@
    (feature-l2md)
    (feature-msmtp)
    (feature-notmuch
+    #:extra-tag-updates-post
+    '("notmuch tag +guix-home -- 'thread:\"\
+{((subject:guix and subject:home) or subject:/home:/) and tag:new}\"'")
     #:notmuch-saved-searches
     (cons*
      '(:name "Work Inbox" :query "tag:work and tag:inbox" :key "W")
      '(:name "Personal Inbox" :query "tag:personal and tag:inbox" :key "P")
+     '(:name "Guix Home Inbox" :key "H" :query "tag:guix-home and tag:unread")
      %rde-notmuch-saved-searches))
 
    (feature-transmission #:auto-start? #f)
