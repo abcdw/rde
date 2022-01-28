@@ -69,12 +69,22 @@
 	   (car spl-str)
 	   (map string-capitalize (cdr spl-str)))))
 
+(define (serialize-git-term term)
+  (match term
+    (#t "true")
+    (#f "false")
+    ((? symbol? e) (symbol->string e))
+    ((? number? e) (number->string e))
+    ((? string? e) e)
+    ((lst ...)
+     (raise (formatted-message
+             (G_ "Git term should be a non-list value (string, \
+boolean, number, symbol, or gexp). Provided term is:\n ~a") lst)))
+    (e e)))
+
 (define (serialize-field field-name val)
-   (cond
-    ((boolean? val) (serialize-boolean field-name val))
-    (else
-     (list (format #f "\t~a = " (uglify-field-name field-name))
-	   val "\n"))))
+  (list (format #f "\t~a = " (uglify-field-name field-name))
+	(serialize-git-term val) "\n"))
 
 (define (serialize-alist field-name val)
   (generic-serialize-alist append serialize-field val))
@@ -82,7 +92,6 @@
 (define (serialize-boolean field-name val)
   (serialize-field field-name (if val "true" "false")))
 
-(define serialize-string serialize-field)
 (define git-config? list?)
 
 (define (serialize-git-section-header name value)
