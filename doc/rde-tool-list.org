@@ -1,0 +1,13 @@
+| Purpose                     | Tool         |
+|-----------------------------+--------------|
+| Window Manager              | Sway         |
+| Terminal                    | Alacritty    |
+| Login Shell                 | GNU Bash     |
+| Interactive Unix Shell      | Zsh          |
+| Service Manager/Init System | GNU Shepherd |
+| Package Manager             | GNU Guix     |
+| Filesystem                  | Btrfs        |
+| Multimedia Framework        | PipeWire     |
+| Video Player                | mpv          |
+| Everything Else (:          | GNU Emacs    |
+

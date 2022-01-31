@@ -1,0 +1,35 @@
+@multitable {Service Manager/Init System} {GNU Shepherd} 
+@headitem 
+Purpose
+ @tab Tool
+@item 
+Window Manager
+ @tab Sway
+@item 
+Terminal
+ @tab Alacritty
+@item 
+Login Shell
+ @tab GNU Bash
+@item 
+Interactive Unix Shell
+ @tab Zsh
+@item 
+Service Manager/Init System
+ @tab GNU Shepherd
+@item 
+Package Manager
+ @tab GNU Guix
+@item 
+Filesystem
+ @tab Btrfs
+@item 
+Multimedia Framework
+ @tab PipeWire
+@item 
+Video Player
+ @tab mpv
+@item 
+Everything Else (:
+ @tab GNU Emacs
+@end multitable

@@ -24,6 +24,11 @@ iso:
 	guix time-machine  -C stale/guix-related/guix/channels-lock -- \
 	system -L ./ image -t iso9660 stale/guix-related/system/install.scm
 
+doc/rde-tool-list.texi: doc/rde-tool-list.org
+	pandoc doc/rde-tool-list.org -f org -t texinfo \
+	-o doc/rde-tool-list.texi
+	sed -i '1,3d' doc/rde-tool-list.texi
+
 doc/rde.info: doc/rde.texi
 	makeinfo -o doc/rde.info doc/rde.texi
 
@@ -38,6 +43,7 @@ doc/rde.pdf: doc/rde.texi
 	makeinfo --pdf -o doc/rde.pdf doc/rde.texi
 
 clean:
-	rm -rf doc/rde.html
+	rm -f doc/rde.html
 	rm -f doc/rde.pdf
 	rm -f doc/rde.info
+	rm -f doc/rde-tool-list.texi

@@ -72,15 +72,7 @@ A picture to catch your eye)
 https://cdn.fosstodon.org/media_attachments/files/106/900/674/950/793/851/original/4b17f03528571ca0.png
 
 *** Tools
-| Purpose                | Tool      |
-|------------------------+-----------|
-| Window Manager         | Sway      |
-| Terminal               | Alacritty |
-| Login Shell            | Bash      |
-| Interactive Unix Shell | Zsh       |
-| Service Manager/Init   | Shepherd  |
-| Filesystem             | Btrfs     |
-| Everything Else (:     | Emacs     |
+#+INCLUDE: "doc/rde-tool-list.texi" src texinfo
 
 ** Community
 There are a few [[https://lists.sr.ht/~abcdw][mailing lists]] you can subscribe and/or post with your
