@@ -69,6 +69,13 @@
 			       (keyboard-layout-to-sway-config kb-layout)
 			       '()))
 
+
+           (lock-cmd
+            ;; ,(file-append swaylock "/bin/swaylock -c 3e3e3e")
+            (get-value 'lock-cmd config
+                       "swaylock -f -c 3e3e3e"))
+
+           (lock-cmd-quoted (format #f "'~a'" lock-cmd))
            (default-terminal
              (get-value 'default-terminal config
                         (file-append foot "/bin/foot")))
@@ -89,11 +96,19 @@
             (set $mod ,sway-mod)
             (set $term ,default-terminal)
             (set $menu ,default-app-launcher)
+            (set $lock ,lock-cmd)
 
             (,#~"")
             (bindsym $mod+Control+Shift+Return exec $term)
             (bindsym --to-code $mod+Shift+d exec $menu)
-            (bindsym $mod+Shift+l exec swaylock -c 3e3e3e)
+            (bindsym $mod+Shift+l exec $lock)
+            (,#~"")
+            (exec swayidle -w
+                  lock ,lock-cmd-quoted
+                  before-sleep ,lock-cmd-quoted
+                  timeout 300 ,lock-cmd-quoted
+                  timeout 600 "'swaymsg \"output * dpms off\"'"
+                  resume "'swaymsg \"output * dpms on\"'")
 
 	    (,#~"")
             (default_border pixel)
@@ -120,7 +135,9 @@
         (append
          (if (get-value 'default-terminal config) '() (list foot))
 	 (list wofi qtwayland
-               swayidle swaylock
+               swayidle
+               ;; swaylock
+               swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
        (simple-service 'set-wayland-specific-env-vars
 		       home-environment-variables-service-type
