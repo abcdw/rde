@@ -164,6 +164,11 @@
              (xwayland? . ,xwayland?)))
    (home-services-getter sway-home-services)))
 
+
+;;;
+;;; sway-run-on-tty.
+;;;
+
 (define* (feature-sway-run-on-tty
 	  #:key (sway-tty-number 2))
   "Launch Sway on specified tty upon user login.  Also,
@@ -196,6 +201,11 @@ automatically switch to SWAY-TTY-NUMBER on boot."
    (values (make-feature-values sway-tty-number))
    (home-services-getter sway-run-on-tty-home-services)
    (system-services-getter sway-run-on-tty-system-services)))
+
+
+;;;
+;;; sway-screenshot.
+;;;
 
 (define* (feature-sway-screenshot)
   "Configure slurp, grim and other tools for screenshot capabilities."
@@ -252,6 +262,11 @@ automatically switch to SWAY-TTY-NUMBER on boot."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+
+;;;
+;;; sway-statusbar.
+;;;
+
 ;; <https://www.reddit.com/r/unixporn/comments/a2c9kl/sway_in_the_wild/>
 (define* (feature-sway-statusbar
           #:key
@@ -291,6 +306,10 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+
+;;;
+;;; swayidle.
+;;;
 
 (define* (feature-swayidle
           #:key
