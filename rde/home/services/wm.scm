@@ -35,6 +35,9 @@
             home-swayidle-service-type
 	    home-swayidle-configuration
 
+            home-swaylock-service-type
+	    home-swaylock-configuration
+
             sway-config?))
 
 
@@ -252,14 +255,45 @@ Install and configure swayidle, sway's idle management daemon")))
 ;;; swaylock.
 ;;;
 
+(define (serialize-swaylock-config config)
+  (define (serialize-swaylock-term term)
+    (match term
+      ((? symbol? e) (symbol->string e))
+      ((? string? e) e)
+      (e
+       (raise (formatted-message
+               (G_ "Swaylock term should be a non-list value (string, \
+symbol). Provided term is:\n ~a") e)))))
+
+  (define (serialize-swaylock-option lst)
+    (unless (or (pair? lst) (gexp? lst))
+      (raise (formatted-message
+              (G_ "Swaylock option must be a gexp or pair, second \
+element can be a boolean. Provided term is:\n ~a") lst)))
+    (match lst
+      ((x . #t) (list (serialize-swaylock-term x) "\n"))
+      ((x . #f) (list))
+      ((x)      (list (serialize-swaylock-term x) "\n"))
+      ((x . y)  (list (serialize-swaylock-term x) "="
+                      (serialize-swaylock-term y) "\n"))
+      (e (list e "\n"))))
+  (append-map serialize-swaylock-option config))
+
+(define (swaylock-config? x)
+  (list? x))
+
 (define-configuration home-swaylock-configuration
   (swaylock
     (package swaylock)
     "swaylock package to use.")
   (config
-   (key-equal-value-config
-    `())
-   ""))
+   (swaylock-config
+    '())
+   "A list of pairs, each pair represents an option described in
+@code{man swaylock}.  The second element of the pair can be a string,
+symbol, boolean or omitted.  If second element is omitted or @code{#t}
+option is enabled, if @code{#f} disabled, and set to the value
+otherwise."))
 
 (define (add-swaylock-packages config)
   (list (home-swaylock-configuration-swaylock config)))
@@ -269,7 +303,8 @@ Install and configure swayidle, sway's idle management daemon")))
      ,(apply
        mixed-text-file
        "swaylock-config"
-       (serialize-key-equal-value-config (home-swaylock-configuration-config config))))))
+       (serialize-swaylock-config
+        (home-swaylock-configuration-config config))))))
 
 (define (home-swaylock-extensions cfg extensions)
   (home-swaylock-configuration
@@ -291,4 +326,4 @@ Install and configure swayidle, sway's idle management daemon")))
 		(extend home-swaylock-extensions)
                 (default-value (home-swaylock-configuration))
                 (description "\
-Install and configure swaylock, sway's idle management daemon")))
+Install and configure swaylock, screen locker for Wayland.")))
