@@ -46,6 +46,7 @@
 	  (extra-config '())
 	  (sway sway)
           (foot foot)
+          (bemenu bemenu)
           (xdg-desktop-portal xdg-desktop-portal)
           (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
           ;; Logo key. Use Mod1 for Alt.
@@ -57,17 +58,16 @@
   (ensure-pred boolean? add-keyboard-layout-to-config?)
   (ensure-pred any-package? sway)
   (ensure-pred any-package? foot)
+  (ensure-pred any-package? bemenu)
   (ensure-pred any-package? xdg-desktop-portal)
   (ensure-pred any-package? xdg-desktop-portal-wlr)
 
   (define (sway-home-services config)
     "Returns home services related to sway."
-    ;; (require-value 'elogind config)
     (let* ((kb-layout      (get-value 'keyboard-layout config))
 	   (layout-config  (if (and add-keyboard-layout-to-config? kb-layout)
 			       (keyboard-layout-to-sway-config kb-layout)
 			       '()))
-
 
            (lock-cmd
             (get-value 'default-screen-locker config "loginctl lock-session"))
@@ -75,9 +75,9 @@
            (default-terminal
              (get-value 'default-terminal config
                         (file-append foot "/bin/foot")))
-           (default-app-launcher
-             (get-value 'default-app-launcher config
-                        (file-append wofi "/bin/wofi --show=drun"))))
+           (default-application-launcher
+             (get-value 'default-application-launcher config
+                        (file-append bemenu "/bin/bemenu-run -l 20 -p run:"))))
       (list
        (service
 	home-sway-service-type
@@ -91,7 +91,7 @@
             (,#~"")
             (set $mod ,sway-mod)
             (set $term ,default-terminal)
-            (set $menu ,default-app-launcher)
+            (set $menu ,default-application-launcher)
             (set $lock ,lock-cmd)
 
             (,#~"")
@@ -132,14 +132,14 @@
         (@@ (gnu home services) home-run-on-change-service-type)
         `(("files/config/sway/config"
            ,#~(system* #$(file-append sway "/bin/swaymsg") "reload"))))
-       ;; TODO: Move wofi to feature-app-launcher or something like that
+
        (simple-service
         'packages-for-sway
 	home-profile-service-type
         (append
          (if (get-value 'default-terminal config) '() (list foot))
-	 (list wofi qtwayland
-               swayhide
+         (if (get-value 'default-application-launcher config) '() (list bemenu))
+	 (list qtwayland swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
        (simple-service 'set-wayland-specific-env-vars
 		       home-environment-variables-service-type
