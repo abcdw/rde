@@ -201,10 +201,13 @@ Install and configure Sway, a Wayland compositor compatible with i3.")))
   (config
    (sway-config
     `())
-   "This field has the same format as sway's config field, but make sure
-<command> is quoted with single quotes, otherwise only first part will
-be interpretet as a command by swayidle.  To get the complete list of
-available options see @code{man swayidle}.
+   "This field has the same format as sway's config field, but in reality
+swayidle supports only a subset of sway config, also, make sure
+<command> is quoted with single quotes if it has arguments, otherwise
+only first part will be interpreted as a command by swayidle.  To get
+the complete list of available options see @code{man swayidle}.
+
+The example configuration:
 
 @lisp
 ((lock \"'swaylock -c 303030'\")
@@ -266,7 +269,7 @@ Install and configure swayidle, sway's idle management daemon")))
      ,(apply
        mixed-text-file
        "swaylock-config"
-       (serialize-sway-config (home-swaylock-configuration-config config))))))
+       (serialize-key-equal-value-config (home-swaylock-configuration-config config))))))
 
 (define (home-swaylock-extensions cfg extensions)
   (home-swaylock-configuration

@@ -18,13 +18,15 @@
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
   #:use-module (gnu home services)
-  #:use-module (gnu home-services wm)
+  #:use-module (rde home services wm)
   #:use-module (gnu home-services shells)
   #:use-module (guix gexp)
   #:export (feature-sway
 	    feature-sway-run-on-tty
             feature-sway-screenshot
-            feature-sway-statusbar))
+            feature-sway-statusbar
+
+            feature-swayidle))
 
 ;; https://github.com/jjquin/dotfiles/tree/master/sway/.config/sway/config.d
 ;; https://nixos.wiki/wiki/Sway
@@ -43,7 +45,6 @@
 	  (extra-config '())
 	  (sway sway)
           (swaylock swaylock)
-          (swayidle swayidle)
           (foot foot)
           (xdg-desktop-portal xdg-desktop-portal)
           (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
@@ -56,7 +57,6 @@
   (ensure-pred boolean? add-keyboard-layout-to-config?)
   (ensure-pred any-package? sway)
   (ensure-pred any-package? swaylock)
-  (ensure-pred any-package? swayidle)
   (ensure-pred any-package? foot)
   (ensure-pred any-package? xdg-desktop-portal)
   (ensure-pred any-package? xdg-desktop-portal-wlr)
@@ -75,7 +75,6 @@
             (get-value 'lock-cmd config
                        "swaylock -f -c 3e3e3e"))
 
-           (lock-cmd-quoted (format #f "'~a'" lock-cmd))
            (default-terminal
              (get-value 'default-terminal config
                         (file-append foot "/bin/foot")))
@@ -102,20 +101,28 @@
             (bindsym $mod+Control+Shift+Return exec $term)
             (bindsym --to-code $mod+Shift+d exec $menu)
             (bindsym $mod+Shift+l exec $lock)
-            (,#~"")
-            (exec swayidle -w
-                  lock ,lock-cmd-quoted
-                  before-sleep ,lock-cmd-quoted
-                  timeout 300 ,lock-cmd-quoted
-                  timeout 600 "'swaymsg \"output * dpms off\"'"
-                  resume "'swaymsg \"output * dpms on\"'")
 
 	    (,#~"")
             (default_border pixel)
             (default_floating_border pixel)
-            (gaps inner ,(get-value 'emacs-margin config 8))
+            (gaps inner ,(get-value 'emacs-margin config 8))))))
 
-            (,#~"")))))
+       (when (get-value 'swayidle-cmd config)
+         (simple-service
+	  'sway-enable-swayidle
+	  home-sway-service-type
+          `((,#~"")
+	    (exec ,(get-value 'swayidle-cmd config)))))
+
+       (when (get-value 'swayidle config)
+         (let* ((swaymsg (file-append sway "/bin/swaymsg"))
+                (swaymsg-cmd (lambda (cmd)
+                               #~(format #f "'~a \"~a\"'" #$swaymsg #$cmd))))
+           (simple-service
+            'sway-add-dpms-to-swayidle
+            home-swayidle-service-type
+            `((timeout 600    ,(swaymsg-cmd "output * dpms off")
+                       resume ,(swaymsg-cmd "output * dpms on\"'"))))))
 
        (simple-service
 	'sway-configuration
@@ -135,7 +142,6 @@
         (append
          (if (get-value 'default-terminal config) '() (list foot))
 	 (list wofi qtwayland
-               swayidle
                ;; swaylock
                swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
@@ -298,6 +304,32 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
    (home-services-getter get-home-services)))
 
 
+(define* (feature-swayidle
+          #:key
+          (swayidle swayidle))
+  "Configure swayidle."
+  (ensure-pred any-package? swayidle)
+
+  (define swayidle-cmd (file-append swayidle "/bin/swayidle -w"))
+
+  (define (get-home-services config)
+    (define lock-cmd "swaylock -f -c 3e3e3e")
+    (define lock-cmd-quoted (format #f "'~a'" lock-cmd))
+    (list
+     (service
+      home-swayidle-service-type
+      (home-swayidle-configuration
+       (swayidle swayidle)
+       (config
+        `((lock ,lock-cmd-quoted)
+          (before-sleep ,lock-cmd-quoted)
+          (timeout 300 ,lock-cmd-quoted)))))))
+
+  (feature
+   (name 'swayidle)
+   (values `((swayidle . ,swayidle)
+             (swayidle-cmd . ,swayidle-cmd)))
+   (home-services-getter get-home-services)))
 ;; [X] feature-sway-run-on-tty
 ;; [X] feature-sway-screenshot
 ;; [ ] feature-sway-lock-idle-sleep
