@@ -43,7 +43,7 @@
 ;;;
 
 (define sway-config? list?)
-(define (serialize-sway-config field-name val)
+(define (serialize-sway-config val)
   (define (aligner nestness)
     (apply string-append
 	   (map (const "    ") (iota nestness))))
@@ -112,8 +112,7 @@ optionally ending with subconfigs, but provided expression is:\n ~a")
 	       (G_ "Sway (sub)config should be a list of expressions, \
 where each expression is also a list, but provided value is:\n ~a") e))) ))
 
-  #~(apply string-append
-	   '#$(serialize-sway-subconfig val)))
+  (serialize-sway-subconfig val))
 
 (define-configuration home-sway-configuration
   (package
@@ -138,13 +137,13 @@ For gradual migration, the file with old config can be included as
 shown in the example below.  After that, you can start translate lines
 to scheme one by one.
 
-@example
+@lisp
 `((include ,(local-file \"./sway/config\"))
   (bindsym $mod+Ctrl+Shift+a exec emacsclient -c --eval \"'(eshell)'\")
   (bindsym $mod+Ctrl+Shift+o \"[class=\\\"IceCat\\\"]\" kill)
   (input * ((xkb_layout us,ru)
             (xkb_variant dvorak,))))
-@end example
+@end lisp
 
 would yield something like:
 
@@ -163,9 +162,10 @@ input * {
 
 (define (add-sway-configuration config)
   `(("config/sway/config"
-     ,(mixed-text-file
+     ,(apply
+       mixed-text-file
        "sway-config"
-       (serialize-configuration config home-sway-configuration-fields)))))
+       (serialize-sway-config (home-sway-configuration-config config))))))
 
 (define (home-sway-extensions cfg extensions)
   (home-sway-configuration
@@ -201,16 +201,26 @@ Install and configure Sway, a Wayland compositor compatible with i3.")))
   (config
    (sway-config
     `())
-   "This field has the same format as sway's config field."))
+   "This field has the same format as sway's config field, but make sure
+<command> is quoted with single quotes, otherwise only first part will
+be interpretet as a command by swayidle.  To get the complete list of
+available options see @code{man swayidle}.
+
+@lisp
+((lock \"'swaylock -c 303030'\")
+ (before-sleep \"'swaylock -c 303030'\")
+ (timeout 300 \"'swaylock -c 303030'\"))
+@end lisp"))
 
 (define (add-swayidle-packages config)
   (list (home-swayidle-configuration-swayidle config)))
 
 (define (add-swayidle-configuration config)
   `(("config/swayidle/config"
-     ,(mixed-text-file
+     ,(apply
+       mixed-text-file
        "swayidle-config"
-       (serialize-configuration config home-swayidle-configuration-fields)))))
+       (serialize-sway-config (home-swayidle-configuration-config config))))))
 
 (define (home-swayidle-extensions cfg extensions)
   (home-swayidle-configuration
