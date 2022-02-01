@@ -32,11 +32,14 @@
   #:export (home-sway-service-type
 	    home-sway-configuration
 
+            home-swayidle-service-type
+	    home-swayidle-configuration
+
             sway-config?))
 
 
 ;;;
-;;; Sway.
+;;; sway.
 ;;;
 
 (define sway-config? list?)
@@ -185,3 +188,48 @@ input * {
                 (default-value (home-sway-configuration))
                 (description "\
 Install and configure Sway, a Wayland compositor compatible with i3.")))
+
+
+;;;
+;;; swayidle.
+;;;
+
+(define-configuration home-swayidle-configuration
+  (swayidle
+    (package swayidle)
+    "swayidle package to use.")
+  (config
+   (sway-config
+    `())
+   "This field has the same format as sway's config field."))
+
+(define (add-swayidle-packages config)
+  (list (home-swayidle-configuration-swayidle config)))
+
+(define (add-swayidle-configuration config)
+  `(("config/swayidle/config"
+     ,(mixed-text-file
+       "swayidle-config"
+       (serialize-configuration config home-swayidle-configuration-fields)))))
+
+(define (home-swayidle-extensions cfg extensions)
+  (home-swayidle-configuration
+   (inherit cfg)
+   (config
+    (append (home-swayidle-configuration-config cfg)
+            (append-map identity (reverse extensions))))))
+
+(define home-swayidle-service-type
+  (service-type (name 'home-swayidle)
+                (extensions
+                 (list (service-extension
+			home-profile-service-type
+			add-swayidle-packages)
+		       (service-extension
+                        home-files-service-type
+                        add-swayidle-configuration)))
+		(compose identity)
+		(extend home-swayidle-extensions)
+                (default-value (home-swayidle-configuration))
+                (description "\
+Install and configure swayidle, sway's idle management daemon")))
