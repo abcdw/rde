@@ -1,10 +1,9 @@
 (define-module (gnu home-services wm)
   #:use-module (gnu home services)
+  #:use-module (rde home services wm)
   #:use-module (gnu home-services-utils)
   #:use-module (gnu packages wm)
   #:use-module (gnu services configuration)
-
-  #:use-module (rde home wm)
 
   #:use-module (guix packages)
   #:use-module (guix gexp)

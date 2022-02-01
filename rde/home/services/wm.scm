@@ -16,7 +16,7 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with GNU Guix.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (rde home wm)
+(define-module (rde home services wm)
   #:use-module (gnu home services)
   #:use-module (gnu packages wm)
   #:use-module (gnu services configuration)
@@ -243,3 +243,49 @@ available options see @code{man swayidle}.
                 (default-value (home-swayidle-configuration))
                 (description "\
 Install and configure swayidle, sway's idle management daemon")))
+
+
+;;;
+;;; swaylock.
+;;;
+
+(define-configuration home-swaylock-configuration
+  (swaylock
+    (package swaylock)
+    "swaylock package to use.")
+  (config
+   (key-equal-value-config
+    `())
+   ""))
+
+(define (add-swaylock-packages config)
+  (list (home-swaylock-configuration-swaylock config)))
+
+(define (add-swaylock-configuration config)
+  `(("config/swaylock/config"
+     ,(apply
+       mixed-text-file
+       "swaylock-config"
+       (serialize-sway-config (home-swaylock-configuration-config config))))))
+
+(define (home-swaylock-extensions cfg extensions)
+  (home-swaylock-configuration
+   (inherit cfg)
+   (config
+    (append (home-swaylock-configuration-config cfg)
+            (append-map identity (reverse extensions))))))
+
+(define home-swaylock-service-type
+  (service-type (name 'home-swaylock)
+                (extensions
+                 (list (service-extension
+			home-profile-service-type
+			add-swaylock-packages)
+		       (service-extension
+                        home-files-service-type
+                        add-swaylock-configuration)))
+		(compose identity)
+		(extend home-swaylock-extensions)
+                (default-value (home-swaylock-configuration))
+                (description "\
+Install and configure swaylock, sway's idle management daemon")))
