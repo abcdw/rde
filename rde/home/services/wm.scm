@@ -255,6 +255,8 @@ Install and configure swayidle, sway's idle management daemon")))
 ;;; swaylock.
 ;;;
 
+(define swaylock-config? list?)
+
 (define (serialize-swaylock-config config)
   (define (serialize-swaylock-term term)
     (match term
@@ -278,9 +280,6 @@ element can be a boolean. Provided term is:\n ~a") lst)))
                       (serialize-swaylock-term y) "\n"))
       (e (list e "\n"))))
   (append-map serialize-swaylock-option config))
-
-(define (swaylock-config? x)
-  (list? x))
 
 (define-configuration home-swaylock-configuration
   (swaylock

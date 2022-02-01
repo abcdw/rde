@@ -26,7 +26,8 @@
             feature-sway-screenshot
             feature-sway-statusbar
 
-            feature-swayidle))
+            feature-swayidle
+            feature-swaylock))
 
 ;; https://github.com/jjquin/dotfiles/tree/master/sway/.config/sway/config.d
 ;; https://nixos.wiki/wiki/Sway
@@ -44,7 +45,6 @@
 	  #:key
 	  (extra-config '())
 	  (sway sway)
-          (swaylock swaylock)
           (foot foot)
           (xdg-desktop-portal xdg-desktop-portal)
           (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
@@ -56,7 +56,6 @@
   (ensure-pred sway-config? extra-config)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
   (ensure-pred any-package? sway)
-  (ensure-pred any-package? swaylock)
   (ensure-pred any-package? foot)
   (ensure-pred any-package? xdg-desktop-portal)
   (ensure-pred any-package? xdg-desktop-portal-wlr)
@@ -71,9 +70,7 @@
 
 
            (lock-cmd
-            ;; ,(file-append swaylock "/bin/swaylock -c 3e3e3e")
-            (get-value 'lock-cmd config
-                       "swaylock -f -c 3e3e3e"))
+            (get-value 'default-screen-locker config "loginctl lock-session"))
 
            (default-terminal
              (get-value 'default-terminal config
@@ -142,7 +139,6 @@
         (append
          (if (get-value 'default-terminal config) '() (list foot))
 	 (list wofi qtwayland
-               ;; swaylock
                swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
        (simple-service 'set-wayland-specific-env-vars
@@ -160,21 +156,13 @@
                          ("QT_QPA_PLATFORM" . "wayland-egl")
 			 ("_JAVA_AWT_WM_NONREPARENTING" . "1"))))))
 
-  (define (sway-system-services _)
-    "Returns system services related to sway."
-    (list
-     ;; TODO: Find a better solution for foreign distros?
-     ;; TODO: Move it to a separate feature?
-     (screen-locker-service swaylock "swaylock")))
-
   (feature
    (name 'sway)
    (values `((sway . ,sway)
              (wl-clipboard . ,wl-clipboard)
 	     (wayland . #t)
              (xwayland? . ,xwayland?)))
-   (home-services-getter sway-home-services)
-   (system-services-getter sway-system-services)))
+   (home-services-getter sway-home-services)))
 
 (define* (feature-sway-run-on-tty
 	  #:key (sway-tty-number 2))
@@ -313,7 +301,7 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
   (define swayidle-cmd (file-append swayidle "/bin/swayidle -w"))
 
   (define (get-home-services config)
-    (define lock-cmd "swaylock -f -c 3e3e3e")
+    (define lock-cmd (get-value 'default-screen-locker config))
     (define lock-cmd-quoted (format #f "'~a'" lock-cmd))
     (list
      (service
@@ -330,9 +318,68 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
    (values `((swayidle . ,swayidle)
              (swayidle-cmd . ,swayidle-cmd)))
    (home-services-getter get-home-services)))
+
+
+;;;
+;;; swaylock.
+;;;
+
+(define* (feature-swaylock
+          #:key
+          (swaylock swaylock)
+          (show-failed-attempts? #t)
+          (show-keyboard-layout? #f)
+          (daemonize? #t)
+          (extra-config '())
+          (default-screen-locker? #t))
+  "Configure swaylock."
+  (ensure-pred any-package? swaylock)
+
+  (define (get-home-services config)
+    (list
+     (service
+      home-swaylock-service-type
+      (home-swaylock-configuration
+       (swaylock swaylock)
+       (config
+        `((show-failed-attempts . ,show-failed-attempts?)
+          (daemonize . ,daemonize?)
+          (show-keyboard-layout . ,show-keyboard-layout?)
+          ;; TODO: Source color from colorscheme
+          (color . 3e3e3e)
+          (indicator-caps-lock)
+          ,@extra-config))))))
+
+  (define (get-system-services _)
+    (list
+     (screen-locker-service swaylock "swaylock")
+     ;; (simple-service
+     ;;  'setuid-chkpwd
+     ;;  setuid-program-service-type
+     ;;  (list (file-like->setuid-program
+     ;;         (file-append linux-pam "/sbin/unix_chkpwd"))))
+
+     ;; (simple-service
+     ;;  'sway-add-swaylock-pam
+     ;;  pam-root-service-type
+     ;;  (list
+     ;;   (unix-pam-service "swaylock")))
+     ))
+
+  (feature
+   (name 'swaylock)
+   (values `((swaylock . ,swaylock)
+             ,@(if default-screen-locker?
+                   ;; TODO: Change it to path in the store, once
+                   ;; https://issues.guix.gnu.org/53468 is resolved
+                   `((default-screen-locker . "/run/setuid-programs/swaylock"))
+                   '())))
+   (home-services-getter get-home-services)
+   (system-services-getter get-system-services)))
+
 ;; [X] feature-sway-run-on-tty
 ;; [X] feature-sway-screenshot
-;; [ ] feature-sway-lock-idle-sleep
+;; [X] feature-sway-lock-idle-sleep
 ;; [ ] feature-sway-input
 ;; [ ] feature-sway-keybindings
 ;; [ ] feature-sway-media-keys
