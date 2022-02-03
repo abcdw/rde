@@ -404,3 +404,40 @@ When using the minibuffer, you can switch - with completion and
 filtering provided by your completion setup - to any directory you’ve
 visited recently, or to a project or bookmarked directory. The
 minibuffer prompt will be replaced with the directory you choose.")))
+
+(use-modules (gnu packages gtk)
+             (gnu packages image))
+
+(define-public rofi-wayland
+  (package
+   (inherit rofi)
+   (name "rofi-wayland")
+   (version "1.7.2+wayland1")
+   (source (origin
+            (method url-fetch)
+            (uri (string-append "https://github.com/lbonn/rofi"
+                                "/releases/download/"
+                                version "/rofi-" version ".tar.xz"))
+            (sha256
+             (base32
+              "1smrxjq693z48c7n5pcfrvb0m0vsn6pxn7qpn8bm68j942n8rg3x"))))
+   (build-system meson-build-system)
+   (arguments
+    (substitute-keyword-arguments (package-arguments rofi)
+      ((#:configure-flags flags '())
+       #~(list "-Dxcb=disabled"))))
+    (inputs
+     (list cairo
+           glib
+           libjpeg-turbo
+           librsvg
+           libxkbcommon
+           wayland
+           wayland-protocols
+           pango
+           startup-notification))
+    (description "Rofi is a minimalist application launcher.  It memorizes which
+applications you regularly use and also allows you to search for an application
+by name.
+
+This is a fork with added support for Wayland via layer shell protocol.")))
