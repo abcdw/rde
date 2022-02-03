@@ -24,7 +24,8 @@
 	  #:key
 	  config-file
 	  (package alacritty)
-          (default-terminal? #t))
+          (default-terminal? #f)
+          (backup-terminal? #t))
   "Configure Alacritty terminal."
   (ensure-pred maybe-file-like? config-file)
   (ensure-pred any-package? package)
@@ -54,18 +55,27 @@
 
   (feature
    (name 'alacritty)
-   (values `((alacritty . ,package)
-             ,@(if default-terminal?
-                 `((default-terminal . ,(file-append package "/bin/alacritty")))
-                 '())))
+   (values
+    `((alacritty . ,package)
+      ,@(if default-terminal?
+            `((default-terminal . ,(file-append package "/bin/alacritty")))
+            '())
+      ,@(if backup-terminal?
+            `((backup-terminal . ,(file-append package "/bin/alacritty")))
+            '())))
    (home-services-getter alacritty-home-services)))
 
 
 (define* (feature-vterm
 	  #:key
-	  (emacs-vterm emacs-vterm-latest))
+	  (emacs-vterm emacs-vterm-latest)
+          (default-terminal? #t))
   "Configure Alacritty terminal."
   (ensure-pred any-package? emacs-vterm)
+
+  (define (get-term-cmd config)
+    (file-append
+     (get-value 'emacs-client-create-frame config) " -e \"(vterm t)\""))
 
   (define (get-home-services config)
     (require-value 'emacs config)
@@ -98,14 +108,6 @@
                                (list (get-value 'emacs-consult config))
                                '())))
 
-     (when (get-value 'sway config)
-       (simple-service
-        'emacs-vterm-add-sway-bind
-        home-sway-service-type
-        `((bindsym $mod+Shift+Return exec
-		   ,(get-value 'emacs-client-create-frame config)
-                   "-e \"(vterm t)\""))))
-
      (when (get-value 'zsh config)
        (simple-service
         'emacs-vterm-zsh-configuration
@@ -117,6 +119,10 @@
 
   (feature
    (name 'vterm)
-   (values `((vterm . #t)
-             (emacs-vterm . ,emacs-vterm)))
+   (values
+    `((vterm . #t)
+      (emacs-vterm . ,emacs-vterm)
+      ,@(if default-terminal?
+            `((default-terminal . ,get-term-cmd))
+            '())))
    (home-services-getter get-home-services)))

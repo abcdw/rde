@@ -153,7 +153,8 @@
 
    (feature-alacritty
     #:config-file (local-file "./config/alacritty/alacritty.yml")
-    #:default-terminal? #t)
+    #:default-terminal? #f
+    #:backup-terminal? #t)
    (feature-vterm)
    (feature-tmux
     #:config-file (local-file "./config/tmux/tmux.conf"))

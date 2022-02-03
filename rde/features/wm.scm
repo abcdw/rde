@@ -73,7 +73,10 @@
             (get-value 'default-screen-locker config "loginctl lock-session"))
 
            (default-terminal
-             (get-value 'default-terminal config
+             (get-value-eval 'default-terminal config
+                             (file-append foot "/bin/foot")))
+           (backup-terminal
+             (get-value 'backup-terminal config
                         (file-append foot "/bin/foot")))
            (default-application-launcher
              (get-value 'default-application-launcher config
@@ -91,11 +94,14 @@
             (,#~"")
             (set $mod ,sway-mod)
             (set $term ,default-terminal)
+            (set $backup-term ,backup-terminal)
             (set $menu ,default-application-launcher)
             (set $lock ,lock-cmd)
 
             (,#~"")
-            (bindsym $mod+Control+Shift+Return exec $term)
+            (bindsym $mod+Control+Shift+Return exec $backup-term)
+            (bindsym $mod+Return exec $term)
+
             (bindsym --to-code $mod+Shift+d exec $menu)
             (bindsym $mod+Shift+l exec $lock)
 
@@ -138,7 +144,9 @@
         'packages-for-sway
 	home-profile-service-type
         (append
-         (if (get-value 'default-terminal config) '() (list foot))
+         (if (and (get-value 'default-terminal config)
+                  (get-value 'backup-terminal config))
+             '() (list foot))
          (if (get-value 'default-application-launcher config) '() (list bemenu))
 	 (list qtwayland swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
