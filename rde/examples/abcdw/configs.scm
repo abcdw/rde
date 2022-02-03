@@ -5,6 +5,7 @@
   #:use-module (rde features keyboard)
   #:use-module (rde features system)
   #:use-module (rde features wm)
+  #:use-module (rde features xdisorg)
   #:use-module (rde features xdg)
   #:use-module (rde features password-utils)
   #:use-module (rde features version-control)
@@ -185,6 +186,13 @@
    (feature-sway-screenshot)
    (feature-sway-statusbar
     #:use-global-fonts? #f)
+   (feature-swayidle)
+   (feature-swaylock
+    #:swaylock (@ (gnu packages wm) swaylock-effects)
+    #:extra-config '((screenshots)
+                     (effect-blur . 7x5)
+                     (clock)))
+   (feature-rofi)
 
    (feature-emacs
     #:extra-init-el `()
