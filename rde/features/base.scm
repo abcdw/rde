@@ -11,6 +11,7 @@
   #:use-module (gnu home services shepherd)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages fonts)
+  #:use-module (gnu packages glib)
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
 
@@ -175,7 +176,9 @@ be a symbol, which will be used to construct feature name."
 	     (number-of-ttys . ,%number-of-ttys)))
    (system-services-getter get-base-system-services)))
 
-(define* (feature-desktop-services)
+(define* (feature-desktop-services
+          #:key
+          (dbus dbus))
   "Provides desktop system services."
   (define (get-home-services _)
     (list
@@ -192,8 +195,7 @@ be a symbol, which will be used to construct feature name."
         (provision '(dbus-home))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
-                  (list #$(file-append (@@ (gnu packages glib) dbus)
-                                       "/bin/dbus-daemon")
+                  (list #$(file-append dbus "/bin/dbus-daemon")
                         "--nofork"
                         "--session"
                         (string-append
