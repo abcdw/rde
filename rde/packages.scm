@@ -441,3 +441,61 @@ applications you regularly use and also allows you to search for an application
 by name.
 
 This is a fork with added support for Wayland via layer shell protocol.")))
+
+(use-modules (guix build-system go)
+             (gnu packages golang)
+             (gnu packages syncthing))
+
+(define-public go-gopkg-in-alecthomas-kingpin-v2
+  (package
+    (name "go-gopkg-in-alecthomas-kingpin-v2")
+    (version "2.2.6")
+    (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://gopkg.in/alecthomas/kingpin.v2")
+               (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+          (base32 "0mndnv3hdngr3bxp7yxfd47cas4prv98sqw534mx7vp38gd88n5r"))))
+    (build-system go-build-system)
+    (native-inputs
+     (list go-github-com-alecthomas-template go-github-com-alecthomas-units
+           go-github-com-stretchr-testify))
+    (arguments
+      '(#:import-path
+        "gopkg.in/alecthomas/kingpin.v2"
+        #:unpack-path
+        "gopkg.in/alecthomas/kingpin.v2"
+        #:phases %standard-phases))
+    (home-page "https://gopkg.in/alecthomas/kingpin.v2")
+    (synopsis "Kingpin - A Go (golang) command line and flag parser")
+    (description "Package kingpin provides command line interfaces like this:")
+    (license license:expat)))
+
+(define-public go-github-com-yory8-clipman
+  (package
+    (name "go-github-com-yory8-clipman")
+    (version "1.6.1")
+    (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+               (url "https://github.com/yory8/clipman")
+               (commit (string-append "v" version))))
+        (file-name (git-file-name name version))
+        (sha256
+          (base32 "0b9kvj0dif4221dy6c1npknhhjxvbc4kygzhwxjirpwjws0yv6v9"))))
+    (build-system go-build-system)
+    (arguments '(#:import-path "github.com/yory8/clipman"))
+    (propagated-inputs
+     (list
+      go-gopkg-in-alecthomas-kingpin-v2
+      go-github-com-kballard-go-shellquote
+      go-github-com-alecthomas-units
+      go-github-com-alecthomas-template))
+    (home-page "https://github.com/yory8/clipman")
+    (synopsis "Clipman")
+    (description "GPL v3.0 2019- (C) yory8 <yory8@users.noreply.github.com>")
+    (license license:gpl3)))
