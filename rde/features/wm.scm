@@ -114,12 +114,13 @@
        (when (get-value 'swayidle config)
          (let* ((swaymsg (file-append sway "/bin/swaymsg"))
                 (swaymsg-cmd (lambda (cmd)
-                               #~(format #f "'~a \"~a\"'" #$swaymsg #$cmd))))
+                               #~(format #f "'~a \"~a\"'" #$swaymsg #$cmd)))
+                (idle-timeout (+ 30 (get-value 'lock-timeout config 120))))
            (simple-service
             'sway-add-dpms-to-swayidle
             home-swayidle-service-type
-            `((timeout 600    ,(swaymsg-cmd "output * dpms off")
-                       resume ,(swaymsg-cmd "output * dpms on\"'"))))))
+            `((timeout ,idle-timeout ,(swaymsg-cmd "output * dpms off")
+               resume                ,(swaymsg-cmd "output * dpms on"))))))
 
        (simple-service
 	'sway-configuration
@@ -314,6 +315,7 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
 (define* (feature-swayidle
           #:key
           (swayidle swayidle)
+          (lock-timeout 120)
           (extra-config '()))
   "Configure swayidle."
   (ensure-pred any-package? swayidle)
@@ -333,14 +335,15 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
                 (let ((lock-cmd-quoted (format #f "'~a'" lock-cmd)))
                   `((lock ,lock-cmd-quoted)
                     (before-sleep ,lock-cmd-quoted)
-                    (timeout 300 ,lock-cmd-quoted)))
+                    (timeout ,lock-timeout ,lock-cmd-quoted)))
                 '())
           ,@extra-config))))))
 
   (feature
    (name 'swayidle)
    (values `((swayidle . ,swayidle)
-             (swayidle-cmd . ,swayidle-cmd)))
+             (swayidle-cmd . ,swayidle-cmd)
+             (lock-timeout . ,lock-timeout)))
    (home-services-getter get-home-services)))
 
 
