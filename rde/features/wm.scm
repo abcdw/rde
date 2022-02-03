@@ -313,7 +313,8 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
 
 (define* (feature-swayidle
           #:key
-          (swayidle swayidle))
+          (swayidle swayidle)
+          (extra-config '()))
   "Configure swayidle."
   (ensure-pred any-package? swayidle)
 
@@ -321,16 +322,20 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
 
   (define (get-home-services config)
     (define lock-cmd (get-value 'default-screen-locker config))
-    (define lock-cmd-quoted (format #f "'~a'" lock-cmd))
+
     (list
      (service
       home-swayidle-service-type
       (home-swayidle-configuration
        (swayidle swayidle)
        (config
-        `((lock ,lock-cmd-quoted)
-          (before-sleep ,lock-cmd-quoted)
-          (timeout 300 ,lock-cmd-quoted)))))))
+        `(,@(if lock-cmd
+                (let ((lock-cmd-quoted (format #f "'~a'" lock-cmd)))
+                  `((lock ,lock-cmd-quoted)
+                    (before-sleep ,lock-cmd-quoted)
+                    (timeout 300 ,lock-cmd-quoted)))
+                '())
+          ,@extra-config))))))
 
   (feature
    (name 'swayidle)
