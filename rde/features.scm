@@ -36,6 +36,7 @@
 	    make-feature-values
 	    require-value
 	    get-value
+	    get-value-eval
 
 	    ensure-pred
 	    throw-message
@@ -199,6 +200,13 @@ to each system-services-getter function."
     (if handle
 	(cdr handle)
 	default-value)))
+
+(define* (get-value-eval key config #:optional default-value)
+  "Get KEY from rde-config-values, if the value is a function apply it
+to config one more time."
+  (let* ((handle (hash-get-handle (rde-config-values config) key))
+         (val (if handle (cdr handle) default-value)))
+      (if (procedure? val) (val config) val)))
 
 (define* (require-value key config #:optional (additional-msg #f))
   (throw-message
