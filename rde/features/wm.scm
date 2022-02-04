@@ -20,7 +20,12 @@
   #:use-module (gnu home services)
   #:use-module (rde home services wm)
   #:use-module (gnu home-services shells)
+
   #:use-module (guix gexp)
+  #:use-module (guix packages)
+
+  #:use-module (srfi srfi-1)
+
   #:export (feature-sway
 	    feature-sway-run-on-tty
             feature-sway-screenshot
@@ -91,19 +96,53 @@
             (,#~"")
             ,@layout-config
 
-            (,#~"")
+            (,#~"\n\n# General settings:")
             (set $mod ,sway-mod)
             (set $term ,default-terminal)
             (set $backup-term ,backup-terminal)
             (set $menu ,default-application-launcher)
             (set $lock ,lock-cmd)
 
-            (,#~"")
+            (floating_modifier $mod normal)
+
+            (bindsym $mod+Shift+r reload)
+
+            (,#~"\n\n# Launching external applications:")
             (bindsym $mod+Control+Shift+Return exec $backup-term)
             (bindsym $mod+Return exec $term)
 
-            (bindsym --to-code $mod+Shift+d exec $menu)
+            (bindsym $mod+Shift+d exec $menu)
             (bindsym $mod+Shift+l exec $lock)
+
+            (,#~"\n\n# Manipulating windows:")
+            (bindsym $mod+Shift+c kill)
+            (bindsym $mod+Shift+f fullscreen)
+            (bindsym $mod+Shift+space floating toggle)
+            (bindsym $mod+Ctrl+space focus mode_toggle)
+
+            (bindsym $mod+Left focus left)
+            (bindsym $mod+Down focus down)
+            (bindsym $mod+Up focus up)
+            (bindsym $mod+Right focus right)
+
+            (bindsym $mod+Shift+Left move left)
+            (bindsym $mod+Shift+Down move down)
+            (bindsym $mod+Shift+Up move up)
+            (bindsym $mod+Shift+Right move right)
+
+            (,#~"\n\n# Moving around workspaces:")
+            (bindsym $mod+tab workspace back_and_forth)
+            ,@(append-map
+               (lambda (x)
+                 `((bindsym ,(format #f "$mod+~a" (modulo x 10))
+                            workspace number ,x)
+                   (bindsym ,(format #f "$mod+Shift+~a" (modulo x 10))
+                            move container to workspace number ,x)))
+               (iota 10 1))
+
+            (,#~"\n\n# Scratchpad settings:")
+            (bindsym $mod+Shift+minus move scratchpad)
+            (bindsym $mod+minus scratchpad show)
 
 	    (,#~"")
             (default_border pixel)
