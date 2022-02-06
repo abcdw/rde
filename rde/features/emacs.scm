@@ -1305,6 +1305,7 @@ git-link, git-timemachine."
          (let ((map goto-map))
            (define-key map (kbd "g") 'consult-goto-line)
            (define-key map (kbd "M-g") 'consult-goto-line)
+           (define-key map (kbd "l") 'consult-line)
            (define-key map (kbd "o") 'consult-outline)
            (define-key map (kbd "i") 'consult-imenu)
            (define-key map (kbd "m") 'consult-mark)
