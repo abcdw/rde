@@ -20,23 +20,23 @@
   #:export (feature-emacs
             feature-emacs-appearance
             feature-emacs-faces
-	    feature-emacs-completion
-	    feature-emacs-vertico
-	    feature-emacs-mct
-	    feature-emacs-input-methods
-	    feature-emacs-project
-	    feature-emacs-perspective
-	    feature-emacs-git
-	    feature-emacs-dired
+            feature-emacs-completion
+            feature-emacs-vertico
+            feature-emacs-mct
+            feature-emacs-input-methods
+            feature-emacs-project
+            feature-emacs-perspective
+            feature-emacs-git
+            feature-emacs-dired
             feature-emacs-eshell
-	    feature-emacs-monocle
-	    feature-emacs-org
-	    feature-emacs-org-roam
-	    feature-emacs-org-agenda
-	    feature-emacs-erc
+            feature-emacs-monocle
+            feature-emacs-org
+            feature-emacs-org-roam
+            feature-emacs-org-agenda
+            feature-emacs-erc
             feature-emacs-elpher
-	    feature-emacs-telega
-	    feature-emacs-pdf-tools
+            feature-emacs-telega
+            feature-emacs-pdf-tools
             feature-emacs-which-key
             feature-emacs-keycast
 
@@ -55,8 +55,8 @@
   "Returns a package, which configures emacs.  Can be used as a
 dependency for other packages."
     (let* ((configure-package
-	  (elisp-configuration-package
-	   (string-append "configure-" (symbol->string name))
+          (elisp-configuration-package
+           (string-append "configure-" (symbol->string name))
            elisp-expressions
            #:elisp-packages elisp-packages
            #:autoloads? autoloads?
@@ -78,7 +78,7 @@ dependency for other packages."
           (require-in-init? (not autoload-each-sexp-in-configure-package?)))
   (let* ((pkg-name (symbol-append 'configure- name))
          (configure-package
-	  (rde-emacs-configuration-package
+          (rde-emacs-configuration-package
            name elisp-expressions
            #:summary summary
            #:commentary commentary
@@ -125,10 +125,10 @@ dependency for other packages."
 
 
 (define* (feature-emacs
-	  #:key
-	  (emacs emacs-next-pgtk-latest)
-	  (emacs-server-mode? #t)
-	  (additional-elisp-packages '())
+          #:key
+          (emacs emacs-next-pgtk-latest)
+          (emacs-server-mode? #t)
+          (additional-elisp-packages '())
           (extra-init-el '())
           (extra-early-init-el '()))
   "Setup and configure GNU Emacs."
@@ -139,22 +139,22 @@ dependency for other packages."
   (define emacs-client (file-append emacs "/bin/emacsclient"))
   (define emacs-client-create-frame
     (program-file "emacs-client-create-frame"
-		  #~(apply system*
-			   #$(file-append emacs "/bin/emacsclient")
-			   "--create-frame"
-			   (cdr (command-line)))))
+                  #~(apply system*
+                           #$(file-append emacs "/bin/emacsclient")
+                           "--create-frame"
+                           (cdr (command-line)))))
   (define emacs-client-no-wait
     (program-file "emacs-client-no-wait"
-		  #~(apply system*
-			   #$(file-append emacs "/bin/emacsclient")
-			   "--no-wait"
-			   (cdr (command-line)))))
+                  #~(apply system*
+                           #$(file-append emacs "/bin/emacsclient")
+                           "--no-wait"
+                           (cdr (command-line)))))
   (define emacs-editor
     (program-file "emacs-editor"
-		  #~(apply system*
-			   #$(file-append emacs "/bin/emacs")
-			   "--no-splash"
-			   (cdr (command-line)))))
+                  #~(apply system*
+                           #$(file-append emacs "/bin/emacs")
+                           "--no-splash"
+                           (cdr (command-line)))))
 
   (define emacs-configure-rde-keymaps
     (rde-emacs-configuration-package
@@ -171,7 +171,7 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
     (require-value 'full-name config)
     (require-value 'email config)
     (let* ((full-name (get-value 'full-name config))
-	   (email     (get-value 'email config)))
+           (email     (get-value 'email config)))
       (list
        (emacs-xdg-service 'emacs-q "Emacs (No init: -q)"
                           #~(system* "emacs" "-q"))
@@ -183,31 +183,31 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
         `((require 'configure-rde-keymaps)
 
           (setq user-full-name ,full-name)
-	  (setq user-mail-address ,email)
+          (setq user-mail-address ,email)
 
           ,#~""
-	  (setq custom-file
-		(concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-			"/emacs/custom.el"))
-	  (load custom-file t)
+          (setq custom-file
+                (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                        "/emacs/custom.el"))
+          (load custom-file t)
 
           (setq backup-directory-alist
                 `(,(cons "." (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		                     "/emacs/backup"))))
+                                     "/emacs/backup"))))
 
           ,#~""
           (column-number-mode 1)
-	  (save-place-mode 1)
+          (save-place-mode 1)
           ;; MAYBE: Make it buffer local?
           (show-paren-mode 1)
           ,#~";; Treat camelCased parts as separate words."
           (subword-mode 1)
           ;; (add-hook 'prog-mode-hook 'subword-mode)
 
-	  (setq-default indent-tabs-mode nil)
-	  (setq save-interprogram-paste-before-kill t)
-	  (setq mouse-yank-at-point t)
-	  (setq require-final-newline t)
+          (setq-default indent-tabs-mode nil)
+          (setq save-interprogram-paste-before-kill t)
+          (setq mouse-yank-at-point t)
+          (setq require-final-newline t)
           (add-hook 'prog-mode-hook
                     (lambda () (setq show-trailing-whitespace t)))
 
@@ -241,7 +241,7 @@ C-h C-a to open About Emacs buffer."
           (dolist (mode-hook '(prog-mode-hook compilation-mode-hook))
                   (add-hook mode-hook (lambda () (setq truncate-lines t))))
           (setq compilation-scroll-output 'first-error)
-	  (define-key global-map (kbd "s-r") 'recompile)
+          (define-key global-map (kbd "s-r") 'recompile)
 
           ,#~""
           ;; TODO: Move it to feature-emacs-tramp
@@ -302,50 +302,50 @@ Prefix argument can be used to kill a few words."
         #:keywords '(convenience))
 
        (service
-	home-emacs-service-type
-	(home-emacs-configuration
-	 (package emacs)
-	 (elisp-packages additional-elisp-packages)
-	 (server-mode? emacs-server-mode?)
-	 (xdg-flavor? #t)
-	 (init-el extra-init-el)
-	 (early-init-el
-	  `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))
+        home-emacs-service-type
+        (home-emacs-configuration
+         (package emacs)
+         (elisp-packages additional-elisp-packages)
+         (server-mode? emacs-server-mode?)
+         (xdg-flavor? #t)
+         (init-el extra-init-el)
+         (early-init-el
+          `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))
             ,@extra-early-init-el))
-	 ;;; TODO: Rebuilding packages with emacs will be useful for
-	 ;;; native-comp, but for some reason dash.el fails to build,
-	 ;;; need to investigate the issue.
-	 ;; (rebuild-elisp-packages? #t)
+         ;;; TODO: Rebuilding packages with emacs will be useful for
+         ;;; native-comp, but for some reason dash.el fails to build,
+         ;;; need to investigate the issue.
+         ;; (rebuild-elisp-packages? #t)
          ))
 
        (simple-service 'emacs-set-default-editor
-		       home-environment-variables-service-type
-		       `(("ALTERNATE_EDITOR" . ,emacs-editor)
-			 ("VISUAL" . ,emacs-client-no-wait)))
+                       home-environment-variables-service-type
+                       `(("ALTERNATE_EDITOR" . ,emacs-editor)
+                         ("VISUAL" . ,emacs-client-no-wait)))
        (when (get-value 'sway config)
- 	 (simple-service
-	  'emacs-update-environment-variables-on-sway-start
-	  home-sway-service-type
-	  `((,#~"")
+         (simple-service
+          'emacs-update-environment-variables-on-sway-start
+          home-sway-service-type
+          `((,#~"")
             (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
-	     ,(program-file
-	       "update-emacs-env-variables"
-	       #~(system*
-		  #$emacs-client "--eval"
-		  (string-append
+             ,(program-file
+               "update-emacs-env-variables"
+               #~(system*
+                  #$emacs-client "--eval"
+                  (string-append
                    "(mapcar (lambda (lst) (apply #'setenv lst)) '"
                    (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
-		                   (string-append "env")))
-	                  (result ((@@ (ice-9 rdelim) read-delimited) "" port))
-	                  (vars (map (lambda (x)
+                                   (string-append "env")))
+                          (result ((@@ (ice-9 rdelim) read-delimited) "" port))
+                          (vars (map (lambda (x)
                                        (let ((si (string-index x #\=)))
                                          (list (string-take x si)
                                                (string-drop x (+ 1 si)))))
-			             ((@@ (srfi srfi-1) remove)
-			              string-null? (string-split
+                                     ((@@ (srfi srfi-1) remove)
+                                      string-null? (string-split
                                                     result #\newline)))))
-	             (close-port port)
-	             (format #f "~s" vars))
+                     (close-port port)
+                     (format #f "~s" vars))
                    ")"))))
             (for_window "[title=\".* - Emacs Client\"]"
                         floating enable,
@@ -395,7 +395,7 @@ and overall looks cool."
               `((fg-window-divider-inner . "#000000")
                 (fg-window-divider-outer . "#000000")))
 
-	(load-theme 'modus-operandi t)
+        (load-theme 'modus-operandi t)
         (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle)
         (setq bookmark-set-fringe-mark nil)
 
@@ -403,18 +403,18 @@ and overall looks cool."
         (setq mode-line-modes
               (let ((recursive-edit-help-echo "Recursive edit, type C-M-c to get out"))
                 (list (propertize "%[" 'help-echo recursive-edit-help-echo)
-	              "("
-	              `(:propertize ("" mode-name)
-			            help-echo "Major mode\n\
+                      "("
+                      `(:propertize ("" mode-name)
+                                    help-echo "Major mode\n\
 mouse-1: Display major mode menu\n\
 mouse-2: Show help for major mode\n\
 mouse-3: Toggle minor modes"
-			            mouse-face mode-line-highlight
-			            local-map ,mode-line-major-mode-keymap)
-	              '("" mode-line-process)
-	              ")"
-	              (propertize "%]" 'help-echo recursive-edit-help-echo)
-	              " ")))
+                                    mouse-face mode-line-highlight
+                                    local-map ,mode-line-major-mode-keymap)
+                      '("" mode-line-process)
+                      ")"
+                      (propertize "%]" 'help-echo recursive-edit-help-echo)
+                      " ")))
         (custom-set-faces
          `(git-gutter-fr:modified
            ((t (:foreground "blue" :background "white"))))
@@ -490,10 +490,10 @@ Almost all visual elements are disabled.")))
          name))))
 
 (define* (feature-emacs-input-methods
-	  #:key
+          #:key
           (enable-reverse-im #f)
-	  (default-input-method "cyrillic-dvorak")
-	  (input-method-packages (list emacs-cyrillic-dvorak-im)))
+          (default-input-method "cyrillic-dvorak")
+          (input-method-packages (list emacs-cyrillic-dvorak-im)))
   "Configure input-method for GNU Emacs.  Allows to use other layouts
 with emacs, whithout losing ability to use keybindings.  Supported
 both Emacsy toggle-input-method (C-\\) and system layout switching by
@@ -507,7 +507,7 @@ utilizing reverse-im package."
      (elisp-configuration-service
       emacs-f-name
       `((with-eval-after-load
-	 'mule
+         'mule
          (setq-default mode-line-mule-info nil)
          ;; Feels a little hacky, but mule-related hooks are
          ;; inconsistent and cursor not changed back in some cases.
@@ -519,14 +519,14 @@ utilizing reverse-im package."
          ,@(map (lambda (x) `(require ',(strip-emacs-name x)))
                 input-method-packages)
 
-	 (setq default-input-method ,default-input-method)
+         (setq default-input-method ,default-input-method)
          (define-key global-map (kbd "s-SPC") 'toggle-input-method))
 
-	,@(if enable-reverse-im
+        ,@(if enable-reverse-im
               `((add-hook 'after-init-hook 'reverse-im-mode)
                 (with-eval-after-load
-	         'reverse-im
-	         (setq reverse-im-input-methods ,default-input-method)))
+                 'reverse-im
+                 (setq reverse-im-input-methods ,default-input-method)))
             '()))
       #:elisp-packages `(,@(if enable-reverse-im (list emacs-reverse-im) '())
                          ,@input-method-packages))))
@@ -538,12 +538,12 @@ utilizing reverse-im package."
 
 
 (define* (feature-emacs-erc
-	  #:key
-	  ;; (emacs-client? #f)
-	  (erc-server "irc.libera.chat")
-	  (erc-port 6697)
-	  (erc-nick #f)
-	  (erc-autojoin-channels-alist '())
+          #:key
+          ;; (emacs-client? #f)
+          (erc-server "irc.libera.chat")
+          (erc-port 6697)
+          (erc-nick #f)
+          (erc-autojoin-channels-alist '())
           (erc-kill-buffers-on-quit #t)
           (align-nicknames? #t)
           (extra-config '()))
@@ -567,23 +567,23 @@ utilizing reverse-im package."
          (require 'erc-fill)
          (require 'erc-track))
         (with-eval-after-load
-	 'erc-status-sidebar
+         'erc-status-sidebar
          (setq-default erc-status-sidebar-header-line-format
                        (concat " " erc-status-sidebar-mode-line-format))
          (setq-default erc-status-sidebar-mode-line-format nil)
          (setq erc-status-sidebar-width 18))
         (with-eval-after-load
-	 'erc
-	 (setq erc-server ,erc-server)
-	 (setq erc-port ,erc-port)
-	 ,@(if erc-nick `((setq erc-nick ,erc-nick)) '())
-	 (setq erc-autojoin-channels-alist
-	       ',erc-autojoin-channels-alist)
+         'erc
+         (setq erc-server ,erc-server)
+         (setq erc-port ,erc-port)
+         ,@(if erc-nick `((setq erc-nick ,erc-nick)) '())
+         (setq erc-autojoin-channels-alist
+               ',erc-autojoin-channels-alist)
 
          ,@(if align-nicknames?
                '((setq erc-fill-static-center 14)
-	         (setq erc-fill-function 'erc-fill-static)
-	         (setq erc-fill-column 82))
+                 (setq erc-fill-function 'erc-fill-static)
+                 (setq erc-fill-column 82))
                '())
 
          (setq erc-hide-list '())
@@ -626,7 +626,7 @@ utilizing reverse-im package."
          #$emacs-cmd
          "--eval"
          (string-append
-	  "(progn
+          "(progn
 (set-frame-name \"Telega - Emacs Client\")
 (if (and (boundp 'telega--status) (equal telega--status \"Ready\"))
  (telega-browse-url \"" (car (cdr (command-line))) "\")"
@@ -648,10 +648,10 @@ utilizing reverse-im package."
         (define-key rde-app-map (kbd "t") telega-prefix-map)
 
         (with-eval-after-load
-	 'telega
+         'telega
 
          (define-key telega-chat-mode-map (kbd "s-B") 'telega-chat-with)
-	 (define-key telega-root-mode-map (kbd "s-B") 'telega-chat-with)
+         (define-key telega-root-mode-map (kbd "s-B") 'telega-chat-with)
          (setq telega-emoji-company-backend 'telega-company-emoji)
          ,@(if (get-value 'mpv config)
                `((setq telega-video-player-command
@@ -667,7 +667,7 @@ utilizing reverse-im package."
            (company-mode 1))
          (add-hook 'telega-chat-mode-hook 'rde-telega-chat-mode)
 
-	 (setq telega-completing-read-function completing-read-function)))
+         (setq telega-completing-read-function completing-read-function)))
       #:elisp-packages (list emacs-telega
                              (get-value 'emacs-configure-rde-keymaps config)))
 
@@ -775,10 +775,10 @@ previous window layout otherwise.  With universal argument toggles
                    (global-olivetti-mode 1)))
               (if (one-window-p)
                   (if rde--monocle-previous-window-configuration
-	              (let ((cur-buffer (current-buffer)))
+                      (let ((cur-buffer (current-buffer)))
                         (set-window-configuration
                          rde--monocle-previous-window-configuration)
-	                (setq rde--monocle-previous-window-configuration nil)
+                        (setq rde--monocle-previous-window-configuration nil)
                         (switch-to-buffer cur-buffer)))
                   (setq rde--monocle-previous-window-configuration
                         (current-window-configuration))
@@ -789,7 +789,7 @@ previous window layout otherwise.  With universal argument toggles
         (define-key rde-toggle-map (kbd "O") 'global-olivetti-mode)
         (define-key rde-toggle-map (kbd "m") 'hide-mode-line-mode)
         (define-key rde-toggle-map (kbd "M") 'global-hide-mode-line-mode)
-	(define-key global-map (kbd "s-f") 'rde-toggle-monocle))
+        (define-key global-map (kbd "s-f") 'rde-toggle-monocle))
       #:elisp-packages (list emacs-olivetti emacs-hide-header-line
                              (get-value 'emacs-configure-rde-keymaps config)))))
 
@@ -812,7 +812,7 @@ previous window layout otherwise.  With universal argument toggles
          #$emacs-cmd
          "--eval"
          (string-append
-	  "(dired \"" (car (cdr (command-line))) "\")")))
+          "(dired \"" (car (cdr (command-line))) "\")")))
     (list
      (elisp-configuration-service
       emacs-f-name
@@ -915,9 +915,9 @@ previous window layout otherwise.  With universal argument toggles
 
         (with-eval-after-load
          'org
-	 (setq org-adapt-indentation nil)
-	 (setq org-edit-src-content-indentation 0)
-	 (setq org-startup-indented t)
+         (setq org-adapt-indentation nil)
+         (setq org-edit-src-content-indentation 0)
+         (setq org-startup-indented t)
 
          (setq org-outline-path-complete-in-steps nil)
          (setq org-refile-use-outline-path 'full-file-path)
@@ -927,8 +927,8 @@ previous window layout otherwise.  With universal argument toggles
 
          (setq org-ellipsis "⤵")
          (set-face-attribute 'org-ellipsis nil
-		             :inherit '(font-lock-comment-face default)
-		             :weight 'normal)
+                             :inherit '(font-lock-comment-face default)
+                             :weight 'normal)
          (setq org-hide-emphasis-markers t)
          (setq org-log-into-drawer t)
 
@@ -1062,7 +1062,7 @@ Start an unlimited search at `point-min' otherwise."
          #$emacs-cmd
          "--eval"
          (string-append
-	  "(elpher-go \"" (car (cdr (command-line))) "\")")))
+          "(elpher-go \"" (car (cdr (command-line))) "\")")))
     (list
      (elisp-configuration-service
       emacs-f-name
@@ -1175,33 +1175,33 @@ git-link, git-timemachine."
      (elisp-configuration-service
       emacs-f-name
       `((with-eval-after-load
-	 'faces
-	 (let* ((mono-fn ,(font-name font-monospace))
-		(sans-fn ,(font-name font-sans))
-		(serif-fn ,(font-name font-serif))
-		(mono (font-spec
-		       :name ,(font-name font-monospace)
+         'faces
+         (let* ((mono-fn ,(font-name font-monospace))
+                (sans-fn ,(font-name font-sans))
+                (serif-fn ,(font-name font-serif))
+                (mono (font-spec
+                       :name ,(font-name font-monospace)
                        ;; For some reason pgtk emacs has much smaller
                        ;; font than alacritty with the same size value
-		       :size   ,(+ 3 (font-size font-monospace))
-		       :weight ',(or (font-weight font-monospace) 'normal)))
-		;; For people coming here years later, only
-		;; face which can contain size or integer
-		;; height is default, everything else should
-		;; set only family or relative height
-		;; (decimal value), the font-spec even
-		;; without height/size shouldn't be used.
-		;; Otherwise text-adjust and other stuff can
-		;; be broken.
-		(faces `((default ((t (:font ,mono))))
-			 (fixed-pitch ((t (:family ,mono-fn))))
-			 (button ((t (:inherit (fixed-pitch)))))
-			 (variable-pitch ((t (:family ,serif-fn)))))))
-	   (dolist (face faces)
-		   (custom-set-faces face))
+                       :size   ,(+ 3 (font-size font-monospace))
+                       :weight ',(or (font-weight font-monospace) 'normal)))
+                ;; For people coming here years later, only
+                ;; face which can contain size or integer
+                ;; height is default, everything else should
+                ;; set only family or relative height
+                ;; (decimal value), the font-spec even
+                ;; without height/size shouldn't be used.
+                ;; Otherwise text-adjust and other stuff can
+                ;; be broken.
+                (faces `((default ((t (:font ,mono))))
+                         (fixed-pitch ((t (:family ,mono-fn))))
+                         (button ((t (:inherit (fixed-pitch)))))
+                         (variable-pitch ((t (:family ,serif-fn)))))))
+           (dolist (face faces)
+                   (custom-set-faces face))
 
-	   (dolist (face faces)
-		   (put (car face) 'saved-face nil))))))))
+           (dolist (face faces)
+                   (put (car face) 'saved-face nil))))))))
 
   (feature
    (name f-name)
@@ -1233,7 +1233,7 @@ git-link, git-timemachine."
          (require 'consult))
 
         (with-eval-after-load
-	 'minibuffer
+         'minibuffer
 
          (setq minibuffer-prompt-properties
                '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -1243,12 +1243,12 @@ git-link, git-timemachine."
          ;;             :override 'consult-completing-read-multiple)
 
          (setq completion-styles '(orderless))
-	 (setq completion-category-overrides
+         (setq completion-category-overrides
                ;; basic is required for /ssh: completion to work, but
                ;; keep the same values for project-file too.
-	       '((file (styles . (basic partial-completion)))
+               '((file (styles . (basic partial-completion)))
                  (project-file (styles . (basic partial-completion)))))
-	 (setq enable-recursive-minibuffers t)
+         (setq enable-recursive-minibuffers t)
 
          (setq resize-mini-windows nil)
 
@@ -1279,16 +1279,16 @@ git-link, git-timemachine."
                  '(mini-frame-ignore-commands '()))))
              '()))
 
-	(custom-set-variables
+        (custom-set-variables
          '(history-length 10000)
          '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		                 "/emacs/history")))
-	(add-hook 'after-init-hook 'savehist-mode)
+                                 "/emacs/history")))
+        (add-hook 'after-init-hook 'savehist-mode)
         (run-with-idle-timer 30 t 'savehist-save)
 
         (custom-set-variables
          '(recentf-save-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-		                     "/emacs/recentf")))
+                                     "/emacs/recentf")))
 
         (add-hook 'after-init-hook 'recentf-mode)
         (run-with-idle-timer 30 t 'recentf-save-list)
@@ -1298,7 +1298,7 @@ git-link, git-timemachine."
 
         (progn
          (define-key minibuffer-local-map (kbd "M-r") 'consult-history)
-	 (define-key global-map (kbd "M-y") 'consult-yank-pop)
+         (define-key global-map (kbd "M-y") 'consult-yank-pop)
          (define-key global-map (kbd "s-B") 'consult-buffer)
          (define-key minibuffer-local-map (kbd "s-B") 'embark-become)
          ;; (define-key global-map (kbd "M-.") 'embark-dwim)
@@ -1332,7 +1332,7 @@ git-link, git-timemachine."
          (define-key global-map (kbd "s-b") 'switch-to-buffer)
          (define-key global-map (kbd "s-w") 'kill-current-buffer)
          (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
-	 (define-key global-map (kbd "s-o") 'other-window))
+         (define-key global-map (kbd "s-o") 'other-window))
 
         (autoload 'consult-customize "consult" "" nil 'macro)
         (autoload 'consult--customize-set "consult")
@@ -1342,7 +1342,7 @@ git-link, git-timemachine."
          (require 'embark-consult))
 
         (with-eval-after-load
-	 'consult
+         'consult
          (require 'embark-consult)
 
          (consult-customize consult-history :category 'consult-history)
@@ -1524,7 +1524,7 @@ buffer should be displayed in other window use least recent one."
                  (add-hook 'completion-list-mode-hook
                            'consult-preview-at-point-mode))
                '()))
-	(add-hook 'after-init-hook 'mct-minibuffer-mode))
+        (add-hook 'after-init-hook 'mct-minibuffer-mode))
       #:elisp-packages (list emacs-mct
                              (get-value 'emacs-consult config emacs-consult)))))
 
@@ -1552,14 +1552,14 @@ buffer should be displayed in other window use least recent one."
                   (lambda ()
                     (define-key global-map (kbd "s-p") project-prefix-map)))
         (with-eval-after-load
-	 'project
+         'project
          (add-to-list 'project-switch-commands '(project-compile "Compile") t)
-	 (with-eval-after-load
-	  'consult
-	  (setq consult-project-root-function
-		(lambda ()
-		  (when-let (project (project-current))
-			    (car (project-roots project))))))))
+         (with-eval-after-load
+          'consult
+          (setq consult-project-root-function
+                (lambda ()
+                  (when-let (project (project-current))
+                            (car (project-roots project))))))))
       #:elisp-packages (list (get-value 'emacs-consult config emacs-consult)))))
 
   (feature
@@ -1591,8 +1591,8 @@ emacsclient feels more like a separate emacs instance."
 
 ;; TODO: rewrite to states
 (define* (feature-emacs-org-roam
-	  #:key
-	  (org-roam-directory #f))
+          #:key
+          (org-roam-directory #f))
   "Configure org-roam for GNU Emacs."
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
@@ -1614,16 +1614,15 @@ emacsclient feels more like a separate emacs instance."
         (autoload 'org-roam-db-autosync-enable "org-roam")
         (with-eval-after-load 'org-roam (org-roam-db-autosync-enable))
 
-	(define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
-	(define-key global-map (kbd "C-c n f") 'org-roam-node-find)
-	(define-key global-map (kbd "C-c n i") 'org-roam-node-insert))
+        (define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
+        (define-key global-map (kbd "C-c n f") 'org-roam-node-find)
+        (define-key global-map (kbd "C-c n i") 'org-roam-node-insert))
       #:elisp-packages (list emacs-org-roam))))
 
   (feature
    (name f-name)
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
-
 
 (define* (feature-emacs-keycast)
   "Show keybindings and related functions as you type."
