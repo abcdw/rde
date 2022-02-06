@@ -1028,9 +1028,10 @@ Start an unlimited search at `point-min' otherwise."
                     ((org-agenda-block-separator nil)
                      (org-agenda-skip-function '(or (org-agenda-skip-if nil '(scheduled deadline))))
                      (org-agenda-overriding-header "\nBacklog\n")))))))
-
-
-
+         (setq org-agenda-tags-column
+               ;; TODO: Name this value better
+               ,(- (get-value 'olivetti-body-width config 85)))
+         (setq org-agenda-window-setup 'current-window)
          (setq org-agenda-files ',org-agenda-files))))))
 
   (feature
