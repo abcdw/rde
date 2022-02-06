@@ -388,6 +388,8 @@ and overall looks cool."
                 (fg-window-divider-outer . "#000000")))
 
 	(load-theme 'modus-operandi t)
+        (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle)
+        (setq bookmark-set-fringe-mark nil)
 
         ;; (setq header-line-format (delete 'mode-line-modes header-line-format))
         (setq mode-line-modes
@@ -446,7 +448,8 @@ modes, which setups mode-line late."
 
         (add-hook 'calendar-initial-window-hook
                   'rde--move-mode-line-to-header))
-      #:elisp-packages (list emacs-modus-themes)
+      #:elisp-packages (list emacs-modus-themes
+                             (get-value 'emacs-configure-rde-keymaps config))
       #:keywords '(appearance mode-line faces accessibility)
       #:summary "\
 Sets theme, fonts, faces and provides different visual tweaks"
