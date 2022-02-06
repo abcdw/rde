@@ -812,8 +812,11 @@ previous window layout otherwise.  With universal argument toggles
         (with-eval-after-load
          'dired
          (setq dired-dwim-target t)
-         (setq dired-listing-switches "-l --time-style=long-iso -h -AG")
-         (add-hook 'dired-mode-hook 'dired-hide-details-mode)
+         ,@(if (get-value 'emacs-advanced-user? config)
+               '((add-hook 'dired-mode-hook 'dired-hide-details-mode)
+                 (setq dired-listing-switches "-l --time-style=long-iso -h -AG"))
+               '())
+
          (add-hook 'dired-mode-hook (lambda () (setq truncate-lines t)))
          (setq dired-hide-details-hide-symlink-targets nil))))
      (emacs-xdg-service emacs-f-name "Emacs (Client) [file:]" xdg-gexp
