@@ -200,12 +200,19 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
 	  (save-place-mode 1)
           ;; MAYBE: Make it buffer local?
           (show-paren-mode 1)
+          ,#~";; Treat camelCased parts as separate words."
+          (subword-mode 1)
+          ;; (add-hook 'prog-mode-hook 'subword-mode)
+
 	  (setq-default indent-tabs-mode nil)
 	  (setq save-interprogram-paste-before-kill t)
 	  (setq mouse-yank-at-point t)
 	  (setq require-final-newline t)
           (add-hook 'prog-mode-hook
                     (lambda () (setq show-trailing-whitespace t)))
+
+          ;; Highlight zero-width whitespaces and other glypless characters.
+          (set-face-background 'glyphless-char "red")
           ,#~""
           (define-key global-map (kbd "C-=") 'er/expand-region)
 
