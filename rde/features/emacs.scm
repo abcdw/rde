@@ -909,6 +909,9 @@ previous window layout otherwise.  With universal argument toggles
       `((eval-when-compile
          (require 'org)
          (require 'org-refile))
+
+        (define-key mode-specific-map (kbd "c") 'org-capture)
+
         (with-eval-after-load
          'org
 	 (setq org-adapt-indentation nil)
