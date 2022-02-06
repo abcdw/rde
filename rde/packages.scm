@@ -297,14 +297,14 @@ emacs packages of current profile explorable by external Emacs.")))
 (define-public emacs-mct
   (package
    (name "emacs-mct")
-   (version "0.4.1")
+   (version "0.4.2")
    (source (origin
             (method git-fetch)
             (uri (git-reference
                   (url "https://gitlab.com/protesilaos/mct.git")
                   (commit version)))
             (sha256
-             (base32 "0g0qzlkjzh2a9wqxyjyydp5k8hk729f9f1i1m630cb671c2lz6dd"))
+             (base32 "0sj9hyxpighspwrm2yimqkdxlhw2yiznaj69ysn2sjd6jn2aqpc6"))
             (file-name (git-file-name name version))))
    (build-system emacs-build-system)
    (license license:gpl3+)
@@ -383,12 +383,12 @@ functionality.")))
 (define-public emacs-consult-dir
   (package
    (name "emacs-consult-dir")
-   (version "0.1.0")
+   (version "0.1")
    (source (origin
             (method git-fetch)
             (uri (git-reference
                   (url "https://github.com/karthink/consult-dir")
-                  (commit "08f543ae6acbfc1ffe579ba1d00a5414012d5c0b")))
+                  (commit (string-append "v" version))))
             (sha256
              (base32 "1cff4ssrn1mw2s5n090pdmwdirnfih8idg5f0ll2bi2djc4hq5kn"))
             (file-name (git-file-name name version))))
