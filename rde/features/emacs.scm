@@ -1384,6 +1384,12 @@ calculation function for vertico buffer."
          'mct
          (setq mct-live-update-delay 0)
          (setq mct-minimum-input 3)
+
+         (let ((map mct-minibuffer-local-completion-map))
+           ;; (define-key map (kbd "<RET>") 'mct-complete-and-exit)
+           (define-key map (kbd "<tab>") 'minibuffer-force-complete)
+           (define-key map (kbd "C-v") 'switch-to-completions))
+
          (defvar rde-completion-categories-other-window
            '(imenu)
            "Completion categories that has to be in other window than
@@ -1427,7 +1433,7 @@ buffer should be displayed in other window use least recent one."
              (setq-local mct-minimum-input 0)
              (mct--live-completions)))
 
-         (add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
+         ;; (add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
          ,@(if (get-value 'emacs-consult config)
                `((autoload 'consult-preview-at-point-mode "consult")
                  (setq rde-completion-categories-other-window
@@ -1439,7 +1445,7 @@ buffer should be displayed in other window use least recent one."
                  (add-hook 'completion-list-mode-hook
                            'consult-preview-at-point-mode))
                '()))
-	(add-hook 'after-init-hook 'mct-mode))
+	(add-hook 'after-init-hook 'mct-minibuffer-mode))
       #:elisp-packages (list emacs-mct
                              (get-value 'emacs-consult config emacs-consult)))))
 
