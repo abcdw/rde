@@ -703,7 +703,9 @@ utilizing reverse-im package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-monocle)
+(define* (feature-emacs-monocle
+          #:key
+          (olivetti-body-width 85))
   "Configure olivetti and helper functions for focused editing/reading."
   (define emacs-f-name 'monocle)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -716,9 +718,17 @@ utilizing reverse-im package."
          (require 'olivetti)
          (require 'hide-mode-line))
 
-        (custom-set-variables '(olivetti-body-width 85)
-                              '(olivetti-margin-width 0))
+        (setq olivetti-body-width ,olivetti-body-width
+              olivetti-margin-width 0)
 
+        (with-eval-after-load
+         'org-agenda
+         (defun ensure-olivetti (orig-fun &rest r)
+           "Don't lose olivetti mode on `org-agenda-redo-all'."
+           (let ((olivetti-p (if olivetti-mode 1 0)))
+             (apply orig-fun r)
+             (olivetti-mode olivetti-p)))
+         (advice-add 'org-agenda-redo-all :around 'ensure-olivetti))
         (with-eval-after-load
          'hide-mode-line
          (custom-set-variables '(hide-mode-line-excluded-modes '())))
@@ -728,7 +738,9 @@ utilizing reverse-im package."
           (seq-filter 'derived-mode-p modes))
 
         (defun rde--turn-on-olivetti-mode ()
-          (unless (memq major-mode '(minibuffer-mode which-key-mode))
+          (unless (memq major-mode
+                        '(minibuffer-mode which-key-mode
+                          minibuffer-inactive-mode))
             (olivetti-mode 1)))
 
         (define-globalized-minor-mode global-olivetti-mode
@@ -775,7 +787,8 @@ previous window layout otherwise.  With universal argument toggles
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((,f-name . #t)
+             (olivetti-body-width . ,olivetti-body-width)))
    (home-services-getter get-home-services)))
 
 
