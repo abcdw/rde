@@ -995,8 +995,8 @@ Start an unlimited search at `point-min' otherwise."
                      ;; highlight because that only has a practical
                      ;; utility in multi-day views.
                      (org-agenda-day-face-function (lambda (date) 'org-agenda-date))
-                     (org-agenda-skip-function
-                      '(org-agenda-skip-entry-if 'todo '("NEXT")))
+                     ;; (org-agenda-skip-function
+                     ;;  '(org-agenda-skip-entry-if 'todo '("NEXT")))
                      (org-agenda-format-date "%A %-e %B %Y")
                      (org-agenda-overriding-header "\nAgenda for the day\n")))
                    (todo
