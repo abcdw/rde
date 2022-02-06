@@ -1283,6 +1283,14 @@ git-link, git-timemachine."
          '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
 		                 "/emacs/history")))
 	(add-hook 'after-init-hook 'savehist-mode)
+        (run-with-idle-timer 30 t 'savehist-save)
+
+        (custom-set-variables
+         '(recentf-save-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+		                     "/emacs/recentf")))
+
+        (add-hook 'after-init-hook 'recentf-mode)
+        (run-with-idle-timer 30 t 'recentf-save-list)
 
         (define-key global-map (kbd "s-.") 'embark-act)
         (define-key global-map (kbd "s->") 'embark-become)
