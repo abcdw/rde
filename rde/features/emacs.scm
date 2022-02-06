@@ -251,6 +251,12 @@ C-h C-a to open About Emacs buffer."
            (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
 
           ,#~""
+          ,@(if (get-value 'emacs-advanced-user? config)
+                '((put 'narrow-to-page   'disabled nil)
+                  (put 'narrow-to-region 'disabled nil))
+                '())
+
+          ,#~""
           ;; TODO: Extend info-lookup-alist with Guix Manual nodes to
           ;; make `C-h S' find guix services and other items.
           (eval-when-compile (require 'guix))
@@ -1312,6 +1318,12 @@ git-link, git-timemachine."
            (define-key map (kbd "m") 'consult-mark)
            (define-key map (kbd "M") 'consult-global-mark)
            (define-key map (kbd "b") 'consult-bookmark))
+
+         (define-key narrow-map (kbd "g")
+           (lambda ()
+             (interactive)
+             (let ((consult-line-numbers-widen nil))
+               (call-interactively #'consult-goto-line))))
 
          (let ((map search-map))
            (define-key map (kbd "f") 'consult-find)
