@@ -535,7 +535,10 @@ utilizing reverse-im package."
 	  (erc-server "irc.libera.chat")
 	  (erc-port 6697)
 	  (erc-nick #f)
-	  (erc-autojoin-channels-alist '()))
+	  (erc-autojoin-channels-alist '())
+          (erc-kill-buffers-on-quit #t)
+          (align-nicknames? #t)
+          (extra-config '()))
   "Configure GNU Emacs IRC client."
   (ensure-pred string? erc-server)
   (ensure-pred integer? erc-port)
@@ -556,6 +559,12 @@ utilizing reverse-im package."
          (require 'erc-fill)
          (require 'erc-track))
         (with-eval-after-load
+	 'erc-status-sidebar
+         (setq-default erc-status-sidebar-header-line-format
+                       (concat " " erc-status-sidebar-mode-line-format))
+         (setq-default erc-status-sidebar-mode-line-format nil)
+         (setq erc-status-sidebar-width 18))
+        (with-eval-after-load
 	 'erc
 	 (setq erc-server ,erc-server)
 	 (setq erc-port ,erc-port)
@@ -563,11 +572,29 @@ utilizing reverse-im package."
 	 (setq erc-autojoin-channels-alist
 	       ',erc-autojoin-channels-alist)
 
-	 (setq erc-fill-static-center 14)
-	 (setq erc-fill-function 'erc-fill-static)
-	 (setq erc-fill-column 86)
+         ,@(if align-nicknames?
+               '((setq erc-fill-static-center 14)
+	         (setq erc-fill-function 'erc-fill-static)
+	         (setq erc-fill-column 82))
+               '())
 
-	 (setq erc-track-visibility nil))))
+         (setq erc-hide-list '())
+         (setq erc-track-exclude-types
+               '("324" ; channel mode is
+                 "329" ; creation time
+                 ;; "332" "333" "353" "477"
+                 ;; "MODE"
+                 "JOIN" "PART" "QUIT"))
+         ,@(if erc-kill-buffers-on-quit
+               '((setq erc-kill-server-buffer-on-quit t)
+                 ;; (setq erc-kill-buffer-on-part t)
+                 (setq erc-kill-queries-on-quit t))
+               '())
+
+         (setq erc-header-line-format " %n on %t (%m,%l)"))
+
+        ,@extra-config)
+      #:elisp-packages (list emacs-erc-status-sidebar emacs-erc-hl-nicks))
      (emacs-xdg-service
       emacs-f-name
       "Emacs (Client) [IRC]"
