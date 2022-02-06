@@ -326,7 +326,8 @@ Prefix argument can be used to kill a few words."
  	 (simple-service
 	  'emacs-update-environment-variables-on-sway-start
 	  home-sway-service-type
-	  `((exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
+	  `((,#~"")
+            (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
 	     ,(program-file
 	       "update-emacs-env-variables"
 	       #~(system*
