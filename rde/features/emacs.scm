@@ -919,8 +919,10 @@ previous window layout otherwise.  With universal argument toggles
 	 (setq org-startup-indented t)
 
          (setq org-outline-path-complete-in-steps nil)
-         (setq org-refile-use-outline-path 'path)
-         (setq org-refile-targets `((nil . (:maxlevel . 3))))
+         (setq org-refile-use-outline-path 'full-file-path)
+         (setq org-refile-allow-creating-parent-nodes 'confirm)
+         (setq org-refile-targets `((nil . (:maxlevel . 3))
+                                    (org-agenda-files . (:maxlevel . 3))))
 
          (setq org-ellipsis "⤵")
          (set-face-attribute 'org-ellipsis nil
