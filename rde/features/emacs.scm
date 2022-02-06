@@ -1554,6 +1554,8 @@ buffer should be displayed in other window use least recent one."
         (with-eval-after-load
          'project
          (add-to-list 'project-switch-commands '(project-compile "Compile") t)
+         (setq project-switch-use-entire-map t)
+
          (with-eval-after-load
           'consult
           (setq consult-project-root-function
