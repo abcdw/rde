@@ -1181,7 +1181,8 @@ git-link, git-timemachine."
                '(read-only t cursor-intangible t face minibuffer-prompt))
          (add-hook 'minibuffer-setup-hook 'cursor-intangible-mode)
 
-         (setq completion-in-region-function 'consult-completion-in-region)
+         ;; (advice-add 'completing-read-multiple
+         ;;             :override 'consult-completing-read-multiple)
 
          (setq completion-styles '(orderless))
 	 (setq completion-category-overrides
@@ -1311,6 +1312,12 @@ git-link, git-timemachine."
       `((eval-when-compile
          (require 'vertico)
          (require 'vertico-multiform))
+        ,@(if (get-value 'emacs-consult config)
+              '((with-eval-after-load
+                 'minibuffer
+                 (setq completion-in-region-function
+                       'consult-completion-in-region)))
+                '())
         (with-eval-after-load
          'vertico
          (define-key global-map (kbd "s-s") 'vertico-repeat)
@@ -1328,14 +1335,15 @@ calculation function for vertico buffer."
            (setq-local mode-line-format nil)
            (setq-local vertico-count (+ vertico-count 1)))
 
-         (add-hook 'minibuffer-setup-hook
-                   'rde--vertico-prepare-header-line)
+         (advice-add 'vertico-buffer--setup :after
+                     'rde--vertico-prepare-header-line)
 
-         (defadvice vertico-insert
-           (after vertico-insert-add-history activate)
-           "Make vertico-insert add to the minibuffer history."
-           (unless (eq minibuffer-history-variable t)
-             (add-to-history minibuffer-history-variable (minibuffer-contents))))
+         ;; TODO: Need to be more specific not to pollute histories.
+         ;; (defadvice vertico-insert
+         ;;   (after vertico-insert-add-history activate)
+         ;;   "Make vertico-insert add to the minibuffer history."
+         ;;   (unless (eq minibuffer-history-variable t)
+         ;;     (add-to-history minibuffer-history-variable (minibuffer-contents))))
 
          (setq vertico-multiform-categories
                '((consult-grep buffer)
