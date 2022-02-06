@@ -1337,6 +1337,10 @@ git-link, git-timemachine."
         (autoload 'consult--customize-set "consult")
 
         (with-eval-after-load
+         'embark
+         (require 'embark-consult))
+
+        (with-eval-after-load
 	 'consult
          (require 'embark-consult)
 
