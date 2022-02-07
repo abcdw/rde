@@ -33,14 +33,19 @@
 
 (define* (feature-fonts
 	  #:key
-	  (font-monospace (font "Iosevka" #:size 11 #:weight 'regular))
+          (default-font-size 11)
+	  (font-monospace (font "Iosevka"
+                                #:size default-font-size #:weight 'regular))
 	  (font-sans      (font "Fira Go"))
 	  (font-serif     (font "Liberation Serif"))
 	  (font-unicode   (font "Unifont"))
 	  (font-packages  '())
 	  (base-font-packages  %rde-default-font-packages))
-  "Configure fonts."
+  "Configure fonts.  DEFAULT-FONT-SIZE will be used for making
+font-monospace default value, and it will be ignored if
+#:font-monospace argument is specified."
 
+  (ensure-pred integer? default-font-size)
   (ensure-pred font? font-monospace)
   (ensure-pred list-of-packages? font-packages)
   (ensure-pred list-of-packages? base-font-packages)
