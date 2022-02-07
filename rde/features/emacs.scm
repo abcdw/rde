@@ -1832,7 +1832,10 @@ emacsclient feels more like a separate emacs instance."
    (home-services-getter get-home-services)))
 
 
-(define* (feature-emacs-restclient)
+(define* (feature-emacs-restclient
+          #:key
+          (package    emacs-restclient)
+          (package-ob emacs-ob-restclient))
   "Configure restclient for GNU Emacs."
   (define emacs-f-name 'restclient)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1842,7 +1845,8 @@ emacsclient feels more like a separate emacs instance."
      (elisp-configuration-service
       emacs-f-name
       `()
-      #:elisp-packages (list emacs-restclient emacs-ob-restclient))))
+      #:elisp-packages (list emacs-restclient
+                             emacs-ob-restclient))))
 
   (feature
    (name f-name)
