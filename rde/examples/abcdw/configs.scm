@@ -78,6 +78,7 @@
     #:user-groups '("lp")) ;; TODO confluence of features -> groups
 
    (feature-gnupg
+     #:pinentry-flavor 'qt ;;'emacs ;; '
      #:gpg-primary-key "EE20E25391AAB9BB"
      #:gpg-smart-card? #f)
     ;; (feature-password-store
@@ -165,7 +166,8 @@
      ((@ (gnu services) simple-service)
       'make-guix-aware-of-guix-home-subcomand
       (@ (gnu home services) home-environment-variables-service-type)
-      '(("GUILE_LOAD_PATH" .
+      '(("WLR_DRM_DEVICES" . "/dev/dri/card0:/dev/dri/card1") ;; gpu:cpu
+        ("GUILE_LOAD_PATH" .
          "$XDG_CONFIG_HOME/guix/current/share/guile/site/3.0\
 :$GUILE_LOAD_PATH")
         ("GUILE_LOAD_COMPILED_PATH" .
@@ -183,6 +185,9 @@
         ("NODE_REPL_HISTORY" . "${NODE_REPL_HISTORY:-$XDG_CACHE_HOME/node/repl_history}")
         ("NVM_DIR" . "${NVM_DIR:-$XDG_DATA_HOME/nvm}")
         ("BABEL_CACHE_PATH" . "${BABEL_CACHE_PATH:-$XDG_CACHE_HOME/babel/cache.json}")
+        ("GUIX_CHECKOUT" . "$HOME/git/sys/guix")
+        ("GUIX_EXTRA_PROFILES" . "$HOME/.guix-extra-profiles")
+        ("GDK_BACKEND" . "wayland") ;; ... for clipboarding emacs
         ("PATH" . (string-join (list "$PATH"
                                      "$HOME/.local/bin"
                                      "$HOME/.krew/bin"
@@ -196,15 +201,25 @@
      ;;      "alias superls="
      ;;      #$(file-append (@ (gnu packages base) coreutils) "/bin/ls"))))
 
+     ;; see logs at ~/.local/var/log/mcron.log
+     ;;   tail --follow ~/.local/var/log/mcron.log
      ((@ (gnu services) simple-service)
       'notes-commit-job
       (@ (gnu home services mcron) home-mcron-service-type)
-      (list #~(job '(next-hour)
+      (list #~(job '(next-minute)
                    (lambda ()
-                     (system* "cd" my-org-directory)
+                     (system* "echo \"$(date -u) attempting to commit\" >> /tmp/commit-log")
+                     (system* "cd $HOME/life")
                      (system* "git add .")
                      (system* "git commit -m \"auto-commit | $(date -u)\""))
-                     "notes-commit")))
+                   "notes-commit")))
+     ((@ (gnu services) simple-service)
+      'wtf-job
+      (@ (gnu home services mcron) home-mcron-service-type)
+      (list #~(job '(next-minute)
+                   (lambda ()
+                     (system* "echo bonk >> /tmp/wtf")
+                     "wtf"))))
      )
     #:system-services
     (list (service postgresql-service-type)
@@ -235,11 +250,11 @@
     #:font-packages (list font-iosevka font-fira-mono))
 
    (feature-alacritty
-    #:config-file (local-file "./config/alacritty/alacritty.yml")
-    )
+     #:config-file (local-file "./config/alacritty/alacritty.yml"))
    (feature-zsh
     #:extra-zshrc
     (list ;; XXX higher level category
+     ;; something which evals equiv to following for each promptline "PS1=\"[$(date -u '+%Y-%m-%d | %H:%M')] $PS1\""
      "alias ns='cd $HOME/git/ns'"
      "alias om='ns && cd om'"
      "alias omom='om && cd om'"
@@ -255,6 +270,11 @@
      "alias rgrt='rgw $HOME/git/ns/routing'"
      "alias rgsys='rgw $HOME/git/sys'"
 
+     "alias gp='ls $GUIX_EXTRA_PROFILES'"
+     "_gP() { export GUIX_PROFILE=$1 ; }"
+     "alias gP='_gP'"
+     "_gsP() { . $GUIX_EXTRA_PROFILES/$1/$1 ; }"
+     "gsP=_gsP"
      ;; (string-append
      ;;  "export PATH=\""
      ;;  (string-join (list "$PATH"
@@ -305,6 +325,7 @@
 
    ;; #:package sway-latest
    (feature-sway
+    #:xwayland? #f
     #:opacity 0.9
     #:wallpaper "$HOME/.cache/wallpaper.png"
     #:extra-config `((include ,(local-file "./config/sway/config"))))
@@ -410,16 +431,18 @@
    ;; #:org-agenda-files '("~/work/abcdw/agenda/todo.org"))
     #:org-roam-directory my-notes-directory
     #:org-roam-dailies-directory (string-append my-notes-directory "/daily"))
-   (feature-emacs-ref
-    ;; TODO: Rewrite to states
-    #:bibliography-paths
-    (list (string-append my-org-directory "/tex.bib"))
-    #:bibliography-notes
-    (string-append my-org-directory "/bib.org")
-    #:bibliography-directory my-notes-directory)
+   ;; (feature-emacs-ref
+   ;;  ;; why error with nil for reftex-default-bibliography
+   ;;  ;; TODO: Rewrite to states
+   ;;  #:bibliography-paths
+   ;;  (list (string-append my-org-directory "/tex.bib"))
+   ;;  #:bibliography-notes
+   ;;  (list(string-append my-org-directory "/bib.org")
+   ;;  #:bibliography-directory my-notes-directory)
 
    (feature-emacs-es-mode)
-   (feature-emacs-restclient)
+   (feature-emacs-restclient
+    #:package-ob emacs-ob-restclient)
    (feature-mpv)
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
@@ -465,8 +488,14 @@
       "fheroes2"
       ;; TODO: Enable pipewire support to chromium by default
       ;; chrome://flags/#enable-webrtc-pipewire-capturer
+      "ungoogled-chromium-wayland" "ublock-origin-chromium"
+      "nyxt"
+      ;;
       "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-standard"
-      "ripgrep" "curl" "make")))))
+      "ripgrep" "curl" "make"
+      ;;; nonguix
+      ;;"firefox"
+      )))))
 (pretty-print "post-%main-features")
 
 
@@ -654,3 +683,5 @@
 
 (pretty-print "pre-dispatch")
 (dispatcher)
+
+
