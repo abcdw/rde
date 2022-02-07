@@ -4,8 +4,8 @@
 #+PROPERTY: header-args:sh :tangle-mode (identity #o755)
 
 * tangling
-** noweb tangler ; root                                               :meta: 
-#+begin_src scheme :noweb yes :tangle emacs.scm :tangle-mode 
+** noweb tangler ; root                                               :meta:
+#+begin_src scheme :noweb yes :tangle emacs.scm :tangle-mode
 (define-module (rde examples abcdw emacs)
   #:export (init-el))
 
@@ -46,7 +46,7 @@
 #+RESULTS:
 
 ***** ~var~                                                         :var:
-*** :tangle-mode 
+*** :tangle-mode
 **** #o444 ; readonly
 **** #0755 ; executable
 
@@ -358,7 +358,7 @@ not elegant AT ALL, but the API to ripgrep from consult uses
 
 consuming
 
-#+begin_src emacs-lisp :noweb-ref consult 
+#+begin_src emacs-lisp :noweb-ref consult
 (defun qz/consult-ripgrep-bookmark ()
   (interactive)
   (let ((files (mapcar (lambda (b) (cdr (assoc 'filename b)))
@@ -370,6 +370,16 @@ consuming
 
 #+RESULTS:
 : qz/consult-ripgrep-bookmark
+
+*** basic remaps
+#+begin_src emacs-lisp :noweb-ref consult
+(mapcar (lambda (bind)
+          (define-key global-map (kbd (car bind)) (cadr bind)))
+        '(("C-x b" consult-buffer)))
+#+end_src
+
+#+RESULTS:
+| consult-buffer |
 
 ** custom
 *** noweb tangler                                                    :meta:
@@ -700,10 +710,10 @@ processing a lot"
 ******* advice: org-clock-resolve
 
 - used in 'org-resolve-clocks
-  
+
 #+begin_src emacs-lisp :noweb-ref agenda
-(list 
- ;; optimisation setup: setup subset of clock files 
+(list
+ ;; optimisation setup: setup subset of clock files
  (qz/advice- org-clock-resolve :before qz/agenda-files-update-clock)
  ;; optimisation teardown: restore full set of agenda-files
  (qz/advice- org-clock-resolve :after qz/agenda-files-update))
@@ -735,12 +745,12 @@ qz/agenda-daily-files-f
   (split-string
    (shell-command-to-string
     "rg CLOCK ~/life/roam/ -c | grep -v 'org#' | awk -F '[,:]' '{print $1}'")))
-#+end_src 
+#+end_src
 
 #+RESULTS:
 : qz/clock-files
 
-***** files-agenda :func: 
+***** files-agenda :func:
 #+begin_src emacs-lisp :noweb-ref agenda :results drawer
 (defun qz/files-agenda ()
   (seq-uniq (append qz/org-agenda-files (qz/project-files))))
@@ -849,7 +859,7 @@ qz/agenda-daily-files-f
 
 
 (defun qz/agenda-todo-dailies ()
-  "the most necessary simple invention in months. 
+  "the most necessary simple invention in months.
 (as of [2022-01-19 Wed])
 
 get a list of `TODO' entries, from daily files, ordered by date (from filename/category) DESCENDING.
@@ -1003,7 +1013,7 @@ Refer to `org-agenda-prefix-format' for more information."
 
 **** async
 - :: [[id:4062856a-e182-4820-bc7b-817a693518a3][emacs-ob-async]]
-  
+
 #+begin_src emacs-lisp :noweb-ref org
 (require 'ob-async)
 #+end_src
@@ -1154,15 +1164,15 @@ use a prefix arg to shortcut (org-table-get-constant \"bonk\"
               (with-current-buffer (find-file-noselect f)
                 (save-excursion
                   ;; it's odd that nil means "i found it"
-                  (when (not (org-babel-goto-named-src-block name)) 
+                  (when (not (org-babel-goto-named-src-block name))
                     (cl-return-from named (cons f (point)))))))
             (remove nil qz/org-babel-lob-ingest-files))))
 
 (defun qz/lob-goto-named-src-block (name)
-  (interactive 
+  (interactive
    (list
     (completing-read "lob: " (mapcar 'car org-babel-library-of-babel))))
-  (cl-destructuring-bind 
+  (cl-destructuring-bind
       (file . pt) (qz/lob-get-named-src-block name)
     (find-file file)
     (goto-char pt)))
@@ -1309,9 +1319,9 @@ causes `font-lock-specified-p' to return non-nil, which means
 the major mode specifies support for Font Lock."
   (interactive)
   (let* ((regexp (hi-lock-regexp-okay
-		  (find-tag-default-as-symbol-regexp)))
-	 (hi-lock-auto-select-face t)
-	 (face (hi-lock-read-face-name)))
+                  (find-tag-default-as-symbol-regexp)))
+         (hi-lock-auto-select-face t)
+         (face (hi-lock-read-face-name)))
     (or (facep face)
         (and hi-lock-auto-select-face
              (hi-lock-read-face-name))
@@ -1679,7 +1689,7 @@ PROPERTIES with non-nil :ID:"
 :END:
 
 - :: [[id:6ae36e2f-ab6d-45bc-9448-8dce233c8528][data-driven automatic actions in org roam]]
-  
+
 lifted from [[id:c6c1e44f-bb16-459b-9ba3-2d4657649816][Proposal for timestamping notes at time of capture (V2) ·
 Issue #1485 · org-roam/org-roam]].
 
@@ -1949,10 +1959,10 @@ with recursive cte (id, degree) as (
   select n.id, 0 as degree
   from nodes n
   where n.id = $s1
-  
+
   union all
-  
-  select distinct 
+
+  select distinct
     source as id, c.degree + 1 as degree
   from links l
   join cte c on l.dest = c.id
@@ -2099,7 +2109,7 @@ updated -> property:updated, file-name:updated
 
 ;;(funcall (lambda (a b c) (message "%s %s %s" a b c)) 1 2 3)
 
-(defun qz/do-migration--created-updated () 
+(defun qz/do-migration--created-updated ()
   (delete-file "/tmp/oo")
   (write-region
    (s-join
@@ -2163,9 +2173,9 @@ cat /tmp/oo | cut -d, -f1 | uniq -c | sort -rgk1 | head
       1 ff06c7dc-3266-4ba1-82a6-c5f430bb1963
 :end:
 
-****** date distribution 
+****** date distribution
 ******* updated
-#+begin_src shell :results drawer 
+#+begin_src shell :results drawer
 cat /tmp/oo | awk -F, '{print $2}' | sort | uniq -c | sort -rgk1 | wc -l
 cat /tmp/oo | awk -F, '{print $2}' | sort | uniq -c | sort -rgk1 | head
 #+end_src
@@ -2186,7 +2196,7 @@ cat /tmp/oo | awk -F, '{print $2}' | sort | uniq -c | sort -rgk1 | head
 :end:
 
 ******* created
-#+begin_src shell :results drawer 
+#+begin_src shell :results drawer
 cat /tmp/oo | awk -F, '{print $3}' | sort | uniq -c | sort -rgk1 | wc -l
 cat /tmp/oo | awk -F, '{print $3}' | sort | uniq -c | sort -rgk1 | head
 #+end_src
@@ -2207,7 +2217,7 @@ cat /tmp/oo | awk -F, '{print $3}' | sort | uniq -c | sort -rgk1 | head
 :end:
 
 ******* created,updated
-#+begin_src shell :results drawer 
+#+begin_src shell :results drawer
 cat /tmp/oo | awk -F, '{print $2,$3}' | sort | uniq -c | sort -rgk1 | head
 #+end_src
 
@@ -2487,14 +2497,14 @@ files of note
                        "*aws*"))
 #+end_src
 
-*** 
+***
 ** kubernetes
 *** kubectl-context :var:
 #+begin_src emacs-lisp :noweb-ref conf
 (defvar qz/kubectl-context nil
   "the operating kubernetes context.
 
-to check, at a shell, run: 
+to check, at a shell, run:
 `$ kubectl config get-contexts -o name'
 or
 `$ kubectl config current-context")
@@ -2507,7 +2517,7 @@ or
         (or ctx (completing-read "k8s ctx: "
                                  (qz/shell-command-to-list-of-strings
                                   "kubectl config get-contexts -o name"))))
-  (async-shell-command (format "kubectl config use-context %s" 
+  (async-shell-command (format "kubectl config use-context %s"
                                qz/kubectl-context)
                        "*kubectl*"))
 
@@ -2664,7 +2674,7 @@ we want to restore after, respecting the initial font-size
 
 #+RESULTS:
 : qz/font-big-80
-*** unsplash 
+*** unsplash
 #+begin_src emacs-lisp :noweb-ref conf
 (defvar qz/unsplash-tags nil)
 (defun qz/unsplash ()
@@ -3582,7 +3592,7 @@ if `truncate-lines' is non-nil."
 
 an [[id:6baf4bff-d5fe-4ce0-a130-0464e49de67d][org-mode]] extension for a new link backend targeting manpages
 
-**** TODO [[id:cfcecb80-bcde-4c1d-a4fd-8a55eb5e5f20][deep link]] (content-based) encode line for context & regexp jump 
+**** TODO [[id:cfcecb80-bcde-4c1d-a4fd-8a55eb5e5f20][deep link]] (content-based) encode line for context & regexp jump
 **** source
 #+begin_src emacs-lisp
 ;;; ol-man.el - Support for links to man pages in Org mode
