@@ -22,7 +22,8 @@ client.urgent               #ca1243  #ca1243  #e5e5e6  #0184bc  #ca1243
 # output eDP-1 res 1920x1080
 # output HDMI-A-1 res 1920x1080 scale 1.5
 #output DP-2 scale 2 disable
-output HDMI-A-1 res 5120x1440 bg ~/.cache/wallpaper.png fill
+#output HDMI- res 5120x1440 bg ~/.cache/wallpaper.png fill
+output DP-1 res 5120x1440 bg ~/.cache/wallpaper.png fill
 #
 # Example configuration:
 #
