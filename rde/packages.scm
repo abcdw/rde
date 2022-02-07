@@ -673,3 +673,26 @@ Commands provided:
 - iscroll-previous-line
 ")
     (license license:gpl3+)))
+
+(define-public emacs-ob-restclient
+  (let ((commit "f81f2f4f3fe6882947b8547ccd570f540106ed4d"))
+    (package
+      (name "emacs-ob-restclient")
+      (version (git-version "0.02" "2" commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/alf/ob-restclient.el")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "16byn85gsl99k818686jp3r4ipjcwdyq3nilmb32g4hgg0dlgaij"))))
+      (propagated-inputs
+       (list emacs-restclient))
+      (build-system emacs-build-system)
+      (home-page "https://github.com/alf/ob-restclient.el")
+      (synopsis "Org-babel functionality for @code{restclient-mode}")
+      (description
+       "This package integrates @code{restclient-mode} with Org.")
+      (license license:gpl3+))))
