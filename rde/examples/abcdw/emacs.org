@@ -1060,7 +1060,7 @@ fuck the speed my man; {M-x load-library RET ob-} is so annoying
 **** library of babel
 CREATED: <2021-11-29 Mon>
 
-***** ingest-files                                             :var:func:
+***** lob-ingest-files                                         :var:func:
 CREATED: <2021-11-29 Mon>
 
 #+begin_src emacs-lisp :noweb-ref roam
@@ -1069,7 +1069,10 @@ CREATED: <2021-11-29 Mon>
                     (when-let ((n (org-roam-node-from-title-or-alias s)))
                       (org-roam-node-file n)))
                   '("NewStore" "kubernetes"))
-          (list nil))
+          ;; .. other files
+          nil
+          ;; ..
+          )
   "files from which named `src' blocks should be loaded")
 
 (defun qz/org-babel-do-lob-ingest-files (&optional files)
@@ -1125,11 +1128,96 @@ use a prefix arg to shortcut (org-table-get-constant \"bonk\"
 #+RESULTS:
 : qz/org-babel-choose-block
 
+***** goto babel block
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/lob-get-named-src-block-body (name)
+  (cl-destructuring-bind
+      (file . pt) (qz/lob-get-named-src-block name)
+    (with-current-buffer (find-file-noselect file)
+      (save-excursion
+        (goto-char pt)
+        (org-babel-expand-src-block)))))
+
+;;(apply 'format "hey %s %s %s" (list 1 2 4))
+
+(defun qz/named (name &rest args)
+  "shorthand wrapper of `qz/lob-get-named-src-block-body', for clearer header args"
+  (apply 'format (qz/lob-get-named-src-block-body name) args))
+
+(defun qz/lob-get-named-src-block (name)
+  (message "checking name: %s" name)
+  (cl-block named    ; thank u cltl, thank u 1980s, thank u guy steele
+    (save-excursion  ; check current-buffer
+      (when (not (org-babel-goto-named-src-block name))
+        (cl-return-from named (cons (buffer-file-name) (point)))))
+    (mapcar (lambda (f)
+              (with-current-buffer (find-file-noselect f)
+                (save-excursion
+                  ;; it's odd that nil means "i found it"
+                  (when (not (org-babel-goto-named-src-block name)) 
+                    (cl-return-from named (cons f (point)))))))
+            (remove nil qz/org-babel-lob-ingest-files))))
+
+(defun qz/lob-goto-named-src-block (name)
+  (interactive 
+   (list
+    (completing-read "lob: " (mapcar 'car org-babel-library-of-babel))))
+  (cl-destructuring-bind 
+      (file . pt) (qz/lob-get-named-src-block name)
+    (find-file file)
+    (goto-char pt)))
+#+end_src
+
+#+RESULTS:
+: qz/lob-goto-named-src-block
+
+****** restclient-copy-as-curl + org-babel
+we use LOB blocks as
+
+ ,#+name: call-my-block-name
+ ,#+call: my-block-name(arg="value")
+
+so with the point on =my-block-name=, of the =call= we can invoke:
+- {M-x qz/lob-restclient-copy-curl-command}
+... to copy the corresponding block reference's restclient definition
+
+to improve:
+- format in the call arguments before copying
+  - this might be achieved by using =org-element-babel-call-parser= to
+    get the components of the call, if no other /interim state/ of the
+    called block exists
+  - ideally this can be general enough, so as to use the
+    =variable-format= type specified by the babel backend's =:var= header
+    arg. idk how or where this is though -- reference the list parsing
+    in ob-restclient[fn:2] -- literally just smashing it in at the top
 
 
-#+name: call-kubectl-get-logs-from-pod-with-error
 
-***** {M-l} bind choose-babel-block to insert convention            :kbd:
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/lob-restclient-copy-curl-command (&optional name)
+  "this one was a struggle"
+  (interactive)
+  (when-let ((name (or name (thing-at-point 'symbol))))
+    (cl-destructuring-bind
+        (file . pt) (qz/lob-get-named-src-block name)
+      (save-excursion
+        (with-current-buffer (find-file-noselect file)
+          (goto-char pt)
+          (next-line)
+          (let ((expanded (org-babel-expand-src-block)))
+            (message "expanded: %s" expanded)
+            (with-temp-buffer ;;(get-buffer-create "*restclient*") ;;TODO replace w temp
+              (restclient-mode)
+              (insert expanded)
+              (goto-char (point-min))
+              (restclient-jump-next)
+              (restclient-copy-curl-command))))))))
+#+end_src
+
+#+RESULTS:
+: qz/lob-restclient-copy-curl-command
+
+***** {M-l} bind lob-choose-babel-block to insert convention        :kbd:
 CREATED: <2021-11-29 Mon>
 
 #+begin_src emacs-lisp :noweb-ref org
@@ -1138,6 +1226,23 @@ CREATED: <2021-11-29 Mon>
 
 #+RESULTS:
 : qz/org-babel-choose-block
+
+
+***** {M-g} bind lob-goto-named-src-block to insert convention      :kbd:
+CREATED: <2021-11-29 Mon>
+
+#+begin_src emacs-lisp :noweb-ref org
+(define-key org-babel-map (kbd "M-l") 'qz/org-babel-choose-block)
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-choose-block
+#+begin_src emacs-lisp :noweb-ref org
+(define-key org-babel-map (kbd "M-g") 'qz/lob-goto-named-src-block)
+#+end_src
+
+#+RESULTS:
+: qz/lob-goto-named-src-block
 
 **** helpers
 ***** make-table-constants                                     :func:kbd:
@@ -3536,6 +3641,70 @@ PATH should be a topic that can be thrown at the man command."
 : ol-man
 
 * Footnotes
+
+[fn:2] example for how =:var= header args are dealt with in an
+=org-babel-execute:backend= situation
+#+begin_src emacs-lisp :tangle no
+(defun org-babel-execute:restclient (body params)
+  "Execute a block of Restclient code with org-babel.
+This function is called by `org-babel-execute-src-block'"
+  (message "executing Restclient source code block")
+  (with-temp-buffer
+    (let ((results-buffer (current-buffer))
+          (restclient-same-buffer-response t)
+          (restclient-same-buffer-response-name (buffer-name))
+          (display-buffer-alist
+           (cons
+            '("\\*temp\\*" display-buffer-no-window (allow-no-window . t))
+            display-buffer-alist)))
+
+      (insert (buffer-name))
+      (with-temp-buffer
+        (dolist (p params)
+          (let ((key (car p))
+                (value (cdr p)))
+            (when (eql key :var)
+              (insert (format ":%s = <<\n%s\n#\n" (car value) (cdr value))))))
+        (insert body)
+        (goto-char (point-min))
+        (delete-trailing-whitespace)
+        (goto-char (point-min))
+        (restclient-http-parse-current-and-do
+         'restclient-http-do (org-babel-restclient--raw-payload-p params) t))
+
+      (while restclient-within-call
+        (sleep-for 0.05))
+
+      (goto-char (point-min))
+      (when (equal (buffer-name) (buffer-string))
+        (error "Restclient encountered an error"))
+
+      (when (or (org-babel-restclient--return-pure-payload-result-p params)
+                (assq :noheaders params)
+                (assq :jq params))
+        (org-babel-restclient--hide-headers))
+
+       (when-let* ((jq-header (assoc :jq params))
+                  (jq-path "jq"))
+        (shell-command-on-region
+         (point-min)
+         (point-max)
+         (format "%s %s" org-babel-restclient--jq-path
+                         (shell-quote-argument (cdr jq-header)))
+         (current-buffer)
+         t))
+
+       ;; widen if jq but not pure payload
+      (when (and (assq :jq params)
+                 (not (assq :noheaders params))
+                 (not (org-babel-restclient--return-pure-payload-result-p params)))
+        (widen))
+
+      (when (not (org-babel-restclient--return-pure-payload-result-p params))
+        (org-babel-restclient--wrap-result))
+
+      (buffer-string))))
+#+end_src
 [fn:1] capture template as an interactive function so we can use it as
 a COMMAND, and consequently, bind it to a key--better traceability
 than a lambda

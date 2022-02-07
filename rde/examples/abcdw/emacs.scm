@@ -283,7 +283,7 @@
        Returns a LIST of files that contain CLOCK, which reduces
       processing a lot"
         (interactive)
-        (setq org-agenda-files (qz/files-clock)))
+        (setq org-agenda-files (qz/clock-files)))
       (list 
        ;; optimisation setup: setup subset of clock files 
        (qz/advice- org-clock-resolve :before qz/agenda-files-update-clock)
@@ -294,9 +294,12 @@
       (defun qz/agenda-daily-files-f ()
         (seq-filter (lambda (s) (string-match qz/daily-title-regexp s))
                     org-agenda-files))
+      
+      (qz/agenda-daily-files-f)
       (defun qz/clock-files ()
         (split-string
-         (shell-command-to-string "rg CLOCK ~/life/roam/ -c | grep -v 'org#' | awk -F '[,:]' '{print $1}'")))
+         (shell-command-to-string
+          "rg CLOCK ~/life/roam/ -c | grep -v 'org#' | awk -F '[,:]' '{print $1}'")))
       (defun qz/files-agenda ()
         (seq-uniq (append qz/org-agenda-files (qz/project-files))))
       (defun qz/project-files ()
@@ -319,6 +322,27 @@
                    :inner :join nodes
                    :on (= tags:node_id nodes:id)
                    :where (= tags:tag "private")])))
+      ;; current (default) sorting strat
+      '((agenda habit-down time-up priority-down category-keep)
+        (todo priority-down category-keep)
+        (tags priority-down category-keep)
+        (search category-keep))
+      
+      
+      (defun qz/agenda-todo-dailies ()
+        "the most necessary simple invention in months. 
+      (as of [2022-01-19 Wed])
+      
+      get a list of `TODO' entries, from daily files, ordered by date (from filename/category) DESCENDING.
+      
+      - see `qz/agenda-daily-files-f' for the subset view of `org-agenda-files'
+      - see `org-agenda-sorting-strategy' for sort permutations."
+        (interactive)
+        (let* ((org-agenda-files (qz/agenda-daily-files-f))
+               (org-agenda-sorting-strategy '(timestamp-down category-down)))
+          (org-todo-list)))
+      
+      (define-key global-map (kbd "C-c n t") 'qz/agenda-todo-dailies)
       (setq qz/org-agenda-prefix-length 20
             org-agenda-prefix-format nil)
       ;; '((agenda . " %i Emacs Configuration %?-12t% s")
@@ -429,7 +453,63 @@
               (insert (format "(%s)" (s-join ", " args)))))))
       
       ;;(qz/org-babel-choose-block 'newstore-get-order-by-type)
+      (defun qz/lob-get-named-src-block-body (name)
+        (cl-destructuring-bind 
+            (file . pt) (qz/lob-get-named-src-block name)
+          (with-current-buffer (find-file-noselect file)
+            (save-excursion
+              (goto-char pt)
+              (org-babel-expand-src-block)))))
+      
+      ;;(apply 'format "hey %s %s %s" (list 1 2 4))
+      
+      (defun qz/named (name &rest args)
+        "shorthand wrapper of `qz/lob-get-named-src-block-body', for clearer header args"
+        (apply 'format (qz/lob-get-named-src-block-body name) args))
+      
+      (defun qz/lob-get-named-src-block (name)
+        (message "checking name: %s" name)
+        (cl-block named    ; thank u cltl, thank u 1980s, thank u guy steele
+          (save-excursion  ; check current-buffer
+            (when (not (org-babel-goto-named-src-block name))
+              (cl-return-from named (cons (buffer-file-name) (point)))))
+          (mapcar (lambda (f)
+                    (with-current-buffer (find-file-noselect f)
+                      (save-excursion
+                        ;; it's odd that nil means "i found it"
+                        (when (not (org-babel-goto-named-src-block name)) 
+                          (cl-return-from named (cons f (point)))))))
+                  (remove nil qz/org-babel-lob-ingest-files))))
+      
+      (defun qz/lob-goto-named-src-block (name)
+        (interactive 
+         (list
+          (completing-read "lob: " (mapcar 'car org-babel-library-of-babel))))
+        (cl-destructuring-bind 
+            (file . pt) (qz/lob-get-named-src-block name)
+          (find-file file)
+          (goto-char pt)))
+      (defun qz/lob-restclient-copy-curl-command (&optional name)
+        "this one was a struggle"
+        (interactive)
+        (when-let ((name (or name (thing-at-point 'symbol))))
+          (cl-destructuring-bind 
+              (file . pt) (qz/lob-get-named-src-block name)
+            (save-excursion 
+              (with-current-buffer (find-file-noselect file)      
+                (goto-char pt)
+                (next-line)
+                (let ((expanded (org-babel-expand-src-block)))
+                  (message "expanded: %s" expanded)
+                  (with-temp-buffer ;;(get-buffer-create "*restclient*") ;;TODO replace w temp
+                    (restclient-mode)
+                    (insert expanded)
+                    (goto-char (point-min))
+                    (restclient-jump-next)
+                    (restclient-copy-curl-command))))))))
       (define-key org-babel-map (kbd "M-l") 'qz/org-babel-choose-block)
+      (define-key org-babel-map (kbd "M-l") 'qz/org-babel-choose-block)
+      (define-key org-babel-map (kbd "M-g") 'qz/lob-goto-named-src-block)
       (defun qz/org-babel-make-table-constants ()
         "exec from the top of a tree"
         (interactive)
@@ -541,7 +621,10 @@
                             (when-let ((n (org-roam-node-from-title-or-alias s)))
                               (org-roam-node-file n)))
                           '("NewStore" "kubernetes"))
-                  (list nil))
+                  ;; .. other files
+                  nil
+                  ;; ..
+                  )
           "files from which named `src' blocks should be loaded")
         
         (defun qz/org-babel-do-lob-ingest-files (&optional files)
