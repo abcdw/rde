@@ -691,7 +691,7 @@ to populate, just fill a `pass' entry like so echo mypass | pass
  Returns a LIST of files that contain CLOCK, which reduces
 processing a lot"
   (interactive)
-  (setq org-agenda-files (qz/files-clock)))
+  (setq org-agenda-files (qz/clock-files)))
 #+end_src
 
 #+RESULTS:
@@ -714,29 +714,34 @@ processing a lot"
 | qz/advice-enable--org-clock-resolve--qz/agenda-files-update       | qz/advice-disable--org-clock-resolve--qz/agenda-files-update       |
 
 ***** [[id:9b0676a9-93d3-4449-ac82-721d4e20d4d6][daily-files]]                                              :func:var:
-#+begin_src emacs-lisp :noweb-ref agenda
+#+begin_src emacs-lisp :noweb-ref agenda :results drawer
 (setq qz/daily-title-regexp ".?[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.?")
 
 (defun qz/agenda-daily-files-f ()
   (seq-filter (lambda (s) (string-match qz/daily-title-regexp s))
               org-agenda-files))
+
+;;(qz/agenda-daily-files-f)
 #+end_src
 
 #+RESULTS:
-: qz/agenda-daily-files-f
+:results:
+qz/agenda-daily-files-f
+:end:
 
 ***** clock-files
 #+begin_src emacs-lisp :noweb-ref agenda
 (defun qz/clock-files ()
   (split-string
-   (shell-command-to-string "rg CLOCK ~/life/roam/ -c | grep -v 'org#' | awk -F '[,:]' '{print $1}'")))
+   (shell-command-to-string
+    "rg CLOCK ~/life/roam/ -c | grep -v 'org#' | awk -F '[,:]' '{print $1}'")))
 #+end_src 
 
 #+RESULTS:
 : qz/clock-files
 
-***** files-agenda :func:
-#+begin_src emacs-lisp :noweb-ref agenda
+***** files-agenda :func: 
+#+begin_src emacs-lisp :noweb-ref agenda :results drawer
 (defun qz/files-agenda ()
   (seq-uniq (append qz/org-agenda-files (qz/project-files))))
 #+end_src
@@ -797,7 +802,7 @@ processing a lot"
      (qz/agenda-daily-files-f . 124)))))
  (qz/agenda-files-update-clock
   ((org-files-list . 220)
-   ((org-agenda-files . 43)
+   ((qorg-agenda-files . 43)
     ((qz/project-files . 203)
      (qz/agenda-daily-files-f . 30))))))
 #+end_example
@@ -833,6 +838,34 @@ processing a lot"
 #+end_example
 
 **** custom commands
+
+***** daily TODOs
+#+begin_src emacs-lisp :noweb-ref agenda
+;; current (default) sorting strat
+'((agenda habit-down time-up priority-down category-keep)
+  (todo priority-down category-keep)
+  (tags priority-down category-keep)
+  (search category-keep))
+
+
+(defun qz/agenda-todo-dailies ()
+  "the most necessary simple invention in months. 
+(as of [2022-01-19 Wed])
+
+get a list of `TODO' entries, from daily files, ordered by date (from filename/category) DESCENDING.
+
+- see `qz/agenda-daily-files-f' for the subset view of `org-agenda-files'
+- see `org-agenda-sorting-strategy' for sort permutations."
+  (interactive)
+  (let* ((org-agenda-files (qz/agenda-daily-files-f))
+         (org-agenda-sorting-strategy '(timestamp-down category-down)))
+    (org-todo-list)))
+
+(define-key global-map (kbd "C-c n t") 'qz/agenda-todo-dailies)
+#+end_src
+
+#+RESULTS:
+: qz/agenda-todo-dailies
 
 ***** g ; GTD
 #+begin_src emacs-lisp :noweb-ref roam
