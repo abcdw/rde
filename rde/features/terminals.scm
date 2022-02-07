@@ -25,7 +25,8 @@
 	  config-file
 	  (package alacritty)
           (default-terminal? #f)
-          (backup-terminal? #t))
+          (backup-terminal? #t)
+          (software-rendering? #f))
   "Configure Alacritty terminal."
   (ensure-pred maybe-file-like? config-file)
   (ensure-pred any-package? package)
@@ -43,6 +44,9 @@
        (config
         `((window . ((padding . ((x . 10)
                                  (y . 5)))))
+          ,@(if software-rendering?
+                '((env . ((LIBGL_ALWAYS_SOFTWARE . "1"))))
+                '())
           ,@(if font-mono
                 `((font . ((normal . ((style . , (font-weight->style
                                                   (font-weight font-mono)))
