@@ -2008,6 +2008,41 @@ emacsclient feels more like a separate emacs instance."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define* (feature-emacs-matrix
+          #:key
+          (ement emacs-ement))
+  "Configure matrix-client (ement) for GNU Emacs."
+  (define emacs-f-name 'ement)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((require 'configure-rde-keymaps)
+        (define-key rde-app-map (kbd "m") '("ement" . ement-list-rooms))
+
+        (eval-after-load
+         'ement
+
+         ;; TODO investigate other config options
+         (custom-set-variables
+          '(ement-room-send-message-filter 'ement-room-send-org-filter))
+
+         (define-key ement-room-mode-map (kbd "C-<return>") 'ement-room-compose-message)
+         ;;; TODO ement: combine reply & compose behaviours
+         ;;; - it's currently not in the porcelain to `compose' on an
+         ;;;   event (see `ement-room-send-reply', which opens in minibuffer)
+         ;;(define-key ement-room-mode-map (kbd "C-S-<return>") 'ement-room-compose-reply)
+         (define-key ement-room-mode-map (kbd "p") 'ement-room-goto-prev)
+         (define-key ement-room-mode-map (kbd "n") 'ement-room-goto-next))
+      #:elisp-packages (list ement)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 ;; TODO: feature-emacs-reasonable-keybindings
 ;; TODO: Fix env vars for emacs daemon
 ;; https://github.com/purcell/exec-path-from-shell
