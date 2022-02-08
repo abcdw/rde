@@ -20,6 +20,7 @@
 (define* (feature-bluetooth
 	  #:key
 	  ;;(bluetooth-configuration (home-bluetooth-configuration))
+          (dual-mode #f)
           (auto-enable? #t)) ;; XXX should this stick to guix defaults, or tailor to ease for users?
   "Setup and configure Bluetooth."
   ;;(ensure-pred home-bluetooth-configuration? bluetooth-configuration)
@@ -32,5 +33,6 @@
   (feature
    (name 'bluetooth)
    (values '((bluetooth . #t)))
+   ;; TODO port etc-service reference to make home-service > system-service
    (system-services-getter bluetooth-home-services)))
 
