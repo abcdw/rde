@@ -85,9 +85,7 @@
      #:pinentry-flavor 'qt ;;'emacs ;; '
      #:gpg-primary-key "EE20E25391AAB9BB"
      #:gpg-smart-card? #f)
-    ;; (feature-password-store
-    ;;  #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
-
+   (feature-password-store)
    (feature-mail-settings
     #:mail-accounts
     (list (mail-account
