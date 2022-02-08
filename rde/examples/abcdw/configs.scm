@@ -67,6 +67,10 @@
             (name (symbol->string id))
             (urls urls)))))
 
+(define my-org-directory "~/life")
+(define my-notes-directory
+  (string-append my-org-directory "/roam"))
+
 (pretty-print "pre-%abcdw-features")
 (define %abcdw-features
   (list
@@ -245,7 +249,7 @@
    (feature-backlight)
 
    (feature-fonts
-    #:font-monospace (font "Iosevka" #:size 11 #:weight 'regular)
+    #:font-monospace (font "Iosevka" #:size 14 #:weight 'regular)
     ;; #:font-monospace (font "Fira Mono" #:size 14 #:weight 'semi-light)
     #:font-packages (list font-iosevka font-fira-mono))
 
@@ -316,13 +320,6 @@
                         (port . 22)
                         (identity-file . "~/.ssh/newstore-luminate.pem"))))))))
    (feature-git)
-   (feature-ssh
-    #:ssh-configuration
-    (home-ssh-configuration
-     (toplevel-options
-      '((host-key-algorithms . "+ssh-rsa")
-        (pubkey-accepted-key-types . "+ssh-rsa")))))
-
    ;; #:package sway-latest
    (feature-sway
     #:xwayland? #f
@@ -341,9 +338,13 @@
                      (effect-blur . 7x5)
                      (clock)))
    (feature-rofi)
-
+   (feature-direnv)
    (feature-emacs
-    #:extra-init-el `()
+    #:extra-init-el
+    (append
+      (list #~"(define-key key-translation-map [?\\C-x] [?\\C-u])\n"
+            #~"(define-key key-translation-map [?\\C-u] [?\\C-x])\n")
+      init-el)
     #:additional-elisp-packages
     ;; TODO if feature-emacs-PACKAGE exists, advise its use
     (append
@@ -365,7 +366,6 @@
            "emacs-forge"
            "emacs-debbugs"
            "emacs-ob-async"
-           ;;"emacs-es-mode"
            "emacs-org-fragtog"
 
            "emacs-explain-pause-mode"
@@ -380,17 +380,10 @@
            "emacs-go-mode"
            "emacs-eros"
            "emacs-string-inflection"
+           "emacs-htmlize" ;; ement: -> ox-export html: org src blocks
            ;; emacs-impostman
-           ;;"emacs-restclient" "emacs-ob-restclient"
            ;; "emacs-org-autotangle"
-           ))
-    #:extra-config ;; this will be much tidier collected from literate config, with each elisp block as `:noweb'
-    (append
-      (list #~"(define-key key-translation-map [?\\C-x] [?\\C-u])\n"
-            #~"(define-key key-translation-map [?\\C-u] [?\\C-x])\n"
-            )
-      init-el
-      ))
+           )))
 
    (feature-emacs-appearance #:light? #f)
    (feature-emacs-faces)
@@ -447,7 +440,7 @@
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
    (feature-msmtp
-    #:msmtp-package msmtp-latest)
+    #:msmtp msmtp-latest)
    (feature-notmuch
     #:extra-tag-updates-post
     '("notmuch tag +guix-home -- 'thread:\"\
