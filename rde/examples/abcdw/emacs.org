@@ -287,10 +287,10 @@ buffer are offered."
 I don't use this very much, as it curls my whole left hand up (qwerty troubles)
 
 #+begin_src emacs-lisp :noweb yes :noweb-ref kbd
-(define-key global-map (kbd "H-M-s-h") 'windmove-swap-states-left)
-(define-key global-map (kbd "H-M-s-j") 'windmove-swap-states-down)
-(define-key global-map (kbd "H-M-s-k") 'windmove-swap-states-up)
-(define-key global-map (kbd "H-M-s-l") 'windmove-swap-states-right)
+(define-key global-map (kbd "M-s-h") 'windmove-swap-states-left)
+(define-key global-map (kbd "M-s-j") 'windmove-swap-states-down)
+(define-key global-map (kbd "M-s-k") 'windmove-swap-states-up)
+(define-key global-map (kbd "M-s-l") 'windmove-swap-states-right)
 #+end_src
 
 #+RESULTS:
@@ -304,10 +304,10 @@ I don't use this very much, as it curls my whole left hand up (qwerty troubles)
 #+end_src
 *** {H-s-h}jkl windmove
 #+begin_src emacs-lisp :noweb yes :noweb-ref kbd
-(define-key global-map (kbd "H-s-h") 'windmove-left)
-(define-key global-map (kbd "H-s-j") 'windmove-down)
-(define-key global-map (kbd "H-s-k") 'windmove-up)
-(define-key global-map (kbd "H-s-l") 'windmove-right)
+(define-key global-map (kbd "s-h") 'windmove-left)
+(define-key global-map (kbd "s-j") 'windmove-down)
+(define-key global-map (kbd "s-k") 'windmove-up)
+(define-key global-map (kbd "s-l") 'windmove-right)
 #+end_src
 
 #+RESULTS:
@@ -315,7 +315,7 @@ I don't use this very much, as it curls my whole left hand up (qwerty troubles)
 
 *** {s-\} org-store-link
 #+begin_src emacs-lisp :noweb yes :noweb-ref kbd
-(define-key global-map (kbd "H-s-\\") 'org-store-link)
+(define-key global-map (kbd "s-\\") 'org-store-link)
 #+end_src
 
 #+RESULTS:
