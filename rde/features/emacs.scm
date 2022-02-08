@@ -1797,7 +1797,9 @@ emacsclient feels more like a separate emacs instance."
    (home-services-getter get-home-services)))
 
 
-(define* (feature-emacs-perfect-margin)
+(define* (feature-emacs-perfect-margin
+          #:key
+          (visible-width 128))
   "Configure perfect-margin for GNU Emacs."
   (define emacs-f-name 'perfect-margin)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1806,7 +1808,9 @@ emacsclient feels more like a separate emacs instance."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `()
+      `((eval-after-load
+         'perfect-margin
+         (setq perfect-margin-visible-width ,visible-width)))
       #:elisp-packages (list emacs-perfect-margin))))
 
   (feature
