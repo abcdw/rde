@@ -292,13 +292,11 @@ function, which accepts config with rde values and returns a string."
 (define* (feature-msmtp
           #:key
           (msmtp msmtp)
-          (msmtp-settings %default-msmtp-settings)
-          (msmtp-provider-settings %default-msmtp-provider-settings)
-          (msmtp-serializer default-msmtp-serializer))
+          (msmtp-settings default-msmtp-global-settings)
+          (msmtp-serializers %default-msmtp-serializers))
   "Configure msmtp MTA."
-;;  (ensure-pred maybe-list? mail-account-ids)
   (ensure-pred list? msmtp-serializers)
-  (ensure-pred list? msmtp-global-settings)
+  (ensure-pred list? msmtp-settings)
 
   (define (serialize-mail-acc mail-acc)
     ((assoc-ref msmtp-serializers (mail-account-type mail-acc))
@@ -319,7 +317,7 @@ function, which accepts config with rde values and returns a string."
       (home-msmtp-configuration
        (config
         (append
-         msmtp-global-settings
+         msmtp-settings
          (append-map serialize-mail-acc mail-accounts)))))
 
      ;; (when (get-value 'git-send-email? config)
@@ -331,10 +329,10 @@ function, which accepts config with rde values and returns a string."
      ;;      `((sendemail
      ;;         ((sendmailcmd . ,(file-append msmtp "/bin/msmtp --read-envelope-from")))))))))
 
-     ;; (simple-service
-     ;;  'msmtp-package
-     ;;  home-profile-service-type
-     ;;  (list msmtp))
+     (simple-service
+      'msmtp-package
+      home-profile-service-type
+      (list msmtp))
     ))
 
   ;; TODO: Implement config serialization or msmtp-home-service
