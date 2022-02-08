@@ -87,7 +87,7 @@
 ;;; User's utils.
 ;;;
 
-(define (slurp-file-gexp file)
+(define* (slurp-file-gexp file #:key (encoding "UTF-8"))
   "Returns a gexp, which reads all the content of the FILE and returns
 it as a string.  FILE must be a file-like object."
   (when (not (file-like? file))
@@ -95,7 +95,8 @@ it as a string.  FILE must be a file-like object."
             (G_ "~a is not a file-like object.")
             file)))
   #~(call-with-input-file #$file
-        (@ (ice-9 textual-ports) get-string-all)))
+      (@ (ice-9 textual-ports) get-string-all)
+      #:encoding #$encoding))
 
 
 ;;;
@@ -449,4 +450,3 @@ runs GEXP.  NAME is the name of the executable that will be put in the store."
                            (enum-name stem)
                            (syntax->datum msg)
                            val))))))))))
-
