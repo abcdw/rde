@@ -105,6 +105,18 @@ ctl_type.pipewire {
 }
 ")))))
 
+     ;; TODO make home-wireplumber-service-type
+     ;; TODO make configs for wireplumber bluetooth profiles (?) ->
+     ;; might be a bluetooth root daemon problems
+     ;; https://pipewire.pages.freedesktop.org/wireplumber/configuration/main.html
+     (simple-service
+      'pipewire-add-wireplumber-conf
+      home-files-service-type
+      `(("config/wireplumber/main.conf"
+         ,(mixed-text-file
+           "main.conf"
+           "# TODO"))))
+
 
      (simple-service
       'pipewire-add-shepherd-daemons
