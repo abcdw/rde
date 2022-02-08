@@ -80,7 +80,7 @@
     (list
      ;; TODO: Make home-alsa-service-type
      (simple-service
-      'pipewire-add-asoundrd
+      'pipewire-add-asoundrc
       home-files-service-type
       `(("config/alsa/asoundrc"
          ,(mixed-text-file
