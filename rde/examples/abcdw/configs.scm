@@ -393,7 +393,8 @@
    (feature-emacs-input-methods)
    (feature-emacs-which-key)
    (feature-emacs-keycast)
-   (feature-emacs-perfect-margin)
+   (feature-emacs-perfect-margin
+    #:visible-width 150)
 
    (feature-emacs-dired)
    (feature-emacs-vterm)
