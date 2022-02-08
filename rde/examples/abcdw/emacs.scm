@@ -101,15 +101,15 @@
     ;;(org-remap org-mode-map
     ;;           'open-line 'org-open-line)
     
-    (define-key global-map (kbd "H-M-s-h") 'windmove-swap-states-left)
-    (define-key global-map (kbd "H-M-s-j") 'windmove-swap-states-down)
-    (define-key global-map (kbd "H-M-s-k") 'windmove-swap-states-up)
-    (define-key global-map (kbd "H-M-s-l") 'windmove-swap-states-right)
-    (define-key global-map (kbd "H-s-h") 'windmove-left)
-    (define-key global-map (kbd "H-s-j") 'windmove-down)
-    (define-key global-map (kbd "H-s-k") 'windmove-up)
-    (define-key global-map (kbd "H-s-l") 'windmove-right)
-    (define-key global-map (kbd "H-s-\\") 'org-store-link)
+    (define-key global-map (kbd "M-s-h") 'windmove-swap-states-left)
+    (define-key global-map (kbd "M-s-j") 'windmove-swap-states-down)
+    (define-key global-map (kbd "M-s-k") 'windmove-swap-states-up)
+    (define-key global-map (kbd "M-s-l") 'windmove-swap-states-right)
+    (define-key global-map (kbd "s-h") 'windmove-left)
+    (define-key global-map (kbd "s-j") 'windmove-down)
+    (define-key global-map (kbd "s-k") 'windmove-up)
+    (define-key global-map (kbd "s-l") 'windmove-right)
+    (define-key global-map (kbd "s-\\") 'org-store-link)
     ;; NOWEB KBD END
     ;; NOWEB CONSULT START
     (with-eval-after-load 'consult
@@ -131,6 +131,9 @@
           (qz/consult-ripgrep-files files)))
       
       (define-key global-map (kbd "C-c b s") 'qz/consult-ripgrep-bookmark)
+      (mapcar (lambda (bind)
+                (define-key global-map (kbd (car bind)) (cadr bind)))
+              '(("C-x b" consult-buffer)))
       )
     ;; NOWEB CONSULT END
     ;; NOWEB CUSTOM START
@@ -284,8 +287,8 @@
       processing a lot"
         (interactive)
         (setq org-agenda-files (qz/clock-files)))
-      (list 
-       ;; optimisation setup: setup subset of clock files 
+      (list
+       ;; optimisation setup: setup subset of clock files
        (qz/advice- org-clock-resolve :before qz/agenda-files-update-clock)
        ;; optimisation teardown: restore full set of agenda-files
        (qz/advice- org-clock-resolve :after qz/agenda-files-update))
@@ -295,7 +298,7 @@
         (seq-filter (lambda (s) (string-match qz/daily-title-regexp s))
                     org-agenda-files))
       
-      (qz/agenda-daily-files-f)
+      ;;(qz/agenda-daily-files-f)
       (defun qz/clock-files ()
         (split-string
          (shell-command-to-string
@@ -330,7 +333,7 @@
       
       
       (defun qz/agenda-todo-dailies ()
-        "the most necessary simple invention in months. 
+        "the most necessary simple invention in months.
       (as of [2022-01-19 Wed])
       
       get a list of `TODO' entries, from daily files, ordered by date (from filename/category) DESCENDING.
@@ -454,7 +457,7 @@
       
       ;;(qz/org-babel-choose-block 'newstore-get-order-by-type)
       (defun qz/lob-get-named-src-block-body (name)
-        (cl-destructuring-bind 
+        (cl-destructuring-bind
             (file . pt) (qz/lob-get-named-src-block name)
           (with-current-buffer (find-file-noselect file)
             (save-excursion
@@ -477,15 +480,15 @@
                     (with-current-buffer (find-file-noselect f)
                       (save-excursion
                         ;; it's odd that nil means "i found it"
-                        (when (not (org-babel-goto-named-src-block name)) 
+                        (when (not (org-babel-goto-named-src-block name))
                           (cl-return-from named (cons f (point)))))))
                   (remove nil qz/org-babel-lob-ingest-files))))
       
       (defun qz/lob-goto-named-src-block (name)
-        (interactive 
+        (interactive
          (list
           (completing-read "lob: " (mapcar 'car org-babel-library-of-babel))))
-        (cl-destructuring-bind 
+        (cl-destructuring-bind
             (file . pt) (qz/lob-get-named-src-block name)
           (find-file file)
           (goto-char pt)))
@@ -493,10 +496,10 @@
         "this one was a struggle"
         (interactive)
         (when-let ((name (or name (thing-at-point 'symbol))))
-          (cl-destructuring-bind 
+          (cl-destructuring-bind
               (file . pt) (qz/lob-get-named-src-block name)
-            (save-excursion 
-              (with-current-buffer (find-file-noselect file)      
+            (save-excursion
+              (with-current-buffer (find-file-noselect file)
                 (goto-char pt)
                 (next-line)
                 (let ((expanded (org-babel-expand-src-block)))
@@ -993,7 +996,7 @@
     (defvar qz/kubectl-context nil
       "the operating kubernetes context.
     
-    to check, at a shell, run: 
+    to check, at a shell, run:
     `$ kubectl config get-contexts -o name'
     or
     `$ kubectl config current-context")
@@ -1003,7 +1006,7 @@
             (or ctx (completing-read "k8s ctx: "
                                      (qz/shell-command-to-list-of-strings
                                       "kubectl config get-contexts -o name"))))
-      (async-shell-command (format "kubectl config use-context %s" 
+      (async-shell-command (format "kubectl config use-context %s"
                                    qz/kubectl-context)
                            "*kubectl*"))
     

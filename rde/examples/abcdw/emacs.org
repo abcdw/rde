@@ -4,6 +4,14 @@
 #+PROPERTY: header-args:sh :tangle-mode (identity #o755)
 
 * tangling
+** ensure headings are sorted alphabetically :demo:
+#+begin_src emacs-lisp :tangle no
+(org-map-entries
+ (lambda ()
+   (when (org-get-heading)
+     (org-sort-entries t ?a))))
+#+end_src
+
 ** noweb tangler ; root                                               :meta:
 #+begin_src scheme :noweb yes :tangle emacs.scm :tangle-mode
 (define-module (rde examples abcdw emacs)
@@ -19,13 +27,6 @@
     <<conf>>
     ;; NOWEB CONF END
     ))
-#+end_src
-** ensure headings are sorted alphabetically :demo:
-#+begin_src emacs-lisp :tangle no
-(org-map-entries
- (lambda ()
-   (when (org-get-heading)
-     (org-sort-entries t ?a))))
 #+end_src
 
 * configs
@@ -2524,7 +2525,6 @@ or
 ;; optional; quality of life improvement to bury kubectl buffer
 (add-to-list 'display-buffer-alist '("*kubectl*" display-buffer-no-window))
 #+end_src
-
 
 ** system commands
 *** get mail
