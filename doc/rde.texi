@@ -51,7 +51,7 @@ practices and workflows.
 
 @menu
 * Introduction::                What rde is?
-* Approaching The Project::
+* Community::                   The best rde part.
 * Getting Started::             Try, customize and install.
 * Features::                    All the parts of rde.
 * Contributing::                Tips and guidelines.
@@ -67,12 +67,6 @@ rde
 
 * Principles::
 
-Contributing
-
-* New features, fixes or ideas: New features fixes or ideas.
-* Documentation::
-* Community::
-
 @end detailmenu
 @end menu
 
@@ -81,14 +75,17 @@ Contributing
 
 First of all rde is a developer and power user friendly GNU/Linux
 operating system, ready for use with a few to zero tweaks.  Let's call
-this part @dfn{rde system}.
+this part @dfn{rde GNU/Linux}.  Currently, it's targeted for single-user
+setups, to some extent it can be used by multiple people on the same
+machine, but with restrictions (@pxref{FAQ}).
 
 Sometimes, it can be treated as an Emacs distribution, but while GNU
 Emacs is an important part, in reality rde manages not only Emacs, its
-packages and configurations, but other user space software too, let's
-call this part @dfn{rde home}.  In addition to that, it can be used to
-manage home environments (@pxref{Home Configuration,,, guix,}) on the
-operating system other than rde or Guix.
+packages and configurations, but other user space software too (which
+often integrates with Emacs), let's call this part @dfn{rde home}.  In
+addition to that, it can be used to manage home environments
+(@pxref{Home Configuration,,, guix,}) on the operating system other
+than rde GNU/Linux or Guix System.
 
 @c TODO: Part about per-project rde tools.
 
@@ -124,30 +121,45 @@ Read the next section to get some ideas behind our choice.
 @node Principles
 @section Principles
 
-@subsection Main
+There is a list of principles we try to follow to simplify decision
+making process and provide a better understanding of our previous
+choices for newcommers.  If you see some part of rde hardly violating
+them please let us know.
+
+@subsection Primary
 
 @table @asis
 @item Ergonomic
-Sane keybindings, good contrast, readable fonts.
+Sane keybindings, good contrast, and readable fonts.  The environment
+should be safe and comfortable for long-lasting working sessions
 @item Reproducible
-Setup can be easily replicated.
+Setup can be easily replicated.  It not only helps with sharing and
+replicating setups, but also provides an ability to rollback to
+working state in case of missconfiguration or other problems.
 @item Hackable
-Easy to throw out or modify any part of setup.
+Easy to explore, throw out or modify any part of setup.  We have
+strong opinions on various aspects of working environments, but we
+don't enforce them.
 @item Stateless
-All state must be explicit and syncable or temporary.
+All state must be explicit and syncable or temporary, that means all
+the important data is backed up by default.  In combination with
+reproducibility it gives a sense of security and confidence that both
+your configurations and data are safe.
 @end table
 
-@c @node Secondary
 @subsection Secondary
+
+This is a list of additional principles, which we find reasonable and
+often refer to them.
 
 @table @asis
 @item Lightweight
 Not only because of undepowered hardware, but also cause of
 simplicity.  Slim solutions easier to understand, debug and fix.
 @item Energy and battery efficient
-wayland, fast native apps.
+Wayland, fast native applications.
 @item Offline
-most of workflows and apps should work without network.
+Most of workflows and programs should work without network.
 @item Peaceful
 Attention-friendly, minimal use of notification and other distractive
 things.
@@ -163,13 +175,77 @@ things.
 @c - [ ] Reporting problem section (rde-discuss ML, guix describe,
 @c   config, etc).
 
-@node Approaching The Project
-@chapter Approaching The Project
+@node Community
+@chapter Community
 
-The explanation will go here.
+@section Approaching The Project
+
+rde is a free/libre software (free as in a freedom), brought by
+passioned volunteers.  It's not easy to explain the culture of the
+project, we also don't have a formal code of conduct, but it seems
+@dfn{rde people}, who forms the community and its culture are nice,
+kind, smart, polite and well-minded.  We encourage you to join our
+communication channels, learn how everything usually happens here and
+try to make this cozy place only better, enjoy.
+
+There are a plenty of useful resources: documentation, manuals, and
+other learning materials, mailing lists and IRC channels, and of
+course the source code.  Use any or all of them.  Some information
+will be outdated, features will be missing and issues will be
+appearing, it's in a nature of software, please share the ideas,
+concerns, reports, suggestions and ask questions
+(@pxref{Communication}), don't hesitate to provide fixes, features,
+modifications or even experimental prototypes (@pxref{Contributing}).
+
+@anchor{Communication}
+@section Communication
+
+The primary way of communication is mailing lists.  The development,
+support, announcements happens here, and there are a few reasons why
+(@pxref{Mailing Lists}).  For casual discussions, more interactive
+support or just pleasant pastime we use IRC and Matrix.
+
+@anchor{Mailing Lists}
+@subsection Mailing Lists
+Mailing lists are persistent and offline-friendly --- archives are
+available and can be explored or even downloaded much later than
+discussion took place, federated --- email is federated, anyone can
+participate with already existing account from any email server,
+accessible --- archives are additionally available over web-interface,
+and almost everyone have an email address and can easily join.
+
+There are a few @uref{https://lists.sr.ht/~abcdw, mailing lists} you
+can subscribe and/or post with your existing email account:
+@itemize
+@item @uref{https://lists.sr.ht/~abcdw/rde-announce, ~abcdw/rde-announce@@lists.sr.ht}
+for news and updates.
+@item @uref{https://lists.sr.ht/~abcdw/rde-discuss, ~abcdw/rde-discuss@@lists.sr.ht}
+for questions, discussions and support.
+@item @uref{https://lists.sr.ht/~abcdw/rde-devel, ~abcdw/rde-devel@@lists.sr.ht}
+for patches, development related discussions and bug reports.
+@end itemize
+
+@subsection Chat
+We use IRC as our primary chatting platform for a number of reasons,
+but the primary one is: it's hugely accessible --- IRC clients
+available for almost each hardware and software platform, there are of
+course web and mobile clients as well, no registration or other
+additional steps are required.
+
+Just join #tropin channel at @uref{https://libera.chat, libera.chat}.
+
+IRC is a great tool for a real-time text-based communication.  You
+join the channel when you need or want to and leave any time you
+desire. @c (@pxref{IRC} to learn more).
+
+It's also possible to connect to IRC channel via Matrix bridge using
+#tropin:libera.chat room handle, learn more here:
+https://libera.chat/guides/faq#can-i-connect-with-matrix
 
 @node Getting Started
 @chapter Getting Started
+
+@c TODO: Explain how to fork rde
 
 @c @node Channel introduction
 @c @section Channel introduction
@@ -192,46 +268,35 @@ The explanation will go here.
 @node Features
 @chapter rde Features
 
+@section rde Emacs
+@c How Prot learning Emacs: https://youtu.be/46w9e4GAjsU
+
+@c Emacs how undo works
+@c https://casouri.github.io/note/2021/visual-undo-tree/index.html
+
 @node Contributing
 @chapter Contributing
 
 @c TODO: Add process similar to srfi?
 @c https://srfi.schemers.org/srfi-process.html
 
-@menu
-* New features, fixes or ideas: New features fixes or ideas.
-* Documentation::
-* Community::
-@end menu
+@c @menu
+@c * New features, fixes or ideas: New features fixes or ideas.
+@c * Documentation::
+@c @end menu
 
-@node New features fixes or ideas
-@section New features, fixes or ideas
+@c @node New features fixes or ideas
+@c @section New features, fixes or ideas
 
-Send mails, optionally with inline patches to rde-devel mailing list.
+@c Send mails, optionally with inline patches to rde-devel mailing list.
 
-@node Documentation
-@section Documentation
-
-Emacs how undo works
-https://casouri.github.io/note/2021/visual-undo-tree/index.html
-
-@node Community
-@section Community
-
-There are a few @uref{https://lists.sr.ht/~abcdw, mailing lists} you can subscribe and/or post with your
-existing email account:
-@table @asis
-@item @uref{https://lists.sr.ht/~abcdw/rde-announce/, ~abcdw/rde-announce@@lists.sr.ht}
-for news and updates.
-@item @uref{https://lists.sr.ht/~abcdw/rde-discuss/, ~abcdw/rde-discuss@@lists.sr.ht}
-for discussions and questions.
-@item @uref{https://lists.sr.ht/~abcdw/rde-devel/, ~abcdw/rde-devel@@lists.sr.ht}
-for patches and development related
-discussions.
-@end table
+@c @node Documentation
+@c @section Documentation
 
 @node FAQ
 @chapter FAQ
+
+TODO: Write about multi-user usage.
 
 @node Acknowledgments
 @chapter Acknowledgments
