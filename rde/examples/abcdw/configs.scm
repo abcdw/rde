@@ -433,7 +433,8 @@
    ;;  (list(string-append my-org-directory "/bib.org")
    ;;  #:bibliography-directory my-notes-directory)
 
-   (feature-emacs-es-mode)
+   (feature-emacs-es-mode
+    #:package emacs-es-mode)
    (feature-emacs-restclient
     #:package-ob emacs-ob-restclient)
    (feature-mpv)
