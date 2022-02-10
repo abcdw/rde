@@ -323,7 +323,14 @@
     #:xwayland? #f
     #:opacity 0.9
     #:wallpaper "$HOME/.cache/wallpaper.png"
-    #:extra-config `((include ,(local-file "./config/sway/config"))))
+    #:extra-config
+    `(;;(include ,(local-file "./config/sway/config"))
+      ;; TODO sway: toggle opacity for WINDOW
+      (,#~"output DP-1 res 5120x1440 bg ~/.cache/wallpaper.png fill")
+      ;; TODO sway: wacom input rotation matrix
+      (,#~"input \"*\" tool_mode \"*\" relative calibration_matrix 0.0 -1.0 1.0 1.0 0.0 0.0")
+      )
+    )
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
    (feature-sway-screenshot)
