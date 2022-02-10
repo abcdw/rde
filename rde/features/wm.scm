@@ -151,8 +151,6 @@
             (default_border pixel)
             (default_floating_border pixel)
             (gaps inner ,(get-value 'emacs-margin config 8))
-            (,#~"")
-            (,#~"input \"*\" tool_mode \"*\" relative calibration_matrix 0.0 -1.0 1.0 1.0 0.0 0.0") ;; needs wayland >= 1.6
 
             (,#~"")
             (set $opacity ,opacity)
