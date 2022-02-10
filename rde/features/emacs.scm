@@ -300,8 +300,10 @@ Prefix argument can be used to kill a few words."
           (define-key global-map (kbd "M-u") 'upcase-dwim)
           (define-key global-map (kbd "C-w") 'kill-region-dwim)
 
-          (define-key mode-specific-map (kbd "a") 'rde-app-map)
-          (define-key mode-specific-map (kbd "t") 'rde-toggle-map))
+          (define-key mode-specific-map (kbd "a")
+            '("rde applications" . rde-app-map))
+          (define-key mode-specific-map (kbd "t")
+            '("rde toggles" . rde-toggle-map)))
         #:summary "General settings"
         #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
                                emacs-expand-region emacs-guix)
@@ -651,7 +653,8 @@ utilizing reverse-im package."
          (require 'company))
 
         (require 'configure-rde-keymaps)
-        (define-key rde-app-map (kbd "t") telega-prefix-map)
+        (define-key rde-app-map (kbd "t")
+          (cons "telega-prefix" telega-prefix-map))
 
         (with-eval-after-load
          'telega
