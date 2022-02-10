@@ -199,23 +199,17 @@
 
      ;; see logs at ~/.local/var/log/mcron.log
      ;;   tail --follow ~/.local/var/log/mcron.log
-     ((@ (gnu services) simple-service)
-      'notes-commit-job
-      (@ (gnu home services mcron) home-mcron-service-type)
-      (list #~(job '(next-minute)
-                   (lambda ()
-                     (system* "echo \"$(date -u) attempting to commit\" >> /tmp/commit-log")
-                     (system* "cd $HOME/life")
-                     (system* "git add .")
-                     (system* "git commit -m \"auto-commit | $(date -u)\""))
-                   "notes-commit")))
-     ((@ (gnu services) simple-service)
-      'wtf-job
-      (@ (gnu home services mcron) home-mcron-service-type)
-      (list #~(job '(next-minute)
-                   (lambda ()
-                     (system* "echo bonk >> /tmp/wtf")
-                     "wtf"))))
+     ;; ((@ (gnu services) simple-service)
+     ;;  'notes-commit-job
+     ;;  (@ (gnu home services mcron) home-mcron-service-type)
+     ;;  (list #~(job '(next-minute)
+     ;;               (lambda ()
+     ;;                 (system* "echo \"$(date -u) attempting to commit\" >> /tmp/commit-log")
+     ;;                 (system* "cd $HOME/life")
+     ;;                 (system* "git add .")
+     ;;                 (system* "git commit -m \"auto-commit | $(date -u)\""))
+     ;;               "notes-commit")))
+     
      )
     #:system-services
     (list (service postgresql-service-type)
