@@ -197,6 +197,7 @@
                                     ("Cookie" . ,(format "ACCEZZIOCOOKIE=%s"
                                                          (read-from-minibuffer "es cookie: ")))))))
       (setq es-default-url "https://elasticsearch-production.newstore.luminatesec.com"
+            es-current-url es-default-url
             es-default-headers nil
             es-always-pretty-print t
             es-default-headers
