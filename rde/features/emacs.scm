@@ -160,10 +160,10 @@ dependency for other packages."
     (rde-emacs-configuration-package
      'rde-keymaps
      `((defvar rde-app-map nil "Prefix keymap for applications.")
-       (define-prefix-command 'rde-app-map nil "rde applications")
+       (define-prefix-command 'rde-app-map nil)
        (defvar rde-toggle-map nil "\
 Prefix keymap for binding various minor modes for toggling functionalitty.")
-       (define-prefix-command 'rde-toggle-map nil "rde toggles"))
+       (define-prefix-command 'rde-toggle-map nil))
      #:summary "Keymaps inteded for reuse among configure-* packages"))
 
   (define (emacs-home-services config)
