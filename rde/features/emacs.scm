@@ -42,6 +42,7 @@
 	    feature-emacs-erc
             feature-emacs-elpher
             feature-emacs-telega
+            feature-emacs-ement
             feature-emacs-pdf-tools
             feature-emacs-nov-el
             feature-emacs-which-key
@@ -2028,10 +2029,10 @@ emacsclient feels more like a separate emacs instance."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-matrix
+(define* (feature-emacs-ement
           #:key
-          (ement emacs-ement))
-  "Configure matrix-client (ement) for GNU Emacs."
+          (emacs-ement emacs-ement))
+  "Configure ement, a matrix client for GNU Emacs."
   (define emacs-f-name 'ement)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
@@ -2040,23 +2041,41 @@ emacsclient feels more like a separate emacs instance."
      (elisp-configuration-service
       emacs-f-name
       `((require 'configure-rde-keymaps)
-        (define-key rde-app-map (kbd "m") '("ement" . ement-list-rooms))
 
-        (eval-after-load
+        ;; XXX given `telega-prefix-map' we aren't prefixing like
+        ;;     `rde-telega-prefix-map'; should we be?
+        (defvar rde-ement-map nil "Prefix keymap for binding ement commands.")
+        (define-prefix-command
+          'rde-ement-map nil
+          ;; XXX potential for global menu preference; nil removes
+          ;;     annoying print -- but both show +rde-ement-map in
+          ;;     which-key, which arguably is the de-facto drop in for
+          ;;     (gui) menu discoverability in modern emacs
+          ,(if #f "ement" 'nil))
+
+        (define-key rde-app-map   (kbd "e") 'rde-ement-map)
+        (define-key rde-ement-map (kbd "c") 'ement-connect)
+        (define-key rde-ement-map (kbd "d") 'ement-disconnect)
+        (define-key rde-ement-map (kbd "e") 'ement-list-rooms)
+        (define-key rde-ement-map (kbd "v") 'ement-view-room)
+
+        (with-eval-after-load
          'ement
 
-         ;; TODO investigate other config options
-         (custom-set-variables
-          '(ement-room-send-message-filter 'ement-room-send-org-filter))
+         (setq ement-room-send-message-filter 'ement-room-send-org-filter
+               ement-room-message-format-spec "%S  %L%B%r%R%t")
 
          (define-key ement-room-mode-map (kbd "C-<return>") 'ement-room-compose-message)
          ;;; TODO ement: combine reply & compose behaviours
          ;;; - it's currently not in the porcelain to `compose' on an
          ;;;   event (see `ement-room-send-reply', which opens in minibuffer)
          ;;(define-key ement-room-mode-map (kbd "C-S-<return>") 'ement-room-compose-reply)
+
          (define-key ement-room-mode-map (kbd "p") 'ement-room-goto-prev)
-         (define-key ement-room-mode-map (kbd "n") 'ement-room-goto-next))
-      #:elisp-packages (list ement)))))
+         (define-key ement-room-mode-map (kbd "n") 'ement-room-goto-next)))
+
+      #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
+                             emacs-ement))))
 
   (feature
    (name f-name)
