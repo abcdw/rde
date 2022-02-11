@@ -20,6 +20,8 @@
   #:use-module (gnu home services)
   #:use-module (gnu packages wm)
   #:use-module (gnu services configuration)
+  #:use-module (rde serializers json)
+  #:use-module (rde serializers css)
 
   #:use-module (guix packages)
   #:use-module (guix gexp)
@@ -27,6 +29,7 @@
   #:use-module (guix ui)
 
   #:use-module (srfi srfi-1)
+  #:use-module (srfi srfi-43)
   #:use-module (ice-9 match)
 
   #:export (home-sway-service-type
@@ -37,6 +40,10 @@
 
             home-swaylock-service-type
 	    home-swaylock-configuration
+
+            home-waybar-service-type
+	    home-waybar-configuration
+            home-waybar-extension
 
             sway-config?))
 
@@ -58,6 +65,7 @@
       (#f "no")
       ((? symbol? e) (symbol->string e))
       ((? number? e) (number->string e))
+      ;; TODO: Change it to ((? string? e) (format #f "~s" e))
       ((? string? e) e)
       ((lst ...)
        (raise (formatted-message
@@ -326,3 +334,192 @@ otherwise."))
                 (default-value (home-swaylock-configuration))
                 (description "\
 Install and configure swaylock, screen locker for Wayland.")))
+
+
+;;;
+;;; waybar.
+;;;
+
+;; (print-json
+;;  '((ipc . #t)
+;;    (ipc . #f)
+;;    (battery#bat2 . ((hehe . val)
+;;                     (hehe2 . key)))
+;;    (modules-left . #("sway/workspaces" module/another))
+;;    (modules-left . #("sway/mode"))))
+
+(define waybar-keys-to-merge
+  '(modules-left modules-center modules-right))
+
+(define (waybar-key-to-merge? x)
+
+
+  ;; (define (json-equal? v1 v2)
+  ;;   (equal? (->symbol v1) (->symbol v2)))
+
+  (member
+   x
+   (append
+    waybar-keys-to-merge
+    (map symbol->string waybar-keys-to-merge))))
+
+(define (->symbol v)
+  (if (symbol? v) v (string->symbol v)))
+
+(define (->string v)
+  (if (string? v) v (symbol->string v)))
+
+(define (json-assoc-ref alist key)
+  (or
+   (assoc-ref alist (->symbol key))
+   (assoc-ref alist (->string key))))
+
+(define (waybar-merge-configs c1 c2)
+  "Appends C2 alist to the end of C1, if key satisfies
+waybar-key-to-merge?, merge the values of those keys."
+
+
+  (unless (equal? (json-assoc-ref c1 'name) (json-assoc-ref c2 'name))
+    (throw 'waybar-merge-name-mismatch (list c1 c2)))
+
+  (define updated-c1
+    (fold-right
+     (lambda (x acc)
+       (let* ((key (car x))
+              (v1 (cdr x))
+              (v2 (json-assoc-ref c2 key)))
+         (if (and v2 (waybar-key-to-merge? key))
+             (cons (cons key (vector-append v1 v2)) acc)
+             (cons x acc))))
+     '() c1))
+
+  (define updated-c2
+    (fold-right
+     (lambda (x acc)
+       (let* ((key (car x))
+              (v (json-assoc-ref updated-c1 key)))
+         (if (and v (waybar-key-to-merge? key))
+             acc
+             (cons x acc))))
+     '() c2))
+
+  (append updated-c1 updated-c2))
+
+;; (print-json
+;;  (waybar-merge-configs
+;;   '((position . "top")
+;;       (name . main)
+;;       (modules-left . #(sway/workspaces)))
+;;   '((ipc . #t)
+;;     (height . 34)
+;;     (name . main)
+;;     (modules-left . #(sway/mode)))))
+
+(define (waybar-collapse-configs configs)
+  "Merge bar configs with the same name."
+  (define (index-by-name name vec)
+    (vector-index
+     (lambda (x)
+       (equal? (json-assoc-ref x 'name) name)) vec))
+
+  (vector-fold
+   (lambda (i acc x)
+     (let* ((name (json-assoc-ref x 'name))
+            (ind (index-by-name name acc)))
+       (if ind
+           (begin
+             (vector-set! acc ind (waybar-merge-configs (vector-ref acc ind) x))
+             acc)
+           (vector-append acc (vector x)))))
+   #() configs))
+
+;; (print-json
+;;  (waybar-collapse-configs
+;;   #(((position . "top")
+;;      (name . main)
+;;      (modules-left . #(sway/workspaces)))
+;;     ((ipc . #t)
+;;      (height . 34)
+;;      (name . main)
+;;      (modules-left . #(sway/mode))))))
+
+(define (waybar-config? config)
+  (vector? config))
+
+(define (serialize-waybar-config config)
+  (serialize-json config))
+
+(define-configuration home-waybar-configuration
+  (waybar
+    (file-like waybar)
+    "waybar package to use.")
+  (config
+   (waybar-config
+    #())
+   "A vector of alists, each alists represent a separate bar
+configuration.  Configurations for bars provided by extensions will be
+merged by the value of name key, *-modules get appended, the rest just
+added to the end of original configuration of the bar.")
+  (style-css
+   (css-config
+    '())
+   "Style definitions for waybar look and feel customization."))
+
+(define-configuration home-waybar-extension
+  (config
+   (waybar-config
+    #())
+   "A vector of alists, each alists represent a separate bar
+configuration.  Configurations for bars provided by extensions will be
+merged by the value of name key, *-modules get appended, the rest just
+added to the end of original configuration of the bar.")
+  (style-css
+   (css-config
+    '())
+   "Additional style definitions for waybar look and feel customization."))
+
+(define (add-waybar-packages config)
+  (list (home-waybar-configuration-waybar config)))
+
+(define (home-waybar-extensions cfg extensions)
+  (let ((extensions (reverse extensions)))
+    (home-waybar-configuration
+     (inherit cfg)
+     (config
+      (waybar-collapse-configs
+       (vector-append
+        (home-waybar-configuration-config cfg)
+        (vector-concatenate
+         (map home-waybar-extension-config extensions)))))
+     (style-css
+      (append
+       (home-waybar-configuration-style-css cfg)
+       (append-map home-waybar-extension-style-css extensions))))))
+
+(define (add-waybar-configuration config)
+  `(("config/waybar/style.css"
+     ,(apply
+       mixed-text-file
+       "waybar-style-css"
+       (serialize-css-config (home-waybar-configuration-style-css config))))
+    ("config/waybar/config"
+     ,(apply
+       mixed-text-file
+       "waybar-config"
+       (serialize-waybar-config (home-waybar-configuration-config config))))))
+
+(define home-waybar-service-type
+  (service-type (name 'home-waybar)
+                (extensions
+                 (list (service-extension
+			home-profile-service-type
+			add-waybar-packages)
+		       (service-extension
+                        home-files-service-type
+                        add-waybar-configuration)))
+		(compose append)
+		(extend home-waybar-extensions)
+                (default-value (home-waybar-configuration))
+                (description "\
+Install and configure waybar, a highly customizible wayland bar for
+wlroots based compositors.")))
