@@ -696,3 +696,20 @@ Commands provided:
       (description
        "This package integrates @code{restclient-mode} with Org.")
       (license license:gpl3+))))
+
+(define-public emacs-modus-themes-latest
+  (package
+   (inherit emacs-modus-themes)
+   (name "emacs-modus-themes")
+   (version "2.0.0-patch")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url "https://gitlab.com/protesilaos/modus-themes")
+           (commit "4f177f036b30dd6c1f2e6c5342f2b87e034dc97e")))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32 "15zxab2wg97ldy85wv2sx7j31z0cg0h28vm9yjnp3b7vl7sbzf33"))
+     (patches (search-patches
+               "0001-DRAFT-Add-tentative-support-for-ement.el.patch"))))))

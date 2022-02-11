@@ -382,7 +382,8 @@ Prefix argument can be used to kill a few words."
           #:key
           (margin 8)
           (light? #t)
-          (deuteranopia? #t))
+          (deuteranopia? #t)
+          (emacs-modus-themes emacs-modus-themes))
   "Make Emacs looks modern and minimalistic. `deuteranopia?' substitutes
 red/green colors with red/blue, which helps people with colorblindness
 and overall looks cool."
