@@ -317,6 +317,9 @@
       (,#~"output DP-1 res 5120x1440 bg ~/.cache/wallpaper.png fill")
       ;; TODO sway: wacom input rotation matrix
       (,#~"input \"*\" tool_mode \"*\" relative calibration_matrix 0.0 -1.0 1.0 1.0 0.0 0.0")
+      ;; danke demis https://github.com/minikN/guix/blob/ca15b5a5954d50fe75e2b03f21afc019e002022b/config.scm#L173
+      (for_window "[app_id=\"pavucontrol\"]" floating enable, border pixel)
+      (for_window "[app_id=\"pinentry-qt\"]" floating enable, border pixel)
       )
     )
    (feature-sway-run-on-tty
