@@ -381,6 +381,7 @@
            "emacs-forge"
            "emacs-debbugs"
            "emacs-ob-async"
+           "emacs-plantuml-mode"
            "emacs-org-fragtog"
 
            "emacs-explain-pause-mode"
