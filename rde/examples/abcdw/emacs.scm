@@ -1028,13 +1028,13 @@
       (sleep-for .5)
       (async-shell-command
        (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
-               "&& make ixy-home-reconfigure")))
+    	   "&& make ixy-home-reconfigure")))
     
     (defun qz/reload-config-system ()
       (interactive)
       (async-shell-command
        (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
-               "&& sudo -E make ixy-system-reconfigure")))
+    	   "&& sudo -E make ixy-system-reconfigure")))
     
     (defun qz/reload-config-emacs ()
       (interactive)
@@ -1044,13 +1044,13 @@
       (interactive)
       (async-shell-command
        (concat "cd $HOME/git/sys/rde/ "
-               "&& make channels-update-lock && make channels-pull")))
+    	   "&& make channels-update-lock && make channels-pull")))
     
     (defun qz/guix-upgrade ()
       (interactive)
       (async-shell-command
        (concat "cd $HOME/git/sys/rde"
-               "&& make channels-update-lock && make channels-pull && guix upgrade && make")))
+    	   "&& make channels-update-lock && make channels-pull && guix upgrade && make")))
     (setq tramp-cache-read-persistent-data t)
     (require 'perfect-margin)
     

@@ -2552,14 +2552,18 @@ or
    "~/git/sys/rde/rde/examples/abcdw/emacs.org")
   (sleep-for .5)
   (async-shell-command
-   (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
-           "&& make ixy-home-reconfigure")))
+   (concat
+    "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
+    "&& make ixy-home-reconfigure"
+    "&& echo 'home fuck complete' | espeak --stdin")))
 
 (defun qz/reload-config-system ()
   (interactive)
   (async-shell-command
-   (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
-           "&& sudo -E make ixy-system-reconfigure")))
+   (concat
+    "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
+    "&& sudo -E make ixy-system-reconfigure"
+    "&& echo 'system fuck complete' | espeak --stdin")))
 
 (defun qz/reload-config-emacs ()
   (interactive)
@@ -2569,13 +2573,13 @@ or
   (interactive)
   (async-shell-command
    (concat "cd $HOME/git/sys/rde/ "
-           "&& make channels-update-lock && make channels-pull")))
+	   "&& make channels-update-lock && make channels-pull")))
 
 (defun qz/guix-upgrade ()
   (interactive)
   (async-shell-command
    (concat "cd $HOME/git/sys/rde"
-           "&& make channels-update-lock && make channels-pull && guix upgrade && make")))
+	   "&& make channels-update-lock && make channels-pull && guix upgrade && make")))
 #+end_src
 
 #+RESULTS:
