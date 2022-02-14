@@ -26,6 +26,7 @@
   ;; #:use-module (gnu services)
   ;; #:use-module (gnu services nix)
   #:use-module (flat packages emacs)
+  #:use-module (nongnu packages nvidia)
   #:use-module (rde examples abcdw emacs)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
@@ -162,13 +163,25 @@
      ((@ (gnu services) simple-service)
       'make-guix-aware-of-guix-home-subcomand
       (@ (gnu home services) home-environment-variables-service-type)
-      '(("WLR_DRM_DEVICES" . "/dev/dri/card0:/dev/dri/card1") ;; gpu:cpu
+      '(
+        ;;; GRAPHICS
+        ("GBM_BACKEND" . "nvidia-drm")
+        ("GBM_BACKENDS_PATH" . "/gnu/store/k52jklliyks6sjhp8w44by7qph73y2rw-nvidia-driver-495.46/lib/gbm")
+        ("__GLX_VENDOR_LIBRARY_NAME" . "nvidia")
+        ("WLR_NO_HARDWARE_CURSORS" . "1")
+        ("WLR_DRM_DEVICES" . "/dev/dri/card0")   ;; gpu only
+        ;;("WLR_DRM_DEVICES" . "/dev/dri/card1") ;; cpu only
+        ;;("WLR_DRM_DEVICES" . "/dev/dri/card0:/dev/dri/card1") ;; gpu:cpu
+
+        ;;; GUILE
         ("GUILE_LOAD_PATH" .
          "$XDG_CONFIG_HOME/guix/current/share/guile/site/3.0\
 :$GUILE_LOAD_PATH")
         ("GUILE_LOAD_COMPILED_PATH" .
          "$XDG_CONFIG_HOME/guix/current/lib/guile/3.0/site-ccache\
 :$GUILE_LOAD_COMPILED_PATH")
+
+        ;;; JS/BABEL
         ;; javascript sucks, npm sucks
         ;; https://github.com/npm/npm/issues/6675#issuecomment-250318382
         ;; https://github.com/npm/cli/issues/1451
@@ -181,9 +194,13 @@
         ("NODE_REPL_HISTORY" . "${NODE_REPL_HISTORY:-$XDG_CACHE_HOME/node/repl_history}")
         ("NVM_DIR" . "${NVM_DIR:-$XDG_DATA_HOME/nvm}")
         ("BABEL_CACHE_PATH" . "${BABEL_CACHE_PATH:-$XDG_CACHE_HOME/babel/cache.json}")
+
+        ;;; DEVELOPMENT
         ("GUIX_CHECKOUT" . "$HOME/git/sys/guix")
         ("GUIX_EXTRA_PROFILES" . "$HOME/.guix-extra-profiles")
-        ("GDK_BACKEND" . "wayland") ;; ... for clipboarding emacs
+
+        ;;; ETC
+        ("GDK_BACKEND" . "wayland") ;; ... for clipboarding emasc
         ("PATH" . (string-join (list "$PATH"
                                      "$HOME/.local/bin"
                                      "$HOME/.krew/bin"
@@ -209,7 +226,7 @@
      ;;                 (system* "git add .")
      ;;                 (system* "git commit -m \"auto-commit | $(date -u)\""))
      ;;               "notes-commit")))
-     
+
      )
     #:system-services
     (list (service postgresql-service-type)
@@ -323,7 +340,9 @@
       )
     )
    (feature-sway-run-on-tty
-    #:sway-tty-number 2)
+    #:sway-tty-number 2
+    ;;#:launch-args "--unsupported-gpu" ;; 1.7-rc1+ https://github.com/swaywm/sway/releases/tag/1.7-rc1
+    #:launch-args "--my-next-gpu-wont-be-nvidia --debug &>/tmp/sway")
    (feature-sway-screenshot)
    (feature-sway-statusbar
     #:use-global-fonts? #f)
@@ -550,16 +569,21 @@
    ;;; Allows to declare specific bootloader configuration,
    ;;; grub-efi-bootloader used by default
    ;; (feature-bootloader)
-   ; os
+   ;; os
    (feature-kernel
-    #:kernel nongnu:linux
+    #:kernel nongnu:linux-lts
     #:kernel-arguments
-    '("quiet" "ipv6.disable=1" "net.ifnames=0")
+    '("quiet" "ipv6.disable=1" "net.ifnames=0"
+      ;; https://forums.developer.nvidia.com/t/nvidia-495-on-sway-tutorial-questions-arch-based-distros/192212
+       "nvidia-drm.modeset=1" "nouveau.blacklist=1" "modprobe.blacklist=nouveau"
+      )
     ;; removed "modprobe.blacklist=snd_hda_intel,snd_soc_skl"
     #:firmware (list nongnu:linux-firmware
-                     nongnu:sof-firmware)
+                     nongnu:sof-firmware
+                     nvidia-driver)
     #:initrd nongnu-sys:microcode-initrd
-    #:kernel-loadable-modules (list v4l2loopback-linux-module))
+    #:kernel-loadable-modules (list v4l2loopback-linux-module
+                                    nvidia-driver))
    (feature-file-systems
     #:mapped-devices ixy-mapped-devices
     #:file-systems   ixy-file-systems)
