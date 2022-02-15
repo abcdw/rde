@@ -283,6 +283,13 @@ buffer are offered."
 #+RESULTS:
 : qz/newline-above
 
+*** {C-M-j} delete-indentation
+maximum [[id:6eb04531-fbcc-45da-86e9-499b48caeb8a][ergonomics]]
+
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+(define-key global-map (kbd "C-M-j") 'delete-indentation)
+#+end_src
+
 *** {H-M-s-h}jkl windmove swap
 
 I don't use this very much, as it curls my whole left hand up (qwerty troubles)
@@ -681,6 +688,14 @@ to populate, just fill a `pass' entry like so echo mypass | pass
 #+begin_src emacs-lisp :noweb-ref conf
 (require 'hyperbole)
 #+end_src
+*** {C-<mouse-2} hkey-either
+#+begin_src emacs-lisp :noweb-ref conf
+(define-key global-map (kbd "C-<down-mouse-2>") 'hkey-either)
+#+end_src
+
+#+RESULTS:
+: hkey-either
+
 ** [[id:6baf4bff-d5fe-4ce0-a130-0464e49de67d][org]]
 *** agenda
 **** data

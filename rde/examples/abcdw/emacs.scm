@@ -1027,14 +1027,18 @@
        "~/git/sys/rde/rde/examples/abcdw/emacs.org")
       (sleep-for .5)
       (async-shell-command
-       (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
-    	   "&& make ixy-home-reconfigure")))
+       (concat
+        "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
+        "&& make ixy-home-reconfigure"
+        "&& echo 'home fuck complete' | espeak --stdin")))
     
     (defun qz/reload-config-system ()
       (interactive)
       (async-shell-command
-       (concat "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
-    	   "&& sudo -E make ixy-system-reconfigure")))
+       (concat
+        "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
+        "&& sudo -E make ixy-system-reconfigure"
+        "&& echo 'system fuck complete' | espeak --stdin")))
     
     (defun qz/reload-config-emacs ()
       (interactive)
