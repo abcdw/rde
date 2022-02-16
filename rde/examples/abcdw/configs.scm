@@ -345,8 +345,8 @@
       (for_window "[app_id=\"pinentry-qt\"]" floating enable, border pixel)
       (for_window "[title=\"Nightly - Sharing Indicator\"]" floating enable, border pixel)
       (bindsym $mod+Ctrl+o opacity set 1)
-      (bindsym $mod+Ctrl+p opacity minus 0.1))
-    )
+      (bindsym $mod+Ctrl+p opacity minus 0.1)
+      (bindsym $mod+x exec $menu)))
    (feature-sway-run-on-tty
     #:sway-tty-number 2
     ;;#:launch-args "--unsupported-gpu" ;; 1.7-rc1+ https://github.com/swaywm/sway/releases/tag/1.7-rc1

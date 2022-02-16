@@ -101,6 +101,7 @@
     ;;(org-remap org-mode-map
     ;;           'open-line 'org-open-line)
     
+    (define-key global-map (kbd "C-M-j") 'delete-indentation)
     (define-key global-map (kbd "M-s-h") 'windmove-swap-states-left)
     (define-key global-map (kbd "M-s-j") 'windmove-swap-states-down)
     (define-key global-map (kbd "M-s-k") 'windmove-swap-states-up)
@@ -235,6 +236,7 @@
       (let ((jq-interactive-command "yq"))
         (call-interactively 'jq-interactively)))
     (require 'hyperbole)
+    (define-key global-map (kbd "C-<down-mouse-2>") 'hkey-either)
     (message "pre org: %s" (shell-command-to-string "date"))
     (with-eval-after-load 'org
       (message "mid org: %s" (
