@@ -17,6 +17,7 @@
 (define* (feature-rofi
           #:key
           (rofi rofi-wayland)
+          (theme #f)
           (default-application-launcher? #t))
   "Configure rofi."
   (ensure-pred any-package? rofi)
@@ -42,7 +43,8 @@
             (kb-page-prev . "Alt+v")))
           ,#~(format
               #f "@theme \"~a\""
-              #$(file-append rofi "/share/rofi/themes/Arc.rasi"))))))))
+              (or #$theme
+                  #$(file-append rofi "/share/rofi/themes/Arc.rasi")))))))))
 
   (feature
    (name 'rofi)
