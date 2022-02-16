@@ -43,6 +43,7 @@
             feature-emacs-elpher
             feature-emacs-telega
             feature-emacs-pdf-tools
+            feature-emacs-nov-el
             feature-emacs-which-key
             feature-emacs-keycast
             feature-emacs-perfect-margin
@@ -2040,6 +2041,82 @@ emacsclient feels more like a separate emacs instance."
          (define-key ement-room-mode-map (kbd "p") 'ement-room-goto-prev)
          (define-key ement-room-mode-map (kbd "n") 'ement-room-goto-next))
       #:elisp-packages (list ement)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-nov-el
+          #:key
+          (emacs-nov-el emacs-nov-el))
+  "Configure nov.el for GNU Emacs."
+  (define emacs-f-name 'nov-el)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
+        (with-eval-after-load
+         'nov
+         (setq nov-text-width t)
+
+         ;; lifted from https://depp.brause.cc/nov.el#Rendering
+         (defun my-nov-window-configuration-change-hook ()
+           (my-nov-post-html-render-hook)
+           (remove-hook 'window-configuration-change-hook
+                        'my-nov-window-configuration-change-hook
+                        t))
+
+         (defun my-nov-post-html-render-hook ()
+           "adds local hook to listen to resize events
+`my-nov-window-configuration-change-hook'"
+           (if (get-buffer-window)
+               (let ((max-width (pj-line-width))
+                     buffer-read-only)
+                 (save-excursion
+                  (goto-char (point-min))
+                  (while (not (eobp))
+                    (when (not (looking-at "^[[:space:]]*$"))
+                      (goto-char (line-end-position))
+                      (when (> (shr-pixel-column) max-width)
+                        (goto-char (line-beginning-position))
+                        (pj-justify)))
+                    (forward-line 1))))
+               (add-hook 'window-configuration-change-hook
+                         'my-nov-window-configuration-change-hook
+                         nil t)))
+         (add-hook 'nov-post-html-render-hook 'my-nov-post-html-render-hook)
+
+         ;; XXX justify-kp: this should be optional I suppose, it just
+         ;;     really ties the whole thing together
+         (require 'justify-kp)
+         (with-eval-after-load
+          'justify-kp
+          (defun pj-line-width ()
+           "Return preferred line width."
+           (min 699 (pj--get-working-window-width))))
+
+         (require 'olivetti)
+         (with-eval-after-load
+          'olivetti
+          (add-hook 'nov-mode-hook
+                    (lambda () (olivetti-mode 1))))
+
+         (with-eval-after-load
+          'perfect-margin
+          (add-hook 'nov-mode-hook
+                    (lambda () (funcall-interactively 'perfect-margin-mode -1))))
+         ))
+     #:elisp-packages (list emacs-nov-el
+                            emacs-olivetti
+                            emacs-justify-kp)
+     )))
+  ;; TODO nov-el: add XDG default for epub !!!!!
+  ;; TODO nov-el: add zsync sycnhing of progress to states of epub
 
   (feature
    (name f-name)
