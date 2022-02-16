@@ -17,9 +17,11 @@
 (define* (feature-rofi
           #:key
           (rofi rofi-wayland)
+          (theme "Arc")
           (default-application-launcher? #t))
   "Configure rofi."
   (ensure-pred any-package? rofi)
+  (ensure-pred file-like-or-path? theme)
 
   (define (get-home-services config)
     (list
@@ -40,9 +42,7 @@
             (kb-clear-line . "Control+slash")
             (kb-page-next . "Control+v")
             (kb-page-prev . "Alt+v")))
-          ,#~(format
-              #f "@theme \"~a\""
-              #$(file-append rofi "/share/rofi/themes/Arc.rasi"))))))))
+          ,#~(format #f "@theme \"~a\"" #$theme)))))))
 
   (feature
    (name 'rofi)
