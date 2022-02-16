@@ -85,13 +85,13 @@
    (feature-mail-settings
     #:mail-accounts
     (list (mail-account
-           (id   'work)
-           (fqda "sculpepper@newstore.com")
-           (type 'gmail))
-          (mail-account
            (id   'personal)
            (fqda "samuel@samuelculpepper.com")
-           (type 'bravehost)))
+           (type 'bravehost))
+          (mail-account
+           (id   'work)
+           (fqda "sculpepper@newstore.com")
+           (type 'gmail)))
     #:mailing-lists
     (list
      (mail-lst 'python-speed "speed@python.org"
