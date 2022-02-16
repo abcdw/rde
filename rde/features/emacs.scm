@@ -37,6 +37,7 @@
             feature-emacs-elpher
             feature-emacs-telega
             feature-emacs-pdf-tools
+            feature-emacs-nov-el
             feature-emacs-which-key
             feature-emacs-keycast
 
@@ -1718,5 +1719,68 @@ provided add rde-keycast-mode to after-init-hook."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define* (feature-emacs-nov-el
+          #:key
+          (emacs-nov-el emacs-nov-el))
+  "Configure nov.el for GNU Emacs."
+  (define emacs-f-name 'nov-el)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
 
-;; TODO: feature-emacs-epub https://depp.brause.cc/nov.el/
+  (define (get-home-services config)
+    (require-value 'emacs-client-create-frame config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+
+        (with-eval-after-load
+         'nov
+         (add-hook 'nov-mode-hook (lambda () (olivetti-mode 1)))
+
+         (setq nov-text-width t)
+
+         (autoload 'pj-line-width "justify-kp")
+
+         ;; <https://depp.brause.cc/nov.el#Rendering>
+         (defun rde-nov-window-configuration-change-hook ()
+           (rde-nov-post-html-render-hook)
+           (remove-hook 'window-configuration-change-hook
+                        'rde-nov-window-configuration-change-hook
+                        t))
+
+         (defun rde-nov-post-html-render-hook ()
+           "Adds local hook to listen to resize events
+`rde-nov-window-configuration-change-hook'"
+           (if (get-buffer-window)
+               (let ((max-width (pj-line-width))
+                     buffer-read-only)
+                 (save-excursion
+                  (goto-char (point-min))
+                  (while (not (eobp))
+                    (when (not (looking-at "^[[:space:]]*$"))
+                      (goto-char (line-end-position))
+                      (when (> (shr-pixel-column) max-width)
+                        (goto-char (line-beginning-position))
+                        (pj-justify)))
+                    (forward-line 1))))
+               (add-hook 'window-configuration-change-hook
+                         'rde-nov-window-configuration-change-hook
+                         nil t)))
+
+         (add-hook 'nov-post-html-render-hook 'rde-nov-post-html-render-hook)))
+     #:elisp-packages (list emacs-nov-el
+                            (get-value 'emacs-olivetti config emacs-olivetti)
+                            emacs-justify-kp))
+     (emacs-xdg-service
+      emacs-f-name "Emacs (Client) [EPUB]"
+      #~(apply system*
+               #$(get-value 'emacs-client-create-frame config)
+               (cdr (command-line)))
+      #:default-for '(application/epub+zip))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+;;; emacs.scm end here
