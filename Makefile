@@ -8,12 +8,12 @@ DEBUG ?= 0
 home:
 	RDE_TARGET=ixy-home \
 	GUILE_LOAD_PATH=./ \
-	guix home reconfigure ./rde/examples/abcdw/configs.scm
+	guix home reconfigure ./rde/examples/abcdw/configs.scm --allow-downgrades
 
 system:
 	RDE_TARGET=ixy-system \
 	GUILE_LOAD_PATH=./ \
-	guix system reconfigure ./rde/examples/abcdw/configs.scm
+	guix system reconfigure ./rde/examples/abcdw/configs.scm --allow-downgrades
 
 # home-reconfigure-local:
 # 	GUILE_LOAD_PATH=./ ../gnu/guix/pre-inst-env guix \

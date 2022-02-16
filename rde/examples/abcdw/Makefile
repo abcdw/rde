@@ -23,7 +23,7 @@ targets-system = $(addsuffix -system, $(HOSTS))
 
 %-system-reconfigure:
 	GUILE_LOAD_PATH=$(GLP) RDE_TARGET=$*-system \
-	guix system reconfigure $(CONFIG_FILE) --fallback
+	guix system reconfigure $(CONFIG_FILE) --fallback --allow-downgrades
 
 
 $(targets-home): %-home-reconfigure

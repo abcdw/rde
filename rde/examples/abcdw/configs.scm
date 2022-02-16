@@ -169,7 +169,7 @@
         ("GBM_BACKENDS_PATH" . "/gnu/store/k52jklliyks6sjhp8w44by7qph73y2rw-nvidia-driver-495.46/lib/gbm")
         ("__GLX_VENDOR_LIBRARY_NAME" . "nvidia")
         ("WLR_NO_HARDWARE_CURSORS" . "1")
-        ("WLR_DRM_DEVICES" . "/dev/dri/card0")   ;; gpu only
+        ;;("WLR_DRM_DEVICES" . "/dev/dri/card1")   ;; gpu only
         ;;("WLR_DRM_DEVICES" . "/dev/dri/card1") ;; cpu only
         ;;("WLR_DRM_DEVICES" . "/dev/dri/card0:/dev/dri/card1") ;; gpu:cpu
 

@@ -25,7 +25,7 @@
 
       (channel
        (name 'nonguix)
-       (url "https://gitlab.com/nonguix/nonguix"))
+       (url "file:///home/samuel/git/sys/nonguix"))
 
       ;; (channel
       ;;  (name 'guix-gaming-games)
