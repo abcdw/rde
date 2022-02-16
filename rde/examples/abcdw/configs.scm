@@ -305,6 +305,12 @@
                         ;;(identity-file . "~/.ssh/newstore-luminate.pem")
                         )))
             (ssh-host
+             (host "ko")
+             (options '((user . "root")
+                        (hostname . "192.168.0.240")
+                        (port . 2222)
+                        (identity-file . "~/.ssh/ko.pub"))))
+            (ssh-host
              (host "bastion-sandbox")
              (options '((user . "ubuntu@bastion-sandbox")
                         (hostname . "bastion-sandbox.ssh.newstore.luminatesec.com")
