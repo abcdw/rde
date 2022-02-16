@@ -4,7 +4,9 @@
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages xdisorg)
-
+  #:use-module (gnu packages password-utils)
+  #:use-module (gnu packages gnome)
+  #:use-module (gnu packages man)
   #:use-module (srfi srfi-1)
 
   #:use-module (guix diagnostics)
@@ -713,3 +715,34 @@ Commands provided:
       (base32 "15zxab2wg97ldy85wv2sx7j31z0cg0h28vm9yjnp3b7vl7sbzf33"))
      (patches (search-patches
                "0001-DRAFT-Add-tentative-support-for-ement.el.patch"))))))
+
+(define-public tessen
+  (package
+    (name "tessen")
+    (version "1.3.1")
+    (home-page "https://github.com/ayushnix/tessen")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append home-page "/archives/refs/tags/v" version ".tar.gz"))
+       (sha256
+        (base32 "07ddb5himj4c9ijdibjy25dshil3k5nqd7869z9rkldzh97zh29f"))))
+    (build-system gnu-build-system)
+    (arguments
+     '(#:make-flags (list (string-append "PREFIX=" %output))
+       #:phases (modify-phases %standard-phases
+                  (delete 'configure)
+                  (delete 'check))))
+    (inputs (list password-store
+                  wl-clipboard
+                  libnotify
+                  pass-otp
+                  xdg-utils
+                  scdoc))
+    (synopsis
+     "An interactive menu to autotype and copy password-store data ")
+    (description
+     "tessen is a bash script that can use any wayland native
+dmenu-like backend as an interface for auto-typing and copying
+password-store data, known to work with bemenu, fuzzel, rofi, wofi")
+    (license license:gpl3+)))

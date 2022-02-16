@@ -11,6 +11,7 @@
   #:use-module (gnu packages qt)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages xdisorg)
+  #:use-module (gnu packages password-utils)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages terminals)
   #:use-module (gnu packages rust-apps)
@@ -28,6 +29,7 @@
 
   #:export (feature-sway
             feature-sway-run-on-tty
+            feature-sway-tessen
             feature-sway-screenshot
             feature-sway-statusbar
 
@@ -317,6 +319,49 @@ automatically switch to SWAY-TTY-NUMBER on boot."
       home-sway-service-type
       `((bindsym $mod+Print exec ,shot-output)
         (bindsym $mod+Shift+Print exec ,shot-window-or-selection)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; sway-tessen.
+;;;
+
+(define* (feature-sway-tessen
+          #:key
+          ;; TODO this should really take from `default-application-launcher'
+          ;;      -  should get the program from
+          ;;     `(basename (get 'default-application-launcher config))'
+          (menu-arg "bemenu -l20")
+          (menu-package bemenu))
+  "Configure tessen, a wayland-focused menu-agnostic interface to pass."
+
+  (define sway-f-name 'tessen)
+  (define f-name (symbol-append 'sway- sway-f-name))
+
+  (define (get-home-services config)
+    (require-value 'sway config)
+
+    (define* script
+      (program-file
+       "sway-tessen"
+       #~(system
+          (string-append
+           #$(file-append tessen "/bin/tessen") " -b '" #$menu-arg "' -a copy"))))
+
+    (list
+     (simple-service
+      'sway-tessen-packages
+      home-profile-service-type
+      (list tessen password-store menu-package))
+
+     (simple-service
+      'sway-bind-tessen
+      home-sway-service-type
+      `((bindsym $mod+Ctrl+Period exec ,script)))))
 
   (feature
    (name f-name)
