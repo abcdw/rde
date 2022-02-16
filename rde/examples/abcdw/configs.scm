@@ -343,12 +343,17 @@
       ;; danke demis https://github.com/minikN/guix/blob/ca15b5a5954d50fe75e2b03f21afc019e002022b/config.scm#L173
       (for_window "[app_id=\"pavucontrol\"]" floating enable, border pixel)
       (for_window "[app_id=\"pinentry-qt\"]" floating enable, border pixel)
-      )
+      (for_window "[title=\"Nightly - Sharing Indicator\"]" floating enable, border pixel)
+      (bindsym $mod+Ctrl+o opacity set 1)
+      (bindsym $mod+Ctrl+p opacity minus 0.1))
     )
    (feature-sway-run-on-tty
     #:sway-tty-number 2
     ;;#:launch-args "--unsupported-gpu" ;; 1.7-rc1+ https://github.com/swaywm/sway/releases/tag/1.7-rc1
     #:launch-args "--my-next-gpu-wont-be-nvidia --debug &>/tmp/sway")
+   (feature-sway-tessen
+    #:menu-arg "rofi"
+    #:menu-package rofi-wayland)
    (feature-sway-screenshot)
    (feature-sway-statusbar
     #:use-global-fonts? #f)
@@ -358,7 +363,8 @@
     #:extra-config '((screenshots)
                      (effect-blur . 7x5)
                      (clock)))
-   (feature-rofi)
+   (feature-rofi
+    #:theme (local-file "config/rofi/themes/base16-default-dark.rasi"))
    (feature-direnv)
    (feature-emacs
     #:extra-init-el
