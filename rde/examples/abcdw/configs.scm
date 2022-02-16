@@ -413,7 +413,9 @@
            ;; "emacs-org-autotangle"
            )))
 
-   (feature-emacs-appearance #:light? #f)
+   (feature-emacs-appearance
+    #:light? #f
+    #:emacs-modus-themes emacs-modus-themes-latest)
    (feature-emacs-faces)
    (feature-emacs-completion
     #:mini-frame? #f)
@@ -438,6 +440,7 @@
    (feature-emacs-elpher)
    (feature-emacs-telega)
    (feature-emacs-pdf-tools)
+   (feature-emacs-nov-el)
 
    ;; TODO: Revisit <https://en.wikipedia.org/wiki/Git-annex>
    (feature-emacs-git)
@@ -465,7 +468,7 @@
    (feature-emacs-es-mode
     #:package emacs-es-mode)
    (feature-emacs-restclient
-    #:package-ob emacs-ob-restclient)
+    #:package-ob emacs-ob-restclient-latest)
    (feature-mpv)
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
