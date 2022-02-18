@@ -942,6 +942,15 @@
       (message "post org: %s" (shell-command-to-string "date"))
       )
     (setq org-image-actual-width 640)
+    
+    ;; (setq minibuffer-mode-hook nil)
+    ;; (add-hook 'minibuffer-mode-hook 'olivetti-mode)
+    
+    (add-hook 'minibuffer-mode-hook
+              (lambda ()
+                (setq-local olivetti-body-width 200)
+                (olivetti-mode)))
+    
     (with-eval-after-load 'pdf-view
       (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode))
     (defvar qz/restclient-env nil)
