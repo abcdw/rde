@@ -156,6 +156,8 @@
     #:system-services
     (list
      ;; (service nix-service-type)
+     (simple-service 'nvidia-udev-rule udev-service-type
+                     (list nvidia-driver))
      )
     #:home-services
     (list
@@ -165,10 +167,17 @@
       (@ (gnu home services) home-environment-variables-service-type)
       '(
         ;;; GRAPHICS
+        ;;("LIBGL_DRIVERS_PATH" . (string-join (list "/gnu/store/bg8mrp0ply34c76xq1i8b4hgjyh6hi8k-nvidia-driver-495.46/lib/gbm"
+        ;;                                           "/gnu/store/bg8mrp0ply34c76xq1i8b4hgjyh6hi8k-nvidia-driver-495.46/lib"
+        ;;                                           "/gnu/store/bg8mrp0ply34c76xq1i8b4hgjyh6hi8k-nvidia-driver-495.46") ":"))
+        ("LIBGL_DEBUG" . "verbose")
+        ("G_MESSAGES_DEBUG" . "1")
+
         ("GBM_BACKEND" . "nvidia-drm")
-        ("GBM_BACKENDS_PATH" . "/gnu/store/k52jklliyks6sjhp8w44by7qph73y2rw-nvidia-driver-495.46/lib/gbm")
+        ("GBM_BACKENDS_PATH" . "/gnu/store/bg8mrp0ply34c76xq1i8b4hgjyh6hi8k-nvidia-driver-495.46/lib/gbm")
         ("__GLX_VENDOR_LIBRARY_NAME" . "nvidia")
         ("WLR_NO_HARDWARE_CURSORS" . "1")
+        ("WLR_DRM_NO_ATOMIC" . "1")
         ;;("WLR_DRM_DEVICES" . "/dev/dri/card1")   ;; gpu only
         ;;("WLR_DRM_DEVICES" . "/dev/dri/card1") ;; cpu only
         ;;("WLR_DRM_DEVICES" . "/dev/dri/card0:/dev/dri/card1") ;; gpu:cpu
@@ -331,6 +340,7 @@
    (feature-git)
    ;; #:package sway-latest
    (feature-sway
+    #:xdg-desktop-portal-wlr xdg-desktop-portal-wlr-latest
     #:xwayland? #f
     #:opacity 0.9
     #:wallpaper "$HOME/.cache/wallpaper.png"
@@ -398,6 +408,7 @@
 
            "emacs-explain-pause-mode"
            ;; TODO feature-emacs-lsp
+           "emacs-jq-mode"
            "emacs-eglot"
            "emacs-lsp-ui"
            "emacs-lsp-mode"
@@ -407,6 +418,7 @@
            "emacs-protobuf-mode"
            "emacs-go-mode"
            "emacs-eros"
+           "emacs-terraform-mode"
            "emacs-string-inflection"
            "emacs-htmlize" ;; ement: -> ox-export html: org src blocks
            ;; emacs-impostman
@@ -505,6 +517,7 @@
      ;; (pkgs-vanilla
      ;;  "icecat" "nyxt"
      ;;  "ungoogled-chromium-wayland" "ublock-origin-chromium")
+     (list wlroots-latest wayland-latest)
      (pkgs
       "alsa-utils" "mpv" "youtube-dl" "imv" "vim"
       "cozy" "pavucontrol"
