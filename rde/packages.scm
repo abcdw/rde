@@ -786,3 +786,122 @@ password-store data, known to work with bemenu, fuzzel, rofi, wofi")
                 "0xw5hmx816w4hsy1pwz3qikxc7m6pcx1ly03hhbb6vp94gfcwpr3"))
               (patches (search-patches "xdg-desktop-portal-wlr-harcoded-length.patch"))))
         (license license:expat))))
+
+(use-modules (gnu packages wm)
+             (gnu packages gl)
+             (gnu packages xorg))
+(define-public wlroots-latest
+  (package
+    (inherit wlroots)
+    (name "wlroots-latest")
+    (version "0.15.1")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://gitlab.freedesktop.org/wlroots/wlroots")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "00s73nhi3sc48l426jdlqwpclg41kx1hv0yk4yxhbzw19gqpfm1h"))))
+    (build-system meson-build-system)
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         (add-before 'configure 'hardcode-paths
+           (lambda* (#:key inputs #:allow-other-keys)
+             (substitute* "xwayland/server.c"
+               (("Xwayland") (string-append (assoc-ref inputs
+                                                       "xorg-server-xwayland")
+                                            "/bin/Xwayland")))
+             #t)))))
+    (propagated-inputs
+     (list ;; As required by wlroots.pc.
+           eudev
+           libinput
+           libxkbcommon
+           mesa
+           pixman
+           seatd
+           wayland-latest
+           wayland-protocols
+           xcb-util-errors
+           xcb-util-wm
+           xorg-server-xwayland))
+    (native-inputs
+     (list pkg-config wayland))
+    (home-page "https://github.com/swaywm/wlroots")
+    (synopsis "Pluggable, composable, unopinionated modules for building a
+Wayland compositor")
+    (description "wlroots is a set of pluggable, composable, unopinionated
+modules for building a Wayland compositor.")
+    (license license:expat)))
+
+(use-modules (gnu packages libffi)
+             (gnu packages xml)
+             (gnu packages docbook))
+(define-public wayland-latest
+  (package
+    (inherit wayland)
+    (name "wayland-latest")
+    (version "1.20.0")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append "https://wayland.freedesktop.org/releases/"
+                                  name "-" version ".tar.xz"))
+              (sha256
+               (base32
+                "09c7rpbwavjg4y16mrfa57gk5ix6rnzpvlnv1wp7fnbh9hak985q"))))
+    (build-system meson-build-system)
+    (outputs '("out" "doc"))
+    (arguments
+     `(#:parallel-tests? #f
+        #:phases
+       (modify-phases %standard-phases
+         (add-after 'unpack 'patch-docbook-xml
+           (lambda* (#:key native-inputs inputs #:allow-other-keys)
+             (with-directory-excursion "doc"
+               (substitute* (find-files "." "\\.xml$")
+                 (("http://www.oasis-open.org/docbook/xml/4\\.5/")
+                  (string-append (assoc-ref (or native-inputs inputs)
+                                            "docbook-xml")
+                                 "/xml/dtd/docbook/"))
+                 (("http://www.oasis-open.org/docbook/xml/4\\.2/")
+                  (string-append (assoc-ref (or native-inputs inputs)
+                                            "docbook-xml-4.2")
+                                 "/xml/dtd/docbook/"))))))
+         (add-after 'install 'move-doc
+           (lambda* (#:key outputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (doc (assoc-ref outputs "doc")))
+               (mkdir-p (string-append doc "/share"))
+               (rename-file
+                (string-append out "/share/doc")
+                (string-append doc "/share/doc"))))))))
+    (native-inputs
+     `(("docbook-xml-4.2" ,docbook-xml-4.2)
+       ("docbook-xml" ,docbook-xml)
+       ("docbook-xsl" ,docbook-xsl)
+       ("dot" ,graphviz)
+       ("doxygen" ,doxygen)
+       ("pkg-config" ,pkg-config)
+       ("python" ,python)
+       ("xmlto" ,xmlto)
+       ("xsltproc" ,libxslt)
+       ,@(if (%current-target-system)
+             `(("pkg-config-for-build" ,pkg-config-for-build)
+               ("wayland" ,this-package)) ; for wayland-scanner
+             '())))
+    (inputs
+     (list expat libxml2))           ; for XML_CATALOG_FILES
+    (propagated-inputs
+     (list libffi))
+    (home-page "https://wayland.freedesktop.org/")
+    (synopsis "Core Wayland window system code and protocol")
+    (description "Wayland is a project to define a protocol for a compositor to
+talk to its clients as well as a library implementation of the protocol.  The
+compositor can be a standalone display server running on Linux kernel
+modesetting and evdev input devices, an X application, or a wayland client
+itself.  The clients can be traditional applications, X servers (rootless or
+fullscreen) or other display servers.")
+    (license license:expat)))
