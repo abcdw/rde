@@ -21,8 +21,10 @@ available functions, ~C-h v~ to explore available variables, ~C-h k~
 to learn what is called on particular keybinding.
 ** Additional keybindings
 rde emacs tries to stick to vanilla keybinding, if it necessary to
-declare new combination it tries to use as emacsy key as possible, for
-example: project related command will go under ~C-x p~ prefix.
-Frequently used commands can go under ~s-~ prefix, for example: ~s-e~
-can call ~eshell-toggle~.
+declare new combination it tries to use as /emacsy/ keys as possible,
+for example: project related command will go under ~C-x p~ prefix.
+Frequently used commands can go under ~s-~ prefix, for example: ~s-e~ can
+call ~eshell-toggle~.
+
+
 

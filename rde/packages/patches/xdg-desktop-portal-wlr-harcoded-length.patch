@@ -1,0 +1,28 @@
+From 3121eeb5e68bedd6e2398f35b9bd60b69709a47e Mon Sep 17 00:00:00 2001
+From: Josselin Poiret <dev@jpoiret.xyz>
+Date: Tue, 14 Dec 2021 18:49:54 +0100
+Subject: [PATCH] Replace hardcoded command length
+
+---
+ src/screenshot/screenshot.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/src/screenshot/screenshot.c b/src/screenshot/screenshot.c
+index 9df0ea7..5f27681 100644
+--- a/src/screenshot/screenshot.c
++++ b/src/screenshot/screenshot.c
+@@ -42,8 +42,9 @@ static bool exec_screenshooter_interactive(const char *path) {
+ 		perror("fork");
+ 		return false;
+ 	} else if (pid == 0) {
+-		char cmd[strlen(path) + 25];
+-		snprintf(cmd, sizeof(cmd), "grim -g \"$(slurp)\" -- %s", path);
++		const char cmd_fmt[] = "grim -g \"$(slurp)\" -- %s";
++		char cmd[strlen(path) + sizeof(cmd_fmt)];
++		snprintf(cmd, sizeof(cmd), cmd_fmt, path);
+ 		execl("/bin/sh", "/bin/sh", "-c", cmd, NULL);
+ 		perror("execl");
+ 		exit(127);
+-- 
+2.34.0
+

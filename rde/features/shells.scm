@@ -16,10 +16,11 @@
             feature-bash))
 
 (define* (feature-zsh
-	  #:key
-	  (zsh zsh)
-	  (default-shell? #t)
-	  (enable-zsh-autosuggestions? #t))
+          #:key
+          (zsh zsh)
+          (default-shell? #t)
+          (enable-zsh-autosuggestions? #t)
+          (extra-zshrc '()))
   "Configure Zsh."
   (ensure-pred any-package? zsh)
 
@@ -38,6 +39,12 @@
      (when enable-zsh-autosuggestions?
        (service home-zsh-autosuggestions-service-type
                 zsh-autosuggestions-latest))
+
+     (simple-service
+      'zsh-splice-user-zshrc
+      home-zsh-service-type
+      (home-zsh-extension
+       (zshrc extra-zshrc)))
 
      (when (get-value 'wayland config)
        (let* ((wl-clipboard (get-value
@@ -85,9 +92,9 @@ bindkey -e '^Y' rde-yank
        (xdg-flavor? #t)
        (package zsh)
        (zshrc
-	(list
-	 (slurp-file-gexp (local-file "./zsh/zshrc"))
-	 "alias state-sync='herd sync state && pass git push origin master'"))))))
+        (list
+         (slurp-file-gexp (local-file "./zsh/zshrc"))
+         "alias state-sync='herd sync state && pass git push origin master'"))))))
 
   (feature
    (name 'zsh)

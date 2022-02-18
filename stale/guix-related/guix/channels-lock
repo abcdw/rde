@@ -1,13 +1,38 @@
 (list (channel
-        (name 'rde)
-        (url "https://github.com/abcdw/rde")
+        (name 'guix-gaming-games)
+        (url "file:///home/samuel/git/sys/guix-gaming-channels")
+        (branch "master")
         (commit
-          "8920be155d7f05c2fff541cc22a30b4740ec9acd"))
+          "519e2c97dd10abfbab4186aa11407900f5c7ba36"))
+      (channel
+        (name 'nonguix)
+        (url "file:///home/samuel/git/sys/nonguix")
+        (branch "master")
+        (commit
+          "a8ab4a7b36f776bbe1f6522ca5ef2e2f920f9e36"))
+      (channel
+        (name 'flat)
+        (url "https://github.com/flatwhatson/guix-channel.git")
+        (branch "master")
+        (commit
+          "86fb7253a4384b70c77739a0e03115be75d60ad1")
+        (introduction
+          (make-channel-introduction
+            "33f86a4b48205c0dc19d7c036c85393f0766f806"
+            (openpgp-fingerprint
+              "736A C00E 1254 378B A982  7AF6 9DBE 8265 81B6 4490"))))
+      (channel
+        (name 'rde)
+        (url "https://git.sr.ht/~abcdw/rde")
+        (branch "master")
+        (commit
+          "520e1429593c2daf4a296a9ea55c4aa32848b491"))
       (channel
         (name 'guix)
         (url "https://git.savannah.gnu.org/git/guix.git")
+        (branch "master")
         (commit
-          "827656c370b93ccbda3da8d116e9e603c33837c8")
+          "791069737c8c51582cc021438dae32eb0fb7b8e0")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"

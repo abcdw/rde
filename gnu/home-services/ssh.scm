@@ -18,7 +18,9 @@
             home-ssh-configuration
 	    home-ssh-configuration?
             ssh-host
-            ssh-match))
+            ssh-match
+
+            list-of-ssh-host-or-ssh-match?))
 
 ;;; Commentary:
 ;;;
@@ -36,7 +38,7 @@
   (cond
    ((boolean? val) (serialize-boolean field-name val))
    ((list? val) (serialize-list field-name val #:toplevel? toplevel?))
-   (else 
+   (else
     (let ((field-name (uglify-field-name field-name)))
       (cond
        ((or (member field-name '("Host" "Match"))
@@ -76,7 +78,7 @@
   (serialize-field field-name (boolean->yes-or-no val)))
 
 (define serialize-string serialize-field)
-(define (list-of-ssh-host-or-ssh-match? val)
+(define (list-of-ssh-host-or-ssh-match? lst)
   (list-of (lambda (val)
             (or (ssh-host? val)
                 (ssh-match? val)))))
@@ -205,11 +207,12 @@ Include /some/path/to/file
 @lisp
 (home-ssh-configuration
  (extra-config
-  (list (ssh-host \"savannah\"
-                  '((compression . #f)
+  (list (ssh-host
+         (host \"savannah\"
+         (options '((compression . #f)
                     (ciphers . (\"3des-cbc\" \"aes256-ctr\"))
                     (identity-file . \"~/.ssh/keys.d/id_rsa\")
-                    (server-alive-count-max . 3)))
+                    (server-alive-count-max . 3)))))
         (ssh-match '(exec \"grep key secret.txt\")
                    '((compression . #t))))))
 @end lisp

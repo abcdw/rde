@@ -1,0 +1,3757 @@
+#+title: emacs config
+#+auto-tangle: yes
+#+PROPERTY: header-args    :tangle-mode (identity #o444)
+#+PROPERTY: header-args:sh :tangle-mode (identity #o755)
+
+* tangling
+** ensure headings are sorted alphabetically :demo:
+#+begin_src emacs-lisp :tangle no
+(org-map-entries
+ (lambda ()
+   (when (org-get-heading)
+     (org-sort-entries t ?a))))
+#+end_src
+
+** noweb tangler ; root                                               :meta:
+#+begin_src scheme :noweb yes :tangle emacs.scm :tangle-mode
+(define-module (rde examples abcdw emacs)
+  #:export (init-el))
+
+(define init-el
+  '(
+    ;; NOWEB GENERAL START
+    <<general>>
+    ;; NOWEB GENERAL END
+
+    ;; NOWEB CONF START
+    <<conf>>
+    ;; NOWEB CONF END
+    ))
+#+end_src
+
+* configs
+** about this file
+*** slice
+#+begin_src emacs-lisp :tangle no
+(org-tags-sparse-tree)
+#+end_src
+
+**** tag
+***** ~func~                                                       :func:
+***** ~kbd~                                                         :kbd:
+***** ~meta~                                                       :meta:
+#+begin_src emacs-lisp :tangle no
+(org-tags-sparse-tree nil "meta")
+#+end_src
+
+#+RESULTS:
+
+***** ~var~                                                         :var:
+*** :tangle-mode
+**** #o444 ; readonly
+**** #0755 ; executable
+
+** bindings                                                            :kbd:
+*** {C-c C-j} +org-goto+ -> consult-org-heading
+imenu's leaf-nodes-only display is wack and cba to find out why right now
+#+begin_src emacs-lisp :noweb-ref org
+(define-key org-mode-map (kbd "C-c C-j") 'consult-org-heading)
+#+end_src
+
+#+RESULTS:
+: consult-org-heading
+
+**** consult-org--headings                                          :demo:
+#+begin_src emacs-lisp :results drawer :tangle no
+(require 'consult)
+
+(pp (let ((h (s-join "/" (org-get-outline-path nil nil))))
+      (car (seq-filter (lambda (s)
+                         (message "%s BONK %s" h s)
+                         (s-contains? h s))
+                       (consult-org--headings nil nil nil)))))
+#+end_src
+
+#+RESULTS:
+:results:
+#("bindings/{C-c C-j} +org-goto+ -> consult-org-heading􀜋" 0 1
+(face org-level-1 consult-org--heading
+(#<marker at 1803 in emacs.org> 2 nil nil))
+1 8
+(face org-level-1)
+9 52
+(face org-level-2)
+52 53
+(consult-strip t invisible t))
+:end:
+
+
+***** assoc                                                        :demo:
+#+begin_src emacs-lisp :results drawer :tangle no
+(pp (assoc (s-join "/" (org-get-outline-path t nil))
+           (consult-org--headings nil nil nil)))
+#+end_src
+
+#+RESULTS:
+:results:
+nil
+:end:
+
+#+RESULTS:
+: bindings/{C-c C-j} +org-goto+ -> consult-org-heading/outline path ; to assoc
+
+****** org-babel-indent-block ; indent babel
+#+begin_src emacs-lisp :noweb-ref org
+(defvar qz/org-babel-indent-exclude-lang nil "org-babel languages to exclude from auto indent/format with ")
+(setq qz/org-babel-indent-exclude-lang nil)
+
+(setq qz/debug t)
+
+(defun qz/org-babel-indent-block (beg end &rest args)
+  (interactive "r")
+  (and qz/debug (message "qz/org-babel-indent-block: BEG %s END %s ARGS %s" beg end args))
+  (save-mark-and-excursion
+    (when (and (funcall-interactively 'org-babel-mark-block)
+               (not (seq-contains-p
+                     qz/org-babel-indent-exclude-lang
+                     (car (car (cdr (car (org-babel-tangle-single-block 1 t))))))))
+      (call-interactively 'indent-region))))
+
+(define-key org-mode-map (kbd "C-c C-v C-\\") 'qz/org-babel-indent-block)
+
+;; NOTE: blocks default
+;;(add-to-list 'org-ctrl-c-ctrl-c-hook 'qz/org-babel-indent-block)
+;;(setq org-ctrl-c-ctrl-c-hook nil)
+;;
+;; NOTE: not the right eval/exec fn for `{C-c C-c}'
+;;(advice-add 'org-babel-eval :before 'qz/org-babel-indent-block)
+;;(advice-remove 'org-babel-eval 'qz/org-babel-indent-block)
+;;
+;; conclusion: use `advice' so as not to block standard org-mode
+;; `{C-c C-c}' behaviour like with `org-ctrl-c-ctrl-c-hook'
+
+(qz/advice- org-babel-execute-src-block :before qz/org-babel-indent-block)
+#+end_src
+
+#+RESULTS:
+| qz/advice-enable--org-babel-execute-src-block--qz/org-babel-indent-block | qz/advice-disable--org-babel-execute-src-block--qz/org-babel-indent-block |
+
+****** org-babel-refresh-graphics
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-refresh-inline-images (&rest args)
+  (org-toggle-inline-images t)
+  (org-toggle-inline-images t))
+
+(qz/advice- org-babel-execute-src-block :after qz/org-refresh-inline-images)
+#+end_src
+
+#+RESULTS:
+| qz/advice-enable--org-babel-execute-src-block--qz/org-refresh-inline-images | qz/advice-disable--org-babel-execute-src-block--qz/org-refresh-inline-images |
+
+
+****** re-sorting to emulate initial position                     :demo:
+#+begin_src emacs-lisp :tangle no
+(let* ((c 0)
+       (cands (consult--with-increased-gc (consult-org--headings nil nil nil)))
+       (olp (s-join "/" (org-get-outline-path t nil)))
+       (current-cand (seq-find (lambda (s)
+                                 (setq c (+ 1 c))
+                                 (and qz/debug (message "%s BONK %s" olp s))
+                                 (s-contains? olp s))
+                               (consult-org--headings nil nil nil))))
+
+  (message "%s" (list current-cand c (length cands)))
+
+  (append
+   (subseq cands (1- c) (length cands))
+   (subseq cands 0 (- c 2)))
+
+  ;;  (nth (1- c) cands)
+  ;; (message
+  ;;  "%S"
+  ;;  (mapc 'org-no-properties
+  ;;        (list
+  ;;         (nth (1- c) cands)
+  ;;         (nth c cands)
+  ;;         (nth (1+ c) cands))))
+  )
+#+end_src
+
+#+RESULTS:
+: ("bindings/{C-c C-j} +org-goto+ -> consult-org-heading/consult-org--headings/assoc/re-sorting to emulate initial position􁂽" "bindings/{C-c C-j} +org-goto+ -> consult-org-heading/consult-org-heading ; redef􁖬" "system commands􁹖")
+"bindings/{C-c C-j} +org-goto+ -> consult-org-heading/consult-org--headings/assoc/re-sorting to emulate initial position􁂽"
+"bindings/{C-c C-j} +org-goto+ -> consult-org-heading/consult-org-heading ; redef􁒉"
+"system commands􁴲")
+
+
+
+**** consult-org-heading ; redef                                    :demo:
+
+hmm. although some proxy for 'initial position' - it doesn't actually
+work so nicely.
+
+#+begin_src emacs-lisp :tangle no
+(defun consult-org-heading (&optional match scope)
+  "Jump to an Org heading.
+
+MATCH and SCOPE are as in `org-map-entries' and determine which
+entries are offered.  By default, all entries of the current
+buffer are offered."
+  (interactive (unless (derived-mode-p 'org-mode)
+                 (user-error "Must be called from an Org buffer")))
+  (let* ((c 0)
+         (prefix (not (memq scope '(nil tree region region-start-level file))))
+         (cands (consult--with-increased-gc (consult-org--headings prefix match scope)))
+         (olp (s-join "/" (org-get-outline-path t nil)))
+         (current-cand (seq-find (lambda (s)
+                                   (setq c (1+ c))
+                                   (and qz/debug (message "%s BONK %s" olp s))
+                                   (s-contains? olp s))
+                                 (consult-org--headings nil nil nil))))
+    (message "%s" c)
+    (setq consult-initial-position (- c 1))
+    (consult--read
+     (if (and nil current-cand)
+         (append
+          (cl-subseq cands (- c 1) (length cands))
+          (cl-subseq cands 0 (- c 2)))
+       cands)
+
+     :prompt "Go to heading: "
+     ;; `default' will just make some nonsense value which doesn't respect the setup (ordering, selection)
+     ;;   instead what we're going for is to
+     ;;     - make the cand list, sort
+     ;;     - jump to `default-candidate', retaining sort
+     ;;       - note that a 'jump' can be some numerical index of cands, therefore an intial-position key
+     ;;       - where relevance of candidate is given by some function of candidates
+     ;;     - a resort can emulate 'initial-position'
+     ;; `initial' will filter all other cands, which makes it totally unsuitable
+
+
+     :category 'consult-org-heading
+     :sort nil
+     :require-match t
+     :history '(:input consult-org--history)
+     :narrow (consult-org--narrow)
+     :state (consult--jump-state)
+     :group
+     (when prefix
+       (lambda (cand transform)
+         (let ((name (buffer-name
+                      (marker-buffer
+                       (car (get-text-property 0 'consult-org--heading cand))))))
+           (if transform (substring cand (1+ (length name))) name))))
+     :lookup
+     (lambda (_ candidates cand)
+       (when-let (found (member cand candidates))
+         (car (get-text-property 0 'consult-org--heading (car found))))))))
+
+(defun qz/vertico-set-initial-position()
+  (when consult-initial-position
+    (vertico-next consult-initial-position)))
+
+(setq vertico-mode-hook nil)
+
+                                        ;(add-hook 'vertico-mode-hook 'qz/vertico-set-initial-position)
+#+end_src
+
+#+RESULTS:
+| qz/vertico-set-initial-position |
+
+*** {C-x} <-> {C-u}
+
+*** {C-z} newline-above
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+;;(custom-set-variables
+;; '(org-disputed-keys '([(shift o)] . [(meta shift o)])))
+
+(defun qz/newline-above ()
+  (interactive)
+  (save-excursion
+    (beginning-of-line)
+    (newline))
+  (indent-according-to-mode))
+
+(define-key global-map (kbd "C-z") 'qz/newline-above)
+;;(define-key global-map (kbd "C-o") 'open-line)
+;;
+;;(org-remap org-mode-map
+;;           'open-line 'org-open-line)
+
+#+end_src
+
+#+RESULTS:
+: qz/newline-above
+
+*** {C-M-j} delete-indentation
+maximum [[id:6eb04531-fbcc-45da-86e9-499b48caeb8a][ergonomics]]
+
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+(define-key global-map (kbd "C-M-j") 'delete-indentation)
+#+end_src
+
+*** {H-M-s-h}jkl windmove swap
+
+I don't use this very much, as it curls my whole left hand up (qwerty troubles)
+
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+(define-key global-map (kbd "M-s-h") 'windmove-swap-states-left)
+(define-key global-map (kbd "M-s-j") 'windmove-swap-states-down)
+(define-key global-map (kbd "M-s-k") 'windmove-swap-states-up)
+(define-key global-map (kbd "M-s-l") 'windmove-swap-states-right)
+#+end_src
+
+#+RESULTS:
+: windmove-swap-states-right
+
+*** noweb-tangler
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+;; NOWEB KBD START
+<<kbd>>
+;; NOWEB KBD END
+#+end_src
+*** {H-s-h}jkl windmove
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+(define-key global-map (kbd "s-h") 'windmove-left)
+(define-key global-map (kbd "s-j") 'windmove-down)
+(define-key global-map (kbd "s-k") 'windmove-up)
+(define-key global-map (kbd "s-l") 'windmove-right)
+#+end_src
+
+#+RESULTS:
+: windmove-right
+
+*** {s-\} org-store-link
+#+begin_src emacs-lisp :noweb yes :noweb-ref kbd
+(define-key global-map (kbd "s-\\") 'org-store-link)
+#+end_src
+
+#+RESULTS:
+: org-store-link
+
+** consult
+
+*** noweb tangler
+#+begin_src emacs-lisp :noweb-ref conf :noweb yes
+;; NOWEB CONSULT START
+(with-eval-after-load 'consult
+  <<consult>>
+  )
+;; NOWEB CONSULT END
+#+end_src
+
+*** consult-ripgrep-files :func:
+
+not elegant AT ALL, but the API to ripgrep from consult uses
+'default-directory', so suck it up
+
+#+begin_src emacs-lisp :noweb-ref consult
+(defun qz/consult-ripgrep-files (files)
+  (let* ((consult-ripgrep-args (concat consult-ripgrep-args " -L"))
+         (rg-dir "/tmp/null"))
+    (f-delete rg-dir t)
+    (mkdir rg-dir t)
+    (mapcar (lambda (f)
+              (f-symlink (expand-file-name f)
+                         (format "%s/%s-%s"
+                                 rg-dir (gensym) (s-replace "/" "-" f))))
+            files)
+    (consult-ripgrep rg-dir)))
+#+end_src
+
+#+RESULTS:
+: qz/consult-ripgrep-files
+
+*** consult-ripgrep-bookmark :func:kbd:
+
+consuming
+
+#+begin_src emacs-lisp :noweb-ref consult
+(defun qz/consult-ripgrep-bookmark ()
+  (interactive)
+  (let ((files (mapcar (lambda (b) (cdr (assoc 'filename b)))
+                       bookmark-alist)))
+    (qz/consult-ripgrep-files files)))
+
+(define-key global-map (kbd "C-c b s") 'qz/consult-ripgrep-bookmark)
+#+end_src
+
+#+RESULTS:
+: qz/consult-ripgrep-bookmark
+
+*** basic remaps
+#+begin_src emacs-lisp :noweb-ref consult
+(mapcar (lambda (bind)
+          (define-key global-map (kbd (car bind)) (cadr bind)))
+        '(("C-x b" consult-buffer)))
+#+end_src
+
+#+RESULTS:
+| consult-buffer |
+
+** custom
+*** noweb tangler                                                    :meta:
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+;; NOWEB CUSTOM START
+<<custom>>
+;; NOWEB CUSTOM END
+#+end_src
+
+*** org-imenu-depth                                                   :var:
+- :: help:imenu-create-index-function
+- :: help:org-imenu-get-tree
+- :: help:imenu
+- :: info:elisp#Imenu
+
+#+begin_src emacs-lisp :noweb-ref custom
+(custom-set-variables
+ '(org-imenu-depth 99))
+#+end_src
+
+#+RESULTS:
+
+(setq org-goto-interface 'outline-path-completionp)
+(setq org-outline-path-complete-in-steps nil)
+**** NOTE it would be nice to have individual headings present, not just 'leaves'
+#+begin_src emacs-lisp :results code
+(org-imenu-get-tree)
+#+end_src
+
+#+RESULTS:
+
+** es-mode
+*** choose
+**** es-choose-url
+#+begin_src emacs-lisp :noweb-ref es
+(defun qz/es-choose-url (&optional url backend env)
+  (interactive)
+  (and qz/debug (message "DEBUG qz/es-choose-url: %s"
+                         (list url backend env)))
+  (let* ((backend (qz/es-choose-backend backend))
+         (url (or url
+                  (and backend env
+                       (qz/es-choose-env env)
+                       (format qz/newstore-es-string backend env)))))
+    (message "es-default-url: %s"
+             (setq es-default-url
+                   (or url (completing-read
+                            "es-url: " qz/newstore-es-urls)))))
+  es-default-url)
+
+(defun qz/es-choose-backend (&optional backend)
+  (interactive)
+  (and qz/debug (message "DEBUG qz/es-choose-backend: %s" backend))
+  (message "qz/newstore-es-backend-current: %s"
+           (setq qz/newstore-es-backend-current
+                 (or backend (completing-read "es-backend: " qz/newstore-es-backends))))
+  qz/newstore-es-backend-current)
+
+(defun qz/es-choose-env (&optional env)
+  (interactive)
+  (and qz/debug (message "DEBUG qz/es-choose-env: %s" env))
+  (message "qz/newstore-es-env-current: %s"
+           (setq qz/newstore-es-env-current
+                 (or env (completing-read "es-env: " qz/newstore-envs))))
+  qz/newstore-es-env-current)
+
+(defun qz/test-es-ui (&optional url backend env)
+  (setq qz/newstore-es-env-current nil
+        qz/newstore-es-backend-current nil)
+  (funcall-interactively 'qz/es-choose-url url backend env)
+  (list
+   qz/newstore-es-env-current
+   qz/newstore-es-backend-current
+   es-default-url))
+
+;;(qz/test-es-ui)              ;; prompt, noset
+;;(qz/test-es-ui nil)          ;; prompt, noset
+;;(qz/test-es-ui nil nil)      ;; prompt, noset
+;;(qz/test-es-ui nil nil nil)  ;; prompt, noset
+;;(qz/test-es-ui nil 'kibana 'production)    ;; noprompt, set
+
+#+end_src
+
+#+RESULTS:
+: qz/test-es-ui
+
+**** es-choose-cookie-headers
+#+begin_src emacs-lisp :noweb-ref es
+(defun qz/es-choose-cookie-headers ()
+  "TODO"
+  (interactive)
+  (message
+   "es-default-headers: %s"
+   (setq es-default-headers `(("Content-Type" . "application/json; charset=UTF-8")
+                              ("Cookie" . ,(format "ACCEZZIOCOOKIE=%s"
+                                                   (read-from-minibuffer "es cookie: ")))))))
+#+end_src
+
+#+RESULTS:
+: qz/es-choose-cookie-headers
+
+*** noweb tangler
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+;; NOWEB ES START
+(with-eval-after-load 'restclient
+  <<es>>
+  )
+;; NOWEB ES END
+#+end_src
+
+**** settings
+#+begin_src emacs-lisp :noweb-ref es
+(setq es-default-url "https://elasticsearch-production.newstore.luminatesec.com"
+      es-current-url es-default-url
+      es-default-headers nil
+      es-always-pretty-print t
+      es-default-headers
+      `(("Content-Type" . "application/json; charset=UTF-8")
+        ("Cookie" . ,(format "ACCEZZIOCOOKIE=%s"
+                             "11fdbe68-b0f3-4dd0-9894-f97afe3662dc"))))
+
+(setq qz/newstore-es-string "https://%s-%s.newstore.luminatesec.com"
+      qz/newstore-es-backends '(kibana elasticsearch)
+      qz/newstore-es-backend-current nil
+      qz/newstore-es-env-current nil
+      qz/newstore-es-urls (cl-loop for env in qz/newstore-envs
+                                   append (cl-loop for es-backend in qz/newstore-es-backends
+                                                   collect (format qz/newstore-es-string es-backend env))))
+#+end_src
+
+#+RESULTS:
+| https://kibana-sandbox.newstore.luminatesec.com | https://elasticsearch-sandbox.newstore.luminatesec.com | https://kibana-staging.newstore.luminatesec.com | https://elasticsearch-staging.newstore.luminatesec.com | https://kibana-production.newstore.luminatesec.com | https://elasticsearch-production.newstore.luminatesec.com |
+
+** embark
+*** noweb tangler
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+;; NOWEB EMBARK START
+<<embark-hoist>>
+(with-eval-after-load 'embark
+  <<embark>>
+  )
+;; NOWEB EMBARK END
+#+end_src
+
+*** {C-.} -> embark-act :kbd:
+#+begin_src emacs-lisp :noweb-ref embark-hoist
+(define-key global-map (kbd "C-.") 'embark-act)
+#+end_src
+
+#+RESULTS:
+: embark-act
+
+*** embark
+#+begin_src emacs-lisp :noweb-ref embark
+#+end_src
+
+** general
+*** advice                                                     :func:macro:
+#+begin_src emacs-lisp :noweb-ref general
+(defmacro qz/advice- (target-fn state advice-fn)
+  (let* ((s-advice (lambda (e)
+                     (intern (format "qz/advice-%s--%s--%s"
+                                     e target-fn advice-fn))))
+         (enable (funcall s-advice 'enable))
+         (disable (funcall s-advice 'disable)))
+    `(progn
+       (defun ,enable ()
+         (interactive)
+         (advice-add ',target-fn ,state ',advice-fn))
+
+       (defun ,(funcall s-advice 'disable) ()
+         (interactive)
+         (advice-remove ',target-fn ',advice-fn))
+
+       (,enable)
+       (list ',enable ',disable))))
+#+end_src
+
+#+RESULTS:
+: qz/advice-
+*** ensure-list
+#+begin_src emacs-lisp :noweb-ref general
+(defun qz/ensure-list (s)
+  (if (listp s)
+      s
+    (list s)))
+#+end_src
+
+#+RESULTS:
+: qz/ensure-list
+
+*** TODO debug
+#+begin_src emacs-lisp :noweb-ref general
+(defvar qz/debug 0 "debugging assists")
+
+(defmacro qz/debug- (&rest body)
+  (if qz/debug
+      `(progn ,@body)))
+
+(qz/debug- (message "yo"))
+#+end_src
+
+#+RESULTS:
+: yo
+**** demo ;; what is happening here? why is message evaluated
+#+begin_src emacs-lisp :tangle no
+(view-echo-area-messages)
+(setq qz/debug 0)
+(qz/debug- (message "offffff"))
+(setq qz/debug 1)
+(qz/debug- (message "on"))
+#+end_src
+
+#+RESULTS:
+: on
+
+*** newstore
+
+#+begin_src emacs-lisp :noweb-ref general
+(setq qz/newstore-envs '(sandbox staging production)
+      qz/newstore-env-current nil
+      qz/newstore-envs-abbrev '((sandbox . x) (staging . s) (production . p))
+      qz/newstore-tenant-current nil
+      qz/newstore-tenants '("dodici" "windsor"
+                            "boardriders" "marine-layer"
+                            "frankandoak" "vince"))
+
+(defun qz/newstore-choose-env (&optional env)
+  (interactive)
+  (message "qz/newstore-env-current: %s"
+           (setq qz/newstore-env-current
+                 (or env (completing-read "env: " qz/newstore-envs))))
+  (qz/restclient-choose-env qz/newstore-env-current)
+  (qz/es-choose-url nil nil qz/newstore-env-current))
+
+(defun qz/newstore-choose-tenant (&optional tenant)
+  (interactive)
+  (message "qz/newstore-tenant-current: %s"
+           (setq qz/newstore-tenant-current
+                 (or tenant (completing-read "tenant: " qz/newstore-tenants))))
+  (qz/restclient-choose-tenant qz/newstore-tenant-current))
+
+(defun qz/newstore-auth-current ()
+  (message "qz/newstore-auth-cache: <for qz/newstore-env-current: %s>"
+           qz/newstore-env-current)
+  (setq qz/newstore-auth-cache
+        (qz/newstore-auth qz/newstore-env-current)))
+
+(defun qz/newstore-auth (env)
+  "get the auth (password) associated with
+a given `env' from `qz/newstore/envs'
+
+to populate, just fill a `pass' entry like so echo mypass | pass
+  insert -e newstore/production"
+  (s-trim (shell-command-to-string
+           (format "pass newstore/%s" env))))
+
+(defun qz/newstore-quick-auth ()
+  (interactive)
+  (qz/newstore-choose-tenant)
+  (qz/newstore-choose-env)
+  (org-sbe "newstore-token"))
+#+end_src
+
+#+RESULTS:
+: qz/newstore-quick-auth
+
+*** shell-command-to-list-of-strings :func:
+#+begin_src emacs-lisp :noweb-ref general
+(defun qz/shell-command-to-list-of-strings (command)
+  (remove "" (s-split "\n" (shell-command-to-string command))))
+#+end_src
+
+#+RESULTS:
+: qz/shell-command-to-list-of-strings
+
+*** revert-buffer-no-confirm                                         :func:
+- :: http://www.emacswiki.org/emacs-en/download/misc-cmds.el
+
+#+begin_src emacs-lisp :noweb-ref general
+(defun qz/revert-buffer-no-confirm ()
+  "Revert buffer without confirmation."
+  (interactive)
+  (revert-buffer :ignore-auto :noconfirm))
+#+end_src
+*** yq-interactively
+#+begin_src emacs-lisp :noweb-ref conf
+(defun qz/yq-interactively ()
+  "haha yaml loophole"
+  (interactive)
+  (let ((jq-interactive-command "yq"))
+    (call-interactively 'jq-interactively)))
+#+end_src
+
+#+RESULTS:
+: qz/yq-interactively
+** hyperbole
+#+begin_src emacs-lisp :noweb-ref conf
+(require 'hyperbole)
+#+end_src
+*** {C-<mouse-2} hkey-either
+#+begin_src emacs-lisp :noweb-ref conf
+(define-key global-map (kbd "C-<down-mouse-2>") 'hkey-either)
+#+end_src
+
+#+RESULTS:
+: hkey-either
+
+** [[id:6baf4bff-d5fe-4ce0-a130-0464e49de67d][org]]
+*** agenda
+**** data
+***** setters
+****** [[id:ec8b00b4-3bd3-458c-9777-d2581c0f6fd5][agenda-files-update]]                                    :func:var:
+#+begin_src emacs-lisp :noweb-ref agenda
+(defun qz/agenda-files-update (&rest _)
+  "Update the value of `org-agenda-files' with relevant candidates"
+  (interactive)
+  (setq org-agenda-files (qz/files-agenda)
+        qz/agenda-daily-files (qz/agenda-daily-files-f)))
+#+end_src
+
+#+RESULTS:
+: qz/agenda-files-update
+****** agenda-files-update-clock :func:var:
+#+begin_src emacs-lisp :noweb-ref agenda
+(defun qz/agenda-files-update-clock (&rest _)
+  "An optimisation for org-clock, which is SO SLOW.
+ Returns a LIST of files that contain CLOCK, which reduces
+processing a lot"
+  (interactive)
+  (setq org-agenda-files (qz/clock-files)))
+#+end_src
+
+#+RESULTS:
+: qz/agenda-files-update-clock
+
+******* advice: org-clock-resolve
+
+- used in 'org-resolve-clocks
+
+#+begin_src emacs-lisp :noweb-ref agenda
+(list
+ ;; optimisation setup: setup subset of clock files
+ (qz/advice- org-clock-resolve :before qz/agenda-files-update-clock)
+ ;; optimisation teardown: restore full set of agenda-files
+ (qz/advice- org-clock-resolve :after qz/agenda-files-update))
+#+end_src
+
+#+RESULTS:
+| qz/advice-enable--org-clock-resolve--qz/agenda-files-update-clock | qz/advice-disable--org-clock-resolve--qz/agenda-files-update-clock |
+| qz/advice-enable--org-clock-resolve--qz/agenda-files-update       | qz/advice-disable--org-clock-resolve--qz/agenda-files-update       |
+
+***** [[id:9b0676a9-93d3-4449-ac82-721d4e20d4d6][daily-files]]                                              :func:var:
+#+begin_src emacs-lisp :noweb-ref agenda :results drawer
+(setq qz/daily-title-regexp ".?[0-9]\\{4\\}-[0-9]\\{2\\}-[0-9]\\{2\\}.?")
+
+(defun qz/agenda-daily-files-f ()
+  (seq-filter (lambda (s) (string-match qz/daily-title-regexp s))
+              org-agenda-files))
+
+;;(qz/agenda-daily-files-f)
+#+end_src
+
+#+RESULTS:
+:results:
+qz/agenda-daily-files-f
+:end:
+
+***** clock-files
+#+begin_src emacs-lisp :noweb-ref agenda
+(defun qz/clock-files ()
+  (split-string
+   (shell-command-to-string
+    "rg CLOCK ~/life/roam/ -c | grep -v 'org#' | awk -F '[,:]' '{print $1}'")))
+#+end_src
+
+#+RESULTS:
+: qz/clock-files
+
+***** files-agenda :func:
+#+begin_src emacs-lisp :noweb-ref agenda :results drawer
+(defun qz/files-agenda ()
+  (seq-uniq (append qz/org-agenda-files (qz/project-files))))
+#+end_src
+
+***** [[id:cb81cfd7-fb16-4965-af20-69129cf4fd97][project-files]] :func:
+#+begin_src emacs-lisp :noweb-ref agenda
+(defun qz/project-files ()
+  "Return a list of note files containing Project tag."
+  (seq-map
+   'car
+   (org-roam-db-query
+    '(:select :distinct file
+              :from tags
+              :inner :join nodes
+              :on (= tags:node_id nodes:id)
+              :where (= tags:tag "project")))))
+#+end_src
+
+#+RESULTS:
+: qz/project-files
+***** private-files :func:
+#+begin_src emacs-lisp :noweb-ref agenda
+(defun qz/org-roam-private-files ()
+  "Return a list of note files containing tag =private="
+  (seq-map
+   #'car
+   (org-roam-db-query
+    [:select :distinct file
+             :from tags
+             :inner :join nodes
+             :on (= tags:node_id nodes:id)
+             :where (= tags:tag "private")])))
+#+end_src
+***** test
+****** inspect-agenda-files
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/inspect-agenda-files ()
+  `((org-files-list . ,(length (org-files-list)))
+    ((org-agenda-files . ,(length (org-agenda-files)))
+     ((qz/project-files . ,(length (qz/project-files)))
+      (qz/agenda-daily-files-f . ,(length (qz/agenda-daily-files-f)))))))
+#+end_src
+
+#+RESULTS:
+: qz/inspect-agenda-files
+
+******* do
+#+begin_src emacs-lisp :tangle no
+(pp (qz/inspect-agenda-updates))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+((qz/agenda-files-update
+  ((org-files-list . 216)
+   ((org-agenda-files . 205)
+    ((qz/project-files . 203)
+     (qz/agenda-daily-files-f . 124)))))
+ (qz/agenda-files-update-clock
+  ((org-files-list . 220)
+   ((qorg-agenda-files . 43)
+    ((qz/project-files . 203)
+     (qz/agenda-daily-files-f . 30))))))
+#+end_example
+
+****** inspect-agenda-updates
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/inspect-agenda-updates ()
+  (mapcar (lambda (s) `(,s . (,(progn (funcall s)
+                                      (qz/inspect-agenda-files)))))
+          '(qz/agenda-files-update qz/agenda-files-update-clock)))
+#+end_src
+
+#+RESULTS:
+: qz/inspect-agenda-updates
+
+******* do
+#+begin_src emacs-lisp :tangle no
+(pp (qz/inspect-agenda-updates))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+((qz/agenda-files-update
+  ((org-files-list . 216)
+   ((org-agenda-files . 205)
+    ((qz/project-files . 203)
+     (qz/agenda-daily-files-f . 124)))))
+ (qz/agenda-files-update-clock
+  ((org-files-list . 220)
+   ((org-agenda-files . 43)
+    ((qz/project-files . 203)
+     (qz/agenda-daily-files-f . 30))))))
+#+end_example
+
+**** custom commands
+
+***** daily TODOs
+#+begin_src emacs-lisp :noweb-ref agenda
+;; current (default) sorting strat
+'((agenda habit-down time-up priority-down category-keep)
+  (todo priority-down category-keep)
+  (tags priority-down category-keep)
+  (search category-keep))
+
+
+(defun qz/agenda-todo-dailies ()
+  "the most necessary simple invention in months.
+(as of [2022-01-19 Wed])
+
+get a list of `TODO' entries, from daily files, ordered by date (from filename/category) DESCENDING.
+
+- see `qz/agenda-daily-files-f' for the subset view of `org-agenda-files'
+- see `org-agenda-sorting-strategy' for sort permutations."
+  (interactive)
+  (let* ((org-agenda-files (qz/agenda-daily-files-f))
+         (org-agenda-sorting-strategy '(timestamp-down category-down)))
+    (org-todo-list)))
+
+(define-key global-map (kbd "C-c n t") 'qz/agenda-todo-dailies)
+#+end_src
+
+#+RESULTS:
+: qz/agenda-todo-dailies
+
+***** g ; GTD
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/org-agenda-gtd ()
+  (interactive)
+  (org-agenda nil "g")
+  (goto-char (point-min))
+  (org-agenda-goto-today))
+
+(setq org-agenda-custom-commands nil)
+
+(add-to-list
+ 'org-agenda-custom-commands
+ `("g" "GTD"
+   ((agenda "" ((org-agenda-span 'day) (org-deadline-warning-days 60)))
+    (tags-todo "now"
+               ((org-agenda-overriding-header "now")))
+    (tags-todo "wip"
+               ((org-agenda-overriding-header "wip")))
+    (todo "TODO"
+          ((org-agenda-overriding-header "to process")
+           (org-agenda-files '(,(format "%s/%s" org-roam-directory "inbox.org")))))
+    (todo "TODO"
+          ((org-agenda-overriding-header "daily inbox")
+           (org-agenda-files qz/agenda-daily-files)))
+    (todo "TODO"
+          ((org-agenda-overriding-header "emails")
+           (org-agenda-files '(,(format "%s/%s" org-roam-directory "emails.org")))))
+    (todo "TODO"
+          ((org-agenda-overriding-header "one-off Tasks")
+           (org-agenda-files '(,(format "%s/%s" org-roam-directory "next.org")))))
+    (todo "TODO"
+          ((org-agenda-overriding-header "to yak shave")
+           (org-agenda-files '(,(format "%s/%s" org-roam-directory "emacs.org"))))))))
+
+(add-to-list
+ 'org-agenda-custom-commands
+ `("c" "create"
+   ((agenda "" ((org-agenda-span 'day) (org-deadline-warning-days 60)))
+    (tags-todo "diy+create+do+buy+make+wip"
+               ((org-agenda-overriding-header "wip")))
+    (tags-todo "diy+create+do"
+               ((org-agenda-overriding-header "create")))
+    (tags-todo "buy"
+               ((org-agenda-overriding-header "buy")))
+    (tags-todo "make"
+               ((org-agenda-overriding-header "make"))))))
+
+(add-to-list
+ 'org-agenda-custom-commands
+ `("w" "work"
+   ((tags "@work+wip"
+          ((org-agenda-overriding-header "wip")))
+    (tags-todo "@work"
+               ((org-agenda-overriding-header "work"))))))
+
+;;(pp org-agenda-custom-commands)
+#+end_src
+
+#+RESULTS:
+| w | work   | ((tags @work+wip ((org-agenda-overriding-header wip))) (tags-todo @work ((org-agenda-overriding-header work))))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| c | create | ((agenda  ((org-agenda-span 'day) (org-deadline-warning-days 60))) (tags-todo diy+create+do+buy+make+wip ((org-agenda-overriding-header wip))) (tags-todo diy+create+do ((org-agenda-overriding-header create))) (tags-todo buy ((org-agenda-overriding-header buy))) (tags-todo make ((org-agenda-overriding-header make))))                                                                                                                                                                                                                                                                                                                                                                        |
+| g | GTD    | ((agenda  ((org-agenda-span 'day) (org-deadline-warning-days 60))) (tags-todo now ((org-agenda-overriding-header now))) (tags-todo wip ((org-agenda-overriding-header wip))) (todo TODO ((org-agenda-overriding-header to process) (org-agenda-files '(~/life//roam/inbox.org)))) (todo TODO ((org-agenda-overriding-header daily inbox) (org-agenda-files qz/agenda-daily-files))) (todo TODO ((org-agenda-overriding-header emails) (org-agenda-files '(~/life//roam/emails.org)))) (todo TODO ((org-agenda-overriding-header one-off Tasks) (org-agenda-files '(~/life//roam/next.org)))) (todo TODO ((org-agenda-overriding-header to yak shave) (org-agenda-files '(~/life//roam/emacs.org))))) |
+
+**** noweb tangler
+#+begin_src emacs-lisp :noweb yes :noweb-ref org
+
+;; NOWEB AGENDA START
+<<agenda>>
+;; NOWEB AGENDA END
+
+#+end_src
+
+**** settings
+***** org-agenda-files
+#+begin_src emacs-lisp :noweb-ref roam
+(setq qz/org-agenda-files
+      (mapcar (lambda (f) (expand-file-name (format "%s/%s" org-roam-directory f)))
+              '("calendar-home.org" "calendar-work.org" "schedule.org")))
+#+end_src
+
+#+RESULTS:
+| /home/samuel/life/roam/calendar-home.org | /home/samuel/life/roam/calendar-work.org | /home/samuel/life/roam/schedule.org |
+
+**** visual
+***** vulpea's category agenda refinement :org:
+#+begin_src emacs-lisp :noweb-ref agenda
+(setq qz/org-agenda-prefix-length 20
+      org-agenda-prefix-format nil)
+;; '((agenda . " %i Emacs Configuration %?-12t% s")
+;;   (todo . " %i Emacs Configuration  ")
+;;   (tags . " %i Emacs Configuration  ")
+;;   (search . " %i Emacs Configuration  "))
+
+(defun vulpea-agenda-category (&optional len)
+  "Get category of item at point for agenda.
+
+Category is defined by one of the following items:
+- CATEGORY property
+- TITLE keyword
+- TITLE property
+- filename without directory and extension
+
+When LEN is a number, resulting string is padded right with
+spaces and then truncated with ... on the right if result is
+longer than LEN.
+
+Usage example:
+
+  (setq org-agenda-prefix-format
+        '((agenda . \" Emacs Configuration %?-12t %12s\")))
+
+Refer to `org-agenda-prefix-format' for more information."
+  (let* ((file-name (when buffer-file-name
+                      (file-name-sans-extension
+                       (file-name-nondirectory buffer-file-name))))
+         (title (qz/node-title))
+         (category (org-get-category))
+         (result
+          (or (if (and
+                   title
+                   (string-equal category file-name))
+                  title
+                category)
+              "")))
+    (if (numberp len)
+        (s-truncate len (s-pad-right len " " result))
+      result)))
+#+end_src
+
+#+RESULTS:
+: ((agenda .  %i Emacs Configuration %?-12t% s) (todo .  %i Emacs Configuration  ) (tags .  %i Emacs Configuration  ) (search .  %i Emacs Configuration  ))
+
+*** [[id:0213945d-cba5-4dd0-812c-9c01d6f51148][babel]]
+
+**** async
+- :: [[id:4062856a-e182-4820-bc7b-817a693518a3][emacs-ob-async]]
+
+#+begin_src emacs-lisp :noweb-ref org
+(require 'ob-async)
+#+end_src
+
+#+RESULTS:
+: ob-async
+
+**** src options                                                     :var:
+#+begin_src emacs-lisp :noweb-ref org
+(setq org-confirm-babel-evaluate nil)
+(setq org-structure-template-alist
+      '(;; yp
+        ("d"  . "definition")
+        ("ee" . "example")
+        ("es" . "src es")
+        ("el" . "src emacs-lisp")
+        ("q"  . "quote")
+        ("sb" . "src shell")
+        ("se" . "src emacs-lisp")
+        ("sl" . "src scheme")
+        ("sp" . "src sql :engine postgres")
+        ("sr" . "src R")
+        ("ss" . "src")
+        ("jp" . "src jupyter-python")
+        ("jr" . "src jupyter-R")
+        ("r"  . "src restclient")))
+#+end_src
+
+#+RESULTS:
+: ((d . definition) (ee . example) (es . src es) (el . src emacs-lisp) (q . quote) (sb . src shell) (se . src emacs-lisp) (sl . src scheme) (sp . src sql :engine postgres) (sr . src R) (ss . src) (jp . src jupyter-python) (jr . src jupyter-R) (r . src restclient))
+
+**** do-load-languages
+fuck the speed my man; {M-x load-library RET ob-} is so annoying
+#+begin_src emacs-lisp :noweb-ref org
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (lisp . t)
+   ;;(jupyter . t)
+   (python . t)
+   ;;(ipython . t)
+   (scheme . t)
+   (sql . t)
+   ;;(plant-uml . t)
+   (shell . t)
+   (sqlite . t)
+   (elasticsearch . t)
+   (restclient . t)
+   (R . t)))
+#+end_src
+
+#+RESULTS:
+
+**** library of babel
+CREATED: <2021-11-29 Mon>
+
+***** lob-ingest-files                                         :var:func:
+CREATED: <2021-11-29 Mon>
+
+#+begin_src emacs-lisp :noweb-ref roam
+(defvar qz/org-babel-lob-ingest-files
+  (append (mapcar (lambda (s)
+                    (when-let ((n (org-roam-node-from-title-or-alias s)))
+                      (org-roam-node-file n)))
+                  '("NewStore" "kubernetes"))
+          ;; .. other files
+          nil
+          ;; ..
+          )
+  "files from which named `src' blocks should be loaded")
+
+(defun qz/org-babel-do-lob-ingest-files (&optional files)
+  (interactive)
+  (mapcar (lambda (f) (org-babel-lob-ingest f))
+          (append qz/org-babel-lob-ingest-files files)))
+
+(qz/org-babel-do-lob-ingest-files)
+#+end_src
+
+#+RESULTS:
+
+***** choose babel block                                           :func:
+CREATED: <2021-11-29 Mo>n
+
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-babel-choose-block (&optional lob)
+  "choose block, insert scaffold for args.
+
+might honestly be better to generate `yas' template when we load
+blocks with `qz/org-babel-do-lob-ingest-files', but I've never used
+yas so idk
+
+use a prefix arg to shortcut (org-table-get-constant \"bonk\"
+"
+  (interactive)
+  (message "prefix: %s" (list current-prefix-arg prefix-arg lob))
+  (let ((lob (or lob
+                 (intern (completing-read
+                          "lob: " (mapcar 'car org-babel-library-of-babel))))))
+    (with-current-buffer (current-buffer)
+      (end-of-line)
+      (newline)
+      (insert (format "#+name: call-%s\n#+call: %s(%s)"
+                      lob lob (or (and current-prefix-arg
+                                       "(org-table-get-constant \"bonk\")")
+                                  "")))
+
+      (when-let
+          ((args (remove
+                  nil (cl-loop for a in (assoc lob org-babel-library-of-babel)
+                               append
+                               (when (listp a)
+                                 (cl-loop for b in a
+                                          collect
+                                          (when (eq :var (car b)) (cdr b))))))))
+        (message "%s" args)
+        (insert (format "(%s)" (s-join ", " args)))))))
+
+;;(qz/org-babel-choose-block 'newstore-get-order-by-type)
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-choose-block
+
+***** goto babel block
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/lob-get-named-src-block-body (name)
+  (cl-destructuring-bind
+      (file . pt) (qz/lob-get-named-src-block name)
+    (with-current-buffer (find-file-noselect file)
+      (save-excursion
+        (goto-char pt)
+        (org-babel-expand-src-block)))))
+
+;;(apply 'format "hey %s %s %s" (list 1 2 4))
+
+(defun qz/named (name &rest args)
+  "shorthand wrapper of `qz/lob-get-named-src-block-body', for clearer header args"
+  (apply 'format (qz/lob-get-named-src-block-body name) args))
+
+(defun qz/lob-get-named-src-block (name)
+  (message "checking name: %s" name)
+  (cl-block named    ; thank u cltl, thank u 1980s, thank u guy steele
+    (save-excursion  ; check current-buffer
+      (when (not (org-babel-goto-named-src-block name))
+        (cl-return-from named (cons (buffer-file-name) (point)))))
+    (mapcar (lambda (f)
+              (with-current-buffer (find-file-noselect f)
+                (save-excursion
+                  ;; it's odd that nil means "i found it"
+                  (when (not (org-babel-goto-named-src-block name))
+                    (cl-return-from named (cons f (point)))))))
+            (remove nil qz/org-babel-lob-ingest-files))))
+
+(defun qz/lob-goto-named-src-block (name)
+  (interactive
+   (list
+    (completing-read "lob: " (mapcar 'car org-babel-library-of-babel))))
+  (cl-destructuring-bind
+      (file . pt) (qz/lob-get-named-src-block name)
+    (find-file file)
+    (goto-char pt)))
+#+end_src
+
+#+RESULTS:
+: qz/lob-goto-named-src-block
+
+****** restclient-copy-as-curl + org-babel
+we use LOB blocks as
+
+ ,#+name: call-my-block-name
+ ,#+call: my-block-name(arg="value")
+
+so with the point on =my-block-name=, of the =call= we can invoke:
+- {M-x qz/lob-restclient-copy-curl-command}
+... to copy the corresponding block reference's restclient definition
+
+to improve:
+- format in the call arguments before copying
+  - this might be achieved by using =org-element-babel-call-parser= to
+    get the components of the call, if no other /interim state/ of the
+    called block exists
+  - ideally this can be general enough, so as to use the
+    =variable-format= type specified by the babel backend's =:var= header
+    arg. idk how or where this is though -- reference the list parsing
+    in ob-restclient[fn:2] -- literally just smashing it in at the top
+
+
+
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/lob-restclient-copy-curl-command (&optional name)
+  "this one was a struggle"
+  (interactive)
+  (when-let ((name (or name (thing-at-point 'symbol))))
+    (cl-destructuring-bind
+        (file . pt) (qz/lob-get-named-src-block name)
+      (save-excursion
+        (with-current-buffer (find-file-noselect file)
+          (goto-char pt)
+          (next-line)
+          (let ((expanded (org-babel-expand-src-block)))
+            (message "expanded: %s" expanded)
+            (with-temp-buffer ;;(get-buffer-create "*restclient*") ;;TODO replace w temp
+              (restclient-mode)
+              (insert expanded)
+              (goto-char (point-min))
+              (restclient-jump-next)
+              (restclient-copy-curl-command))))))))
+#+end_src
+
+#+RESULTS:
+: qz/lob-restclient-copy-curl-command
+
+***** {M-l} bind lob-choose-babel-block to insert convention        :kbd:
+CREATED: <2021-11-29 Mon>
+
+#+begin_src emacs-lisp :noweb-ref org
+(define-key org-babel-map (kbd "M-l") 'qz/org-babel-choose-block)
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-choose-block
+
+
+***** {M-g} bind lob-goto-named-src-block to insert convention      :kbd:
+CREATED: <2021-11-29 Mon>
+
+#+begin_src emacs-lisp :noweb-ref org
+(define-key org-babel-map (kbd "M-l") 'qz/org-babel-choose-block)
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-choose-block
+#+begin_src emacs-lisp :noweb-ref org
+(define-key org-babel-map (kbd "M-g") 'qz/lob-goto-named-src-block)
+#+end_src
+
+#+RESULTS:
+: qz/lob-goto-named-src-block
+
+**** helpers
+***** make-table-constants                                     :func:kbd:
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-babel-make-table-constants ()
+  "exec from the top of a tree"
+  (interactive)
+  (let* ((hi-lock-auto-select-face t)
+         ;; above is 100x better when you patch `hi-lock-face-symbol-at-point'
+         ;; with `(or (and hi-lock-auto-select-face (hi-lock-read-face-name)) 'hi-yellow)'
+         (col '()))
+    (save-excursion
+      (org-map-tree
+       (lambda ()
+         (when-let* ((s (org-get-heading))
+                     (s (org-no-properties s))
+                     (i (string-match ":" s))
+                     (k (substring s 0 i))
+                     (v (substring s (+ 2 i))))
+           (message "key: %s" k)
+           (message "value: %s" v)
+           (message "col: %s" col)
+           (setq col (cons (format "%s=%s" k v) col))
+           (funcall-interactively 'highlight-phrase v))))
+      (org-back-to-heading)
+      (next-line)
+      (newline)
+      (previous-line)
+      (insert (format "#+constants: %s" (s-join " " (reverse col)))))
+    col))
+
+(define-key org-babel-map (kbd "M-d") 'qz/org-babel-make-table-constants)
+#+end_src
+
+#+RESULTS:
+: qz/org-babel-make-table-constants
+
+
+***** list->rows                                                   :func:
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-babel--list->rows (name lst)
+  (cons (list name)
+        (cons 'hline (mapcar 'list lst))))
+#+end_src
+
+#+RESULTS:
+: qz/org-babel--list->rows
+
+***** patching
+#+begin_src emacs-lisp :tangle no
+(defun hi-lock-face-symbol-at-point ()
+  "Highlight each instance of the symbol at point.
+Uses the next face from `hi-lock-face-defaults' without prompting,
+unless you use a prefix argument.
+Uses `find-tag-default-as-symbol-regexp' to retrieve the symbol at point.
+
+If REGEXP contains upper case characters (excluding those preceded by `\\')
+and `search-upper-case' is non-nil, the matching is case-sensitive.
+
+This uses Font lock mode if it is enabled; otherwise it uses overlays,
+in which case the highlighting will not update as you type.  The Font
+Lock mode is considered \"enabled\" in a buffer if its `major-mode'
+causes `font-lock-specified-p' to return non-nil, which means
+the major mode specifies support for Font Lock."
+  (interactive)
+  (let* ((regexp (hi-lock-regexp-okay
+                  (find-tag-default-as-symbol-regexp)))
+         (hi-lock-auto-select-face t)
+         (face (hi-lock-read-face-name)))
+    (or (facep face)
+        (and hi-lock-auto-select-face
+             (hi-lock-read-face-name))
+        (setq face (or (and hi-lock-auto-select-face
+                            (hi-lock-read-face-name))
+                       'hi-yellow)))
+    (unless hi-lock-mode (hi-lock-mode 1))
+    (hi-lock-set-pattern
+     regexp face nil nil
+     (if (and case-fold-search search-upper-case)
+         (isearch-no-upper-case-p regexp t)
+       case-fold-search))))
+#+end_src
+
+#+RESULTS:
+: hi-lock-face-symbol-at-point
+
+*** capture
+**** helpers                                                        :func:
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-inbox-capture ()
+  (interactive)
+  "Capture a task in agenda mode."
+  (org-capture nil "i"))
+#+end_src
+
+**** templates
+these are regular [[id:6baf4bff-d5fe-4ce0-a130-0464e49de67d][org-mode]] capture templates, but we will defer to
+org-roam loading, as we use it's variables.
+- :: 'org-roam-directory
+- :: 'org-roam-dailies-directory
+
+#+begin_src emacs-lisp :noweb yes :noweb-ref roam
+;; [[file:~/.doom.d/config.org::*templates][templates]]
+(setq org-capture-templates
+      `(("i" "inbox" entry
+         (file ,(concat org-agenda-directory "/inbox.org"))
+         "* TODO %? \nCREATED: %u\nFROM: %a")
+        ;; spanish language capturing
+        ("v" "vocab; spanish" entry
+         (file+headline ,(concat org-roam-directory "/spanish_language.org") "vocab, phrases")
+         ,(s-join "\n" '("** \"%?\" :es:"
+                         "FROM: %a" ""
+                         "*** :en:" "")))
+        ;; capture link to live `org-roam' thing
+        ("n" "now, as in NOW" entry (file ,(concat org-agenda-directory "/wip.org"))
+         ,(s-join "\n" '("* TODO [#A1] %? "
+                         "DEADLINE: %T"
+                         "CREATED: %u")))
+        ;; fire directly into inbox
+        ("c" "org-protocol-capture" entry (file ,(concat org-agenda-directory "/inbox.org"))
+         ,(s-join "\n" '("* TODO [[%:link][%:description]]"
+                         "CREATED: %u" ""
+                         "#+begin_quote" ""
+                         "%i"
+                         "#+end_quote"))
+         :immediate-finish t)
+        ;; push last captured item into inbox
+        ("l" "last-capture" entry (file ,(concat org-agenda-directory "/inbox.org"))
+         (function qz/inbox-last-captured)
+         :immediate-finish t)
+        ("I" "current-roam" entry (file ,(concat org-agenda-directory "inbox.org"))
+         (function qz/current-roam-link)
+         :immediate-finish t)
+        ("w" "weekly review" entry
+         (file+datetree ,(concat org-agenda-directory "reviews.org"))
+         (file ,(concat org-agenda-directory "templates/weekly_review.org")))))
+
+
+
+
+;; [[file:~/.doom.d/config.org::*capture templates][roam capture templates]]
+
+#+end_src
+
+#+RESULTS:
+| i | inbox | entry | (file ~/life//roam/inbox.org) | * TODO %? |
+
+*** noweb tangler                                                    :meta:
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+(message "pre org: %s" (shell-command-to-string "date"))
+(with-eval-after-load 'org
+  (message "mid org: %s" (
+                          shell-command-to-string "date"))
+  ;; NOWEB ORG START
+  <<org>>
+  ;; NOWEB ORG END
+  (message "post org: %s" (shell-command-to-string "date"))
+  )
+#+end_src
+
+*** [[id:b33372ae-f731-4482-8e3a-0c5e986ac70a][roam]]
+**** capture
+***** helpers                                                      :func:
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/org-roam-capture-current ()
+  (interactive)
+  "Capture a task in agenda mode."
+  (org-capture nil "I"))
+
+(defun qz/roam-capture-todo ()
+  (interactive)
+  "Capture a task in agenda mode."
+  (cl-destructuring-bind (thing region)
+      (qz/thing-at-point-or-region-and-region)
+    (org-roam-capture- :goto t
+                       :keys "n"
+                       :node (org-roam-node-create :title thing)
+                       :props `(:immediate-finish t :jump-to-captured nil
+                                                  :region ,region     :insert-at ,(point-marker)
+                                                  :finalize 'insert-link))
+    (qz/capture-last-captured)))
+#+end_src
+
+***** templates                                                     :var:
+#+begin_src emacs-lisp :noweb yes :noweb-ref roam
+(setq qz/org-roam-capture-head "#+title: ${title}\n")
+(setq qz/capture-title-timestamp-roam "20210813T161035Z-${slug}.org")
+(setq org-roam-capture-templates
+      `(("d" "default" plain "%?"
+         :if-new (file+head ,qz/capture-title-timestamp-roam
+                            ,qz/org-roam-capture-head)
+         :unnarrowed t)
+        ("n" "empty" plain "%?"
+         :if-new (file+head ,qz/capture-title-timestamp-roam
+                            ,qz/org-roam-capture-head)
+         :immediate-finish t)
+        ))
+#+end_src
+
+**** dailies
+***** capture                                                       :var:
+****** templates
+#+begin_src emacs-lisp :noweb-ref roam
+(setq org-roam-dailies-capture-templates
+      `(("d" "default" entry
+         ,(s-join "\n" '("* [%<%H:%M>] %?"
+                         "CREATED: <%<%Y-%m-%d %H:%M>>"
+                         "FROM: %a"))
+         :if-new (file+head+olp
+                  ,qz/org-roam-dailies-filespec
+                  ,(s-join "\n" '("#+title: <%<%Y-%m-%d>>"
+                                  "#+filetags: daily private project" ""
+                                  "%(qz/today-dateref)" ""
+
+                                  "* today, I will"))
+                  ("journal")))))
+
+(setq qz/org-roam-dailies-capture-templates--tangent
+      '("d" "default" entry
+        ,(s-join "\n" '("* TANGENT [%<%H:%M>] %?"
+                        "CREATED: <%<%Y-%m-%d %H:%M>>"
+                        "FROM: %a"))
+        :if-new (file+head+olp
+                 ,qz/org-roam-dailies-filespec
+                 ,(s-join "\n" '("#+title: <%<%Y-%m-%d>>"
+                                 "#+filetags: daily private project" ""
+                                 "%(qz/today-dateref)" ""
+                                 "* today, I will"
+                                 "* journal"
+                                 "* tangent"))
+                 ("tangent"))))
+#+end_src
+
+#+RESULTS:
+| d | default | entry | (, (s-join |
+
+****** helpers
+******* today's date reference as roam links             :project:func:
+:PROPERTIES:
+:ID:       24cca9c1-2a89-4de2-b840-5d2adb9180931
+:END:
+
+this is just a nice reference spec to include in the daily notes.
+
+I've used explicit lookups for day/month here, because it's quicker to =assoc= a
+small list than to hit the cache (=>2k=) or hit the database a bunch.
+
+=year= is left as a call to =(org-roam-node-from-title-or-alias "2021")= as years
+are less discrete; I haven't made all possible years, and it's infrequent to
+make a new year in this case.
+
+******** day-lookup                                              :var:
+#+begin_src emacs-lisp :noweb-ref roam
+;;; day lookup
+(defvar qz/day-lookup
+  '((Mon . "[[id:d5ad0bac-e82b-43d0-960f-26eeb1daf91b][Monday]]")
+    (Tue . "[[id:cb662cc6-bde2-4f9c-b3fa-62346c6df27a][Tuesday]]")
+    (Wed . "[[id:411a8e5a-8d89-4886-b2ea-047a3970710a][Wednesday]]")
+    (Thu . "[[id:659b9931-ae09-422b-8e91-1bf4cc58e94c][Thursday]]")
+    (Fri . "[[id:b3255cd1-db37-4e07-99cf-5e60d52a2579][Friday]]")
+    (Sat . "[[id:b63897c3-30cc-42eb-83b5-c8e372e5af9a][Saturday]]")
+    (Sun . "[[id:2e28574b-4793-4c05-b83d-e36e9a77515b][Sunday]]"))
+  "an index; get days from abbrev (assoc 'Mon qz/day-lookup)")
+#+end_src
+
+#+RESULTS:
+: qz/day-lookup
+
+******** month-lookup                                            :var:
+#+begin_src emacs-lisp :noweb-ref roam
+(defvar qz/month-lookup
+  '("[[id:b92355d7-110e-467c-b7a7-d02b2043af3f][January]]"
+    "[[id:7e0af966-8d3e-4e88-b53f-d074902e175a][February]]"
+    "[[id:f41751f8-a2a9-4b38-ba03-2ceec2fae4cc][March]]"
+    "[[id:ae0ae458-2216-4178-8073-4a26f23747d9][April]]"
+    "[[id:6a680100-e842-4257-819f-8cf6cbedddbc][May]]"
+    "[[id:f811621c-1b37-43f7-9d01-52bdf9f27637][June]]"
+    "[[id:a4d5c8fe-3910-4483-b59e-ce50cd6699a7][July]]"
+    "[[id:94e9b0a7-6cd0-4104-821e-613876fe76e3][August]]"
+    "[[id:f9ad8160-cae5-4195-a85f-0160710ce8dd][September]]"
+    "[[id:da9f0d53-e3f7-4f72-bc1a-d060bc2d1745][October]]"
+    "[[id:a4e3a97a-dac9-4bc6-a5e9-5949f707a6de][November]]"
+    "[[id:f874ca1a-0d3f-4840-8340-511ed0ac286f][December]]")
+  "an index; get days from abbrev (nth 0 qz/month-lookup)")
+#+end_src
+
+#+RESULTS:
+: qz/month-lookup
+
+******** today-dateref                                          :func:
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/today-dateref (&optional time)
+  (cl-destructuring-bind (day nday month year)
+      (split-string
+       (format-time-string "%a:%d:%m:%Y" (or nil (current-time))) ":")
+    (format "%s %s %s, %s"
+            (cdr (assoc (intern day) qz/day-lookup))
+            nday
+            (nth (- (string-to-number month) 1) qz/month-lookup)
+            (or (if-let ((node (org-roam-node-from-title-or-alias year)))
+                    (org-link-make-string
+                     (concat "id:" (org-roam-node-id node))
+                     (org-roam-node-title node)))
+                year))))
+#+end_src
+******* daily-tangent-capture[fn:1]                              :func:
+so we can use it as a COMMAND. better traceability than a lambda
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/org-daily-tangent-capture ()
+  (interactive)
+  "Capture the inevitable tangent"
+  (org-capture nil "t"))
+#+end_src
+
+#+RESULTS:
+: qz/org-daily-tangent-capture
+******* today-as-dailies-file
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/today-as-daily-file ()
+  (format-time-string "private-%Y-%m-%d.org"))
+#+end_src
+
+***** dailies-filespec                                              :var:
+#+begin_src emacs-lisp :noweb-ref roam-hoist
+(setq qz/org-roam-dailies-filespec "private-%<%Y-%m-%d>.org")
+#+end_src
+
+#+RESULTS:
+: private-%<%Y-%m-%d>.org
+
+**** helpers
+***** current-roam-link
+#+begin_src emacs-lisp :noweb-ref roam
+;; [[file:~/.doom.d/config.org::*capture convenience functions][capture convenience functions]]
+(defun qz/current-roam-link ()
+  "Get link to org-roam file with title"
+  (interactive)
+  (concat "* TODO "
+          (let ((n (qz/org-roam-node-at-point)))
+            (org-link-make-string
+             (concat "id:" (org-roam-node-id n))
+             (org-roam-node-title n)))))
+#+end_src
+
+****** TODO rename this to ~qz/roam-current-node-as-link~
+***** node-tags :func:
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/node-tags (&optional node)
+  (or (and node (org-roam-node-tags node))
+      (save-excursion
+        (goto-char (org-roam-node-point (org-roam-node-at-point 'assert)))
+        (if (= (org-outline-level) 0)
+            (split-string-and-unquote (or (cadr (car (org-collect-keywords '("filetags")))) ""))
+          (org-get-tags)))))
+
+#+end_src
+
+#+RESULTS:
+: qz/node-tags
+
+***** node-title
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/node-title (&optional node limit)
+  (or (and node (org-roam-node-title node))
+      (save-excursion
+        (goto-char (org-roam-node-point (org-roam-node-at-point 'assert)))
+        (if (= (org-outline-level) 0)
+            (cadr (car (org-collect-keywords '("title"))))
+          (substring-no-properties (org-get-heading t t t))))))
+#+end_src
+
+#+RESULTS:
+: qz/node-title
+
+***** title->roam-id
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/title->roam-id (title)
+  (org-roam-node-id (org-roam-node-from-title-or-alias title)))
+#+end_src
+
+#+RESULTS:
+: qz/title->roam-id
+
+***** ensure-tag
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/ensure-tag (tagstring tag)
+  "Apply `org-roam-tag-add' for `tag' to node with existing tags
+`tagstring'
+
+HACK: using `re-search-backward' to jump back to applicable
+point (implicitly, `point-min' for file-level; :PROPERTIES: drawer for
+entry); covering 'inherited match'.
+
+this could be updated to jump back, but only 'landing' final on
+PROPERTIES with non-nil :ID:"
+  (let ((ltag (-flatten (or (and (listp tag) tag) (list tag)))))
+    (progn (message "ensuring tag for %s" ltag)
+           (org-roam-tag-add ltag))))
+#+end_src
+
+#+RESULTS:
+: qz/ensure-tag
+
+***** ensure-alias
+#+begin_src emacs-lisp
+(defun qz/ensure-alias (alias &optional node)
+  (let ((node (or node  (org-roam-node-at-point 'assert))))
+    (save-excursion
+      (with-current-buffer (find-file-noselect (org-roam-node-file node))
+        (goto-char (org-roam-node-point node))
+        (org-roam-alias-add alias)))))
+#+end_src
+
+#+RESULTS:
+: qz/ensure-alias
+
+**** TODO noweb tangler                                                :meta:
+#+begin_src emacs-lisp :noweb yes :noweb-ref org
+(with-eval-after-load 'org-roam
+  ;; NOWEB ROAM START
+  (message "roam start")
+  <<roam-hoist>>
+
+  <<roam>>
+  ;; NOWEB ROAM END
+  )
+#+end_src
+
+**** hooks
+***** make metadata on node created/updated
+:PROPERTIES:
+:ID:       5aa025eb-cc43-4866-9401-bd043ecf971b
+:CREATED:  <2021-12-12 Sun 22:34>
+:END:
+
+- :: [[id:6ae36e2f-ab6d-45bc-9448-8dce233c8528][data-driven automatic actions in org roam]]
+
+lifted from [[id:c6c1e44f-bb16-459b-9ba3-2d4657649816][Proposal for timestamping notes at time of capture (V2) ·
+Issue #1485 · org-roam/org-roam]].
+
+it is beneficial to attach to 'org-id-get-create as =:after= advice too,
+as this is my current mechanism for making a [[id:5d31286f-eef2-490a-8d44-0cded26c6475][node]] from a headline.
+
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/org-roam--insert-timestamp (&rest args)
+  (when (not (org-entry-get nil "CREATED"))
+    (org-entry-put nil "CREATED" (format-time-string "<%Y-%m-%d %a %H:%M>")))
+  (qz/org-roam--updated-timestamp))
+
+(defun qz/org-roam--updated-timestamp (&rest args)
+  (when-let* ((_ (org-roam-file-p))
+              (n (org-roam-node-at-point)))
+    (org-entry-put
+     (org-roam-node-point n) "UPDATED"
+     (format-time-string "<%Y-%m-%d %a %H:%M>"))))
+
+(add-hook 'org-roam-capture-new-node-hook 'qz/org-roam--insert-timestamp)
+(add-hook 'before-save-hook 'qz/org-roam--updated-timestamp)
+(qz/advice- org-id-get-create :after qz/org-roam--insert-timestamp)
+#+end_src
+
+#+RESULTS:
+| qz/advice-enable--org-id-get-create--qz/org-roam--insert-timestamp | qz/advice-disable--org-id-get-create--qz/org-roam--insert-timestamp |
+***** auto-tagging
+****** test
+******* predicate
+******** should-be-private-p; interactive sanity check the current file for privacy
+#+begin_src emacs-lisp
+(defun qz/should-be-private-p (file)
+  (with-current-buffer (or (find-buffer-visiting file)
+                           (find-file-noselect file))
+    (qz/is-private-p)))
+
+(defun qz/is-file-private ()
+  (interactive)
+  (message (concat "should " (f-this-file) " be private..? "
+                   (or (and (qz/should-be-private-p (f-this-file)) "yes") "no"))))
+#+end_src
+
+#+RESULTS:
+: qz/is-file-private
+
+****** helpers
+******* plumbing
+******** refresh filetags cache
+addressing caching & consistency problems with :PROPERTIES: drawer and #+properties
+
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/hard-refresh-org-tags-in-buffer ()
+  (interactive)
+  (setq org-file-tags nil)      ; blast the cache
+  (org-set-regexps-and-options) ; regen property detection regexp
+  (org-get-tags))               ; write to cache
+#+end_src
+******* transformations
+******** title-to-tag
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/title-to-tag (title)
+  "Convert TITLE to tag."
+  (if (equal "@" (subseq title 0 1))
+      title
+    (concat "@" (s-replace " " "" title))))
+#+end_src
+
+#+RESULTS:
+: qz/title-to-tag
+******* data
+******** get-file-by-tag; add multi AND/OR
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/org-roam-node-from-tag (tag)
+  (seq-map
+   #'car
+   (org-roam-db-query
+    [:select :distinct file
+             :from tags
+             :inner :join nodes
+             :on (= tags:node_id nodes:id)
+             :where (= tags:tag tag)])))
+#+end_src
+
+#+RESULTS:
+: qz/org-roam-node-from-tag
+
+********* do
+#+begin_src emacs-lisp :tangle no
+(let ((s (qz/org-roam-node-from-tag "project")))
+  (list (length s)
+        s))
+#+end_src
+
+#+RESULTS:
+| 497 | (/home/samuel/life/roam/20200706T122138Z-meeting_epic_cleanup.org /home/samuel/life/roam/20201014T112751Z-bread.org /home/samuel/life/roam/20200605T122503Z-meeting_innovation_et_al_0.org /home/samuel/life/roam/20200609T154023Z-cirosantilli.org /home/samuel/life/roam/20210426T075531Z-alice_harford.org /home/samuel/life/roam/20200710T095038Z-alonzo_church.org /home/samuel/life/roam/20210813T161035Z-luis_eduardo_velez_montoya.org /home/samuel/life/roam/20200513T103003Z-human.org /home/samuel/life/roam/20210503T085723Z-newstore_coding_challenge.org /home/samuel/life/roam/20200515T152023Z-pl_pgsql.org /home/samuel/life/roam/20200701T080711Z-aha.org /home/samuel/life/roam/20210430T110535Z-ricardo_lopez.org /home/samuel/life/roam/20200623T075047Z-meeting_team_a_refinement_2020_06_23.org /home/samuel/life/roam/20210420T133136Z-edmund_j_gettier.org /home/samuel/life/roam/20210813T161035Z-adler_how_to_read_a_book.org /home/samuel/life/roam/20210404T170636Z-computer_scientist.org /home/samuel/life/roam/20210524T171731Z-automated_routing_of_muscle_fibers_for_soft_robots_youtube.org /home/samuel/life/roam/20210628T095151Z-on_reading.org /home/samuel/life/roam/20210524T191313Z-topology_optimisation.org /home/samuel/life/roam/20210330T072217Z-data_guild.org /home/samuel/life/roam/20210422T104455Z-org_roam_database_machinations.org /home/samuel/life/roam/20201001T082253Z-iueodoe.org /home/samuel/life/roam/20200518T112756Z-christian_eisenhammer.org /home/samuel/life/roam/20210427T143800Z-disturbing_films.org /home/samuel/life/roam/emacs.org /home/samuel/life/roam/20201007T090252Z-elliot_dable.org /home/samuel/life/roam/20210525T075747Z-ben_weiner.org /home/samuel/life/roam/20210531T083456Z-gigantic_optical_forces_on_diffractive_light_sails_for_in_space_propulsion.org /home/samuel/life/roam/20210404T151328Z-stalin.org /home/samuel/life/roam/20210813T161035Z-sanskrit.org /home/samuel/life/roam/reading.org /home/samuel/life/roam/20210813T161035Z-kshitij_saxena.org /home/samuel/life/roam/20210628T090758Z-human_computer_interaction.org /home/samuel/life/roam/daily/private-2021-10-22.org /home/samuel/life/roam/daily/private-2020-07-01.org /home/samuel/life/roam/daily/private-2021-06-22.org /home/samuel/life/roam/daily/private-2020-10-17.org /home/samuel/life/roam/daily/private-2021-04-04.org /home/samuel/life/roam/daily/private-2021-08-09.org /home/samuel/life/roam/daily/private-2020-06-05.org /home/samuel/life/roam/daily/private-2021-03-24.org /home/samuel/life/roam/daily/private-2020-05-27.org /home/samuel/life/roam/daily/private-2020-11-13.org /home/samuel/life/roam/daily/private-2021-11-24.org /home/samuel/life/roam/daily/private-2021-04-23.org /home/samuel/life/roam/daily/private-2021-02-12.org /home/samuel/life/roam/daily/private-2020-12-09.org /home/samuel/life/roam/daily/private-2021-04-01.org /home/samuel/life/roam/daily/private-2020-12-14.org /home/samuel/life/roam/daily/private-2021-05-23.org /home/samuel/life/roam/daily/private-2021-05-07.org /home/samuel/life/roam/daily/private-2021-04-12.org /home/samuel/life/roam/daily/private-2021-03-25.org /home/samuel/life/roam/daily/private-2020-04-03.org /home/samuel/life/roam/daily/private-2021-11-05.org /home/samuel/life/roam/daily/private-2020-10-20.org /home/samuel/life/roam/daily/private-2020-06-02.org /home/samuel/life/roam/daily/private-2021-10-20.org /home/samuel/life/roam/daily/private-2020-11-20.org /home/samuel/life/roam/daily/private-2021-06-15.org /home/samuel/life/roam/daily/private-2021-11-02.org /home/samuel/life/roam/daily/private-2021-05-06.org /home/samuel/life/roam/daily/private-2021-11-08.org /home/samuel/life/roam/daily/private-2020-09-21.org /home/samuel/life/roam/daily/private-2021-08-12.org /home/samuel/life/roam/daily/private-2021-05-20.org /home/samuel/life/roam/daily/private-2021-03-17.org /home/samuel/life/roam/daily/private-2021-11-26.org /home/samuel/life/roam/daily/private-2021-10-26.org /home/samuel/life/roam/daily/private-2021-06-10.org /home/samuel/life/roam/daily/private-2020-04-02.org /home/samuel/life/roam/daily/private-2021-08-06.org /home/samuel/life/roam/daily/private-2020-08-07.org /home/samuel/life/roam/daily/private-2020-10-23.org /home/samuel/life/roam/daily/private-20200512T083133Z-1_on_1_20200511.org /home/samuel/life/roam/daily/private-2021-02-09.org /home/samuel/life/roam/daily/private-2021-10-06.org /home/samuel/life/roam/daily/private-2020-07-16.org /home/samuel/life/roam/daily/private-2021-02-11.org /home/samuel/life/roam/daily/private-2021-10-25.org /home/samuel/life/roam/daily/private-2021-06-09.org /home/samuel/life/roam/daily/private-2021-06-30.org /home/samuel/life/roam/daily/private-2021-06-01.org /home/samuel/life/roam/daily/private-2020-04-04.org /home/samuel/life/roam/daily/private-2020-05-12.org /home/samuel/life/roam/daily/private-2020-06-24.org /home/samuel/life/roam/daily/private-2021-10-27.org /home/samuel/life/roam/daily/private-2021-03-22.org /home/samuel/life/roam/daily/private-2021-03-03.org /home/samuel/life/roam/daily/private-2021-08-25.org /home/samuel/life/roam/daily/private-2021-03-05.org /home/samuel/life/roam/daily/private-2020-10-01.org /home/samuel/life/roam/daily/private-2020-07-03.org /home/samuel/life/roam/daily/private-2021-09-26.org /home/samuel/life/roam/daily/private-2021-08-16.org /home/samuel/life/roam/daily/private-2020-09-03.org /home/samuel/life/roam/daily/private-2021-11-03.org /home/samuel/life/roam/daily/private-2021-06-04.org /home/samuel/life/roam/daily/private-2020-10-30.org /home/samuel/life/roam/daily/private-2020-11-17.org /home/samuel/life/roam/daily/private-2020-05-26.org /home/samuel/life/roam/daily/private-2021-08-23.org /home/samuel/life/roam/daily/private-2021-04-06.org /home/samuel/life/roam/daily/private-2020-09-14.org /home/samuel/life/roam/daily/private-2021-09-13.org /home/samuel/life/roam/daily/private-2020-10-08.org /home/samuel/life/roam/daily/private-2020-10-15.org /home/samuel/life/roam/daily/private-2020-06-26.org /home/samuel/life/roam/daily/private-2021-08-24.org /home/samuel/life/roam/daily/private-2020-11-09.org /home/samuel/life/roam/daily/private-2021-09-02.org /home/samuel/life/roam/daily/private-2021-04-28.org /home/samuel/life/roam/daily/private-2021-03-09.org /home/samuel/life/roam/daily/private-2020-11-12.org /home/samuel/life/roam/daily/private-2020-07-11.org /home/samuel/life/roam/daily/private-2020-07-23.org /home/samuel/life/roam/daily/private-20200612T105000Z-2019_09_01.org /home/samuel/life/roam/daily/private-2021-04-30.org /home/samuel/life/roam/daily/private-2021-07-12.org /home/samuel/life/roam/daily/private-2020-08-06.org /home/samuel/life/roam/daily/private-2021-04-27.org /home/samuel/life/roam/daily/private-2020-09-30.org /home/samuel/life/roam/daily/private-2020-08-02.org /home/samuel/life/roam/daily/private-2020-11-11.org /home/samuel/life/roam/daily/private-2021-07-01.org /home/samuel/life/roam/daily/private-2020-08-31.org /home/samuel/life/roam/daily/private-2020-08-12.org /home/samuel/life/roam/daily/private-20200512T085434Z-1_on_1_meeting.org /home/samuel/life/roam/daily/private-2020-06-20.org /home/samuel/life/roam/daily/private-2021-08-20.org /home/samuel/life/roam/daily/private-2021-08-26.org /home/samuel/life/roam/daily/private-2020-06-08.org /home/samuel/life/roam/daily/private-20200518T093033Z-meeting_cross_project_search.org /home/samuel/life/roam/daily/private-2020-06-07.org /home/samuel/life/roam/daily/private-2020-06-15.org /home/samuel/life/roam/daily/private-2020-09-17.org /home/samuel/life/roam/daily/private-2021-11-23.org /home/samuel/life/roam/daily/private-2020-10-05.org /home/samuel/life/roam/daily/private-2021-09-27.org /home/samuel/life/roam/daily/private-2020-06-21.org /home/samuel/life/roam/daily/private-2021-04-18.org /home/samuel/life/roam/daily/private-2021-05-10.org /home/samuel/life/roam/daily/private-2020-07-06.org /home/samuel/life/roam/daily/private-2020-04-01.org /home/samuel/life/roam/daily/private-2021-08-27.org /home/samuel/life/roam/daily/private-2021-11-04.org /home/samuel/life/roam/daily/private-2021-06-24.org /home/samuel/life/roam/daily/private-2021-09-14.org /home/samuel/life/roam/daily/private-2020-07-21.org /home/samuel/life/roam/daily/private-2020-06-19.org /home/samuel/life/roam/daily/private-2021-06-28.org /home/samuel/life/roam/daily/private-2020-05-14.org /home/samuel/life/roam/daily/private-2020-05-28.org /home/samuel/life/roam/daily/private-2021-09-28.org /home/samuel/life/roam/daily/private-2021-02-15.org /home/samuel/life/roam/daily/private-2021-07-31.org /home/samuel/life/roam/daily/private-2021-10-07.org /home/samuel/life/roam/daily/private-2020-06-03.org /home/samuel/life/roam/daily/private-2021-11-30.org /home/samuel/life/roam/daily/private-2021-07-30.org /home/samuel/life/roam/daily/private-2021-06-29.org /home/samuel/life/roam/daily/private-2021-08-11.org /home/samuel/life/roam/daily/private-2020-09-08.org /home/samuel/life/roam/daily/private-2020-07-20.org /home/samuel/life/roam/daily/private-2020-07-22.org /home/samuel/life/roam/daily/private-2020-09-04.org /home/samuel/life/roam/daily/private-2020-08-11.org /home/samuel/life/roam/daily/private-2021-10-04.org /home/samuel/life/roam/daily/private-2021-03-29.org /home/samuel/life/roam/daily/private-2021-01-18.org /home/samuel/life/roam/daily/private-2021-10-12.org /home/samuel/life/roam/daily/private-2021-01-25.org /home/samuel/life/roam/daily/private-2021-06-18.org /home/samuel/life/roam/daily/private-20200612T110105Z-2020_05_01.org /home/samuel/life/roam/daily/private-2021-11-09.org /home/samuel/life/roam/daily/private-2021-05-31.org /home/samuel/life/roam/daily/private-2021-08-03.org /home/samuel/life/roam/daily/private-2020-06-17.org /home/samuel/life/roam/daily/private-2021-03-11.org /home/samuel/life/roam/daily/private-2021-09-25.org /home/samuel/life/roam/daily/private-2020-07-10.org /home/samuel/life/roam/daily/private-2020-06-13.org /home/samuel/life/roam/daily/private-2020-06-12.org /home/samuel/life/roam/daily/private-2021-09-07.org /home/samuel/life/roam/daily/private-2021-10-15.org /home/samuel/life/roam/daily/private-2020-07-09.org /home/samuel/life/roam/daily/private-2020-10-28.org /home/samuel/life/roam/daily/private-2021-08-10.org /home/samuel/life/roam/daily/private-2021-07-02.org /home/samuel/life/roam/daily/private-2020-08-14.org /home/samuel/life/roam/daily/private-2020-04-19.org /home/samuel/life/roam/daily/private-2020-05-11.org /home/samuel/life/roam/daily/private-2021-04-20.org /home/samuel/life/roam/daily/private-2021-03-28.org /home/samuel/life/roam/daily/private-2021-10-29.org /home/samuel/life/roam/daily/private-2021-10-28.org /home/samuel/life/roam/daily/private-2021-03-16.org /home/samuel/life/roam/daily/private-2021-05-18.org /home/samuel/life/roam/daily/private-2021-06-23.org /home/samuel/life/roam/daily/private-2021-10-18.org /home/samuel/life/roam/daily/private-2020-07-14.org /home/samuel/life/roam/daily/private-2021-09-16.org /home/samuel/life/roam/daily/private-2021-05-24.org /home/samuel/life/roam/daily/private-2020-06-18.org /home/samuel/life/roam/daily/private-2020-10-26.org /home/samuel/life/roam/daily/private-2021-03-15.org /home/samuel/life/roam/daily/private-2020-10-21.org /home/samuel/life/roam/daily/private-2021-08-29.org /home/samuel/life/roam/daily/private-2020-10-13.org /home/samuel/life/roam/daily/private-2020-08-24.org /home/samuel/life/roam/daily/private-2020-06-10.org /home/samuel/life/roam/daily/private-2021-04-29.org /home/samuel/life/roam/daily/private-2020-06-16.org /home/samuel/life/roam/daily/private-2021-09-06.org /home/samuel/life/roam/daily/private-2021-01-11.org /home/samuel/life/roam/daily/private-2020-06-23.org /home/samuel/life/roam/daily/private-2021-09-03.org /home/samuel/life/roam/daily/private-2020-11-23.org /home/samuel/life/roam/daily/private-2021-09-15.org /home/samuel/life/roam/daily/private-2020-08-09.org /home/samuel/life/roam/daily/private-2021-04-21.org /home/samuel/life/roam/daily/private-2020-07-07.org /home/samuel/life/roam/daily/private-2021-11-25.org /home/samuel/life/roam/daily/private-2020-07-24.org /home/samuel/life/roam/daily/private-2021-11-15.org /home/samuel/life/roam/daily/private-2020-07-15.org /home/samuel/life/roam/daily/private-2020-09-16.org /home/samuel/life/roam/daily/private-2020-05-25.org /home/samuel/life/roam/daily/private-2020-10-12.org /home/samuel/life/roam/daily/private-2020-07-02.org /home/samuel/life/roam/daily/private-2020-08-05.org /home/samuel/life/roam/daily/private-2021-04-22.org /home/samuel/life/roam/daily/private-2020-09-07.org /home/samuel/life/roam/daily/private-2020-10-18.org /home/samuel/life/roam/daily/private-2021-10-19.org /home/samuel/life/roam/daily/private-2021-11-10.org /home/samuel/life/roam/daily/private-2020-09-22.org /home/samuel/life/roam/daily/private-2020-09-15.org /home/samuel/life/roam/daily/private-2020-06-11.org /home/samuel/life/roam/daily/private-2020-11-10.org /home/samuel/life/roam/daily/private-2021-11-18.org /home/samuel/life/roam/daily/private-2020-05-22.org /home/samuel/life/roam/daily/private-2021-09-01.org /home/samuel/life/roam/daily/private-2021-10-13.org /home/samuel/life/roam/daily/private-2021-09-17.org /home/samuel/life/roam/daily/private-2021-10-05.org /home/samuel/life/roam/daily/private-2021-08-17.org /home/samuel/life/roam/daily/private-2021-06-14.org /home/samuel/life/roam/daily/private-2020-10-02.org /home/samuel/life/roam/daily/private-2021-08-30.org /home/samuel/life/roam/daily/private-2021-06-21.org /home/samuel/life/roam/daily/private-2020-05-04.org /home/samuel/life/roam/daily/private-2020-05-20.org /home/samuel/life/roam/daily/private-2021-09-20.org /home/samuel/life/roam/daily/private-2020-05-18.org /home/samuel/life/roam/daily/private-2021-09-08.org /home/samuel/life/roam/daily/private-2021-03-23.org /home/samuel/life/roam/daily/private-2021-02-16.org /home/samuel/life/roam/daily/private-2021-04-19.org /home/samuel/life/roam/daily/private-2021-08-19.org /home/samuel/life/roam/daily/private-20200518T113409Z-meeting_jsonb_conception.org /home/samuel/life/roam/daily/private-2021-06-07.org /home/samuel/life/roam/daily/private-2021-03-02.org /home/samuel/life/roam/daily/private-2020-11-04.org /home/samuel/life/roam/daily/private-2021-06-12.org /home/samuel/life/roam/daily/private-2021-08-18.org /home/samuel/life/roam/daily/private-2021-09-21.org /home/samuel/life/roam/daily/private-2020-08-03.org /home/samuel/life/roam/daily/private-2021-07-03.org /home/samuel/life/roam/daily/private-2020-06-04.org /home/samuel/life/roam/daily/private-2023-03-31.org /home/samuel/life/roam/daily/private-2020-08-23.org /home/samuel/life/roam/daily/private-2020-05-13.org /home/samuel/life/roam/daily/private-2021-04-26.org /home/samuel/life/roam/daily/private-2021-07-06.org /home/samuel/life/roam/daily/private-2021-02-02.org /home/samuel/life/roam/daily/private-2021-05-05.org /home/samuel/life/roam/daily/private-2020-08-01.org /home/samuel/life/roam/daily/private-2021-05-03.org /home/samuel/life/roam/daily/private-2021-09-30.org /home/samuel/life/roam/daily/private-2021-06-03.org /home/samuel/life/roam/daily/private-2020-06-29.org /home/samuel/life/roam/daily/private-2021-10-11.org /home/samuel/life/roam/daily/private-2021-02-05.org /home/samuel/life/roam/daily/private-2020-06-25.org /home/samuel/life/roam/daily/private-2021-11-22.org /home/samuel/life/roam/daily/private-2021-09-29.org /home/samuel/life/roam/daily/private-2020-09-18.org /home/samuel/life/roam/daily/private-2020-11-24.org /home/samuel/life/roam/daily/private-2020-10-22.org /home/samuel/life/roam/daily/private-2021-02-08.org /home/samuel/life/roam/daily/private-2021-10-14.org /home/samuel/life/roam/daily/private-2020-08-04.org /home/samuel/life/roam/daily/private-2020-07-08.org /home/samuel/life/roam/daily/private-2020-08-30.org /home/samuel/life/roam/daily/private-2020-06-09.org /home/samuel/life/roam/daily/private-2021-03-30.org /home/samuel/life/roam/daily/private-2020-10-19.org /home/samuel/life/roam/daily/private-2021-11-28.org /home/samuel/life/roam/daily/private-2020-10-27.org /home/samuel/life/roam/daily/private-2021-02-03.org /home/samuel/life/roam/daily/private-2020-07-17.org /home/samuel/life/roam/daily/private-2020-06-30.org /home/samuel/life/roam/daily/private-2021-11-19.org /home/samuel/life/roam/20201014T163555Z-byron_blackford.org /home/samuel/life/roam/20210525T091717Z-how_to_study_linguistics_a_guide_to_understanding_language.org /home/samuel/life/roam/20201018T143915Z-andrew_louis.org /home/samuel/life/roam/20200511T151311Z-information_and_the_universe.org /home/samuel/life/roam/20200702T132312Z-max_thumfart.org /home/samuel/life/roam/20210524T165432Z-louis_nashelsky.org /home/samuel/life/roam/wip.org /home/samuel/life/roam/20200903T080046Z-tpcde_728_monitor_filter_performance_thinkproject_jira.org /home/samuel/life/roam/20201007T091102Z-andrea_mair.org /home/samuel/life/roam/20200408133856-the_bits_and_bytes_of_computer_networking.org /home/samuel/life/roam/20210524T165420Z-robert_l_boylestad.org /home/samuel/life/roam/20200615T082229Z-moving_to_berlin.org /home/samuel/life/roam/20200615T135629Z-tpconfluence.org /home/samuel/life/roam/jorge_luis_borges.org /home/samuel/life/roam/20200708T115605Z-atabey_kaygun.org /home/samuel/life/roam/20200609T150107Z-how_to_get_a_list_of_video_capture_devices_web_cameras_on_linux_ubuntu_c_c_stack_overflow.org /home/samuel/life/roam/20200513T103529Z-daily_meeting_20200513.org /home/samuel/life/roam/20210523T153341Z-streamlink_streamlink_streamlink_is_a_cli_utility_which_pipes_video_streams_from_various_services_into_a_video_player.org /home/samuel/life/roam/20210524T182927Z-robotsculptor_artist_directed_robotic_sculpting_of_clay_youtube.org /home/samuel/life/roam/20200701T094347Z-meeting_okr_2020_07_01.org /home/samuel/life/roam/20200611T112619Z-autovacuum.org /home/samuel/life/roam/20200511T135020Z-tpberlin.org /home/samuel/life/roam/20200419T194507Z-microgreens.org /home/samuel/life/roam/20201001T081129Z-michael_bischoff.org /home/samuel/life/roam/20200605T133126Z-gareth_burton.org /home/samuel/life/roam/20210423T104212Z-ancient_greek.org /home/samuel/life/roam/20200613T135018Z-bank_transaction_analysis.org /home/samuel/life/roam/schedule.org /home/samuel/life/roam/20210419T075838Z-luke_smith.org /home/samuel/life/roam/20210607T154402Z-circular_saw.org /home/samuel/life/roam/20201007T091003Z-andrew_tutt.org /home/samuel/life/roam/20210329T081859Z-pgdeploy_release_rollout_meeting.org /home/samuel/life/roam/20200520T111508Z-euler.org /home/samuel/life/roam/20210430T110825Z-stuart_farrimond.org /home/samuel/life/roam/20200901T104325Z-freecad.org /home/samuel/life/roam/reviews.org /home/samuel/life/roam/20200518T094013Z-meeting.org /home/samuel/life/roam/20210203T130148Z-scicloj_meeting_19_alan_dipert_common_lisp_for_the_curious_clojurian_youtube.org /home/samuel/life/roam/20200405160940-meditation_apps_are_fueling_tech_addiction_not_easing_stress.org /home/samuel/life/roam/20200828T141851Z-will_arnett.org /home/samuel/life/roam/20200414T222846Z-ian_barber.org /home/samuel/life/roam/20210427T142746Z-planconnect.org /home/samuel/life/roam/20200605T122559Z-sven_eric_schapke.org /home/samuel/life/roam/20210330T095339Z-robert_wolf.org /home/samuel/life/roam/20200623T110115Z-keybindings.org /home/samuel/life/roam/20200515T154313Z-book.org /home/samuel/life/roam/20210816T182301Z-ronaldo_moura.org /home/samuel/life/roam/20201031T163512Z-jessealdridge_electric_toothbrush_simple_client_server_notetaking_tool_inspired_by_notational_velocity.org /home/samuel/life/roam/20210527T132715Z-tobias_løfgren.org /home/samuel/life/roam/20210524T191248Z-level_set_topology_optimisation.org /home/samuel/life/roam/20200515T082816Z-org_roam_network_analysis.org /home/samuel/life/roam/20200624T102404Z-robert_tarjan_wikipedia.org /home/samuel/life/roam/20200410182435-art.org /home/samuel/life/roam/20200612T111631Z-matt_culpepper.org /home/samuel/life/roam/20200606T175037Z-marvel_movie_timeline_the_best_order_to_watch_marvel_movies.org /home/samuel/life/roam/20210524T190500Z-static_equilibrium_constraint.org /home/samuel/life/roam/20200623T081435Z-pg_deploy.org /home/samuel/life/roam/20210527T133055Z-mathematician.org /home/samuel/life/roam/learning.org /home/samuel/life/roam/20200515T113542Z-igraph.org /home/samuel/life/roam/20200518T094057Z-dirk_lutzeback.org /home/samuel/life/roam/20201012T103944Z-meetup.org /home/samuel/life/roam/20210504T142547Z-eric_jahn.org /home/samuel/life/roam/20201117T102439Z-augmenting_human_intellect.org /home/samuel/life/roam/20200622T120506Z-amit_kapila.org /home/samuel/life/roam/20210608T081923Z-latin_language.org /home/samuel/life/roam/conor_white_sullivan_f_f_f.org /home/samuel/life/roam/20201014T112934Z-niklas_luhmann.org /home/samuel/life/roam/20210423T104229Z-aristotle.org /home/samuel/life/roam/20210813T161035Z-pavel_batishchev.org /home/samuel/life/roam/20200513T104142Z-colleague.org /home/samuel/life/roam/20210427T191553Z-guy_l_steele_jr.org /home/samuel/life/roam/20200901T104600Z-atte.org /home/samuel/life/roam/20200701T093505Z-meeting_sprint_switch_2020_07_01.org /home/samuel/life/roam/20200610T093202Z-meeting_backlog_refinement_20200610.org /home/samuel/life/roam/20201117T101304Z-doug_engelbart.org /home/samuel/life/roam/20210813T161035Z-peter_stubbs.org /home/samuel/life/roam/20210524T115509Z-simulation.org /home/samuel/life/roam/20210505T162454Z-interactive_network_visualization_with_r_r_bloggers.org /home/samuel/life/roam/20201017T115021Z-greg_detre.org /home/samuel/life/roam/20210420T092520Z-xiantian_zhou.org /home/samuel/life/roam/20200619T215855Z-common_lisp_repl_diaries.org /home/samuel/life/roam/private/private-2020-04-07.org /home/samuel/life/roam/private/private-2020-04-08.org /home/samuel/life/roam/20210423T103947Z-max_weissman.org /home/samuel/life/roam/20200518T065928Z-meeting_cemar_text_searching_analysis.org /home/samuel/life/roam/20200702T132017Z-meeting_how_do_filter_work_from_the_db_side.org /home/samuel/life/roam/20210817T073807Z-bernardo_torres.org /home/samuel/life/roam/20200403151517-a_beginner_s_guide_to_graph_visualization.org /home/samuel/life/roam/20200512T082020Z-lloyd_culpepper.org /home/samuel/life/roam/20200616T090917Z-andrea_hofmann.org /home/samuel/life/roam/20200701T153403Z-common_lisp_the_language.org /home/samuel/life/roam/20210311T113202Z-chris_heimann.org /home/samuel/life/roam/20200623T104934Z-meeting_sprint_switch_2020_06_17.org /home/samuel/life/roam/20200707T072109Z-meeting_more_epic_cleaning_and_aha.org /home/samuel/life/roam/20210527T112026Z-line_line_intersection.org /home/samuel/life/roam/20210423T104238Z-socrates.org /home/samuel/life/roam/20200513T103441Z-daily_meeting.org /home/samuel/life/roam/20210505T135556Z-plantuml.org /home/samuel/life/roam/20200403172933-jethro_kuan.org /home/samuel/life/roam/20200701T093349Z-meeting_up_date_jira.org /home/samuel/life/roam/20210813T161035Z-my_email.org /home/samuel/life/roam/20210430T110455Z-vicente_ferreira.org /home/samuel/life/roam/20200610T103951Z-tpcde.org /home/samuel/life/roam/20210615T072126Z-my_recipes.org /home/samuel/life/roam/20200709T130411Z-meeting_1_on_1_2020_07_09.org /home/samuel/life/roam/20200611T115532Z-pg_stat_database.org /home/samuel/life/roam/20210813T161035Z-n26.org /home/samuel/life/roam/20210420T092449Z-carlos_ordonez.org /home/samuel/life/roam/20200513T104213Z-software_engineer.org /home/samuel/life/roam/20210507T075527Z-chopi.org /home/samuel/life/roam/20200609T132052Z-projects.org /home/samuel/life/roam/20210612181500-plywood.org /home/samuel/life/roam/20200713T091701Z-ilya_kosmodemiansky.org /home/samuel/life/roam/20200402180451-laszlo_forro.org /home/samuel/life/roam/20210518T125438Z-my_youtube_channel.org /home/samuel/life/roam/20210423T104204Z-plato.org /home/samuel/life/roam/20201117T102439Z-augmenting_human_intellect_a_conceptual_framework.org /home/samuel/life/roam/20200623T075751Z-technical_account_manager.org /home/samuel/life/roam/20200728T101310Z-jack_rusher.org /home/samuel/life/roam/20201117T103145Z-alan_kay.org /home/samuel/life/roam/20210420T091609Z-shoeb_ahmed_mogal.org /home/samuel/life/roam/20200710T100007Z-alan_turing.org /home/samuel/life/roam/20210423T110812Z-machiavelli.org /home/samuel/life/roam/20200709T090331Z-thinkprojectgroup_query_cache.org /home/samuel/life/roam/20210813T161035Z-shared.org /home/samuel/life/roam/20210813T161035Z-andrew_petelin.org /home/samuel/life/roam/20210404T152634Z-learning_mathematics.org /home/samuel/life/roam/20210813T161035Z-adam_m_grant.org /home/samuel/life/roam/20200616T091718Z-meeting_communication_launch_for_jsonb.org /home/samuel/life/roam/20200518T094303Z-wolfram_schneider.org /home/samuel/life/roam/20210524T175017Z-a_compiler_for_3d_machine_knitting_youtube.org /home/samuel/life/roam/20200729T132839Z-diederik_verkest.org /home/samuel/life/roam/20210813T161035Z-cassava_root.org /home/samuel/life/roam/20200701T103013Z-counsel_spotify.org /home/samuel/life/roam/20210420T092707Z-claudia_kerschl.org /home/samuel/life/roam/20201020T113639Z-wild_yeast.org /home/samuel/life/roam/daily/private-2021-11-01.org /home/samuel/life/roam/daily/private-2021-11-11.org /home/samuel/life/roam/20210527T113506Z-mind_power.org /home/samuel/life/roam/20210506T092125Z-samuelculpepper_com.org /home/samuel/life/roam/daily/private-2021-12-09.org /home/samuel/life/roam/daily/private-2021-11-16.org /home/samuel/life/roam/inbox.org /home/samuel/life/roam/daily/private-2021-12-10.org /home/samuel/life/roam/daily/private-2021-12-13.org /home/samuel/life/roam/daily/private-2021-12-06.org /home/samuel/life/roam/20210813T161035Z-graphics_tablets.org /home/samuel/life/roam/20210813T161035Z-publishing_my_notes.org /home/samuel/life/roam/daily/private-2021-12-16.org /home/samuel/life/roam/daily/private-2021-12-08.org /home/samuel/life/roam/systems.org /home/samuel/life/roam/daily/private-2021-12-18.org /home/samuel/life/roam/daily/private-2021-12-26.org /home/samuel/life/roam/daily/private-2021-12-30.org /home/samuel/life/roam/20210628T094551Z-my_writing.org /home/samuel/life/roam/daily/private-2021-12-15.org /home/samuel/life/roam/20201020T113920Z-making_essential_foods.org /home/samuel/life/roam/daily/private-2022-01-07.org /home/samuel/life/roam/20200515T161256Z-samuel_culpepper.org /home/samuel/life/roam/20200625T083146Z-career.org /home/samuel/life/roam/20210311T122210Z-tennet_hierarchical_lists.org /home/samuel/life/roam/daily/private-2021-05-21.org /home/samuel/life/roam/daily/private-2021-11-17.org /home/samuel/life/roam/daily/private-2022-01-11.org /home/samuel/life/roam/someday.org /home/samuel/life/roam/20200511T150956Z-git.org /home/samuel/life/roam/20200919T152005Z-gnu_guix.org /home/samuel/life/roam/20200415T145703Z-emacs_lisp.org /home/samuel/life/roam/daily/private-2022-01-13.org /home/samuel/life/roam/daily/private-2021-08-13.org /home/samuel/life/roam/daily/private-2021-11-12.org /home/samuel/life/roam/daily/private-2021-11-29.org /home/samuel/life/roam/20210420T114708Z-newstore.org /home/samuel/life/roam/watching.org /home/samuel/life/roam/daily/private-2022-01-12.org /home/samuel/life/roam/20210518T124941Z-building_living.org /home/samuel/life/roam/daily/private-2022-01-18.org /home/samuel/life/roam/daily/private-2022-01-17.org /home/samuel/life/roam/20210505T104623Z-anton_tinyakov.org /home/samuel/life/roam/daily/private-2021-10-01.org /home/samuel/life/roam/daily/private-2022-01-06.org /home/samuel/life/roam/daily/private-2021-08-31.org /home/samuel/life/roam/daily/private-2021-12-12.org /home/samuel/life/roam/daily/private-2022-01-14.org /home/samuel/life/roam/daily/private-2022-01-10.org /home/samuel/life/roam/config.org /home/samuel/life/roam/daily/private-2021-12-17.org /home/samuel/life/roam/daily/private-2021-12-14.org /home/samuel/life/roam/daily/private-2021-12-07.org /home/samuel/life/roam/daily/private-2022-01-19.org /home/samuel/life/roam/daily/private-2022-01-20.org /home/samuel/life/roam/20200401202402-org_roam.org) |
+******* predicates
+******** content-based
+from filepath, or structural properties of the file
+
+********* note-buffer-p
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/note-buffer-p (&optional node &rest _)
+  "Return non-nil if the currently visited buffer is a note."
+  (interactive)
+  (or (org-roam-node-p node)
+      (and buffer-file-name (org-roam-file-p buffer-file-name))))
+#+end_src
+
+#+RESULTS:
+: qz/note-buffer-p
+
+********* is-private-p
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/is-private-p (&optional node &rest _)
+  (interactive)
+  (let ((title (qz/node-title node)))
+    (if (not title)
+        (and (message "unable to evaluate privateness; no title") nil) ; return false (not private)
+      (or (string-match-p qz/daily-title-regexp title) ; daily
+          (string-match-p "meeting" title)             ; concerns a meeting
+          (qz/has-link-to-p
+           (list (qz/title->roam-id "thinkproject")
+                 (qz/title->roam-id "NewStore")))))))   ; concerns work
+#+end_src
+
+#+RESULTS:
+: qz/is-private-p
+
+********* is-daily-p
+#+begin_src emacs-lisp
+(defun qz/is-daily-p (&optional node &rest _)
+  (if-let ((title (qz/node-title node)))
+      (string-match-p qz/daily-title-regexp title)))
+#+end_src
+
+#+RESULTS:
+: qz/is-daily-p
+
+********* is-project-p
+#+begin_src emacs-lisp
+(defun qz/is-project-p (&optional node &rest _)
+  (or (qz/file-has-todo-p node _)
+      (qz/is-daily-p node _)))
+#+end_src
+
+#+RESULTS:
+: qz/is-project-p
+********* is-person-p
+#+begin_src emacs-lisp
+(defun qz/is-person-p (&optional node &rest _)
+  (qz/has-link-to-p (qz/title->roam-id "person")
+                    (and node (org-roam-node-p node)
+                         (org-roam-node-id node)))
+#+end_src
+
+#+RESULTS:
+: qz/is-person-p
+
+********* file-has-todo-p
+#+begin_src emacs-lisp
+(defun qz/file-has-todo-p (&optional node &rest _)
+  "Return non-nil if current buffer has any todo entry.
+
+TODO entries marked as done are ignored, meaning the this
+function returns nil if current buffer contains only completed
+tasks.
+
+(1) parse the buffer using org-element-parse-buffer. It
+  returns an abstract syntax tree of the current Org buffer. But
+  since we care only about headings, we ask it to return only them
+  by passing a GRANULARITY parameter - 'headline. This makes
+  things faster.
+
+(2) Then we extract information about TODO keyword from
+  headline AST, which contains a property we are interested in -
+  :todo-type, which returns the type of TODO keyword according to
+  org-todo-keywords - 'done, 'todo or nil (when keyword is not
+  present).
+
+(3) Now all we have to do is to check if the buffer list contains
+  at least one keyword with 'todo type. We could use seq=find on
+  the result of org-element-map, but it turns out that it provides
+  an optional first-match argument that can be used for our needs."
+  (save-excursion
+    (with-current-buffer (or (and node (org-roam-node-p node)
+                                  (find-file-noselect (org-roam-node-file node)))
+                             (current-buffer))
+      (org-with-wide-buffer
+       (org-element-map                          ; (2)
+           (org-element-parse-buffer 'headline) ; (1)
+           'headline
+         (lambda (h)
+           (eq (org-element-property :todo-type h)
+               'todo))
+         nil 'first-match)))))                     ; (3)
+
+#+end_src
+
+#+RESULTS:
+: qz/file-has-todo-p
+
+******** link-based
+********* has-links
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/has-links (node)
+  "connections exist, for id of `node'"
+  (org-roam-db-query
+   [:select [source dest]
+            :from links
+            :where (or  (= dest $s1)
+                        (= source $s1))]
+   node))
+
+(defun qz/node-has-links (node)
+  "connections exist, for `node'"
+  (qz/has-links (org-roam-node-id node)))
+#+end_src
+
+#+RESULTS:
+: qz/node-has-links
+
+********* has-link-p
+#+begin_src emacs-lisp
+(defun qz/has-link-p (src dst)
+  "undirected connection exists, from `src' to `dst'"
+  (org-roam-db-query
+   [:select [source dest]
+            :from links
+            :where (or (and (= dest $s1) (= source $s2))
+                       (and (= dest $s2) (= source $s1)))]
+   src dst))
+
+(defun qz/node-has-link-p (src dst)
+  (qz/has-link-p (org-roam-node-id src)
+                 (org-roam-node-id dst)))
+#+end_src
+
+#+RESULTS:
+: qz/node-has-link-p
+
+********* has-link-to-p
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/has-link-to-p (dst &optional src)
+  "directed connection exists, from `src' to `dst'"
+  (if-let* ((nap (or src (org-roam-node-at-point)))
+            (src (or src (org-roam-node-id nap))))
+      (org-roam-db-query
+       [:select dest
+                :from links
+                :where (and (= source $s1)
+                            (IN dest $v2))]
+       src (apply 'vector (qz/ensure-list dst)))))
+
+(defun qz/node-has-link-to-p (dst &optional src)
+  (qz/has-link-to-p (org-roam-node-id dst)
+                    (and dst (org-roam-node-id dst))))
+#+end_src
+
+#+RESULTS:
+: qz/node-has-link-to-p
+
+********* has-transitive-link-p
+#+begin_src emacs-lisp
+(setq qz/transitive-query "
+with recursive cte (id, degree) as (
+
+  select n.id, 0 as degree
+  from nodes n
+  where n.id = $s1
+
+  union all
+
+  select distinct
+    source as id, c.degree + 1 as degree
+  from links l
+  join cte c on l.dest = c.id
+  where degree <= 1 -- therefore, yield 1st degree transitivity
+
+)
+select distinct id, degree
+from cte
+--where cte.id = $s2
+--where degree = 2
+order by degree desc
+")
+
+(defun qz/transitive-links (dst)
+  (org-roam-db-query qz/transitive-query dst))
+
+(defun qz/has-transitive-link-p (dst &optional src)
+  (if-let* ((nap (or src (org-roam-node-at-point)))
+            (src (or src (org-roam-node-id nap))))
+      (seq-contains
+       (seq-map 'car
+                (org-roam-db-query qz/transitive-query dst src))
+       src)
+    ))
+
+(seq-contains '(1 2 4) 1)
+
+(defun qz/node-has-transitive-link-p (dst &optional src)
+  (qz/has-transitive-link (org-roam-node-id dst) src))
+
+(qz/has-transitive-link-p (qz/title->roam-id "emacs"))
+#+end_src
+
+#+RESULTS:
+
+********* TODO has-mutual-connection
+
+**** migrations
+***** helpers
+****** migrate-jobs
+#+begin_src emacs-lisp
+(defun qz/org-roam-migrate-jobs ()
+  (interactive )
+  (dolist (file (org-roam--list-all-files))
+    (with-current-buffer (or (find-buffer-visiting file)
+                             (find-file-noselect file))
+      (message "%s visiting" file)
+      (qz/dispatch-hook)
+      (save-buffer))))
+
+                                        ;(qz/org-roam-migrate-jobs)
+#+end_src
+***** TODO #roam_key -> =:ROAM_REFS:=
+:PROPERTIES:
+:ID:       1c775b12-32d0-4531-82e3-8813d3138d9b
+:CREATED:  <2021-12-14 Tue 18:14>
+:END:
+#+roam_key: https://bonk.com
+
+a function of a node
+#+begin_src emacs-lisp
+
+#+end_src
+
+***** created && updated
+e.g https://commonplace.doubleloop.net/recentchanges
+(or updated created)
+
+entry log -> created
+activity log -> (node, ?commit=HEAD) ?updated, created
+
+created -> property:created, file-name:created
+updated -> property:updated, file-name:updated
+
+#+begin_src emacs-lisp
+(defun qz/file-created-as-timestamp (&optional file)
+  (when-let* ((file (or file (buffer-file-name (current-buffer))))
+              (ffile (f-base file))
+              (p (string-match "-" ffile))
+              (s (substring ffile 0 p)))
+    (cond
+     ((= p 16) (let* ((td (timezone-parse-date s))
+                      (tt (timezone-parse-time (elt td 3))))
+                 (format "<%s %s>"
+                         (s-join "-" (cl-subseq td nil 3))
+                         (s-join ":" tt))))
+     ((= p 14) (let* ((yy (substring s 0 4))
+                      (mm (substring s 4 6))
+                      (dd (substring s 6 8))
+                      (hh (substring s 8 10))
+                      (MM (substring s 10 12))
+                      (ss (substring s 12 14)))
+                 (format "<%s-%s-%s %s:%s:%s>"
+                         yy mm dd
+                         hh MM ss))))))
+
+(defun qz/org-roam-node-updated-precedence (pt file)
+  (list (org-roam-get-keyword "UPDATED")
+        (let ((v (s-join " " (org-entry-get-multivalued-property pt "UPDATED"))))
+          (when (not (string-empty-p v)) v))
+        (format-time-string
+         "<%Y-%m-%d %H:%M:%S>"
+         (file-attribute-modification-time (file-attributes file)))))
+
+(defun qz/org-roam-node-created-precedence (pt file)
+  (list (org-roam-get-keyword "CREATED")
+        (let ((v (s-join " " (org-entry-get-multivalued-property pt "CREATED"))))
+          (when (not (string-empty-p v)) v))
+        (qz/file-created-as-timestamp file)))
+
+(defun qz/org-roam-node-date-precedence (node date-fn)
+  (save-excursion
+    (let* ((pt (org-roam-node-point node))
+           (file (org-roam-node-file node)))
+      (with-current-buffer (or (find-buffer-visiting file)
+                               (find-file-noselect file))
+        (goto-char pt)
+        ;;(message "qz: getting node updated: %s" (org-roam-node-title node))
+        (org-with-wide-buffer
+         (car (remove nil (funcall date-fn pt file))))))))
+
+(defun qz/org-roam-node-updated-date (node)
+  (qz/org-roam-node-date-precedence
+   node
+   (lambda (pt file)
+     (append (qz/org-roam-node-updated-precedence pt file)
+             (qz/org-roam-node-created-precedence pt file)))))
+
+(defun qz/org-roam-node-created-date (node)
+  (qz/org-roam-node-date-precedence
+   node
+   '(lambda (pt file)
+      (append (qz/org-roam-node-created-precedence pt file)
+              (reverse (qz/org-roam-node-updated-precedence pt file))))))
+
+;;(cl-subseq [1 2 3] 1 2)
+;;(car [1 2 3])
+;;(or (s-join "a" nil) "b")
+
+
+(let ((node (org-roam-node-from-title-or-alias "wine")))
+  (list (qz/org-roam-node-updated-date node)
+        (qz/org-roam-node-created-date node)))
+
+;;(funcall (lambda (a b c) (message "%s %s %s" a b c)) 1 2 3)
+
+(defun qz/do-migration--created-updated ()
+  (delete-file "/tmp/oo")
+  (write-region
+   (s-join
+    "\n" (let ((org-mode-hook nil))
+           (cl-loop for node in (seq-map 'car (org-roam-db-query [:select id :from nodes]))
+                    ;;(org-roam-node-list) groups erroneously
+                    collect
+                    (let ((node (org-roam-populate (org-roam-node-create :id node))))
+                      (format "%s,%s,%s,%s"
+                              ;;"%s:%s,%s,%s,%s" to show with point
+                              (org-roam-node-id node)
+                              ;;(org-roam-node-point node)
+                              (qz/org-roam-node-updated-date node)
+                              (qz/org-roam-node-created-date node)
+                              (org-roam-node-title node))
+                      (kill-buffer (get-file-buffer (org-roam-node-file node))))))) nil "/tmp/oo"))
+#+end_src
+
+#+RESULTS:
+
+****** sanity
+#+begin_src shell :results drawer
+cat /tmp/oo | wc -l
+cat /tmp/oo | uniq -c | sort -r | wc -l
+cat /tmp/oo | uniq -c | sort -r | head
+#+end_src
+
+#+RESULTS:
+:results:
+3394
+3395
+      1 fffec49f-29e6-4eeb-bf72-8a332f758222,<2021-09-30 01:00:38>,<2020-07-13 09:03:06>,Why, and how much, extra disk space is required when upgrading with Slony-1?
+      1 ffd716b0-02c7-4594-aec9-bb6cf729d86a,<2021-09-30 01:00:38>,<2021-09-30 01:00:38>,pollo de limon
+      1 ffcd9f0f-7eca-4d4e-bf94-a7a41266994f,<2021-09-30 01:00:38>,<2021-09-30 01:00:38>,<2021-06-15>
+      1 ffa31214-f0c3-415a-be09-16971e46c56e,<2022-01-07 Fri 13:06>,<2022-01-07 Fri 13:06>,tig welding
+      1 ff7134e1-beed-4110-a1d1-299a77dcec12,<2021-10-05 11:01:34>,<2021-08-16 18:32:45>,how did you get into <<job>>
+      1 ff5c3587-1d6f-40a9-8ced-c0a07b5fcd76,<2021-10-19 08:47:34>,<2020-05-18 09:40:13>,meeting
+      1 ff4838ef-41ae-43d4-844e-c4d8a1451411,<2021-09-30 01:00:38>,<2021-08-13 16:10:35>,Arthur Holmes
+      1 ff318634-08d2-4987-8a82-3a436303c753,<2021-09-30 01:00:38>,<2021-09-30 01:00:38>,<2020-08-23>
+      1 ff1873f7-5ad7-4d4e-8de1-eb0046675047,<2021-09-30 01:00:38>,<2021-09-30 01:00:38>,wine
+      1 ff06c7dc-3266-4ba1-82a6-c5f430bb1963,<2021-12-15 Wed 11:36>,<2021-04-20 11:47:08>,NewStore
+:end:
+
+****** duplicate ids?
+only if we use org-roam-node-list smh
+#+begin_src shell :results drawer
+cat /tmp/oo | cut -d, -f1 | uniq -c | sort -rgk1 | head
+#+end_src
+
+#+RESULTS:
+:results:
+      1 fffec49f-29e6-4eeb-bf72-8a332f758222
+      1 ffd716b0-02c7-4594-aec9-bb6cf729d86a
+      1 ffcd9f0f-7eca-4d4e-bf94-a7a41266994f
+      1 ffa31214-f0c3-415a-be09-16971e46c56e
+      1 ff7134e1-beed-4110-a1d1-299a77dcec12
+      1 ff5c3587-1d6f-40a9-8ced-c0a07b5fcd76
+      1 ff4838ef-41ae-43d4-844e-c4d8a1451411
+      1 ff318634-08d2-4987-8a82-3a436303c753
+      1 ff1873f7-5ad7-4d4e-8de1-eb0046675047
+      1 ff06c7dc-3266-4ba1-82a6-c5f430bb1963
+:end:
+
+****** date distribution
+******* updated
+#+begin_src shell :results drawer
+cat /tmp/oo | awk -F, '{print $2}' | sort | uniq -c | sort -rgk1 | wc -l
+cat /tmp/oo | awk -F, '{print $2}' | sort | uniq -c | sort -rgk1 | head
+#+end_src
+
+#+RESULTS:
+:results:
+534
+   2246 <2021-09-30 01:00:38>
+     96 <2022-01-06 12:46:02>
+     77 <2021-10-19 08:47:34>
+     35 <2022-01-12 20:09:37>
+     34 <2021-10-05 11:42:04>
+     14 <2022-01-12 16:47:20>
+     14 <2021-12-13 11:13:32>
+     11 <2021-10-05 16:34:48>
+     11 <2021-10-01 16:24:07>
+     10 <2022-01-12 13:40:32>
+:end:
+
+******* created
+#+begin_src shell :results drawer
+cat /tmp/oo | awk -F, '{print $3}' | sort | uniq -c | sort -rgk1 | wc -l
+cat /tmp/oo | awk -F, '{print $3}' | sort | uniq -c | sort -rgk1 | head
+#+end_src
+
+#+RESULTS:
+:results:
+1893
+    500 <2021-08-13 16:10:35>
+    459 <2021-09-30 01:00:38>
+    102 <2021-04-20 11:47:08>
+     37 <2021-05-18 12:49:41>
+     28 <2021-10-19 08:47:34>
+     20 <2020-05-15 16:39:41>
+     15 <2021-12-13 11:13:32>
+     13 <2022-01-12 Wed 16:58>
+     12 <2020-05-11 15:09:56>
+     11 <2021-06-08 08:19:23>
+:end:
+
+******* created,updated
+#+begin_src shell :results drawer
+cat /tmp/oo | awk -F, '{print $2,$3}' | sort | uniq -c | sort -rgk1 | head
+#+end_src
+
+#+RESULTS:
+:results:
+    459 <2021-09-30 01:00:38> <2021-09-30 01:00:38>
+    241 <2021-09-30 01:00:38> <2021-08-13 16:10:35>
+     96 <2022-01-06 12:46:02> <2021-04-20 11:47:08>
+     35 <2022-01-12 20:09:37> <2021-05-18 12:49:41>
+     28 <2021-10-19 08:47:34> <2021-10-19 08:47:34>
+     26 <2021-10-19 08:47:34> <2021-08-13 16:10:35>
+     19 <2021-10-05 11:42:04> <2021-08-13 16:10:35>
+     14 <2022-01-12 16:47:20> <2020-05-15 16:39:41>
+     14 <2021-12-13 11:13:32> <2021-12-13 11:13:32>
+     11 <2021-10-05 16:34:48> <2021-06-08 08:19:23>
+:end:
+
+
+****** deciding on timeline formats
+******* node feed: timeline of created-only
+******* activity feed: timeline of updated + created
+******** updated instance = commit + updated value
+******** created instance = created value
+****** TODO node timelone
+
+**** protocol (ref)
+***** capture                                                       :var:
+****** templates
+#+begin_src emacs-lisp :noweb yes :noweb-ref roam
+;;; ref capture
+(setq org-roam-capture-ref-templates
+      `(("r" "ref" plain
+         "%?"
+         :if-new (file+head ,qz/capture-title-timestamp-roam
+                            "#+title: ${title}\n")
+         :unnarrowed t)))
+#+end_src
+
+#+RESULTS:
+| r | ref | plain | %? | :if-new | (file+head 20210813T161035Z-${slug}.org #+title: ${title} |
+**** visual
+***** =*org-roam*= (backlinks) buffer                            :var:func:
+****** ... images should be small
+:PROPERTIES:
+:ID:       1a5a2369-eef1-4e73-b701-e5a91a11e22a
+:CREATED:  <2021-12-12 Sun 22:38>
+:END:
+
+so set a buffer-local value to constrain the size of images across
+their width with 'org-image-actual-width, and attach to the hook
+'org-roam-mode-hook.
+
+easy peasy, only took me 20 minutes
+
+#+begin_src emacs-lisp :noweb-ref roam
+(defun qz/roam-buffer-image-width ()
+  (setq-local org-image-actual-width 150)
+  (org-redisplay-inline-images))
+
+(add-hook 'org-roam-mode-hook 'qz/roam-buffer-image-width)
+#+end_src
+****** ... start buffer folded/collapsed
+https://github.com/org-roam/org-roam/issues/991#issuecomment-882010053
+
+#+begin_src emacs-lisp :noweb-ref roam
+(add-to-list 'magit-section-initial-visibility-alist (cons 'org-roam-node-section 'hide))
+#+end_src
+
+#+RESULTS:
+: ((org-roam-node-section . hide) (stashes . hide))
+
+*** settings
+**** org-confirm-babel-evaluate; don't ask                           :var:
+#+begin_src emacs-lisp :noweb yes :noweb-ref org
+(setq org-confirm-babel-evaluate nil)
+#+end_src
+
+**** org-refile-targets                                              :var:
+#+begin_src emacs-lisp :noweb yes :noweb-ref org
+;; [[file:~/.doom.d/config.org::*refile][refile]]
+(setq org-refile-targets '(("reading.org" :level . 0)
+                           ("emacs.org" :level . 0)
+                           ("watching.org" :level . 0)
+                           ("learning.org" :level . 0)
+                           ("inbox.org" :level . 0)
+                           ("sample.org" :level . 0)
+                           ("wip.org" :level . 0)))
+#+end_src
+
+**** org-log-done :var:
+#+begin_src emacs-lisp :noweb-ref org
+(setq org-log-done 'time)
+#+end_src
+
+*** download :var:
+#+begin_src emacs-lisp :noweb-ref org
+(require 'org-download)
+#+end_src
+*** links
+**** insert link to attachment
+#+begin_src emacs-lisp :noweb-ref org
+(defun qz/org-choose-current-attachment ()
+  (let ((attach-dir (org-attach-dir)))
+    (if attach-dir
+        (let* ((file (pcase (org-attach-file-list attach-dir)
+                       (`(,file) file)
+                       (files (completing-read "Open attachment: "
+                                               (mapcar #'list files) nil t))))
+               (path (expand-file-name file attach-dir)))
+          path))))
+
+(defun qz/org-insert-current-attachment ()
+  (interactive)
+  (insert
+   (format "[[file:./%s]]"
+           (dired-make-relative
+            (qz/org-choose-current-attachment)))))
+
+(define-key org-mode-map (kbd "C-c M-a") 'qz/org-insert-current-attachment)
+
+#+end_src
+*** tag
+
+**** [[id:26b5040b-0883-444f-af7a-abd4e1d67c0e][my thoughts]]
+
+I'm using tags and auto-tags rather sporadically
+- person
+- private
+- daily
+
+***** TODO tag analysis (file | -> headline) ; [[id:3ec0367f-9ff5-419d-9a44-a3424656c1eb][org-roam database machinations]]
+
+**** org-tag-alist                                                   :var:
+CREATED: <2021-12-07 Tue 14:13>
+
+#+begin_src emacs-lisp
+(setq org-tag-alist
+      '(("@errand" . ?e)
+        ("@work" . ?w)
+        ("@home" . ?h)
+        ("@blog" . ?B)
+        (:newline)
+        ("emacs" . ?E)
+        ("task" . ?t)
+        ("CANCELLED" . ?C)
+        (:newline)
+        ("learning" . ?l)
+        ("research" . ?r)
+        (:newline)
+        ("book" . ?b)
+        ("article" . ?a)
+        ("paper" . ?p)
+        ("talk" . ?t)
+        ("film" . ?f)))
+#+end_src
+
+#+RESULTS:
+: ((@errand . 101) (@work . 119) (@home . 104) (@blog . 66) (:newline) (emacs . 69) (task . 116) (CANCELLED . 67) (:newline) (learning . 108) (research . 114) (:newline) (book . 98) (article . 97) (paper . 112) (talk . 116) (film . 102))
+
+*** visual
+
+**** use fixed size of images
+640px is a good size, at approximately 64 columns
+
+----------------------------------------------------------------
+#+DOWNLOADED: screenshot @ 2021-12-12 22:14:04
+[[file:configs/2021-12-12_22-14-04_screenshot.png]]
+
+check with (org-redisplay-inline-images)
+-----------------------------------------------------------------
+
+#+begin_src emacs-lisp :noweb-ref conf
+(setq org-image-actual-width 640)
+#+end_src
+
+#+RESULTS:
+: 640
+
+**** [[id:8b0b7251-2404-404b-9b64-53e4d3ce2fe6][olivetti]]
+***** apply [[id:8b0b7251-2404-404b-9b64-53e4d3ce2fe6][olivetti]] to [[id:0b89e24d-72c0-46ae-8f61-94cee95d7732][minibuffer]]
+#+begin_src emacs-lisp :noweb-ref conf
+
+;; (setq minibuffer-mode-hook nil)
+;; (add-hook 'minibuffer-mode-hook 'olivetti-mode)
+
+(add-hook 'minibuffer-mode-hook
+          (lambda ()
+            (setq-local olivetti-body-width 200)
+            (olivetti-mode)))
+
+#+end_src
+
+#+RESULTS:
+| lambda | nil | (setq-local olivetti-body-width 200) | (olivetti-mode) |
+
+** pdf-view
+*** midnight-minor-mode ; dark-mode filter on pdfs
+#+begin_src emacs-lisp :noweb-ref conf
+(with-eval-after-load 'pdf-view
+  (add-hook 'pdf-view-mode-hook 'pdf-view-midnight-minor-mode))
+#+end_src
+
+** restclient
+*** choose
+**** restclient-choose-env
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/restclient-env nil)
+
+(defun qz/restclient-choose-env (&optional env)
+  (interactive)
+  (message "qz/restclient-env: %s"
+           (setq qz/restclient-env
+                 (cdr (assoc (intern (or env
+                                         (completing-read "restclient-env: " qz/newstore-envs)))
+                             qz/newstore-envs-abbrev))))
+  qz/restclient-env)
+#+end_src
+
+#+RESULTS:
+: qz/restclient-choose-env
+
+**** restclient-choose-tenant
+#+begin_src emacs-lisp :noweb-ref es
+(defvar qz/restclient-tenant nil)
+
+(defun qz/restclient-choose-tenant (&optional tenant)
+  (interactive)
+  (message "qz/restclient-tenant: %s"
+           (setq qz/restclient-tenant
+                 (or tenant (completing-read
+                             "restclient-tenant: " qz/newstore-tenants))))
+  qz/restclient-tenant)
+#+end_src
+
+#+RESULTS:
+: qz/restclient-choose-tenant
+
+*** token
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/restclient-token nil)
+(defvar qz/restclient-token-field 'access_token)
+
+(defun qz/restclient-hook ()
+  "Update token from a request."
+  ;; url is visible while the hook is running.
+  (let ((result))
+    (save-excursion
+      (cond
+       ((string-suffix-p "/token" url)
+        (condition-case nil
+            (progn
+              (setq result (cdr (assoc qz/restclient-token-field (json-read))))
+              (when (stringp result)
+                (progn
+                  (setq qz/restclient-token result)
+                  (message (concat "stored token: " qz/restclient-token)))))
+          (error (message "That wasn't cleanly handled."))))))))
+
+(add-hook 'restclient-response-loaded-hook 'qz/restclient-hook)
+(provide 'restclient-hooks)
+#+end_src
+
+#+RESULTS:
+: restclient-hooks
+
+** aws
+
+*** aws-env
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/aws-env nil
+  "the aws login configuration, managed through saml2aws
+
+to manipulate, run
+$ saml2aws login -a PROFILE_ALIAS
+
+files of note
+`$HOME/.aws/'
+`$HOME/.saml2aws'")
+#+end_src
+
+*** choose
+#+begin_src emacs-lisp :noweb-ref conf
+(defun qz/choose-aws-env (&optional env)
+  (interactive)
+  (setq qz/aws-env
+        (or env (completing-read
+                 "aws-env: "
+                 (->> (shell-command-to-string
+                       "cat ~/.saml2aws | grep '^name' | cut -d'=' -f2")
+                      (s-split "\n")
+                      (remove "")))))
+  (async-shell-command (format "saml2aws login -a %s"
+                               qz/aws-env)
+                       "*aws*"))
+#+end_src
+
+***
+** kubernetes
+*** kubectl-context :var:
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/kubectl-context nil
+  "the operating kubernetes context.
+
+to check, at a shell, run:
+`$ kubectl config get-contexts -o name'
+or
+`$ kubectl config current-context")
+#+end_src
+*** choose :func:
+#+begin_src emacs-lisp :noweb-ref conf
+(defun qz/choose-kubectl-context (ctx)
+  (interactive)
+  (setq qz/kubectl-context
+        (or ctx (completing-read "k8s ctx: "
+                                 (qz/shell-command-to-list-of-strings
+                                  "kubectl config get-contexts -o name"))))
+  (async-shell-command (format "kubectl config use-context %s"
+                               qz/kubectl-context)
+                       "*kubectl*"))
+
+;; optional; quality of life improvement to bury kubectl buffer
+(add-to-list 'display-buffer-alist '("*kubectl*" display-buffer-no-window))
+#+end_src
+
+** system commands
+*** get mail
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+(defun qz/get-mail ()
+  (interactive)
+  (async-shell-command "mbsync -Va && notmuch new"))
+#+end_src
+
+*** rde-sanity
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+(defun qz/rde-sanity ()
+  (interactive)
+  (async-shell-command
+   (concat "cd $HOME/git/sys/rde"
+           "&& guix repl -L . sanity.scm")))
+#+end_src
+
+*** reload-config
+#+begin_src emacs-lisp :noweb yes :noweb-ref conf
+(defun qz/reload-config-home ()
+  (interactive)
+  (org-babel-tangle-file
+   "~/git/sys/rde/rde/examples/abcdw/emacs.org")
+  (sleep-for .5)
+  (async-shell-command
+   (concat
+    "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
+    "&& make ixy-home-reconfigure"
+    "&& echo 'home fuck complete' | espeak --stdin")))
+
+(defun qz/reload-config-system ()
+  (interactive)
+  (async-shell-command
+   (concat
+    "cd $HOME/git/sys/rde/rde/examples/abcdw/ "
+    "&& sudo -E make ixy-system-reconfigure"
+    "&& echo 'system fuck complete' | espeak --stdin")))
+
+(defun qz/reload-config-emacs ()
+  (interactive)
+  (load-file "~/.config/emacs/init.el"))
+
+(defun qz/reload-guix-pins ()
+  (interactive)
+  (async-shell-command
+   (concat "cd $HOME/git/sys/rde/ "
+	   "&& make channels-update-lock && make channels-pull")))
+
+(defun qz/guix-upgrade ()
+  (interactive)
+  (async-shell-command
+   (concat "cd $HOME/git/sys/rde"
+	   "&& make channels-update-lock && make channels-pull && guix upgrade && make")))
+#+end_src
+
+#+RESULTS:
+: qz/guix-upgrade
+
+** [[id:fbfebc6c-8732-4646-85da-96345218116e][tramp]]
+*** tramp-cache-read-persistent-data ; yes please
+#+begin_src emacs-lisp :noweb-ref conf
+(setq tramp-cache-read-persistent-data t)
+#+end_src
+
+#+RESULTS:
+: t
+** visual
+*** [[id:c6490b3a-4dc3-4f9a-bb21-81bb6abc6beb][emacs-perfect-margin]]
+#+begin_src emacs-lisp :noweb-ref conf
+(require 'perfect-margin)
+
+(perfect-margin-mode 1)
+(setq perfect-margin-ignore-regexps nil
+      perfect-margin-ignore-filters nil)
+#+end_src
+*** cursor
+#+begin_src emacs-lisp :noweb-ref conf
+(custom-set-variables
+ '(cursor-type 'hbar))
+#+end_src
+*** hi-lock
+
+I believe that when 'hi-lock-auto-select-face is non-nil, this should
+cycle colors automatically.
+
+#+begin_src emacs-lisp :noweb-ref conf
+(defun hi-lock-face-symbol-at-point ()
+  "Highlight each instance of the symbol at point.
+Uses the next face from `hi-lock-face-defaults' without prompting,
+unless you use a prefix argument.
+Uses `find-tag-default-as-symbol-regexp' to retrieve the symbol at point.
+
+If REGEXP contains upper case characters (excluding those preceded by `\\')
+and `search-upper-case' is non-nil, the matching is case-sensitive.
+
+This uses Font lock mode if it is enabled; otherwise it uses overlays,
+in which case the highlighting will not update as you type.  The Font
+Lock mode is considered \"enabled\" in a buffer if its `major-mode'
+causes `font-lock-specified-p' to return non-nil, which means
+the major mode specifies support for Font Lock."
+  (interactive)
+  (let* ((regexp (hi-lock-regexp-okay
+                  (find-tag-default-as-symbol-regexp)))
+         (hi-lock-auto-select-face t)
+         (face (hi-lock-read-face-name)))
+    (or (facep face)
+        (setq face (or (and hi-lock-auto-select-face (hi-lock-read-face-name))
+                       'hi-yellow)))
+    (unless hi-lock-mode (hi-lock-mode 1))
+    (hi-lock-set-pattern
+     regexp face nil nil
+     (if (and case-fold-search search-upper-case)
+         (isearch-no-upper-case-p regexp t)
+       case-fold-search))))
+#+end_src
+
+#+RESULTS:
+: hi-lock-face-symbol-at-point
+
+*** [[id:bdba5c2b-bcfc-429c-bd90-57aaa211de65][font]] modulation
+**** save load-time font size :var:func:
+
+this is useful for when we switch to the single-frame font-size, but
+we want to restore after, respecting the initial font-size
+
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/font-initial-size (face-attribute 'default :height))
+(defvar qz/resize-mini-windows-initial resize-mini-windows)
+(defvar qz/max-mini-window-height-initial max-mini-window-height)
+
+(defun qz/reset-visual-initial ()
+  (interactive)
+  (set-face-attribute 'default nil :height qz/font-initial-size)
+  (setq resize-mini-windows    qz/resize-mini-windows-initial
+        max-mini-window-height qz/max-mini-window-height-initial))
+#+end_src
+
+#+RESULTS:
+: qz/reset-visual-initial
+
+**** set font as big enough for comfy casual 80char emacs use       :func:
+
+#+begin_src emacs-lisp :noweb-ref conf
+(defun qz/font-big-80 ()
+  (interactive)
+  (set-face-attribute 'default nil :height 300)
+  (setq resize-mini-windows t
+        max-mini-window-height nil))
+#+end_src
+
+#+RESULTS:
+: qz/font-big-80
+*** unsplash
+#+begin_src emacs-lisp :noweb-ref conf
+(defvar qz/unsplash-tags nil)
+(defun qz/unsplash ()
+  "yet another lazy shell-command wrapper; wallpaper edition"
+  (interactive)
+  (let ((tag (read-from-minibuffer
+              "unsplash tags: " (car qz/unsplash-tags))))
+    (async-shell-command
+     (format "TAGS='%s'
+mv \"$XDG_CACHE_HOME/wallpaper.png\" \"$XDG_CACHE_HOME/$(date +%%Y-%%m-%%d--%%H-%%M-%%S)-wallpaper.png\"
+curl -L \"https://source.unsplash.com/5120x1440?$TAGS\" -o \"$XDG_CACHE_HOME/wallpaper.png\"
+swaymsg output \"*\" background ~/.cache/wallpaper.png fill" tag))
+    (setq qz/unsplash-tags (seq-uniq (cons tag qz/unsplash-tags)))))
+#+end_src
+
+#+RESULTS:
+: qz/unsplash
+
+** wiki
+*** col-highlight.el
+#+begin_src emacs-lisp :tangle no
+;;; col-highlight.el --- Highlight the current column.
+;;
+;; Filename: col-highlight.el
+;; Description: Highlight the current column.
+;; Author: Drew Adams
+;; Maintainer: Drew Adams (concat "drew.adams" "@" "oracle" ".com")
+;; Copyright (C) 2006-2018, Drew Adams, all rights reserved.
+;; Created: Fri Sep 08 11:06:35 2006
+;; Version: 0
+;; Package-Requires: ((vline "0"))
+;; Last-Updated: Mon Jan  1 10:17:48 2018 (-0800)
+;;           By: dradams
+;;     Update #: 446
+;; URL: https://www.emacswiki.org/emacs/download/col-highlight.el
+;; Doc URL: https://emacswiki.org/emacs/HighlightCurrentColumn
+;; Keywords: faces, frames, emulation, highlight, cursor, accessibility
+;; Compatibility: GNU Emacs: 22.x, 23.x, 24.x, 25.x, 26.x
+;;
+;; Features that might be required by this library:
+;;
+;;   `vline'.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Commentary:
+;;
+;;  This library highlights the current column.  When you move the
+;;  cursor, the highlighting follows (tracks the cursor), as long as
+;;  the highlighting stays on.
+;;
+;;  Command `column-highlight-mode' toggles this highlighting on and
+;;  off.
+;;
+;;  If you use `column-highlight-mode' twice in succession (I bind it
+;;  to `C-+'), you can flash the highlighting to show you the current
+;;  column temporarily.  An alternative way to flash-highlight is to
+;;  use command `flash-column-highlight' (once).  It shows the
+;;  highlighting for just a second or two (see option
+;;  `col-highlight-period').
+;;
+;;  You can also have current-column highlighting come on
+;;  automatically, when Emacs is idle.  Command
+;;  `toggle-highlight-column-when-idle' toggles this mode.  Command
+;;  `col-highlight-set-interval' changes the number of idle seconds to
+;;  wait before highlighting.
+;;
+;;  You can use option `col-highlight-overlay-priority' to make the
+;;  vline (i.e., column) highlighting appear on top of other overlay
+;;  highlighting that might exist.
+;;
+;;  You can use option `col-highlight-show-only' to restrict
+;;  current-column highlighting to a section of text of a particular
+;;  kind: paragaph, sentence, page, defun, etc.
+;;
+;;
+;;  To use this file, you must also have library `vline.el'.
+;;  Put this in your Emacs init file (~/.emacs):
+;;
+;;    (require 'col-highlight) ; Load this file (and `vline')
+;;
+;;  If you want to turn on continual current-column highlighting by
+;;  default, then add this to your init file:
+;;
+;;    (column-highlight-mode 1)
+;;
+;;  If you want to turn on automatic idle highlighting of the current
+;;  column, then add this to your init file:
+;;
+;;    (toggle-highlight-column-when-idle 1)
+;;
+;;  If you want to use a different wait interval, before idle
+;;  highlighting begins, then set it in your init file using
+;;  `col-highlight-set-interval':
+;;
+;;    (col-highlight-set-interval 6) ; Wait 6 idle secs.
+;;
+;;  Note that `column-highlight-mode' is intentionally a global minor
+;;  mode.  If you want a local minor mode, so that highlighting
+;;  affects only a particular buffer, you can use `vline-mode' (in
+;;  `vline.el').
+;;
+;;
+;;  See also:
+;;
+;;  * Library `hl-line+.el', which offers the same functionality, but
+;;    for the current line instead of the current column.
+;;
+;;  * Library `crosshairs.el', which combines the features of
+;;    `col-highlight.el' and `hl-line+.el', providing a crosshair
+;;    highlighting effect.  It requires `col-highlight.el' and
+;;    `hl-line+.el'.
+;;
+;;  * Library `cursor-chg.el' or library `oneonone.el', to change the
+;;    cursor type when Emacs is idle.
+;;
+;;  User options defined here:
+;;
+;;    `col-highlight-period', `column-highlight-mode',
+;;    `col-highlight-overlay-priority', `col-highlight-show-only',
+;;    `col-highlight-vline-face-flag'.
+;;
+;;  Faces defined here:
+;;
+;;    `col-highlight'.
+;;
+;;  Commands defined here:
+;;
+;;    `col-highlight-flash', `col-highlight-set-interval',
+;;    `col-highlight-toggle-when-idle', `column-highlight-mode',
+;;    `flash-column-highlight', `toggle-highlight-column-when-idle'.
+;;
+;;  Non-interactive functions defined here:
+;;
+;;    `col-highlight-highlight', `col-highlight-unhighlight'.
+;;
+;;  Internal variables defined here:
+;;
+;;    `col-highlight-face', `col-highlight-idle-interval',
+;;    `col-highlight-idle-timer', `col-highlight-when-idle-p'.
+;;
+;;
+;;  ***** NOTE: The following function defined in `vline.el' has
+;;              been REDEFINED HERE:
+;;
+;;    `vline-show' - Respect options `col-highlight-overlay-priority'
+;;                   and `col-highlight-show-only'.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Change Log:
+;;
+;; 2017/05/10 dadams
+;;     vline-show: Wrap arg to make-string with abs.  Not a fix, but bypasses error from not
+;;                 handling SPC char with display property value of (space :align-to N).
+;; 2013/08/08 dadams
+;;     Added: col-highlight-show-only, redefinition of vline-show.
+;;     Removed defadvice of vline-show (replaced by redefinition).
+;; 2012/12/25 dadams
+;;     Added Package-Requires.
+;; 2012/05/18 dadams
+;;     Added: col-highlight-overlay-priority, defadvice of vline-show.
+;; 2011/01/03 dadams
+;;     Added autoload cookies for defgroup, defcustom, defface, and commands.
+;; 2008/09/03 dadams
+;;     col-highlight-highlight: Bind vline-current-window-only to t.
+;; 2008/08/08 dadams
+;;     col-highlight-(un)highlight: Added optional arg.
+;; 2008/01/21 dadams
+;;     Use vline.el instead of column-marker.el.
+;;     Added: group column-highlight, option col-highlight-vline-face-flag.
+;;     col-highlight-toggle-when-idle: col-highlight-unhighlight when turn off.
+;;     col-highlight-flash: Use col-highlight-highlight, not mode.
+;;     col-highlight-(un)highlight: Respect col-highlight-vline-face-flag.
+;;                                  Don't highlight minibuffer.
+;;     Renamed: face col-highlight-face to col-highlight.
+;;     Removed semi-support for Emacs 20.
+;; 2006/09/08 dadams
+;;     Created.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;; This program is free software; you can redistribute it and/or
+;; modify it under the terms of the GNU General Public License as
+;; published by the Free Software Foundation; either version 3, or
+;; (at your option) any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth
+;; Floor, Boston, MA 02110-1301, USA.
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; Code:
+
+(require 'vline)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+;;;###autoload
+(defgroup column-highlight nil
+  "Highlight the current column."
+  :prefix "col-highlight-"
+  :group 'editing :group 'cursor :group 'hl-line :group 'frames
+  :link `(url-link :tag "Send Bug Report"
+          ,(concat "mailto:" "drew.adams" "@" "oracle" ".com?subject=\
+col-highlight.el bug: \
+&body=Describe bug here, starting with `emacs -q'.  \
+Don't forget to mention your Emacs and library versions."))
+  :link '(url-link :tag "Other Libraries by Drew"
+          "https://www.emacswiki.org/emacs/DrewsElispLibraries")
+  :link '(url-link :tag "Download"
+          "https://www.emacswiki.org/emacs/download/col-highlight.el"))
+
+;;;###autoload
+(defcustom col-highlight-show-only nil
+  "Non-nil means `column-highlight-mode' affects only a section of text.
+This affects `vline-mode' also.
+
+The non-nil value determines the type of text section: paragraph,
+sentence, defun, page...
+
+The actual non-nil value is a forward movement command for the given
+section type, e.g., `forward-paragraph', `end-of-defun'."
+  :type '(choice
+          (const    :tag "All text"  nil)
+          (const    :tag "Paragraph" forward-paragraph)
+          (const    :tag "Sentence"  forward-sentence)
+          (const    :tag "Page"      forward-page)
+          (const    :tag "Defun"     end-of-defun)
+          (function :tag "Forward-thing function" :value forward-paragraph))
+  :group 'column-highlight)
+
+;;;###autoload
+(defcustom col-highlight-vline-face-flag t
+  "*Non-nil means `column-highlight-mode' uses `col-highlight-face'.
+nil means that it uses `vline-face'."
+  :type 'boolean :group 'column-highlight)
+
+;;;###autoload
+(defcustom col-highlight-period 1
+  "*Number of seconds to highlight the current column."
+  :type 'integer :group 'column-highlight)
+
+;;;###autoload
+(defcustom col-highlight-overlay-priority 300
+  "*Priority to use for overlays in `vline-overlay-table'.
+A higher priority can make the vline highlighting appear on top of
+other overlays that might exist."
+  :type '(choice
+          (const   :tag "No priority (default priority)"  nil)
+          (integer :tag "Priority"  300))
+  :group 'column-highlight)
+
+;;;###autoload
+(defface col-highlight '((t (:background "SlateGray3")))
+  "*Face for current-column highlighting by `column-highlight-mode'.
+Not used if `col-highlight-vline-face-flag' is nil."
+  :group 'column-highlight :group 'faces)
+
+(defvar col-highlight-face 'col-highlight
+  "Face used for highlighting current column.
+Do NOT change this.")
+
+(defvar col-highlight-idle-interval 5
+  "Number of seconds to wait before highlighting current column.
+Do NOT change this yourself to change the wait period; instead, use
+`\\[col-highlight-set-interval]'.")
+
+(defvar col-highlight-when-idle-p nil
+  "Non-nil means highlight the current column whenever Emacs is idle.
+Do NOT change this yourself; instead, use
+`\\[toggle-highlight-column-when-idle]'.")
+
+(defvar col-highlight-idle-timer
+  (progn                              ; Cancel to prevent duplication.
+    (when (boundp 'col-highlight-idle-timer)
+      (cancel-timer col-highlight-idle-timer))
+    (run-with-idle-timer col-highlight-idle-interval t 'col-highlight-highlight))
+  "Timer used to highlight current column whenever Emacs is idle.")
+
+;; Turn it off, by default.
+;; You must use `toggle-highlight-column-when-idle' to turn it on.
+(cancel-timer col-highlight-idle-timer)
+
+
+
+;;  REPLACE ORIGINAL `vline-show' defined in `vline.el'.
+;;
+;;  1. Respect options `col-highlight-overlay-priority' and `col-highlight-show-only'.
+;;  2. Tolerate SPC char with `display' property value (space :align-to N).
+;;
+(defun vline-show (&optional point)
+  (vline-clear)
+  (save-window-excursion
+    (save-excursion
+      (if point
+          (goto-char point)
+        (setq point  (point)))
+      (let* ((column           (vline-current-column))
+             (lcolumn          (current-column))
+             (i                0)
+             (compose-p        (memq vline-style '(compose mixed)))
+             (face-p           (memq vline-style '(face mixed)))
+             (line-char        (if compose-p vline-line-char ?\   ))
+             (line-str         (make-string 1 line-char))
+             (visual-line-str  line-str)
+             (in-fringe-p      (vline-into-fringe-p))
+             (only-beg         (and col-highlight-show-only
+                                    (condition-case nil
+                                        (save-excursion
+                                          (funcall col-highlight-show-only -1)
+                                          (point))
+                                      (error nil))))
+             (only-end         (and col-highlight-show-only
+                                    (condition-case nil
+                                        (save-excursion
+                                          (funcall col-highlight-show-only 1)
+                                          (point))
+                                      (error nil)))))
+        (when face-p
+          (setq line-str (propertize line-str 'face (vline-face nil)))
+          (setq visual-line-str  (propertize visual-line-str 'face (vline-face t))))
+        (goto-char (window-end nil t))
+        (vline-forward 0)
+        (while (and (not (bobp))
+                    (not in-fringe-p)
+                    (< i (window-height))
+                    (< i (length vline-overlay-table)))
+          (let ((cur-column   (vline-move-to-column column t))
+                (cur-lcolumn  (current-column)))
+            (unless (or (= (point) point) ; Non-cursor line only (eol workaround).
+                        (and only-beg  only-end  (or (<= (point) only-beg)
+                                                     (>= (point) only-end))))
+              (when (> cur-column column)
+                (let ((lcol  (current-column)))
+                  (backward-char)
+                  (setq cur-column  (- cur-column (- lcol (current-column))))))
+              (let* ((ovr       (aref vline-overlay-table i))
+                     (visual-p  (or (< lcolumn (current-column))
+                                    (> lcolumn (+ (current-column)
+                                                  (- column cur-column)))))
+                     ;; Consider a newline, tab and wide char.
+                     (str       (concat (make-string (abs (- column cur-column)) ?\  )
+                                        (if visual-p visual-line-str line-str)))
+                     (char      (char-after)))
+                (unless ovr
+                  (setq ovr  (make-overlay 0 0))
+                  (overlay-put ovr 'rear-nonsticky t)
+                  (aset vline-overlay-table i ovr))
+                (overlay-put ovr 'face nil)
+                (overlay-put ovr 'before-string nil)
+                (overlay-put ovr 'after-string nil)
+                (overlay-put ovr 'invisible nil)
+                (overlay-put ovr 'window (and vline-current-window-only  (selected-window)))
+                (cond ((memq char vline-multiwidth-space-list) ; Multiwidth space
+                       (setq str  (concat str (make-string (- (save-excursion (forward-char)
+                                                                              (current-column))
+                                                              (current-column)
+                                                              (string-width str))
+                                                           ?\  )))
+                       (move-overlay ovr (point) (1+ (point)))
+                       (overlay-put ovr 'invisible t)
+                       (overlay-put ovr 'after-string str))
+                      ((eolp)
+                       (move-overlay ovr (point) (point))
+                       (overlay-put ovr 'after-string str)
+                       (when (and (not truncate-lines) ; Do not expand more than window width.
+                                  (>= (1+ column) (window-width))
+                                  (>= column (vline-current-column))
+                                  (not (vline-into-fringe-p)))
+                         (delete-overlay ovr)))
+                      (t
+                       (cond (compose-p
+                              (let (str)
+                                (when char
+                                  (setq str  (compose-chars char
+                                                            (cond ((= (char-width char) 1)
+                                                                   '(tc . tc))
+                                                                  ((= cur-column column)
+                                                                   '(tc . tr))
+                                                                  (t
+                                                                   '(tc . tl)))
+                                                            line-char))
+                                  (when face-p
+                                    (setq str  (propertize str 'face (vline-face visual-p))))
+                                  (move-overlay ovr (point) (1+ (point)))
+                                  (overlay-put ovr 'invisible t)
+                                  (overlay-put ovr 'after-string str))))
+                             (face-p
+                              (move-overlay ovr (point) (1+ (point)))
+                              (overlay-put ovr 'face (vline-face visual-p))))))))
+            (setq i  (1+ i))
+            (vline-forward -1))))))
+  (mapc (lambda (ov) (when (overlayp ov) ; Set overlay priority to `col-highlight-overlay-priority'.
+                  (overlay-put ov 'priority col-highlight-overlay-priority)))
+        vline-overlay-table))
+
+;;;###autoload
+(define-minor-mode column-highlight-mode
+    "Toggle highlighting the current column.
+With ARG, turn column highlighting on if and only if ARG is positive.
+
+Column-Highlight mode uses the functions
+`col-highlight-unhighlight' and `col-highlight-highlight'
+on `pre-command-hook' and `post-command-hook'."
+  :init-value nil :global t :group 'column-highlight
+  :link `(url-link :tag "Send Bug Report"
+                   ,(concat "mailto:" "drew.adams" "@" "oracle" ".com?subject=\
+col-highlight.el bug: \
+&body=Describe bug here, starting with `emacs -q'.  \
+Don't forget to mention your Emacs and library versions."))
+  :link '(url-link :tag "Other Libraries by Drew"
+          "https://www.emacswiki.org/emacs/DrewsElispLibraries")
+  :link '(url-link :tag
+          "Download" "https://www.emacswiki.org/emacs/download/col-highlight.el")
+  :link '(url-link :tag "Description"
+          "https://www.emacswiki.org/emacs/ChangingCursorDynamically")
+  :link '(emacs-commentary-link :tag "Commentary" "col-highlight")
+  (cond (column-highlight-mode
+         (add-hook 'pre-command-hook 'col-highlight-unhighlight)
+         (add-hook 'post-command-hook 'col-highlight-highlight))
+        (t
+         (col-highlight-unhighlight)
+         (remove-hook 'pre-command-hook 'col-highlight-unhighlight)
+         (remove-hook 'post-command-hook 'col-highlight-highlight))))
+
+;;;###autoload
+(defalias 'toggle-highlight-column-when-idle 'col-highlight-toggle-when-idle)
+;;;###autoload
+(defun col-highlight-toggle-when-idle (&optional arg)
+  "Turn on or off highlighting the current column when Emacs is idle.
+With prefix argument, turn on if ARG > 0; else turn off."
+  (interactive "P")
+  (setq col-highlight-when-idle-p  (if arg
+                                       (> (prefix-numeric-value arg) 0)
+                                     (not col-highlight-when-idle-p)))
+  (cond (col-highlight-when-idle-p
+         (timer-activate-when-idle col-highlight-idle-timer)
+         (add-hook 'pre-command-hook 'col-highlight-unhighlight)
+         (message "Turned ON highlighting current column when Emacs is idle."))
+        (t
+         (cancel-timer col-highlight-idle-timer)
+         (col-highlight-unhighlight)
+         (remove-hook 'pre-command-hook 'col-highlight-unhighlight)
+         (message "Turned OFF highlighting current column when Emacs is idle."))))
+
+;;;###autoload
+(defun col-highlight-set-interval (n)
+  "Set the delay before highlighting current column when Emacs is idle.
+Whenever Emacs has been idle for N seconds, the current column is
+highlighted using the face that is the value of variable
+`col-highlight-face'.
+
+To turn on or off automatically highlighting the current column
+when Emacs is idle, use `\\[toggle-highlight-column-when-idle]."
+  (interactive
+   "nSeconds to idle, before highlighting current column: ")
+  (timer-set-idle-time col-highlight-idle-timer
+                       (setq col-highlight-idle-interval  n)
+                       t))
+
+;;;###autoload
+(defalias 'flash-column-highlight 'col-highlight-flash)
+;;;###autoload
+(defun col-highlight-flash (&optional arg)
+  "Highlight the current column for `col-highlight-period' seconds.
+With a prefix ARG, highlight for that many seconds."
+  (interactive)
+  (col-highlight-highlight)
+  (let ((column-period  col-highlight-period))
+    (when current-prefix-arg
+      (setq column-period  (prefix-numeric-value current-prefix-arg)))
+    (run-at-time column-period nil 'col-highlight-unhighlight)))
+
+(defun col-highlight-highlight (&optional minibuffer-also-p)
+  "Highlight current column.
+This has no effect in the minibuffer, unless optional arg
+MINIBUFFER-ALSO-P is non-nil."
+  (unless (and (minibufferp)  (not minibuffer-also-p))
+    (let ((vline-current-window-only  t))
+      (if col-highlight-vline-face-flag
+          (let ((vline-style  'face)
+                (vline-face   col-highlight-face))
+            (vline-show))
+        (vline-show)))))
+
+(defun col-highlight-unhighlight (&optional minibuffer-also-p)
+  "Turn off highlighting of current column.
+This has no effect in the minibuffer, unless optional arg
+MINIBUFFER-ALSO-P is non-nil."
+  (unless (and (minibufferp)  (not minibuffer-also-p))
+    (if col-highlight-vline-face-flag
+        (let ((vline-style  'face)
+              (vline-face   col-highlight-face))
+          (vline-clear))
+      (vline-clear))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(provide 'col-highlight)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; col-highlight.el ends here
+#+end_src
+
+#+RESULTS:
+: col-highlight
+
+*** vline.el
+#+begin_src emacs-lisp :tangle no
+;;; vline.el --- show vertical line (column highlighting) mode.
+
+;; Copyright (C) 2002, 2008-2012 by Taiki SUGAWARA <buzz.taiki@gmail.com>
+
+;; Author: Taiki SUGAWARA <buzz.taiki@gmail.com>
+;; Maintainer: Taiki SUGAWARA <buzz.taiki@gmail.com>
+;; Keywords: faces, editing, emulating
+;; Version: 1.11
+;; Time-stamp: <2012-01-08 12:40:18 UTC taiki>
+;; URL: http://www.emacswiki.org/cgi-bin/wiki/vline.el
+;; URL: http://bitbucket.org/buzztaiki/elisp/src/tip/vline.el
+
+;; This file is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+
+;; This file is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
+
+;;; Commentary:
+
+;; put followings your .emacs
+;;   (require 'vline)
+;;
+;; if you display a vertical line, type M-x vline-mode.  `vline-mode' doesn't
+;; effect other buffers, because it is a buffer local minor mode.  if you hide
+;; a vertical line, type M-x vline-mode again.
+;;
+;; if you display a vertical line in all buffers, type M-x vline-global-mode.
+;;
+;; `vline-style' provides a display style of vertical line.  see
+;; `vline-style' docstring.
+;;
+;; if you don't want to visual line highlighting (ex.  for performance
+;; issue), please to set `vline-visual' to nil.
+;;
+;; if you don't want to use timer (ex.  you want to highlight column
+;; during moving cursors), please to set `vline-use-timer' to nil.
+
+;;; Change Log:
+
+;; 2012-01-08 taiki
+;; fix for the Lint warnings.
+
+;; 2010-02-02 taiki
+;; improve performance.
+
+;; 2009-08-26 taiki
+;; support org-mode, outline-mode
+
+;; 2009-08-18 taiki
+;; add autoload cookies.
+
+;; 2009-08-18 taiki
+;; fix last line highlighting probrem.
+
+;; 2009-08-18 taiki
+;; support visual line highlighting.
+;; - Added face vline-visual.
+;; - Added defcustom vline-visual-face.
+;; - Added defcustom vline-visual.
+;;
+;; 2009-08-17 taiki
+;; fix continuas line problem.
+;; - Don't display vline when cursor into fringe
+;; - Don't expand eol more than window width.
+;;
+;; 2008-10-22 taiki
+;; fix coding-system problem.
+;; - Added vline-multiwidth-space-list
+;; - Use ucs code-point for japanese fullwidth space.
+;;
+;; 2008-01-22 taiki
+;; applied patch from Lennart Borgman
+;; - Added :group 'vline
+;; - Added defcustom vline-current-window-only
+;; - Added header items to simplify for users
+
+;;; TODO:
+;; - track window-scroll-functions, window-size-change-functions.
+;; - consider other minor modes (using {after,before}-string overlay).
+;; - don't use {post,after}-command-hook for performance??
+
+;;; Code:
+
+(defvar vline-overlay-table-size 200)
+(defvar vline-overlay-table (make-vector vline-overlay-table-size nil))
+(defvar vline-line-char ?|)
+(defvar vline-multiwidth-space-list
+  (list
+   ?\t
+   (decode-char 'ucs #x3000)            ; japanese fullwidth space
+   ))
+(defvar vline-timer nil)
+
+(defcustom vline-style 'face
+  "This variable holds vertical line display style.
+Available values are followings:
+`face'      : use face.
+`compose'   : use composit char.
+`mixed'     : use face and composit char."
+  :type '(radio
+          (const face)
+          (const compose)
+          (const mixed))
+  :group 'vline)
+
+
+(defface vline
+  '((t (:background "light steel blue")))
+  "A default face for vertical line highlighting."
+  :group 'vline)
+
+(defface vline-visual
+  '((t (:background "gray90")))
+  "A default face for vertical line highlighting in visual lines."
+  :group 'vline)
+
+(defcustom vline-face 'vline
+  "A face for vertical line highlighting."
+  :type 'face
+  :group 'vline)
+
+(defcustom vline-visual-face 'vline-visual
+  "A face for vertical line highlighting in visual lines."
+  :type 'face
+  :group 'vline)
+
+(defcustom vline-current-window-only nil
+  "If non-nil then highlight column in current window only.
+If the buffer is shown in several windows then highlight column only
+in the currently selected window."
+  :type 'boolean
+  :group 'vline)
+
+(defcustom vline-visual t
+  "If non-nil then highlight column in visual lines.
+If you specified `force' then use force visual line highlighting even
+if `truncate-lines' is non-nil."
+  :type '(radio
+          (const nil)
+          (const t)
+          (const force))
+  :group 'vline)
+
+(defcustom vline-use-timer t
+  "If non-nil, use idle timer instead of (post|after)-command-hook."
+  :type 'boolean
+  :group 'vline)
+
+(defcustom vline-idle-time 0.02
+  "Idle time for highlighting column."
+  :type 'number
+  :group 'vline)
+
+;;;###autoload
+(define-minor-mode vline-mode
+  "Display vertical line mode."
+  :global nil
+  :lighter " VL"
+  :group 'vline
+  (if vline-mode
+      (progn
+        (add-hook 'pre-command-hook 'vline-pre-command-hook nil t)
+        (if vline-use-timer
+            (vline-set-timer)
+          (add-hook 'post-command-hook 'vline-post-command-hook nil t)))
+    (vline-cancel-timer)
+    (vline-clear)
+    (remove-hook 'pre-command-hook 'vline-pre-command-hook t)
+    (remove-hook 'post-command-hook 'vline-post-command-hook t)))
+
+;;;###autoload
+(define-global-minor-mode vline-global-mode
+  vline-mode
+  (lambda ()
+    (unless (minibufferp)
+      (vline-mode 1)))
+  :group 'vline)
+
+(defun vline-pre-command-hook ()
+  (when (and vline-mode (not (minibufferp)))
+    (vline-clear)))
+
+(defun vline-post-command-hook ()
+  (when (and vline-mode (not (minibufferp)))
+    (vline-show)))
+
+(defun vline-set-timer ()
+  (setq vline-timer
+        (run-with-idle-timer
+         vline-idle-time t 'vline-timer-callback)))
+
+(defun vline-cancel-timer ()
+  (when (timerp vline-timer)
+    (cancel-timer vline-timer)))
+
+(defun vline-timer-callback ()
+  (when (and vline-mode (not (minibufferp)))
+    (vline-show)))
+
+(defun vline-clear ()
+  (mapcar (lambda (ovr)
+            (and ovr (delete-overlay ovr)))
+          vline-overlay-table))
+
+(defsubst vline-into-fringe-p ()
+  (eq (nth 1 (posn-at-point)) 'right-fringe))
+
+(defsubst vline-visual-p ()
+  (or (eq vline-visual 'force)
+      (and (not truncate-lines)
+           vline-visual)))
+
+(defsubst vline-current-column ()
+  (if (or (not (vline-visual-p))
+          ;; margin for full-width char
+          (< (1+ (current-column)) (window-width)))
+      (current-column)
+    ;; hmm.. posn-at-point is not consider tab width.
+    (- (current-column)
+       (save-excursion
+         (vertical-motion 0)
+         (current-column)))))
+
+(defsubst vline-move-to-column (col &optional bol-p)
+  (if (or (not (vline-visual-p))
+          ;; margin for full-width char
+          (< (1+ (current-column)) (window-width)))
+      (move-to-column col)
+    (unless bol-p
+      (vertical-motion 0))
+    (let ((bol-col (current-column)))
+      (- (move-to-column (+ bol-col col))
+         bol-col))))
+
+(defsubst vline-invisible-p (pos)
+  (let ((inv (get-char-property pos 'invisible)))
+    (and inv
+         (or (eq buffer-invisibility-spec t)
+             (memq inv buffer-invisibility-spec)
+             (assq inv buffer-invisibility-spec)))))
+
+(defsubst vline-forward (n)
+  (unless (memq n '(-1 0 1))
+    (error "n(%s) must be 0 or 1" n))
+  (if (not (vline-visual-p))
+      (progn
+        (forward-line n)
+        ;; take care of org-mode, outline-mode
+        (when (and (not (bobp))
+                   (vline-invisible-p (1- (point))))
+          (goto-char (1- (point))))
+        (when (vline-invisible-p (point))
+          (if (< n 0)
+              (while (and (not (bobp)) (vline-invisible-p (point)))
+                (goto-char (previous-char-property-change (point))))
+            (while (and (not (bobp)) (vline-invisible-p (point)))
+              (goto-char (next-char-property-change (point))))
+            (forward-line 1))))
+    (vertical-motion n)))
+
+(defun vline-face (visual-p)
+  (if visual-p
+      vline-visual-face
+    vline-face))
+
+(defun vline-show (&optional point)
+  (vline-clear)
+  (save-window-excursion
+    (save-excursion
+      (if point
+          (goto-char point)
+        (setq point (point)))
+      (let* ((column (vline-current-column))
+             (lcolumn (current-column))
+             (i 0)
+             (compose-p (memq vline-style '(compose mixed)))
+             (face-p (memq vline-style '(face mixed)))
+             (line-char (if compose-p vline-line-char ? ))
+             (line-str (make-string 1 line-char))
+             (visual-line-str line-str)
+             (in-fringe-p (vline-into-fringe-p)))
+        (when face-p
+          (setq line-str (propertize line-str 'face (vline-face nil)))
+          (setq visual-line-str (propertize visual-line-str 'face (vline-face t))))
+        (goto-char (window-end nil t))
+        (vline-forward 0)
+        (while (and (not in-fringe-p)
+                    (< i (window-height))
+                    (< i (length vline-overlay-table))
+                    (not (bobp)))
+          (let ((cur-column (vline-move-to-column column t))
+                (cur-lcolumn (current-column)))
+            ;; non-cursor line only (workaround of eol probrem.
+            (unless (= (point) point)
+              ;; if column over the cursor's column (when tab or wide char is appered.
+              (when (> cur-column column)
+                (let ((lcol (current-column)))
+                  (backward-char)
+                  (setq cur-column (- cur-column (- lcol (current-column))))))
+              (let* ((ovr (aref vline-overlay-table i))
+                     (visual-p (or (< lcolumn (current-column))
+                                   (> lcolumn (+ (current-column)
+                                                 (- column cur-column)))))
+                     ;; consider a newline, tab and wide char.
+                     (str (concat (make-string (- column cur-column) ? )
+                                  (if visual-p visual-line-str line-str)))
+                     (char (char-after)))
+                ;; create overlay if not found.
+                (unless ovr
+                  (setq ovr (make-overlay 0 0))
+                  (overlay-put ovr 'rear-nonsticky t)
+                  (aset vline-overlay-table i ovr))
+
+                ;; initialize overlay.
+                (overlay-put ovr 'face nil)
+                (overlay-put ovr 'before-string nil)
+                (overlay-put ovr 'after-string nil)
+                (overlay-put ovr 'invisible nil)
+                (overlay-put ovr 'window
+                             (if vline-current-window-only
+                                 (selected-window)
+                               nil))
+
+                (cond
+                 ;; multiwidth space
+                 ((memq char vline-multiwidth-space-list)
+                  (setq str
+                        (concat str
+                                (make-string (- (save-excursion (forward-char)
+                                                                (current-column))
+                                                (current-column)
+                                                (string-width str))
+                                             ? )))
+                  (move-overlay ovr (point) (1+ (point)))
+                  (overlay-put ovr 'invisible t)
+                  (overlay-put ovr 'after-string str))
+                 ;; eol
+                 ((eolp)
+                  (move-overlay ovr (point) (point))
+                  (overlay-put ovr 'after-string str)
+                  ;; don't expand eol more than window width
+                  (when (and (not truncate-lines)
+                             (>= (1+ column) (window-width))
+                             (>= column (vline-current-column))
+                             (not (vline-into-fringe-p)))
+                    (delete-overlay ovr)))
+                 (t
+                  (cond
+                   (compose-p
+                    (let (str)
+                      (when char
+                        (setq str (compose-chars
+                                   char
+                                   (cond ((= (char-width char) 1)
+                                          '(tc . tc))
+                                         ((= cur-column column)
+                                          '(tc . tr))
+                                         (t
+                                          '(tc . tl)))
+                                   line-char))
+                        (when face-p
+                          (setq str (propertize str 'face (vline-face visual-p))))
+                        (move-overlay ovr (point) (1+ (point)))
+                        (overlay-put ovr 'invisible t)
+                        (overlay-put ovr 'after-string str))))
+                   (face-p
+                    (move-overlay ovr (point) (1+ (point)))
+                    (overlay-put ovr 'face (vline-face visual-p))))))))
+            (setq i (1+ i))
+            (vline-forward -1)))))))
+
+(provide 'vline)
+
+;;; Local Variables:
+;;; time-stamp-format: "%:y-%02m-%02d %02H:%02M:%02S %Z %u"
+;;; time-stamp-line-limit: 16
+;;; End:
+
+;;; vline.el ends here
+#+end_src
+
+#+RESULTS:
+: vline
+
+*** ol-man.el
+- source :: https://orgmode.org/manual/Adding-Hyperlink-Types.html
+
+an [[id:6baf4bff-d5fe-4ce0-a130-0464e49de67d][org-mode]] extension for a new link backend targeting manpages
+
+**** TODO [[id:cfcecb80-bcde-4c1d-a4fd-8a55eb5e5f20][deep link]] (content-based) encode line for context & regexp jump
+**** source
+#+begin_src emacs-lisp
+;;; ol-man.el - Support for links to man pages in Org mode
+(require 'ol)
+
+(org-link-set-parameters "man"
+                         :follow 'org-man-open
+                         :export 'org-man-export
+                         :store  'org-man-store-link)
+
+(defcustom org-man-command 'man
+  "The Emacs command to be used to display a man page."
+  :group 'org-link
+  :type '(choice (const man) (const woman)))
+
+(defun org-man-open (path _)
+  "Visit the manpage on PATH.
+PATH should be a topic that can be thrown at the man command."
+  (funcall org-man-command path))
+
+(defun org-man-store-link ()
+  "Store a link to a man page."
+  (when (memq major-mode '(Man-mode woman-mode))
+    ;; This is a man page, we do make this link.
+    (let* ((page (org-man-get-page-name))
+           (link (concat "man:" page))
+           (description (format "Man page for %s" page)))
+      (org-link-store-props
+       :type "man"
+       :link link
+       :description description))))
+
+(defun org-man-get-page-name ()
+  "Extract the page name from the buffer name."
+  ;; This works for both `Man-mode' and `woman-mode'.
+  (if (string-match " \\(\\S-+\\)\\*" (buffer-name))
+      (match-string 1 (buffer-name))
+    (error "Cannot create link to this man page")))
+
+(defun org-man-export (link description format _)
+  "Export a man page link from Org files."
+  (let ((path (format "http://man.he.net/?topic=%s&section=all" link))
+        (desc (or description link)))
+    (pcase format
+      (`html (format "<a target=\"_blank\" href=\"%s\">%s</a>" path desc))
+      (`latex (format "\\href{%s}{%s}" path desc))
+      (`texinfo (format "@uref{%s,%s}" path desc))
+      (`ascii (format "%s (%s)" desc path))
+      (t path))))
+
+(provide 'ol-man)
+;;; ol-man.el ends here
+#+end_src
+
+#+RESULTS:
+: ol-man
+
+* Footnotes
+
+[fn:2] example for how =:var= header args are dealt with in an
+=org-babel-execute:backend= situation
+#+begin_src emacs-lisp :tangle no
+(defun org-babel-execute:restclient (body params)
+  "Execute a block of Restclient code with org-babel.
+This function is called by `org-babel-execute-src-block'"
+  (message "executing Restclient source code block")
+  (with-temp-buffer
+    (let ((results-buffer (current-buffer))
+          (restclient-same-buffer-response t)
+          (restclient-same-buffer-response-name (buffer-name))
+          (display-buffer-alist
+           (cons
+            '("\\*temp\\*" display-buffer-no-window (allow-no-window . t))
+            display-buffer-alist)))
+
+      (insert (buffer-name))
+      (with-temp-buffer
+        (dolist (p params)
+          (let ((key (car p))
+                (value (cdr p)))
+            (when (eql key :var)
+              (insert (format ":%s = <<\n%s\n#\n" (car value) (cdr value))))))
+        (insert body)
+        (goto-char (point-min))
+        (delete-trailing-whitespace)
+        (goto-char (point-min))
+        (restclient-http-parse-current-and-do
+         'restclient-http-do (org-babel-restclient--raw-payload-p params) t))
+
+      (while restclient-within-call
+        (sleep-for 0.05))
+
+      (goto-char (point-min))
+      (when (equal (buffer-name) (buffer-string))
+        (error "Restclient encountered an error"))
+
+      (when (or (org-babel-restclient--return-pure-payload-result-p params)
+                (assq :noheaders params)
+                (assq :jq params))
+        (org-babel-restclient--hide-headers))
+
+       (when-let* ((jq-header (assoc :jq params))
+                  (jq-path "jq"))
+        (shell-command-on-region
+         (point-min)
+         (point-max)
+         (format "%s %s" org-babel-restclient--jq-path
+                         (shell-quote-argument (cdr jq-header)))
+         (current-buffer)
+         t))
+
+       ;; widen if jq but not pure payload
+      (when (and (assq :jq params)
+                 (not (assq :noheaders params))
+                 (not (org-babel-restclient--return-pure-payload-result-p params)))
+        (widen))
+
+      (when (not (org-babel-restclient--return-pure-payload-result-p params))
+        (org-babel-restclient--wrap-result))
+
+      (buffer-string))))
+#+end_src
+[fn:1] capture template as an interactive function so we can use it as
+a COMMAND, and consequently, bind it to a key--better traceability
+than a lambda
