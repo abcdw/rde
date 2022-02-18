@@ -768,3 +768,21 @@ Commands provided:
 dmenu-like backend as an interface for auto-typing and copying
 password-store data, known to work with bemenu, fuzzel, rofi, wofi")
     (license license:gpl3+)))
+
+(define-public xdg-desktop-portal-wlr-latest
+  (let ((commit "c34d09877cb55eb353311b5e85bf50443be9439d"))
+  (package
+    (inherit xdg-desktop-portal-wlr)
+    (name "xdg-desktop-portal-wlr")
+    (version "0.5.0")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                     (url "https://github.com/emersion/xdg-desktop-portal-wlr")
+                     (commit commit)))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0xw5hmx816w4hsy1pwz3qikxc7m6pcx1ly03hhbb6vp94gfcwpr3"))
+              (patches (search-patches "xdg-desktop-portal-wlr-harcoded-length.patch"))))
+        (license license:expat))))
