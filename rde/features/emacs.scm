@@ -768,10 +768,26 @@ utilizing reverse-im package."
           "Check if current mode is derived from one of the MODES."
           (seq-filter 'derived-mode-p modes))
 
+        (defvar global-olivetti-ignore-modes
+          '(minibuffer-mode
+            which-key-mode
+            minibuffer-inactive-mode)
+          "A LIST of SYM representing `modes' to ignore in
+`rde--turn-on-olivetti-mode'.")
+
+        (defvar global-olivetti-ignore-buffers
+          '(" *which-key*")
+          "A LIST of STRING/REGEXP representing `buffer' names to ignore in
+`rde--turn-on-olivetti-mode'.")
+
         (defun rde--turn-on-olivetti-mode ()
-          (unless (memq major-mode
-                        '(minibuffer-mode which-key-mode
-                          minibuffer-inactive-mode))
+          "Apply `olivetti-mode' buffer-wise, upon `global-olivetti-mode',
+  unless mode is `global-olivetti-ignore-modes' or buffer is
+`global-olivetti-ignore-buffers'."
+          (unless (or (memq major-mode global-olivetti-ignore-modes)
+                      (seq-filter
+                       (lambda (s) (string-match (buffer-name) s))
+                       global-olivetti-ignore-buffers))
             (olivetti-mode 1)))
 
         (define-globalized-minor-mode global-olivetti-mode
