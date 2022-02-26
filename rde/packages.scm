@@ -346,12 +346,12 @@ functionality.")))
     (license license:expat)))
 
 (define-public emacs-vertico-latest
-  (let* ((commit "a8fe9a0b2e156e022136169a3159b4dad78b2439")
-         (revision "0"))
+  (let* ((commit "2de617a9199d152533ce280c6eb653147f15f8d1")
+         (revision "2"))
     (package
      (inherit emacs-vertico)
      (name "emacs-vertico")
-     (version (git-version "0.18" revision commit))
+     (version (git-version "0.20" revision commit))
      (source
       (origin
        (method git-fetch)
@@ -360,7 +360,7 @@ functionality.")))
              (commit commit)))
        (file-name (git-file-name name version))
        (sha256
-        (base32 "17jdxjcfs5dn39wbp1rf1nar08zs1slxpgxnnj9vf2il49n5n922")))))))
+        (base32 "08h1lv63dkrfk3m94z73xmjabch6699kd9qm3cvkcr8n67h6j6fp")))))))
 
 (define-public emacs-vterm-latest
   (let ((version "0.0.1")
