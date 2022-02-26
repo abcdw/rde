@@ -81,6 +81,7 @@
   "Setup and configure sway."
   (ensure-pred sway-config? extra-config)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
+  (ensure-pred boolean? xwayland?)
   (ensure-pred any-package? sway)
   (ensure-pred any-package? foot)
   (ensure-pred any-package? bemenu)
