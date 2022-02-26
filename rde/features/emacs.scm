@@ -1327,11 +1327,14 @@ git-link, git-timemachine."
            (define-key map (kbd "M") 'consult-global-mark)
            (define-key map (kbd "b") 'consult-bookmark))
 
-         (define-key narrow-map (kbd "g")
-           (lambda ()
-             (interactive)
-             (let ((consult-line-numbers-widen nil))
-               (call-interactively #'consult-goto-line))))
+         (defun rde-goto-line-relative ()
+           "Just a wrapper around `consult-goto-line', which uses
+relative line numbers, when narrowing is active."
+           (interactive)
+           (let ((consult-line-numbers-widen nil))
+             (call-interactively 'consult-goto-line)))
+
+         (define-key narrow-map (kbd "g") 'rde-goto-line-relative)
 
          (let ((map search-map))
            (define-key map (kbd "f") 'consult-find)
