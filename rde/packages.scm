@@ -459,6 +459,25 @@ by name.
 
 This is a fork with added support for Wayland via layer shell protocol.")))
 
+(define-public wtype
+  (package
+   (name "wtype")
+   (version "0.4")
+   (source (origin
+            (method url-fetch)
+            (uri (string-append "https://github.com/atx/wtype"
+                                "/archive/refs/tags/v" version ".tar.gz"))
+            (sha256
+             (base32
+              "1ya6hxmgmsmxsy3yzssq4q2xm7lkfc253g44p0lnwslbh9npi4fs"))))
+   (build-system meson-build-system)
+   (inputs (list libxkbcommon wayland pkg-config))
+   (home-page "https://github.com/atx/wtype")
+   (synopsis "xdotool type for wayland")
+   (description "wtype is a Wayland tool that allows you to simulate
+keyboard input like xdotool type for X11.")
+   (license license:gpl3+)))
+
 (use-modules (guix build-system go)
              (gnu packages golang)
              (gnu packages syncthing))
