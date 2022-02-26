@@ -220,21 +220,24 @@
 (define* (feature-sway-run-on-tty
           #:key
           (sway-tty-number 2)
-          (launch-args ""))
+          (launch-arguments ""))
   "Launch Sway on specified tty upon user login.  Also,
 automatically switch to SWAY-TTY-NUMBER on boot."
   (ensure-pred tty-number? sway-tty-number)
-  (ensure-pred string? launch-args)
+  (ensure-pred string? launch-arguments)
 
   (define (sway-run-on-tty-home-services config)
+    (require-value 'sway config)
     (list
      (simple-service
       'run-sway-on-login-to-sway-tty
       home-shell-profile-service-type
       (list
-       (format #f "[ $(tty) = /dev/tty~a ] && exec sway ~a"
-               sway-tty-number
-               launch-args)))))
+       #~(format #f "[ $(tty) = /dev/tty~a ] && exec ~a~a~a"
+                 #$sway-tty-number
+                 #$(file-append (get-value 'sway config) "/bin/sway")
+                 #$(if (positive? (string-length launch-arguments)) " " "")
+                 #$launch-arguments)))))
 
   (define (sway-run-on-tty-system-services _)
     (list
