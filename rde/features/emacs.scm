@@ -1394,7 +1394,8 @@ relative line numbers, when narrowing is active."
 
 (define* (feature-emacs-vertico
           #:key
-          (emacs-vertico emacs-vertico-latest))
+          (emacs-vertico emacs-vertico-latest)
+          (completion-in-region? #t))
   "Configure vertico completion UI for GNU Emacs."
   (define emacs-f-name 'vertico)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1406,11 +1407,15 @@ relative line numbers, when narrowing is active."
       `((eval-when-compile
          (require 'vertico)
          (require 'vertico-multiform))
-        ,@(if (get-value 'emacs-consult config)
+        ,@(if (and (get-value 'emacs-consult config) completion-in-region?)
               '((with-eval-after-load
                  'minibuffer
                  (setq completion-in-region-function
-                       'consult-completion-in-region)))
+                       (lambda (&rest args)
+                         (apply (if vertico-mode
+                                    'consult-completion-in-region
+                                    'completion--in-region)
+                                args)))))
                 '())
         (with-eval-after-load
          'vertico
