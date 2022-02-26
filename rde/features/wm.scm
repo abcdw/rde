@@ -389,7 +389,7 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
 (define* (feature-swayidle
           #:key
           (swayidle swayidle)
-          (lock-timeout 120)
+          (lock-timeout 240)
           (extra-config '()))
   "Configure swayidle."
   (ensure-pred any-package? swayidle)
