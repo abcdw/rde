@@ -442,7 +442,7 @@
 ;; 	 (rde-config-system-services ixy-config)))
 
 ;; (use-modules (rde features))
-;; ((@@ (ice-9 pretty-print) pretty-print)
+;; ((@ (ice-9 pretty-print) pretty-print)
 ;;  (map feature-name (rde-config-features ixy-config)))
 
 (dispatcher)

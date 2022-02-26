@@ -196,7 +196,7 @@
 
        (simple-service
         'sway-reload-config-on-change
-        (@@ (gnu home services) home-run-on-change-service-type)
+        (@ (gnu home services) home-run-on-change-service-type)
         `(("files/config/sway/config"
            ,#~(system* #$(file-append sway "/bin/swaymsg") "reload"))))
 

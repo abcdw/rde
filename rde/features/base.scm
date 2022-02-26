@@ -104,7 +104,7 @@ installed by system or home services."
 			   pulseaudio-service-type alsa-service-type))))
 	  %desktop-services))
 
-;; ((@@ (ice-9 pretty-print) pretty-print)
+;; ((@ (ice-9 pretty-print) pretty-print)
 ;;  (map service-kind  %base-services))
 
 (define* (feature-custom-services

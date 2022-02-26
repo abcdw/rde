@@ -35,7 +35,7 @@
       #~(string-trim-right
 	   (with-output-to-string
 	     (lambda ()
-	       ((@@ (ice-9 pretty-print) pretty-print)
+	       ((@ (ice-9 pretty-print) pretty-print)
 		'#$elem
                 #:max-expr-width 79)))
 	   #\newline))))
@@ -303,7 +303,7 @@ extensible, self-documenting editor.")))
 loaded on startup."
 
   (define (package->package-input pkg)
-    (list ((@@ (guix packages) package-name) pkg) pkg))
+    (list ((@ (guix packages) package-name) pkg) pkg))
 
   (define (add-autoloads elisp-expressions)
     (fold-right

@@ -30,10 +30,10 @@
               (path (assoc-ref meta 'path))
               (remote (assoc-ref meta 'remote)))
          (format #t "Initializing ~a.\n" self)
-         (let* ((port ((@@ (guix build utils) open-pipe-with-stderr)
+         (let* ((port ((@ (guix build utils) open-pipe-with-stderr)
                        #$(file-append mercurial "/bin/hg") "clone" remote path)))
            (waitpid WAIT_ANY)
-           (display ((@@ (ice-9 rdelim) read-delimited) "" port))
+           (display ((@ (ice-9 rdelim) read-delimited) "" port))
            (close-port port))
 
          (when '#$config
@@ -54,10 +54,10 @@
 	 (format #t "Initializing ~a.\n" self)
 	 ;; TODO: revisit git clone implementation
 	 ;; FIXME: Hang up shepherd if username/password asked
-	 (let* ((port ((@@ (guix build utils) open-pipe-with-stderr)
+	 (let* ((port ((@ (guix build utils) open-pipe-with-stderr)
 		       #$(file-append git "/bin/git") "clone" remote path)))
 	   (waitpid WAIT_ANY)
-	   (display ((@@ (ice-9 rdelim) read-delimited) "" port))
+	   (display ((@ (ice-9 rdelim) read-delimited) "" port))
 	   (close-port port))
 
 	 (when #$config
@@ -77,10 +77,10 @@
 	      (remote (assoc-ref meta 'remote)))
 	 (format #t "Initializing ~a.\n" self)
 	 ;; TODO: revisit git clone implementation
-	 (let* ((port ((@@ (guix build utils) open-pipe-with-stderr)
+	 (let* ((port ((@ (guix build utils) open-pipe-with-stderr)
 		       #$(file-append rsync "/bin/rsync") "-aP" remote path)))
 	   (waitpid WAIT_ANY)
-	   (display ((@@ (ice-9 rdelim) read-delimited) "" port))
+	   (display ((@ (ice-9 rdelim) read-delimited) "" port))
 	   (close-port port))))
    #:sync-gexp
    #~(lambda* (_ self)
@@ -88,10 +88,10 @@
 	      (path (assoc-ref meta 'path))
 	      (remote (assoc-ref meta 'remote)))
 	 (format #t "Synchronizing ~a.\n" self)
-	 (let* ((port ((@@ (guix build utils) open-pipe-with-stderr)
+	 (let* ((port ((@ (guix build utils) open-pipe-with-stderr)
 		       #$(file-append rsync "/bin/rsync") "-aP" path remote)))
 	   (waitpid WAIT_ANY)
-	   (display ((@@ (ice-9 rdelim) read-delimited) "" port))
+	   (display ((@ (ice-9 rdelim) read-delimited) "" port))
 	   (close-port port))))
    #:additional-metadata `((remote . ,remote)
 			   (general-sync? . #t))))

@@ -343,14 +343,14 @@ Prefix argument can be used to kill a few words."
                   #$emacs-client "--eval"
                   (string-append
                    "(mapcar (lambda (lst) (apply #'setenv lst)) '"
-                   (let* ((port   ((@@ (ice-9 popen) open-input-pipe)
+                   (let* ((port   ((@ (ice-9 popen) open-input-pipe)
                                    (string-append "env")))
-                          (result ((@@ (ice-9 rdelim) read-delimited) "" port))
+                          (result ((@ (ice-9 rdelim) read-delimited) "" port))
                           (vars (map (lambda (x)
                                        (let ((si (string-index x #\=)))
                                          (list (string-take x si)
                                                (string-drop x (+ 1 si)))))
-                                     ((@@ (srfi srfi-1) remove)
+                                     ((@ (srfi srfi-1) remove)
                                       string-null? (string-split
                                                     result #\newline)))))
                      (close-port port)
