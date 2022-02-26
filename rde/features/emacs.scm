@@ -1642,8 +1642,11 @@ emacsclient feels more like a separate emacs instance."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-keycast)
-  "Show keybindings and related functions as you type."
+(define* (feature-emacs-keycast
+          #:key
+          (turn-on? #f))
+  "Show keybindings and related functions as you type.  When TURN-ON?
+provided add rde-keycast-mode to after-init-hook."
 
   (define emacs-f-name 'keycast)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1672,7 +1675,9 @@ emacsclient feels more like a separate emacs instance."
                (setq keycast--this-command-keys nil)
                (setq keycast--command-repetitions 0)
                (remove-hook 'pre-command-hook 'keycast--update))))
-
+        ,@(if turn-on?
+              '((add-hook 'after-init-hook 'rde-keycast-mode))
+              '())
         (require 'configure-rde-keymaps)
         (define-key rde-toggle-map (kbd "k") 'rde-keycast-mode)
         (define-key rde-toggle-map (kbd "K") 'rde-keycast-mode))
