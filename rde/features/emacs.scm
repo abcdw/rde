@@ -611,7 +611,7 @@ utilizing reverse-im package."
          (setq erc-header-line-format " %n on %t (%m,%l)"))
 
         ,@extra-config)
-      #:elisp-packages (list emacs-erc-status-sidebar emacs-erc-hl-nicks))
+      #:elisp-packages (list emacs-erc-hl-nicks))
      (emacs-xdg-service
       emacs-f-name
       "Emacs (Client) [IRC]"
