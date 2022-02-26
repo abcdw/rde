@@ -1222,8 +1222,10 @@ git-link, git-timemachine."
 (define* (feature-emacs-completion
           #:key
           (mini-frame? #f)
+          (emacs-orderless emacs-orderless)
           (emacs-consult emacs-consult)
-          (emacs-embark emacs-embark))
+          (emacs-embark emacs-embark)
+          (emacs-marginalia emacs-marginalia))
   "Configure completion system for GNU Emacs."
   (define emacs-f-name 'completion)
   (define f-name (symbol-append 'emacs- emacs-f-name))
