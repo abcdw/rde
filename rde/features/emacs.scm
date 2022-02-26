@@ -1373,8 +1373,8 @@ relative line numbers, when narrowing is active."
 
         (with-eval-after-load
          'marginalia
-         (add-to-list 'marginalia-prompt-categories
-                      '("\\<completion\\>" . consult-completion)))
+         (setq marginalia-annotator-registry
+               (assq-delete-all 'library marginalia-annotator-registry)))
         (add-hook 'after-init-hook 'marginalia-mode))
       #:elisp-packages
       (append
