@@ -362,6 +362,23 @@ functionality.")))
        (sha256
         (base32 "08h1lv63dkrfk3m94z73xmjabch6699kd9qm3cvkcr8n67h6j6fp")))))))
 
+(define-public emacs-marginalia-latest
+  (let* ((commit "5767b6ff49e26ecd6aa26f552397d5d2b8213d25")
+         (revision "0"))
+    (package
+     (inherit emacs-marginalia)
+     (name "emacs-marginalia")
+     (version (git-version "0.12" revision commit))
+     (source
+      (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/minad/marginalia")
+             (commit commit)))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "143d57fy5i5ziwfxxix595k0f98ay5l57x5z69g8lkp6nb7b1rq7")))))))
+
 (define-public emacs-vterm-latest
   (let ((version "0.0.1")
         (revision "1")
