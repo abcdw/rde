@@ -1225,7 +1225,7 @@ git-link, git-timemachine."
           (emacs-orderless emacs-orderless)
           (emacs-consult emacs-consult)
           (emacs-embark emacs-embark)
-          (emacs-marginalia emacs-marginalia))
+          (emacs-marginalia emacs-marginalia-latest))
   "Configure completion system for GNU Emacs."
   (define emacs-f-name 'completion)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1371,10 +1371,10 @@ relative line numbers, when narrowing is active."
          (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
 
-        (with-eval-after-load
-         'marginalia
-         (setq marginalia-annotator-registry
-               (assq-delete-all 'library marginalia-annotator-registry)))
+        ;; (with-eval-after-load
+        ;;  'marginalia
+        ;;  (setq marginalia-annotator-registry
+        ;;        (assq-delete-all 'library marginalia-annotator-registry)))
         (add-hook 'after-init-hook 'marginalia-mode))
       #:elisp-packages
       (append
