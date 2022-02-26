@@ -1653,7 +1653,13 @@ emacsclient feels more like a separate emacs instance."
               org-roam-directory ,org-roam-directory)
 
         (autoload 'org-roam-db-autosync-enable "org-roam")
-        (with-eval-after-load 'org-roam (org-roam-db-autosync-enable))
+        (with-eval-after-load
+         'org-roam
+         (setq org-roam-node-display-template
+               (concat "${title:80} " (propertize "${tags:20}" 'face 'org-tag))
+               org-roam-node-annotation-function
+               (lambda (node) (marginalia--time (org-roam-node-file-mtime node))))
+         (org-roam-db-autosync-enable))
 
         (define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
         (define-key global-map (kbd "C-c n f") 'org-roam-node-find)
