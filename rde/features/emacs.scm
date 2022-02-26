@@ -1425,6 +1425,17 @@ relative line numbers, when narrowing is active."
          (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
          (custom-set-variables '(vertico-cycle t))
 
+         (require 'vertico-directory)
+         (defun rde-vertico-kill-region-dwim (&optional count)
+           "The function kills region if mark is active, otherwise
+calls `vertico-directory-delete-word'.  Prefix argument can be used to
+kill a few words or directories."
+           (interactive "p")
+           (if (use-region-p)
+               (kill-region (region-beginning) (region-end) 'region)
+               (vertico-directory-delete-word count)))
+         (define-key vertico-map (kbd "C-w") 'rde-vertico-kill-region-dwim)
+
          (defun rde--vertico-prepare-header-line ()
            "The same as `rde--move-mode-line-to-header', but also increase
 vertico-count by 1 to show one more candidate, which is hidden
