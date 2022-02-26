@@ -1718,8 +1718,5 @@ provided add rde-keycast-mode to after-init-hook."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-;; TODO: feature-emacs-reasonable-keybindings
-;; TODO: Fix env vars for emacs daemon
-;; https://github.com/purcell/exec-path-from-shell
+
 ;; TODO: feature-emacs-epub https://depp.brause.cc/nov.el/
-;; TODO: feature-series-tracker https://github.com/MaximeWack/seriesTracker
