@@ -224,10 +224,44 @@
    (feature-emacs-monocle)
    (feature-emacs-message)
    (feature-emacs-erc
+    #:erc-kill-buffers-on-quit #t
     #:erc-nick "abcdw"
+    #:align-nicknames? #f
     #:erc-autojoin-channels-alist
-    '(("irc.libera.chat" "#guix" "#emacs" "#tropin" "#rde")
-      ("irc.oftc.net"    "#pipewire" "#wayland")))
+    '((Libera.Chat "#guix" "#emacs" "#tropin" "#rde" "#sway")
+      (OFTC        "#pipewire" "#wayland"))
+
+    ;; #:erc-server "chat.sr.ht"
+    #:extra-config
+    `((setq rde-bouncer-network-alist
+            `((irc.libera.chat . "abcdw")
+              (irc.oftc.net . "abcdw")))
+      (setq rde-bouncer-nick "abcdw")
+
+      (with-eval-after-load
+       'erc
+       (add-to-list 'erc-modules 'log)
+       ;; (erc-update-modules) Probably not needed, because the module
+       ;; added before erc starts.
+       )
+
+      (with-eval-after-load
+       'erc-log
+       (setq erc-log-insert-log-on-open t))
+      ;; Rename server buffers to reflect the current network name instead
+      ;; of SERVER:PORT (e.g., "freenode" instead of "irc.freenode.net:6667").
+      ;; This is useful when using a bouncer like ZNC where you have multiple
+      ;; connections to the same server.
+      (setq erc-rename-buffers t)
+
+      (defun rde-erc-connect-bouncer-oftc ()
+        (interactive)
+        (setq erc-email-userid "abcdw/irc.oftc.net")
+        (erc-tls :server "chat.sr.ht" :nick rde-bouncer-nick))
+      (defun rde-erc-connect-bouncer-libera ()
+        (interactive)
+        (setq erc-email-userid "abcdw/irc.libera.chat")
+        (erc-tls :server "chat.sr.ht" :nick rde-bouncer-nick))))
    (feature-emacs-elpher)
    (feature-emacs-telega)
    (feature-emacs-pdf-tools)
