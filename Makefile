@@ -1,6 +1,9 @@
 # pipefail is not POSIX complaint
 all: doc/rde.info
 
+install:
+	@echo some installation will happen here
+
 home:
 	RDE_TARGET=ixy-home \
 	GUILE_LOAD_PATH=./ \
