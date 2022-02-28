@@ -45,8 +45,8 @@ Edition @value{EDITION} @*
 @top rde
 
 This document describes rde version @value{VERSION}, the GNU/Linux
-distribution, a set of tools for managing development environments,
-home environments, and operating systems, predefined configurations,
+distribution, a set of tools for managing development environments, home
+environments, and operating systems, a set of predefined configurations,
 practices and workflows.
 
 @menu
@@ -240,7 +240,7 @@ desire. @c (@pxref{IRC} to learn more).
 
 It's also possible to connect to IRC channel via Matrix bridge using
 #tropin:libera.chat room handle, learn more here:
-https://libera.chat/guides/faq#can-i-connect-with-matrix
+@uref{https://libera.chat/guides/faq#can-i-connect-with-matrix}
 
 @node Getting Started
 @chapter Getting Started
