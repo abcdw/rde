@@ -12,6 +12,7 @@
   #:use-module (gnu packages certs)
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages glib)
+  #:use-module (rde packages)
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
 
@@ -62,7 +63,8 @@
 	  #:key
 	  (home-packages '())
 	  (system-packages '())
-	  (base-system-packages %rde-base-system-packages))
+	  (base-system-packages %rde-base-system-packages)
+          (base-home-packages (list rde)))
   "Provides base packages and allows to specify additional standalone
 packages for home-environment, or operating-system, or both.
 Standalone means that packages do not require configuration and not
@@ -76,7 +78,8 @@ installed by system or home services."
      (simple-service
       'add-base-package-to-home-profile
       home-profile-service-type
-      home-packages)))
+      (append home-packages
+              base-home-packages))))
 
   (define (get-system-packages values)
     (list
@@ -84,7 +87,7 @@ installed by system or home services."
       'add-base-packages-to-system-profile
       profile-service-type
       (append system-packages
-	      base-system-packages))))
+              base-system-packages))))
 
   (feature
    (name 'base-packages)
