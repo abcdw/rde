@@ -5,6 +5,7 @@
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu services)
   #:use-module (gnu services docker)
+  #:use-module (rde system services accounts)
 
   #:export (feature-docker))
 
@@ -31,6 +32,10 @@
 
   (define (get-system-services config)
     (list
+     (simple-service
+      'docker-add-docker-group-to-user
+      rde-account-service-type
+      (list "docker"))
      (service
       docker-service-type
       (docker-configuration

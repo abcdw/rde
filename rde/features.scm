@@ -300,27 +300,21 @@ to config one more time."
 	 (login-shell      (get-value 'login-shell config (default-shell)))
 	 (user-password    (get-value 'user-initial-password-hash config #f))
 
-	 (users            (if user-name
-			       (cons
-			        (user-account
-			   	 (name user-name)
-			   	 (comment full-name)
-			   	 (password user-password)
-			   	 (home-directory home-directory)
-			   	 (shell login-shell)
-			   	 (group "users")
-			   	 (supplementary-groups
-                                  (append
-                                   '("wheel" "netdev" "audio" "video")
-                                   ;; MAYBE: Reimplement user-account creation
-                                   ;; using service, to make it possible
-                                   ;; to extend it with supplimentary groups
-                                   (if (get-value 'docker config)
-                                       '("docker") '())
-                                   user-groups)))
-			        %base-user-accounts)
-			       (operating-system-users initial-os)))
+	 (user             (if user-name
+                               (user-account
+			   	(name user-name)
+			   	(comment full-name)
+			   	(password user-password)
+			   	(home-directory home-directory)
+			   	(shell login-shell)
+			   	(group "users")
+			   	(supplementary-groups
+                                 (append
+                                  '("wheel" "netdev" "audio" "video")
+                                  user-groups)))
+                               #f))
 
+         (rde-acc-service  (service rde-account-service-type user))
 	 (services         (rde-config-system-services config))
 
 	 (kernel           (get-value
@@ -351,7 +345,6 @@ to config one more time."
       (bootloader bootloader)
       (mapped-devices mapped-devices)
       (file-systems file-systems)
-      (users users)
       (keyboard-layout keyboard-layout)
       (kernel kernel)
       (kernel-arguments kernel-arguments)
@@ -359,7 +352,7 @@ to config one more time."
       (initrd initrd)
       (initrd-modules initrd-modules)
       (firmware firmware)
-      (services services))))
+      (services (append services (list rde-acc-service))))))
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)
