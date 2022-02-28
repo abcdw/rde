@@ -535,3 +535,46 @@ keyboard input like xdotool type for X11.")
     (synopsis "Clipman")
     (description "GPL v3.0 2019- (C) yory8 <yory8@users.noreply.github.com>")
     (license license:gpl3)))
+
+(use-modules (gnu packages base))
+
+(define-public rde
+  (package
+    (name "rde")
+    (version "0.1.0")
+    (home-page "https://trop.in/rde")
+    (source
+     (origin
+      (method git-fetch)
+      (uri (git-reference (url "https://git.sr.ht/~abcdw/rde")
+                          (commit "0d72e180b7eb92ea5a23d8dd481bde93b6ec252c")))
+      (sha256
+       (base32
+        "0vcsgbziv6cm4b4sccllsg67anpxg0q9mm3d80nms60ng6ld3i6b"))
+      (file-name (string-append "rde-" version "-checkout"))))
+    (build-system gnu-build-system)
+    (native-inputs
+     (list gnu-make texinfo))
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'configure)
+          (delete 'check)
+          (add-after 'install 'install-info
+            (lambda* (#:key outputs #:allow-other-keys)
+              (let* ((out  (assoc-ref outputs "out"))
+                     (info (string-append out "/share/info")))
+                (install-file "doc/rde.info" info)))))))
+    (synopsis "Developers and power user friendly GNU/Linux distribution")
+    (description "The GNU/Linux distribution, a set of tools for managing
+development environments, home environments, and operating systems, a set of
+predefined configurations, practices and workflows.")
+    (license license:gpl3+)))
+
+(define-public rde-latest
+  (package
+    (inherit rde)
+    (source
+     (local-file (dirname (dirname (current-filename))) #:recursive? #t))))
+
