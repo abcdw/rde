@@ -2,15 +2,19 @@
   #:use-module (guix records)
   #:use-module (guix ui)
   #:use-module (guix gexp)
+
   #:use-module (gnu services)
   #:use-module (gnu system)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system accounts)
   #:use-module (gnu system shadow)
+  #:use-module (rde system services accounts)
+
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)
   #:use-module (gnu home)
   #:use-module (gnu services configuration)
+
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (srfi srfi-35)
@@ -126,7 +130,7 @@ of services.  Service can be either @code{service?} or
 (define-syntax ensure-pred
   (syntax-rules ()
     ((ensure-pred pred field)
-     (when (not (pred field)) 
+     (when (not (pred field))
        (raise (condition
                (&message
 		(message
@@ -139,7 +143,7 @@ of services.  Service can be either @code{service?} or
 (define-syntax throw-message
   (syntax-rules ()
     ((throw-message pred msg)
-     (when pred 
+     (when pred
        (raise (condition
                (&message
 		(message
@@ -252,7 +256,7 @@ to config one more time."
   (operating-system
    (host-name "antelope")
    (timezone  "Europe/Paris")
-   (locale  "en_US.utf8")
+   (locale    "en_US.utf8")
    (bootloader (bootloader-configuration
 		(bootloader grub-efi-bootloader)
 		(targets '("/boot/efi"))))
@@ -314,7 +318,6 @@ to config one more time."
                                   user-groups)))
                                #f))
 
-         (rde-acc-service  (service rde-account-service-type user))
 	 (services         (rde-config-system-services config))
 
 	 (kernel           (get-value
@@ -352,7 +355,11 @@ to config one more time."
       (initrd initrd)
       (initrd-modules initrd-modules)
       (firmware firmware)
-      (services (append services (list rde-acc-service))))))
+      (services (append
+                 services
+                 (if user-name
+                     (list (service rde-account-service-type user))
+                     '()))))))
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)
