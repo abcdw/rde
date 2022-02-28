@@ -126,18 +126,18 @@
 
             (floating_modifier $mod normal)
 
-            (bindsym $mod+Shift+r reload)
+            (bindsym --to-code $mod+Shift+r reload)
 
             (,#~"\n\n# Launching external applications:")
             (bindsym $mod+Control+Shift+Return exec $backup-term)
             (bindsym $mod+Return exec $term)
 
-            (bindsym $mod+Shift+d exec $menu)
-            (bindsym $mod+Shift+l exec $lock)
+            (bindsym --to-code $mod+Shift+d exec $menu)
+            (bindsym --to-code $mod+Shift+l exec $lock)
 
             (,#~"\n\n# Manipulating windows:")
-            (bindsym $mod+Shift+c kill)
-            (bindsym $mod+Shift+f fullscreen)
+            (bindsym --to-code $mod+Shift+c kill)
+            (bindsym --to-code $mod+Shift+f fullscreen)
             (bindsym $mod+Shift+space floating toggle)
             (bindsym $mod+Ctrl+space focus mode_toggle)
 
@@ -162,8 +162,8 @@
                (iota 10 1))
 
             (,#~"\n\n# Scratchpad settings:")
-            (bindsym $mod+Shift+minus move scratchpad)
-            (bindsym $mod+minus scratchpad show)
+            (bindsym --to-code $mod+Shift+minus move scratchpad)
+            (bindsym --to-code $mod+minus scratchpad show)
 
 	    (,#~"")
             (default_border pixel)
