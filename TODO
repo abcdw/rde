@@ -29,14 +29,7 @@ creation.
 :VISIBILITY: content
 :END:
 ** First Release                                                 :release_1:
-*** DONE Add rde documentation template [2/2]
-SCHEDULED: <2022-01-13 Thu>
-[[info:texinfo#Sample Beginning][texinfo#Sample Beginning]]
-Create rde (.texi and Makefile)
-- [X] org->texinfo?  No, plain texinfo is good enough.
-- [X] info, html and pdf make targets.
-*** TODO Deploy documentation as a web page
-SCHEDULED: <2022-01-21 Fri>
+*** DONE Add a package with rde info file
 *** TODO Prepare rde iso with HE inside
 *** TODO Setup ci and substitutes
 *** TODO Place a release-tag tag
@@ -66,12 +59,44 @@ See also emacs-multitran
 https://github.com/oantolin/orderless
 https://github.com/minad/consult/wiki#minads-orderless-configuration
 ** TODO Configure icecat profiles
-** DONE Prevent highlighting of refiled entities
-SCHEDULED: <2022-01-21 Fri>
-  [2022-01-21 Fri]
-
 * Archive                                                           :ARCHIVE:
 
+** DONE Add rde documentation template [2/2]                 :rde:release_1:
+SCHEDULED: <2022-01-13 Thu>
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-02-03 Thu 06:33
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~/First Release
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde release_1
+:END:
+[[info:texinfo#Sample Beginning][texinfo#Sample Beginning]]
+Create rde (.texi and Makefile)
+- [X] org->texinfo?  No, plain texinfo is good enough.
+- [X] info, html and pdf make targets.
+** DONE Prevent highlighting of refiled entities                       :rde:
+SCHEDULED: <2022-01-21 Fri>
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-02-03 Thu 06:33
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+  [2022-01-21 Fri]
+
+** DONE Deploy documentation as a web page                   :rde:release_1:
+SCHEDULED: <2022-01-21 Fri>
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-02-03 Thu 06:32
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~/First Release
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde release_1
+:END:
 ** Archive                                                    :guix:ARCHIVE:
 :PROPERTIES:
 :ARCHIVE_TIME: 2022-01-20 Thu 08:59
