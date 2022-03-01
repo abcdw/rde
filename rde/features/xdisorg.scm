@@ -18,6 +18,8 @@
           #:key
           (rofi rofi-wayland)
           (theme "Arc")
+          (show-icons? #t)
+          (show-actions? #t)
           (default-application-launcher? #t))
   "Configure rofi."
   (ensure-pred any-package? rofi)
@@ -32,8 +34,8 @@
        (config-rasi
         `((configuration
            ((modi . "run,ssh,drun")
-            (drun-show-actions . #t)
-            (show-icons)
+            (drun-show-actions . ,show-actions?)
+            (show-icons . ,show-icons?)
             (kb-row-tab . "")
             (kb-row-select . "Tab")
             (kb-secondary-paste . "Control+y")
