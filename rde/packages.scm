@@ -5,6 +5,7 @@
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages texinfo)
+  #:use-module (gnu packages gnome)
 
   #:use-module (srfi srfi-1)
 
@@ -12,9 +13,11 @@
   #:use-module (guix i18n)
   #:use-module (guix packages)
   #:use-module (guix gexp)
+  #:use-module (guix download)
   #:use-module (guix git-download)
   #:use-module (guix build-system meson)
   #:use-module (guix build-system trivial)
+  #:use-module (guix build-system gnu)
   #:use-module ((guix licenses) #:prefix license:))
 
 (define (search-patch file-name)
@@ -68,74 +71,6 @@ FILE-NAME found in %PATCH-PATH."
       (inputs
        (package-inputs emacs-next))
       )))
-
-(use-modules (guix download)
-             (guix build-system gnu)
-             (gnu packages gnome)
-             (gnu packages tls)
-             (gnu packages gsasl)
-             (gnu packages compression))
-
-(define-public msmtp-latest
-  (package
-    (name "msmtp-latest")
-    (version "1.8.15")
-    (source
-     (origin
-       (method url-fetch)
-       (uri (string-append "https://marlam.de/msmtp/releases/"
-                           "/msmtp-" version ".tar.xz"))
-       (sha256
-        (base32 "1klrj2a77671xb6xa0a0iyszhjb7swxhmzpzd4qdybmzkrixqr92"))
-       (patches
-        (search-patches "msmtpq-add-enqueue-option.patch"
-                        "msmtpq-add-env-variables.patch"))))
-    (build-system gnu-build-system)
-    (inputs
-     `(("libsecret" ,libsecret)
-       ("gnutls" ,gnutls)
-       ("zlib" ,zlib)
-       ("gsasl" ,gsasl)))
-    (native-inputs
-     `(("pkg-config" ,pkg-config)))
-    (home-page "https://marlam.de/msmtp/")
-    (arguments
-     `(#:configure-flags (list "--with-libgsasl"
-                               "--with-libidn"
-                               "--with-tls=gnutls")
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'install 'install-additional-files
-           (lambda* (#:key outputs #:allow-other-keys)
-             (let* ((out (assoc-ref outputs "out"))
-                    (bin (string-append out "/bin"))
-                    (doc (string-append out "/share/doc/msmtp"))
-                    (msmtpq "scripts/msmtpq")
-                    (vimfiles (string-append out "/share/vim/vimfiles/plugin")))
-               (install-file (string-append msmtpq "/msmtpq") bin)
-               (install-file (string-append msmtpq "/msmtp-queue") bin)
-               (install-file (string-append msmtpq "/README.msmtpq") doc)
-               (install-file "scripts/vim/msmtp.vim" vimfiles)
-               (substitute* (string-append bin "/msmtp-queue")
-                 (("^exec msmtpq") (format #f "exec ~a/msmtpq" bin)))
-               (substitute* (string-append bin "/msmtpq")
-                 (("^MSMTP=msmtp") (format #f "MSMTP=~a/msmtp" bin))
-                 ;; Make msmtpq quite by default, because Emacs treat output
-                 ;; as an indicator of error.  Logging still works as it was.
-                 (("^EMAIL_QUEUE_QUIET=\\$\\{MSMTPQ_QUIET:-\\}")
-                  "EMAIL_QUEUE_QUIET=${MSMTPQ_QUIET:-t}")
-                 ;; Use ping test instead of netcat by default, because netcat
-                 ;; is optional and can be missing.
-                 (("^EMAIL_CONN_TEST=\\$\\{MSMTPQ_CONN_TEST:-n\\}")
-                  "EMAIL_CONN_TEST=${MSMTPQ_CONN_TEST:-p}"))
-               #t))))))
-    (synopsis
-     "Simple and easy to use SMTP client with decent sendmail compatibility")
-    (description
-     "msmtp is an SMTP client.  In the default mode, it transmits a mail to
-an SMTP server (for example at a free mail provider) which takes care of further
-delivery.")
-    (license license:gpl3+)))
 
 (define-public emacs-consumer
   (package
