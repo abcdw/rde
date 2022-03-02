@@ -37,7 +37,7 @@
      ;; principle
      (when enable-zsh-autosuggestions?
        (service home-zsh-autosuggestions-service-type
-                zsh-autosuggestions-latest))
+                zsh-autosuggestions))
 
      (when (get-value 'wayland config)
        (let* ((wl-clipboard (get-value
