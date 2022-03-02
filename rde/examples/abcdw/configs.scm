@@ -28,6 +28,7 @@
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
   #:use-module (rde packages)
+  #:use-module (rde packages emacs-xyz)
   #:use-module (gnu packages fonts)
   #:use-module (guix gexp)
   #:use-module (guix inferior)
