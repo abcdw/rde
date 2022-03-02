@@ -6,6 +6,9 @@
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages texinfo)
   #:use-module (gnu packages gnome)
+  #:use-module (gnu packages gtk)
+  #:use-module (gnu packages image)
+  #:use-module (gnu packages glib)
 
   #:use-module (srfi srfi-1)
 
@@ -41,37 +44,6 @@ FILE-NAME found in %PATCH-PATH."
    (append
     (list (string-append %channel-root "rde/packages/patches"))
     (%patch-path))))
-
-
-(use-modules (gnu packages glib))
-(define-public pipewire-media-session
-  (package
-    (name "pipewire-media-session")
-    (version "0.4.1")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://gitlab.freedesktop.org/pipewire/media-session")
-             (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32
-         "1gjspcgl5z19j4m3jr0771a1cxiizzvkjsw2v4rq6d92760zp7bv"))))
-    (build-system meson-build-system)
-    (native-inputs
-     (list pkg-config))
-    (inputs
-     (list pipewire-0.3
-           alsa-lib
-           dbus))
-    (home-page "https://pipewire.org/")
-    (synopsis "PipeWire Media Session")
-    (description #f)
-    (license license:expat)))
-
-(use-modules (gnu packages gtk)
-             (gnu packages image))
 
 (define-public rofi-wayland
   (package
