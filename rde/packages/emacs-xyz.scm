@@ -47,4 +47,20 @@
     "Paragraph justification for emacs using Knuth/Plass algorithm ")
    (license license:gpl3+))))
 
-
+(define-public emacs-org-modern
+  (package
+   (name "emacs-org-modern")
+   (version "0.1")
+   (source (origin
+            (method git-fetch)
+            (uri (git-reference
+                  (url "https://github.com/minad/org-modern")
+                  (commit "6b1350096915fa5852cfb157a420ae1ce532cfc8")))
+            (sha256
+             (base32 "0x4bwiidis49avzs8055h9hba3a9x2xwip1625wh3sdw2nbw6gha"))
+            (file-name (git-file-name name version))))
+   (build-system emacs-build-system)
+   (license license:gpl3+)
+   (home-page "https://github.com/minad/org-modern")
+   (synopsis "")
+   (description "")))
