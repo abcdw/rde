@@ -24,6 +24,7 @@
   #:use-module (rde features markup)
   ;; #:use-module (gnu services)
   ;; #:use-module (gnu services nix)
+  #:use-module (gnu system keyboard)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
@@ -90,7 +91,12 @@
                                     '("https://yhetil.org/guix-patches/1"))))
 
    (feature-keyboard
-    #:keyboard-layout %dvorak-layout)))
+    ;; To get all available options, layouts and variants run:
+    ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
+    #:keyboard-layout
+    (keyboard-layout
+     "us,ru" "dvorak,"
+     #:options '("grp:shifts_toggle" "ctrl:nocaps")))))
 
 ;;; TODO: feature-wallpapers https://wallhaven.cc/
 ;;; TODO: feature-icecat
