@@ -10,6 +10,7 @@
   #:use-module (gnu home-services wm)
   #:use-module (gnu services)
   #:use-module (rde packages)
+  #:use-module (rde packages emacs-xyz)
   #:use-module (gnu packages terminals)
   #:use-module (guix gexp)
 
