@@ -210,9 +210,8 @@ development environments, home environments, and operating systems, a set of
 predefined configurations, practices and workflows.")
     (license license:gpl3+)))
 
-(define-public rde-latest
-  (package
-    (inherit rde)
-    (source
-     (local-file (dirname (dirname (current-filename))) #:recursive? #t))))
-
+;; (define-public rde-latest
+;;   (package
+;;     (inherit rde)
+;;     (source
+;;      (local-file (dirname (dirname (current-filename))) #:recursive? #t))))
