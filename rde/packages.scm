@@ -13,10 +13,10 @@
   #:use-module (guix i18n)
   #:use-module (guix packages)
   #:use-module (guix gexp)
+  #:use-module (guix utils)
   #:use-module (guix download)
   #:use-module (guix git-download)
   #:use-module (guix build-system meson)
-  #:use-module (guix build-system trivial)
   #:use-module (guix build-system gnu)
   #:use-module ((guix licenses) #:prefix license:))
 
@@ -42,59 +42,6 @@ FILE-NAME found in %PATCH-PATH."
     (list (string-append %channel-root "rde/packages/patches"))
     (%patch-path))))
 
-(use-modules (gnu packages emacs))
-(use-modules (guix utils))
-
-(define-public emacs-next-pgtk-latest
-  (let ((commit "172c055745b1eb32def7be8ddcaae975996a789f")
-        (revision "1"))
-    (package
-      (inherit emacs-next-pgtk)
-      (name "emacs-next-pgtk-latest")
-      (version (git-version "29.0.50" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://git.savannah.gnu.org/git/emacs.git/")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32
-           "00qikl80lly6nz15b7pp7gpy28iw7fci05q6k1il20fkdx27fp4x"))))
-      (arguments
-       (substitute-keyword-arguments (package-arguments emacs-next)
-         ((#:configure-flags flags ''())
-          `(cons* "--with-pgtk" ,flags))))
-      ;; (propagated-inputs
-      ;;  (list gsettings-desktop-schemas glib-networking))
-      (inputs
-       (package-inputs emacs-next))
-      )))
-
-(define-public emacs-consumer
-  (package
-   (name "emacs-consumer")
-   (version "0.1.0")
-   (source (local-file "./packages.scm"))
-   (build-system trivial-build-system)
-   (arguments
-    `(#:builder
-      (let ((out (assoc-ref %outputs "out")))
-        (mkdir out)
-        #t)))
-   (native-search-paths
-    (list (search-path-specification
-           (variable "EMACSLOADPATH")
-           (files '("share/emacs/site-lisp")))
-          (search-path-specification
-           (variable "INFOPATH")
-           (files '("share/info")))))
-   (license license:gpl3+)
-   (home-page "https://sr.ht/~abcdw/rde")
-   (synopsis "Apropriate values for @env{EMACSLOADPATH} and @env{INFOPATH}.")
-   (description "This package helps to set environment variables, which make
-emacs packages of current profile explorable by external Emacs.")))
 
 (use-modules (gnu packages glib))
 (define-public pipewire-media-session

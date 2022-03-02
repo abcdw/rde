@@ -29,6 +29,7 @@
   #:use-module (gnu services)
 
   #:use-module (rde packages)
+  #:use-module (rde packages emacs)
   #:use-module (rde packages emacs-xyz)
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages emacs-xyz)
