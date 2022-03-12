@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;;
 ;;; This file is part of rde.
@@ -34,10 +34,12 @@
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages terminals)
   #:use-module (gnu packages rust-apps)
+  #:use-module (gnu packages fonts)
   #:use-module (gnu services)
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
   #:use-module (gnu home services)
+  #:use-module (gnu home-services-utils)
   #:use-module (rde home services wm)
   #:use-module (gnu home-services shells)
 
@@ -49,7 +51,17 @@
   #:export (feature-sway
 	    feature-sway-run-on-tty
             feature-sway-screenshot
+
             feature-sway-statusbar
+            feature-waybar
+            waybar-sway-language
+            waybar-sway-window
+            waybar-sway-workspaces
+            waybar-tray
+            waybar-temperature
+            waybar-idle-inhibitor
+            waybar-clock
+            waybar-battery
 
             feature-swayidle
             feature-swaylock))
@@ -196,7 +208,7 @@
 
        (simple-service
         'sway-reload-config-on-change
-        (@ (gnu home services) home-run-on-change-service-type)
+        home-run-on-change-service-type
         `(("files/config/sway/config"
            ,#~(system* #$(file-append sway "/bin/swaymsg") "reload"))))
 
@@ -346,12 +358,11 @@ automatically switch to SWAY-TTY-NUMBER on boot."
 ;; <https://www.reddit.com/r/unixporn/comments/a2c9kl/sway_in_the_wild/>
 (define* (feature-sway-statusbar
           #:key
-          ;; (package waybar)
           (battery "BAT0")
           (use-global-fonts? #f))
   "Configure statusbar."
 
-  (define sway-f-name 'waybar)
+  (define sway-f-name 'statusbar)
   (define f-name (symbol-append 'sway- sway-f-name))
 
   (define (get-home-services config)
@@ -365,7 +376,7 @@ automatically switch to SWAY-TTY-NUMBER on boot."
 $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
     (list
      (simple-service
-      'sway-waybar
+      'sway-statusbar
       home-sway-service-type
       `((bar ((position top)
               ,@(if use-global-fonts?
@@ -373,13 +384,288 @@ $(date +'%Y-%m-%d %l:%M:%S %p'); do sleep 5; done" battery))
                     '())
               (colors ((statusline "#ffffff")
                        (background "#323232")))
-              (status_command ,(get-status-command))))
-        ;; (bar swaybar_command ,(file-append package "/bin/waybar"))
-        ))))
+              (status_command ,(get-status-command))))))))
 
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; waybar.
+;;;
+
+;; TODO: Move to home services?
+(define* (waybar-module
+          name
+          #:optional
+          (config '())
+          (style '())
+          #:key
+          (placement 'modules-right)
+          (bar-id 'main))
+  "Returns a service, which extends home-waybar-service-type in the way the
+module will be added to the BAR-ID."
+  (simple-service
+   (symbol-append 'waybar-module- name)
+   home-waybar-service-type
+   (home-waybar-extension
+    (config `#(((name . ,bar-id)
+                (,placement . #(,name))
+                (,name . ,config))))
+    (style-css style))))
+
+(define* (waybar-sway-language)
+  (waybar-module 'sway/language))
+
+(define* (waybar-sway-window)
+  (waybar-module
+   'sway/window
+   `()
+   `((#{#window}#
+      ((margin-left . 1em)
+       (margin-right . 1em))))
+   #:placement 'modules-center))
+
+(define* (waybar-sway-workspaces
+          #:key
+          (format-icons '(("1" . )
+                          ("2" . )
+                          ("3" . )
+                          ("4" . )
+                          ("6" . )  ; 
+                          ("7" . )  ; 
+                          ("8" . )
+                          ("9" . )
+                          ("10" . )
+
+                          ("urgent" . )
+                          ("focused" . )
+                          ("default" . ))))
+  (waybar-module
+   'sway/workspaces
+   `((disable-scroll . #t)
+     (format . {icon})
+     ;; FIXME: Height becomes higher when icons are not used.
+     (format-icons . ,format-icons))
+   `(((#{#workspaces}# button)
+      ((background . none)
+       (border-radius . 0.2em)
+       (margin . (0.4em 0.2em))
+       (padding . (0.1em 0.2em))
+       (color . @base05)))
+
+     ((#{#workspaces}# button:hover)
+      ((background . none)
+       (border-color . @base07)))
+
+     ((#{#workspaces}# button.focused)
+      ((background . @base02)
+       (color . @base07)))
+
+     ((#{#workspaces}# button.urgent)
+      ((color . @base08))))
+   #:placement 'modules-left))
+
+(define (waybar-tray)
+  (waybar-module
+   'tray
+   `()
+   `(((#{#tray}# menu)
+      ((color . @base05)
+       (background . @base01)
+       (border . (solid 1px))
+       (border-color . @base02)))
+
+     ((#{#tray}# menu menuitem)
+      ((padding-top . 0px)
+       (padding-bottom . 0px)
+       (margin-top . 0.1em)
+       (margin-bottom . 0em)))
+
+     ((#{#tray}# menu menuitem:hover)
+      ((background . none)))
+
+     ((#{#tray}# menu separator)
+      ((background . @base03)
+       (padding-top . 1px)
+       (margin-top . 0.2em)
+       (margin-bottom . 0.2em))))))
+
+(define* (waybar-temperature) (waybar-module 'temperature))
+
+(define* (waybar-idle-inhibitor)
+  (waybar-module
+   'idle_inhibitor
+   '((format . {icon})
+     (format-icons . ((activated . )
+                      (deactivated . ))))))
+
+(define* (waybar-clock
+          #:key
+          (format "{:%Y-%m-%d %H:%M}")
+          (interval 60)
+          (timezone #f))
+  "Returns a function, which accepts rde config and returns waybar clock module.
+Left click on the module open world-clock in emacs client, right click opens
+calendar."
+  (lambda (config)
+    (define ec (get-value 'emacs-client config))
+    (define (ec-command command)
+      #~(format #f "\"~a --eval \\\"(~a)\\\"\"" #$ec #$command))
+    (waybar-module
+     'clock
+     `((tooltip-format
+        . "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>")
+
+       ,@(if timezone `((timezone . ,timezone)) '())
+       (format . ,format)
+       ,@(if ec
+             `((on-click . ,(ec-command "world-clock"))
+               (on-click-right . ,(ec-command "calendar")))
+             '())
+
+       (interval . ,interval)))))
+
+(define* (waybar-battery
+          #:key
+          (intense? #f)
+          (charging-icon "⚡"))
+  "When INTENSE? is #t changes background color instead of text color when the
+battery is low or nearly empty."
+  (waybar-module
+   'battery
+   `((format . "{capacity}% {icon}")
+     (format-charging . ,(format #f "{capacity}~a {icon}" charging-icon))
+     ;; | icon |  range |
+     ;; |------+--------|
+     ;; |    0 | 0-10   |
+     ;; |   25 | 10-40  |
+     ;; |   50 | 40-60  |
+     ;; |   75 | 60-90  |
+     ;; |  100 | 90-100 |
+     (states . ((empty . 10)
+                (low . 20)
+                (half-low . 40)
+                (half . 60)
+                (high . 90)
+                (full . 100)))
+     (format-icons . ((empty . )
+                      (low . )
+                      (half-low . )
+                      (half . )
+                      (high . )
+                      (full . ))))
+   `((#{#battery.discharging.empty}#
+      ,(if intense?
+           `((color . @base02)
+             (background . @base08))
+           `((color . @base08))))
+     (#{#battery.discharging.low}#
+      ,(if intense?
+           `((color . @base02)
+             (background . @base09))
+           `((color . @base09)))))))
+
+(define* (feature-waybar
+          #:key
+          (waybar waybar)
+          (waybar-modules
+           (list
+            (waybar-sway-workspaces)
+            (waybar-tray)
+            (waybar-idle-inhibitor)
+            (waybar-sway-language)
+            (waybar-battery #:intense? #f)
+            (waybar-clock)))
+          (base16-css (local-file "./wm/waybar/base16-default-dark.css"))
+          (transitions? #f))
+  "Configure waybar.  Each element of WAYBAR-MODULES is a home service or a
+function accepting an rde config and returning a home-service, which extends
+home-waybar-service-type.  Set TRANSITIONS? to #t if you prefer a smooth
+animation."
+
+  (define f-name 'waybar)
+
+  (define (get-home-services config)
+    ;; (when use-global-fonts?
+    ;;   (require-value 'font-monospace config))
+    (define font-mono
+      (and=> (get-value 'font-monospace config)
+             (compose string->symbol font-name)))
+    (append
+     (list
+      (service
+        home-waybar-service-type
+        (home-waybar-configuration
+         (waybar waybar)
+         (config #(((position . top)
+                    (name . main))))
+         ;; TODO: fix tray menu styles.
+         (style-css
+          `(,#~(format #f "@import \"~a\";\n" #$base16-css)
+            (*
+             ((font-family . #(,@(if font-mono (list font-mono) '())
+                               ;; TODO: Add icon-font argument
+                               FontAwesome))
+              ,@(if transitions? '() '((transition . none)))
+              (box-shadow . none)
+              (text-shadow . none)
+              (min-height . 0)))
+
+            (tooltip
+             ((border . (solid @base02))
+              (background . @base01)
+              (opacity . 0.9)))
+
+            ((tooltip label)
+             ((color . @base05)
+              (padding . 0)))
+
+            (#{#waybar}#
+             ((color . @base04)
+              (background . @base01)))
+
+            (#((.modules-right label)
+               (.modules-right image))
+             ((margin . (0.4em 0.2em))
+              (padding . (0 0.4em))
+              (background . @base02)
+              (border-radius . 0.2em)))
+
+            (.modules-left
+             ((margin-left . 0.2em)))
+
+            (.modules-right
+             ((margin-right . 0.2em))))))))
+
+      (map (lambda (x) (if (procedure? x) (x config) x)) waybar-modules)
+
+      (list
+       (simple-service
+        'waybar-add-font-package
+        home-profile-service-type
+        (list font-awesome))
+
+       (simple-service
+        'waybar-reload-config-on-change
+        home-run-on-change-service-type
+        `(("files/config/waybar/style.css"
+           ,#~(system* #$(file-append psmisc "/bin/killall") "-SIGUSR2" "waybar"))
+          ("files/config/waybar/config"
+           ,#~(system* #$(file-append psmisc "/bin/killall") "-SIGUSR2" "waybar"))))
+
+       (when (get-value 'sway config)
+         (simple-service
+          'sway-waybar
+          home-sway-service-type
+          `((bar swaybar_command ,(file-append waybar "/bin/waybar"))))))))
+
+  (feature
+   (name 'waybar)
+   (values `((waybar . ,waybar)
+             (sway-statusbar . #t)))
    (home-services-getter get-home-services)))
 
 
