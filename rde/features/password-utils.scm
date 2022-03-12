@@ -8,6 +8,8 @@
   #:use-module (gnu packages password-utils)
   #:use-module (gnu services)
 
+  #:use-module (guix gexp)
+
   #:export (feature-password-store))
 
 
@@ -38,6 +40,16 @@
 	      (get-value 'home-directory config)
 	      "/.local/var/lib/password-store")
 	     remote-password-store-url)))
+
+          (when (get-value 'emacs config)
+            (emacs-xdg-service
+             'pass
+             "Emacs (Client) [pass]"
+             #~(system* #$(get-value 'emacs-client-create-frame config)
+                        "--eval" "(progn \
+(set-frame-name \"pass - Emacs Client\") \
+(call-interactively 'rde-consult-pass) \
+(run-at-time 1 nil delete-frame))")))
 
           (when (get-value 'emacs config)
             (let ((emacs-embark (get-value 'emacs-embark config))
