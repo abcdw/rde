@@ -1,16 +1,14 @@
-# -*- mode: org; org-html-head-include-scripts: nil; -*-
+# -*- mode: org; org-html-head-include-scripts: nil; org-html-head-include-default-style: nil; -*-
 #+OPTIONS: toc:nil
 
 * rde
-Set of tools for managing computing environments with GNU Guix.  Also,
-rde contains additional home services for Guix Home and packages for
-GNU Guix.  More info is available at [[http://trop.in/rde][trop.in/rde]].
+Developers and power user friendly GNU/Linux distribution.  More info
+is available at [[http://trop.in/rde/manual][trop.in/rde]].
 
 *Disclaimer:* The project is in an active development stage.
 
-*Tip:* older Nix source code is available under ~stale/~ directory.
-
 ** Principles
+More detailed description can be found in the [[https://trop.in/rde/manual#Principles][manual]].
 *** Main
 - Ergonomic :: Sane keybindings, good contrast, readable fonts.
 - Reproducible :: Setup can be easily replicated.
@@ -41,13 +39,21 @@ GNU Guix and git should be installed before invoking commands above.
 
 The alternative and more apropriate way to use rde will be described
 later.
+
 ** Guix Home
 ~Guix Home~ is a part of GNU Guix now, no additional installation steps
 are required.
 
 *** People's Guix Home configurations
+Those repositories are not affilated with rde or Guix, they are provided as
+real-world Guix Home usage examples, but be careful and thoughtful, remember
+that blindly copying snippets of code from the internet can have a huge
+security implications on your setup.
+
 - [[https://hg.sr.ht/~yoctocell/guixrc/browse/yoctocell/home][yoctocell]]'s full-blown configuration with variety of software.
 - [[https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/home/yggdrasil][krevedkokun]]'s Emacs(Evil)/Wayland(Sway) compact and clean config.
+- [[https://github.com/nicolas-graves/dotfiles][Nicolas Graves]]' dotfiles forked from krevedkokun's.
+- [[https://git.sr.ht/~akagi/guixrc][akagi]]'s configurations, home and system services and packages.
 
 ** Channel introduction
 In case you want to use rde as a channel, add the following code to
@@ -72,7 +78,7 @@ A picture to catch your eye)
 https://cdn.fosstodon.org/media_attachments/files/106/900/674/950/793/851/original/4b17f03528571ca0.png
 
 *** Tools
-#+INCLUDE: "doc/rde-tool-list.texi" src texinfo
+#+INCLUDE: "doc/rde-tool-list.org"
 
 ** Community
 There are a few [[https://lists.sr.ht/~abcdw][mailing lists]] you can subscribe and/or post with your
