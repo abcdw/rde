@@ -430,6 +430,7 @@ module will be added to the BAR-ID."
 
 (define* (waybar-sway-workspaces
           #:key
+          (persistent-workspaces '())
           (format-icons '(("1" . )
                           ("2" . )
                           ("3" . )
@@ -443,12 +444,14 @@ module will be added to the BAR-ID."
                           ("urgent" . )
                           ("focused" . )
                           ("default" . ))))
+  "PERSISTENT-WORKSPACES is a list of pairs workspace and vector of outputs."
   (waybar-module
    'sway/workspaces
    `((disable-scroll . #t)
      (format . {icon})
      ;; FIXME: Height becomes higher when icons are not used.
-     (format-icons . ,format-icons))
+     (format-icons . ,format-icons)
+     (persistent_workspaces . ,persistent-workspaces))
    `(((#{#workspaces}# button)
       ((background . none)
        (border-radius . 0.2em)
