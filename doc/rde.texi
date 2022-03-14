@@ -9,6 +9,7 @@
 
 @include version.texi
 @set WEB-PAGE https://trop.in/rde
+@set GIT-REPO https://git.sr.ht/~abcdw/rde
 
 @copying
 This manual is for rde, version @value{VERSION}.
@@ -54,6 +55,7 @@ practices and workflows.
 * Community::                   The best rde part.
 * Getting Started::             Try, customize and install.
 * Features::                    All the parts of rde.
+* Installation::
 * Contributing::                Tips and guidelines.
 * FAQ::                         Frequently asked questions.
 
@@ -247,23 +249,56 @@ It's also possible to connect to IRC channel via Matrix bridge using
 
 @c TODO: Explain how to fork rde
 
-@c @node Channel introduction
-@c @section Channel introduction
+@section Trying it
+There are several ways to use rde.
 
-@c In case you want to use rde as a channel, add the following code to
-@c your @code{~/.config/guix/channels.scm}, and call @code{guix pull}.
-@c @example
-@c (cons*
-@c  (channel
-@c   (name 'rde)
-@c   (url "https://git.sr.ht/~abcdw/rde")
-@c   (introduction
-@c    (make-channel-introduction
-@c     "257cebd587b66e4d865b3537a9a88cccd7107c95"
-@c     (openpgp-fingerprint
-@c      "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
-@c  %default-channels)
-@c @end example
+@subsection rde Live Image
+The primary one is to get the latest ISO image, write it to DVD or USB
+stick, boot from it and try it.
+
+The image is available here:
+
+@value{WEB-PAGE}/current-live/amd64/rde-live-latest-amd64.iso
+
+TODO: Actually make a live ISO and upload it.
+
+After all or some of the corners of live operating system are explored,
+you can proceed with installation (@pxref{Installation}).
+Alternatively, you can use a current Guix System installation and just
+use rde on top of it, the steps will be similiar.
+
+@subsection rde home on Foreign Distro
+The secondary option is to use rde on already existing non-Guix
+operating system with @command{guix} command available.  On Debian
+GNU/Linux and derivatives Guix can be installed and started in two
+commands:
+
+@example
+sudo apt update && sudo apt install guix
+sudo systemctl start guix-daemon
+@end example
+
+After that you can use rde home as usual or even proceed with full
+operating system installation (@pxref{Installation}).
+
+@subsection rde as a Channel
+Some advanced users may prefer to use only parts of rde they are
+interested: features, services, or just packages.
+
+In that case you can add the following channel to @file{channels.scm}.
+
+@example
+(cons*
+ (channel
+  (name 'rde)
+  (url "@value{GIT-REPO}")
+  (introduction
+   (make-channel-introduction
+    "257cebd587b66e4d865b3537a9a88cccd7107c95"
+    (openpgp-fingerprint
+     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
+ %default-channels)
+@end example
 
 @node Features
 @chapter rde Features
@@ -273,6 +308,9 @@ It's also possible to connect to IRC channel via Matrix bridge using
 
 @c Emacs how undo works
 @c https://casouri.github.io/note/2021/visual-undo-tree/index.html
+
+@node Installation
+@chapter Installation
 
 @node Contributing
 @chapter Contributing
@@ -300,6 +338,17 @@ TODO: Write about multi-user usage.
 
 @node Acknowledgments
 @chapter Acknowledgments
+
+The project is inspired by Nix and GNU Guix, technically it heavily
+relies on Guix Home, Guix System and GNU Emacs, but it also take
+inspiration in Nix's home-manager, NixOS and Nix itself.  Some parts of
+rde become a part of Guix, different packages or services, additions to
+build system and some bigger parts like @command{guix home}, sometimes
+ideas drift from GNU Guix and its community to rde and we are very
+greatful for insights, collaboration and all the help.
+
+rde won't be possible without GNU, Emacs and many other Free/Libre and
+Open Source projects, much kudos to all of them.
 
 @node Concept Index
 @unnumbered Concept Index
