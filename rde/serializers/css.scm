@@ -1,4 +1,5 @@
 ;;; rde --- Reproducible development environment.
+;;;
 ;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
@@ -22,7 +23,7 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
 
-  #:use-module (gnu services configuration)
+  #:use-module (rde serializers utils)
 
   #:use-module (guix packages)
   #:use-module (guix gexp)
@@ -130,7 +131,7 @@ would yeild:
       (#f "false") ; but useful for rofi's rasi dialect.
       ((? symbol? e) (symbol->string e))
       ((? number? e) (number->string e))
-      ((? string? e) (format #f "~s" e))
+      ((? string? e) (object->string e))
       ((lst ...)
        (raise (formatted-message
                (G_ "CSS term should be a non-list value (string, \
