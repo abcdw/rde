@@ -31,7 +31,7 @@
   #:use-module (srfi srfi-1)
 
   #:export (home-i2pd-service-type
-	    home-i2pd-configuration
+            home-i2pd-configuration
             home-i2pd-extension))
 
 
@@ -61,6 +61,7 @@
       (provision '(i2pd))
       (start #~(make-forkexec-constructor
                 (list #$(file-append i2pd "/bin/i2pd"))
+                #:pid-file (string-append (getenv "HOME") "/.i2pd/i2pd.pid")
                 #:log-file (string-append
                             (or (getenv "XDG_LOG_HOME")
                                 (string-append
@@ -72,12 +73,6 @@
 
 (define (i2pd-config-file name config)
   (apply mixed-text-file name (serialize-ini-config config)))
-
-(define (ensure-i2pd-dir-on-activation _)
-  #~(begin
-      (use-modules (guix build utils))
-      (let ((i2pd-dir (format #f "~a/.i2pd" (getenv "HOME"))))
-        (mkdir-p i2pd-dir))))
 
 (define (add-i2pd-configuration config)
   `(("i2pd/i2pd.conf"
@@ -112,9 +107,6 @@
                  (list (service-extension
                         home-shepherd-service-type
                         home-i2pd-shepherd-service)
-                       ;; (service-extension
-                       ;;  home-activation-service-type
-                       ;;  ensure-i2pd-dir-on-activation)
                        (service-extension
                         home-files-service-type
                         add-i2pd-configuration)))
