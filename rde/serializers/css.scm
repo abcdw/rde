@@ -30,8 +30,8 @@
   #:use-module (guix diagnostics)
   #:use-module (guix ui)
 
-  #:export (serialize-css
-            print-css
+  #:export (css-serialize
+            css-print
 
             serialize-css-config
             css-config?))
@@ -39,7 +39,7 @@
 (define (css-config? config)
   (list? config))
 
-(define (serialize-css-config config)
+(define (css-serialize config)
   "An implementation of css serialization, which produces a list of tokens, that
 can be later concatenated to get a string represnting resulting css.
 
@@ -216,10 +216,9 @@ but provided value is:\n ~a") e)))))
         (list "}\n")))
       (e
        (raise (formatted-message
-               (G_ "CSS expression should be a list of containing \
-path element as a first item and list of properties or subconfig as a \
-second is:\n ~a")
-               e)))))
+               (G_ "CSS expression should be a list containing path element \
+as the first item and list of properties or subconfig as the second, but \
+provided value is:\n~a") e)))))
 
   (define* (serialize-css-subconfig
 	    subconfig #:optional (nestness 0))
@@ -272,8 +271,8 @@ but provided value is:\n ~a") subconfig)))
 
 ;; (print-css sample-styles)
 
-(define serialize-css serialize-css-config)
+(define serialize-css-config css-serialize)
 
-(define* (print-css css)
-  "Prints generated json, useful for debugging."
-  (display (apply string-append (serialize-css-config css))))
+(define* (css-print css)
+  "Prints generated css, useful for debugging."
+  (display (apply string-append (css-serialize css))))

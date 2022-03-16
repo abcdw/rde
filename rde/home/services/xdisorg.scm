@@ -34,10 +34,10 @@
   #:export (home-rofi-service-type
 	    home-rofi-configuration))
 
-(define rasi-config? list?)
+(define rasi-config? css-config?)
 
 (define (serialize-rasi-config config)
-  (serialize-css config))
+  (serialize-css-config config))
 
 (define (rasi-config-file name config)
   (apply
@@ -92,7 +92,7 @@ configuration {
 
 (define (add-rofi-configuration config)
   `(("config/rofi/config.rasi"
-     ,(rasi-config-file "rofi-config"
+     ,(rasi-config-file "rofi-config.rasi"
                         (home-rofi-configuration-config-rasi config)))))
 
 (define (home-rofi-extensions cfg extensions)
