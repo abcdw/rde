@@ -142,7 +142,8 @@ dependency for other packages."
       (xdg-desktop-entry
        (file file-name)
        (name xdg-name)
-       (config `((exec . ,file-file)))
+       (config `((exec . ,file-file)
+                 (icon . "emacs")))
        (type 'application)))))))
 
 
