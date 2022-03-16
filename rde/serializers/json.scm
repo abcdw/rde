@@ -23,8 +23,10 @@
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-43)
   #:use-module (guix gexp)
-  #:export (serialize-json
-            print-json))
+  #:export (json-serialize
+            json-print
+
+            serialize-json-config))
 
 (define (json-number? number)
   (and (number? number) (eqv? (imag-part number) 0) (finite? number)))
@@ -128,13 +130,15 @@
     ((? pairs? v) (json-s-alist v level pretty?))
     (e (throw 'json-invalid json))))
 
-(define* (serialize-json json #:key (pretty? #t))
+(define* (json-serialize json #:key (pretty? #t))
   "Works similar to guile-json, but returns a list of strings, which
 have to be concatenated.  Additionally, supports gexps and file-likes.
 vectors -> arrays, alists -> objects, etc."
   (json-s-json json 0 pretty?))
 
-(define* (print-json json #:key (pretty? #t))
+(define serialize-json-config json-serialize)
+
+(define* (json-print json #:key (pretty? #t))
   "Prints generated json, useful for debugging."
   (display (apply string-append (json-s-json json 0 pretty?))))
 

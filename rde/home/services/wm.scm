@@ -1,4 +1,5 @@
-;;; rde --- Reproducible development environment
+;;; rde --- Reproducible development environment.
+;;;
 ;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
@@ -340,7 +341,7 @@ Install and configure swaylock, screen locker for Wayland.")))
 ;;; waybar.
 ;;;
 
-;; (print-json
+;; (json-print
 ;;  '((ipc . #t)
 ;;    (ipc . #f)
 ;;    (battery#bat2 . ((hehe . val)
@@ -447,7 +448,7 @@ waybar-key-to-merge?, merge the values of those keys."
   (vector? config))
 
 (define (serialize-waybar-config config)
-  (serialize-json config))
+  (serialize-json-config config))
 
 (define-configuration home-waybar-configuration
   (waybar
@@ -517,7 +518,7 @@ added to the end of original configuration of the bar.")
 		       (service-extension
                         home-files-service-type
                         add-waybar-configuration)))
-		(compose append)
+		(compose identity)
 		(extend home-waybar-extensions)
                 (default-value (home-waybar-configuration))
                 (description "\
