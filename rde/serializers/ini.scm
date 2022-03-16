@@ -29,12 +29,15 @@
   #:use-module (guix diagnostics)
   #:use-module (guix ui)
 
-  #:export (serialize-ini
-            print-ini
-            merge-ini
+  #:export (ini-serialize
+            ini-print
+            ini-merge
+            ini-append
 
             serialize-ini-config
             ini-config?))
+
+(define ini-config? list?)
 
 (define sample-ini
   `((global ((daemon)
@@ -47,7 +50,7 @@
     ('global "")
     (name (format #f "[~a]\n" (symbol->string name)))))
 
-(define* (serialize-ini
+(define* (ini-serialize
           config
           #:key
           (equal-string " = ")
@@ -119,13 +122,14 @@ is:\n~a") e)))))
       (list "\n")))
    config))
 
-(define (merge-ini ini1 ini2)
+(define (ini-merge ini1 ini2)
   "Combine to INIs. Naive quadratic implementation, which can be rediculously
 slow."
   (define keys-to-merge
     (fold
      (match-lambda*
-       (((k v) acc) (if (assoc-ref ini2 k) (cons k acc) acc)))
+       (((k v) acc) (if (assoc-ref ini2 k) (cons k acc) acc))
+       (((? gexp? e) acc) acc))
      '() ini1))
 
   (define enriched-ini1
@@ -134,14 +138,22 @@ slow."
        (((k v) acc)
         (cons
          (cons k (list (append v (car (or (assoc-ref ini2 k) '(()))))))
-         acc)))
+         acc))
+       (((? gexp? e) acc) (cons e acc)))
      '()
      ini1))
 
   (define stripped-ini2
-    (remove (lambda (x) (memq (car x) keys-to-merge)) ini2))
+    (remove (match-lambda
+              ((k . v) (memq k keys-to-merge))
+              (e #f))
+            ini2))
   (append enriched-ini1 stripped-ini2))
 
+(define (ini-append x acc)
+  (ini-merge acc x))
+
+(define serialize-ini-config ini-serialize)
 ;; (display
 ;;  (merge-ini
 ;;   '((section1 ((k1 . v1)))
@@ -152,6 +164,6 @@ slow."
 
 ;; (cdr '(a ((k . v) (k2 . v2))))
 
-(define (print-ini ini)
+(define (ini-print ini)
   "Prints generated INI, useful for debugging."
-  (display (apply string-append (serialize-ini ini))))
+  (display (apply string-append (ini-serialize ini))))
