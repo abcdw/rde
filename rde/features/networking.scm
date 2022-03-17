@@ -1,7 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
-;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
+;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;

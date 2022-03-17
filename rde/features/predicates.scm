@@ -1,5 +1,6 @@
 (define-module (rde features predicates)
   #:use-module (rde features)
+  #:use-module (rde serializers ini)
   #:use-module (gnu system)
   #:use-module (gnu services)
   #:use-module (gnu home services)
@@ -11,7 +12,8 @@
   #:use-module (guix inferior)
   #:use-module (guix gexp)
 
-  #:re-export (package?))
+  #:re-export (package?
+               ini-config?))
 
 (define-public (maybe-string? x)
   (or (string? x) (not x)))
