@@ -23,6 +23,10 @@
   #:use-module (rde features video)
   #:use-module (rde features markup)
   ;; #:use-module (gnu services)
+  #:use-module (rde features networking)
+  #:use-module (gnu services)
+  #:use-module (rde home services i2p)
+
   ;; #:use-module (gnu services nix)
   #:use-module (gnu system keyboard)
   #:use-module (gnu system file-systems)
@@ -130,6 +134,9 @@
 ;;; services of other features.  Be careful changing it.
 (define %main-features
   (list
+   (feature-i2pd
+    #:outproxy 'http://acetone.i2p:8888
+    #:less-anonymous? #t)
    (feature-custom-services
     #:feature-name-prefix 'ixy
     #:system-services
@@ -137,7 +144,20 @@
      ;; (service nix-service-type)
      )
     #:home-services
+    ;; TODO: move to feature-irc-settings
     (list
+     (simple-service
+      'i2pd-add-ilita-irc
+      home-i2pd-service-type
+      (home-i2pd-extension
+       (tunnels-conf
+        `((IRC-ILITA ((type . client)
+                      (address . 127.0.0.1)
+                      (port . 6669)
+                      (destination . irc.ilita.i2p)
+                      (destinationport . 6667)
+                      (keys . ilita-keys.dat)))))))
+
      ;; ((@ (gnu services) simple-service)
      ;;  'extend-shell-profile
      ;;  (@ (gnu home-services shells) home-shell-profile-service-type)
