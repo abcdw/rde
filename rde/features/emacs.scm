@@ -2,6 +2,7 @@
 ;;;
 ;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
+;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -1184,8 +1185,14 @@ git-link, git-timemachine."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-which-key)
-  "Configure which-key."
+(define* (feature-emacs-which-key
+          #:key
+          (min-height 1))
+  "Configure which-key. MIN-HEIGHT can be used to adjust the look of which-key
+popup, when there are not many items in it, can be easier to look through
+available options."
+  (ensure-pred integer? min-height)
+
   (define emacs-f-name 'which-key)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
@@ -1193,7 +1200,8 @@ git-link, git-timemachine."
     (list
      (elisp-configuration-service
       emacs-f-name
-      '((require 'which-key)
+      `((require 'which-key)
+        (setq which-key-min-display-lines ,min-height)
         (which-key-mode 1)
         (define-key global-map (kbd "C-h C-k") 'which-key-show-top-level))
       #:elisp-packages (list emacs-which-key))))
