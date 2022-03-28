@@ -172,56 +172,27 @@ Used for executing user's commands at the exit of login shell.  It
 won't be read in some cases (if the shell terminates by exec'ing
 another process for example)."))
 
-(define (add-zsh-configuration config)
-  (let* ((xdg-flavor? (home-zsh-configuration-xdg-flavor? config)))
+(define (zsh-filter-fields field)
+  (filter-configuration-fields home-zsh-configuration-fields (list field)))
 
-    (define prefix-file
-      (cut string-append
-        (if xdg-flavor?
-            "config/zsh/."
-            "") <>))
+(define (zsh-serialize-field config field)
+  (serialize-configuration config (zsh-filter-fields field)))
 
-    (define (filter-fields field)
-      (filter-configuration-fields home-zsh-configuration-fields
-                                   (list field)))
+(define* (zsh-field-not-empty? config field)
+  (let ((file-name (symbol->string field))
+        (field-obj (car (zsh-filter-fields field))))
+    (not (null? ((configuration-field-getter field-obj) config)))))
 
-    (define (serialize-field field)
-      (serialize-configuration
-       config
-       (filter-fields field)))
+(define (zsh-file-zshenv config)
+  (mixed-text-file
+   "zshenv"
+   (zsh-serialize-field config 'zshenv)
+   (zsh-serialize-field config 'environment-variables)))
 
-    (define (file-if-not-empty field)
-      (let ((file-name (symbol->string field))
-            (field-obj (car (filter-fields field))))
-        (if (not (null? ((configuration-field-getter field-obj) config)))
-            `(,(prefix-file file-name)
-              ,(mixed-text-file
-                file-name
-                (serialize-field field)))
-            '())))
-
-    (filter
-     (compose not null?)
-     `(,(if xdg-flavor?
-            `("zshenv"
-              ,(mixed-text-file
-                "auxiliary-zshenv"
-                (if xdg-flavor?
-                    "source ${XDG_CONFIG_HOME:-$HOME/.config}/zsh/.zshenv\n"
-                    "")))
-            '())
-       (,(prefix-file "zshenv")
-        ,(mixed-text-file
-          "zshenv"
-          (if xdg-flavor?
-              "export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh\n"
-              "")
-          (serialize-field 'zshenv)
-          (serialize-field 'environment-variables)))
-       (,(prefix-file "zprofile")
-        ,(mixed-text-file
-          "zprofile"
-          "\
+(define (zsh-file-zprofile config)
+  (mixed-text-file
+   "zprofile"
+   "\
 # Setups system and user profiles and related variables
 source /etc/profile
 # Setups home environment profile
@@ -230,11 +201,47 @@ source ~/.profile
 # It's only necessary if zsh is a login shell, otherwise profiles will
 # be already sourced by bash
 "
-          (serialize-field 'zprofile)))
+   (zsh-serialize-field config 'zprofile)))
 
-       ,@(list (file-if-not-empty 'zshrc)
-               (file-if-not-empty 'zlogin)
-               (file-if-not-empty 'zlogout))))))
+(define (zsh-file-by-field config field)
+  (match field
+    ('zshenv (zsh-file-zshenv config))
+    ('zprofile (zsh-file-zprofile config))
+    (e (mixed-text-file
+        (symbol->string field)
+        (zsh-serialize-field config field)))))
+
+(define (zsh-get-configuration-files config)
+  `(("zprofile" ,(zsh-file-by-field config 'zprofile)) ;; Always non-empty
+    ,@(if (and (zsh-field-not-empty? config 'zshenv)
+               (zsh-field-not-empty? config 'environment-variables))
+          `(("zshenv" ,(zsh-file-by-field config 'zshenv))) '())
+    ,@(if (zsh-field-not-empty? config 'zshrc)
+          `(("zshrc" ,(zsh-file-by-field config 'zshrc))) '())
+    ,@(if (zsh-field-not-empty? config 'zlogin)
+          `(("zlogin" ,(zsh-file-by-field config 'zlogin))) '())
+    ,@(if (zsh-field-not-empty? config 'zlogout)
+          `(("zlogout" ,(zsh-file-by-field config 'zlogout))) '())))
+
+(define (add-zsh-dot-configuration config)
+  (define zshenv-auxiliary-file
+    (mixed-text-file
+     "zshenv-auxiliary"
+     "export ZDOTDIR=${XDG_CONFIG_HOME:-$HOME/.config}/zsh\n"
+     "[[ -f $ZDOTDIR/.zshenv ]] && source $ZDOTDIR/.zshenv\n"))
+
+  (if (home-zsh-configuration-xdg-flavor? config)
+      `(("zshenv" ,zshenv-auxiliary-file))
+      (zsh-get-configuration-files config)))
+
+(define (add-zsh-xdg-configuration config)
+  (if (home-zsh-configuration-xdg-flavor? config)
+      (map
+       (lambda (lst)
+         (cons (string-append "zsh/." (car lst))
+               (cdr lst)))
+       (zsh-get-configuration-files config))
+      '()))
 
 (define (add-zsh-packages config)
   (list (home-zsh-configuration-package config)))
@@ -292,7 +299,10 @@ source ~/.profile
                 (extensions
                  (list (service-extension
                         home-files-service-type
-                        add-zsh-configuration)
+                        add-zsh-dot-configuration)
+                       (service-extension
+                        home-xdg-configuration-files-service-type
+                        add-zsh-xdg-configuration)
                        (service-extension
                         home-profile-service-type
                         add-zsh-packages)))
