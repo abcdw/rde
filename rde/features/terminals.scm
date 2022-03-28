@@ -107,6 +107,24 @@
 
                  (advice-add 'consult-yank-pop :around
                              'vterm-consult-yank-pop-wrapper)))
+              '())
+        ,@(if (get-value 'emacs-project config)
+              `((with-eval-after-load
+                 'project
+                 (defun project-vterm ()
+                   "Start vterm in the current project's root directory.
+If a buffer already exists for running vterm in the project's root,
+switch to it.  Otherwise, create a new vterm buffer.
+With \\[universal-argument] prefix arg, create a new vterm buffer even
+if one already exists."
+                   (interactive)
+                   (let* ((default-directory (project-root (project-current t)))
+                          (vterm-buffer-name (project-prefixed-buffer-name "vterm"))
+                          (vterm-buffer (get-buffer vterm-buffer-name)))
+                     (if (and vterm-buffer (not current-prefix-arg))
+                         (pop-to-buffer-same-window vterm-buffer)
+                         (vterm t))))
+                 (define-key project-prefix-map (kbd "t") 'project-vterm)))
               '()))
       #:elisp-packages `(,emacs-vterm
                          ,@(if (get-value 'emacs-consult config)
