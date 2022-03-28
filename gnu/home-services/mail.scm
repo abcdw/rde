@@ -136,10 +136,6 @@ binary.")
   (package
    (package notmuch)
    "notmuch package to use.")
-  (xdg-flavor?
-   (boolean #t)
-   "Whether to use the {$XDG_CONFIG_HOME/notmuch/default/config}
-configuration file or not.")
   (config
    (ini-config '())
    "AList of pairs, each pair is a String and String or Gexp.")
@@ -200,9 +196,7 @@ notmuch-hooks} for more information."))
 
   (remove null?
   `(,@(map get-hook '("pre-new" "post-new" "post-insert"))
-    (,(if (home-notmuch-configuration-xdg-flavor? config)
-          "config/notmuch/default/config"
-          "notmuch-config")
+    ("config/notmuch/default/config"
      ,(mixed-text-file
        "notmuch-config"
        (generic-serialize-ini-config
