@@ -358,20 +358,21 @@ a particular public-inbox repository."))
 (define l2md-shepherd-service
   (match-lambda
     (($ <home-l2md-configuration> _ package autostart?)
-     (optional autostart?
-               (list (shepherd-service
-                      (documentation
-                       "L2md service for downloading public-inbox archives.")
-                      (provision '(l2md))
-                      (start #~(make-forkexec-constructor
-                                (list #$(file-append package "/bin/l2md"))
-                                #:log-file (string-append
-                                            (or (getenv "XDG_LOG_HOME")
-                                                (string-append
-                                                 (getenv "HOME")
-                                                 "/.local/var/log"))
-                                            "/l2md.log")))
-                      (stop #~(make-kill-destructor))))))))
+     (if autostart?
+         (list (shepherd-service
+                (documentation
+                 "L2md service for downloading public-inbox archives.")
+                (provision '(l2md))
+                (start #~(make-forkexec-constructor
+                          (list #$(file-append package "/bin/l2md"))
+                          #:log-file (string-append
+                                      (or (getenv "XDG_LOG_HOME")
+                                          (string-append
+                                           (getenv "HOME")
+                                           "/.local/var/log"))
+                                      "/l2md.log")))
+                (stop #~(make-kill-destructor))))
+         '()))))
 
 (define (l2md-profile-service config)
   (list (home-l2md-configuration-package config)))
