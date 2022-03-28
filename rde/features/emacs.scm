@@ -1694,7 +1694,26 @@ emacsclient feels more like a separate emacs instance."
       `((add-hook 'after-init-hook 'persp-mode)
         (custom-set-variables
          '(persp-show-modestring nil)
-         '(persp-modestring-dividers '(" [" "]" "|"))))
+         '(persp-modestring-dividers '(" [" "]" "|")))
+
+        ;; MAYBE: Move it to feature-project
+        ;; This is mostly a project-related functionality, which uses
+        ;; perspective as isolation mechanism.
+        ,@(if (get-value 'emacs-project config)
+              `((defun rde-persp-switch-project (dir)
+                   "Switch to a project in its own perspective."
+                   (interactive (list (project-prompt-project-dir)))
+                   (let ((name (file-name-nondirectory
+				(directory-file-name
+                                 (file-name-directory dir)))))
+                     (persp-switch name)
+                     (project-switch-project dir)))
+                (with-eval-after-load
+                 'project
+                 (define-key project-prefix-map
+                   (kbd "P")
+                   'rde-persp-switch-project)))
+              '()))
       #:elisp-packages (list emacs-perspective))))
 
   (feature
