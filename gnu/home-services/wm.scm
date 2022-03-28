@@ -40,10 +40,6 @@
    (boolean #f)
    "Whether to install the @code{ghc-xmonad-contrib} package, which
 contains many third-party extensions for XMonad.")
-  (xdg-flavor?
-   (boolean #t)
-   "Whether to respect XDG base directory, this will set the relevant
-environment variables if enabled.")
   (config
    (gexp-text-config '())
    "List of strings or gexps containing the XMonad configuration, see
@@ -59,21 +55,19 @@ documentation} for how to configure it."))
 
 (define xmonad-files-service
   (match-lambda
-    (($ <home-xmonad-configuration> _ package xmonad-contrib?
-                                    xdg-flavor? config)
+    (($ <home-xmonad-configuration> _ package xmonad-contrib? config)
      (if (null? config)
          '()
-         `((,(string-append (if xdg-flavor? "config/" "") "xmonad/xmonad.hs")
+         `(("config/xmonad/xmonad.hs"
             ,(mixed-text-file "xmonad-xmonad.hs"
                               (serialize-text-config #f config))))))))
 
 (define xmonad-run-on-change-service
   (match-lambda
-    (($ <home-xmonad-configuration> _ package xmonad-contrib?
-                                    xdg-flavor? config)
-     `((,(if xdg-flavor? "files/config/xmonad/xmonad.hs" "files/xmonad/xmonad.hs")
+    (($ <home-xmonad-configuration> _ package xmonad-contrib? config)
+     `(("files/config/xmonad/xmonad.hs"
         ,#~(let ((executable #$(file-append package "/bin/xmonad")))
-             (system* executable"--recompile")
+             (system* executable "--recompile")
              (system* executable "--restart")))))))
 
 (define home-xmonad-service-type
