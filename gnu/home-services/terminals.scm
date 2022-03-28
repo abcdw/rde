@@ -48,7 +48,7 @@ key_bindings:
 
 (define (add-alacritty-configuration config)
   (let ((cfg (home-alacritty-configuration-config config)))
-    `(("config/alacritty/alacritty.yml"
+    `(("alacritty/alacritty.yml"
        ,(mixed-text-file
          "alacritty.yml"
          (serialize-alacritty-config cfg))))))
@@ -61,7 +61,7 @@ key_bindings:
    (name 'home-alacritty)
    (extensions
     (list (service-extension
-           home-files-service-type
+           home-xdg-configuration-files-service-type
            add-alacritty-configuration)
           (service-extension
            home-profile-service-type

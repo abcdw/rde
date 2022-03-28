@@ -173,7 +173,7 @@ input * {
   (list (home-sway-configuration-package config)))
 
 (define (add-sway-configuration config)
-  `(("config/sway/config"
+  `(("sway/config"
      ,(apply
        mixed-text-file
        "sway-config"
@@ -193,7 +193,7 @@ input * {
 			home-profile-service-type
 			add-sway-packages)
 		       (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         add-sway-configuration)))
 		(compose identity)
 		(extend home-sway-extensions)
@@ -231,7 +231,7 @@ The example configuration:
   (list (home-swayidle-configuration-swayidle config)))
 
 (define (add-swayidle-configuration config)
-  `(("config/swayidle/config"
+  `(("swayidle/config"
      ,(apply
        mixed-text-file
        "swayidle-config"
@@ -251,7 +251,7 @@ The example configuration:
 			home-profile-service-type
 			add-swayidle-packages)
 		       (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         add-swayidle-configuration)))
 		(compose identity)
 		(extend home-swayidle-extensions)
@@ -307,7 +307,7 @@ otherwise."))
   (list (home-swaylock-configuration-swaylock config)))
 
 (define (add-swaylock-configuration config)
-  `(("config/swaylock/config"
+  `(("swaylock/config"
      ,(apply
        mixed-text-file
        "swaylock-config"
@@ -328,7 +328,7 @@ otherwise."))
 			home-profile-service-type
 			add-swaylock-packages)
 		       (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         add-swaylock-configuration)))
 		(compose identity)
 		(extend home-swaylock-extensions)
@@ -498,12 +498,12 @@ added to the end of original configuration of the bar.")
        (append-map home-waybar-extension-style-css extensions))))))
 
 (define (add-waybar-configuration config)
-  `(("config/waybar/style.css"
+  `(("waybar/style.css"
      ,(apply
        mixed-text-file
        "waybar-style-css"
        (serialize-css-config (home-waybar-configuration-style-css config))))
-    ("config/waybar/config"
+    ("waybar/config"
      ,(apply
        mixed-text-file
        "waybar-config"
@@ -516,7 +516,7 @@ added to the end of original configuration of the bar.")
 			home-profile-service-type
 			add-waybar-packages)
 		       (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         add-waybar-configuration)))
 		(compose identity)
 		(extend home-waybar-extensions)

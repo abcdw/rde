@@ -91,7 +91,7 @@ configuration {
   (list (home-rofi-configuration-rofi config)))
 
 (define (add-rofi-configuration config)
-  `(("config/rofi/config.rasi"
+  `(("rofi/config.rasi"
      ,(rasi-config-file "rofi-config.rasi"
                         (home-rofi-configuration-config-rasi config)))))
 
@@ -109,7 +109,7 @@ configuration {
 			home-profile-service-type
 			add-rofi-packages)
 		       (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         add-rofi-configuration)))
 		(compose identity)
 		(extend home-rofi-extensions)

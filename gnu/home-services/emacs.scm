@@ -201,12 +201,12 @@ connect to it.")
 
 ;;   (computed-file name build))
 
-(define (add-emacs-configuration config)
+(define (get-emacs-configuration-files config)
   (let* ((xdg-flavor? (home-emacs-configuration-xdg-flavor? config)))
     (define prefix-file
       (cut string-append
 	(if xdg-flavor?
-	    "config/emacs/"
+	    "emacs/"
 	    "emacs.d/")
 	<>))
 
@@ -236,6 +236,15 @@ connect to it.")
       (file-if-not-empty 'init-el)
       (file-if-not-empty 'early-init-el)))))
 
+(define (add-emacs-dot-configuration config)
+  (if (home-emacs-configuration-xdg-flavor? config)
+      '()
+      (get-emacs-configuration-files config)))
+
+(define (add-emacs-xdg-configuration config)
+  (if (home-emacs-configuration-xdg-flavor? config)
+      (get-emacs-configuration-files config)
+      '()))
 
 (define-configuration home-emacs-extension
   (elisp-packages
@@ -278,7 +287,10 @@ connect to it.")
 			add-emacs-shepherd-service)
 		       (service-extension
                         home-files-service-type
-                        add-emacs-configuration)))
+                        add-emacs-dot-configuration)
+                       (service-extension
+                        home-xdg-configuration-files-service-type
+                        add-emacs-xdg-configuration)))
 		(compose identity)
 		(extend home-emacs-extensions)
                 (default-value (home-emacs-configuration))

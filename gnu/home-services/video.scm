@@ -90,13 +90,13 @@ is the same as the @code{options} field in
    serialize-bindings))
 
 (define (mpv-files-service config)
-  `(("config/mpv/mpv.conf"
+  `(("mpv/mpv.conf"
      ,(mixed-text-file
        "mpv-mpv.conf"
        (serialize-configuration
         config (filter-configuration-fields
                 home-mpv-configuration-fields '(bindings) #t))))
-    ("config/mpv/input.conf"
+    ("mpv/input.conf"
      ,(mixed-text-file
        "mpv-input.conf"
        (serialize-configuration
@@ -110,7 +110,7 @@ is the same as the @code{options} field in
   (service-type (name 'home-mpv)
                 (extensions
                  (list (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         mpv-files-service)
                        (service-extension
                         home-profile-service-type

@@ -58,7 +58,7 @@ documentation} for how to configure it."))
     (($ <home-xmonad-configuration> _ package xmonad-contrib? config)
      (if (null? config)
          '()
-         `(("config/xmonad/xmonad.hs"
+         `(("xmonad/xmonad.hs"
             ,(mixed-text-file "xmonad-xmonad.hs"
                               (serialize-text-config #f config))))))))
 
@@ -81,7 +81,7 @@ documentation} for how to configure it."))
                         home-run-on-change-service-type
                         xmonad-run-on-change-service)
                        (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         xmonad-files-service)))
                 (description "\
 Install and configure XMonad, a window manager written in Haskell.")))

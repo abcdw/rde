@@ -91,13 +91,23 @@ binary.")
         "mbsync" wrapper-gexp)
        (home-isync-configuration-package config))))
 
-(define (add-isync-configuration config)
+(define (get-isync-configuration config)
   `((,(if (home-isync-configuration-xdg-flavor? config)
-          "config/isync/mbsyncrc"
+          "isync/mbsyncrc"
           "mbsyncrc")
      ,(mixed-text-file
        "mbsyncrc"
        (serialize-isync-config #f (home-isync-configuration-config config))))))
+
+(define (add-isync-dot-configuration config)
+  (if (home-isync-configuration-xdg-flavor? config)
+      '()
+      (get-isync-configuration config)))
+
+(define (add-isync-xdg-configuration config)
+  (if (home-isync-configuration-xdg-flavor? config)
+      (get-isync-configuration config)
+      '()))
 
 (define (home-isync-extensions cfg extensions)
   (home-isync-configuration
@@ -112,7 +122,10 @@ binary.")
                         add-isync-package)
                        (service-extension
                         home-files-service-type
-                        add-isync-configuration)))
+                        add-isync-dot-configuration)
+                       (service-extension
+                        home-xdg-configuration-files-service-type
+                        add-isync-xdg-configuration)))
                 (compose concatenate)
                 (extend home-isync-extensions)
                 (default-value (home-isync-configuration))
@@ -184,7 +197,7 @@ notmuch-hooks} for more information."))
                                  (list field)))
 
   (define (hook-file hook gexps)
-    (list (string-append "config/notmuch/default/hooks/" hook)
+    (list (string-append "notmuch/default/hooks/" hook)
           (program-file (string-append "notmuch-" hook) #~(begin #$@gexps))))
 
   (define (get-hook hook)
@@ -196,7 +209,7 @@ notmuch-hooks} for more information."))
 
   (remove null?
   `(,@(map get-hook '("pre-new" "post-new" "post-insert"))
-    ("config/notmuch/default/config"
+    ("notmuch/default/config"
      ,(mixed-text-file
        "notmuch-config"
        (generic-serialize-ini-config
@@ -226,7 +239,7 @@ notmuch-hooks} for more information."))
                         home-profile-service-type
                         add-notmuch-package)
                        (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         add-notmuch-configuration)))
                 (compose identity)
                 (extend home-notmuch-extensions)

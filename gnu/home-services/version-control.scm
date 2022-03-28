@@ -182,21 +182,21 @@ of the configuration file."))
 (define (add-git-configuration config)
   (define (filter-fields fields)
     (filter-configuration-fields home-git-configuration-fields fields))
-  `(("config/git/attributes"
+  `(("git/attributes"
      ,(mixed-text-file
        "git-attributes"
        (serialize-configuration
         config
 	(filter-fields '(attributes)))
        (home-git-configuration-attributes-extra-content config)))
-    ("config/git/ignore"
+    ("git/ignore"
      ,(mixed-text-file
        "git-ignore"
        (serialize-configuration
         config
 	(filter-fields '(ignore)))
        (home-git-configuration-ignore-extra-content config)))
-    ("config/git/config"
+    ("git/config"
      ,(mixed-text-file
 	     "git-config"
 	     (serialize-configuration
@@ -227,7 +227,7 @@ of the configuration file."))
   (service-type (name 'home-git)
                 (extensions
                  (list (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         add-git-configuration)
                        (service-extension
                         home-profile-service-type
@@ -381,7 +381,7 @@ will turn into this:
                                 `((ui
                                    ((ignore . ,(plain-file "hg-ignores"
                                                            ignores)))))))))
-    `(("config/hg/hgrc"
+    `(("hg/hgrc"
        ,(apply mixed-text-file
                "hgrc"
                (serialize-hg-config final-config))))))
@@ -427,7 +427,7 @@ will turn into this:
   (service-type (name 'home-hg)
                 (extensions
                  (list (service-extension
-                        home-files-service-type
+                        home-xdg-configuration-files-service-type
                         home-hg-files-service)
                        (service-extension
                         home-profile-service-type
