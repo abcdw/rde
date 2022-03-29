@@ -21,12 +21,15 @@
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (rde home services i2p)
+  #:use-module (gnu home services shepherd)
+  #:use-module (gnu packages ssh)
   #:use-module (rde packages)
   #:use-module (gnu services)
 
   #:use-module (guix gexp)
 
-  #:export (feature-i2pd))
+  #:export (feature-i2pd
+            feature-ssh-socks-proxy))
 
 ;; privoxy https://wiki.archlinux.org/title/Privoxy
 ;; tinyproxy with i2p/tor/ygg upstreams https://youtu.be/8r2bo-EEooM
@@ -92,3 +95,38 @@
    (values `((i2pd . ,i2pd)))
    (home-services-getter get-home-services)
    (system-services-getter get-system-services)))
+
+;;;
+;;; SSH SOCKS Proxy.
+;;;
+
+(define* (feature-ssh-socks-proxy
+          #:key
+          (user "root")
+          (host #f)
+          (proxy-port 8123))
+  "Configure SSH SOCKS Proxy. To customize port and other settings use
+feature-ssh."
+  (ensure-pred string? user)
+  (ensure-pred string? host)
+  (ensure-pred integer? proxy-port)
+
+  (define (get-home-services config)
+    (define ssh (get-value 'ssh config openssh))
+    (list
+     (simple-service
+      'ssh-socks-proxy-add-shepherd-service
+      home-shepherd-service-type
+      (list
+       (shepherd-service
+        (provision '(ssh-socks-proxy))
+        (stop  #~(make-kill-destructor))
+        (start #~(make-forkexec-constructor
+                  (list #$(file-append ssh "/bin/ssh")
+                        "-ND" #$(number->string proxy-port)
+                        #$(format #f "~a@~a" user host)))))))))
+
+  (feature
+   (name 'ssh-socks-proxy)
+   (values `((ssh-socks-proxy . #t)))
+   (home-services-getter get-home-services)))
