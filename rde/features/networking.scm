@@ -22,6 +22,7 @@
   #:use-module (rde features predicates)
   #:use-module (rde home services i2p)
   #:use-module (gnu home services shepherd)
+  #:use-module (gnu packages i2p)
   #:use-module (gnu packages ssh)
   #:use-module (rde packages)
   #:use-module (gnu services)
@@ -33,6 +34,7 @@
 
 ;; privoxy https://wiki.archlinux.org/title/Privoxy
 ;; tinyproxy with i2p/tor/ygg upstreams https://youtu.be/8r2bo-EEooM
+;; tun2proxy
 
 ;; Create an icecat profile
 ;; broswer.fixup.alternate.enabled = fales
@@ -55,7 +57,7 @@
 
 (define* (feature-i2pd
           #:key
-          (i2pd i2pd-latest)
+          (i2pd i2pd)
           (outproxy #f)
           (less-anonymous? #f)
           (extra-i2pd-conf '()))
@@ -69,7 +71,7 @@
      (service
       home-i2pd-service-type
       (home-i2pd-configuration
-       (i2pd i2pd-latest)
+       (i2pd i2pd)
        (i2pd-conf
         `((global ((bandwidth . P)))
           (sam ((enabled . #f)))

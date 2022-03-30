@@ -216,22 +216,4 @@ predefined configurations, practices and workflows.")
 ;;     (source
 ;;      (local-file (dirname (dirname (current-filename))) #:recursive? #t))))
 
-(use-modules (gnu packages i2p))
 
-(define-public i2pd-latest
-  (package
-    (inherit i2pd)
-    (name "i2pd")
-    (version "2.41.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/PurpleI2P/i2pd")
-             (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0kh03lb4m8fvlfvq06d4hgwmk43pk7yp7n7y36kb2vplhrjrn2kx"))))
-    (arguments
-     (substitute-keyword-arguments (package-arguments i2pd)
-       ((#:tests? _ #f) #f)))))
