@@ -348,19 +348,29 @@
    (feature-base-packages
     #:home-packages
     (append
-     ;; (pkgs-vanilla
-     ;;  "icecat" "nyxt"
-     ;;  "ungoogled-chromium-wayland" "ublock-origin-chromium")
      (pkgs
+      "figlet" ;; TODO: Move to emacs-artist-mode
+      "calibre"
+      "icecat" "nyxt"
+      "ungoogled-chromium-wayland" "ublock-origin-chromium"
+
+      "utox" "qtox" "jami"
+
       "alsa-utils" "youtube-dl" "imv" "cozy"
       "pavucontrol" "wev"
       "obs" "obs-wlrobs"
-      "recutils"
+      "recutils" "binutils"
       "fheroes2"
       ;; TODO: Enable pipewire support to chromium by default
       ;; chrome://flags/#enable-webrtc-pipewire-capturer
       "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-standard"
-      "ripgrep" "curl" "make")))))
+      "papirus-icon-theme" "arc-theme"
+      "thunar"
+      ;; "glib:bin"
+
+      ;; TODO: Fix telega package!
+      "ffmpeg"
+      "ripgrep" "curl")))))
 
 (define %laptop-features
   (list ))
