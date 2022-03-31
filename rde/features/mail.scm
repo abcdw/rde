@@ -201,11 +201,12 @@ function, which accepts config with rde values and returns a string."
          (setq message-citation-line-function
                'message-insert-formatted-citation-line)
 
-         (custom-set-variables
-          '(message-citation-line-format "On %Y-%m-%d %R, %N wrote:\n")
-          `(message-auto-save-directory
-               ,(concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                        "/emacs/mail-drafts"))))))
+         (customize-set-variable
+          'message-citation-line-format "On %Y-%m-%d %R, %N wrote:\n")
+         (customize-set-variable
+          'message-auto-save-directory
+          (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                  "/emacs/mail-drafts")))))
 
      (emacs-xdg-service
       emacs-f-name
