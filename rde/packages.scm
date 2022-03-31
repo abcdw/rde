@@ -150,9 +150,9 @@ keyboard input like xdotool type for X11.")
     (description "Package kingpin provides command line interfaces like this:")
     (license license:expat)))
 
-(define-public go-github-com-yory8-clipman
+(define-public clipman
   (package
-    (name "go-github-com-yory8-clipman")
+    (name "clipman")
     (version "1.6.1")
     (source
       (origin
