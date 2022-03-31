@@ -1326,7 +1326,7 @@ available options."
                  (project-file (styles . (basic partial-completion)))))
          (setq enable-recursive-minibuffers t)
 
-         (setq resize-mini-windows nil)
+         ;; (setq resize-mini-windows nil)
 
          ;; MAYBE: Make transient use child-frame:
          ;; https://github.com/magit/transient/issues/102
