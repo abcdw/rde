@@ -115,6 +115,7 @@ feature-ssh."
 
   (define (get-home-services config)
     (define ssh (get-value 'ssh config openssh))
+    (ensure-pred file-like? ssh)
     (list
      (simple-service
       'ssh-socks-proxy-add-shepherd-service

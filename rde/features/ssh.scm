@@ -3,6 +3,8 @@
   #:use-module (rde features predicates)
   #:use-module (gnu home-services ssh)
   #:use-module (gnu services)
+  #:use-module (gnu packages)
+  #:use-module (gnu packages ssh)
 
   #:export (feature-ssh)
 
@@ -13,6 +15,7 @@
 
 (define* (feature-ssh
 	  #:key
+          (ssh openssh)
 	  (ssh-configuration (home-ssh-configuration)))
   "Setup and configure SSH."
   (ensure-pred home-ssh-configuration? ssh-configuration)
@@ -24,5 +27,5 @@
 
   (feature
    (name 'ssh)
-   (values '((ssh . #t)))
+   (values `((ssh . ,openssh)))
    (home-services-getter ssh-home-services)))
