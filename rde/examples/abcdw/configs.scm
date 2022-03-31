@@ -134,8 +134,11 @@
 ;;; services of other features.  Be careful changing it.
 (define %main-features
   (list
+   (feature-ssh-socks-proxy
+    #:host "204:cbf:3e07:e67a:424f:93bc:fc5c:b3dc")
    (feature-i2pd
     #:outproxy 'http://acetone.i2p:8888
+    ;; 'purokishi.i2p
     #:less-anonymous? #t)
    (feature-custom-services
     #:feature-name-prefix 'ixy
