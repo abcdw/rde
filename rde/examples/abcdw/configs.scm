@@ -243,6 +243,10 @@
    (feature-rofi)
 
    (feature-emacs
+    #:emacs
+    (if (string=? (getenv "BUILD_SUBMITTER") "git.sr.ht")
+        (@ (gnu packages emacs) emacs-next-pgtk)
+        emacs-next-pgtk-latest)
     #:extra-init-el `()
     #:additional-elisp-packages
     (append
