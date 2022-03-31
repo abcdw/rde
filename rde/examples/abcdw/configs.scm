@@ -231,8 +231,9 @@
    (feature-swayidle)
    (feature-swaylock
     #:swaylock (@ (gnu packages wm) swaylock-effects)
-    #:extra-config '((screenshots)
-                     (effect-blur . 7x5)
+    ;; The blur on lock screen is not privacy-friendly.
+    #:extra-config '(;; (screenshots)
+                     ;; (effect-blur . 7x5)
                      (clock)))
    (feature-rofi)
 
