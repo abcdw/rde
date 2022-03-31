@@ -266,10 +266,10 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     (list
      (simple-service
       'msmtp-config
-      home-files-service-type
+      home-xdg-configuration-files-service-type
       (list
        (list
-        "config/msmtp/config"
+        "msmtp/config"
         ;; TODO: Try $HOME/.local/var/log expansion
         (apply
          mixed-text-file
