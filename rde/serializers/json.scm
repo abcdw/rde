@@ -25,8 +25,12 @@
   #:use-module (guix gexp)
   #:export (json-serialize
             json-print
+            json-config?
 
             serialize-json-config))
+
+(define (json-config? json)
+  (or (vector? json) (list? json)))
 
 (define (json-number? number)
   (and (number? number) (eqv? (imag-part number) 0) (finite? number)))
