@@ -580,6 +580,7 @@ utilizing reverse-im package."
           (erc-autojoin-channels-alist '())
           (erc-kill-buffers-on-quit #t)
           (align-nicknames? #t)
+          (log? #f)
           (extra-config '()))
   "Configure GNU Emacs IRC client."
   (ensure-pred string? erc-server)
@@ -606,6 +607,14 @@ utilizing reverse-im package."
                        (concat " " erc-status-sidebar-mode-line-format))
          (setq-default erc-status-sidebar-mode-line-format nil)
          (setq erc-status-sidebar-width 18))
+
+        (with-eval-after-load
+         'erc-log
+         (setq erc-log-insert-log-on-open t)
+         (setq erc-log-channels-directory
+               (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                       "/emacs/erc-logs")))
+
         (with-eval-after-load
          'erc
          (setq erc-server ,erc-server)
@@ -632,6 +641,10 @@ utilizing reverse-im package."
                  ;; (setq erc-kill-buffer-on-part t)
                  (setq erc-kill-queries-on-quit t))
                '())
+
+         ,@(if log? '((add-to-list 'erc-modules 'log)) '())
+         ;; (erc-update-modules) Probably not needed, because the module
+         ;; added before erc starts.
 
          (setq erc-header-line-format " %n on %t (%m,%l)"))
 

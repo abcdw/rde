@@ -274,6 +274,7 @@
     #:erc-autojoin-channels-alist
     '((Libera.Chat "#guix" "#emacs" "#tropin" "#rde" "#sway")
       (OFTC        "#pipewire" "#wayland"))
+    #:log? #t
 
     ;; #:erc-server "chat.sr.ht"
     #:extra-config
@@ -282,16 +283,6 @@
               (irc.oftc.net . "abcdw")))
       (setq rde-bouncer-nick "abcdw")
 
-      (with-eval-after-load
-       'erc
-       (add-to-list 'erc-modules 'log)
-       ;; (erc-update-modules) Probably not needed, because the module
-       ;; added before erc starts.
-       )
-
-      (with-eval-after-load
-       'erc-log
-       (setq erc-log-insert-log-on-open t))
       ;; Rename server buffers to reflect the current network name instead
       ;; of SERVER:PORT (e.g., "freenode" instead of "irc.freenode.net:6667").
       ;; This is useful when using a bouncer like ZNC where you have multiple
