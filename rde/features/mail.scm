@@ -232,6 +232,8 @@ function, which accepts config with rde values and returns a string."
 (define-public %default-msmtp-provider-settings
   `((gmail . ((host . "smtp.gmail.com")
               (port . 587)))
+    (gandi . ((host . "mail.gandi.net")
+              (port . 587)))
     (generic . #f)))
 
 (define %default-msmtp-settings
@@ -409,6 +411,17 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 (define gmail-isync-settings
   (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
 
+(define gandi-folder-mapping
+  '(("inbox"   . "INBOX")
+    ("sent"    . "Sent")
+    ("drafts"  . "Drafts")
+    ("archive" . "Archive")
+    ("trash"   . "Trash")
+    ("spam"    . "Junk")))
+
+(define gandi-isync-settings
+  (generate-isync-serializer "mail.gandi.net" gandi-folder-mapping))
+
 (define (generic-isync-settings mail-directory mail-account)
   (let* ((user     (mail-account-fqda mail-account)))
     `(,#~"# Do not know how to serialize generic accounts :("
@@ -417,6 +430,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 
 (define %default-isync-serializers
   `((gmail . ,gmail-isync-settings)
+    (gandi . ,gandi-isync-settings)
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
