@@ -81,8 +81,8 @@
      ;; TODO: Make home-alsa-service-type
      (simple-service
       'pipewire-add-asoundrc
-      home-files-service-type
-      `(("config/alsa/asoundrc"
+      home-xdg-configuration-files-service-type
+      `(("alsa/asoundrc"
          ,(mixed-text-file
            "asoundrc"
            #~(string-append
