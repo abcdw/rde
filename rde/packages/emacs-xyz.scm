@@ -58,9 +58,9 @@
             (method git-fetch)
             (uri (git-reference
                   (url "https://github.com/minad/org-modern")
-                  (commit "6b1350096915fa5852cfb157a420ae1ce532cfc8")))
+                  (commit "dc19304f409259d1b258c51cedd2d362e0ff9b98")))
             (sha256
-             (base32 "0x4bwiidis49avzs8055h9hba3a9x2xwip1625wh3sdw2nbw6gha"))
+             (base32 "1b0cis1n786c4lkrsi71ak2wv21mhgbfk3q2pp6qiqhddah0l1cg"))
             (file-name (git-file-name name version))))
    (build-system emacs-build-system)
    (license license:gpl3+)
