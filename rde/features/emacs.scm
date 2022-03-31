@@ -388,10 +388,11 @@ Prefix argument can be used to kill a few words."
   (feature
    (name 'emacs)
    (values (make-feature-values
-            emacs emacs-editor emacs-client
-            emacs-configure-rde-keymaps
+            emacs
+            emacs-editor emacs-client
             emacs-client-create-frame
             emacs-client-no-wait
+            emacs-configure-rde-keymaps
             emacs-server-mode?))
    (home-services-getter emacs-home-services)))
 
