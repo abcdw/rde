@@ -1723,7 +1723,7 @@ emacsclient feels more like a separate emacs instance."
           #:key
           (turn-on? #f))
   "Show keybindings and related functions as you type.  When TURN-ON?
-provided add rde-keycast-mode to after-init-hook."
+enable rde-keycast-mode on configure-keycast package load."
 
   (define emacs-f-name 'keycast)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1736,9 +1736,9 @@ provided add rde-keycast-mode to after-init-hook."
         (with-eval-after-load
          'keycast
          (require 'moody)
-         (setq keycast-window-predicate 'moody-window-active-p)
-         (setq keycast-separator-width 1)
-         (add-to-list 'global-mode-string mode-line-keycast))
+         (setq keycast-mode-line-window-predicate 'moody-window-active-p)
+         (setq keycast-mode-line-format "%k%c%r ")
+         (add-to-list 'global-mode-string keycast-mode-line))
 
         (autoload 'keycast--update "keycast")
         ;; <https://github.com/tarsius/keycast/issues/7#issuecomment-627604064>
@@ -1746,14 +1746,14 @@ provided add rde-keycast-mode to after-init-hook."
           "Show current command and its key binding in the mode line."
           :global t
           (if rde-keycast-mode
-              (add-hook 'pre-command-hook 'keycast--update t)
+              (add-hook 'post-command-hook 'keycast--update t)
               (progn
                (setq keycast--this-command nil)
                (setq keycast--this-command-keys nil)
                (setq keycast--command-repetitions 0)
-               (remove-hook 'pre-command-hook 'keycast--update))))
+               (remove-hook 'post-command-hook 'keycast--update))))
         ,@(if turn-on?
-              '((add-hook 'after-init-hook 'rde-keycast-mode))
+              '((rde-keycast-mode 1))
               '())
         (require 'configure-rde-keymaps)
         (define-key rde-toggle-map (kbd "k") 'rde-keycast-mode)
