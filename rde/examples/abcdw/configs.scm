@@ -85,7 +85,7 @@
     #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
 
    (feature-mail-settings
-    #:mail-accounts (list (mail-acc 'work       "andrew@trop.in")
+    #:mail-accounts (list (mail-acc 'work       "andrew@trop.in" 'gandi)
                           (mail-acc 'personal   "andrewtropin@gmail.com"))
     #:mailing-lists (list (mail-lst 'guix-devel "guix-devel@gnu.org"
                                     '("https://yhetil.org/guix-devel/0"))
