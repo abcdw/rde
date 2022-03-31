@@ -6,5 +6,4 @@ sources:
 tasks:
   - check: |
       cd rde
-      guix pull
       make check
