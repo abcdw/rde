@@ -172,7 +172,7 @@
    (feature-docker)
 
    (feature-pipewire)
-   (feature-backlight)
+   (feature-backlight #:step 5)
 
    (feature-fonts
     #:font-monospace (font "Iosevka" #:size 11 #:weight 'regular)
@@ -182,7 +182,8 @@
    (feature-alacritty
     #:config-file (local-file "./config/alacritty/alacritty.yml")
     #:default-terminal? #f
-    #:backup-terminal? #t)
+    #:backup-terminal? #t
+    #:software-rendering? #f)
    (feature-vterm)
    (feature-tmux
     #:config-file (local-file "./config/tmux/tmux.conf"))
@@ -199,6 +200,7 @@
         (pubkey-accepted-key-types . "+ssh-rsa")))))
 
    (feature-sway
+    #:xwayland? #f
     #:extra-config
     `((output DP-2 scale 2)
       (workspace 9 output DP-2)
@@ -256,7 +258,7 @@
    (feature-emacs-perspective)
    (feature-emacs-input-methods)
    (feature-emacs-which-key)
-   (feature-emacs-keycast)
+   (feature-emacs-keycast #:turn-on? #f)
 
    (feature-emacs-dired)
    (feature-emacs-eshell)
