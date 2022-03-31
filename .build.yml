@@ -1,0 +1,10 @@
+image: guix
+packages:
+  - make
+sources:
+  - https://git.sr.ht/~abcdw/rde
+tasks:
+  - check: |
+      cd rde
+      guix pull
+      make check
