@@ -11,7 +11,8 @@ home:
 
 check:
 	RDE_TARGET=ixy-home \
-	./pre-inst-env guix home build ./rde/examples/abcdw/configs.scm
+	./pre-inst-env guix home build \
+	./gnu/home/examples/home-environment.tmpl
 
 # home-reconfigure-local:
 # 	GUILE_LOAD_PATH=./ ../gnu/guix/pre-inst-env guix \

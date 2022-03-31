@@ -17,7 +17,6 @@
 
 (define sample-he
   (home-environment
-   ;; (symlink-name ".guix-home-env")
    (packages
     (map specification->package+output
 	 '("ungoogled-chromium-wayland" "ublock-origin-chromium" "nyxt")))
@@ -68,8 +67,8 @@
 	      (home-ssh-configuration
 	       (extra-config
 		(list
-		 (ssh-host "savannah"
-			   '((compression . #f)))))))
+		 (ssh-host (host "savannah")
+			   (options '((compression . #f))))))))
      (service home-gnupg-service-type
 	      (home-gnupg-configuration
 	       (gpg-agent-config
