@@ -887,7 +887,7 @@ previous window layout otherwise.  With universal argument toggles
          (setq dired-dwim-target t)
          ,@(if (get-value 'emacs-advanced-user? config)
                '((add-hook 'dired-mode-hook 'dired-hide-details-mode)
-                 (setq dired-listing-switches "-l --time-style=long-iso -h -AG"))
+                 (setq dired-listing-switches "-l --time-style=long-iso -h -A"))
                '())
 
          (add-hook 'dired-mode-hook (lambda () (setq truncate-lines t)))
