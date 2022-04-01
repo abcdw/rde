@@ -1216,6 +1216,8 @@ available options."
       emacs-f-name
       `((require 'which-key)
         (setq which-key-min-display-lines ,min-height)
+        ;; … takes the space of two characters, which missaligns some popups
+        (setq which-key-ellipsis "...")
         (which-key-mode 1)
         (define-key global-map (kbd "C-h C-k") 'which-key-show-top-level))
       #:elisp-packages (list emacs-which-key))))
