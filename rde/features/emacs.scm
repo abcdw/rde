@@ -526,6 +526,7 @@ Almost all visual elements are disabled.")))
 
 (define* (feature-emacs-input-methods
           #:key
+          (toggle-keybinding "s-SPC")
           (enable-reverse-im #f)
           (default-input-method "cyrillic-dvorak")
           (input-method-packages (list emacs-cyrillic-dvorak-im)))
@@ -555,7 +556,7 @@ utilizing reverse-im package."
                 input-method-packages)
 
          (setq default-input-method ,default-input-method)
-         (define-key global-map (kbd "s-SPC") 'toggle-input-method))
+         (define-key global-map (kbd ,toggle-keybinding) 'toggle-input-method))
 
         ,@(if enable-reverse-im
               `((add-hook 'after-init-hook 'reverse-im-mode)
