@@ -9,7 +9,10 @@ home:
 	GUILE_LOAD_PATH=./ \
 	guix home reconfigure ./rde/examples/abcdw/configs.scm
 
-check:
+check-channel:
+	guix pull -C ./rde/examples/channels.tmpl
+
+check: check-channel
 	RDE_TARGET=ixy-home \
 	./pre-inst-env guix home build \
 	./gnu/home/examples/home-environment.tmpl
