@@ -60,7 +60,7 @@ documentation} for how to configure it."))
          '()
          `(("xmonad/xmonad.hs"
             ,(mixed-text-file "xmonad-xmonad.hs"
-                              (serialize-text-config #f config))))))))
+                              (serialize-gexp-text-config #f config))))))))
 
 (define xmonad-run-on-change-service
   (match-lambda
