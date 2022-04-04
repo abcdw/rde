@@ -303,6 +303,9 @@ In that case you can add the following channel to @file{channels.scm}.
 @node Features
 @chapter rde Features
 
+@section Finances
+@ref{,,,ledger3} and @ref{,,,ledger-mode}.
+
 @section rde Emacs
 @c How Prot learning Emacs: https://youtu.be/46w9e4GAjsU
 
