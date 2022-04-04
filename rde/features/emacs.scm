@@ -459,15 +459,18 @@ mouse-3: Toggle minor modes"
            ((t (:foreground "red" :background "white")))))
 
         (window-divider-mode))
+
       #:early-init
-      `(,#~"\n;; Prevent the glimpse of un-styled Emacs by disabling \
-these UI elements early."
+      `(,#~"\n;; Disable ui elements, add margins."
         (push '(menu-bar-lines . 0) default-frame-alist)
         (push '(tool-bar-lines . 0) default-frame-alist)
         (push '(vertical-scroll-bars) default-frame-alist)
-        (push '(internal-border-width . ,margin) default-frame-alist)
+        (setq menu-bar-mode nil
+              tool-bar-mode nil
+              scroll-bar-mode nil)
 
         ,#~""
+        (push '(internal-border-width . ,margin) default-frame-alist)
         (setq-default fringes-outside-margins t)
         (setq-default left-margin-width 1)
         (setq-default right-margin-width 1)
