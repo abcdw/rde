@@ -431,7 +431,11 @@ and overall looks cool."
                 (fg-window-divider-outer . "#000000")))
 
         (load-theme 'modus-operandi t)
-        (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle)
+
+        (with-eval-after-load
+         'configure-rde-keymaps
+         (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle))
+
         (setq bookmark-set-fringe-mark nil)
 
         ;; (setq header-line-format (delete 'mode-line-modes header-line-format))
