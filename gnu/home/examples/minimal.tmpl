@@ -27,9 +27,7 @@
               ,(plain-file "tmp-file.txt" "hehe"))))
      (service home-bash-service-type
 	      (home-bash-configuration
-	       (guix-defaults? #f)
-	       (bash-profile '("\
-export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))
+	       (guix-defaults? #f)))
      (service home-ssh-service-type
 	      (home-ssh-configuration
 	       (extra-config
