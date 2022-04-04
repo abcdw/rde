@@ -28,8 +28,8 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-next-pgtk-latest
-  (let ((commit "c7f085b53fe4bf0e6bc13e33b38f46f6b35a5608")
-        (revision "2"))
+  (let ((commit "9ff2f0be32be621a0a1953cac2d552afebafe226")
+        (revision "3"))
     (package
       (inherit emacs-next-pgtk)
       (name "emacs-next-pgtk-latest")
@@ -43,7 +43,7 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "0ligi84km1ngszxfm0mkqvyf6f48lvjy521cl0cnpjfbawq56xmj"))))
+           "0kj252ywhc0jw0j7mr3dwx4q5mi5rrlm4jlhc8mbx66ylfvxi9qg"))))
       (arguments
        (substitute-keyword-arguments (package-arguments emacs-next)
          ((#:configure-flags flags ''())
