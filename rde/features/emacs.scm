@@ -417,7 +417,7 @@ and overall looks cool."
         (blink-cursor-mode 0)
         (setq-default cursor-in-non-selected-windows nil)
 
-        (custom-set-variables '(window-divider-default-right-width ,margin))
+        (customize-set-variable 'window-divider-default-right-width ,margin)
 
         (require 'modus-themes)
         ;; Doesn't see the effect.
