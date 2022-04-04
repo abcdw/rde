@@ -15,7 +15,7 @@ check-channel:
 check: check-channel
 	RDE_TARGET=ixy-home \
 	./pre-inst-env guix home build \
-	./gnu/home/examples/home-environment.tmpl
+	./gnu/home/examples/minimal.tmpl
 
 # home-reconfigure-local:
 # 	GUILE_LOAD_PATH=./ ../gnu/guix/pre-inst-env guix \
