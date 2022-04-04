@@ -34,7 +34,7 @@ export HISTFILE=\"$XDG_CACHE_HOME\"/.bash_history"))))
 	      (home-ssh-configuration
 	       (extra-config
 		(list
-		 (ssh-host "savannah"
-			   '((compression . #f)))))))))))
+                 (ssh-host (host "savannah")
+			   (options '((compression . #f))))))))))))
 
 sample-he
