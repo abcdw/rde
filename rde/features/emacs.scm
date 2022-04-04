@@ -1680,7 +1680,9 @@ buffer should be displayed in other window use least recent one."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-perspective)
+(define* (feature-emacs-perspective
+          #:key
+          (persp-show-modestring? #t))
   "Configure perspective.el to group/isolate buffers per frames.  Make
 emacsclient feels more like a separate emacs instance."
 
@@ -1692,9 +1694,10 @@ emacsclient feels more like a separate emacs instance."
      (elisp-configuration-service
       emacs-f-name
       `((add-hook 'after-init-hook 'persp-mode)
-        (custom-set-variables
-         '(persp-show-modestring nil)
-         '(persp-modestring-dividers '(" [" "]" "|")))
+        ;; TODO: Show current perspective in some global space (tab-bar?).
+        (customize-set-variable
+         'persp-show-modestring ,(if persp-show-modestring? 't 'nil))
+        (customize-set-variable 'persp-modestring-dividers '(" [" "]" "|"))
 
         ;; MAYBE: Move it to feature-project
         ;; This is mostly a project-related functionality, which uses
