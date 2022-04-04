@@ -47,7 +47,7 @@ doc/rde.info: doc/rde.texi
 
 doc/rde.html: doc/rde.texi
 	makeinfo --html --no-split \
-	--css-ref=https://www.gnu.org/software/gnulib/manual.css \
+	--css-ref=/assets/manual.css \
 	-c "EXTRA_HEAD=<meta name=\"viewport\" \
 content=\"width=device-width, initial-scale=1\" />" \
 	-o doc/rde.html doc/rde.texi
