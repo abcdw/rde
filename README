@@ -3,7 +3,13 @@
 
 * rde
 Developers and power user friendly GNU/Linux distribution.  More info
-is available at [[http://trop.in/rde/manual][trop.in/rde]].
+is available at [[http://trop.in/rde][trop.in/rde]].
+
+#+BEGIN_EXPORT html
+<p><a href="https://builds.sr.ht/~abcdw/rde?">
+<img src="https://builds.sr.ht/~abcdw/rde.svg" alt="builds.sr.ht status" />
+</a></p>
+#+END_EXPORT
 
 *Disclaimer:* The project is in an active development stage.
 
@@ -30,7 +36,7 @@ here and I use following commands to apply it:
 #+begin_src shell
 git clone https://git.sr.ht/~abcdw/rde
 cd rde
-make
+make home
 #+end_src
 
 Read more about ~home-environment~ at [[http://guix.gnu.org/en/manual/devel/en/guix.html#Home-Configuration][Home Configuration]].
