@@ -362,8 +362,8 @@ a particular public-inbox repository."))
             (base . ,base)))
           ,@(map l2md-repo->alist repos)))))))
 
-(define (l2md-files-service config)
-  `(("l2mdconfig"
+(define (l2md-configuration-files config)
+  `(("l2md/config"
      ,(apply mixed-text-file
              "l2mdconfig"
              (serialize-l2md-configuration config)))))
@@ -394,8 +394,8 @@ a particular public-inbox repository."))
   (service-type (name 'home-l2md)
                 (extensions
                  (list (service-extension
-                        home-files-service-type
-                        l2md-files-service)
+                        home-xdg-configuration-files-service-type
+                        l2md-configuration-files)
                        (service-extension
                         home-shepherd-service-type
                         l2md-shepherd-service)
