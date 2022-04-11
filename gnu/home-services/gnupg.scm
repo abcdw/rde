@@ -274,14 +274,14 @@ have a configuration for gpg-agent."))
   ;; Don't create file if empty
   (filter (compose not null?)
           ;; TODO: Pass directly to gpg-agent to avoid symlink?
-          `(("gnupg/gpg-agent.conf"
+          `((".gnupg/gpg-agent.conf"
              ,(home-gpg-agent-file config))
             ,(if (null? (home-gpg-agent-configuration-ssh-keys
                          (home-gnupg-configuration-gpg-agent-config config)))
                  '()
-                 `("gnupg/sshcontrol"
+                 `(".gnupg/sshcontrol"
                    ,(home-gpg-sshcontrol-file config)))
-            ("gnupg/gpg.conf"
+            (".gnupg/gpg.conf"
              ,(home-gpg-file config)))))
 
 (define (home-gnupg-shepherd-service config)

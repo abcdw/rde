@@ -133,14 +133,14 @@ URxvt.secondaryScroll: 0
   (list (home-xresources-configuration-package config)))
 
 (define (home-xresources-run-on-change-service config)
-  `(("files/Xresources"
+  `(("files/.Xresources"
      ,#~(begin
           (display "Reloading Xresources\n")
           (system* #$(file-append (home-xresources-configuration-package config)
                                   "/bin/xrdb")
                    "-load"
                    (string-append (getenv "GUIX_NEW_HOME")
-                                  "/files/Xresources"))))))
+                                  "/files/.Xresources"))))))
 
 (define (home-xresources-extension old-config extension-configs)
   (match old-config

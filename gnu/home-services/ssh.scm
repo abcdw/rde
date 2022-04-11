@@ -36,7 +36,7 @@
   (cond
    ((boolean? val) (serialize-boolean field-name val))
    ((list? val) (serialize-list field-name val #:toplevel? toplevel?))
-   (else 
+   (else
     (let ((field-name (uglify-field-name field-name)))
       (cond
        ((or (member field-name '("Host" "Match"))
@@ -227,7 +227,7 @@ Match exec \"grep key secret.txt\"
 @end example"))
 
 (define (add-ssh-configuration config)
-  `(("ssh/config"
+  `((".ssh/config"
      ,(mixed-text-file "ssh-config"
                        (serialize-configuration
                         config

@@ -68,6 +68,7 @@
                                  (getenv "HOME")
                                  "/.local/var/log"))
                             "/i2pd.log")))
+      ;; TODO: Add graceful shutdown.
       (stop #~(make-kill-destructor))
       (documentation "Run I2Pd")))))
 
@@ -75,10 +76,10 @@
   (apply mixed-text-file name (serialize-ini-config config)))
 
 (define (add-i2pd-configuration config)
-  `(("i2pd/i2pd.conf"
+  `((".i2pd/i2pd.conf"
      ,(i2pd-config-file "i2pd-config.conf"
                        (home-i2pd-configuration-i2pd-conf config)))
-    ("i2pd/tunnels.conf"
+    (".i2pd/tunnels.conf"
      ,(i2pd-config-file "i2pd-tunnels.conf"
                        (home-i2pd-configuration-tunnels-conf config)))))
 

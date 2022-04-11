@@ -78,7 +78,7 @@ user's customizations.  Extend home-shell-profile service only if you
 really know what you do."))
 
 (define (add-shell-profile-file config)
-  `(("profile"
+  `((".profile"
      ,(mixed-text-file
        "shell-profile"
        "\
@@ -212,16 +212,16 @@ source ~/.profile
         (zsh-serialize-field config field)))))
 
 (define (zsh-get-configuration-files config)
-  `(("zprofile" ,(zsh-file-by-field config 'zprofile)) ;; Always non-empty
+  `((".zprofile" ,(zsh-file-by-field config 'zprofile)) ;; Always non-empty
     ,@(if (and (zsh-field-not-empty? config 'zshenv)
                (zsh-field-not-empty? config 'environment-variables))
-          `(("zshenv" ,(zsh-file-by-field config 'zshenv))) '())
+          `((".zshenv" ,(zsh-file-by-field config 'zshenv))) '())
     ,@(if (zsh-field-not-empty? config 'zshrc)
-          `(("zshrc" ,(zsh-file-by-field config 'zshrc))) '())
+          `((".zshrc" ,(zsh-file-by-field config 'zshrc))) '())
     ,@(if (zsh-field-not-empty? config 'zlogin)
-          `(("zlogin" ,(zsh-file-by-field config 'zlogin))) '())
+          `((".zlogin" ,(zsh-file-by-field config 'zlogin))) '())
     ,@(if (zsh-field-not-empty? config 'zlogout)
-          `(("zlogout" ,(zsh-file-by-field config 'zlogout))) '())))
+          `((".zlogout" ,(zsh-file-by-field config 'zlogout))) '())))
 
 (define (add-zsh-dot-configuration config)
   (define zshenv-auxiliary-file
@@ -231,14 +231,14 @@ source ~/.profile
      "[[ -f $ZDOTDIR/.zshenv ]] && source $ZDOTDIR/.zshenv\n"))
 
   (if (home-zsh-configuration-xdg-flavor? config)
-      `(("zshenv" ,zshenv-auxiliary-file))
+      `((".zshenv" ,zshenv-auxiliary-file))
       (zsh-get-configuration-files config)))
 
 (define (add-zsh-xdg-configuration config)
   (if (home-zsh-configuration-xdg-flavor? config)
       (map
        (lambda (lst)
-         (cons (string-append "zsh/." (car lst))
+         (cons (string-append "zsh/" (car lst))
                (cdr lst)))
        (zsh-get-configuration-files config))
       '()))
@@ -397,7 +397,7 @@ alias grep='grep --color=auto'\n")
           (field-obj (car (filter-fields field))))
       (if (or extra-content
               (not (null? ((configuration-field-getter field-obj) config))))
-          `(,(object->snake-case-string file-name)
+          `(,(string-append "." (object->snake-case-string file-name))
             ,(mixed-text-file
               (object->snake-case-string file-name)
               (if extra-content extra-content "")
@@ -406,7 +406,7 @@ alias grep='grep --color=auto'\n")
 
   (filter
    (compose not null?)
-   `(("bash_profile"
+   `((".bash_profile"
       ,(mixed-text-file
         "bash_profile"
         "\

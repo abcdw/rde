@@ -65,7 +65,7 @@ documentation} for how to configure it."))
 (define xmonad-run-on-change-service
   (match-lambda
     (($ <home-xmonad-configuration> _ package xmonad-contrib? config)
-     `(("files/config/xmonad/xmonad.hs"
+     `(("files/.config/xmonad/xmonad.hs"
         ,#~(let ((executable #$(file-append package "/bin/xmonad")))
              (system* executable "--recompile")
              (system* executable "--restart")))))))
