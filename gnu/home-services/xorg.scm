@@ -123,7 +123,7 @@ URxvt.secondaryScroll: 0
   (generic-serialize-alist append format-config (check-duplicates config)))
 
 (define (home-xresources-files-service config)
-  `(("Xresources"
+  `((".Xresources"
      ,(apply mixed-text-file
              "Xresources"
              (serialize-xresources-config
