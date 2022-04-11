@@ -21,8 +21,12 @@
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (rde home services i2p)
+  #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
+  #:use-module (rde system services networking)
+  #:use-module (rde system services accounts)
   #:use-module (gnu packages i2p)
+  #:use-module (gnu packages networking)
   #:use-module (gnu packages ssh)
   #:use-module (rde packages)
   #:use-module (gnu services)
@@ -30,20 +34,18 @@
   #:use-module (guix gexp)
 
   #:export (feature-i2pd
+            feature-yggdrasil
             feature-ssh-socks-proxy))
 
 ;; privoxy https://wiki.archlinux.org/title/Privoxy
 ;; tinyproxy with i2p/tor/ygg upstreams https://youtu.be/8r2bo-EEooM
 ;; tun2proxy
+;; https://youtu.be/wVFox5K4cFg shadowsocks
 
 ;; Create an icecat profile
 ;; broswer.fixup.alternate.enabled = fales
 ;; browser.fixup.fallback-to-https = false
 ;;
-;; https://wiki.archlinux.org/title/Yggdrasil
-
-;; TODO: Add auto peering?
-;; https://github.com/popura-network/Popura/wiki/Autopeering
 
 
 ;;;
@@ -97,6 +99,55 @@
    (values `((i2pd . ,i2pd)))
    (home-services-getter get-home-services)
    (system-services-getter get-system-services)))
+
+
+;;;
+;;; Yggdrasil.
+;;;
+
+;; https://wiki.archlinux.org/title/Yggdrasil
+
+(define yggdrasil-default-peers
+  #(tls://188.225.9.167:18227
+    tls://yggno.de:18227
+    tls://95.216.5.243:18836
+    tls://51.255.223.60:54232
+    "tls://[2a01:4f9:2a:60c::2]:18836"))
+
+(define* (feature-yggdrasil
+          #:key
+          (yggdrasil yggdrasil)
+          (peers yggdrasil-default-peers))
+  "Configure Yggdrasil."
+  (ensure-pred file-like? yggdrasil)
+  (ensure-pred vector? peers)
+
+  (define (get-home-services config)
+    (list
+     ;; MAYBE: It should be installed system-wide?
+     (simple-service
+      'yggdrasil-add-yggdrasil-package
+      home-profile-service-type
+      (list yggdrasil))))
+
+  (define (get-system-services _)
+    (list
+     (simple-service
+      'yggdrasil-add-yggdrasil-group-to-user
+      rde-account-service-type
+      (list "yggdrasil"))
+     (service
+      yggdrasil-service-type
+      (yggdrasil-configuration
+       (yggdrasil-conf
+        `((peers . ,peers)))))))
+
+  (feature
+   (name 'yggdrasil)
+   (values `((yggdrasil . ,yggdrasil)))
+   (home-services-getter get-home-services)
+   (system-services-getter get-system-services)))
+
 
 ;;;
 ;;; SSH SOCKS Proxy.
