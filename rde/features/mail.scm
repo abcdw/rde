@@ -125,7 +125,8 @@ features."
      (simple-service
       'mail-settings-add-mailcap-file
       home-files-service-type
-      `(("mailcap" ,(plain-file "mailcap" "text/*; xdg-open %s\n"))))))
+      ;; TODO: Reference xdg-open by full path?
+      `((".mailcap" ,(plain-file "mailcap" "text/*; xdg-open %s\n"))))))
 
   (feature
    (name 'mail-settings)

@@ -28,10 +28,10 @@
       home-profile-service-type (list direnv))
      (simple-service
       'direnv-config
-      home-files-service-type
-      `(("config/direnv/direnvrc" ,(plain-file
-                                   "direnvrc"
-                                   "\
+      home-xdg-configuration-files-service-type
+      `(("direnv/direnvrc" ,(plain-file
+                             "direnvrc"
+                             "\
 use_guixs() {
   eval \"$(guix shell \"$@\" --search-paths)\"
 }"))))

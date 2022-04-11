@@ -66,6 +66,11 @@
             feature-swayidle
             feature-swaylock))
 
+
+;;;
+;;; Sway.
+;;;
+
 ;; https://github.com/jjquin/dotfiles/tree/master/sway/.config/sway/config.d
 ;; https://nixos.wiki/wiki/Sway
 ;; https://github.com/swaywm/sway/wiki/Useful-add-ons-for-sway
@@ -209,7 +214,7 @@
        (simple-service
         'sway-reload-config-on-change
         home-run-on-change-service-type
-        `(("files/config/sway/config"
+        `(("files/.config/sway/config"
            ,#~(system* #$(file-append sway "/bin/swaymsg") "reload"))))
 
        (simple-service
@@ -654,9 +659,9 @@ animation."
        (simple-service
         'waybar-reload-config-on-change
         home-run-on-change-service-type
-        `(("files/config/waybar/style.css"
+        `(("files/.config/waybar/style.css"
            ,#~(system* #$(file-append psmisc "/bin/killall") "-SIGUSR2" "waybar"))
-          ("files/config/waybar/config"
+          ("files/.config/waybar/config"
            ,#~(system* #$(file-append psmisc "/bin/killall") "-SIGUSR2" "waybar"))))
 
        (when (get-value 'sway config)

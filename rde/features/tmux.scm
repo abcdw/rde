@@ -27,7 +27,7 @@
       #:files
       (filter list?
 	      (list (when config-file
-		      (list "config/tmux/tmux.conf" config-file))))
+		      (list ".config/tmux/tmux.conf" config-file))))
       #:packages (list package))))
 
   (feature
