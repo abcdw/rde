@@ -85,7 +85,7 @@
                                   (consult--read (password-store-list)
                                                  :prompt "Pass entry: "
                                                  :sort nil
-                                                 :require-match t
+                                                 :require-match nil
                                                  :category 'pass)))
                            (funcall (if arg
                                         'password-store-url
