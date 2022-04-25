@@ -73,21 +73,17 @@
 
 (define* (feature-vterm
 	  #:key
-	  (emacs-vterm emacs-vterm-latest)
-          (default-terminal? #t))
-  "Configure Alacritty terminal."
-  (ensure-pred any-package? emacs-vterm)
-
-  (define (get-term-cmd config)
-    (file-append
-     (get-value 'emacs-client-create-frame config) " -e \"(vterm t)\""))
+	  (emacs-vterm emacs-vterm-latest))
+  "Configure emacs-vterm and shells."
+  (ensure-pred file-like? emacs-vterm)
 
   (define (get-home-services config)
     (require-value 'emacs config)
     (list
      (elisp-configuration-service
       'vterm
-      `(,@(if (get-value 'emacs-consult config)
+      `((define-key global-map (kbd "s-t") 'vterm)
+        ,@(if (get-value 'emacs-consult config)
               `((eval-when-compile
                  (require 'cl-macs))
 
@@ -144,8 +140,5 @@ if one already exists."
    (name 'vterm)
    (values
     `((vterm . #t)
-      (emacs-vterm . ,emacs-vterm)
-      ,@(if default-terminal?
-            `((default-terminal . ,get-term-cmd))
-            '())))
+      (emacs-vterm . ,emacs-vterm)))
    (home-services-getter get-home-services)))

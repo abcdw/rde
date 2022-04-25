@@ -155,7 +155,8 @@ dependency for other packages."
           (emacs-server-mode? #t)
           (additional-elisp-packages '())
           (extra-init-el '())
-          (extra-early-init-el '()))
+          (extra-early-init-el '())
+          (default-terminal? #t))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
@@ -387,13 +388,17 @@ Prefix argument can be used to kill a few words."
 
   (feature
    (name 'emacs)
-   (values (make-feature-values
-            emacs
-            emacs-editor emacs-client
-            emacs-client-create-frame
-            emacs-client-no-wait
-            emacs-configure-rde-keymaps
-            emacs-server-mode?))
+   (values (append
+            (make-feature-values
+             emacs
+             emacs-editor emacs-client
+             emacs-client-create-frame
+             emacs-client-no-wait
+             emacs-configure-rde-keymaps
+             emacs-server-mode?)
+            (if default-terminal?
+                `((default-terminal . ,emacs-client-create-frame))
+                '())))
    (home-services-getter emacs-home-services)))
 
 (define* (feature-emacs-appearance
