@@ -92,7 +92,7 @@ than rde GNU/Linux or Guix System.
 
 @c TODO: Part about per-project rde tools.
 
-@quotation
+@quotation Note
 The project is in an active development stage, API is a subject to
 change, watch rde-devel mailing list to be up to date with the latest
 news.
@@ -302,16 +302,86 @@ In that case you can add the following channel to @file{channels.scm}.
 @end example
 
 @node Features
-@chapter rde Features
+@chapter Features
+rde feature is a building block of rde configuration.
 
-@section Finances
-@ref{,,,ledger3} and @ref{,,,ledger-mode}.
+TODO: Write here information about rde values, feature fields and basic
+conventions. Integration between features based on rde values.
 
 @section rde Emacs
+
+TODO: Write a paragraph about importance of Emacs in rde setup.  Deep
+integrations, consistent and uniform interface.
+
 @c How Prot learning Emacs: https://youtu.be/46w9e4GAjsU
 
 @c Emacs how undo works
 @c https://casouri.github.io/note/2021/visual-undo-tree/index.html
+
+@section Getting Help
+
+@section Key Bindings
+The most frequent actions are usually binded to combinations using
+@kbd{s-} modifier, where @kbd{s} is super key (@pxref{Modifier
+Keys,,,Emacs}).  @kbd{s-@key{RET}} to launch emacsclient,
+@kbd{s-@key{TAB}} switch back and forth between workspaces, inside Emacs
+@kbd{s-e} for toggle eshell, @kbd{s-b} for switch buffer, @kbd{s-b} for
+recompile.
+
+@quotation Note
+As you can see we use Emacs notation for keybindings.  We expect reader
+to be familiar with basic terminology, if you are not yet @xref{User
+Input,,,Emacs}, and @xref{Keys,,,Emacs}.
+@end quotation
+
+All of the key bindings are organized in keymaps
+(@pxref{Keymaps,,,Emacs}), and usually keymaps are binded to prefix
+keys.  For example @code{goto-map} is binded to @kbd{M-g} prefix,
+@kbd{M-g g} will invoke @code{goto-line} or similiar command.  Keymaps
+can overlap, for example you can bind @kbd{M-g s} in @code{global-map}
+and @kbd{o} in @code{goto-map}, the both @kbd{M-g s} and @kbd{M-g o}
+will coexist.  Also, one keymap can shadow binding of another, more
+information is available in Emacs manual.
+
+There are two important tricks, which used often in key bindings:
+continous modifiers and double tap.  If you want to make it easier to
+type a key sequence, use the same modifier: @kbd{M-g M-l} is much easier
+to press than @kbd{M-g C-l}, because in the first option you press
+modifier once and hold it, after that you type @kbd{gl} and in the
+second you press and hold @key{Meta}, press @kbd{g}, release @key{Meta},
+press and hold @key{Control}, press @kbd{l}.
+
+If the command is frequently used bind it to the same key as well:
+@kbd{M-g M-g} for goto-line or similiar action, @kbd{C-c C-c} for
+finishing org capture operation, git commit message or other action
+depending on the context, @kbd{s-b s-b} switching back and forth between
+current and previous buffer.
+
+The last example is a little special, because it's not a key sequence,
+but two actions bound to the same key, first one is
+@code{switch-to-buffer} defined in the @code{global-map}, bound to
+@kbd{s-b} and the second one is @code{exit-minibuffer} defined in
+@code{minibuffer-local-map}, bound to the same key, after the first
+press, when the minibuffer spawned for picking a candidate,
+@code{minibuffer-local-map} is activated and @kbd{s-b} shadowed with
+@code{exit-minibuffer}.  While implementation is a little special the
+idea is still the same.
+
+@section Completion
+There are a lot of places, where completion happens, but most of the
+heavy work are usually done in Emacs, and this section is focused on it.
+Other applications can try to mimic a fraction of its power and work in
+a similiar way to some degree, we try to configure them to do so, but
+there are no guarantees.
+
+@kbd{M-/} dabbrev-expand
+@kbd{C-M-i} completion-at-point
+
+@subsection Vertico
+
+
+@section Finances
+@ref{,,,ledger3} and @ref{,,,ledger-mode}.
 
 @node Installation
 @chapter Installation
