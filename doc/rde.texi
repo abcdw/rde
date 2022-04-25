@@ -57,6 +57,7 @@ practices and workflows.
 * Features::                    All the parts of rde.
 * Installation::
 * Contributing::                Tips and guidelines.
+* Tips and Tricks::
 * FAQ::                         Frequently asked questions.
 
 * Acknowledgments::             Thanks!
@@ -333,6 +334,16 @@ In that case you can add the following channel to @file{channels.scm}.
 
 @c @node Documentation
 @c @section Documentation
+
+@node Tips and Tricks
+@chapter Tips and Tricks
+@section guix build
+
+Building a package from the local sources.
+@example
+GUILE_LOAD_PATH=path/to/src guix build -e '(@ (your module name) package-name)'
+@end example
+
 
 @node FAQ
 @chapter FAQ
