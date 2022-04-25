@@ -320,6 +320,7 @@ integrations, consistent and uniform interface.
 
 @section Getting Help
 
+@anchor{Key Bindings}
 @section Key Bindings
 The most frequent actions are usually binded to combinations using
 @kbd{s-} modifier, where @kbd{s} is super key (@pxref{Modifier
@@ -378,6 +379,48 @@ there are no guarantees.
 @kbd{C-M-i} completion-at-point
 
 @subsection Vertico
+
+@section Shells
+@subsection Bash
+rde uses GNU Bash (@pxref{,,,Bash}) with minimum customizations as a
+login shell (@pxref{login shell,,,Bash}), it's available on many foreign
+distributions and usually used as a login shell for user, so it won't
+require any additional setup or admin privileges to change some system
+settings while using rde home.
+
+@subsection Zsh
+However, the default shell is zsh (@pxref{,,,zsh}), in contrast to login
+shell, setting the default shell doesn't require admin privileges.  The
+configuration is quite customized to provide a good out of the box
+experience.
+
+@subsection Eshell
+Due to Emacs-centric approach of rde, eshell (@pxref{,,,Eshell}) is
+intended to be the primary shell for everyday use.  It's not a
+POSIX-complaint, and is not a shell you can use in usual terminal
+emulator.  It feels somehow similar to bash and zsh, but has a deep
+integration with Emacs and Emacs Lisp.
+
+@c TODO: Write about prefix arguments and ``tabs''.
+
+@section Terminals
+There is a notion of default and backup terminals in rde, the former is
+a terminal emulator intended for everyday use, the latter is one, which
+can be used for recovery work or during migration from usual CLI-based
+to Emacs-based workflows.
+
+rde uses emacsclient (@pxref{Emacs Server,,,Emacs}) as a default
+terminal, while emacsclient itself isn't a terminal emulator, it can
+launch @code{term}, @code{ansi-term} or @code{vterm}.  The latter is a
+full-fledged terminal emulator, which works inside Emacs and recommended
+as an alternative to a separate terminal applications, also, when
+@code{feature-vterm} is enabled @code{vterm} is bound to @key{s-t} and
+due to key binding approach (@pxref{Key Bindings}) can be easily invoked
+with @key{s-RET s-t}.  In addition to that in many cases the terminal
+emulator isn't needed and you can just spawn eshell directly with
+@key{s-RET s-e}.
+
+@subsection vterm
 
 
 @section Finances
