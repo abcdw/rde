@@ -368,14 +368,36 @@ press, when the minibuffer spawned for picking a candidate,
 @code{exit-minibuffer}.  While implementation is a little special the
 idea is still the same.
 
+@section Navigation
+
 @section Completion
 There are a lot of places, where completion happens, but most of the
-heavy work are usually done in Emacs, and this section is focused on it.
+heavy work is usually done in Emacs, and this section is focused on it.
 Other applications can try to mimic a fraction of its power and work in
 a similiar way to some degree, we try to configure them to do so, but
 there are no guarantees.
 
-@kbd{M-/} dabbrev-expand
+@subsection Dynamic Abbreviations
+The first and most versatile completion can be done with
+@code{dabbrev-completion}, which is bound to @kbd{C-M-/}, it will
+present a list of words, which were used before in current buffer and
+have the same prefix as text before point.  While the list of candidates
+can be not preciese or sometimes even meaningless for current position,
+it works in almost any buffer in almost any mode.
+
+The list of candidates can be expanded by the prefix argument @kbd{C-u
+C-M-/} will also provide candidates from friendly buffers, @kbd{C-u C-u
+C-M-/} will use all buffers for searching candidates.
+
+@code{dabbrev-expand} expands current text instead of giving a list of
+candidates, it's bound to @kbd{M-/} and can used multiple times in a row
+to go further in the list of expansion candidates.
+
+For more information @xref{Dynamic Abbrevs,,,Emacs}.
+
+@subsection Completion At Point
+
+
 @kbd{C-M-i} completion-at-point
 
 @subsection Vertico
@@ -454,7 +476,7 @@ emulator isn't needed and you can just spawn eshell directly with
 
 Building a package from the local sources.
 @example
-GUILE_LOAD_PATH=path/to/src guix build -e '(@ (your module name) package-name)'
+GUILE_LOAD_PATH=path/to/src guix build -e '(@@ (your module name) package-name)'
 @end example
 
 
