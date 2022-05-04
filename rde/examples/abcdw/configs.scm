@@ -135,8 +135,8 @@
 ;;; services of other features.  Be careful changing it.
 (define %main-features
   (list
-   (feature-ssh-socks-proxy
-    #:host "204:cbf:3e07:e67a:424f:93bc:fc5c:b3dc")
+   (feature-yggdrasil)
+   (feature-ssh-socks-proxy #:host "pinky-ygg")
    (feature-i2pd
     #:outproxy 'http://acetone.i2p:8888
     ;; 'purokishi.i2p
@@ -199,6 +199,20 @@
    (feature-ssh
     #:ssh-configuration
     (home-ssh-configuration
+     (extra-config
+      (list (ssh-host
+             (host "pinky-ygg")
+             (options
+              '((host-name . "200:554d:3eb1:5bc5:6d7b:42f4:8792:efb8")
+                (user . "bob")
+                (port . 50621)
+                (compression . #t))))
+            (ssh-host
+             (host "dosya-ygg")
+             (options
+              '((host-name . "204:cbf:3e07:e67a:424f:93bc:fc5c:b3dc")
+                (user . "root")
+                (compression . #t))))))
      (toplevel-options
       '((host-key-algorithms . "+ssh-rsa")
         (pubkey-accepted-key-types . "+ssh-rsa")))))
