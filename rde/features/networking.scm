@@ -155,12 +155,10 @@
 
 (define* (feature-ssh-socks-proxy
           #:key
-          (user "root")
           (host #f)
           (proxy-port 8123))
   "Configure SSH SOCKS Proxy. To customize port and other settings use
 feature-ssh."
-  (ensure-pred string? user)
   (ensure-pred string? host)
   (ensure-pred integer? proxy-port)
 
@@ -178,7 +176,7 @@ feature-ssh."
         (start #~(make-forkexec-constructor
                   (list #$(file-append ssh "/bin/ssh")
                         "-ND" #$(number->string proxy-port)
-                        #$(format #f "~a@~a" user host)))))))))
+                        #$(format #f "~a" host)))))))))
 
   (feature
    (name 'ssh-socks-proxy)
