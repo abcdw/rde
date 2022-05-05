@@ -290,7 +290,7 @@ C-h C-a to open About Emacs buffer."
           (eval-when-compile (require 'guix))
           (define-key rde-toggle-map (kbd "p") 'guix-prettify-mode)
           (define-key rde-toggle-map (kbd "P") 'global-guix-prettify-mode)
-          (add-hook 'after-init-hook 'global-guix-prettify-mode)
+          (global-guix-prettify-mode 1)
 
           ,#~""
           (eval-when-compile
@@ -578,10 +578,10 @@ utilizing reverse-im package."
          (define-key global-map (kbd ,toggle-keybinding) 'toggle-input-method))
 
         ,@(if enable-reverse-im
-              `((add-hook 'after-init-hook 'reverse-im-mode)
-                (with-eval-after-load
+              `((with-eval-after-load
                  'reverse-im
-                 (setq reverse-im-input-methods ,default-input-method)))
+                 (setq reverse-im-input-methods ,default-input-method))
+                (reverse-im-mode 1))
             '()))
       #:elisp-packages `(,@(if enable-reverse-im (list emacs-reverse-im) '())
                          ,@input-method-packages))))
@@ -1349,8 +1349,7 @@ available options."
          ;; MAYBE: Make transient use child-frame:
          ;; https://github.com/magit/transient/issues/102
          ,@(if mini-frame?
-             `((add-hook 'after-init-hook 'mini-frame-mode)
-               (with-eval-after-load
+             `((with-eval-after-load
                 'mini-frame
                 (custom-set-faces
                  '(child-frame-border
@@ -1370,21 +1369,23 @@ available options."
                  '(mini-frame-advice-functions '(read-from-minibuffer
                                                  read-key-sequence
                                                  save-some-buffers yes-or-no-p))
-                 '(mini-frame-ignore-commands '()))))
+                 '(mini-frame-ignore-commands '())))
+               (mini-frame-mode 1))
              '()))
 
         (custom-set-variables
          '(history-length 10000)
          '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                                  "/emacs/history")))
-        (add-hook 'after-init-hook 'savehist-mode)
+
+        (savehist-mode 1)
         (run-with-idle-timer 30 t 'savehist-save)
 
         (custom-set-variables
          '(recentf-save-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                                      "/emacs/recentf")))
 
-        (add-hook 'after-init-hook 'recentf-mode)
+        (recentf-mode 1)
         (run-with-idle-timer 30 t 'recentf-save-list)
 
         (define-key global-map (kbd "s-.") 'embark-act)
@@ -1461,7 +1462,7 @@ relative line numbers, when narrowing is active."
         ;;  'marginalia
         ;;  (setq marginalia-annotator-registry
         ;;        (assq-delete-all 'library marginalia-annotator-registry)))
-        (add-hook 'after-init-hook 'marginalia-mode))
+        (marginalia-mode 1))
       #:elisp-packages
       (append
        (if mini-frame?
