@@ -1812,7 +1812,8 @@ emacsclient feels more like a separate emacs instance."
 
 (define* (feature-emacs-keycast
           #:key
-          (turn-on? #f))
+          (turn-on? #f)
+          (emacs-keycast emacs-keycast))
   "Show keybindings and related functions as you type.  When TURN-ON?
 enable rde-keycast-mode on configure-keycast package load."
 
@@ -1854,7 +1855,7 @@ enable rde-keycast-mode on configure-keycast package load."
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((,f-name . ,emacs-keycast)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-nov-el
