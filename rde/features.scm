@@ -25,8 +25,9 @@
   #:export (rde-config
 	    rde-config-features
 	    rde-config-home-environment
-	    rde-config-operating-system
 	    rde-config-home-services
+	    rde-config-home-packages
+	    rde-config-operating-system
 	    rde-config-system-services
 
 	    pretty-print-rde-config
@@ -109,6 +110,11 @@ of services.  Service can be either @code{service?} or
    (thunked)
    (default
      (get-home-environment this-rde-config)))
+  (home-packages
+   rde-config-home-packages
+   (thunked)
+   (default
+     (get-home-environment-packages this-rde-config)))
 
   (initial-os
    rde-config-initial-os
@@ -224,6 +230,7 @@ to config one more time."
              (gnu home services fontutils)
              (gnu home services symlink-manager)
              (gnu home-services shells))
+
 (define (get-home-environment config)
   (home-environment
    (essential-services
@@ -251,6 +258,16 @@ to config one more time."
      (service home-service-type)
      (service home-profile-service-type '())))
    (services (rde-config-home-services config))))
+
+(define* (home-environment-packages he)
+  "Return a list of packages."
+  (let* ((services (home-environment-services he))
+         (packages (fold-services services
+                                  #:target-type home-profile-service-type)))
+    (service-value packages)))
+
+(define (get-home-environment-packages config)
+  (home-environment-packages (get-home-environment config)))
 
 (define bare-bone-os
   (operating-system
