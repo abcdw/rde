@@ -1314,13 +1314,9 @@ available options."
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
+    (define ripgrep (get-value 'ripgrep config
+                               (@ (gnu packages rust-apps) ripgrep)))
     (list
-     ;; Do we need it or better to set absolute path instead of rg in
-     ;; `consult-ripgrep-args'
-     (simple-service
-      'emacs-completion-add-ripgrep-packages
-      home-profile-service-type
-      (list (@ (gnu packages rust-apps) ripgrep)))
      (elisp-configuration-service
       emacs-f-name
       `((eval-when-compile
@@ -1452,6 +1448,11 @@ relative line numbers, when narrowing is active."
          'consult
          (require 'embark-consult)
 
+         (customize-set-variable
+          'consult-ripgrep-args
+          (concat ,(file-append ripgrep "/bin/rg")
+                  " --null --line-buffered --color=never --max-columns=1000 \
+--path-separator / --smart-case --no-heading --line-number ."))
          (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
 
