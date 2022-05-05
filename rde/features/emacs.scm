@@ -1511,6 +1511,31 @@ relative line numbers, when narrowing is active."
          (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
          (custom-set-variables '(vertico-cycle t))
 
+         ;; (defvar rde--vertico-monocle-previous-window-configuration nil
+         ;;   "Window configuration for restoring on vertico monocle exit.")
+
+         ;; (defun rde-vertico-toggle-monocle ()
+         ;;   "Zoom in/out completion list."
+         ;;   (interactive)
+         ;;   (require 'vertico-buffer)
+         ;;   (if (and rde--vertico-monocle-previous-window-configuration
+         ;;            vertico-buffer--window)
+         ;;       (if rde--vertico-monocle-previous-window-configuration
+         ;;           (let ((cur-buffer (current-buffer)))
+         ;;             (set-window-configuration
+         ;;              rde--vertico-monocle-previous-window-configuration)
+         ;;             (setq rde--vertico-monocle-previous-window-configuration nil)
+         ;;             (switch-to-buffer cur-buffer)))
+         ;;       (unless vertico-buffer--window
+         ;;         (vertico-buffer--setup))
+         ;;       (setq rde--vertico-monocle-previous-window-configuration
+         ;;             (current-window-configuration))
+         ;;       (with-selected-window vertico-buffer--window
+         ;;                             (delete-other-windows))))
+
+         ;; (keymap-set vertico-map "<remap> <rde-toggle-monocle>"
+         ;;             'rde-vertico-toggle-monocle))
+
          (require 'vertico-directory)
          (defun rde-vertico-kill-region-dwim (&optional count)
            "The function kills region if mark is active, otherwise
