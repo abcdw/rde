@@ -1695,6 +1695,7 @@ buffer should be displayed in other window use least recent one."
 
 (define* (feature-emacs-perspective
           #:key
+          (emacs-perspective emacs-perspective)
           (persp-show-modestring? #t))
   "Configure perspective.el to group/isolate buffers per frames.  Make
 emacsclient feels more like a separate emacs instance."
