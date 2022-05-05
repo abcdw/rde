@@ -63,6 +63,7 @@
             feature-emacs-nov-el
             feature-emacs-which-key
             feature-emacs-keycast
+            feature-emacs-eglot
 
             elisp-configuration-service
             emacs-xdg-service))
@@ -1918,6 +1919,31 @@ enable rde-keycast-mode on configure-keycast package load."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+(define* (feature-emacs-eglot
+          #:key
+          (emacs-eglot emacs-eglot))
+  "Configure eglot, an LSP package for emacs."
+
+  (define emacs-f-name 'eglot)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (elisp-configuration-service
+      emacs-f-name
+      `((with-eval-after-load
+         'eglot
+         (add-hook 'eglot-managed-mode-hook
+                   (lambda () (setq consult-imenu--cache nil))))
+        (customize-set-variable 'eglot-extend-to-xref t))
+      #:elisp-packages (list emacs-eglot))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-eglot)))
    (home-services-getter get-home-services)))
 
 ;;; emacs.scm end here
