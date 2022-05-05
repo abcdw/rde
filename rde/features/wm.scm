@@ -301,7 +301,8 @@ automatically switch to SWAY-TTY-NUMBER on boot."
 ;;;
 
 (define* (feature-sway-screenshot)
-  "Configure slurp, grim and other tools for screenshot capabilities."
+  "Configure slurp, grim and other tools for screenshot capabilities.  Feature
+is sway dependent, because it relies on swaymsg."
 
   (define sway-f-name 'screenshot)
   (define f-name (symbol-append 'sway- sway-f-name))
@@ -338,16 +339,21 @@ automatically switch to SWAY-TTY-NUMBER on boot."
       (shot-script "output" #:output subject-output))
     (define shot-window-or-selection
       (shot-script "window-or-selection" #:geom subject-window-or-selection))
+    (define swappy-clipboard
+      (program-file
+       "sway-swappy-clipboard"
+       #~(system
+          (format #f "~a | ~a -f -"
+                  #$(file-append (get-value 'wl-clipboard config wl-clipboard)
+                                 "/bin/wl-paste")
+                  #$(file-append (get-value 'swappy config swappy)
+                                 "/bin/swappy")))))
     (list
-     ;; (simple-service
-     ;;  'sway-screenshot-packages
-     ;;  home-profile-service-type
-     ;;  (list slurp grim wl-clipboard jq))
-
      (simple-service
       'sway-screenshot
       home-sway-service-type
       `((bindsym $mod+Print exec ,shot-output)
+        (bindsym $mod+Alt+Print exec ,swappy-clipboard)
         (bindsym $mod+Shift+Print exec ,shot-window-or-selection)))))
 
   (feature
