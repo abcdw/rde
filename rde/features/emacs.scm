@@ -1343,8 +1343,8 @@ available options."
          (setq completion-category-overrides
                ;; basic is required for /ssh: completion to work, but
                ;; keep the same values for project-file too.
-               '((file (styles . (basic partial-completion)))
-                 (project-file (styles . (basic partial-completion)))))
+               '((file (styles . (partial-completion basic)))
+                 (project-file (styles . (partial-completion basic)))))
          (setq enable-recursive-minibuffers t)
 
          ;; (setq resize-mini-windows nil)
