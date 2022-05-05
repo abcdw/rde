@@ -404,7 +404,9 @@ Prefix argument can be used to kill a few words."
 (define* (feature-emacs-appearance
           #:key
           (margin 8)
-          (deuteranopia? #t))
+          (deuteranopia? #t)
+          (header-line-as-mode-line? #t)
+          (emacs-modus-themes emacs-modus-themes))
   "Make Emacs looks modern and minimalistic. `deuteranopia?' substitutes
 red/green colors with red/blue, which helps people with colorblindness
 and overall looks cool."
@@ -422,10 +424,10 @@ and overall looks cool."
         (blink-cursor-mode 0)
         (setq-default cursor-in-non-selected-windows nil)
 
-        (customize-set-variable 'window-divider-default-right-width ,margin)
-
         (require 'modus-themes)
         ;; Doesn't see the effect.
+
+        (setq modus-themes-mode-line '(borderless))
         (setq modus-themes-diffs 'desaturated)
         (setq modus-themes-deuteranopia ,(if deuteranopia? 't 'nil))
         (setq modus-themes-operandi-color-overrides
@@ -467,6 +469,22 @@ mouse-3: Toggle minor modes"
          `(git-gutter-fr:deleted
            ((t (:foreground "red" :background "white")))))
 
+        ,@(if header-line-as-mode-line?
+              `(,#~"\n;; Move modeline to the top"
+                (setq-default header-line-format mode-line-format)
+                (setq-default mode-line-format nil)
+
+                (defun rde--move-mode-line-to-header ()
+                  "Moves mode-line to header-line, the function is needed for
+various modes, which setups mode-line late."
+                  (setq-local header-line-format mode-line-format)
+                  (setq-local mode-line-format nil))
+
+                (add-hook 'calendar-initial-window-hook
+                          'rde--move-mode-line-to-header))
+              '())
+
+        (customize-set-variable 'window-divider-default-right-width ,margin)
         (window-divider-mode))
 
       #:early-init
@@ -489,20 +507,7 @@ mouse-3: Toggle minor modes"
         (setq use-file-dialog nil)
         ,@(if (get-value 'emacs-advanced-user? config)
               '((setq inhibit-startup-screen t))
-              '())
-
-        ,#~"\n;; Move modeline to the top"
-        (setq-default header-line-format mode-line-format)
-        (setq-default mode-line-format nil)
-
-        (defun rde--move-mode-line-to-header ()
-          "Moves mode-line to header-line, the function is needed for various
-modes, which setups mode-line late."
-          (setq-local header-line-format mode-line-format)
-          (setq-local mode-line-format nil))
-
-        (add-hook 'calendar-initial-window-hook
-                  'rde--move-mode-line-to-header))
+              '()))
       #:elisp-packages (list emacs-modus-themes
                              (get-value 'emacs-configure-rde-keymaps config))
       #:keywords '(appearance mode-line faces accessibility)
@@ -525,6 +530,7 @@ Almost all visual elements are disabled.")))
   (feature
    (name f-name)
    (values `((,f-name . #t)
+             (emacs-header-line-as-mode-line? . ,header-line-as-mode-line?)
              (emacs-margin . ,margin)))
    (home-services-getter get-home-services)))
 
@@ -1513,17 +1519,19 @@ kill a few words or directories."
                (vertico-directory-delete-word count)))
          (define-key vertico-map (kbd "C-w") 'rde-vertico-kill-region-dwim)
 
-         (defun rde--vertico-prepare-header-line ()
-           "The same as `rde--move-mode-line-to-header', but also increase
+         ,@(if (get-value 'emacs-header-line-as-mode-line? config)
+               `((defun rde--vertico-prepare-header-line ()
+                   "The same as `rde--move-mode-line-to-header', but also increase
 vertico-count by 1 to show one more candidate, which is hidden
 otherwise because mode line is expected to be present by height
 calculation function for vertico buffer."
-           (setq-local header-line-format mode-line-format)
-           (setq-local mode-line-format nil)
-           (setq-local vertico-count (+ vertico-count 1)))
+                   (setq-local header-line-format mode-line-format)
+                   (setq-local mode-line-format nil)
+                   (setq-local vertico-count (+ vertico-count 1)))
 
-         (advice-add 'vertico-buffer--setup :after
-                     'rde--vertico-prepare-header-line)
+                 (advice-add 'vertico-buffer--setup :after
+                             'rde--vertico-prepare-header-line))
+               '())
 
          ;; TODO: Need to be more specific not to pollute histories.
          ;; (defadvice vertico-insert
