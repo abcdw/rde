@@ -1672,9 +1672,9 @@ buffer should be displayed in other window use least recent one."
       `((eval-when-compile
          (require 'project)
          (require 'consult))
-        (add-hook 'after-init-hook
-                  (lambda ()
-                    (define-key global-map (kbd "s-p") project-prefix-map)))
+
+        (define-key global-map (kbd "s-p") project-prefix-map)
+
         (with-eval-after-load
          'project
          (add-to-list 'project-switch-commands '(project-compile "Compile") t)
