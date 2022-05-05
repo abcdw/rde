@@ -1502,6 +1502,7 @@ relative line numbers, when narrowing is active."
                                     'completion--in-region)
                                 args)))))
                 '())
+
         (with-eval-after-load
          'vertico
          (define-key global-map (kbd "s-s") 'vertico-repeat)
@@ -1551,6 +1552,7 @@ calculation function for vertico buffer."
                  (info-menu buffer)
                  (consult-history buffer)
                  (execute-extended-command flat)
+                 (embark-keybinding buffer)
                  (consult-location buffer)))
 
          (setq vertico-multiform-commands
@@ -1558,6 +1560,7 @@ calculation function for vertico buffer."
                  ;; For some reason it doesn't have an info-menu
                  ;; category and also setting
                  ;; marginalia-command-categories doesn't help
+                 ;; (org-roam-node-find buffer)
                  (Info-goto-node buffer)
                  (info-lookup-symbol buffer)
                  (Info-follow-reference buffer)
@@ -1565,7 +1568,7 @@ calculation function for vertico buffer."
 
          (vertico-multiform-mode))
 
-        (add-hook 'after-init-hook 'vertico-mode))
+        (vertico-mode 1))
       #:elisp-packages (list emacs-vertico))))
 
   (feature
