@@ -249,3 +249,24 @@ sending Git patches via Email, without leaving Emacs."))))
    (synopsis "Navigate, stage and revert hunks with ease")
    (description "This package provides transient interface for git-gutter function
 to manipulate and navigate hunks.")))
+
+(define-public emacs-consult-eglot
+  (package
+   (name "emacs-consult-eglot")
+   (version "0.2")
+   (source (origin
+            (method git-fetch)
+            (uri (git-reference
+                  (url "https://github.com/mohkale/consult-eglot")
+                  (commit "0da8801dd8435160ce1f62ad8066bd52e38f5cbd")))
+            (sha256
+             (base32 "1qxk1npxbf8m3g9spikgdxcf6mzjx6cwy3f5vn6zz5ksh14xw3sd"))
+            (file-name (git-file-name name version))))
+   (build-system emacs-build-system)
+   (license license:gpl3+)
+   (propagated-inputs (list emacs-consult emacs-eglot))
+   (home-page "https://github.com/mohkale/consult-eglot")
+   (synopsis "Consulting-read interface for eglot")
+   (description "This package acts as a parallel of consult-lsp for eglot and
+provides a front-end interface for the workspace/symbols LSP procedure
+call.")))
