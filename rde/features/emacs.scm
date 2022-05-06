@@ -1578,7 +1578,7 @@ calculation function for vertico buffer."
                  ;; (project-file buffer)
                  (info-menu buffer)
                  (consult-history buffer)
-                 (execute-extended-command flat)
+                 (consult-lsp-symbols buffer)
                  (embark-keybinding buffer)
                  (consult-location buffer)))
 
@@ -1926,7 +1926,8 @@ enable rde-keycast-mode on configure-keycast package load."
 
 (define* (feature-emacs-eglot
           #:key
-          (emacs-eglot emacs-eglot))
+          (emacs-eglot emacs-eglot)
+          (emacs-consult-eglot emacs-consult-eglot))
   "Configure eglot, an LSP package for emacs."
 
   (define emacs-f-name 'eglot)
@@ -1936,12 +1937,13 @@ enable rde-keycast-mode on configure-keycast package load."
     (list
      (elisp-configuration-service
       emacs-f-name
-      `((with-eval-after-load
+      `((define-key goto-map (kbd "s") 'consult-eglot-symbols)
+        (with-eval-after-load
          'eglot
          (add-hook 'eglot-managed-mode-hook
                    (lambda () (setq consult-imenu--cache nil))))
         (customize-set-variable 'eglot-extend-to-xref t))
-      #:elisp-packages (list emacs-eglot))))
+      #:elisp-packages (list emacs-eglot emacs-consult-eglot))))
 
   (feature
    (name f-name)
