@@ -168,8 +168,9 @@ function, which accepts config with rde values and returns a string."
     (define full-name (get-value 'full-name config))
 
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'message)
          (require 'sendmail))
@@ -710,8 +711,9 @@ not appear in the pop-up buffer."
        config
        #:extra-tag-updates-post extra-tag-updates-post))
      (when (get-value 'emacs config)
-       (elisp-configuration-service
+       (rde-elisp-configuration-service
         f-name
+        config
         ;; https://protesilaos.com/dotemacs/#h:a196812e-1644-4536-84ba-687366867def
         ;; https://codeberg.org/jao/elibs/src/branch/main/notmuch.org
         `((eval-when-compile

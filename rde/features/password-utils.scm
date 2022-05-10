@@ -54,8 +54,9 @@
           (when (get-value 'emacs config)
             (let ((emacs-embark (get-value 'emacs-embark config))
                   (emacs-consult (get-value 'emacs-consult config)))
-              (elisp-configuration-service
+              (rde-elisp-configuration-service
                emacs-f-name
+               config
                `((eval-when-compile (require 'pass))
                  ;; TODO: Fix tree view in pass.el
                  ,@(if (get-value 'emacs-advanced-user? config)

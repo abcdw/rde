@@ -19,8 +19,9 @@
   (define f-name 'docker)
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
-      'docker
+     (rde-elisp-configuration-service
+      f-name
+      config
       `((eval-when-compile (require 'configure-rde-keymaps))
         (with-eval-after-load
          'configure-rde-keymaps

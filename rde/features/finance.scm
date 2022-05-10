@@ -35,8 +35,9 @@
 
      ;; TODO: Build emacs-ledger with ledger specified in feature argument.
      (when (get-value 'emacs config)
-       (elisp-configuration-service
+       (rde-elisp-configuration-service
         emacs-f-name
+        config
         `((with-eval-after-load
            'ledger-mode
            (setq ledger-default-date-format ledger-iso-date-format)))

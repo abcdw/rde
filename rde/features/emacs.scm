@@ -65,10 +65,13 @@
             feature-emacs-keycast
             feature-emacs-eglot
 
-            elisp-configuration-service
+            rde-elisp-configuration-service
             emacs-xdg-service))
 
-(define autoload-each-sexp-in-configure-package? #f)
+
+;;;
+;;; rde emacs utilities.
+;;;
 
 (define* (rde-emacs-configuration-package
           name
@@ -76,7 +79,7 @@
           #:key
           summary authors url keywords commentary
           (elisp-packages '())
-          (autoloads? autoload-each-sexp-in-configure-package?))
+          (autoloads? #f))
   "Returns a package, which configures emacs.  Can be used as a
 dependency for other packages."
     (let* ((configure-package
@@ -92,16 +95,19 @@ dependency for other packages."
            #:authors (or authors '("Andrew Tropin <andrew@trop.in>")))))
       configure-package))
 
-(define* (elisp-configuration-service
-          name
+(define* (rde-elisp-configuration-service
+          name config
           #:optional (elisp-expressions '())
           #:key
           summary authors url keywords commentary
           (early-init '())
-          (elisp-packages '())
-          (autoloads? autoload-each-sexp-in-configure-package?)
-          (require-in-init? (not autoload-each-sexp-in-configure-package?)))
+          (elisp-packages '()))
+  "Adds a configure-NAME package to the profile and emacs load path and if
+emacs-portable? rde value is present adds autoloads cookies to each expression
+of it, otherwise adds a require to @file{init.el}."
   (let* ((pkg-name (symbol-append 'configure- name))
+         (autoloads? (get-value 'emacs-portable? config))
+         (require-in-init? (not autoloads?))
          (configure-package
           (rde-emacs-configuration-package
            name elisp-expressions
@@ -205,8 +211,9 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
        (emacs-xdg-service 'emacs-Q "Emacs (No init, no site-lisp: -Q)"
                           #~(system* "emacs" "-Q"))
 
-       (elisp-configuration-service
+       (rde-elisp-configuration-service
         'rde-emacs
+        config
         `((require 'configure-rde-keymaps)
 
           (setq user-full-name ,full-name)
@@ -419,8 +426,9 @@ and overall looks cool."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((set-default 'cursor-type  '(bar . 1))
         (blink-cursor-mode 0)
         (setq-default cursor-in-non-selected-windows nil)
@@ -559,8 +567,9 @@ utilizing reverse-im package."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((with-eval-after-load
          'mule
          (setq-default mode-line-mule-info nil)
@@ -616,8 +625,9 @@ utilizing reverse-im package."
     (require-value 'emacs-client-create-frame config)
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'erc-join)
          (require 'erc-fill)
@@ -706,8 +716,9 @@ utilizing reverse-im package."
    "))")))
 
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'telega)
          (require 'company))
@@ -761,8 +772,9 @@ utilizing reverse-im package."
          #$emacs-cmd
          (car (cdr (command-line)))))
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((custom-set-variables '(pdf-view-use-scaling t))
         (autoload 'pdf-view-mode "pdf-view" "")
         (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
@@ -789,8 +801,9 @@ utilizing reverse-im package."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'olivetti)
          (require 'hide-mode-line))
@@ -899,8 +912,9 @@ previous window layout otherwise.  With universal argument toggles
          (string-append
           "(dired \"" (car (cdr (command-line))) "\")")))
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile (require 'dired))
         (with-eval-after-load
          'dired
@@ -927,8 +941,9 @@ previous window layout otherwise.  With universal argument toggles
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'eshell)
          (require 'em-alias)
@@ -990,8 +1005,9 @@ previous window layout otherwise.  With universal argument toggles
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'org)
          (require 'org-refile))
@@ -1066,8 +1082,9 @@ Start an unlimited search at `point-min' otherwise."
   (define (get-home-services config)
     (require-value 'emacs-org config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'org-agenda))
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
@@ -1149,8 +1166,9 @@ Start an unlimited search at `point-min' otherwise."
          (string-append
           "(elpher-go \"" (car (cdr (command-line))) "\")")))
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((autoload 'elpher-go "elpher"))
       #:elisp-packages (list emacs-elpher))
      (emacs-xdg-service emacs-f-name "Emacs (Client) [gemini:]" xdg-gexp
@@ -1169,8 +1187,9 @@ git-link, git-timemachine."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'git-gutter))
         (custom-set-variables '(git-link-use-commit t)
@@ -1232,8 +1251,9 @@ available options."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((require 'which-key)
         (setq which-key-min-display-lines ,min-height)
         ;; … takes the space of two characters, which missaligns some popups
@@ -1266,8 +1286,9 @@ available options."
     (define font-serif     (get-value 'font-serif     config))
 
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((with-eval-after-load
          'faces
          (let* ((mono-fn ,(font-name font-monospace))
@@ -1318,8 +1339,9 @@ available options."
     (define ripgrep (get-value 'ripgrep config
                                (@ (gnu packages rust-apps) ripgrep)))
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'marginalia)
          (require 'consult))
@@ -1489,8 +1511,9 @@ relative line numbers, when narrowing is active."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (require 'vertico)
          (require 'vertico-multiform))
@@ -1612,8 +1635,9 @@ calculation function for vertico buffer."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile (require 'mct))
         (with-eval-after-load
          'mct
@@ -1697,8 +1721,9 @@ buffer should be displayed in other window use least recent one."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       ;; TODO: https://github.com/muffinmad/emacs-ibuffer-project
       ;; MAYBE: Rework the binding approach
       `((eval-when-compile
@@ -1737,8 +1762,9 @@ emacsclient feels more like a separate emacs instance."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((add-hook 'after-init-hook 'persp-mode)
         ;; TODO: Show current perspective in some global space (tab-bar?).
         (customize-set-variable
@@ -1783,8 +1809,9 @@ emacsclient feels more like a separate emacs instance."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile
          (let ((org-roam-v2-ack t))
            (require 'org-roam)))
@@ -1823,8 +1850,9 @@ enable rde-keycast-mode on configure-keycast package load."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((eval-when-compile (require 'keycast))
         (with-eval-after-load
          'keycast
@@ -1869,8 +1897,9 @@ enable rde-keycast-mode on configure-keycast package load."
   (define (get-home-services config)
     (require-value 'emacs-client-create-frame config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 
         (with-eval-after-load
@@ -1935,8 +1964,9 @@ enable rde-keycast-mode on configure-keycast package load."
 
   (define (get-home-services config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       emacs-f-name
+      config
       `((define-key goto-map (kbd "s") 'consult-eglot-symbols)
         (with-eval-after-load
          'eglot

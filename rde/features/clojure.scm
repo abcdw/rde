@@ -42,8 +42,9 @@
 
      ;; https://github.com/DogLooksGood/meomacs/blob/master/programming.org#fix-clojure-syntax-highlighting
      (when (get-value 'emacs config)
-       (elisp-configuration-service
+       (rde-elisp-configuration-service
         emacs-f-name
+        config
         `((defun rde--clojure-disable-eglot-parts-in-favor-of-cider ()
             (setq-local eglot-stay-out-of '(eldoc flymake)))
           (add-hook 'clojure-mode-hook

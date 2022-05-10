@@ -45,8 +45,9 @@ use_guixs() {
      ;; (add-hook 'Info-mode-hook
      ;;      (lambda ()
      ;;        (setq Info-additional-directory-list (split-string (getenv "INFOPATH") ":"))))
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       'envrc
+      config
       `((eval-when-compile (require 'envrc))
         (add-hook 'after-init-hook 'envrc-global-mode)
         (with-eval-after-load 'envrc

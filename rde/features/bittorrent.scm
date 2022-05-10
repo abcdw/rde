@@ -24,8 +24,9 @@
 
     (list
      (when (get-value 'emacs config)
-       (elisp-configuration-service
+       (rde-elisp-configuration-service
         emacs-f-name
+        config
         `((require 'configure-rde-keymaps)
           (define-key rde-app-map (kbd "T") 'transmission)
           (with-eval-after-load

@@ -80,8 +80,9 @@
   (define (get-home-services config)
     (require-value 'emacs config)
     (list
-     (elisp-configuration-service
+     (rde-elisp-configuration-service
       'vterm
+      config
       `((define-key global-map (kbd "s-t") 'vterm)
         ,@(if (get-value 'emacs-consult config)
               `((eval-when-compile

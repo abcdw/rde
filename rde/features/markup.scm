@@ -20,8 +20,9 @@
   (define (get-home-services config)
     (let ((pandoc (get-value 'pandoc config pandoc)))
       (list
-       (elisp-configuration-service
+       (rde-elisp-configuration-service
         emacs-f-name
+        config
         `(;; The package updates auto-mode-list automatically via autoloads
           (with-eval-after-load
            'markdown-mode
