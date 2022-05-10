@@ -41,6 +41,7 @@
   #:use-module (guix transformations)
 
   #:export (feature-emacs
+            feature-emacs-portable
             feature-emacs-appearance
             feature-emacs-faces
             feature-emacs-completion
@@ -155,6 +156,33 @@ of it, otherwise adds a require to @file{init.el}."
        (type 'application)))))))
 
 
+;;;
+;;; Emacs features.
+;;;
+
+(define* (feature-emacs-portable
+          #:key
+          (emacs emacs-next-pgtk-latest)
+          (additional-elisp-packages '()))
+    (define (emacs-home-services config)
+    "Returns home services related to GNU Emacs, which usually used in development
+environment outside of Guix Home."
+    (list
+     (service
+      home-emacs-service-type
+      (home-emacs-configuration
+       (package emacs)
+       (elisp-packages additional-elisp-packages)
+       ;;; TODO: Rebuilding packages with emacs will be useful for
+       ;;; native-comp, but for some reason dash.el fails to build,
+       ;;; need to investigate the issue.
+       ;; (rebuild-elisp-packages? #t)
+       ))))
+  (feature
+   (name 'emacs)
+   (values (append (make-feature-values emacs)
+                   `((emacs-portable? . #t))))
+   (home-services-getter emacs-home-services)))
 
 (define* (feature-emacs
           #:key
