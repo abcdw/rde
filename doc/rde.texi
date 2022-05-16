@@ -448,6 +448,30 @@ emulator isn't needed and you can just spawn eshell directly with
 @section Finances
 @ref{,,,ledger3} and @ref{,,,ledger-mode}.
 
+@section Graphical Environment
+@subsection Screen Capture
+@anchor{feature-sway-screenshot}
+
+There are 3 primary utilities for creating and modifying screenshots:
+@enumerate
+@item
+@command{shot-output}, which captures the current sway output and saves
+it to clipboard.
+@item
+@command{shot-window-or-selection}, which can capture either window
+under cursor (if clicked), or region (if region is selected with mouse).
+@item
+@command{swappy-clipboard}, which allows to edit the current content of
+the clipboard and save it back to it or file.
+@end enumerate
+
+The usual workflow is following: capture something (output with
+@kbd{s-@key{print}}, window or region with @kbd{s-S-@key{print}}),
+insert the content of clipboard to any application you want (browser,
+instant messanger, etc).  If you need to modify the content of clipboard
+(add a label, highlight something or make an arrow pointing to important
+object, etc) or save it to the file use @kbd{s-M-@key{print}}.
+
 @node Installation
 @chapter Installation
 
