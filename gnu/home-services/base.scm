@@ -10,6 +10,7 @@
 (define* (home-generic-service
 	  name
 	  #:key
+          (description "An auxiliary service.")
 	  (files '())
 	  (packages '())
 	  (extensions '()))
@@ -31,6 +32,7 @@ home-files with FILES.  EXTENSIONS is an alist of pairs @code{(target
 			     extensions))
 	 (type              (service-type
 			     (name name)
+                             (description description)
 			     (extensions
 			      (append
 			       more-extensions
