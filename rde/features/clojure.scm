@@ -17,7 +17,8 @@
 (define* (feature-clojure
           #:key
           (clojure-tools-cli clojure-tools-cli)
-          (clojure-lsp #f))
+          (clojure-lsp #f)
+          (jdk (list openjdk17 "jdk")))
   "Setup and configure environment for Clojure. "
   (ensure-pred file-like? clojure-tools-cli)
   (ensure-pred file-like? clojure-lsp)
@@ -38,7 +39,7 @@
            ;; MAYBE: Add as a dependency to cider?
            (@ (gnu packages compression) unzip)
            clojure-tools
-           (list openjdk17 "jdk"))))
+           jdk)))
 
      ;; https://github.com/DogLooksGood/meomacs/blob/master/programming.org#fix-clojure-syntax-highlighting
      (when (get-value 'emacs config)
