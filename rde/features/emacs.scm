@@ -160,11 +160,22 @@ of it, otherwise adds a require to @file{init.el}."
 ;;; Emacs features.
 ;;;
 
+;; "#f0d3ff" ;; magenta
+;; "#c0efff" ;; cyan
+;; "#b5d0ff" ;; blue
+;; "#aecf90" ;; green
+;; "#f2b0a2" ;; red
+
 (define* (feature-emacs-portable
           #:key
           (emacs emacs-next-pgtk-latest)
+          (status-line-bg-color "#b5d0ff")
           (additional-elisp-packages '()))
-    (define (emacs-home-services config)
+  (ensure-pred maybe-string? status-line-bg-color)
+  (ensure-pred list-of-elisp-packages? additional-elisp-packages)
+  (ensure-pred file-like? emacs)
+
+  (define (emacs-home-services config)
     "Returns home services related to GNU Emacs, which usually used in development
 environment outside of Guix Home."
     (list
@@ -177,7 +188,15 @@ environment outside of Guix Home."
        ;;; native-comp, but for some reason dash.el fails to build,
        ;;; need to investigate the issue.
        ;; (rebuild-elisp-packages? #t)
-       ))))
+       ))
+     (rde-elisp-configuration-service
+      'rde-emacs-portable
+      config
+      `(,@(if status-line-bg-color
+              `((with-eval-after-load
+                 'configure-appearance
+                 (setq rde-status-line-bg-color ,status-line-bg-color)))
+              '())))))
   (feature
    (name 'emacs)
    (values (append (make-feature-values emacs)
@@ -520,6 +539,20 @@ various modes, which setups mode-line late."
                 (add-hook 'calendar-initial-window-hook
                           'rde--move-mode-line-to-header))
               '())
+
+        (defvar rde-status-line-bg-color
+          nil
+          "A string containing a color, which will be used to set initial
+value of background color for mode/header-line.")
+
+        (add-hook 'after-init-hook
+                  (lambda ()
+                    (when rde-status-line-bg-color
+                      (set-face-attribute
+                       ',(if header-line-as-mode-line?
+                             'header-line
+                             'mode-line)
+                       nil :background rde-status-line-bg-color))))
 
         (customize-set-variable 'window-divider-default-right-width ,margin)
         (window-divider-mode))
