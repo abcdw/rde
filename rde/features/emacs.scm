@@ -160,6 +160,16 @@ of it, otherwise adds a require to @file{init.el}."
 ;;; Emacs features.
 ;;;
 
+(define emacs-configure-rde-keymaps
+  (rde-emacs-configuration-package
+   'rde-keymaps
+   `((defvar rde-app-map nil "Prefix keymap for applications.")
+     (define-prefix-command 'rde-app-map nil)
+     (defvar rde-toggle-map nil "\
+Prefix keymap for binding various minor modes for toggling functionalitty.")
+     (define-prefix-command 'rde-toggle-map nil))
+   #:summary "Keymaps inteded for reuse among configure-* packages"))
+
 ;; "#f0d3ff" ;; magenta
 ;; "#c0efff" ;; cyan
 ;; "#b5d0ff" ;; blue
@@ -199,7 +209,7 @@ environment outside of Guix Home."
               '())))))
   (feature
    (name 'emacs)
-   (values (append (make-feature-values emacs)
+   (values (append (make-feature-values emacs emacs-configure-rde-keymaps)
                    `((emacs-portable? . #t))))
    (home-services-getter emacs-home-services)))
 
@@ -235,16 +245,6 @@ environment outside of Guix Home."
                            #$(file-append emacs "/bin/emacs")
                            "--no-splash"
                            (cdr (command-line)))))
-
-  (define emacs-configure-rde-keymaps
-    (rde-emacs-configuration-package
-     'rde-keymaps
-     `((defvar rde-app-map nil "Prefix keymap for applications.")
-       (define-prefix-command 'rde-app-map nil)
-       (defvar rde-toggle-map nil "\
-Prefix keymap for binding various minor modes for toggling functionalitty.")
-       (define-prefix-command 'rde-toggle-map nil))
-     #:summary "Keymaps inteded for reuse among configure-* packages"))
 
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs."
