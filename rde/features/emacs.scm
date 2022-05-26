@@ -1640,8 +1640,7 @@ vertico-count by 1 to show one more candidate, which is hidden
 otherwise because mode line is expected to be present by height
 calculation function for vertico buffer."
                    (setq-local header-line-format mode-line-format)
-                   (setq-local mode-line-format nil)
-                   (setq-local vertico-count (+ vertico-count 1)))
+                   (setq-local mode-line-format nil))
 
                  (advice-add 'vertico-buffer--setup :after
                              'rde--vertico-prepare-header-line))
