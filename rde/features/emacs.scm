@@ -367,8 +367,8 @@ C-h C-a to open About Emacs buffer."
             (define-key map "K" 'find-function-on-key)
             (define-key map "V" 'find-variable))
 
-          (defun kill-region-dwim (&optional count)
-            "The function kills region if mark is active, otherwise kills word.
+          (defun rde-kill-region-dwim (&optional count)
+            "The function kills region if mark is active, otherwise kills a word.
 Prefix argument can be used to kill a few words."
             (interactive "p")
             (if (use-region-p)
@@ -380,7 +380,7 @@ Prefix argument can be used to kill a few words."
           (define-key global-map (kbd "M-c") 'capitalize-dwim)
           (define-key global-map (kbd "M-l") 'downcase-dwim)
           (define-key global-map (kbd "M-u") 'upcase-dwim)
-          (define-key global-map (kbd "C-w") 'kill-region-dwim)
+          (define-key global-map (kbd "C-w") 'rde-kill-region-dwim)
 
           (define-key mode-specific-map (kbd "a")
             '("rde applications" . rde-app-map))
