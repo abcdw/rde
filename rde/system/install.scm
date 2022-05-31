@@ -1,7 +1,8 @@
 (define-module (rde system install)
   #:use-module (gnu)
   #:use-module (gnu system)
-  #:use-module (gnu system install))
+  #:use-module (gnu system install)
+  #:export (guix-with-substitute-mirror))
 
 (define guix-with-substitute-mirror
   (operating-system
