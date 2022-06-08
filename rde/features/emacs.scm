@@ -1256,6 +1256,12 @@ git-link, git-timemachine."
         (custom-set-variables '(git-link-use-commit t)
                               '(git-gutter:lighter " GG"))
 
+        (defun rde-git-link ()
+          "Same as `git-link', but with commit hash specified."
+          (interactive)
+          (let ((git-link-use-commit t))
+            (call-interactively 'git-link)))
+
         (require 'configure-rde-keymaps)
         (define-key rde-toggle-map (kbd "g") 'git-gutter-mode)
         (define-key rde-toggle-map (kbd "G") 'global-git-gutter-mode)
