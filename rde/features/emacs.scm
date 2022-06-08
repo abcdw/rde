@@ -493,7 +493,23 @@ and overall looks cool."
               `((fg-window-divider-inner . "#000000")
                 (fg-window-divider-outer . "#000000")))
 
-        (load-theme 'modus-operandi t)
+        (defun rde-modus-themes-custom-faces ()
+          (modus-themes-with-colors
+           (custom-set-faces
+            ;; Replace green with blue if you use `modus-themes-deuteranopia'.
+            `(git-gutter-fr:added ((,class :foreground ,,(if deuteranopia?
+                                                             'blue-fringe-bg
+                                                             'green-fringe-bg)
+                                     :background ,bg-main)))
+            `(git-gutter-fr:deleted ((,class :foreground ,red-fringe-bg
+                                       :background ,bg-main)))
+            `(git-gutter-fr:modified ((,class :foreground ,yellow-fringe-bg
+                                        :background ,bg-main))))))
+
+        (add-hook 'modus-themes-after-load-theme-hook
+                  'rde-modus-themes-custom-faces)
+
+        (modus-themes-load-operandi)
 
         (with-eval-after-load
          'configure-rde-keymaps
@@ -517,13 +533,6 @@ mouse-3: Toggle minor modes"
                       ")"
                       (propertize "%]" 'help-echo recursive-edit-help-echo)
                       " ")))
-        (custom-set-faces
-         `(git-gutter-fr:modified
-           ((t (:foreground "blue" :background "white"))))
-         `(git-gutter-fr:added
-           ((t (:foreground "green" :background "white"))))
-         `(git-gutter-fr:deleted
-           ((t (:foreground "red" :background "white")))))
 
         ,@(if header-line-as-mode-line?
               `(,#~"\n;; Move modeline to the top"
