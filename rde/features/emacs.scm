@@ -836,7 +836,7 @@ utilizing reverse-im package."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((custom-set-variables '(pdf-view-use-scaling t))
+      `((customize-set-variable 'pdf-view-use-scaling t)
         (autoload 'pdf-view-mode "pdf-view" "")
         (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
         (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
@@ -882,7 +882,7 @@ utilizing reverse-im package."
          (advice-add 'org-agenda-redo-all :around 'ensure-olivetti))
         (with-eval-after-load
          'hide-mode-line
-         (custom-set-variables '(hide-mode-line-excluded-modes '())))
+         (customize-set-variable 'hide-mode-line-excluded-modes '()))
 
         (defun rde--match-modes (modes)
           "Check if current mode is derived from one of the MODES."
@@ -1438,41 +1438,42 @@ available options."
          ;; MAYBE: Make transient use child-frame:
          ;; https://github.com/magit/transient/issues/102
          ,@(if mini-frame?
-             `((with-eval-after-load
-                'mini-frame
-                (custom-set-faces
-                 '(child-frame-border
-                   ;; TODO: inherit ,(face-attribute 'default :foreground)
-                   ((t (:background "#000000")))))
-                (put 'child-frame-border 'saved-face nil)
+               `((with-eval-after-load
+                  'mini-frame
+                  (custom-set-faces
+                   '(child-frame-border
+                     ;; TODO: inherit ,(face-attribute 'default :foreground)
+                     ((t (:background "#000000")))))
+                  (put 'child-frame-border 'saved-face nil)
 
-                (custom-set-variables
-                 '(mini-frame-show-parameters
+                  (customize-set-variable
+                   'mini-frame-show-parameters
                    (lambda ()
                      `((top . 0.2)
                        (width . 0.8)
                        (left . 0.5)
                        (child-frame-border-width . 1))))
-                 '(mini-frame-detach-on-hide nil)
-                 '(mini-frame-color-shift-step 0)
-                 '(mini-frame-advice-functions '(read-from-minibuffer
-                                                 read-key-sequence
-                                                 save-some-buffers yes-or-no-p))
-                 '(mini-frame-ignore-commands '())))
-               (mini-frame-mode 1))
+                  (customize-set-variable 'mini-frame-detach-on-hide nil)
+                  (customize-set-variable 'mini-frame-color-shift-step 0)
+                  (customize-set-variable 'mini-frame-advice-functions
+                                          '(read-from-minibuffer
+                                            read-key-sequence
+                                            save-some-buffers yes-or-no-p))
+                  (customize-set-variable 'mini-frame-ignore-commands '()))
+                 (mini-frame-mode 1))
              '()))
 
-        (custom-set-variables
-         '(history-length 10000)
-         '(savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                                 "/emacs/history")))
+        (customize-set-variable 'history-length 10000)
+        (customize-set-variable
+         'savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                                "/emacs/history"))
 
         (savehist-mode 1)
         (run-with-idle-timer 30 t 'savehist-save)
 
-        (custom-set-variables
-         '(recentf-save-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                                     "/emacs/recentf")))
+        (customize-set-variable
+         'recentf-save-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                                    "/emacs/recentf"))
 
         (recentf-mode 1)
         (run-with-idle-timer 30 t 'recentf-save-list)
@@ -1601,7 +1602,7 @@ relative line numbers, when narrowing is active."
          ;; TODO: Bind vertico-next/previous-group to more usual keys?
 
          (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
-         (custom-set-variables '(vertico-cycle t))
+         (customize-set-variable 'vertico-cycle t)
 
          ;; (defvar rde--vertico-monocle-previous-window-configuration nil
          ;;   "Window configuration for restoring on vertico monocle exit.")
