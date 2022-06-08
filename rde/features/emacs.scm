@@ -460,6 +460,7 @@ Prefix argument can be used to kill a few words."
           #:key
           (margin 8)
           (deuteranopia? #t)
+          (dark? #f)
           (header-line-as-mode-line? #t)
           (emacs-modus-themes emacs-modus-themes))
   "Make Emacs looks modern and minimalistic. `deuteranopia?' substitutes
@@ -509,7 +510,9 @@ and overall looks cool."
         (add-hook 'modus-themes-after-load-theme-hook
                   'rde-modus-themes-custom-faces)
 
-        (modus-themes-load-operandi)
+        ,@(if dark?
+              '((modus-themes-load-vivendi))
+              '((modus-themes-load-operandi)))
 
         (with-eval-after-load
          'configure-rde-keymaps
