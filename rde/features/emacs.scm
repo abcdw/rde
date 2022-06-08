@@ -1240,7 +1240,14 @@ Start an unlimited search at `point-min' otherwise."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-git)
+(define* (feature-emacs-git
+          #:key
+          (emacs-magit emacs-magit)
+          (emacs-magit-todos emacs-magit-todos)
+          (emacs-git-timemachine emacs-git-timemachine)
+          (emacs-git-link emacs-git-link)
+          (emacs-git-gutter-fringe emacs-git-gutter-fringe)
+          (emacs-git-gutter-transient emacs-git-gutter-transient))
   "Configure git-related utilities for GNU Emacs, including magit,
 git-link, git-timemachine."
   (define emacs-f-name 'git)
@@ -1297,7 +1304,7 @@ git-link, git-timemachine."
       #:elisp-packages (list emacs-magit emacs-magit-todos
                              (get-value 'emacs-configure-rde-keymaps config)
                              emacs-git-link emacs-git-timemachine
-                             emacs-git-gutter emacs-git-gutter-fringe
+                             emacs-git-gutter-fringe
                              emacs-git-gutter-transient))))
 
   (feature
