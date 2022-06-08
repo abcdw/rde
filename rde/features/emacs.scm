@@ -272,9 +272,32 @@ environment outside of Guix Home."
                         "/emacs/custom.el"))
           (load custom-file t)
 
-          (setq backup-directory-alist
-                `(,(cons "." (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                                     "/emacs/backup"))))
+          (customize-set-variable
+           'backup-directory-alist
+           `(,(cons "." (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                                "/emacs/backup"))))
+
+          (customize-set-variable
+           'recentf-save-file
+           (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                   "/emacs/recentf"))
+
+          ;; (add-hook 'after-init 'recentf-mode)
+          (recentf-mode 1)
+          (run-with-idle-timer 30 t 'recentf-save-list)
+
+          ;; (customize-set-variable 'history-length 10000)
+          (customize-set-variable
+           'savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                                  "/emacs/history"))
+
+          (savehist-mode 1)
+          (run-with-idle-timer 30 t 'savehist-save)
+
+          (customize-set-variable
+           'bookmark-default-file
+           (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                   "/emacs/bookmarks"))
 
           ,#~""
           (pixel-scroll-precision-mode 1)
@@ -1487,15 +1510,8 @@ available options."
          'savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                                 "/emacs/history"))
 
-        (savehist-mode 1)
-        (run-with-idle-timer 30 t 'savehist-save)
-
-        (customize-set-variable
-         'recentf-save-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                                    "/emacs/recentf"))
-
-        (recentf-mode 1)
-        (run-with-idle-timer 30 t 'recentf-save-list)
+        ;; (savehist-mode 1)
+        ;; (run-with-idle-timer 30 t 'savehist-save)
 
         (define-key global-map (kbd "s-.") 'embark-act)
         (define-key global-map (kbd "s->") 'embark-become)
