@@ -901,7 +901,8 @@ utilizing reverse-im package."
       emacs-f-name
       config
       `((eval-when-compile
-         (require 'olivetti)
+         ;; FIXME: Byte-compilation fails
+         ;; (require 'olivetti)
          (require 'hide-mode-line))
 
         (setq olivetti-body-width ,olivetti-body-width
