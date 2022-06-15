@@ -59,6 +59,7 @@
             waybar-sway-workspaces
             waybar-tray
             waybar-temperature
+            waybar-volume
             waybar-idle-inhibitor
             waybar-clock
             waybar-battery
@@ -613,6 +614,40 @@ battery is low or nearly empty."
              (background . @base09))
            `((color . @base09)))))))
 
+;; https://www.reddit.com/r/swaywm/comments/sks343/pwvolume_pipewire_volume_control_and_waybar_module/
+;; https://github.com/Alexays/Waybar/wiki/Module:-PulseAudio
+(define* (waybar-volume)
+  ""
+  (waybar-module
+   'pulseaudio
+   `((format . "{format_source}{icon} {volume}%")
+     (format-muted . "{format_source}🔇")
+     (format-source . "🎙️ ")    ;; active mic
+     (format-source-muted . "") ;; muted mic
+     (format-bluetooth . "{format_source}{icon} {volume}% ")
+     (states . ((low . 1)
+                (half . 40)
+                (high . 75)
+                (full . 100)))
+     ;; TODO update serializer to allow (s . ((s . ( ... ))))
+     ;; https://github.com/Alexays/Waybar/wiki/Module:-PulseAudio#example
+     ;;
+     ;; The current serializer input format enforces (s . ((s . v)))
+     ;; which is not covering for these circumstances; in waybar,
+     ;; accepted structures can be either:
+     ;;
+     ;; (format-icons . (🔈 🔉 🔊 📢))
+     ;; (format-icons . ((default .  (🔈 🔉 🔊 📢))))
+     (format-icons . ((default . 🔊)
+                      ;; (low  . 🔈)
+                      ;; (half . 🔉)
+                      ;; (high . 🔊)
+                      ;; (full . 📢)
+                      ))
+     (scroll-step . 2)
+     (on-click . "pavucontrol"))
+   ))
+
 (define* (feature-waybar
           #:key
           (waybar waybar)
@@ -622,6 +657,7 @@ battery is low or nearly empty."
             (waybar-tray)
             (waybar-idle-inhibitor)
             (waybar-sway-language)
+            (waybar-volume)
             (waybar-battery #:intense? #f)
             (waybar-clock)))
           (base16-css (local-file "./wm/waybar/base16-default-dark.css"))
