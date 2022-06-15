@@ -271,12 +271,12 @@ notmuch-hooks} for more information."))
    (string-or-list-of-strings)
    "A list of URLs to fetch the public-inbox repository from.")
   (maildir
-   (maybe-string 'disabled)
+   maybe-string
    "The maildir corresponding to the public-inbox repository.  This is
 optional, an external MDA like Procmail can be used instead to filter
 the messages, see the @code{pipe} field.")
   (pipe
-   (maybe-string-or-gexp 'disabled)
+   maybe-string-or-gexp
    "A command to pipe the messages to for further filtering.  This is
 mutually exclusive with the @code{maildir} field.")
   (initial-import
@@ -305,12 +305,12 @@ repositories.")
    "@code{0} to watch for new emails every PERIOD seconds, @code{1} to
 sync once and exit.")
   (maildir
-   (maybe-string 'disabled)
+   maybe-string
    "The maildir to which messages should be delivered.  This can also be
 set on a per-list basis using the using the @code{maildir} field in
 the @code{<l2md-repo>} record.")
   (pipe
-   (maybe-string-or-gexp 'disabled)
+   maybe-string-or-gexp
    "A command to pipe the messages to for further filtering.  This is
 mutually exclusive with the @code{maildir} field.  This can also be
 set on a per-list basis using the @code{<l2md-repo>} record.")
@@ -340,8 +340,8 @@ a particular public-inbox repository."))
                 (,@(map (lambda (url)
                           `(url . ,url))
                         (maybe-list urls))
-                 ,@(optional (not (eq? maildir 'disabled)) `((maildir . ,maildir)))
-                 ,@(optional (not (eq? pipe 'disabled)) `((pipe . ,pipe)))
+                 ,@(optional maildir `((maildir . ,maildir)))
+                 ,@(optional pipe `((pipe . ,pipe)))
                  (initial-import . ,initial-import)
                  (sync-enabled . ,sync-enabled?)))))))
 
@@ -356,8 +356,8 @@ a particular public-inbox repository."))
         #:fields
         `((general
            ((period . ,period)
-            ,@(optional (not (eq? maildir 'disabled)) `((maildir . ,maildir)))
-            ,@(optional (not (eq? pipe 'disabled)) `((pipe . ,pipe)))
+            ,@(optional maildir `((maildir . ,maildir)))
+            ,@(optional pipe `((pipe . ,pipe)))
             (oneshot . ,oneshot)
             (base . ,base)))
           ,@(map l2md-repo->alist repos)))))))
