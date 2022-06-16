@@ -280,122 +280,48 @@ to manipulate and navigate hunks.")))
 provides a front-end interface for the workspace/symbols LSP procedure
 call.")))
 
+(define tdlib-latest-instead-of-tdlib
+  (package-input-rewriting/spec `(("tdlib" . ,(const tdlib-latest)))))
+
 (define-public emacs-telega-server-latest
-  (let ((commit "733194c4ed16f57e2b4e66a79be842a5d0731012")
-        (revision "0"))
-    (package
-      (name "emacs-telega-server")
-      (version (git-version "0.8.03" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/zevlg/telega.el")
-               (commit "733194c4ed16f57e2b4e66a79be842a5d0731012")))
-         (sha256
-          (base32 "0l3a2qbqwf6rrnnkranclqq9fig3ki176ddj02azr9360ps46xly"))
-         (file-name (git-file-name "emacs-telega" version))
-         (patches
-          (search-patches "emacs-telega-path-placeholder.patch"
-                          "emacs-telega-test-env.patch"))))
-      (build-system gnu-build-system)
-      (arguments
-       (list
-        #:make-flags
-        #~(list (string-append "CC=" #$(cc-for-target))
-                (string-append "INSTALL_PREFIX=" #$output "/bin"))
-        #:phases
-        #~(modify-phases %standard-phases
-            (add-before 'configure 'enter-subdirectory
-              (lambda _ (chdir "server")))
-            (replace 'configure
-              (lambda _
-                (substitute* "run_tests.py"
-                  (("^(TELEGA_SERVER = ).*$" _all prefix)
-                   (string-append prefix
-                                  "\"" #$output "/bin/telega-server\"\n")))))
-            (delete 'check)
-            (add-after 'install 'check
-              (assoc-ref %standard-phases 'check))
-            (add-before 'install-license-files 'leave-subdirectory
-              (lambda _ (chdir ".."))))
-        #:test-target "test"))
-      (inputs
-       (list tdlib-latest libappindicator))
-      (native-inputs
-       (list python pkg-config))
-      (home-page "https://zevlg.github.io/telega.el/")
-      (synopsis "Server process of Telega")
-      (description "Telega-server is helper program to interact with Telegram
-service, and connect it with Emacs via inter-process communication.")
-      (license license:gpl3+))))
+  (tdlib-latest-instead-of-tdlib
+   (let ((commit "733194c4ed16f57e2b4e66a79be842a5d0731012")
+         (revision "0"))
+     (package
+       (inherit emacs-telega-server)
+       (name "emacs-telega-server")
+       (version (git-version "0.8.03" revision commit))
+       (source
+        (origin
+          (method git-fetch)
+          (uri (git-reference
+                (url "https://github.com/zevlg/telega.el")
+                (commit "733194c4ed16f57e2b4e66a79be842a5d0731012")))
+          (sha256
+           (base32 "0l3a2qbqwf6rrnnkranclqq9fig3ki176ddj02azr9360ps46xly"))
+          (file-name (git-file-name "emacs-telega" version))
+          (patches
+           (search-patches "emacs-telega-path-placeholder.patch"
+                           "emacs-telega-test-env.patch"))))))))
+
+(define telega-server-latest-instead-of-telega-server
+  (package-input-rewriting/spec
+   `(("emacs-telega-server" . ,(const emacs-telega-server-latest)))))
 
 (define-public emacs-telega-latest
-  (package
-    (inherit emacs-telega-server-latest)
-    (name "emacs-telega")
-    (build-system emacs-build-system)
-    (arguments
-     `(#:emacs ,(if (target-64bit?)
-                    emacs-minimal
-                    ;; Require wide-int support for 32-bit platform.
-                    emacs-wide-int)
-       #:include (cons "^etc\\/" %default-include)
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'patch-sources
-           (lambda* (#:key inputs #:allow-other-keys)
-             ;; Hard-code paths to `ffplay` and `ffmpeg`.
-             (let* ((ffplay-bin (search-input-file inputs "/bin/ffplay"))
-                    (ffmpeg-bin (search-input-file inputs "/bin/ffmpeg")))
-               (substitute* '("telega-ffplay.el" "telega-vvnote.el")
-                 (("(shell-command-to-string\|concat) \"(ffmpeg\|ffprobe)"
-                   all func cmd)
-                  (string-append func " \""
-                                 (search-input-file
-                                  inputs (string-append "/bin/" cmd))))
-                 (("\\(executable-find \"ffplay\"\\)")
-                  (string-append "(and (file-executable-p \"" ffplay-bin "\")"
-                                 "\"" ffplay-bin "\")"))
-                 (("\\(executable-find \"ffmpeg\"\\)")
-                  (string-append "(and (file-executable-p \"" ffmpeg-bin "\")"
-                                 "\"" ffmpeg-bin "\")"))))))
-         (add-after 'unpack 'configure
-           (lambda* (#:key inputs outputs #:allow-other-keys)
-             (substitute* "telega-customize.el"
-               (("@TELEGA_SERVER_BIN@")
-                (search-input-file inputs "/bin/telega-server")))
-             (substitute* "telega-util.el"
-               (("@TELEGA_SHARE@")
-                (string-append (elpa-directory (assoc-ref outputs "out"))
-                               "/etc"))))))))
-    (inputs
-     (list emacs-telega-server-latest ffmpeg))
-    (native-inputs '())
-    (propagated-inputs
-     (list emacs-visual-fill-column emacs-company
-           emacs-rainbow-identifiers))
-    (synopsis "GNU Emacs client for the Telegram messenger")
-    (description "Telega is a full-featured, unofficial GNU Emacs-based client
-for the Telegram messaging platform.")))
+  (telega-server-latest-instead-of-telega-server
+   (package
+     (inherit emacs-telega)
+     (version (package-version emacs-telega-server-latest))
+     (source (package-source emacs-telega-server-latest)))))
+
+(define telega-latest-instead-of-telega
+  (package-input-rewriting/spec
+   `(("emacs-telega" . ,(const emacs-telega-latest)))))
 
 (define-public emacs-telega-contrib-latest
-  (package
-    (inherit emacs-telega-latest)
-    (name "emacs-telega-contrib")
-    (arguments
-     `(#:exclude '("telega-live-location.el")
-       #:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'enter-subdirectory
-           (lambda _ (chdir "contrib") #t))
-         (add-before 'install-license-files 'leave-subdirectory
-           (lambda _ (chdir "..") #t)))))
-    (inputs '())
-    (native-inputs '())
-    (propagated-inputs
-     (list emacs-alert emacs-all-the-icons emacs-dashboard emacs-telega-latest
-           emacs-transient))
-    (synopsis "Contributed packages to Telega")
-    (description "Telega-contrib is a collection of third-party
-contributed packages to Telega.")))
+  (telega-latest-instead-of-telega
+   (package
+     (inherit emacs-telega-contrib)
+     (version (package-version emacs-telega-latest))
+     (source (package-source emacs-telega-latest)))))
