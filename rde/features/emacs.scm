@@ -787,7 +787,10 @@ utilizing reverse-im package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-telega)
+(define* (feature-emacs-telega
+          #:key
+          (emacs-telega emacs-telega-latest)
+          (emacs-telega-contrib emacs-telega-contrib-latest))
   "Configure telega.el for GNU Emacs"
   (define emacs-f-name 'telega)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -844,7 +847,7 @@ utilizing reverse-im package."
          (add-hook 'telega-chat-mode-hook 'rde-telega-chat-mode)
 
          (setq telega-completing-read-function completing-read-function)))
-      #:elisp-packages (list emacs-telega
+      #:elisp-packages (list emacs-telega emacs-telega-contrib
                              (get-value 'emacs-configure-rde-keymaps config)))
 
      (emacs-xdg-service emacs-f-name "Emacs (Client) [tg:]" xdg-gexp
