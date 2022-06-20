@@ -20,6 +20,7 @@
   #:use-module (rde features bittorrent)
   #:use-module (rde features mail)
   #:use-module (rde features docker)
+  #:use-module (rde features virtualization)
   #:use-module (rde features video)
   #:use-module (rde features finance)
   #:use-module (rde features markup)
@@ -175,6 +176,7 @@
    (feature-base-services)
    (feature-desktop-services)
    (feature-docker)
+   (feature-qemu)
 
    (feature-pipewire)
    (feature-backlight #:step 5)
@@ -223,16 +225,30 @@
     #:xwayland? #f
     #:extra-config
     `((output DP-2 scale 2)
+      ,@(map (lambda (x) `(workspace ,x output eDP-1)) (iota 8 1))
+
       (workspace 9 output DP-2)
       (workspace 10 output DP-2)
 
+      ;; (bindswitch --reload --locked lid:on exec /run/setuid-programs/swaylock)
+
+      ;; FIXME: Use absolute path, move to feature-network
+      (exec nm-applet --indicator)
       (bindsym
        --locked $mod+Shift+p exec
        ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
        play-pause)
-      ;; (input type:touchpad
-      ;;            ((tap enabled)
-      ;;             (natural_scroll enabled)))
+
+      (bindsym
+       --locked $mod+Shift+n exec
+       ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
+       next)
+
+      (bindsym $mod+Shift+o ,#~"[floating]" kill)
+      (input type:touchpad
+             ;; TODO: Move it to feature-sway or feature-mouse?
+             (;; (natural_scroll enabled)
+              (tap enabled)))
       (bindsym $mod+Shift+Return exec emacs)))
    (feature-sway-run-on-tty
     #:sway-tty-number 2)
