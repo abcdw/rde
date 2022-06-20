@@ -308,10 +308,10 @@
     #:erc-kill-buffers-on-quit #t
     #:erc-nick "abcdw"
     #:align-nicknames? #f
-    #:erc-autojoin-channels-alist
-    '((Libera.Chat "#guix" "#emacs" "#tropin" "#rde" "#sway")
-      (OFTC        "#pipewire" "#wayland"))
     #:log? #t
+    ;; #:erc-autojoin-channels-alist
+    ;; '((Libera.Chat "#guix" "#emacs" "#tropin" "#rde" "#sway")
+    ;;   (OFTC        "#pipewire" "#wayland"))
 
     ;; #:erc-server "chat.sr.ht"
     #:extra-config
