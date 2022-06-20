@@ -209,10 +209,11 @@
                 (port . 50621)
                 (compression . #t))))
             (ssh-host
-             (host "dosya-ygg")
+             (host "pinky")
              (options
-              '((host-name . "204:cbf:3e07:e67a:424f:93bc:fc5c:b3dc")
-                (user . "root")
+              '((host-name . "23.184.48.219")
+                (user . "bob")
+                (port . 50621)
                 (compression . #t))))))
      (toplevel-options
       '((host-key-algorithms . "+ssh-rsa")
