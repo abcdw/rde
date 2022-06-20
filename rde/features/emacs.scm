@@ -65,6 +65,7 @@
             feature-emacs-which-key
             feature-emacs-keycast
             feature-emacs-eglot
+            feature-emacs-smartparens
 
             rde-elisp-configuration-service
             emacs-xdg-service))
@@ -2084,6 +2085,51 @@ enable rde-keycast-mode on configure-keycast package load."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-eglot)))
+   (home-services-getter get-home-services)))
+
+
+(define* (feature-emacs-smartparens
+          #:key
+          (emacs-smartparens emacs-smartparens)
+          (enable-in-prog-mode? #t)
+          (show-smartparens? #f)
+          (smartparens-bindings? #t))
+  "Configure smartparens for structured code navigation, automatic string escape
+and pair management."
+
+  (define emacs-f-name 'smartparens)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `(,@(if enable-in-prog-mode?
+              `((add-hook 'prog-mode-hook 'smartparens-mode))
+              '())
+        (with-eval-after-load
+         'smartparens
+         (require 'smartparens-config)
+         ,@(if smartparens-bindings? '((sp-use-smartparens-bindings)) '())
+         ,@(if show-smartparens?
+               '((show-paren-mode 0)
+                 (show-smartparens-global-mode 1))
+               '())))
+      #:elisp-packages (list emacs-smartparens)
+      #:summary "\
+Structured editing and navigation, automatic string escaping and pair management"
+      #:commentary "\
+Various tweaks and settings for `smartparents.el'.
+
+By default it calls `sp-use-smartparens-bindings' to set basic keybindings.
+
+Use `sp-cheat-sheet' to get more information about available commands and
+their behavior.")))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-smartparens)))
    (home-services-getter get-home-services)))
 
 ;;; emacs.scm end here
