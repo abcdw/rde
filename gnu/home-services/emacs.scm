@@ -259,21 +259,22 @@ connect to it.")
    "List of expressions to add to @code{ealy-init-el}.  See
 @code{home-emacs-service-type} for more information."))
 
-(define (home-emacs-extensions original-config extension-configs)
-  (home-emacs-configuration
-   (inherit original-config)
-   (elisp-packages
-    (append (home-emacs-configuration-elisp-packages original-config)
-	    (append-map
-	     home-emacs-extension-elisp-packages extension-configs)))
-   (init-el
-    (append (home-emacs-configuration-init-el original-config)
-	    (append-map
-	     home-emacs-extension-init-el extension-configs)))
-   (early-init-el
-    (append (home-emacs-configuration-early-init-el original-config)
-	    (append-map
-	     home-emacs-extension-early-init-el extension-configs)))))
+(define (home-emacs-extensions original-config extensions)
+  (let ((extensions (reverse extensions)))
+    (home-emacs-configuration
+     (inherit original-config)
+     (elisp-packages
+      (append (home-emacs-configuration-elisp-packages original-config)
+	      (append-map
+	       home-emacs-extension-elisp-packages extensions)))
+     (init-el
+      (append (home-emacs-configuration-init-el original-config)
+	      (append-map
+	       home-emacs-extension-init-el extensions)))
+     (early-init-el
+      (append (home-emacs-configuration-early-init-el original-config)
+	      (append-map
+	       home-emacs-extension-early-init-el extensions))))))
 
 
 (define home-emacs-service-type
