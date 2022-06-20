@@ -310,10 +310,10 @@ extensible, self-documenting editor.")))
 	  #:key
           summary authors maintainers url keywords commentary
 	  (elisp-packages '())
-	  (autoloads? #t))
-  "Takes a list of Elisp expressions, create emacs-NAME package.
-@code{#~\";;;###autoload\"} can be used to make next expression be
-loaded on startup."
+	  (autoloads? #f))
+  "Takes a list of Elisp expressions, creates emacs-NAME package.
+When autoloads? is @code{#t} adds @code{#~\";;;###autoload\"} before each
+Elisp expression to make it evaluated on Emacs startup."
 
   (define (package->package-input pkg)
     (list ((@ (guix packages) package-name) pkg) pkg))
