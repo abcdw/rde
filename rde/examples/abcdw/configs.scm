@@ -337,6 +337,7 @@
    (feature-emacs-elpher)
    (feature-emacs-telega)
    (feature-emacs-pdf-tools)
+   (feature-emacs-nov-el)
 
    ;; TODO: Revisit <https://en.wikipedia.org/wiki/Git-annex>
    (feature-emacs-git)
@@ -348,6 +349,9 @@
     #:org-roam-directory "~/work/abcdw/notes/notes")
    (feature-emacs-org-agenda
     #:org-agenda-files '("~/work/abcdw/agenda/todo.org"))
+   (feature-emacs-smartparens
+    #:show-smartparens? #t)
+
 
    (feature-ledger)
    (feature-markdown)
