@@ -13,6 +13,8 @@
           #:key
           (docker docker)
           (docker-cli docker-cli)
+          (emacs-docker emacs-docker)
+          (emacs-dockerfile-mode emacs-dockerfile-mode)
           (containerd containerd))
   "Configure docker and related packages."
 
