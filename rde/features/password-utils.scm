@@ -130,6 +130,6 @@ Keybinding for `rde-consult-pass' and embark actions for it."
 
   (feature
    (name 'password-store)
-   (values '((pass . #t)
-	     (password-store . #t)))
+   (values `((pass . #t)
+	     (password-store . ,password-store)))
    (home-services-getter password-store-home-services)))
