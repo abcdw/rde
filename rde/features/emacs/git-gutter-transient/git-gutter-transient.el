@@ -1,3 +1,34 @@
+;;; git-gutter-transient.el --- Transient additions for git-gutter
+
+;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+
+;; Author: Andrew Tropin <andrew@trop.in>
+;;
+;; URL: https://trop.in/rde
+;; Keywords: convenience
+
+;; This file is part of rde.
+
+;; rde is free software: you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation, either version 3 of the License, or
+;; (at your option) any later version.
+
+;; rde is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with rde.  If not, see <https://www.gnu.org/licenses/>.
+
+;;; Commentary:
+
+;; Interface for fast navigation between hunks and easier access to various
+;; git commands.
+
+;;; Code:
+
 (require 'git-gutter)
 (require 'transient)
 (require 'magit)
