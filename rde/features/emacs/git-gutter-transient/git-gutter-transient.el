@@ -65,7 +65,7 @@
 ;;;###autoload (autoload 'git-gutter-transient "git-gutter-transient" nil t)
 (transient-define-prefix git-gutter-transient ()
   :transient-suffix     'transient--do-stay
-  :transient-non-suffix 'transient--do-warn
+  :transient-non-suffix 'transient--do-exit
   ["Hunk actions"
    [("p" "Previous" git-gutter-transient:previous-hunk)]
    [("n" "Next" git-gutter-transient:next-hunk)]
