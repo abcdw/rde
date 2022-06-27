@@ -40,6 +40,9 @@ and provides GPG-PRIMARY-KEY value for other features."
         home-sway-service-type
         `((exec ,(file-append gnupg "/bin/gpg-connect-agent")
                 updatestartuptty /bye >/dev/null)
+          ,@(if (equal? pinentry-flavor 'qt)
+                '((for_window "[app_id=\"pinentry-qt\"]" floating enable))
+                '())
           (,#~""))))
 
      ;; <https://github.com/drduh/YubiKey-Guide#harden-configuration>
