@@ -178,8 +178,8 @@ function, which accepts config with rde values and returns a string."
          'message
 
          ,@(if msmtp
-             '((setq
-                sendmail-program "msmtp"
+             `((setq
+                sendmail-program ,(file-append msmtp "/bin/msmtp")
                 message-send-mail-function 'message-send-mail-with-sendmail
                 message-sendmail-f-is-evil t
                 message-sendmail-extra-arguments '("--read-envelope-from")))
