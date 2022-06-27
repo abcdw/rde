@@ -78,6 +78,12 @@
           (with-eval-after-load
            'clojure-mode
            (customize-set-variable 'clojure-align-forms-automatically t)))
+        #:summary "\
+Clojure(Script) code style, CIDER, LSP, imenu and other tweaks"
+        #:commentary "\
+Configure eglot, imenu, CIDER, flymake and other packages.
+"
+        #:keywords '(convenience clojure)
         #:elisp-packages
         (list emacs-cider emacs-clojure-mode
               (get-value 'emacs-eglot config emacs-eglot)

@@ -33,6 +33,12 @@
            'transmission
            (let ((map transmission-mode-map))
              (define-key map "R" 'transmission-move))))
+        #:summary "\
+Transmission Emacs interface"
+        #:commentary "\
+Keybinding in `rde-app-map', R for `transmission-move', xdg entry for magnet
+links and torrent files."
+        #:keywords '(convenience)
         #:elisp-packages (list emacs-transmission
                                (get-value 'emacs-configure-rde-keymaps config))))
 

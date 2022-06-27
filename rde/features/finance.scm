@@ -41,6 +41,11 @@
         `((with-eval-after-load
            'ledger-mode
            (setq ledger-default-date-format ledger-iso-date-format)))
+        #:summary "\
+Tweaks for ledger-mode"
+        #:commentary "\
+Use ISO date."
+        #:keywords '(convenience)
         #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
                                emacs-ledger-mode)))))
 

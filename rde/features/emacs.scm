@@ -410,10 +410,12 @@ Prefix argument can be used to kill a few words."
             '("rde applications" . rde-app-map))
           (define-key mode-specific-map (kbd "t")
             '("rde toggles" . rde-toggle-map)))
-        #:summary "General settings"
+        #:summary "General settings, better defaults"
+        #:commentary "\
+It can contain settings not yet moved to separate features."
+        #:keywords '(convenience)
         #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
-                               emacs-expand-region emacs-guix)
-        #:keywords '(convenience))
+                               emacs-expand-region emacs-guix))
 
        (service
         home-emacs-service-type
@@ -688,7 +690,17 @@ utilizing reverse-im package."
                  'reverse-im
                  (setq reverse-im-input-methods ,default-input-method))
                 (reverse-im-mode 1))
-            '()))
+              '()))
+      #:summary "\
+Better keyboard layouts handling"
+      #:commentary "\
+Input methods allows to input characters from different languages and other
+character sets, but preserving all keybindings in place using builtin emacs
+capabilities by toggling input method instead of system keyboard layout.
+
+Reverse input methods works in a similiar way, but for system keyboard layout,
+by mapping characters to default emacs keybindings."
+      #:keywords '(convenience faces)
       #:elisp-packages `(,@(if enable-reverse-im (list emacs-reverse-im) '())
                          ,@input-method-packages))))
 
@@ -777,6 +789,11 @@ utilizing reverse-im package."
          (setq erc-header-line-format " %n on %t (%m,%l)"))
 
         ,@extra-config)
+            #:summary "\
+Reasonable defaults for ERC and some enhancements"
+      #:commentary "\
+Less verbose output, nicks highlighted with different colors."
+      #:keywords '(convenience)
       #:elisp-packages (list emacs-erc-hl-nicks))
      (emacs-xdg-service
       emacs-f-name
@@ -848,6 +865,11 @@ utilizing reverse-im package."
          (add-hook 'telega-chat-mode-hook 'rde-telega-chat-mode)
 
          (setq telega-completing-read-function completing-read-function)))
+            #:summary "\
+Telegram client in Emacs"
+      #:commentary "\
+A few keybindings and small adjustments."
+      #:keywords '(convenience faces)
       #:elisp-packages (list emacs-telega emacs-telega-contrib
                              (get-value 'emacs-configure-rde-keymaps config)))
 
@@ -883,6 +905,12 @@ utilizing reverse-im package."
         (with-eval-after-load
          'saveplace
          (require 'saveplace-pdf-view)))
+      #:summary "\
+PDF reading in Emacs"
+      #:commentary "\
+A few adjustments for pdf-tools and xdg entry for opening PDF files in emacs
+client."
+      #:keywords '(convenience reading)
       #:elisp-packages (list emacs-pdf-tools emacs-saveplace-pdf-view))
      (emacs-xdg-service emacs-f-name "Emacs (Client) [PDF]" xdg-gexp
                         #:default-for '(application/pdf))))
@@ -989,6 +1017,12 @@ previous window layout otherwise.  With universal argument toggles
         (define-key rde-toggle-map (kbd "m") 'hide-mode-line-mode)
         (define-key rde-toggle-map (kbd "M") 'global-hide-mode-line-mode)
         (define-key global-map (kbd "s-f") 'rde-toggle-monocle))
+      #:summary "\
+Focused editing and reading"
+      #:commentary "\
+Various functions, keybindings and settings for creating distraction free
+working environemnt."
+      #:keywords '(convenience reading editing)
       #:elisp-packages (list emacs-olivetti emacs-hide-header-line
                              (get-value 'emacs-configure-rde-keymaps config)))))
 
@@ -1026,7 +1060,12 @@ previous window layout otherwise.  With universal argument toggles
                '())
 
          (add-hook 'dired-mode-hook (lambda () (setq truncate-lines t)))
-         (setq dired-hide-details-hide-symlink-targets nil))))
+         (setq dired-hide-details-hide-symlink-targets nil)))
+      #:summary "\
+Configurations for emacs built-in file manager"
+      #:commentary "\
+Small tweaks, xdg entry for openning directories in emacs client."
+      #:keywords '(convenience dired files))
      (emacs-xdg-service emacs-f-name "Emacs (Client) [file:]" xdg-gexp
                         #:default-for '(inode/directory))))
 
@@ -1089,7 +1128,12 @@ previous window layout otherwise.  With universal argument toggles
              'magit (eshell/alias "gd" "magit-diff-unstaged"))
 
             (define-key eshell-mode-map (kbd "s-e")
-              'switch-to-prev-buffer-or-eshell))))))))
+              'switch-to-prev-buffer-or-eshell)))))
+      #:summary "\
+Eshell configurations, aliases, tweaks"
+      #:commentary "\
+Aliases, keybindings, small hack and tweaks."
+      #:keywords '(convenience eshell))))
 
   (feature
    (name f-name)
@@ -1166,6 +1210,11 @@ Start an unlimited search at `point-min' otherwise."
              '((add-hook 'org-mode-hook 'rde-buffer-name-to-title-config)))
 
          (with-eval-after-load 'notmuch (require 'ol-notmuch))))
+      #:summary "\
+Sensible defaults for org mode"
+      #:commentary "\
+Indentation and refile configurations, visual adjustment."
+      #:keywords '(convenience org-mode)
       #:elisp-packages (list emacs-org emacs-org-contrib))))
 
   (feature
@@ -1246,7 +1295,13 @@ Start an unlimited search at `point-min' otherwise."
                ;; TODO: Name this value better
                ,(- (get-value 'olivetti-body-width config 85)))
          (setq org-agenda-window-setup 'current-window)
-         (setq org-agenda-files ',org-agenda-files))))))
+         (setq org-agenda-files ',org-agenda-files)))
+      #:summary "\
+Preconfigured agenda views"
+      #:commentary "\
+Reasonable keybindings, preconfigured agenda views and integration with
+olivetti package."
+      #:keywords '(convenience))))
 
   (feature
    (name f-name)
@@ -1271,6 +1326,11 @@ Start an unlimited search at `point-min' otherwise."
       emacs-f-name
       config
       `((autoload 'elpher-go "elpher"))
+      #:summary "\
+Gemini and gopher browser"
+      #:commentary "\
+gemini:// links will be automatically openned in emacs client."
+      #:keywords '(convenience)
       #:elisp-packages (list emacs-elpher))
      (emacs-xdg-service emacs-f-name "Emacs (Client) [gemini:]" xdg-gexp
                         #:default-for '(x-scheme-handler/gemini))))
@@ -1341,6 +1401,15 @@ git-link, git-timemachine."
          (define-fringe-bitmap 'git-gutter-fr:deleted
            (vector 8 12 14 15)
            nil nil 'bottom)))
+      #:summary "\
+Combination of packages for git-related operations"
+      #:commentary "\
+Navigating history with git-time-machine, getting link to web interface of
+origin repo with git-link, manipulation and fast navigation through unstaged
+changes using git-gutter-transient.
+
+Almost all other operations are covered by magit."
+      #:keywords '(convenience faces)
       #:elisp-packages (list emacs-magit emacs-magit-todos
                              (get-value 'emacs-configure-rde-keymaps config)
                              emacs-git-link emacs-git-timemachine
@@ -1374,6 +1443,11 @@ available options."
         (setq which-key-ellipsis "...")
         (which-key-mode 1)
         (define-key global-map (kbd "C-h C-k") 'which-key-show-top-level))
+      #:summary "\
+Tooltips for keychords"
+      #:commentary "\
+Keybinding for top level chords and small appearance adjustments."
+      #:keywords '(convenience faces)
       #:elisp-packages (list emacs-which-key))))
 
   (feature
@@ -1430,7 +1504,12 @@ available options."
                    (custom-set-faces face))
 
            (dolist (face faces)
-                   (put (car face) 'saved-face nil))))))))
+                   (put (car face) 'saved-face nil)))))
+      #:summary "\
+Font and face settings"
+      #:commentary "\
+Values are sourced from feature-fonts."
+      #:keywords '(convenience faces))))
 
   (feature
    (name f-name)
@@ -1593,6 +1672,19 @@ relative line numbers, when narrowing is active."
         ;;  (setq marginalia-annotator-registry
         ;;        (assq-delete-all 'library marginalia-annotator-registry)))
         (marginalia-mode 1))
+      #:summary "\
+General settings related to completion"
+      #:commentary "\
+Different commands providing various useful lists of candidates and
+alternatives to builtins.
+
+Matching rules configurations for filtering candidates, using orderless
+package and builtin emacs capabilities.
+
+Actions on candidate or list of candidates using embark.
+
+Annotations for completion candidates using marginalia."
+      #:keywords '(convenience completion)
       #:elisp-packages
       (append
        (if mini-frame?
@@ -1726,6 +1818,12 @@ calculation function for vertico buffer."
          (vertico-multiform-mode))
 
         (vertico-mode 1))
+      #:summary "\
+Flexible minibuffer completion interface"
+      #:commentary "\
+Some completions open in a buffer on the side to make a list of candidates
+higher and easier to navigate."
+      #:keywords '(convenience completion)
       #:elisp-packages (list emacs-vertico))))
 
   (feature
@@ -1812,6 +1910,11 @@ buffer should be displayed in other window use least recent one."
                            'consult-preview-at-point-mode))
                '()))
         (add-hook 'after-init-hook 'mct-minibuffer-mode))
+      #:summary "\
+Alternative minibuffer completion interface using buffers."
+      #:commentary "\
+This configuration packages is not actively maintained right now."
+      #:keywords '(convenience completion)
       #:elisp-packages (list emacs-mct
                              (get-value 'emacs-consult config emacs-consult)))))
 
@@ -1850,6 +1953,12 @@ buffer should be displayed in other window use least recent one."
                 (lambda ()
                   (when-let (project (project-current))
                             (car (project-roots project))))))))
+      #:summary "\
+Enchancements for project management with project.el"
+      #:commentary "\
+Keybinding for `project-prefix-map', integration with consult and minor
+adjustments."
+      #:keywords '(convenience project)
       #:elisp-packages (list (get-value 'emacs-consult config emacs-consult)))))
 
   (feature
@@ -1896,6 +2005,11 @@ emacsclient feels more like a separate emacs instance."
                    (kbd "P")
                    'rde-persp-switch-project)))
               '()))
+      #:summary "\
+Buffer isolation for separate project and emacs clients"
+      #:commentary "\
+Provide basic adjustments and integration with project.el."
+      #:keywords '(convenience)
       #:elisp-packages (list emacs-perspective))))
 
   (feature
@@ -1938,6 +2052,12 @@ emacsclient feels more like a separate emacs instance."
         (define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
         (define-key global-map (kbd "C-c n f") 'org-roam-node-find)
         (define-key global-map (kbd "C-c n i") 'org-roam-node-insert))
+      #:summary "\
+Knowlede base, note-taking set up and ready"
+      #:commentary "\
+Set roam directory, basic keybindings, reasonable defaults and adjust
+marginalia annotations."
+      #:keywords '(convenience org-mode roam knowledgebase)
       #:elisp-packages (list emacs-org-roam))))
 
   (feature
@@ -1986,6 +2106,12 @@ enable rde-keycast-mode on configure-keycast package load."
         (require 'configure-rde-keymaps)
         (define-key rde-toggle-map (kbd "k") 'rde-keycast-mode)
         (define-key rde-toggle-map (kbd "K") 'rde-keycast-mode))
+      #:summary "\
+Show commands and keybindings in header-line"
+      #:commentary "\
+Make `keycast-mode' work with header line instead of modeline, provides
+keybindings and adjust some minor settings."
+      #:keywords '(convenience)
       #:elisp-packages (list emacs-moody emacs-keycast
                              (get-value 'emacs-configure-rde-keymaps config)))))
 
@@ -2044,7 +2170,15 @@ enable rde-keycast-mode on configure-keycast package load."
                          nil t)))
 
          (add-hook 'nov-post-html-render-hook 'rde-nov-post-html-render-hook)))
-     #:elisp-packages (list emacs-nov-el
+      #:summary "\
+Improved rendering for epub reading via nov.el"
+      #:commentary "\
+Integrates `olivetti-mode' for focused reading, justify-kp for better
+rendering.
+
+application/epub+zip mime-type will be openned with emacs client."
+      #:keywords '(convenience hypermedia multimedia epub reading)
+      #:elisp-packages (list emacs-nov-el
                             (get-value 'emacs-olivetti config emacs-olivetti)
                             emacs-justify-kp))
      (emacs-xdg-service
@@ -2080,6 +2214,11 @@ enable rde-keycast-mode on configure-keycast package load."
          (add-hook 'eglot-managed-mode-hook
                    (lambda () (setq consult-imenu--cache nil))))
         (customize-set-variable 'eglot-extend-to-xref t))
+      #:summary "\
+Refactoring, completion, navigation, documentation via LSP"
+      #:commentary "\
+Mostly workarounds and integratios with other packages."
+      #:keywords '(convenience completion lsp editing languages)
       #:elisp-packages (list emacs-eglot emacs-consult-eglot))))
 
   (feature

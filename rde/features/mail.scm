@@ -208,7 +208,12 @@ function, which accepts config with rde values and returns a string."
          (customize-set-variable
           'message-auto-save-directory
           (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                  "/emacs/mail-drafts")))))
+                  "/emacs/mail-drafts"))))
+      #:summary "\
+Email sending interface tweaks"
+      #:commentary "\
+Citation line format, message signature, gpg and msmtp configurations. "
+      #:keywords '(convenience))
 
      (emacs-xdg-service
       emacs-f-name
@@ -869,6 +874,11 @@ not appear in the pop-up buffer."
 ;;            (add-hook 'notmuch-hello-mode-hook 'rde--add-notmuch-hello-hooks)
 
            (setq notmuch-show-logo nil)))
+        #:summary "\
+Tons of configurations and additions for notmuch email client"
+        #:commentary "\
+Set default MUA, adjust view, add auxiliary functions and keybindings."
+        #:keywords '(convenience)
         #:elisp-packages
         (append
          (list (get-value 'emacs-configure-rde-keymaps config) emacs-notmuch)

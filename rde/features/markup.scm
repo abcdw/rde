@@ -29,6 +29,11 @@
            ;; TODO: Package js/css for prettier previews
            (setq markdown-command ,(file-append pandoc "/bin/pandoc"))
            (setq markdown-fontify-code-blocks-natively t)))
+        #:summary "\
+Markdown tweaks"
+        #:commentary "\
+Integration with pandoc, better code blocks rendering."
+        #:keywords '(convenience)
         #:elisp-packages (list emacs-markdown-mode)))))
 
   (feature

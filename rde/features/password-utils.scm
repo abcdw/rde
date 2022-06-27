@@ -116,6 +116,11 @@
                           (add-to-list 'embark-keymap-alist
                                        '(pass . embark-pass-actions))))
                        '()))
+               #:summary "\
+Password store emacs interfaces"
+               #:commentary "\
+Keybinding for `rde-consult-pass' and embark actions for it."
+               #:keywords '(convenience)
                #:elisp-packages
                (append
                 (list emacs-pass emacs-password-store emacs-password-store-otp

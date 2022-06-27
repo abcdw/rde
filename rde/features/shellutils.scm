@@ -52,6 +52,11 @@ use_guixs() {
         (add-hook 'after-init-hook 'envrc-global-mode)
         (with-eval-after-load 'envrc
          (define-key envrc-mode-map (kbd "C-c e") 'envrc-command-map)))
+      #:summary "\
+Source environment for the project from envrc"
+      #:commentary "\
+Default keybinding for `envrc-command-map'."
+      #:keywords '(convenience project)
       #:elisp-packages (list emacs-envrc))))
 
   (feature

@@ -123,6 +123,12 @@ if one already exists."
                          (vterm t))))
                  (define-key project-prefix-map (kbd "t") 'project-vterm)))
               '()))
+      #:summary "\
+Full-fledged terminal in Emacs"
+      #:commentary "\
+Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
+`s-t' hotkey."
+      #:keywords '(convenience)
       #:elisp-packages `(,emacs-vterm
                          ,@(if (get-value 'emacs-consult config)
                                (list (get-value 'emacs-consult config))

@@ -27,6 +27,11 @@
          'configure-rde-keymaps
          (define-key rde-app-map (kbd "d") 'docker))
         (add-to-list 'auto-mode-alist '(".*Dockerfile\\'" . dockerfile-mode)))
+      #:summary "\
+Docker interface and Dockerfile syntax"
+      #:commentary "\
+Keybinding and Dockerfile major mode association."
+      #:keywords '(convenience)
       ;; MAYBE: Add emacs-docker-tramp?
       #:elisp-packages (list emacs-docker emacs-dockerfile-mode
                              (get-value 'emacs-configure-rde-keymaps config)))))
