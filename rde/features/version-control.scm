@@ -42,6 +42,7 @@
        (service
         home-git-service-type
         (home-git-configuration
+         (package git)
          (ignore
           '("*~"
             "*.\\#\\*"
