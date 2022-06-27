@@ -45,13 +45,13 @@
     (quit-window t w)))
 
 (defun git-gutter-transient:quit-and-disable ()
-  "Quit"
+  "Quit."
   (interactive)
   (git-gutter-transient:quit)
   (git-gutter-mode -1))
 
 (defun git-gutter-transient:magit ()
-  "Quit"
+  "Quit and magit."
   (interactive)
   (git-gutter-transient:quit)
   (magit))
