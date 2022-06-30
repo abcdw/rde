@@ -1521,6 +1521,7 @@ Values are sourced from feature-fonts."
           #:key
           (mini-frame? #f)
           (emacs-orderless emacs-orderless)
+          (emacs-cape emacs-cape)
           (emacs-consult emacs-consult)
           (emacs-embark emacs-embark)
           (emacs-marginalia emacs-marginalia-latest))
@@ -1691,12 +1692,13 @@ Annotations for completion candidates using marginalia."
            (list emacs-mini-frame)
            '())
        (list emacs-orderless emacs-marginalia
-             emacs-pcmpl-args
+             emacs-pcmpl-args emacs-cape
              emacs-consult emacs-embark)))))
 
   (feature
    (name f-name)
    (values `((,f-name . #t)
+             (emacs-cape . ,emacs-cape)
              (emacs-embark . ,emacs-embark)
              (emacs-consult . ,emacs-consult)))
    (home-services-getter get-home-services)))
