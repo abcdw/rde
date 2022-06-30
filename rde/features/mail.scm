@@ -756,24 +756,19 @@ not appear in the pop-up buffer."
            (setq notmuch-identities ',emails)
            (setq notmuch-address-use-company nil)
 
-           (defun rde-notmuch-address-expand-name ()
-             "Alternative to `notmuch-address-expand-name', which uses
-`completion-in-region'.  This version of function ignores
-`notmuch-address-post-completion-functions'."
-             (interactive)
-             (let* ((end (point))
-	            (beg (save-excursion
-		          (re-search-backward "\\(\\`\\|[\n:,]\\)[ \t]*")
-		          (goto-char (match-end 0))
-		          (point)))
-	            (orig (buffer-substring-no-properties beg end))
-	            (completion-ignore-case t)
-	            (options (with-temp-message
-                              "Looking for completion candidates..."
-		              (notmuch-address-options orig))))
-               (completion-in-region beg end options)))
-           (advice-add 'notmuch-address-expand-name :override
-                       'rde-notmuch-address-expand-name)
+           (defun rde-notmuch-address-setup ()
+             "Function doing nothing"
+             nil)
+           (advice-add 'notmuch-address-setup :override
+                       'rde-notmuch-address-setup)
+           (defun rde-notmuch-message-mode ()
+             "Add completion at point functions made from company backends."
+             (setq-local
+              completion-at-point-functions
+              (append
+               (list (cape-company-to-capf 'notmuch-company))
+               completion-at-point-functions)))
+           (add-hook 'notmuch-message-mode-hook 'rde-notmuch-message-mode)
 
            (setq notmuch-unthreaded-show-out nil)
 
