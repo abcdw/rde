@@ -352,6 +352,16 @@ modifier once and hold it, after that you type @kbd{gl} and in the
 second you press and hold @key{Meta}, press @kbd{g}, release @key{Meta},
 press and hold @key{Control}, press @kbd{l}.
 
+@anchor{Named ASCII Chars}
+@anchor{Control Characters}
+@quotation Note
+Some actions are bound to @kbd{@key{RET}}, @kbd{@key{TAB}}, etc and on
+regular keyboards it can be inconvinient to reach for such keys,
+especially in long key sequences.  In such cases @kbd{C-m}, @kbd{C-i}
+(@pxref{Named ASCII Chars,,,Emacs}) can be used.  For example @kbd{C-x
+C-f C-n C-n C-m} will open the second file in find-file dialog.
+@end quotation
+
 If the command is frequently used bind it to the same key as well:
 @kbd{M-g M-g} for goto-line or similiar action, @kbd{C-c C-c} for
 finishing org capture operation, git commit message or other action
