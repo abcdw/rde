@@ -377,6 +377,24 @@ Other applications can try to mimic a fraction of its power and work in
 a similiar way to some degree, we try to configure them to do so, but
 there are no guarantees.
 
+The primary completion mechanism is tightly related to minibuffer
+(@pxref{Minibuffer,,,Emacs}) and internally utilize
+@code{completing-read} function (@pxref{Minibuffer Completion,,,Elisp}).
+Minibuffer usually used for reading values.  To simplify this process
+prompt, default value, possible options and predicates checking the
+value can be provided, based on it the completion facilities help to
+input correct value(s) or narrow the list of options and pick apropriate
+candidates.
+
+The way completion candidates are presented, updated, sorted, selected,
+the way hotkeys work and other aspects depend heavily on minibuffer
+completion UI. At the moment of writing rde preferred UI is Vertico, the
+reasons for this choice are described in the corresponding section
+(@pxref{Vertico,,,}).  The way they get filtered depends on completion
+styles (@pxref{Completion Styles,,,Emacs}), in addition to built-in
+styles, rde uses Orderless package and respective completion styles
+(@pxref{Orderless,,,}).
+
 @subsection Dynamic Abbreviations
 The first and most versatile completion can be done with
 @code{dabbrev-completion}, which is bound to @kbd{C-M-/}, it will
@@ -397,9 +415,15 @@ For more information @xref{Dynamic Abbrevs,,,Emacs}.
 
 @subsection Completion At Point
 
-
 @kbd{C-M-i} completion-at-point
 
+@subsection Consult
+@subsection Cape
+
+@anchor{Orderless}
+@subsection Orderless
+
+@anchor{Vertico}
 @subsection Vertico
 
 @section Shells
