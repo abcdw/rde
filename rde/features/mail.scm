@@ -756,6 +756,25 @@ not appear in the pop-up buffer."
            (setq notmuch-identities ',emails)
            (setq notmuch-address-use-company nil)
 
+           (defun rde-notmuch-address-expand-name ()
+             "Alternative to `notmuch-address-expand-name', which uses
+`completion-in-region'.  This version of function ignores
+`notmuch-address-post-completion-functions'."
+             (interactive)
+             (let* ((end (point))
+	            (beg (save-excursion
+		          (re-search-backward "\\(\\`\\|[\n:,]\\)[ \t]*")
+		          (goto-char (match-end 0))
+		          (point)))
+	            (orig (buffer-substring-no-properties beg end))
+	            (completion-ignore-case t)
+	            (options (with-temp-message
+                              "Looking for completion candidates..."
+		              (notmuch-address-options orig))))
+               (completion-in-region beg end options)))
+           (advice-add 'notmuch-address-expand-name :override
+                       'rde-notmuch-address-expand-name)
+
            (setq notmuch-unthreaded-show-out nil)
 
            (setq notmuch-show-empty-saved-searches t)
