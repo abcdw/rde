@@ -68,4 +68,5 @@
   (and (list? lst) (every file-system? lst)))
 (define-public (list-of-mapped-devices? lst)
   (and (list? lst) (every mapped-device? lst)))
-
+(define-public (list-of-swap-devices? lst)
+  (and (list? lst) (every swap-space? lst)))

@@ -53,19 +53,21 @@ keyboard-layout will be overriden by feature-keyboard if it present."
 (define* (feature-file-systems
           #:key
           (mapped-devices '())
+          (swap-devices '())
           (file-systems '())
           (base-file-systems %base-file-systems))
   "Provides file systems for operating-system.  By default
 %base-file-systems will be added to the end of FILE-SYSTEMS, this
 behavior can be overriden with BASE-FILE-SYSTEM argument."
   (ensure-pred list-of-mapped-devices? mapped-devices)
+  (ensure-pred list-of-swap-devices? swap-devices)
   (ensure-pred list-of-file-systems? file-systems)
   (ensure-pred list-of-file-systems? base-file-systems)
 
   (let ((file-systems (append file-systems base-file-systems)))
     (feature
      (name 'file-systems)
-     (values (make-feature-values mapped-devices file-systems)))))
+     (values (make-feature-values mapped-devices swap-devices file-systems)))))
 
 
 (define* (feature-kernel

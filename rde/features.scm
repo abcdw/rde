@@ -308,6 +308,9 @@ to config one more time."
 	 (mapped-devices   (get-value
 			    'mapped-devices config
 			    (operating-system-mapped-devices initial-os)))
+	 (swap-devices     (get-value
+			    'swap-devices config
+			    (operating-system-swap-devices initial-os)))
 	 (file-systems     (get-value
 			    'file-systems config
 			    (operating-system-file-systems initial-os)))
@@ -364,6 +367,7 @@ to config one more time."
       (issue issue)
       (bootloader bootloader)
       (mapped-devices mapped-devices)
+      (swap-devices swap-devices)
       (file-systems file-systems)
       (keyboard-layout keyboard-layout)
       (kernel kernel)
