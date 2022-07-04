@@ -1474,7 +1474,13 @@ Keybinding for top level chords and small appearance adjustments."
 
 ;; TODO: Can be useful to have different presets for different
 ;; environments.  For easier and faster switching.
-(define* (feature-emacs-faces)
+(define* (feature-emacs-faces
+          #:key
+          ;; Serif vs Sans-Serif
+          ;; <https://geniusee.com/single-blog/font-readability-research-famous-designers-vs-scientists>
+          ;; Picked Sans by default, as it works good enough and doesn't look
+          ;; too outstanding.
+          (use-sans-for-variable-pitch? #t))
   "Configure faces for GNU Emacs."
 
   (define emacs-f-name 'faces)
@@ -1512,7 +1518,10 @@ Keybinding for top level chords and small appearance adjustments."
                 (faces `((default ((t (:font ,mono))))
                          (fixed-pitch ((t (:family ,mono-fn))))
                          (button ((t (:inherit (fixed-pitch)))))
-                         (variable-pitch ((t (:family ,serif-fn)))))))
+                         (variable-pitch ((t (:family
+                                              ,,(if use-sans-for-variable-pitch?
+                                                    'sans-fn
+                                                    'serif-fn))))))))
            (dolist (face faces)
                    (custom-set-faces face))
 
