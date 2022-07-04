@@ -283,9 +283,15 @@
     #:extra-init-el `()
     #:additional-elisp-packages
     (append
-     (list emacs-consult-dir)
      (pkgs "emacs-elfeed" "emacs-hl-todo"
+           "emacs-consult-dir" "emacs-org-modern"
+           "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
+           "emacs-kind-icon"
+           "emacs-nginx-mode" "emacs-yaml-mode"
+           "emacs-lispy"
            "emacs-ytdl"
+           "emacs-multitran"
+           "emacs-minimap"
            "emacs-ement"
            "emacs-restart-emacs"
            "emacs-org-present")))
