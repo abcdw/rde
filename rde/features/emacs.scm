@@ -1105,7 +1105,7 @@ Small tweaks, xdg entry for openning directories in emacs client."
               (project-eshell)
               (eshell arg)))
 
-        (define-key global-map (kbd "s-e") 'rde-project-eshell-or-eshell)
+        (define-key global-map (kbd "s-e") 'eshell)
         (with-eval-after-load
          'eshell
          (add-hook
