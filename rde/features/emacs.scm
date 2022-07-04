@@ -377,6 +377,7 @@ C-h C-a to open About Emacs buffer."
                 '(("America/Los_Angeles" "Los Angeles")
                   ("America/Boise" "Boise")
                   ("America/New_York" "New York")
+                  ("UTC" "UTC")
                   ("Europe/London" "London")
                   ("Europe/Paris" "Paris")
                   ("Europe/Helsinki" "Helsinki")
