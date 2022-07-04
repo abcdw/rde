@@ -59,24 +59,6 @@
     "Paragraph justification for emacs using Knuth/Plass algorithm ")
    (license license:gpl3+))))
 
-(define-public emacs-org-modern
-  (package
-   (name "emacs-org-modern")
-   (version "0.1")
-   (source (origin
-            (method git-fetch)
-            (uri (git-reference
-                  (url "https://github.com/minad/org-modern")
-                  (commit "dc19304f409259d1b258c51cedd2d362e0ff9b98")))
-            (sha256
-             (base32 "1b0cis1n786c4lkrsi71ak2wv21mhgbfk3q2pp6qiqhddah0l1cg"))
-            (file-name (git-file-name name version))))
-   (build-system emacs-build-system)
-   (license license:gpl3+)
-   (home-page "https://github.com/minad/org-modern")
-   (synopsis "")
-   (description "")))
-
 (define-public emacs-vertico-latest
   (let* ((commit "2de617a9199d152533ce280c6eb653147f15f8d1")
          (revision "2"))
@@ -129,30 +111,6 @@
                (base32
                 "0r1iz92sn2ddi11arr9s8z7cdpjli7pn55yhaswvp4sdch7chb5r")))))))
 
-(define-public emacs-consult-dir
-  (package
-   (name "emacs-consult-dir")
-   (version "0.1")
-   (source (origin
-            (method git-fetch)
-            (uri (git-reference
-                  (url "https://github.com/karthink/consult-dir")
-                  (commit (string-append "v" version))))
-            (sha256
-             (base32 "1cff4ssrn1mw2s5n090pdmwdirnfih8idg5f0ll2bi2djc4hq5kn"))
-            (file-name (git-file-name name version))))
-   (build-system emacs-build-system)
-   (license license:gpl3+)
-   (propagated-inputs (list emacs-consult))
-   (home-page "https://github.com/karthink/consult-dir")
-   (synopsis "Insert paths into minibuffer prompts in Emacs")
-   (description "Consult-dir allows you to easily insert directory
-paths into the minibuffer prompt in Emacs.
-
-When using the minibuffer, you can switch - with completion and
-filtering provided by your completion setup - to any directory you’ve
-visited recently, or to a project or bookmarked directory. The
-minibuffer prompt will be replaced with the directory you choose.")))
 
 (define-public emacs-cyrillic-dvorak-im
   (package
