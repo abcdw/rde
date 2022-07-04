@@ -1542,12 +1542,17 @@ Values are sourced from feature-fonts."
 (define* (feature-emacs-completion
           #:key
           (mini-frame? #f)
+          (marginalia-align 'left)
           (emacs-orderless emacs-orderless)
           (emacs-cape emacs-cape)
           (emacs-consult emacs-consult)
           (emacs-embark emacs-embark)
           (emacs-marginalia emacs-marginalia-latest))
   "Configure completion system for GNU Emacs."
+
+  (define (marginalia-align? marginalia-align)
+    (memq marginalia-align '(left right)))
+  (ensure-pred marginalia-align? marginalia-align)
   (define emacs-f-name 'completion)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
@@ -1690,10 +1695,10 @@ relative line numbers, when narrowing is active."
          (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
 
-        ;; (with-eval-after-load
-        ;;  'marginalia
-        ;;  (setq marginalia-annotator-registry
-        ;;        (assq-delete-all 'library marginalia-annotator-registry)))
+        (with-eval-after-load
+         'marginalia
+         (setq marginalia-align ',marginalia-align))
+
         (marginalia-mode 1))
       #:summary "\
 General settings related to completion"
