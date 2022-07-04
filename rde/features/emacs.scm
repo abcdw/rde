@@ -1324,6 +1324,7 @@ olivetti package."
 
   (define (get-home-services config)
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (define openssl (get-value 'openssl config (@ (gnu packages tls) openssl)))
     (define xdg-gexp
       #~(system*
          #$emacs-cmd
@@ -1334,7 +1335,10 @@ olivetti package."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((autoload 'elpher-go "elpher"))
+      `((autoload 'elpher-go "elpher")
+        (with-eval-after-load
+         'elpher
+         (setq elpher-openssl-command ,(file-append openssl "/bin/openssl"))))
       #:summary "\
 Gemini and gopher browser"
       #:commentary "\
