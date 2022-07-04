@@ -1547,12 +1547,18 @@ Values are sourced from feature-fonts."
           (emacs-cape emacs-cape)
           (emacs-consult emacs-consult)
           (emacs-embark emacs-embark)
-          (emacs-marginalia emacs-marginalia-latest))
+          (emacs-marginalia emacs-marginalia))
   "Configure completion system for GNU Emacs."
 
   (define (marginalia-align? marginalia-align)
     (memq marginalia-align '(left right)))
   (ensure-pred marginalia-align? marginalia-align)
+  (ensure-pred file-like? emacs-orderless)
+  (ensure-pred file-like? emacs-cape)
+  (ensure-pred file-like? emacs-consult)
+  (ensure-pred file-like? emacs-embark)
+  (ensure-pred file-like? emacs-marginalia)
+
   (define emacs-f-name 'completion)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
