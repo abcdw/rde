@@ -593,6 +593,15 @@ value of background color for mode/header-line.")
                              'mode-line)
                        nil :background rde-status-line-bg-color))))
 
+        (menu-bar-mode 0)
+        (tool-bar-mode 0)
+        (scroll-bar-mode 0)
+
+        (set-frame-parameter (selected-frame) 'internal-border-width ,margin)
+
+        (setq use-dialog-box nil)
+        (setq use-file-dialog nil)
+
         (customize-set-variable 'window-divider-default-right-width ,margin)
         (window-divider-mode))
 
@@ -607,18 +616,14 @@ value of background color for mode/header-line.")
 
         ,#~""
         (push '(internal-border-width . ,margin) default-frame-alist)
-        (setq-default fringes-outside-margins t)
-        (setq-default left-margin-width 1)
-        (setq-default right-margin-width 1)
+        ;; (setq-default fringes-outside-margins t)
+        ;; (setq-default left-margin-width 1)
+        ;; (setq-default right-margin-width 1)
 
         ,#~""
-        (setq use-dialog-box nil)
-        (setq use-file-dialog nil)
         ,@(if (get-value 'emacs-advanced-user? config)
               '((setq inhibit-startup-screen t))
               '()))
-      #:elisp-packages (list emacs-modus-themes
-                             (get-value 'emacs-configure-rde-keymaps config))
       #:keywords '(appearance mode-line faces accessibility)
       #:summary "\
 Sets theme, fonts, faces and provides different visual tweaks"
@@ -634,7 +639,10 @@ with references to researches.
 
 Modeline is simplified and moved to the top of the window.
 
-Almost all visual elements are disabled.")))
+Almost all visual elements are disabled."
+      #:elisp-packages
+      (list emacs-modus-themes
+            (get-value 'emacs-configure-rde-keymaps config)))))
 
   (feature
    (name f-name)
