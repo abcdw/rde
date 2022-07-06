@@ -218,6 +218,20 @@
            ,#~(system* #$(file-append sway "/bin/swaymsg") "reload"))))
 
        (simple-service
+	'xdg-desktop-portal-wlr-configuration
+	home-xdg-configuration-files-service-type
+        `(("xdg-desktop-portal-wlr/config"
+           ,(mixed-text-file
+             "xdg-desktop-portal-wlr-config"
+             #~(format #f "[screencast]
+output_name=
+max_fps=30
+chooser_cmd=~a -f %o -or -c ff0000
+chooser_type=simple"
+                       #$(file-append (get-value 'slurp config slurp)
+                                      "/bin/slurp"))))))
+
+       (simple-service
         'packages-for-sway
 	home-profile-service-type
         (append
