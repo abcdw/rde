@@ -195,7 +195,7 @@ be a symbol, which will be used to construct feature name."
       home-shepherd-service-type
       (list
        (shepherd-service
-        (provision '(dbus-home))
+        (provision '(dbus))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
                   (list #$(file-append dbus "/bin/dbus-daemon")

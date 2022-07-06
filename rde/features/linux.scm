@@ -111,7 +111,7 @@ ctl_type.pipewire {
       home-shepherd-service-type
       (list
        (shepherd-service
-        (requirement '(dbus-home))
+        (requirement '(dbus))
         (provision '(pipewire))
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
