@@ -204,7 +204,11 @@ be a symbol, which will be used to construct feature name."
                         (string-append
                          "--address=" "unix:path="
                          (getenv "XDG_RUNTIME_DIR") "/bus"))
-                  )))))))
+                  #:log-file (string-append
+                                    (or (getenv "XDG_LOG_HOME")
+                                        (format #f "~a/.local/var/log"
+                                                (getenv "HOME")))
+                                    "/dbus.log"))))))))
   (define (get-system-services _)
     %rde-desktop-services)
 
