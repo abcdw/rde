@@ -214,8 +214,9 @@ be a symbol, which will be used to construct feature name."
 
   (feature
    (name 'desktop-services)
-   (values '((desktop-services . #t)
-	     (elogind . #t)))
+   (values `((desktop-services . #t)
+	     (elogind . #t)
+             (dbus . ,dbus)))
    (home-services-getter get-home-services)
    (system-services-getter get-system-services)))
 
