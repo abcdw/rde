@@ -111,7 +111,7 @@
      :transient transient--do-exit)]]
 
   (interactive)
-  (git-gutter)
+  (git-gutter-mode)
   ;; (if (condition-case nil
   ;;         (git-gutter:search-here-diffinfo git-gutter:diffinfos)
   ;;       (error nil))
