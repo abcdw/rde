@@ -25,6 +25,7 @@
   #:use-module (gnu home services fontutils)
   #:use-module (gnu services)
   #:use-module (gnu packages fonts)
+  #:use-module (rde packages fonts)
   #:use-module (srfi srfi-9)
 
   #:export (feature-fonts
@@ -36,10 +37,11 @@
 
 (define %rde-default-font-packages
   (list font-iosevka
-	font-dejavu
-	font-liberation
-	font-gnu-unifont
-	font-fira-go))
+        font-iosevka-aile
+        font-iosevka-etoile
+        font-liberation ;; Substitute for Arial, Times New Roman, Courier New
+        font-noto-emoji
+        font-gnu-unifont))
 
 (define-record-type <font>
   (%font name size weight)
@@ -52,15 +54,17 @@
   (%font name size weight))
 
 (define* (feature-fonts
-	  #:key
+          #:key
           (default-font-size 11)
-	  (font-monospace (font "Iosevka"
+          (font-monospace (font "Iosevka"
                                 #:size default-font-size #:weight 'regular))
-	  (font-sans      (font "Fira Go"))
-	  (font-serif     (font "Liberation Serif"))
-	  (font-unicode   (font "Unifont"))
-	  (font-packages  '())
-	  (base-font-packages  %rde-default-font-packages))
+          (font-sans      (font "Iosevka Aile"
+                                #:size default-font-size #:weight 'regular))
+          (font-serif     (font "Iosevka Etoile"
+                                #:size default-font-size #:weight 'regular))
+          (font-unicode   (font "Unifont"))
+          (font-packages  '())
+          (base-font-packages  %rde-default-font-packages))
   "Configure fonts.  DEFAULT-FONT-SIZE will be used for making
 font-monospace default value, and it will be ignored if
 #:font-monospace argument is specified."
