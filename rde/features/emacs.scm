@@ -1843,6 +1843,17 @@ It shows `completion-at-point' candidates in overlay frame."
 
         (with-eval-after-load
          'vertico
+
+         (advice-add
+          'vertico--format-candidate :around
+          (lambda (orig cand prefix suffix index _start)
+            (let ((cand (funcall orig cand prefix suffix index _start)))
+              (concat
+               (if (= vertico--index index)
+                   (propertize "» " 'face 'vertico-current)
+                   "  ")
+               cand))))
+
          (define-key global-map (kbd "s-s") 'vertico-repeat)
          ;; TODO: Bind vertico-next/previous-group to more usual keys?
 
