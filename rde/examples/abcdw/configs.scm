@@ -184,7 +184,8 @@
    (feature-fonts
     #:font-monospace (font "Iosevka" #:size 11 #:weight 'regular)
     ;; #:font-monospace (font "Fira Mono" #:size 14 #:weight 'semi-light)
-    #:font-packages (list font-iosevka font-fira-mono))
+    ;; #:font-packages (list font-fira-mono)
+    #:default-font-size 11)
 
    (feature-alacritty
     #:config-file (local-file "./config/alacritty/alacritty.yml")
