@@ -1931,7 +1931,9 @@ calculation function for vertico buffer."
 
          (vertico-multiform-mode))
 
-        (vertico-mode 1))
+        (if after-init-time
+            (vertico-mode 1)
+            (add-hook 'after-init-hook 'vertico-mode)))
       #:summary "\
 Flexible minibuffer completion interface"
       #:commentary "\
