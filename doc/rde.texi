@@ -436,6 +436,28 @@ For more information @xref{Dynamic Abbrevs,,,Emacs}.
 @anchor{Vertico}
 @subsection Vertico
 
+@subsection Corfu
+Corfu provides a UI for Completion At Point functions, similiar to the
+one you usually see in IDEs (a small tooltip near the point).  Corfu
+sets @code{completion-in-region-function} and after that
+@code{completion-at-point} starts showing this little overlay completion
+UI, completion candidates a generated using
+@code{completion-at-point-functions}, which provided by many major modes
+and separate packages like cape (@pxref{Cape,,,}), usually other
+features sets them automatically, but nothing stops anyone to adjust it
+to his liking.
+
+Corfu supports completion styles, including orderless, use
+@kbd{M-@key{SPC}} to insert space without closing completion UI.
+
+Use @kbd{M-h}/@kbd{M-g} to quickly review documentation/source code for
+selected candidate and @kbd{C-M-v}/@kbd{C-M-V} to scroll other window.
+
+Use @kbd{M-m} to move candidates to minibuffer, it maybe helpful if you
+want to apply embark (@pxref{Embark,,,}) actions or just get more room.
+
+@subsection Embark
+
 @section Shells
 @subsection Bash
 rde uses GNU Bash (@pxref{,,,Bash}) with minimum customizations as a
