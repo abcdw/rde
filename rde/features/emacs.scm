@@ -1356,6 +1356,7 @@ gemini:// links will be automatically openned in emacs client."
 
 (define* (feature-emacs-git
           #:key
+          (git-gutter-transient-key "s-g")
           (emacs-magit emacs-magit)
           (emacs-magit-todos emacs-magit-todos)
           (emacs-git-timemachine emacs-git-timemachine)
@@ -1386,7 +1387,16 @@ git-link, git-timemachine."
         (require 'configure-rde-keymaps)
         (define-key rde-toggle-map (kbd "g") 'git-gutter-mode)
         (define-key rde-toggle-map (kbd "G") 'global-git-gutter-mode)
-        (define-key global-map (kbd "s-g") 'git-gutter-transient)
+        (define-key global-map (kbd ,git-gutter-transient-key)
+          'git-gutter-transient)
+
+        (with-eval-after-load
+         'git-gutter-transient
+         (transient-insert-suffix
+          'git-gutter-transient "Q"
+          '(,git-gutter-transient-key
+            "Quit and disable" git-gutter-transient:quit-and-disable
+            :transient transient--do-exit)))
 
         (with-eval-after-load
          'git-gutter
