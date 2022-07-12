@@ -2367,11 +2367,11 @@ and pair management."
          'smartparens
          (require 'smartparens-config)
          ,@(if smartparens-bindings? '((sp-use-smartparens-bindings)) '())
+         (define-key smartparens-mode-map (kbd "M-S") 'sp-forward-slurp-sexp)
          ,@(if show-smartparens?
                '((show-paren-mode 0)
                  (show-smartparens-global-mode 1))
                '())))
-      #:elisp-packages (list emacs-smartparens)
       #:summary "\
 Structured editing and navigation, automatic string escaping and pair management"
       #:commentary "\
@@ -2380,7 +2380,9 @@ Various tweaks and settings for `smartparents.el'.
 By default it calls `sp-use-smartparens-bindings' to set basic keybindings.
 
 Use `sp-cheat-sheet' to get more information about available commands and
-their behavior.")))
+their behavior."
+      #:keywords '(convenience editing)
+      #:elisp-packages (list emacs-smartparens))))
 
   (feature
    (name f-name)
