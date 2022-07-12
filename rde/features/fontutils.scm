@@ -71,6 +71,8 @@ font-monospace default value, and it will be ignored if
 
   (ensure-pred integer? default-font-size)
   (ensure-pred font? font-monospace)
+  (ensure-pred font? font-sans)
+  (ensure-pred font? font-serif)
   (ensure-pred list-of-packages? font-packages)
   (ensure-pred list-of-packages? base-font-packages)
 
