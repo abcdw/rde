@@ -45,6 +45,7 @@
             feature-emacs-appearance
             feature-emacs-faces
             feature-emacs-completion
+            feature-emacs-corfu
             feature-emacs-vertico
             feature-emacs-mct
             feature-emacs-input-methods
@@ -1734,6 +1735,83 @@ Annotations for completion candidates using marginalia."
              (emacs-cape . ,emacs-cape)
              (emacs-embark . ,emacs-embark)
              (emacs-consult . ,emacs-consult)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-corfu
+          #:key
+          (emacs-corfu emacs-corfu)
+          (emacs-corfu-doc emacs-corfu-doc)
+          (turn-on? #t)
+          (corfu-auto #t)
+          (corfu-doc-auto #t))
+  "Configure corfu completion UI for GNU Emacs."
+  (ensure-pred file-like? emacs-corfu)
+  (ensure-pred file-like? emacs-corfu-doc)
+  (ensure-pred boolean? turn-on?)
+  (ensure-pred boolean? corfu-auto)
+  (ensure-pred boolean? corfu-doc-auto)
+
+  (define emacs-f-name 'corfu)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile
+         (require 'corfu))
+
+        (with-eval-after-load
+         'corfu
+         (setq corfu-min-width 60)
+         (setq corfu-cycle t)
+
+         (setq corfu-auto ,(if corfu-auto 't 'nil))
+         ;; '((define-key corfu-map (kbd "SPC") 'corfu-insert-separator))
+
+         ;; (define-key corfu-map (kbd "C-e") 'corfu-insert)
+         (defun corfu-move-to-minibuffer ()
+           (interactive)
+           (let ((completion-extra-properties corfu--extra)
+                 completion-cycle-threshold completion-cycling)
+             (apply 'consult-completion-in-region completion-in-region--data)))
+         (define-key corfu-map (kbd "M-m") 'corfu-move-to-minibuffer)
+
+         (defun corfu-enable-in-minibuffer ()
+           "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+           (when (where-is-internal 'completion-at-point
+                                    (list (current-local-map)))
+             (corfu-mode 1)))
+         (add-hook 'minibuffer-setup-hook 'corfu-enable-in-minibuffer)
+
+         (setq corfu-doc-auto ,(if corfu-doc-auto 't 'nil))
+
+         ;; (define-key corfu-map (kbd "M-n") 'corfu-doc-scroll-up)
+         ;; (define-key corfu-map (kbd "M-p") 'corfu-doc-scroll-down)
+         (define-key corfu-map (kbd "M-D") 'corfu-doc-toggle)
+
+         (add-hook 'corfu-mode-hook 'corfu-doc-mode))
+
+        ;; FIXME: Fix override of vertico completion in region.
+        ,@(if turn-on?
+              '((if after-init-time
+                    (global-corfu-mode 1)
+                    (add-hook 'after-init-hook 'global-corfu-mode)))
+              '()))
+      #:summary "\
+Flexible in-buffer (overlay) completion interface"
+      #:commentary "\
+It shows `completion-at-point' candidates in overlay frame."
+      #:keywords '(convenience completion)
+      #:elisp-packages (list (get-value 'emacs-consult config emacs-consult)
+                             emacs-corfu emacs-corfu-doc))))
+
+  (feature
+   (name f-name)
+   (values (append
+            `((emacs-corfu . ,emacs-corfu)
+              (emacs-completion-at-point? . #t))))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-vertico
