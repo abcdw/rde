@@ -1912,6 +1912,7 @@ calculation function for vertico buffer."
                  ;; (file buffer)
                  ;; (project-file buffer)
                  (info-menu buffer)
+                 (consult-org-heading buffer)
                  (consult-history buffer)
                  (consult-lsp-symbols buffer)
                  (embark-keybinding buffer)
