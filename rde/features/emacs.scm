@@ -1753,7 +1753,7 @@ Annotations for completion candidates using marginalia."
           (emacs-corfu-doc emacs-corfu-doc)
           (turn-on? #t)
           (corfu-auto #t)
-          (corfu-doc-auto #t))
+          (corfu-doc-auto #f))
   "Configure corfu completion UI for GNU Emacs."
   (ensure-pred file-like? emacs-corfu)
   (ensure-pred file-like? emacs-corfu-doc)
