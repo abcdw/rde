@@ -481,7 +481,9 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
   (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
 
 (define ovh-isync-settings
-  (generate-isync-serializer "ssl0.ovh.net" gandi-folder-mapping))
+  (generate-isync-serializer "ssl0.ovh.net" gandi-folder-mapping
+                             #:subfolders 'Legacy
+                             #:auth-mechs 'LOGIN))
 
 (define (generic-isync-settings mail-directory mail-account)
   (let* ((user     (mail-account-fqda mail-account)))
