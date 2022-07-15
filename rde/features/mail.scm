@@ -242,6 +242,11 @@ Citation line format, message signature, gpg and msmtp configurations. "
               (port . 587)))
     (gandi . ((host . "mail.gandi.net")
               (port . 587)))
+    (ovh . ((host . "ssl0.ovh.net")
+            (port . 465)
+            (tls_starttls . off)))
+    (gmx-fr . ((host . "mail.gmx.net")
+               (port . 587)))
     (generic . #f)))
 
 (define %default-msmtp-settings
