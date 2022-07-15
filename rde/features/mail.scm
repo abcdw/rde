@@ -435,6 +435,20 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 (define gandi-isync-settings
   (generate-isync-serializer "mail.gandi.net" gandi-folder-mapping))
 
+(define gmx-fr-folder-mapping
+  '(("inbox"   . "INBOX")
+    ("sent"    . "Envoy&AOk-s")
+    ("drafts"  . "Brouillons")
+    ("archive" . "Archive")
+    ("trash"   . "Corbeille")
+    ("spam"    . "Junk")))
+
+(define gmx-fr-isync-settings
+  (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
+
+(define ovh-isync-settings
+  (generate-isync-serializer "ssl0.ovh.net" gandi-folder-mapping))
+
 (define (generic-isync-settings mail-directory mail-account)
   (let* ((user     (mail-account-fqda mail-account)))
     `(,#~"# Do not know how to serialize generic accounts :("
@@ -444,6 +458,8 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 (define %default-isync-serializers
   `((gmail . ,gmail-isync-settings)
     (gandi . ,gandi-isync-settings)
+    (gmx-fr . ,gmx-fr-isync-settings)
+    (ovh . ,ovh-isync-settings)
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
