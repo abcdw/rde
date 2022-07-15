@@ -408,7 +408,16 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
         isync-mapping)
      ,#~"")))
 
-(define (generate-isync-serializer host folders-mapping)
+(define* (generate-isync-serializer
+          host folders-mapping
+          #:key
+          (port #f)
+          (auth-mechs #f)
+          (subfolders 'Verbatim)
+          (cipher-string #f)
+          (pipeline-depth #f))
+  (ensure-pred symbol? subfolders)
+
   (define (isync-settings mail-directory mail-account)
     (let* ((id       (mail-account-id mail-account))
            (user     (mail-account-fqda mail-account))
@@ -417,16 +426,20 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
                           " starts here")
         (IMAPAccount ,id)
         (Host ,host)
+        ,(if (integer? port) `(Port ,port) #~"")
         (User ,user)
         (PassCmd ,pass-cmd)
-        ;; (AuthMechs LOGIN)
+        ,(if (symbol? auth-mechs) `(AuthMechs ,auth-mechs) #~"")
         (SSLType IMAPS)
+        (CertificateFile /etc/ssl/certs/ca-certificates.crt)
+        ,(if (symbol? cipher-string) `(CipherString ,cipher-string) #~"")
+        ,(if (integer? pipeline-depth) `(PipelineDepth ,pipeline-depth) #~"")
         ,#~""
         (IMAPStore ,(symbol-append id '-remote))
         (Account ,id)
         ,#~""
         (MaildirStore ,(symbol-append id '-local))
-        (SubFolders Verbatim)
+        (SubFolders ,subfolders)
         (Path ,(string-append mail-directory "/accounts/" user "/"))
         (Inbox ,(string-append mail-directory "/accounts/" user "/inbox"))
         ,#~""
