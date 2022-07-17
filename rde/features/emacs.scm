@@ -2297,7 +2297,8 @@ Provide basic adjustments and integration with project.el."
 ;; TODO: rewrite to states
 (define* (feature-emacs-org-roam
           #:key
-          (org-roam-directory #f))
+          (org-roam-directory #f)
+          (org-roam-dailies-directory #f))
   "Configure org-roam for GNU Emacs."
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
@@ -2324,11 +2325,18 @@ Provide basic adjustments and integration with project.el."
                (concat "${title:80} " (propertize "${tags:20}" 'face 'org-tag))
                org-roam-node-annotation-function
                (lambda (node) (marginalia--time (org-roam-node-file-mtime node))))
-         (org-roam-db-autosync-enable))
+         (org-roam-db-autosync-enable)
 
+         ,@(if org-roam-dailies-directory
+               `((setq org-roam-dailies-directory ,org-roam-dailies-directory))
+               '()))
+
+        (define-key global-map (kbd "C-c n t") 'org-roam-dailies-goto-today)
+        (define-key global-map (kbd "C-c n d") 'org-roam-dailies-goto-date)
         (define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
         (define-key global-map (kbd "C-c n f") 'org-roam-node-find)
         (define-key global-map (kbd "C-c n i") 'org-roam-node-insert))
+
       #:summary "\
 Knowlede base, note-taking set up and ready"
       #:commentary "\
