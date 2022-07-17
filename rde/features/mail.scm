@@ -58,6 +58,8 @@
             mailing-list-config
 
             generate-isync-serializer
+            %default-isync-serializers
+            %default-msmtp-provider-settings
             %rde-notmuch-saved-searches)
 
   #:re-export (l2md-repo))
@@ -258,7 +260,7 @@ Citation line format, message signature, gpg and msmtp configurations. "
 ;;; feature-msmtp.
 ;;;
 
-(define-public %default-msmtp-provider-settings
+(define %default-msmtp-provider-settings
   `((gmail . ((host . "smtp.gmail.com")
               (port . 587)))
     (gandi . ((host . "mail.gandi.net")
