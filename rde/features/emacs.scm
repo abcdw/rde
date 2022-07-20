@@ -371,7 +371,11 @@ C-h C-a to open About Emacs buffer."
           (eval-when-compile (require 'tramp))
           (with-eval-after-load
            'tramp
-           (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+           (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+
+           ,#~";; Allows to use /sudo:HOST:/path if the user in sudoers."
+           (set-default 'tramp-default-proxies-alist
+                        '((".*" "\\`root\\'" "/ssh:%h:"))))
 
           ,#~""
           ,@(if (get-value 'emacs-advanced-user? config)
