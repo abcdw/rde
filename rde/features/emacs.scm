@@ -1603,12 +1603,69 @@ Values are sourced from feature-fonts."
          ;; (advice-add 'completing-read-multiple
          ;;             :override 'consult-completing-read-multiple)
 
-         (setq completion-styles '(orderless))
+         ,#~"\n;; Needed for orderless in default completion UI."
+         (let ((map minibuffer-local-completion-map))
+           (define-key map (kbd "SPC") nil)
+           (define-key map (kbd "?") nil))
+
+         ,#~"\n;; Allows to use \\SPC instead of \\s-"
+         (setq orderless-component-separator
+               'orderless-escapable-split-on-space)
+
+         (defun rde-orderless-literal-dispatcher (pattern _index _total)
+           "Literal style dispatcher using the equals sign as a suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+           (cond
+            ((equal "=" pattern)
+             '(orderless-literal . "="))
+            ((string-suffix-p "=" pattern)
+             (cons 'orderless-literal (substring pattern 0 -1)))))
+
+         (defun rde-orderless-without-literal-dispatcher (pattern _index _total)
+           "Literal without style dispatcher using the exclamation mark as a
+suffix.  It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+           (cond
+            ((equal "!" pattern)
+             '(orderless-literal . "!"))
+            ((string-suffix-p "!" pattern)
+             (cons 'orderless-without-literal (substring pattern 0 -1)))))
+
+         (defun rde-orderless-initialism-dispatcher (pattern _index _total)
+           "Leading initialism  dispatcher using the comma suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+           (cond
+            ((equal "," pattern)
+             '(orderless-literal . ","))
+            ((string-suffix-p "," pattern)
+             (cons 'orderless-initialism (substring pattern 0 -1)))))
+
+         (defun rde-orderless-flex-dispatcher (pattern _index _total)
+           "Flex  dispatcher using the tilde suffix.
+It matches PATTERN _INDEX and _TOTAL according to how Orderless
+parses its input."
+           (cond
+            ((equal "~" pattern)
+             '(orderless-literal . "~"))
+            ((string-suffix-p "~" pattern)
+             (cons 'orderless-flex (substring pattern 0 -1)))))
+
+         (setq orderless-style-dispatchers
+          '(rde-orderless-literal-dispatcher
+            rde-orderless-without-literal-dispatcher
+            rde-orderless-initialism-dispatcher
+            rde-orderless-flex-dispatcher))
+
+
+         (setq completion-styles '(orderless basic))
+         ;; (setq completion-category-defaults nil)
          (setq completion-category-overrides
                ;; basic is required for /ssh: completion to work, but
                ;; keep the same values for project-file too.
-               '((file (styles . (partial-completion basic)))
-                 (project-file (styles . (partial-completion basic)))))
+               '((project-file (styles . (partial-completion basic orderless)))
+                 (file (styles . (partial-completion basic orderless)))))
          (setq enable-recursive-minibuffers t)
 
          ;; (setq resize-mini-windows nil)
