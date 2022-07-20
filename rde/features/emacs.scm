@@ -315,8 +315,18 @@ environment outside of Guix Home."
           (setq save-interprogram-paste-before-kill t)
           (setq mouse-yank-at-point t)
           (setq require-final-newline t)
+
+          (defun rde-whitespace-mode ()
+            "Equivalent of `whitespace-mode', but highlights only tabs."
+            (interactive)
+            (if (and (featurep 'whitespace) whitespace-mode)
+                (whitespace-mode 0)
+                (let ((whitespace-style '(face tabs)))
+                  (whitespace-mode 1))))
           (add-hook 'prog-mode-hook
-                    (lambda () (setq show-trailing-whitespace t)))
+                    (lambda ()
+                      (rde-whitespace-mode)
+                      (setq show-trailing-whitespace t)))
 
           ;; Highlight zero-width whitespaces and other glypless characters.
           (set-face-background 'glyphless-char "red")
