@@ -1587,6 +1587,9 @@ Values are sourced from feature-fonts."
         (with-eval-after-load
          'minibuffer
 
+         ,#~"\n;; It's a little easier to press C-i than C-M-i"
+         (setq tab-always-indent 'complete)
+
          (setq minibuffer-prompt-properties
                '(read-only t cursor-intangible t face minibuffer-prompt))
          (add-hook 'minibuffer-setup-hook 'cursor-intangible-mode)
