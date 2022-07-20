@@ -883,6 +883,13 @@ Less verbose output, nicks highlighted with different colors."
                `((setq telega-video-player-command
                        ,(file-append (get-value 'mpv config) "/bin/mpv")))
                '())
+
+         ,@(if (get-value 'emacs-consult config)
+               '((setq telega-open-file-function 'consult-file-externally))
+               '())
+         (setq telega-open-message-as-file
+               '(video audio voice-note animation video-note))
+
          (autoload 'company-grab "company")
 
          (setq telega-emoji-company-backend 'telega-company-emoji)
