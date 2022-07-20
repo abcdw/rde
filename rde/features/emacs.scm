@@ -1594,8 +1594,12 @@ Values are sourced from feature-fonts."
                '(read-only t cursor-intangible t face minibuffer-prompt))
          (add-hook 'minibuffer-setup-hook 'cursor-intangible-mode)
 
-         (setq file-name-shadow-properties
-               '(invisible t intangible t face file-name-shadow field shadow))
+         ;; Shows hidden prefix when completing candidates with partial style
+         ;; (setq file-name-shadow-properties
+         ;;       '(invisible t intangible t face file-name-shadow field shadow))
+
+         (add-hook 'rfn-eshadow-update-overlay-hook 'vertico-directory-tidy)
+
          ;; (advice-add 'completing-read-multiple
          ;;             :override 'consult-completing-read-multiple)
 
