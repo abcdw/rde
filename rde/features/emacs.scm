@@ -868,7 +868,7 @@ Less verbose output, nicks highlighted with different colors."
       config
       `((eval-when-compile
          (require 'telega)
-         (require 'company))
+         (require 'cape))
 
         (require 'configure-rde-keymaps)
         (define-key rde-app-map (kbd "t")
@@ -879,28 +879,37 @@ Less verbose output, nicks highlighted with different colors."
 
          (define-key telega-chat-mode-map (kbd "s-B") 'telega-chat-with)
          (define-key telega-root-mode-map (kbd "s-B") 'telega-chat-with)
-         (setq telega-emoji-company-backend 'telega-company-emoji)
          ,@(if (get-value 'mpv config)
                `((setq telega-video-player-command
                        ,(file-append (get-value 'mpv config) "/bin/mpv")))
                '())
+         (autoload 'company-grab "company")
+
+         (setq telega-emoji-company-backend 'telega-company-emoji)
+
          (defun rde-telega-chat-mode ()
-           (set (make-local-variable 'company-backends)
-                (append (list telega-emoji-company-backend
-                              'telega-company-username
-                              'telega-company-hashtag)
-                        (when (telega-chat-bot-p telega-chatbuf--chat)
-                          '(telega-company-botcmd))))
-           (company-mode 1))
+           "Add completion at point functions made from company backends."
+           (setq-local
+            completion-at-point-functions
+            (append
+             (mapcar
+              'cape-company-to-capf
+              (append (list telega-emoji-company-backend
+                            'telega-company-username
+                            'telega-company-hashtag)
+                      (when (telega-chat-bot-p telega-chatbuf--chat)
+                        '(telega-company-botcmd))))
+                    completion-at-point-functions)))
          (add-hook 'telega-chat-mode-hook 'rde-telega-chat-mode)
 
          (setq telega-completing-read-function completing-read-function)))
-            #:summary "\
+      #:summary "\
 Telegram client in Emacs"
       #:commentary "\
 A few keybindings and small adjustments."
       #:keywords '(convenience faces)
       #:elisp-packages (list emacs-telega emacs-telega-contrib
+                             (get-value 'emacs-cape config emacs-cape)
                              (get-value 'emacs-configure-rde-keymaps config)))
 
      (emacs-xdg-service emacs-f-name "Emacs (Client) [tg:]" xdg-gexp
