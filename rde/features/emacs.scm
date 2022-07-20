@@ -351,6 +351,12 @@ C-h C-a to open About Emacs buffer."
           (define-key global-map (kbd "s-r") 'recompile)
 
           ,#~""
+          (define-key global-map (kbd "s-b") 'switch-to-buffer)
+          (define-key global-map (kbd "s-w") 'kill-current-buffer)
+          (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
+          (define-key global-map (kbd "s-o") 'other-window)
+
+          ,#~""
           ;; TODO: Move it to feature-emacs-tramp
           (eval-when-compile (require 'tramp))
           (with-eval-after-load
@@ -1750,12 +1756,8 @@ relative line numbers, when narrowing is active."
           (define-key map (kbd "M-s l") 'consult-line))
         ;; (define-key isearch-mode-map (kbd "C-S-s") 'consult-line)
 
-        ;; MAYBE: Move to feature-emacs-buffers/windows
+        ;; MAYBE: Share this keybinding with switch-to-buffer?
         (define-key minibuffer-local-map (kbd "s-b") 'exit-minibuffer)
-        (define-key global-map (kbd "s-b") 'switch-to-buffer)
-        (define-key global-map (kbd "s-w") 'kill-current-buffer)
-        (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
-        (define-key global-map (kbd "s-o") 'other-window)
 
         (autoload 'consult-customize "consult" "" nil 'macro)
         (autoload 'consult--customize-set "consult")
