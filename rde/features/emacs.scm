@@ -1325,7 +1325,7 @@ Indentation and refile configurations, visual adjustment."
                      (org-agenda-span 14)
                      (org-agenda-show-all-dates nil)
                      (org-agenda-time-grid nil)
-                     (org-deadline-warning-days 0)
+                     (org-agenda-show-future-repeats nil)
                      (org-agenda-block-separator nil)
                      (org-agenda-entry-types '(:deadline))
                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'done))
@@ -1334,6 +1334,8 @@ Indentation and refile configurations, visual adjustment."
                     "*"
                     ((org-agenda-block-separator nil)
                      (org-agenda-span 14)
+                     (org-agenda-show-future-repeats nil)
+                     (org-agenda-skip-deadline-prewarning-if-scheduled t)
                      (org-agenda-overriding-header "\nAgenda\n")))
                    (alltodo
                     ""
