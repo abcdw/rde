@@ -1404,6 +1404,13 @@ gemini:// links will be automatically openned in emacs client."
 git-link, git-timemachine."
   ;; MAYBE: Declare it as a feature value?
   (ensure-pred maybe-string? project-directory)
+  (ensure-pred file-like? emacs-magit)
+  (ensure-pred file-like? emacs-magit-todos)
+  (ensure-pred file-like? emacs-git-timemachine)
+  (ensure-pred file-like? emacs-git-link)
+  (ensure-pred file-like? emacs-git-gutter-fringe)
+  (ensure-pred file-like? emacs-git-gutter-transient)
+
   (define emacs-f-name 'git)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
