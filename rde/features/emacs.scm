@@ -2037,6 +2037,7 @@ calculation function for vertico buffer."
 
          (setq vertico-multiform-commands
                '((telega-chat-with buffer)
+                 (magit:--author flat)
                  ;; For some reason it doesn't have an info-menu
                  ;; category and also setting
                  ;; marginalia-command-categories doesn't help
