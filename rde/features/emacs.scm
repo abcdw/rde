@@ -1393,6 +1393,7 @@ gemini:// links will be automatically openned in emacs client."
 (define* (feature-emacs-git
           #:key
           (git-gutter-transient-key "s-g")
+          (project-directory #f)
           (emacs-magit emacs-magit)
           (emacs-magit-todos emacs-magit-todos)
           (emacs-git-timemachine emacs-git-timemachine)
@@ -1401,6 +1402,8 @@ gemini:// links will be automatically openned in emacs client."
           (emacs-git-gutter-transient emacs-git-gutter-transient))
   "Configure git-related utilities for GNU Emacs, including magit,
 git-link, git-timemachine."
+  ;; MAYBE: Declare it as a feature value?
+  (ensure-pred maybe-string? project-directory)
   (define emacs-f-name 'git)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
@@ -1433,6 +1436,23 @@ git-link, git-timemachine."
           '(,git-gutter-transient-key
             "Quit and disable" git-gutter-transient:quit-and-disable
             :transient transient--do-exit)))
+
+        (with-eval-after-load
+         'magit
+         (defvar rde-projects-directory ,(or project-directory 'nil)
+           "Directory where project repositories are stored.")
+
+         (autoload 'git-link--parse-remote "git-link")
+         (defun rde-get-local-repo-path-from-url (url)
+           "Get directory from repository url and suggest it to
+`magit-clone-default-directory'."
+           (let* ((path (cadr (git-link--parse-remote url)))
+                  (dir (file-name-directory (directory-file-name path))))
+             (if rde-projects-directory
+                 (expand-file-name dir rde-projects-directory)
+                 dir)))
+
+         (setq magit-clone-default-directory 'rde-get-local-repo-path-from-url))
 
         (with-eval-after-load
          'git-gutter
