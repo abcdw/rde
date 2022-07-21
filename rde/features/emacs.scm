@@ -69,7 +69,8 @@
             feature-emacs-smartparens
 
             rde-elisp-configuration-service
-            emacs-xdg-service))
+            emacs-xdg-service
+            expand-extra-elisp))
 
 
 ;;;
@@ -156,6 +157,13 @@ of it, otherwise adds a require to @file{init.el}."
        (config `((exec . ,file-file)
                  (icon . "emacs")))
        (type 'application)))))))
+
+(define (expand-extra-elisp elisp config)
+  "If ELISP is a list just return it, if it's a function call it with CONFIG
+argument, throw an exception otherwise."
+  (let ((res (if (procedure? elisp) (elisp config) elisp)))
+    (ensure-pred list? res)
+    res))
 
 
 ;;;
@@ -510,7 +518,8 @@ It can contain settings not yet moved to separate features."
           (deuteranopia? #t)
           (dark? #f)
           (header-line-as-mode-line? #t)
-          (emacs-modus-themes emacs-modus-themes))
+          (emacs-modus-themes emacs-modus-themes)
+          (extra-elisp '()))
   "Make Emacs looks modern and minimalistic. `deuteranopia?' substitutes
 red/green colors with red/blue, which helps people with colorblindness
 and overall looks cool."
@@ -627,7 +636,9 @@ value of background color for mode/header-line.")
         (setq use-file-dialog nil)
 
         (customize-set-variable 'window-divider-default-right-width ,margin)
-        (window-divider-mode))
+        (window-divider-mode)
+
+        ,@(expand-extra-elisp extra-elisp config))
 
       #:early-init
       `(,#~"\n;; Disable ui elements, add margins."
