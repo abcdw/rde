@@ -516,6 +516,9 @@ red/green colors with red/blue, which helps people with colorblindness
 and overall looks cool."
   (ensure-pred integer? margin)
   (ensure-pred boolean? deuteranopia?)
+  (ensure-pred boolean? dark?)
+  (ensure-pred boolean? header-line-as-mode-line?)
+  (ensure-pred file-like? emacs-modus-themes)
 
   (define emacs-f-name 'appearance)
   (define f-name (symbol-append 'emacs- emacs-f-name))
