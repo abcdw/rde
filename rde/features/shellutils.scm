@@ -40,7 +40,9 @@ use_guixs() {
         'direnv-zsh-hook
         home-zsh-service-type
         (home-zsh-extension
-	 (zshrc (list "eval \"$(direnv hook zsh)\"")))))
+         (zshrc
+          (list
+           "command -v direnv > /dev/null && eval \"$(direnv hook zsh)\"")))))
 
      ;; (add-hook 'Info-mode-hook
      ;;      (lambda ()
