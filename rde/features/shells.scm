@@ -37,10 +37,20 @@
 (define* (feature-zsh
           #:key
           (zsh zsh)
+          (zsh-autosuggestions zsh-autosuggestions)
+          (rde-defaults? #t)
+          (zshrc '())
+          (zprofile '())
+          (zshenv '())
+          (zlogout '())
           (default-shell? #t)
           (enable-zsh-autosuggestions? #t))
   "Configure Zsh."
-  (ensure-pred any-package? zsh)
+  (ensure-pred file-like? zsh)
+  (ensure-pred file-like? zsh-autosuggestions)
+  (ensure-pred boolean? default-shell?)
+  (ensure-pred boolean? enable-zsh-autosuggestions?)
+  (ensure-pred boolean? rde-defaults?)
 
   (define (zsh-home-services config)
     "Returns home services related to Zsh."
@@ -51,9 +61,6 @@
         home-environment-variables-service-type
         `(("SHELL" . ,(file-append zsh "/bin/zsh")))))
 
-     ;; zsh-autosuggestions is very cool plugin, but a little
-     ;; distractive, I find it a little against Attention-friendly
-     ;; principle
      (when enable-zsh-autosuggestions?
        (service home-zsh-autosuggestions-service-type
                 zsh-autosuggestions))
@@ -104,9 +111,16 @@ bindkey -e '^Y' rde-yank
        (xdg-flavor? #t)
        (package zsh)
        (zshrc
-        (list
-         (slurp-file-gexp (local-file "./zsh/zshrc"))
-         "alias state-sync='herd sync state && pass git push origin master'"))))))
+        `(,@(if rde-defaults?
+                `(,(slurp-file-gexp (local-file "./zsh/zshrc"))
+                  ; FIXME: Doesn't belong here, doesn't rely on full paths
+                  "alias state-sync='herd sync state \
+&& pass git push origin master'")
+                '())
+          ,@zshrc))
+       (zprofile zprofile)
+       (zshenv zshenv)
+       (zlogout zlogout)))))
 
   (feature
    (name 'zsh)
