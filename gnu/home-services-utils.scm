@@ -28,6 +28,7 @@
   #:use-module (guix profiles)
   #:use-module (guix packages)
   #:use-module (guix build-system trivial)
+  #:use-module (guix deprecation)
 
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 match)
@@ -97,6 +98,8 @@ it as a string.  FILE must be a file-like object."
   #~(call-with-input-file #$file
       (@ (ice-9 textual-ports) get-string-all)
       #:encoding #$encoding))
+
+(define-deprecated/alias slurp-file-gexp slurp-file-like)
 
 
 ;;;

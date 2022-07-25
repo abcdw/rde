@@ -24,12 +24,12 @@
   #:use-module (gnu home services)
   #:use-module (gnu home-services shells)
   #:use-module (gnu home-services shellutils)
-  #:use-module (gnu home-services-utils)
   #:use-module (gnu services)
   #:use-module (gnu packages shells)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages shellutils)
   #:use-module (guix gexp)
+  #:use-module (rde gexp)
 
   #:export (feature-zsh
             feature-bash))
@@ -112,7 +112,7 @@ bindkey -e '^Y' rde-yank
        (package zsh)
        (zshrc
         `(,@(if rde-defaults?
-                `(,(slurp-file-gexp (local-file "./zsh/zshrc"))
+                `(,(slurp-file-like (local-file "./zsh/zshrc"))
                   ; FIXME: Doesn't belong here, doesn't rely on full paths
                   "alias state-sync='herd sync state \
 && pass git push origin master'")

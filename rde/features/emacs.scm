@@ -26,7 +26,6 @@
   #:use-module (gnu home-services emacs)
   #:use-module (gnu home-services wm)
   #:use-module (gnu home services xdg)
-  #:use-module (gnu home-services-utils)
   #:use-module (gnu services)
 
   #:use-module (rde packages)
@@ -37,6 +36,7 @@
   #:use-module (gnu packages mail)
 
   #:use-module (guix gexp)
+  #:use-module (rde gexp)
   #:use-module (guix packages)
   #:use-module (guix transformations)
 
@@ -456,7 +456,7 @@ It can contain settings not yet moved to separate features."
          (xdg-flavor? #t)
          (init-el extra-init-el)
          (early-init-el
-          `(,(slurp-file-gexp (local-file "./emacs/early-init.el"))
+          `(,(slurp-file-like (local-file "./emacs/early-init.el"))
             ,@extra-early-init-el))
          ;;; TODO: Rebuilding packages with emacs will be useful for
          ;;; native-comp, but for some reason dash.el fails to build,
