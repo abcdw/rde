@@ -1,3 +1,22 @@
+;;; rde --- Reproducible development environment.
+;;;
+;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;;
+;;; This file is part of rde.
+;;;
+;;; rde is free software; you can redistribute it and/or modify it
+;;; under the terms of the GNU General Public License as published by
+;;; the Free Software Foundation; either version 3 of the License, or (at
+;;; your option) any later version.
+;;;
+;;; rde is distributed in the hope that it will be useful, but
+;;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;;; GNU General Public License for more details.
+;;;
+;;; You should have received a copy of the GNU General Public License
+;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
+
 (define-module (rde features shells)
   #:use-module (rde packages)
   #:use-module (rde features)
@@ -16,10 +35,10 @@
             feature-bash))
 
 (define* (feature-zsh
-	  #:key
-	  (zsh zsh)
-	  (default-shell? #t)
-	  (enable-zsh-autosuggestions? #t))
+          #:key
+          (zsh zsh)
+          (default-shell? #t)
+          (enable-zsh-autosuggestions? #t))
   "Configure Zsh."
   (ensure-pred any-package? zsh)
 
@@ -28,9 +47,9 @@
     (list
      (when default-shell?
        (simple-service
-	'set-default-shell-to-zsh
-	home-environment-variables-service-type
-	`(("SHELL" . ,(file-append zsh "/bin/zsh")))))
+        'set-default-shell-to-zsh
+        home-environment-variables-service-type
+        `(("SHELL" . ,(file-append zsh "/bin/zsh")))))
 
      ;; zsh-autosuggestions is very cool plugin, but a little
      ;; distractive, I find it a little against Attention-friendly
@@ -85,9 +104,9 @@ bindkey -e '^Y' rde-yank
        (xdg-flavor? #t)
        (package zsh)
        (zshrc
-	(list
-	 (slurp-file-gexp (local-file "./zsh/zshrc"))
-	 "alias state-sync='herd sync state && pass git push origin master'"))))))
+        (list
+         (slurp-file-gexp (local-file "./zsh/zshrc"))
+         "alias state-sync='herd sync state && pass git push origin master'"))))))
 
   (feature
    (name 'zsh)
@@ -95,8 +114,8 @@ bindkey -e '^Y' rde-yank
    (home-services-getter zsh-home-services)))
 
 (define* (feature-bash
-	  #:key
-	  (bash bash))
+          #:key
+          (bash bash))
   "Configure Bash."
   (ensure-pred any-package? bash)
 
