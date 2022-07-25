@@ -2298,7 +2298,8 @@ Provide basic adjustments and integration with project.el."
 (define* (feature-emacs-org-roam
           #:key
           (org-roam-directory #f)
-          (org-roam-dailies-directory #f))
+          (org-roam-dailies-directory #f)
+          (org-roam-capture-templates #f))
   "Configure org-roam for GNU Emacs."
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
@@ -2326,6 +2327,10 @@ Provide basic adjustments and integration with project.el."
                org-roam-node-annotation-function
                (lambda (node) (marginalia--time (org-roam-node-file-mtime node))))
          (org-roam-db-autosync-enable)
+
+         ,@(if org-roam-capture-templates
+               `((setq org-roam-capture-templates org-roam-capture-templates))
+               '())
 
          ,@(if org-roam-dailies-directory
                `((setq org-roam-dailies-directory ,org-roam-dailies-directory))
