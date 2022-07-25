@@ -2303,6 +2303,9 @@ Provide basic adjustments and integration with project.el."
   "Configure org-roam for GNU Emacs."
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
+  (ensure-pred maybe-path? org-roam-directory)
+  (ensure-pred maybe-path? org-roam-dailies-directory)
+  (ensure-pred maybe-list? org-roam-capture-templates)
 
   (define emacs-f-name 'org-roam)
   (define f-name (symbol-append 'emacs- emacs-f-name))

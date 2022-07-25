@@ -24,6 +24,9 @@
 (define-public (path? x)
   (string? x))
 
+(define-public (maybe-path? x)
+  (or (path? x) (not x)))
+
 (define-public (maybe-file-like? x)
   (or (file-like? x) (not x)))
 
