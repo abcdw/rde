@@ -2299,13 +2299,14 @@ Provide basic adjustments and integration with project.el."
           #:key
           (org-roam-directory #f)
           (org-roam-dailies-directory #f)
-          (org-roam-capture-templates #f))
+          (org-roam-capture-templates #f)
+          (use-node-types? #t))
   "Configure org-roam for GNU Emacs."
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
-  (ensure-pred maybe-path? org-roam-directory)
   (ensure-pred maybe-path? org-roam-dailies-directory)
   (ensure-pred maybe-list? org-roam-capture-templates)
+  (ensure-pred boolean? use-node-types?)
 
   (define emacs-f-name 'org-roam)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -2325,8 +2326,23 @@ Provide basic adjustments and integration with project.el."
         (autoload 'org-roam-db-autosync-enable "org-roam")
         (with-eval-after-load
          'org-roam
+
+         (cl-defmethod
+          org-roam-node-type ((node org-roam-node))
+          "Return the TYPE of NODE, where the TYPE is a directory of
+the node, relative to `org-roam-directory'."
+          (condition-case
+           nil
+           (file-name-nondirectory
+            (directory-file-name
+             (file-name-directory
+              (file-relative-name (org-roam-node-file node)
+                                  org-roam-directory))))
+           (error "")))
+
          (setq org-roam-node-display-template
-               (concat "${title:80} " (propertize "${tags:20}" 'face 'org-tag))
+               (concat ,(if use-node-types? "${type:15} " "")
+                       "${title:80} " (propertize "${tags:20}" 'face 'org-tag))
                org-roam-node-annotation-function
                (lambda (node) (marginalia--time (org-roam-node-file-mtime node))))
          (org-roam-db-autosync-enable)
