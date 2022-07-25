@@ -33,7 +33,12 @@
                              "direnvrc"
                              "\
 use_guixs() {
-  eval \"$(guix shell \"$@\" --search-paths)\"
+  LOCK_FILE=channels-lock.scm
+  if [ -f $LOCK_FILE ]; then
+    eval \"$(guix time-machine -C $LOCK_FILE -- shell \"$@\" --search-paths)\"
+  else
+    eval \"$(guix shell \"$@\" --search-paths)\"
+  fi
 }"))))
      (when (get-value 'zsh config)
        (simple-service
