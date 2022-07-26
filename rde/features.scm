@@ -23,30 +23,30 @@
   #:use-module (ice-9 pretty-print)
 
   #:export (rde-config
-	    rde-config-features
-	    rde-config-home-environment
-	    rde-config-home-services
-	    rde-config-home-packages
-	    rde-config-operating-system
-	    rde-config-system-services
+            rde-config-features
+            rde-config-home-environment
+            rde-config-home-services
+            rde-config-home-packages
+            rde-config-operating-system
+            rde-config-system-services
 
-	    pretty-print-rde-config
+            pretty-print-rde-config
 
-	    feature
-	    feature-name
-	    feature-values
-	    feature-home-services-getter
-	    feature-system-services-getter
+            feature
+            feature-name
+            feature-values
+            feature-home-services-getter
+            feature-system-services-getter
 
-	    make-feature-values
-	    require-value
-	    get-value
-	    get-value-eval
+            make-feature-values
+            require-value
+            get-value
+            get-value-eval
 
-	    ensure-pred
-	    throw-message
+            ensure-pred
+            throw-message
 
-	    bare-bone-os))
+            bare-bone-os))
 
 (define (alist? lst)
   (every pair? lst))
@@ -79,7 +79,7 @@ of services.  Service can be either @code{service?} or
   this-rde-config
 
   (features rde-config-features
-	    (default '()))
+            (default '()))
 
   (values
    rde-config-values
@@ -95,8 +95,8 @@ of services.  Service can be either @code{service?} or
      ;; Doesn't ensure that there is no duplicates in values.  This
      ;; field is inteded for debugging/development purposes.
      (apply append
-	    (map feature-values
-		 (rde-config-features this-rde-config)))))
+            (map feature-values
+                 (rde-config-features this-rde-config)))))
 
   (home-services
    rde-config-home-services
@@ -139,12 +139,12 @@ of services.  Service can be either @code{service?} or
      (when (not (pred field))
        (raise (condition
                (&message
-		(message
-		 (format
-		  #f (G_ "~a: The predicate '~a' is not satisfied with value '~a'.")
-		  'field
-		  (procedure-name pred)
-		  field)))))))))
+                (message
+                 (format
+                  #f (G_ "~a: The predicate '~a' is not satisfied with value '~a'.")
+                  'field
+                  (procedure-name pred)
+                  field)))))))))
 
 (define-syntax throw-message
   (syntax-rules ()
@@ -152,8 +152,8 @@ of services.  Service can be either @code{service?} or
      (when pred
        (raise (condition
                (&message
-		(message
-		 msg))))))))
+                (message
+                 msg))))))))
 
 (define-syntax make-feature-values
   (syntax-rules ()
@@ -166,32 +166,32 @@ of services.  Service can be either @code{service?} or
     (fold
      (lambda (feature acc)
        (fold
-	(lambda (x acc)
-	  (throw-message
-	   (hash-get-handle acc (car x))
-	   (format #f (G_ "Duplicate entry came from ~a feature:\n~a\n
+        (lambda (x acc)
+          (throw-message
+           (hash-get-handle acc (car x))
+           (format #f (G_ "Duplicate entry came from ~a feature:\n~a\n
 The previous value was:\n~a\n")
-		   (feature-name feature)
-		   x
-		   (hash-get-handle acc (car x))))
-	  (hash-set! acc (car x) (cdr x))
-	  acc)
-	acc
-	(feature-values feature))
+                   (feature-name feature)
+                   x
+                   (hash-get-handle acc (car x))))
+          (hash-set! acc (car x) (cdr x))
+          acc)
+        acc
+        (feature-values feature))
        acc)
      (make-hash-table)
      features)))
 
 (define (print-values features)
   (hash-for-each-handle pretty-print
-			(fold-values features)))
+                        (fold-values features)))
 
 (define (fold-some-services features config services-getter)
   (filter service?
-	  (apply append
-		 (map (lambda (f)
-			((services-getter f) config))
-		      features))))
+          (apply append
+                 (map (lambda (f)
+                        ((services-getter f) config))
+                      features))))
 
 (define (fold-home-services features config)
   "Generates a list of home-services from FEATURES by passing CONFIG
@@ -208,8 +208,8 @@ to each system-services-getter function."
   "Get KEY from rde-config-values."
   (let ((handle (hash-get-handle (rde-config-values config) key)))
     (if handle
-	(cdr handle)
-	default-value)))
+        (cdr handle)
+        default-value)))
 
 (define* (get-value-eval key config #:optional default-value)
   "Get KEY from rde-config-values, if the value is a function apply it
@@ -251,6 +251,8 @@ to config one more time."
 
      (service home-symlink-manager-service-type)
 
+     ;; TODO: Remove fontconfig-minimal and shepherd package if he used for
+     ;; building rde for standalone project
      (service home-fontconfig-service-type)
      (service home-xdg-base-directories-service-type)
      (service home-shell-profile-service-type)
@@ -275,8 +277,8 @@ to config one more time."
    (timezone  "Europe/Paris")
    (locale    "en_US.utf8")
    (bootloader (bootloader-configuration
-		(bootloader grub-efi-bootloader)
-		(targets '("/boot/efi"))))
+                (bootloader grub-efi-bootloader)
+                (targets '("/boot/efi"))))
    (issue "This is rde.  Welcome.\n")
    (services '())
    (file-systems %base-file-systems)))
@@ -284,80 +286,80 @@ to config one more time."
 (define (get-operating-system config)
   (let* ((initial-os (rde-config-initial-os config))
 
-	 (host-name        (get-value
-			    'host-name config
-			    (operating-system-host-name initial-os)))
-	 (timezone         (get-value
-			    'timezone config
-			    (operating-system-timezone initial-os)))
+         (host-name        (get-value
+                            'host-name config
+                            (operating-system-host-name initial-os)))
+         (timezone         (get-value
+                            'timezone config
+                            (operating-system-timezone initial-os)))
          (locale           (get-value
-			    'locale config
-			    (operating-system-locale initial-os)))
+                            'locale config
+                            (operating-system-locale initial-os)))
          (issue            (get-value
-			    'issue config
-			    (operating-system-locale initial-os)))
-	 (keyboard-layout  (get-value
-			    'keyboard-layout config
-			    (operating-system-keyboard-layout initial-os)))
-	 (bootloader-cfg   (get-value
-			    'bootloader-configuration config
-			    (operating-system-bootloader initial-os)))
-	 (bootloader       (bootloader-configuration
-			    (inherit bootloader-cfg)
-			    (keyboard-layout keyboard-layout)))
-	 (mapped-devices   (get-value
-			    'mapped-devices config
-			    (operating-system-mapped-devices initial-os)))
-	 (swap-devices     (get-value
-			    'swap-devices config
-			    (operating-system-swap-devices initial-os)))
-	 (file-systems     (get-value
-			    'file-systems config
-			    (operating-system-file-systems initial-os)))
+                            'issue config
+                            (operating-system-locale initial-os)))
+         (keyboard-layout  (get-value
+                            'keyboard-layout config
+                            (operating-system-keyboard-layout initial-os)))
+         (bootloader-cfg   (get-value
+                            'bootloader-configuration config
+                            (operating-system-bootloader initial-os)))
+         (bootloader       (bootloader-configuration
+                            (inherit bootloader-cfg)
+                            (keyboard-layout keyboard-layout)))
+         (mapped-devices   (get-value
+                            'mapped-devices config
+                            (operating-system-mapped-devices initial-os)))
+         (swap-devices     (get-value
+                            'swap-devices config
+                            (operating-system-swap-devices initial-os)))
+         (file-systems     (get-value
+                            'file-systems config
+                            (operating-system-file-systems initial-os)))
 
-	 (user-name        (get-value 'user-name config))
-	 (full-name        (get-value 'full-name config ""))
-	 (user-groups      (get-value 'user-groups config '()))
-	 (home-directory   (get-value
-			    'home-directory config
-			    (string-append "/home/" (or user-name "user"))))
-	 (login-shell      (get-value 'login-shell config (default-shell)))
-	 (user-password    (get-value 'user-initial-password-hash config #f))
+         (user-name        (get-value 'user-name config))
+         (full-name        (get-value 'full-name config ""))
+         (user-groups      (get-value 'user-groups config '()))
+         (home-directory   (get-value
+                            'home-directory config
+                            (string-append "/home/" (or user-name "user"))))
+         (login-shell      (get-value 'login-shell config (default-shell)))
+         (user-password    (get-value 'user-initial-password-hash config #f))
 
-	 (user             (if user-name
+         (user             (if user-name
                                (user-account
-			   	(name user-name)
-			   	(comment full-name)
-			   	(password user-password)
-			   	(home-directory home-directory)
-			   	(shell login-shell)
-			   	(group "users")
-			   	(supplementary-groups
+                                (name user-name)
+                                (comment full-name)
+                                (password user-password)
+                                (home-directory home-directory)
+                                (shell login-shell)
+                                (group "users")
+                                (supplementary-groups
                                  (append
                                   '("wheel" "netdev" "audio" "video")
                                   user-groups)))
                                #f))
 
-	 (services         (rde-config-system-services config))
+         (services         (rde-config-system-services config))
 
-	 (kernel           (get-value
-			    'kernel config
-			    (operating-system-kernel initial-os)))
-	 (kernel-arguments (get-value
-			    'kernel-arguments config
-			    (operating-system-user-kernel-arguments initial-os)))
-	 (kernel-modules   (get-value
-			    'kernel-loadable-modules config
-			    (operating-system-kernel-loadable-modules initial-os)))
-	 (initrd           (get-value
-			    'initrd config
-			    (operating-system-initrd initial-os)))
-	 (initrd-modules   (get-value
-			    'initrd-modules config
-			    (operating-system-initrd-modules initial-os)))
-	 (firmware         (get-value
-			    'firmware config
-			    (operating-system-firmware initial-os))))
+         (kernel           (get-value
+                            'kernel config
+                            (operating-system-kernel initial-os)))
+         (kernel-arguments (get-value
+                            'kernel-arguments config
+                            (operating-system-user-kernel-arguments initial-os)))
+         (kernel-modules   (get-value
+                            'kernel-loadable-modules config
+                            (operating-system-kernel-loadable-modules initial-os)))
+         (initrd           (get-value
+                            'initrd config
+                            (operating-system-initrd initial-os)))
+         (initrd-modules   (get-value
+                            'initrd-modules config
+                            (operating-system-initrd-modules initial-os)))
+         (firmware         (get-value
+                            'firmware config
+                            (operating-system-firmware initial-os))))
 
     (operating-system
       (inherit initial-os)
@@ -384,18 +386,18 @@ to config one more time."
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)
-	       (ice-9 pretty-print))
+               (ice-9 pretty-print))
   (pretty-print
    (rde-config-values-alist
     config))
   (pretty-print
    (map service-kind
-	(rde-config-home-services
-	 config)))
+        (rde-config-home-services
+         config)))
   (pretty-print
    (map service-kind
-	(rde-config-system-services
-	 config))))
+        (rde-config-system-services
+         config))))
 
 ;; (pretty-print-rde-config
 ;;  (rde-config
