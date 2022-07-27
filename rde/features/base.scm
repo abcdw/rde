@@ -22,7 +22,10 @@
 	    feature-base-services
 	    feature-desktop-services
 	    feature-hidpi
-	    feature-generic))
+	    feature-generic
+
+            %rde-default-substitute-urls
+            %rde-default-authorized-guix-keys))
 
 (define* (feature-user-info
 	  #:key user-name full-name email
@@ -134,8 +137,13 @@ be a symbol, which will be used to construct feature name."
    (home-services-getter get-custom-home-services)
    (system-services-getter get-custom-system-services)))
 
+(define %rde-default-substitute-urls %default-substitute-urls)
+(define %rde-default-authorized-guix-keys %default-authorized-guix-keys)
+
 (define* (feature-base-services
 	  #:key
+          (default-substitute-urls %rde-default-substitute-urls)
+          (default-authorized-guix-keys %rde-default-authorized-guix-keys)
 	  (guix-substitute-urls '())
 	  (guix-authorized-keys '())
 	  (udev-rules '())
@@ -161,10 +169,10 @@ be a symbol, which will be used to construct feature name."
         (inherit config)
         (substitute-urls (append
 			  guix-substitute-urls
-                          %default-substitute-urls))
+                          default-substitute-urls))
         (authorized-keys (append
                           guix-authorized-keys
-                          %default-authorized-guix-keys))))
+                          default-authorized-guix-keys))))
       (udev-service-type
        config =>
        (udev-configuration
