@@ -248,7 +248,7 @@ to config one more time."
              (gnu home services xdg)
              (gnu home services fontutils)
              (gnu home services symlink-manager)
-             (gnu home-services shells))
+             (rde home services shells))
 
 (define (get-home-environment config)
   (home-environment
