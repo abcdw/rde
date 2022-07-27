@@ -46,6 +46,7 @@
   (yggdrasil
    (file-like yggdrasil)
    "Yggdrasil package to use.")
+  ;; TODO: Key generation functionality.
   (keys-json-path
    (string "/var/lib/yggdrasil/keys.json")
    "Path to file with keys.")
