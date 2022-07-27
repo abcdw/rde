@@ -19,7 +19,7 @@
         (requirement '(user-homes))
         (provision (list (symbol-append 'guix-home- (string->symbol user))))
         (one-shot? #t)
-        (auto-start? #f)
+        (auto-start? #t)
         (start #~(make-forkexec-constructor
                   '(#$(file-append he "/activate"))
                   #:user #$user
@@ -38,10 +38,7 @@
    (description "Setups home-environments specified in the value.")
    (extensions (list (service-extension
                       shepherd-root-service-type
-                      guix-home-shepherd-service)
-                     (service-extension
-                      gc-root-service-type
-                      guix-home-gc-roots)))
+                      guix-home-shepherd-service)))
    ;; (compose append)
    ;; (extend append)
    (default-value '())))
