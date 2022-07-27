@@ -25,14 +25,14 @@
   #:export (slurp-file-like
             template-file))
 
-(define* (slurp-file-like file-like #:key (encoding "UTF-8"))
-  "Returns a gexp, which reads all the content of the FILE-LIKE and returns it
-as a string.  FILE-LIKE must be a file-like object."
-  (when (not (file-like? file-like))
+(define* (slurp-file-like file #:key (encoding "UTF-8"))
+  "Returns a gexp, which reads all the content of the FILE and returns it as a
+string.  FILE must be a file-like object."
+  (when (not (file-like? file))
     (raise (formatted-message
             (G_ "~a is not a file-like object.")
-            file-like)))
-  #~(call-with-input-file #$file-like
+            file)))
+  #~(call-with-input-file #$file
       (@ (ice-9 textual-ports) get-string-all)
       #:encoding #$encoding))
 
