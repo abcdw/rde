@@ -22,9 +22,9 @@
   (string-capitalize (string-delete #\- (symbol->string weight))))
 
 (define* (feature-alacritty
-	  #:key
-	  config-file
-	  (package alacritty)
+          #:key
+          config-file
+          (package alacritty)
           (default-terminal? #f)
           (backup-terminal? #t)
           (software-rendering? #f))
@@ -72,13 +72,15 @@
 
 
 (define* (feature-vterm
-	  #:key
-	  (emacs-vterm emacs-vterm-latest))
+          #:key
+          (emacs-vterm emacs-vterm-latest))
   "Configure emacs-vterm and shells."
   (ensure-pred file-like? emacs-vterm)
 
   (define (get-home-services config)
     (require-value 'emacs config)
+    (define setup-vterm (local-file "./zsh/vterm" "setup-vterm"))
+
     (list
      (rde-elisp-configuration-service
       'vterm
@@ -139,9 +141,8 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
         'emacs-vterm-zsh-configuration
         home-zsh-service-type
         (home-zsh-extension
-	 (zshrc
-          (list #~(format #f "source ~a"
-                          #$(local-file "./zsh/vterm" "setup-vterm")))))))))
+         (zshrc
+          (list #~(format #f "source ~a" #$setup-vterm))))))))
 
   (feature
    (name 'vterm)
