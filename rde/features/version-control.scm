@@ -54,6 +54,14 @@
               ,@(if sign-commits?
                     `((signingkey . ,gpg-sign-key))
                     '())))
+            (merge
+             ;; diff3 makes it easier to solve conflicts with smerge, zdiff3
+             ;; should make a conflict scope smaller, but guile-git fails if
+             ;; this option is set.
+             ((conflictStyle . diff3)))
+            (diff
+             ;; histogram should be smarter about diff generation.
+             ((algorithm . histogram)))
             (commit
              (,@(if sign-commits?
                     '((gpgsign . #t))
