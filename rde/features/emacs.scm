@@ -1194,8 +1194,10 @@ Aliases, keybindings, small hack and tweaks."
 (define* (feature-emacs-org
           #:key
           (org-directory "~/org")
-          (org-rename-buffer-to-title #t))
+          (org-rename-buffer-to-title? #t))
   "Configure org-mode for GNU Emacs."
+  (ensure-pred boolean? org-rename-buffer-to-title?)
+
   (define emacs-f-name 'org)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
@@ -1257,8 +1259,9 @@ Start an unlimited search at `point-min' otherwise."
            "Configure Org to rename buffer to value of #+TITLE:."
            (font-lock-add-keywords nil '(rde-buffer-name-to-title)))
 
-         ,@(when org-rename-buffer-to-title
-             '((add-hook 'org-mode-hook 'rde-buffer-name-to-title-config)))
+         ,@(if org-rename-buffer-to-title?
+               '((add-hook 'org-mode-hook 'rde-buffer-name-to-title-config))
+               '())
 
          (with-eval-after-load 'notmuch (require 'ol-notmuch))))
       #:summary "\
