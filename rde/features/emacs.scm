@@ -445,15 +445,20 @@ It can contain settings not yet moved to separate features."
          (elisp-packages additional-elisp-packages)
          (server-mode? emacs-server-mode?)
          (xdg-flavor? #t)
-         (init-el extra-init-el)
          (early-init-el
-          `(,(slurp-file-like (local-file "./emacs/early-init.el"))
-            ,@extra-early-init-el))
+          `(,(slurp-file-like (local-file "./emacs/early-init.el"))))
          ;;; TODO: Rebuilding packages with emacs will be useful for
          ;;; native-comp, but for some reason dash.el fails to build,
          ;;; need to investigate the issue.
          ;; (rebuild-elisp-packages? #t)
          ))
+
+       (simple-service
+        'emacs-add-to-init-el
+        home-emacs-service-type
+        (home-emacs-extension
+         (init-el extra-init-el)
+         (early-init-el extra-early-init-el)))
 
        (simple-service 'emacs-set-default-editor
                        home-environment-variables-service-type
