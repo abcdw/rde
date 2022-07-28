@@ -1194,8 +1194,11 @@ Aliases, keybindings, small hack and tweaks."
 (define* (feature-emacs-org
           #:key
           (org-directory "~/org")
+          (org-capture-templates #f)
           (org-rename-buffer-to-title? #t))
   "Configure org-mode for GNU Emacs."
+  (ensure-pred path? org-directory)
+  (ensure-pred maybe-list? org-capture-templates)
   (ensure-pred boolean? org-rename-buffer-to-title?)
 
   (define emacs-f-name 'org)
@@ -1233,6 +1236,10 @@ Aliases, keybindings, small hack and tweaks."
 
          (setq org-directory ,org-directory)
          (setq org-default-notes-file (concat org-directory "/todo.org"))
+
+         ,@(if org-capture-templates
+               `((setq org-capture-templates ',org-capture-templates))
+               '())
 
          ;; <https://emacs.stackexchange.com/questions/54809/rename-org-buffers-to-orgs-title-instead-of-filename>
          (defun rde-buffer-name-to-title (&optional end)
