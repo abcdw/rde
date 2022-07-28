@@ -3,6 +3,7 @@
 ;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
+;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -67,6 +68,7 @@
             feature-emacs-keycast
             feature-emacs-eglot
             feature-emacs-smartparens
+            feature-emacs-tramp
 
             rde-elisp-configuration-service
             emacs-xdg-service
@@ -373,17 +375,6 @@ C-h C-a to open About Emacs buffer."
           (define-key global-map (kbd "s-w") 'kill-current-buffer)
           (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
           (define-key global-map (kbd "s-o") 'other-window)
-
-          ,#~""
-          ;; TODO: Move it to feature-emacs-tramp
-          (eval-when-compile (require 'tramp))
-          (with-eval-after-load
-           'tramp
-           (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-
-           ,#~";; Allows to use /sudo:HOST:/path if the user in sudoers."
-           (set-default 'tramp-default-proxies-alist
-                        '((".*" "\\`root\\'" "/ssh:%h:"))))
 
           ,#~""
           ,@(if (get-value 'emacs-advanced-user? config)
@@ -2580,6 +2571,43 @@ their behavior."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-smartparens)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-tramp
+          #:key
+          (emacs-tramp emacs-tramp))
+  "Configure tramp for emacs."
+
+  (define emacs-f-name 'tramp)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+     config
+      `((eval-when-compile (require 'tramp))
+        (with-eval-after-load
+         'tramp
+         ,#~";; Should be faster for small files."
+         (setq tramp-default-method "ssh")
+         ,#~";; Obtain remote machine's PATH from login shell."
+         (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+         ,#~";; Allows to use /sudo:HOST:/path if the user in sudoers."
+         (set-default 'tramp-default-proxies-alist
+                      '((".*" "\\`root\\'" "/ssh:%h:")))))
+      #:elisp-packages (list emacs-tramp)
+      #:summary "\
+Transparently accessing remote files from within Emacs."
+      #:commentary "\
+Various settings for `tramp'.
+
+Make sure tramp works on remote guix machines and allow to use
+path /sudo:HOST:/path if the user in sudoers.")))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-tramp)))
    (home-services-getter get-home-services)))
 
 ;;; emacs.scm end here
