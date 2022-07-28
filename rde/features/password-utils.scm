@@ -46,10 +46,15 @@
              'pass
              "Emacs (Client) [pass]"
              #~(system* #$(get-value 'emacs-client-create-frame config)
+;; https://git.sr.ht/~bruun/home/tree/master/item/.config/emacs/bruun/bruun-emacs-menu.el
                         "--eval" "(progn \
 (set-frame-name \"pass - Emacs Client\") \
-(call-interactively 'rde-consult-pass) \
-(run-at-time 1 nil delete-frame))")))
+(let ((current-frame (selected-frame))) \
+  (unwind-protect \
+      (command-execute 'rde-consult-pass) \
+    (delete-frame current-frame))))"
+                        "-F"
+                        "((minibuffer . only) (width . 120) (height . 11))")))
 
           (when (get-value 'emacs config)
             (let ((emacs-embark (get-value 'emacs-embark config))
