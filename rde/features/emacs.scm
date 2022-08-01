@@ -1198,13 +1198,17 @@ Aliases, keybindings, small hack and tweaks."
 
 (define* (feature-emacs-org
           #:key
+          (emacs-org-modern emacs-org-modern-latest)
           (org-directory "~/org")
           (org-capture-templates #f)
-          (org-rename-buffer-to-title? #t))
+          (org-rename-buffer-to-title? #t)
+          (org-modern? #t))
   "Configure org-mode for GNU Emacs."
   (ensure-pred path? org-directory)
   (ensure-pred maybe-list? org-capture-templates)
   (ensure-pred boolean? org-rename-buffer-to-title?)
+  (ensure-pred boolean? org-modern?)
+  (ensure-pred file-like? emacs-org-modern)
 
   (define emacs-f-name 'org)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1216,7 +1220,8 @@ Aliases, keybindings, small hack and tweaks."
       config
       `((eval-when-compile
          (require 'org)
-         (require 'org-refile))
+         (require 'org-refile)
+         (require 'org-modern))
 
         (define-key mode-specific-map (kbd "c") 'org-capture)
 
@@ -1275,13 +1280,22 @@ Start an unlimited search at `point-min' otherwise."
                '((add-hook 'org-mode-hook 'rde-buffer-name-to-title-config))
                '())
 
-         (with-eval-after-load 'notmuch (require 'ol-notmuch))))
+         (with-eval-after-load 'notmuch (require 'ol-notmuch))
+
+         (with-eval-after-load
+          'org-modern
+          (setq org-modern-todo nil)
+          (setq org-modern-timestamp nil)
+          (setq org-modern-statistics nil)
+          (setq org-modern-tag nil)
+          (setq org-modern-priority nil))
+         ,@(if org-modern? `((global-org-modern-mode)) '())))
       #:summary "\
 Sensible defaults for org mode"
       #:commentary "\
 Indentation and refile configurations, visual adjustment."
-      #:keywords '(convenience org-mode)
-      #:elisp-packages (list emacs-org emacs-org-contrib))))
+      #:keywords '(convenience org-mode org-modern)
+      #:elisp-packages (list emacs-org emacs-org-contrib emacs-org-modern))))
 
   (feature
    (name f-name)
