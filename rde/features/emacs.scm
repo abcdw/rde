@@ -52,6 +52,7 @@
             feature-emacs-input-methods
             feature-emacs-project
             feature-emacs-perspective
+            feature-emacs-geiser
             feature-emacs-git
             feature-emacs-dired
             feature-emacs-eshell
@@ -1433,6 +1434,38 @@ gemini:// links will be automatically openned in emacs client."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-geiser
+          #:key
+          (emacs-geiser emacs-geiser)
+          (emacs-geiser-guile emacs-geiser-guile))
+  "Configure geiser for emacs."
+  (ensure-pred file-like? emacs-geiser)
+  (ensure-pred file-like? emacs-geiser-guile)
+
+  (define emacs-f-name 'geiser)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile (require 'geiser))
+        (setq geiser-default-implementation 'guile)
+        (setq geiser-active-implementations '(guile))
+        (setq geiser-implementations-alist '(((regexp "\\.scm$") guile))))
+      #:elisp-packages
+      (list emacs-geiser emacs-geiser-guile)
+      #:summary "\
+Scheme interpreter, giving access to a REPL and live metadata."
+      #:commentary "\
+Geiser is configured for the Guile scheme implementation.")))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-geiser)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-git
