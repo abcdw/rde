@@ -1202,11 +1202,13 @@ Aliases, keybindings, small hack and tweaks."
           (org-directory "~/org")
           (org-capture-templates #f)
           (org-rename-buffer-to-title? #t)
+          (org-indent? #t)
           (org-modern? #t))
   "Configure org-mode for GNU Emacs."
   (ensure-pred path? org-directory)
   (ensure-pred maybe-list? org-capture-templates)
   (ensure-pred boolean? org-rename-buffer-to-title?)
+  (ensure-pred boolean? org-indent?)
   (ensure-pred boolean? org-modern?)
   (ensure-pred file-like? emacs-org-modern)
 
@@ -1229,7 +1231,7 @@ Aliases, keybindings, small hack and tweaks."
          'org
          (setq org-adapt-indentation nil)
          (setq org-edit-src-content-indentation 0)
-         (setq org-startup-indented t)
+         (setq org-startup-indented ,(if org-indent? 't 'nil))
 
          (setq org-outline-path-complete-in-steps nil)
          (setq org-refile-use-outline-path 'full-file-path)
