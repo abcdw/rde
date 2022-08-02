@@ -217,3 +217,83 @@ predefined configurations, practices and workflows.")
 ;;      (local-file (dirname (dirname (current-filename))) #:recursive? #t))))
 
 
+
+;;;
+;;; Sway
+;;;
+
+(use-modules (gnu packages freedesktop)
+             (gnu packages xdisorg)
+             (gnu packages wm))
+
+(define-public wayland-protocols-latest
+  (package
+    (inherit wayland-protocols)
+    (name "wayland-protocols")
+    (version "1.26")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://wayland.freedesktop.org/releases/"
+                    "wayland-protocols-" version ".tar.xz"))
+              (sha256
+               (base32
+                "04vgllmpmrv14x3x64ns01vgwx4hriljayjkz9idgbv83i63hly5"))))))
+
+(define-public libdrm-latest
+  (package
+    (inherit libdrm)
+    (name "libdrm")
+    (version "2.4.112")
+    (source (origin
+              (method url-fetch)
+              (uri (string-append
+                    "https://dri.freedesktop.org/libdrm/libdrm-"
+                    version ".tar.xz"))
+              (sha256
+               (base32
+                "1zr0hi7k5s7my4q9hyj6ryzg89zyjx24zbqfv3c5rcq9pl87gc00"))))))
+
+(define freshup-wayland-protocols
+  (package-input-rewriting/spec
+   `(("libdrm" . ,(const libdrm-latest))
+     ("wayland-protocols" . ,(const wayland-protocols-latest)))))
+
+(define-public wlroots-latest
+  (freshup-wayland-protocols
+   (package
+     (inherit wlroots)
+     (name "wlroots")
+     (version "0.15.1")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+              (url "https://gitlab.freedesktop.org/wlroots/wlroots.git")
+              (commit version)))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "00s73nhi3sc48l426jdlqwpclg41kx1hv0yk4yxhbzw19gqpfm1h")))))))
+
+(define freshup-wlroots
+  (package-input-rewriting/spec
+   `(("libdrm" . ,(const libdrm-latest))
+     ("wayland-protocols" . ,(const wayland-protocols-latest))
+     ("wlroots" . ,(const wlroots-latest)))))
+
+(define-public sway-latest
+  (freshup-wlroots
+   (package
+     (inherit sway)
+     (name "sway")
+     (version "1.7")
+     (source
+      (origin
+        (method git-fetch)
+        (uri (git-reference
+              (url "https://github.com/swaywm/sway")
+              (commit version)))
+        (file-name (git-file-name name version))
+        (sha256
+         (base32 "0ss3l258blyf2d0lwd7pi7ga1fxfj8pxhag058k7cmjhs3y30y5l")))))))
+
