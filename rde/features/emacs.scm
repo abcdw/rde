@@ -1199,6 +1199,7 @@ Aliases, keybindings, small hack and tweaks."
 (define* (feature-emacs-org
           #:key
           (emacs-org-modern emacs-org-modern-latest)
+          (emacs-org-appear emacs-org-appear)
           (org-directory "~/org")
           (org-capture-templates #f)
           (org-rename-buffer-to-title? #t)
@@ -1211,6 +1212,7 @@ Aliases, keybindings, small hack and tweaks."
   (ensure-pred boolean? org-indent?)
   (ensure-pred boolean? org-modern?)
   (ensure-pred file-like? emacs-org-modern)
+  (ensure-pred file-like? emacs-org-appear)
 
   (define emacs-f-name 'org)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1284,6 +1286,8 @@ Start an unlimited search at `point-min' otherwise."
 
          (with-eval-after-load 'notmuch (require 'ol-notmuch))
 
+         (add-hook 'org-mode-hook 'org-appear-mode)
+
          (with-eval-after-load
           'org-modern
           (setq org-modern-todo nil)
@@ -1297,7 +1301,8 @@ Sensible defaults for org mode"
       #:commentary "\
 Indentation and refile configurations, visual adjustment."
       #:keywords '(convenience org-mode org-modern)
-      #:elisp-packages (list emacs-org emacs-org-contrib emacs-org-modern))))
+      #:elisp-packages (list emacs-org emacs-org-contrib
+                             emacs-org-appear emacs-org-modern))))
 
   (feature
    (name f-name)
