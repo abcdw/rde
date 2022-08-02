@@ -54,6 +54,7 @@
             feature-emacs-perspective
             feature-emacs-geiser
             feature-emacs-git
+            feature-emacs-guix-development
             feature-emacs-dired
             feature-emacs-eshell
             feature-emacs-monocle
@@ -1584,6 +1585,76 @@ Almost all other operations are covered by magit."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-guix-development
+          #:key
+          (guix-load-path "~/src/guix")
+          (other-guile-load-paths '()))
+  "Configure emacs for guix development."
+  ;; FIXME Both guix-load-path and other-guile-load-paths
+  ;; need to be absolute without ~ to work properly.
+  (ensure-pred string? guix-load-path)
+  (ensure-pred list? other-guile-load-paths)
+
+  (define emacs-f-name 'guix-development)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define* guix-etc
+    (file-union
+     "guix-etc"
+     `(("snippets"
+        ,(local-file (string-append guix-load-path "/etc/snippets")
+                     #:recursive? #t))
+       ("copyright.el"
+        ,(local-file (string-append guix-load-path "/etc/copyright.el"))))))
+
+  (define (get-home-services config)
+
+    (define emacs-yasnippet (get-value 'emacs-yasnippet config))
+
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `(;; Geiser
+        (with-eval-after-load
+         'geiser-guile
+         ,@(cons*
+            (map
+             (lambda (guile-load-path)
+               `(add-to-list 'geiser-guile-load-path ,guile-load-path))
+             (append (list guix-load-path) other-guile-load-paths))))
+        ;; Commit snippets
+        ,@(if emacs-yasnippet
+              `((with-eval-after-load
+                   'yasnippet
+                   (add-to-list
+                    'yas-snippet-dirs
+                    ,(file-append guix-etc "/snippets")))
+                (add-hook
+                 'git-commit-mode-hook
+                 (lambda ()
+                   (when (string= (magit-gitdir)
+                                  ,(string-append guix-load-path "/.git/"))
+                     (yas-minor-mode)))))
+              '())
+        ;; Copyright
+        (load-file ,(file-append guix-etc "/copyright.el"))
+        (setq copyright-names-regexp
+              (format "%s <%s>" user-full-name user-mail-address))
+        (global-set-key (kbd "s-G") 'guix))
+      #:elisp-packages '()
+      #:summary "\
+Configure emacs for guix development, ensure the Perfect Setup as detailed in\
+the Guix manual."
+      #:commentary "\
+Configure geiser with load-paths, yasnippets for commits, and configure\
+copyright.")))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . 'emacs-guix-development)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-which-key
