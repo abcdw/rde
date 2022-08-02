@@ -1287,6 +1287,7 @@ Start an unlimited search at `point-min' otherwise."
          (with-eval-after-load 'notmuch (require 'ol-notmuch))
 
          (add-hook 'org-mode-hook 'org-appear-mode)
+         (add-hook 'org-mode-hook 'olivetti-mode)
 
          (with-eval-after-load
           'org-modern
@@ -1302,6 +1303,7 @@ Sensible defaults for org mode"
 Indentation and refile configurations, visual adjustment."
       #:keywords '(convenience org-mode org-modern)
       #:elisp-packages (list emacs-org emacs-org-contrib
+                             (get-value 'emacs-olivetti config emacs-olivetti)
                              emacs-org-appear emacs-org-modern))))
 
   (feature
