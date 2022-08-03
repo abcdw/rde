@@ -235,11 +235,13 @@ environment outside of Guix Home."
           (extra-init-el '())
           (extra-early-init-el '())
           (default-terminal? #t)
-          (disable-warnings? #t))
+          (disable-warnings? #t)
+          (auto-update-buffers? #t))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred boolean? default-terminal?)
   (ensure-pred boolean? disable-warnings?)
+  (ensure-pred boolean? auto-update-buffers?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
   (ensure-pred any-package? emacs)
 
@@ -438,7 +440,15 @@ Prefix argument can be used to kill a few words."
                   (setq vc-follow-symlinks t)
                   ;; Don't warn when advice is added for functions
                   (setq ad-redefinition-action 'accept))
-                '()))
+                '())
+
+          ,#~""
+          ,@(if auto-update-buffers?
+              `(;; Revert Dired and other buffers
+                (setq global-auto-revert-non-file-buffers t)
+                ;; Revert buffers when the underlying file has changed
+                (global-auto-revert-mode 1))
+              '()))
         #:summary "General settings, better defaults"
         #:commentary "\
 It can contain settings not yet moved to separate features."
