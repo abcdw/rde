@@ -27,6 +27,7 @@
   #:use-module (gnu system file-systems)
   #:use-module (gnu system accounts)
   #:use-module (gnu system shadow)
+  #:use-module (gnu services home)
   #:use-module (rde system services accounts)
 
   #:use-module (gnu bootloader)
@@ -134,6 +135,10 @@ of services.  Service can be either @code{service?} or
    (thunked)
    (default
      (get-home-environment-packages this-rde-config)))
+
+  (integrate-he-in-os?
+   rde-config-integrate-he-in-os?
+   (default #f))
 
   (initial-os
    rde-config-initial-os
@@ -377,6 +382,9 @@ to config one more time."
                             'firmware config
                             (operating-system-firmware initial-os))))
 
+    (when (rde-config-integrate-he-in-os? config)
+      (require-value 'user-name config))
+
     (operating-system
       (inherit initial-os)
       (host-name host-name)
@@ -396,6 +404,12 @@ to config one more time."
       (firmware firmware)
       (services (append
                  services
+                 (if (rde-config-integrate-he-in-os? config)
+                     (list (service guix-home-service-type
+                                    `(,(cons
+                                        user-name
+                                        (get-home-environment config)))))
+                     '())
                  (if user-name
                      (list (service rde-account-service-type user))
                      '()))))))
