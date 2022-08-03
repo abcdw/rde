@@ -457,7 +457,20 @@ Prefix argument can be used to kill a few words."
               `((eval-when-compile (require 'ws-butler))
                 (add-hook 'text-mode-hook 'ws-butler-mode)
                 (add-hook 'prog-mode-hook 'ws-butler-mode))
-              '()))
+              '())
+
+          ,#~""
+          ;; Specifying default action for display-buffer.
+          (setq display-buffer-base-action
+                '(display-buffer-reuse-mode-window
+                  display-buffer-reuse-window
+                  display-buffer-same-window))
+          ;; If a popup does happen, don't resize windows to be equal-sized
+          (setq even-window-sizes nil)
+          ;; Configure ediff for window manager.
+          (setq ediff-diff-options "-w"
+                ediff-split-window-function 'split-window-horizontally
+                ediff-window-setup-function 'ediff-setup-windows-plain))
         #:summary "General settings, better defaults"
         #:commentary "\
 It can contain settings not yet moved to separate features."
