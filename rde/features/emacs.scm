@@ -234,9 +234,12 @@ environment outside of Guix Home."
           (additional-elisp-packages '())
           (extra-init-el '())
           (extra-early-init-el '())
-          (default-terminal? #t))
+          (default-terminal? #t)
+          (disable-warnings? #t))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
+  (ensure-pred boolean? default-terminal?)
+  (ensure-pred boolean? disable-warnings?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
   (ensure-pred any-package? emacs)
 
@@ -424,7 +427,18 @@ Prefix argument can be used to kill a few words."
           (define-key mode-specific-map (kbd "a")
             '("rde applications" . rde-app-map))
           (define-key mode-specific-map (kbd "t")
-            '("rde toggles" . rde-toggle-map)))
+            '("rde toggles" . rde-toggle-map))
+
+          ,#~""
+          ,@(if (or disable-warnings?
+                    (get-value 'emacs-advanced-user? config))
+                `(;; Don't warn for large files
+                  (setq large-file-warning-threshold nil)
+                  ;; Don't warn for followed symlinked files
+                  (setq vc-follow-symlinks t)
+                  ;; Don't warn when advice is added for functions
+                  (setq ad-redefinition-action 'accept))
+                '()))
         #:summary "General settings, better defaults"
         #:commentary "\
 It can contain settings not yet moved to separate features."
