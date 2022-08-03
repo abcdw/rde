@@ -236,12 +236,14 @@ environment outside of Guix Home."
           (extra-early-init-el '())
           (default-terminal? #t)
           (disable-warnings? #t)
-          (auto-update-buffers? #t))
+          (auto-update-buffers? #t)
+          (auto-clean-space? #t))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred boolean? default-terminal?)
   (ensure-pred boolean? disable-warnings?)
   (ensure-pred boolean? auto-update-buffers?)
+  (ensure-pred boolean? auto-clean-space?)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
   (ensure-pred any-package? emacs)
 
@@ -448,13 +450,22 @@ Prefix argument can be used to kill a few words."
                 (setq global-auto-revert-non-file-buffers t)
                 ;; Revert buffers when the underlying file has changed
                 (global-auto-revert-mode 1))
+              '())
+
+          ,#~""
+          ,@(if auto-clean-space?
+              `((eval-when-compile (require 'ws-butler))
+                (add-hook 'text-mode-hook 'ws-butler-mode)
+                (add-hook 'prog-mode-hook 'ws-butler-mode))
               '()))
         #:summary "General settings, better defaults"
         #:commentary "\
 It can contain settings not yet moved to separate features."
         #:keywords '(convenience)
-        #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
-                               emacs-expand-region))
+        #:elisp-packages
+        (append (list (get-value 'emacs-configure-rde-keymaps config)
+                      emacs-expand-region)
+                (if auto-clean-space? (list emacs-ws-butler) '())))
 
        (service
         home-emacs-service-type
