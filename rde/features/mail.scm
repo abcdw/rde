@@ -846,6 +846,8 @@ not appear in the pop-up buffer."
              (setq-local
               completion-at-point-functions
               (append
+               ;; FIXME: doesn't work well with consult-completion-in-region
+               ;; list of candidates not get updated when removing characters.
                (list (cape-company-to-capf 'notmuch-company))
                completion-at-point-functions)))
            (add-hook 'notmuch-message-mode-hook 'rde-notmuch-message-mode)
