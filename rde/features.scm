@@ -353,10 +353,7 @@ to config one more time."
                                 (home-directory home-directory)
                                 (shell login-shell)
                                 (group "users")
-                                (supplementary-groups
-                                 (append
-                                  '("wheel" "netdev" "audio" "video")
-                                  user-groups)))
+                                (supplementary-groups user-groups))
                                #f))
 
          (services         (rde-config-system-services config))

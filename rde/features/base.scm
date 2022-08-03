@@ -50,7 +50,7 @@
           #:key user-name full-name email
           (home-directory (format #f "/home/~a" user-name))
           (user-initial-password-hash #f)
-          (user-groups '())
+          (user-groups '("wheel" "netdev" "audio" "video"))
           (rde-advanced-user? #f)
           (emacs-advanced-user? #f))
   "Provides basic information about user for all features."
