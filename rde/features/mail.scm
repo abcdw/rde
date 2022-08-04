@@ -86,6 +86,8 @@ scenarios, during generation of @file{mbsyncrc} for example.")
   (fqda
    (string #f)
    "Email address. @code{\"someone@example.com\"} for example.")
+  ;; TODO: Add sign? field. or maybe just annoy users, which doesn't
+  ;; have a gpg key for all emails they use?
   (pass-cmd
    (maybe-string #f)
    "Command returning a password.  If value not provided @code{pass
@@ -387,7 +389,26 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     ;; <https://git.kernel.org/pub/scm/linux/kernel/git/dborkman/l2md.git/about/>
     ;; Applying patches <https://git.kyleam.com/piem/about/>
 
+    (define add-ml-tag
+      (map (lambda (x)
+             (format
+              #f "notmuch tag +~a -- path:lists/~a/**"
+              ;; TODO: Use new tag not to retag already existing entities.
+              ;; Do it before new tag will be romved
+              ;; TODO: Fix order of items in post-new hook
+              (mailing-list-id x) (mailing-list-fqda x)))
+           mls))
+
     (list
+     (simple-service
+      'l2md-add-tags-to-mailing-list
+      home-notmuch-service-type
+      (home-notmuch-extension
+       (post-new
+        (list
+         #~(begin (for-each system '#$add-ml-tag))))))
+
+     ;; TODO: Move it to a separate feature and make it conditional
      (service home-mcron-service-type
               (home-mcron-configuration
                (jobs (list #~(job '(next-hour)
@@ -772,6 +793,8 @@ not appear in the pop-up buffer."
     (:name "Sent" :query "tag:sent" :key "s")
     (:name "All mail" :query "*" :key "a")))
 
+;; TODO: revisit this package
+;; https://github.com/larkery/emacs/blob/master/site-lisp/notmuch-attachment-list.el
 (define* (feature-notmuch
           #:key
           (get-notmuch-configuration default-get-notmuch-configuration)
@@ -807,6 +830,9 @@ not appear in the pop-up buffer."
           (autoload 'notmuch-mua-mail "notmuch-mua")
           ;; Copied definition from notmuch-mua becasue it's not
           ;; available until notmuch-mua loaded.
+
+          ;; FIXME: C-x m doesn't accept prefix argument, so I can't
+          ;; pick sender.
           (define-mail-user-agent 'notmuch-user-agent
             'notmuch-mua-mail
             'notmuch-mua-send-and-exit

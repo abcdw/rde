@@ -1,41 +1,75 @@
 # pipefail is not POSIX complaint
+
+HOME_CONFIG=./rde/examples/abcdw/configs.scm
+RDE_TARGET=ixy-home
+GUILE_LOAD_PATH=./
+
 all: doc/rde.info
+	@echo default target
 
 install:
 	@echo some installation will happen here
 
-home:
-	RDE_TARGET=ixy-home \
-	GUILE_LOAD_PATH=./ \
-	guix home reconfigure ./rde/examples/abcdw/configs.scm
-
-check-channel:
-	guix pull -C ./rde/examples/channels.tmpl
-
-check: check-channel
-	RDE_TARGET=ixy-home \
-	./pre-inst-env guix home build \
+check: rde/channels/pull-latest
+	guix home build \
 	./gnu/home/examples/minimal.tmpl
 
-# home-reconfigure-local:
-# 	GUILE_LOAD_PATH=./ ../gnu/guix/pre-inst-env guix \
-# 	home reconfigure ../rde/rde/config.scm
+target:
+	mkdir target
 
-# Rewrite to glakes
-env:
-	guix time-machine -C stale/guix-related/guix/channels-lock -- \
-	environment --ad-hoc make
+rde/abcdw/home:
+	guix home --fallback reconfigure --no-grafts --allow-downgrades \
+	${HOME_CONFIG}
 
-channels-pull:
-	guix pull -C stale/guix-related/guix/channels-lock
+rde/abcdw/home/build:
+	guix home --fallback build --allow-downgrades \
+	${HOME_CONFIG}
 
-channels-update-lock:
-	guix time-machine -C stale/guix-related/guix/channels -- \
-	describe -f channels > stale/guix-related/guix/channels-lock
+rde/livecd/build:
+	guix system --no-grafts \
+	-e '(@ (rde system install) rde-livecd)'
 
-iso:
-	guix time-machine  -C stale/guix-related/guix/channels-lock -- \
-	system -L ./ image -t iso9660 stale/guix-related/system/install.scm
+rde/livecd/iso:
+	guix system image -t iso9660 --no-grafts \
+	-e '(@ (rde system install) rde-livecd)' \
+	-r target/rde.iso
+
+rde/channels/pull-latest:
+	guix pull -C ./rde/examples/channels.tmpl
+
+rde/channels/pull-locked:
+	guix pull -C ./rde/examples/channels-lock.tmpl
+
+rde/channels/update-locked:
+	guix time-machine -C ./rde/examples/channels.tmpl -- \
+	describe -f channels > ./rde/examples/channels-lock.tmpl
+
+
+guix/livecd/iso: target
+	guix system image -t iso9660 \
+	-e '(@ (rde system install) guix-with-substitute-mirror)' \
+	-r target/guix.iso
+
+
+qemu/1/run:
+	qemu-system-x86_64 -m 4096 -smp 1 -enable-kvm \
+	-net user,hostfwd=tcp::10021-:22 -net nic -boot menu=on,order=d \
+	-vga qxl -display gtk,gl=on \
+	-drive file=tmp/system.img
+
+qemu/1/deploy:
+	guix deploy tmp/config.scm --no-grafts
+
+qemu/2/run-from-rde-iso: target/rde.iso
+	qemu-system-x86_64 -m 4096 -smp 1 -enable-kvm \
+	-net user,hostfwd=tcp::10022-:22 -net nic -boot menu=on,order=d \
+	-vga qxl -display gtk,gl=on \
+	-drive media=cdrom,file=target/rde.iso
+
+
+system:
+	make -C ../nonrde install
+
 
 doc/rde-tool-list.texi: doc/rde-tool-list.org
 	pandoc doc/rde-tool-list.org -f org -t texinfo \
@@ -56,6 +90,7 @@ doc/rde.pdf: doc/rde.texi
 	makeinfo --pdf -o doc/rde.pdf doc/rde.texi
 
 clean:
+	rm -rf target
 	rm -f doc/rde.html
 	rm -f doc/rde.pdf
 	rm -f doc/rde.info
