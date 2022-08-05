@@ -54,7 +54,7 @@
             feature-emacs-perspective
             feature-emacs-geiser
             feature-emacs-git
-            feature-emacs-guix-development
+            feature-emacs-guix
             feature-emacs-dired
             feature-emacs-eshell
             feature-emacs-monocle
@@ -385,14 +385,6 @@ C-h C-a to open About Emacs buffer."
                 '())
 
           ,#~""
-          ;; TODO: Extend info-lookup-alist with Guix Manual nodes to
-          ;; make `C-h S' find guix services and other items.
-          (eval-when-compile (require 'guix))
-          (define-key rde-toggle-map (kbd "p") 'guix-prettify-mode)
-          (define-key rde-toggle-map (kbd "P") 'global-guix-prettify-mode)
-          (global-guix-prettify-mode 1)
-
-          ,#~""
           (eval-when-compile
            (require 'time))
           (setq world-clock-list
@@ -438,7 +430,7 @@ Prefix argument can be used to kill a few words."
 It can contain settings not yet moved to separate features."
         #:keywords '(convenience)
         #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
-                               emacs-expand-region emacs-guix))
+                               emacs-expand-region))
 
        (service
         home-emacs-service-type
@@ -1587,74 +1579,60 @@ Almost all other operations are covered by magit."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-guix-development
+(define* (feature-emacs-guix
           #:key
-          (guix-load-path "~/src/guix")
-          (other-guile-load-paths '()))
-  "Configure emacs for guix development."
-  ;; FIXME Both guix-load-path and other-guile-load-paths
-  ;; need to be absolute without ~ to work properly.
-  (ensure-pred string? guix-load-path)
-  (ensure-pred list? other-guile-load-paths)
+          (emacs-guix emacs-guix)
+          (guix-key "s-G")
+          (guix-directory "~/work/gnu/guix"))
+  "Configure emacs for guix usage and development."
+  (ensure-pred maybe-path? guix-directory)
 
-  (define emacs-f-name 'guix-development)
+  (define emacs-f-name 'guix)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
-  (define* guix-etc
-    (file-union
-     "guix-etc"
-     `(("snippets"
-        ,(local-file (string-append guix-load-path "/etc/snippets")
-                     #:recursive? #t))
-       ("copyright.el"
-        ,(local-file (string-append guix-load-path "/etc/copyright.el"))))))
-
   (define (get-home-services config)
-
-    (define emacs-yasnippet (get-value 'emacs-yasnippet config))
-
     (list
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(;; Geiser
+      `(,#~"\
+;; Extend info-lookup-alist with Guix Manual node to
+;; make `C-h S' find guix services and other items."
         (with-eval-after-load
-         'geiser-guile
-         ,@(cons*
-            (map
-             (lambda (guile-load-path)
-               `(add-to-list 'geiser-guile-load-path ,guile-load-path))
-             (append (list guix-load-path) other-guile-load-paths))))
-        ;; Commit snippets
-        ,@(if emacs-yasnippet
-              `((with-eval-after-load
-                   'yasnippet
-                   (add-to-list
-                    'yas-snippet-dirs
-                    ,(file-append guix-etc "/snippets")))
-                (add-hook
-                 'git-commit-mode-hook
-                 (lambda ()
-                   (when (string= (magit-gitdir)
-                                  ,(string-append guix-load-path "/.git/"))
-                     (yas-minor-mode)))))
-              '())
-        ;; Copyright
-        (load-file ,(file-append guix-etc "/copyright.el"))
-        (setq copyright-names-regexp
-              (format "%s <%s>" user-full-name user-mail-address))
-        (global-set-key (kbd "s-G") 'guix))
-      #:elisp-packages '()
+         'info-look
+         (info-lookup-add-help
+          :mode 'scheme-mode
+          :regexp "[^()`',\"        \n]+"
+          :ignore-case t
+          :doc-spec '(("(r5rs)Index" nil "^[ 	]+-+ [^:]+:[ 	]*" "\\b")
+                      ;; TODO: Check what rest nil arguments do
+                      ("(Guix)Programming Index" nil nil nil))))
+
+        (eval-when-compile (require 'guix))
+        (define-key rde-toggle-map (kbd "p") 'guix-prettify-mode)
+        (define-key rde-toggle-map (kbd "P") 'global-guix-prettify-mode)
+        (if after-init-time
+            (global-guix-prettify-mode 1)
+            (add-hook 'after-init-hook 'global-guix-prettify-mode))
+
+        (with-eval-after-load
+         'guix
+         (if ,guix-directory
+             '((setq guix-directory ,guix-directory))
+             '()))
+
+        (global-set-key (kbd ,guix-key) 'guix))
+      #:elisp-packages (list emacs-guix
+                             (get-value 'emacs-configure-rde-keymaps config))
       #:summary "\
-Configure emacs for guix development, ensure the Perfect Setup as detailed in\
-the Guix manual."
+Configure emacs for guix usage and development."
       #:commentary "\
-Configure geiser with load-paths, yasnippets for commits, and configure\
-copyright.")))
+Add keybindings, extend info-lookup-alist with (Guix)Programming Index for C-h
+S to show services and other guix items.")))
 
   (feature
    (name f-name)
-   (values `((,f-name . 'emacs-guix-development)))
+   (values `((,f-name . 'emacs-guix)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-which-key
