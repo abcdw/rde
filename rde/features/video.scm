@@ -10,9 +10,11 @@
 
 (define* (feature-mpv
           #:key
-          (mpv mpv))
+          (mpv mpv)
+          (extra-mpv-conf '()))
   "Setup and configure mpv."
   (ensure-pred any-package? mpv)
+  (ensure-pred alist? extra-mpv-conf)
 
   (define (get-home-services config)
     (list
@@ -23,7 +25,8 @@
        (default-options
          `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
            (keep-open . #t)
-           (save-position-on-quit . #t)))))))
+           (save-position-on-quit . #t)
+           ,@extra-mpv-conf))))))
 
   (feature
    (name 'mpv)

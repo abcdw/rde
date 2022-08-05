@@ -8,7 +8,8 @@
   #:use-module (ice-9 match)
   #:export (mpv-profile
             home-mpv-configuration
-            home-mpv-service-type))
+            home-mpv-service-type)
+  #:re-export (alist?))
 
 ;;; Commentary:
 ;;;
