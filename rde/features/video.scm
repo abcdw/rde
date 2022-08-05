@@ -13,7 +13,7 @@
           (mpv mpv)
           (extra-mpv-conf '()))
   "Setup and configure mpv."
-  (ensure-pred any-package? mpv)
+  (ensure-pred file-like? mpv)
   (ensure-pred alist? extra-mpv-conf)
 
   (define (get-home-services config)
