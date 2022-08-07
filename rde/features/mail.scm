@@ -380,7 +380,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
                         (get-value 'mailing-lists config)))
     (define (get-repo-config ml)
       (let ((repo-config (mailing-list-config ml)))
-        (if (unspecified? (l2md-repo-maildir repo-config))
+        (if (eq? 'unset (l2md-repo-maildir repo-config))
             (l2md-repo
              (inherit repo-config)
              (maildir (string-append
