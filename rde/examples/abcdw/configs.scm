@@ -289,26 +289,6 @@
                      (clock)))
    (feature-rofi)
 
-   (feature-emacs
-    #:emacs
-    (if (string=? (or (getenv "BUILD_SUBMITTER") "") "git.sr.ht")
-        (@ (gnu packages emacs) emacs-next-pgtk)
-        emacs-next-pgtk-latest)
-    #:extra-init-el `()
-    #:additional-elisp-packages
-    (append
-     (pkgs "emacs-elfeed" "emacs-hl-todo"
-           "emacs-consult-dir" "emacs-org-modern"
-           "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
-           "emacs-kind-icon"
-           "emacs-nginx-mode" "emacs-yaml-mode"
-           "emacs-lispy"
-           "emacs-ytdl"
-           "emacs-multitran"
-           "emacs-minimap"
-           "emacs-ement"
-           "emacs-restart-emacs"
-           "emacs-org-present")))
    (feature-emacs-appearance)
    (feature-emacs-faces)
    (feature-emacs-completion
@@ -392,6 +372,29 @@
      %rde-notmuch-saved-searches))
 
    (feature-transmission #:auto-start? #f)
+
+   (feature-emacs
+    #:emacs
+    (if (string=? (or (getenv "BUILD_SUBMITTER") "") "git.sr.ht")
+        (@ (gnu packages emacs) emacs-next-pgtk)
+        emacs-next-pgtk-latest)
+    #:extra-init-el `((load ,(local-file "./tmp.el")))
+    #:additional-elisp-packages
+    (append
+     (list emacs-dirvish)
+     (pkgs "emacs-elfeed" "emacs-hl-todo"
+           "emacs-tempel"
+           "emacs-consult-dir"
+           "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
+           "emacs-kind-icon"
+           "emacs-nginx-mode" "emacs-yaml-mode"
+           "emacs-lispy"
+           "emacs-ytdl"
+           "emacs-multitran"
+           "emacs-minimap"
+           "emacs-ement"
+           "emacs-restart-emacs"
+           "emacs-org-present")))
 
    (feature-xdg
     #:xdg-user-directories-configuration
