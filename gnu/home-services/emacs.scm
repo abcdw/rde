@@ -16,9 +16,9 @@
   #:use-module (guix build-system emacs)
   #:use-module ((guix licenses) #:prefix license:)
   #:export (home-emacs-service-type
-	    home-emacs-configuration
-	    home-emacs-extension
-	    elisp-configuration-package))
+            home-emacs-configuration
+            home-emacs-extension
+            elisp-configuration-package))
 
 (define packages? (list-of package?))
 
@@ -33,17 +33,17 @@
       elem)
      (else
       #~(string-trim-right
-	   (with-output-to-string
-	     (lambda ()
-	       ((@ (ice-9 pretty-print) pretty-print)
-		'#$elem
+           (with-output-to-string
+             (lambda ()
+               ((@ (ice-9 pretty-print) pretty-print)
+                '#$elem
                 #:max-expr-width 79)))
-	   #\newline))))
+           #\newline))))
 
   #~(string-append
      #$@(interpose
-	 (map serialize-list-element val)
-	 "\n" 'suffix)))
+         (map serialize-list-element val)
+         "\n" 'suffix)))
 
 (define-configuration home-emacs-configuration
   (package
@@ -138,33 +138,33 @@ packages with proper GNU Emacs version."
        emacs-build-system)
       (package
         (inherit p)
-	(arguments
-	 (substitute-keyword-arguments (package-arguments p)
-	   ((#:emacs e #f) target-emacs))))
+        (arguments
+         (substitute-keyword-arguments (package-arguments p)
+           ((#:emacs e #f) target-emacs))))
       p))
 
 (define (emacs-argument-updater target-emacs)
   "Recursively updates @code{#:emacs} argument for package and all the
 inputs."
   (package-mapping (update-emacs-argument-for-package target-emacs)
-		   (lambda (p) #f)))
+                   (lambda (p) #f)))
 
 (define (updated-elisp-packages config)
   (let* ((emacs-package  (home-emacs-configuration-package config))
-	 (elisp-packages (home-emacs-configuration-elisp-packages config))
+         (elisp-packages (home-emacs-configuration-elisp-packages config))
 
-	 (updated-elisp-packages
-	  (if (home-emacs-configuration-rebuild-elisp-packages? config)
-	      (map (emacs-argument-updater emacs-package)
-		   elisp-packages)
-	      elisp-packages)))
+         (updated-elisp-packages
+          (if (home-emacs-configuration-rebuild-elisp-packages? config)
+              (map (emacs-argument-updater emacs-package)
+                   elisp-packages)
+              elisp-packages)))
     updated-elisp-packages))
 
 (define (add-emacs-packages config)
   (append (updated-elisp-packages config)
           ;; It's important for packages to go first to override
           ;; built-in emacs packages in case of collisions
-	  (list (home-emacs-configuration-package config))))
+          (list (home-emacs-configuration-package config))))
 
 
 (define (add-emacs-shepherd-service config)
@@ -175,13 +175,13 @@ connect to it.")
              (provision '(emacs-server))
              (start #~(make-forkexec-constructor
                        (list #$(file-append
-				(home-emacs-configuration-package config)
-				"/bin/emacs") "--fg-daemon")
+                                (home-emacs-configuration-package config)
+                                "/bin/emacs") "--fg-daemon")
                        #:log-file (string-append
-				   (or (getenv "XDG_LOG_HOME")
-				       (format #f "~a/.local/var/log"
-					       (getenv "HOME")))
-				   "/emacs.log")))
+                                   (or (getenv "XDG_LOG_HOME")
+                                       (format #f "~a/.local/var/log"
+                                               (getenv "HOME")))
+                                   "/emacs.log")))
              (stop #~(make-kill-destructor))))))
 
 ;; (define* (mixed-text-file name #:rest text)
@@ -205,14 +205,14 @@ connect to it.")
   (let* ((xdg-flavor? (home-emacs-configuration-xdg-flavor? config)))
     (define prefix-file
       (cut string-append
-	(if xdg-flavor?
-	    "emacs/"
-	    "emacs.d/")
-	<>))
+        (if xdg-flavor?
+            "emacs/"
+            "emacs.d/")
+        <>))
 
     (define (filter-fields field)
       (filter-configuration-fields home-emacs-configuration-fields
-				   (list field)))
+                                   (list field)))
 
     (define (serialize-field field)
       (serialize-configuration
@@ -265,35 +265,35 @@ connect to it.")
      (inherit original-config)
      (elisp-packages
       (append (home-emacs-configuration-elisp-packages original-config)
-	      (append-map
-	       home-emacs-extension-elisp-packages extensions)))
+              (append-map
+               home-emacs-extension-elisp-packages extensions)))
      (init-el
       (append (home-emacs-configuration-init-el original-config)
-	      (append-map
-	       home-emacs-extension-init-el extensions)))
+              (append-map
+               home-emacs-extension-init-el extensions)))
      (early-init-el
       (append (home-emacs-configuration-early-init-el original-config)
-	      (append-map
-	       home-emacs-extension-early-init-el extensions))))))
+              (append-map
+               home-emacs-extension-early-init-el extensions))))))
 
 
 (define home-emacs-service-type
   (service-type (name 'home-emacs)
                 (extensions
                  (list (service-extension
-			home-profile-service-type
-			add-emacs-packages)
-		       (service-extension
-			home-shepherd-service-type
-			add-emacs-shepherd-service)
-		       (service-extension
+                        home-profile-service-type
+                        add-emacs-packages)
+                       (service-extension
+                        home-shepherd-service-type
+                        add-emacs-shepherd-service)
+                       (service-extension
                         home-files-service-type
                         add-emacs-dot-configuration)
                        (service-extension
                         home-xdg-configuration-files-service-type
                         add-emacs-xdg-configuration)))
-		(compose identity)
-		(extend home-emacs-extensions)
+                (compose identity)
+                (extend home-emacs-extensions)
                 (default-value (home-emacs-configuration))
                 (description "Install and configure GNU Emacs, the
 extensible, self-documenting editor.")))
@@ -306,11 +306,11 @@ extensible, self-documenting editor.")))
 
 
 (define* (elisp-configuration-package
-	  package-name elisp-expressions
-	  #:key
+          package-name elisp-expressions
+          #:key
           summary authors maintainers url keywords commentary
-	  (elisp-packages '())
-	  (autoloads? #f))
+          (elisp-packages '())
+          (autoloads? #f))
   "Takes a list of Elisp expressions, creates emacs-NAME package.
 When autoloads? is @code{#t} adds @code{#~\";;;###autoload\"} before each
 Elisp expression to make it evaluated on Emacs startup."
@@ -322,8 +322,8 @@ Elisp expression to make it evaluated on Emacs startup."
     (fold-right
      (lambda (e acc)
        (if (list? e)
-	   (cons* #~";;;###autoload" e #~"" acc)
-	   (cons* e #~"" acc)))
+           (cons* #~";;;###autoload" e #~"" acc)
+           (cons* e #~"" acc)))
      '() elisp-expressions))
 
   (package
