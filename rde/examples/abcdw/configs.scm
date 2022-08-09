@@ -351,6 +351,8 @@
     #:org-agenda-files '("~/work/abcdw/agenda/todo.org"))
    (feature-emacs-smartparens
     #:show-smartparens? #t)
+   (feature-emacs-geiser)
+   (feature-emacs-guix)
 
 
    (feature-ledger)
