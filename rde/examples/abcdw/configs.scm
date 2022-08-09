@@ -340,15 +340,21 @@
    (feature-emacs-nov-el)
 
    ;; TODO: Revisit <https://en.wikipedia.org/wiki/Git-annex>
-   (feature-emacs-git)
+   (feature-emacs-git
+    #:project-directory "~/work")
    ;; TODO: <https://www.labri.fr/perso/nrougier/GTD/index.html#table-of-contents>
    (feature-emacs-org
-    #:org-directory "~/work/abcdw/notes")
+    #:org-directory "~/work/abcdw/private"
+    #:org-indent? #f
+    #:org-capture-templates
+    `(("t" "Todo" entry (file+headline "" "Tasks") ;; org-default-notes-file
+       "* TODO %?\nSCHEDULED: %t\n%U\n%a\n" :clock-in t :clock-resume t)))
    (feature-emacs-org-roam
     ;; TODO: Rewrite to states
     #:org-roam-directory "~/work/abcdw/notes/notes")
    (feature-emacs-org-agenda
-    #:org-agenda-files '("~/work/abcdw/agenda/todo.org"))
+    #:org-agenda-files '("~/work/abcdw/private/todo.org"
+                         "~/work/abcdw/rde/TODO"))
    (feature-emacs-smartparens
     #:show-smartparens? #t)
    (feature-emacs-geiser)
