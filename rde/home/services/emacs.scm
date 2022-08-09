@@ -38,9 +38,9 @@
             home-emacs-extension
             elisp-configuration-package))
 
-(define packages? (list-of package?))
+(define file-likes? (list-of file-like?))
 
-(define serialize-packages empty-serializer)
+(define serialize-file-likes empty-serializer)
 (define serialize-boolean empty-serializer)
 
 (define elisp-config? list?)
@@ -68,7 +68,7 @@
    (package emacs)
    "Emacs package to use.")
   (elisp-packages
-   (packages '())
+   (file-likes '())
    "List of Emacs Lisp packages to install.")
   (rebuild-elisp-packages?
    (boolean #f)
@@ -268,7 +268,7 @@ connect to it.")
 
 (define-configuration home-emacs-extension
   (elisp-packages
-   (packages '())
+   (file-likes '())
    "List of additional Emacs Lisp packages.")
   (init-el
    (elisp-config '())
