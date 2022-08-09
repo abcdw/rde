@@ -204,32 +204,45 @@
     #:ssh-configuration
     (home-ssh-configuration
      (extra-config
-      (list (ssh-host
-             (host "pinky-ygg")
-             (options
-              '((host-name . "200:554d:3eb1:5bc5:6d7b:42f4:8792:efb8")
-                (user . "bob")
-                (port . 50621)
-                (compression . #t))))
-            (ssh-host
-             (host "pinky")
-             (options
-              '((host-name . "23.184.48.219")
-                (user . "bob")
-                (port . 50621)
-                (compression . #t))))))
+      (append
+       ;; TODO: Move it feature-qemu?
+       (map (lambda (id)
+              (ssh-host
+               (host (format #f "qemu~a" id))
+               (options
+                `((host-name . "localhost")
+                  (port . ,(+ 10020 id))))))
+              (iota 4))
+       (list
+        (ssh-host
+         (host "pinky-ygg")
+         (options
+          '((host-name . "200:554d:3eb1:5bc5:6d7b:42f4:8792:efb8")
+            (port . 50621)
+            (compression . #t))))
+        (ssh-host
+         (host "pinky")
+         (options
+          '((host-name . "23.184.48.219")
+            (port . 50621)
+            (compression . #t)))))))
      (toplevel-options
       '((host-key-algorithms . "+ssh-rsa")
         (pubkey-accepted-key-types . "+ssh-rsa")))))
 
+   ;; https://sr.ht/~tsdh/swayr/
+   ;; https://github.com/ErikReider/SwayNotificationCenter
+   ;; https://github.com/swaywm/sway/wiki/i3-Migration-Guide
+
+   ;; https://github.com/natpen/awesome-wayland
    (feature-sway
-    #:xwayland? #f
+    ;; #:xwayland? #t
     #:extra-config
     `((output DP-2 scale 2)
       ,@(map (lambda (x) `(workspace ,x output eDP-1)) (iota 8 1))
 
-      (workspace 9 output DP-2)
-      (workspace 10 output DP-2)
+      ;; (workspace 9 output DP-2)
+      ;; (workspace 10 output DP-2)
 
       ;; (bindswitch --reload --locked lid:on exec /run/setuid-programs/swaylock)
 
