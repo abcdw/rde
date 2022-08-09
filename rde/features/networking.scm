@@ -37,6 +37,9 @@
             feature-yggdrasil
             feature-ssh-socks-proxy))
 
+;; TODO: Migrate to iwd
+;; iwd: https://git.sr.ht/~akagi/guixrc/tree/master/item/magi/system/services/networking.scm
+
 ;; privoxy https://wiki.archlinux.org/title/Privoxy
 ;; tinyproxy with i2p/tor/ygg upstreams https://youtu.be/8r2bo-EEooM
 ;; tun2proxy
