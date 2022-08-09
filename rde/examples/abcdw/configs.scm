@@ -289,10 +289,24 @@
                      (clock)))
    (feature-rofi)
 
-   (feature-emacs-appearance)
+   ;; TODO: Add an app for saving and reading articles and web pages
+   ;; https://github.com/wallabag/wallabag
+   ;; https://github.com/chenyanming/wallabag.el
+
+   (feature-emacs-appearance
+    #:extra-elisp
+    `((setq modus-themes-syntax '(faint))
+      ;; (setq modus-themes-region '(bg-only))
+      ;; (setq modus-themes-paren-match '(underline))
+      (setq modus-themes-org-blocks 'tinted-background)))
    (feature-emacs-faces)
+   (feature-emacs-tramp)
    (feature-emacs-completion
-    #:mini-frame? #f)
+    #:mini-frame? #f
+    #:marginalia-align 'right)
+
+   (feature-emacs-corfu
+    #:corfu-doc-auto #f)
    (feature-emacs-vertico)
    (feature-emacs-project)
    (feature-emacs-perspective)
@@ -364,7 +378,8 @@
    (feature-ledger)
    (feature-markdown)
 
-   (feature-mpv)
+   (feature-mpv
+    #:extra-mpv-conf '((speed . 1.61)))
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
    (feature-msmtp)
