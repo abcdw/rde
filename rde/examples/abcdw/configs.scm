@@ -505,77 +505,11 @@
 
 
 
-(use-modules (gnu system file-systems))
-(define live-file-systems
-  (list (file-system
-           (mount-point "/")
-           (device (file-system-label "Guix_image"))
-           (type "ext4"))
-
-         ;; Make /tmp a tmpfs instead of keeping the overlayfs.  This
-         ;; originally was used for unionfs because FUSE creates
-         ;; '.fuse_hiddenXYZ' files for each open file, and this confuses
-         ;; Guix's test suite, for instance (see
-         ;; <http://bugs.gnu.org/23056>).  We keep this for overlayfs to be
-         ;; on the safe side.
-         (file-system
-           (mount-point "/tmp")
-           (device "none")
-           (type "tmpfs")
-           (check? #f))
-
-         ;; XXX: This should be %BASE-FILE-SYSTEMS but we don't need
-         ;; elogind's cgroup file systems.
-         ;; (list %pseudo-terminal-file-system
-         ;;       %shared-memory-file-system
-         ;;       %efivars-file-system
-         ;;       %immutable-store)
-         ))
-
-(use-modules (gnu services))
-(define-public live-config
-  (rde-config
-   (features
-    (append
-     %abcdw-features
-     %main-features
-     (list
-      (feature-host-info
-       #:host-name "gnu"
-       #:timezone  "Europe/Moscow")
-
-      (feature-file-systems
-       #:file-systems live-file-systems)
-      (feature-hidpi)
-      (feature-custom-services
-       #:feature-name-prefix 'live
-       #:system-services
-       (list
-        (simple-service
-         'channels-and-sources
-         etc-service-type
-         `(("channels.scm" ,(local-file "live-channels"))
-           ("guix-sources" ,(local-file "/home/bob/work/gnu/guix"
-                                        #:recursive? #t))
-           ("rde-sources" ,(local-file "/home/bob/work/abcdw/rde"
-                                       #:recursive? #t))))
-        ;; (service
-        ;;  guix-home-service-type
-        ;;  `(("bob" . ,ixy-he)))
-        (service
-         gc-root-service-type
-         (list ixy-he))
-        )))))))
-
-(define-public live-os
-  (rde-config-operating-system live-config))
-
 (define (dispatcher)
   (let ((rde-target (getenv "RDE_TARGET")))
     (match rde-target
       ("ixy-home" ixy-he)
       ("ixy-system" ixy-os)
-      ("live-system" live-os)
       (_ ixy-he))))
 
 ;; (pretty-print-rde-config ixy-config)
