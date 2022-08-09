@@ -500,7 +500,7 @@
 (define-public ixy-os
   (rde-config-operating-system ixy-config))
 
-(define ixy-he
+(define-public ixy-he
   (rde-config-home-environment ixy-config))
 
 
