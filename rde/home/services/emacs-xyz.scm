@@ -60,14 +60,15 @@
        (home-emacs-tempel-configuration-templates config)))))
 
 (define (home-emacs-tempel-extensions config extensions)
-  (let ((extensions (interpose (reverse extensions) (list #~""))))
+  (let ((templates (home-emacs-tempel-configuration-templates config))
+        (extensions (interpose (reverse extensions) (list #~""))))
     (home-emacs-tempel-configuration
      (inherit config)
      (templates
       (apply
        append
-       (home-emacs-tempel-configuration-templates config)
-       (list #~"")
+       templates
+       (if (null? templates) '() (list #~""))
        extensions)))))
 
 (define home-emacs-tempel-service-type
