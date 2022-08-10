@@ -18,6 +18,7 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (rde home services emacs)
+  #:use-module (rde serializers elisp)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu packages emacs)
@@ -43,26 +44,6 @@
 (define serialize-file-likes empty-serializer)
 (define serialize-boolean empty-serializer)
 (define serialize-list empty-serializer)
-
-(define elisp-config? list?)
-(define (serialize-elisp-config field-name val)
-  (define (serialize-list-element elem)
-    (cond
-     ((gexp? elem)
-      elem)
-     (else
-      #~(string-trim-right
-           (with-output-to-string
-             (lambda ()
-               ((@ (ice-9 pretty-print) pretty-print)
-                '#$elem
-                #:max-expr-width 79)))
-           #\newline))))
-
-  #~(string-append
-     #$@(interpose
-         (map serialize-list-element val)
-         "\n" 'suffix)))
 
 (define-configuration home-emacs-configuration
   (package
