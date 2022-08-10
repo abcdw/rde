@@ -456,7 +456,30 @@ For more information @xref{Dynamic Abbrevs,,,Emacs}.
 @subsection Orderless
 
 @anchor{Vertico}
+@anchor{feature-emacs-vertico}
 @subsection Vertico
+It's a well-implemented, hackless and simple, well-integrated with
+built-in Emacs mechanisms, performant, but still quite flexible and
+powerful minibuffer completion UI.  MCT, built-in completion buffers,
+icomplete and other similiar packages can work well, but some more
+sophisticated solutions like helm, ivy won't be a good fit for rde due
+to custom implementation of functionality (alternatives for which later
+appeared in Emacs itself like completion annotations) and thus they will
+have a lower integration quality and user experience consistency.
+
+Having a buffer based completion, like builtin one or mct allows for
+more sophisticated actions, for example to search through annotations
+and not only candidates themselves using isearch.  It can be treated as
+a downside of minibuffer-based completion UIs, however, in most cases
+it's possible to export a list of candidates using embark
+(@pxref{Embark,,,}) and perform the same operations on it.
+
+Vertico configuration in rde is quite minimalistic and intuitive, some
+commands/categories will be presented differently (in other window or in
+one line/ido-like), it's done to provide more room for commands, which
+works better, when there are more candidates visible at the same time
+and provide less distraction, when it's enough to show only a few items
+in one line without annotations.
 
 @anchor{Corfu}
 @anchor{feature-corfu}
@@ -480,6 +503,7 @@ selected candidate and @kbd{C-M-v}/@kbd{C-M-V} to scroll other window.
 Use @kbd{M-m} to move candidates to minibuffer, it maybe helpful if you
 want to apply embark (@pxref{Embark,,,}) actions or just get more room.
 
+@anchor{Embark}
 @subsection Embark
 
 @section Shells
