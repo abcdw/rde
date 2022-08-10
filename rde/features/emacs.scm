@@ -485,7 +485,7 @@ It can contain settings not yet moved to separate features."
         (home-emacs-configuration
          (package emacs)
          (elisp-packages additional-elisp-packages)
-         (server-mode? emacs-server-mode?)
+         (emacs-servers (if emacs-server-mode? '(server) '()))
          (xdg-flavor? #t)
          (early-init-el
           `(,(slurp-file-like (local-file "./emacs/early-init.el"))))
@@ -514,6 +514,7 @@ It can contain settings not yet moved to separate features."
             (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
              ,(program-file
                "update-emacs-env-variables"
+               ;; TODO: Add support for multiple servers.
                #~(system*
                   #$emacs-client "--eval"
                   (string-append

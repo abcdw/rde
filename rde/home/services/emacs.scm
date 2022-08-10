@@ -42,6 +42,7 @@
 
 (define serialize-file-likes empty-serializer)
 (define serialize-boolean empty-serializer)
+(define serialize-list empty-serializer)
 
 (define elisp-config? list?)
 (define (serialize-elisp-config field-name val)
@@ -74,11 +75,12 @@
    (boolean #f)
    "Rebuild Emacs Lisp packages with version of Emacs specified in
 PACKAGE field.")
-  (server-mode?
-   (boolean #f)
-   "Create a shepherd service, which starts emacs in a server-mode.  Use
-can use @command{emacsclient} to connect to the server (@pxref{Emacs
-Server,,,emacs.info}).")
+  (emacs-servers
+   (list '(server))
+   "List of emacs named servers.  Use can use @command{emacsclient -s
+SERVER-NAME} to connect to the server (@pxref{Emacs Server,,,emacs.info}).
+@code{server} is a default emacs server name, which can be used with
+@command{emacsclient} without @command{-s} option.")
   (xdg-flavor?
    (boolean #t)
    "Whether to place all the configuration files in
@@ -184,23 +186,37 @@ inputs."
           ;; built-in emacs packages in case of collisions
           (list (home-emacs-configuration-package config))))
 
+(define (emacs-shepherd-service config name)
+  (shepherd-service
+   (documentation
+    (format #f "Emacs server.  Use ~a to connect to it."
+            (if (eq? 'server name)
+                "@code{emacsclient}"
+                (format #f "@code{emacsclient -s ~a}" name))))
+   (provision `(,(symbol-append 'emacs- name)))
+   (requirement '(emacs))
+   (start #~(make-forkexec-constructor
+             (list #$(file-append
+                      (home-emacs-configuration-package config)
+                      "/bin/emacs") #$(format #f "--fg-daemon=~a" name))
+             #:log-file (string-append
+                         (or (getenv "XDG_LOG_HOME")
+                             (format #f "~a/.local/var/log"
+                                     (getenv "HOME")))
+                         "/emacs-" #$(symbol->string name) ".log")))
+   (stop #~(make-kill-destructor))))
 
 (define (add-emacs-shepherd-service config)
-  (if (home-emacs-configuration-server-mode? config)
-      (list (shepherd-service
-             (documentation "Emacs server.  Use @code{emacsclient} to
-connect to it.")
-             (provision '(emacs-server))
-             (start #~(make-forkexec-constructor
-                       (list #$(file-append
-                                (home-emacs-configuration-package config)
-                                "/bin/emacs") "--fg-daemon")
-                       #:log-file (string-append
-                                   (or (getenv "XDG_LOG_HOME")
-                                       (format #f "~a/.local/var/log"
-                                               (getenv "HOME")))
-                                   "/emacs.log")))
-             (stop #~(make-kill-destructor))))
+  (if (not (null? (home-emacs-configuration-emacs-servers config)))
+      (cons
+       (shepherd-service
+        (documentation "\
+Emacs metaservice.  Can be used to restart all emacs servers.")
+        (provision '(emacs))
+        (start #~(const #t))
+        (stop #~(const #t)))
+       (map (cut emacs-shepherd-service config <>)
+            (home-emacs-configuration-emacs-servers config)))
       '()))
 
 ;; (define* (mixed-text-file name #:rest text)
@@ -270,6 +286,10 @@ connect to it.")
   (elisp-packages
    (file-likes '())
    "List of additional Emacs Lisp packages.")
+  (emacs-servers
+   (list '())
+   "List of emacs servers to add to @code{emacs-servers}.  See
+@code{home-emacs-service-type} for more information.")
   (init-el
    (elisp-config '())
    "List of expressions to add to @code{init-el}.  See
@@ -287,6 +307,10 @@ connect to it.")
       (append (home-emacs-configuration-elisp-packages original-config)
               (append-map
                home-emacs-extension-elisp-packages extensions)))
+     (emacs-servers
+      (append (home-emacs-configuration-emacs-servers original-config)
+              (append-map
+               home-emacs-extension-emacs-servers extensions)))
      (init-el
       (append (home-emacs-configuration-init-el original-config)
               (append-map
