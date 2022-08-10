@@ -407,6 +407,26 @@ styles, rde uses Orderless package and respective completion styles
 
 @subsection Dynamic Abbreviations
 The first and most versatile completion can be done with
+@anchor{feature-emacs-tempel}
+@anchor{TempEL}
+@subsubsection TempEL
+Tempel is a simple template package, it uses tempo syntax and integrates
+well with CAPF and abbrev.  More information about templates syntax read
+@xref{,,,TempEL}.  Various rde features can extend a list of available
+templates using @code{home-emacs-tempel-service-type}.
+
+For expanding templates you have several options: Type the full template
+name and use @code{expand-abbrev}, which is usually bound to @kbd{C-x '}
+or type @code{<PART_OF_THE_TEMPLATE_NAME} and use
+@code{compeltion-at-point} (alternatively if you use corfu
+(@pxref{feature-corfu,,,}), the list will be shown automatically), by
+default @code{feature-emacs-tempel} automatically adds its capf by hooks
+specified in @code{tempel-capf-hooks}, this capf prepended to the list
+of capfs, but triggered only when the string start with
+@code{tempel-trigger-prefix} (@code{<} by default).
+
+@subsubsection Dynamic Abbreviations
+The first and one of the most versatile completion can be done with
 @code{dabbrev-completion}, which is bound to @kbd{C-M-/}, it will
 present a list of words, which were used before in current buffer and
 have the same prefix as text before point.  While the list of candidates
@@ -436,6 +456,8 @@ For more information @xref{Dynamic Abbrevs,,,Emacs}.
 @anchor{Vertico}
 @subsection Vertico
 
+@anchor{Corfu}
+@anchor{feature-corfu}
 @subsection Corfu
 Corfu provides a UI for Completion At Point functions, similiar to the
 one you usually see in IDEs (a small tooltip near the point).  Corfu
