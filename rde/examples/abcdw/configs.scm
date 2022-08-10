@@ -16,6 +16,7 @@
   #:use-module (rde features shellutils)
   #:use-module (rde features ssh)
   #:use-module (rde features emacs)
+  #:use-module (rde features emacs-xyz)
   #:use-module (rde features linux)
   #:use-module (rde features bittorrent)
   #:use-module (rde features mail)
@@ -373,6 +374,11 @@
     #:show-smartparens? #t)
    (feature-emacs-geiser)
    (feature-emacs-guix)
+   (feature-emacs-tempel
+    #:default-templates? #t
+    #:templates `(fundamental-mode
+                  ,#~""
+                  (t (format-time-string "%Y-%m-%d"))))
 
 
    (feature-ledger)
@@ -406,7 +412,6 @@
     (append
      (list emacs-dirvish)
      (pkgs "emacs-elfeed" "emacs-hl-todo"
-           "emacs-tempel"
            "emacs-consult-dir"
            "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
            "emacs-kind-icon"
