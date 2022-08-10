@@ -60,21 +60,22 @@ features use `home-emacs-tempel-service-type'."
 
   (define (get-home-services config)
     (list
-     (service home-emacs-tempel-service-type
-              (home-emacs-tempel-configuration
-               (templates
-                (if default-templates?
-                    `(,#~"fundamental-mode ;; Available everywhere\n"
-                      (today (format-time-string "%Y-%m-%d"))
-                      (copyright
-                       (if (derived-mode-p 'lisp-data-mode 'clojure-mode 'scheme-mode)
-                           ";;;"
-                           comment-start)
-                       (if (string-suffix-p " " comment-start) "" " ")
-                       "Copyright © " (format-time-string "%Y") " "
-                       (format "%s <%s>" user-full-name user-mail-address)
-                       comment-end))
-                    '()))))
+     (service
+      home-emacs-tempel-service-type
+      (home-emacs-tempel-configuration
+       (templates
+        (if default-templates?
+            `(,#~"fundamental-mode ;; Available everywhere\n"
+              (today (format-time-string "%Y-%m-%d"))
+              (copyright
+               (if (derived-mode-p 'lisp-data-mode 'clojure-mode 'scheme-mode)
+                   ";;;"
+                   comment-start)
+               (if (string-suffix-p " " comment-start) "" " ")
+               "Copyright © " (format-time-string "%Y") " "
+               (format "%s <%s>" user-full-name user-mail-address)
+               comment-end))
+            '()))))
 
      (simple-service
       'emacs-tempel-user-templates
