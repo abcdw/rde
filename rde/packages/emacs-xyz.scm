@@ -263,6 +263,42 @@ to manipulate and navigate hunks.")))
      (version (package-version emacs-telega-latest))
      (source (package-source emacs-telega-latest)))))
 
+;; https://github.com/alexluigit/dirvish/blob/main/CUSTOMIZING.org
+(define-public emacs-dirvish
+  (package
+    (name "emacs-dirvish")
+    (version "1.9.23")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/alexluigit/dirvish")
+             (commit "9e2cfbeea2093ee93a64d2b76c8f66692183243f")))
+       (sha256
+        (base32 "1jqajfvd4d5q2i7h2sildz1v54pbpna3gjzyq19xz68yjm069jbc"))
+       (file-name (git-file-name name version))))
+    (build-system emacs-build-system)
+    (propagated-inputs
+     `(("emacs-transient" ,emacs-transient)))
+    (arguments
+     `(#:phases
+       (modify-phases %standard-phases
+         ;; Move the extensions source files to the top level, which is included in
+         ;; the EMACSLOADPATH.
+         (add-after 'unpack 'move-source-files
+           (lambda _
+             (let ((el-files (find-files "./extensions" ".*\\.el$")))
+               (for-each (lambda (f)
+                           (rename-file f (basename f)))
+                         el-files)))))))
+    (home-page "https://github.com/alexluigit/dirvish")
+    (synopsis "Improved version of the Emacs package Dired")
+    (description "Dirvish is an improved version of the Emacs inbuilt package
+Dired.  It not only gives Dired an appealing and highly customizable user
+interface, but also comes together with almost all possible parts required for
+full usability as a modern file manager.")
+    (license license:gpl3+)))
+
 (define-public emacs-org-modern-latest
   (let* ((commit "c82b50a61d04571e11c242fb91944753d8bf945c")
          (revision "0"))
