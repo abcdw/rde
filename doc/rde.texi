@@ -84,11 +84,12 @@ machine, but with restrictions (@pxref{FAQ}).
 
 Sometimes, it can be treated as an Emacs distribution, but while GNU
 Emacs is an important part, in reality rde manages not only Emacs, its
-packages and configurations, but other user space software too (which
-often integrates with Emacs), let's call this part @dfn{rde home}.  In
-addition to that, it can be used to manage home environments
-(@pxref{Home Configuration,,, guix,}) on the operating system other
-than rde GNU/Linux or Guix System.
+packages and configurations, but other software too (which often
+integrates with Emacs), mostly it's user space programs and their
+configurations, let's call this part @dfn{rde home}.  In addition to
+that, it can be used to manage home environments (@pxref{Home
+Configuration,,, guix,}) on the operating system other than rde
+GNU/Linux or Guix System.
 
 @c TODO: Part about per-project rde tools.
 
@@ -115,7 +116,7 @@ additional knowledge on the user side.
 Take a brief look on the list of some tools we picked:
 @include rde-tool-list.texi
 
-Read the next section to get some ideas behind our choice. 
+Read the next section to get some ideas behind our choice.
 
 @menu
 * Principles::
@@ -384,26 +385,27 @@ idea is still the same.
 There are a lot of places, where completion happens, but most of the
 heavy work is usually done in Emacs, and this section is focused on it.
 Other applications can try to mimic a fraction of its power and work in
-a similiar way to some degree, we try to configure them to do so, but
-there are no guarantees.
+a similiar way to some degree, and we try to configure them to do so,
+but there are no guarantees.
 
 The primary completion mechanism is tightly related to minibuffer
 (@pxref{Minibuffer,,,Emacs}) and internally utilize
 @code{completing-read} function (@pxref{Minibuffer Completion,,,Elisp}).
-Minibuffer usually used for reading values.  To simplify this process
-prompt, default value, possible options and predicates checking the
-value can be provided, based on it the completion facilities help to
-input correct value(s) or narrow the list of options and pick apropriate
-candidates.
+Minibuffer usually used for reading values and dynamically adjust the
+behavior of command.  To simplify this process prompt, default value,
+possible options and predicates checking the value can be provided,
+based on it the completion facilities help to input correct value(s) or
+narrow the list of options and pick apropriate candidates.
 
 The way completion candidates are presented, updated, sorted, selected,
 the way hotkeys work and other aspects depend heavily on minibuffer
 completion UI. At the moment of writing rde preferred UI is Vertico, the
 reasons for this choice are described in the corresponding section
 (@pxref{Vertico,,,}).  The way they get filtered depends on completion
-styles (@pxref{Completion Styles,,,Emacs}), in addition to built-in
-styles, rde uses Orderless package and respective completion styles
-(@pxref{Orderless,,,}).
+styles (@pxref{Completion Styles,,,Emacs}) for particular completion
+category (@pxref{Programmed Completion,,,Elisp}), in addition to
+built-in styles, rde uses Orderless package and respective completion
+styles (@pxref{Orderless,,,}).
 
 @subsection Dynamic Abbreviations
 The first and most versatile completion can be done with
