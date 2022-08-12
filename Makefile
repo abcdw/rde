@@ -22,7 +22,7 @@ rde/abcdw/home:
 	${HOME_CONFIG}
 
 rde/abcdw/home/build:
-	guix home --fallback build --allow-downgrades \
+	guix home --fallback build --no-grafts --allow-downgrades \
 	${HOME_CONFIG}
 
 rde/livecd/build:
