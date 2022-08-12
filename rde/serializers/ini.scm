@@ -113,6 +113,7 @@ but provided value is:\n ~a") properties)))
 the first element and alist of properties as the second, but provided value \
 is:\n~a") e)))))
 
+  ;; TODO: serialize global section before all other sections.
   (append-map
    (lambda (expr)
      (append
