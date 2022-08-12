@@ -418,14 +418,15 @@ well with CAPF and abbrev.  More information about templates syntax read
 templates using @code{home-emacs-tempel-service-type}.
 
 For expanding templates you have several options: Type the full template
-name and use @code{expand-abbrev}, which is usually bound to @kbd{C-x '}
-or type @code{<PART_OF_THE_TEMPLATE_NAME} and use
+name and use @code{expand-abbrev}, which is usually bound to @kbd{C-x
+'}, type @code{<PART_OF_THE_TEMPLATE_NAME} and use
 @code{compeltion-at-point} (alternatively if you use corfu
 (@pxref{feature-corfu,,,}), the list will be shown automatically), by
 default @code{feature-emacs-tempel} automatically adds its capf by hooks
 specified in @code{tempel-capf-hooks}, this capf prepended to the list
 of capfs, but triggered only when the string start with
-@code{tempel-trigger-prefix} (@code{<} by default).
+@code{tempel-trigger-prefix} (@code{<} by default) or call
+@code{tempel-insert}, which bound to @kbd{M-+} by default.
 
 @subsubsection Dynamic Abbreviations
 The first and one of the most versatile completion can be done with
