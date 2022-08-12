@@ -12,13 +12,16 @@
 *** TODO Implement home service nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
 ** TODO Make gtk home service
-** TODO Make system service for Guix Home
+** DONE Make system service for Guix Home
+SCHEDULED: <2022-07-21 Thu>
+- [X] Install Guix on qemu and make it accessible via guix deploy.
+
 Allows to make home-environment a part of operating-system and thus
 use without ~guix home~ subcommand.
-** TODO Make it possible to specify the verbosity for ~guix home reconfigure~
+** CANCELLED Make it possible to specify the verbosity for ~guix home reconfigure~
 By default, only the path to the home environment should be shown,
 ~/gnu/store/...-home~.
-** TODO Implement pam_shepherd.so
+** CANCELLED Implement pam_shepherd.so
 Start user-space shepherd on first user login and exit on last logout.
 - [[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
 - https://www.opennet.ru/base/dev/pam_linux.txt.html
@@ -30,8 +33,11 @@ creation.
 :END:
 ** First Release                                                 :release_1:
 *** DONE Add a package with rde info file
-*** TODO Prepare rde iso with HE inside
-*** TODO Setup ci and substitutes
+*** DONE Add integrate-he-in-os? flag to rde-config
+SCHEDULED: <2022-08-03 Wed>
+*** TODO Move live-os to install or other apropriate place
+*** DONE Setup ci
+*** TODO Setup substitutes
 *** TODO Place a release-tag tag
 ** TODO Visually separate sway workspaces for different workflows
 - code
@@ -53,9 +59,15 @@ https://framagit.org/tyreunom/guix-home-manager/-/merge_requests/7/diffs#fde3157
 ** TODO Add feature-emacs-sdcv
 Dictionaries: http://download.huzheng.org/
 See also emacs-multitran
-** TODO Add feature-emacs-smartparens
-** TODO Debug screensharing and xdg portals
-** TODO Configure orderless
+** TODO Add user field to email account
+** DONE Add feature-emacs-corfu or extend feature-completion
+SCHEDULED: <2022-06-27 Mon>
+https://kristofferbalintona.me/posts/202202270056/
+** DONE Add feature-emacs-smartparens
+SCHEDULED: <2022-06-20 Mon>
+** DONE Debug screensharing and xdg portals
+** DONE Configure orderless
+SCHEDULED: <2022-07-14 Thu>
 https://github.com/oantolin/orderless
 https://github.com/minad/consult/wiki#minads-orderless-configuration
 ** TODO Configure icecat profiles
