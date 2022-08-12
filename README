@@ -8,6 +8,9 @@ is available at [[http://trop.in/rde][trop.in/rde]].
 #+BEGIN_EXPORT html
 <p><a href="https://builds.sr.ht/~abcdw/rde?">
 <img src="https://builds.sr.ht/~abcdw/rde.svg" alt="builds.sr.ht status" />
+</a>
+<a href="https://www.gnu.org/software/guile/">
+<img src="https://luis-felipe.gitlab.io/media/badges/gnu-guile-made.svg" alt="" />
 </a></p>
 #+END_EXPORT
 
