@@ -357,6 +357,7 @@ C-h C-a to open About Emacs buffer."
           (define-key global-map (kbd "s-w") 'kill-current-buffer)
           (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
           (define-key global-map (kbd "s-o") 'other-window)
+          (define-key global-map (kbd "C-z") nil)
 
           ,#~""
           ,@(if (get-value 'emacs-advanced-user? config)
