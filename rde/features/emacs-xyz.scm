@@ -1775,6 +1775,8 @@ Geiser is configured for the Guile scheme implementation.")))
           :ignore-case t
           :doc-spec '(("(r5rs)Index" nil "^[ 	]+-+ [^:]+:[ 	]*" "\\b")
                       ;; TODO: Check what rest nil arguments do
+                      ("(Guile)Procedure Index" nil nil nil)
+                      ("(Guile)Variable Index" nil nil nil)
                       ("(Guix)Programming Index" nil nil nil))))
 
         (eval-when-compile (require 'guix))
