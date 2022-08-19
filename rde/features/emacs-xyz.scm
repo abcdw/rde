@@ -1938,12 +1938,14 @@ application/epub+zip mime-type will be openned with emacs client."
           (emacs-org-appear emacs-org-appear)
           (org-directory "~/org")
           (org-capture-templates #f)
+          (org-todo-keywords #f)
           (org-rename-buffer-to-title? #t)
           (org-indent? #t)
           (org-modern? #t))
   "Configure org-mode for GNU Emacs."
   (ensure-pred path? org-directory)
   (ensure-pred maybe-list? org-capture-templates)
+  (ensure-pred maybe-list? org-todo-keywords)
   (ensure-pred boolean? org-rename-buffer-to-title?)
   (ensure-pred boolean? org-indent?)
   (ensure-pred boolean? org-modern?)
@@ -2007,6 +2009,10 @@ application/epub+zip mime-type will be openned with emacs client."
 
          ,@(if org-capture-templates
                `((setq org-capture-templates ',org-capture-templates))
+               '())
+
+         ,@(if org-todo-keywords
+               `((setq org-todo-keywords ',org-todo-keywords))
                '())
 
          ;; <https://emacs.stackexchange.com/questions/54809/rename-org-buffers-to-orgs-title-instead-of-filename>
