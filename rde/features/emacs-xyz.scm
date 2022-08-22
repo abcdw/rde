@@ -74,6 +74,7 @@
             feature-emacs-org
             feature-emacs-org-roam
             feature-emacs-org-agenda
+            feature-emacs-citar
 
             ;; Communication
             feature-emacs-erc
@@ -2230,6 +2231,72 @@ marginalia annotations."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-citar
+          #:key
+          (emacs-citar emacs-citar)
+          (citar-library-paths (list "~/docs/library"))
+          (citar-notes-paths (list "~/docs/bib/notes"))
+          (global-bibliography (list "~/docs/bib/biblio.bib")))
+  "Configure org-cite and citar for GNU Emacs."
+  (ensure-pred list? citar-library-paths)
+  (ensure-pred list? citar-notes-paths)
+  (ensure-pred list? global-bibliography)
+
+  (define emacs-f-name 'citar)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile
+         (require 'citar)
+         (require 'oc-biblatex)
+         (require 'oc-csl))
+
+        (setq org-cite-global-bibliography (list ,@global-bibliography))
+        (setq org-cite-insert-processor 'citar)
+        (setq org-cite-follow-processor 'citar)
+        (setq org-cite-activate-processor 'citar)
+        (setq org-cite-export-processors
+              '((latex biblatex)
+                (t csl)))
+
+        (setq citar-library-paths (list ,@citar-library-paths))
+        (setq citar-notes-paths (list ,@citar-notes-paths))
+        (setq citar-bibliography org-cite-global-bibliography)
+
+        ,@(if (get-value 'emacs-embark config)
+              `((citar-embark-mode 1))
+              '())
+
+        ,@(if (get-value 'emacs-org-roam config)
+              `((citar-org-roam-mode 1))
+              '())
+
+        (defun rde-find-main-bibliography ()
+          "Find and open main bibliography file."
+          (interactive) (find-file ,(car global-bibliography)))
+        (define-key global-map (kbd "C-c b") 'org-cite-insert)
+        (define-key global-map (kbd "C-c n b") 'rde-find-main-bibliography))
+      #:summary "\
+Reference management with emacs and citar"
+      #:commentary "\
+Set org-cite processors and citar configuration, basic keybindings, reasonable
+defaults."
+      #:keywords
+      '(convenience org-mode org-cite citar references roam knowledgebase)
+      #:elisp-packages
+      (append
+       (if (get-value 'emacs-org-roam config) (list emacs-citar-org-roam) '())
+       (list emacs-citar)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-citar)))
    (home-services-getter get-home-services)))
 
 
