@@ -407,29 +407,33 @@ category (@pxref{Programmed Completion,,,Elisp}), in addition to
 built-in styles, rde uses Orderless package and respective completion
 styles (@pxref{Orderless,,,}).
 
-@subsection Dynamic Abbreviations
-The first and most versatile completion can be done with
-@anchor{feature-emacs-tempel}
-@anchor{TempEL}
-@subsubsection TempEL
-Tempel is a simple template package, it uses tempo syntax and integrates
-well with CAPF and abbrev.  More information about templates syntax read
-@xref{,,,TempEL}.  Various rde features can extend a list of available
-templates using @code{home-emacs-tempel-service-type}.
+The second completion mechanism is In-buffer Completion
 
-For expanding templates you have several options: Type the full template
-name and use @code{expand-abbrev}, which is usually bound to @kbd{C-x
-'}, type @code{<PART_OF_THE_TEMPLATE_NAME} and use
-@code{compeltion-at-point} (alternatively if you use corfu
-(@pxref{feature-corfu,,,}), the list will be shown automatically), by
-default @code{feature-emacs-tempel} automatically adds its capf by hooks
-specified in @code{tempel-capf-hooks}, this capf prepended to the list
-of capfs, but triggered only when the string start with
-@code{tempel-trigger-prefix} (@code{<} by default) or call
-@code{tempel-insert}, which bound to @kbd{M-+} by default.
+@subsection Sources of Completion
+
+@anchor{Consult}
+@subsubsection Consult
+@anchor{Cape}
+@subsubsection Cape
+
+@anchor{CAP}
+@anchor{In-buffer Completion}
+@subsection In-buffer Completion
+
+There are a few different completion mechanisms, which can be used for
+completing text in buffer.  Abbreviations, Dynamic Abbreviations,
+Snippets and Completion At Point.
+
+@subsubsection Abbreviations
+The first and one of the simplest completions in buffer can be done.
+Define abbreviations (@pxref{Defining Abbrevs,,,Emacs}) either
+interactively or programmatically.  Expand abbreviation with
+@code{expand-abbrev}, which usually bound to @kbd{C-x '}.  Alternatively
+@code{abbrev-mode} can be enabled and typing space or punctuation
+characters will automatically expand abbreviation.
 
 @subsubsection Dynamic Abbreviations
-The first and one of the most versatile completion can be done with
+The second and one of the most versatile completion can be done with
 @code{dabbrev-completion}, which is bound to @kbd{C-M-/}, it will
 present a list of words, which were used before in current buffer and
 have the same prefix as text before point.  While the list of candidates
@@ -446,16 +450,57 @@ to go further in the list of expansion candidates.
 
 For more information @xref{Dynamic Abbrevs,,,Emacs}.
 
-@subsection Completion At Point
 
-@kbd{C-M-i} completion-at-point
+@subsubsection Completion at Point
+@dfn{CAP} is a very generic in-buffer completion mechanism, it tries
+functions from @code{completion-at-point-functions} and when one of them
+succeed, shows a list of candidates in buffer, minibuffer or overlay
+depending on completion UI (@pxref{Completion,,,}).  It can be used for
+almost everything: completing emails, programming constructs provided by
+REPL or LSP, words, snippets, emojis, anything else.
 
-@subsection Consult
-@subsection Cape
+@dfn{CAPF}s usually added automatically by lsp package, major-mode, but
+can be added manually by user as well, also a few CAPFs can be combined
+in a superCAPF in case you need candidates from different CAPFs be in
+the same list all at once.  For generally useful CAPFs take a look at
+Cape package (@pxref{Cape,,,}).
 
+Usually CAP triggered by @code{completion-at-point} function, often
+bound to @kbd{C-M-i} in many modes.  If @code{tab-always-indent} has
+value @code{'complete}, @kbd{@key{TAB}} can trigger
+@code{completion-at-point} as well.  UIs like Corfu can trigger CAP
+automatically after timeout and when enough number of charactors is
+present (@pxref{Corfu,,,}).
+
+
+@anchor{snippets}
+@anchor{feature-emacs-tempel}
+@anchor{TempEL}
+@subsubsection TempEL snippets
+Tempel is a simple template package, it uses tempo syntax and integrates
+well with CAPF and abbrev.  More information about templates syntax read
+@xref{,,,TempEL}.  Various rde features can extend a list of available
+templates using @code{home-emacs-tempel-service-type}.
+
+For expanding templates you have several options: Type the full template
+name and use @code{expand-abbrev}, which is usually bound to @kbd{C-x
+'}, type @code{<PART_OF_THE_TEMPLATE_NAME_MATCHING_COMPLETION_STYLE} and
+use @code{compeltion-at-point} (alternatively if you use corfu
+(@pxref{feature-corfu,,,}), the list will be shown automatically), by
+default @code{feature-emacs-tempel} automatically adds its capf by hooks
+specified in @code{tempel-capf-hooks}, this capf prepended to the list
+of capfs, but triggered only when the string start with
+@code{tempel-trigger-prefix} (@code{<} by default) or call
+@code{tempel-insert}, which bound to @kbd{M-+} by default.
+
+@subsection Completion Styles
 @anchor{Orderless}
-@subsection Orderless
+@subsubsection Orderless
 
+
+@subsection Annotations
+@anchor{Marginalia}
+@subsubsection Marginalia
 @anchor{Vertico}
 @anchor{feature-emacs-vertico}
 @subsection Vertico
