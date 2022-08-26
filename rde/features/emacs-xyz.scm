@@ -2214,11 +2214,12 @@ the node, relative to `org-roam-directory'."
                `((setq org-roam-dailies-directory ,org-roam-dailies-directory))
                '()))
 
-        (define-key global-map (kbd "C-c n t") 'org-roam-dailies-goto-today)
-        (define-key global-map (kbd "C-c n d") 'org-roam-dailies-goto-date)
-        (define-key global-map (kbd "C-c n n") 'org-roam-buffer-toggle)
-        (define-key global-map (kbd "C-c n f") 'org-roam-node-find)
-        (define-key global-map (kbd "C-c n i") 'org-roam-node-insert))
+        (let ((map mode-specific-map))
+          (define-key map (kbd "n t") 'org-roam-dailies-goto-today)
+          (define-key map (kbd "n d") 'org-roam-dailies-goto-date)
+          (define-key map (kbd "n n") 'org-roam-buffer-toggle)
+          (define-key map (kbd "n f") 'org-roam-node-find)
+          (define-key map (kbd "n i") 'org-roam-node-insert)))
 
       #:summary "\
 Knowlede base, note-taking set up and ready"
@@ -2280,8 +2281,10 @@ marginalia annotations."
         (defun rde-find-main-bibliography ()
           "Find and open main bibliography file."
           (interactive) (find-file ,(car global-bibliography)))
-        (define-key global-map (kbd "C-c b") 'org-cite-insert)
-        (define-key global-map (kbd "C-c n b") 'rde-find-main-bibliography))
+
+        (let ((map mode-specific-map))
+          (define-key map (kbd "b") 'org-cite-insert)
+          (define-key map (kbd "n b") 'rde-find-main-bibliography)))
       #:summary "\
 Reference management with emacs and citar"
       #:commentary "\
