@@ -72,6 +72,7 @@
             ;; Reading
             feature-emacs-pdf-tools
             feature-emacs-nov-el
+            feature-emacs-elfeed
 
             ;; Notetaking
             feature-emacs-org
@@ -1927,6 +1928,64 @@ application/epub+zip mime-type will be openned with emacs client."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-elfeed
+          #:key
+          (emacs-elfeed emacs-elfeed)
+          (emacs-elfeed-org emacs-elfeed-org)
+          (elfeed-org-files '())
+          (capture-in-browser? #f))
+  "Setup and configure Elfeed for Emacs."
+  (ensure-pred list-of-strings? elfeed-org-files)
+  (ensure-pred file-like? emacs-elfeed)
+  (ensure-pred file-like? emacs-elfeed-org)
+  (ensure-pred boolean? capture-in-browser?)
+
+  (define emacs-f-name 'elfeed)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (when (get-value 'emacs config)
+       (rde-elisp-configuration-service
+        emacs-f-name
+        config
+        `((require 'configure-rde-keymaps)
+          (define-key rde-app-map (kbd "e") 'elfeed)
+          (eval-when-compile (require 'elfeed) (require 'elfeed-org))
+          (setq rmh-elfeed-org-files ',elfeed-org-files)
+
+          ,@(if capture-in-browser?
+                `((setq
+                    org-capture-templates
+                    '(("r" "rssadd" entry
+                      (file+headline ,(car elfeed-org-files)
+                                     "Untagged")
+                      "*** %:annotation\n"
+                      :immediate-finish t))))
+                '())
+
+          (with-eval-after-load
+           'elfeed
+           (elfeed-org)))
+        #:summary "\
+Elfeed Emacs interface"
+        #:commentary "\
+Keybinding in `rde-app-map', xdg entry for adding rss feed.
+Configured with an elfeed-org storage for easier tagging.
+capture-in-browser? needs to set
+\"javascript:location.href='org-protocol://capture?%27 +new
+URLSearchParams({template: %27r%27, url: window.location.href,title:
+document.title, body: window.getSelection()});\" as a web bookmark."
+        #:keywords '(convenience)
+        #:elisp-packages
+        (list emacs-elfeed emacs-elfeed-org
+              (get-value 'emacs-configure-rde-keymaps config))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-elfeed)))
    (home-services-getter get-home-services)))
 
 
