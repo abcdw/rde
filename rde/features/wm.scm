@@ -86,7 +86,7 @@
 (define* (feature-sway
 	  #:key
 	  (extra-config '())
-	  (sway sway)
+	  (sway sway-latest)
           (foot foot)
           (bemenu bemenu)
           (xdg-desktop-portal xdg-desktop-portal)
