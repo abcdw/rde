@@ -166,6 +166,12 @@
             (bindsym $mod+Shift+space floating toggle)
             (bindsym $mod+Ctrl+space focus mode_toggle)
 
+            ;; (bindsym --to-code $mod+Shift+o
+            ;;          #{[workspace=__focused__]}# focus next)
+
+            ;; TODO: Add keybindings for controlling swaynag
+            ;; <https://wiki.archlinux.org/title/Sway#Control_swaynag_with_the_keyboard>
+
             (bindsym $mod+Left focus left)
             (bindsym $mod+Down focus down)
             (bindsym $mod+Up focus up)
@@ -321,6 +327,8 @@ automatically switch to SWAY-TTY-NUMBER on boot."
 ;;;
 ;;; sway-screenshot.
 ;;;
+
+;; TODO: Add saving to file https://github.com/jtheoof/swappy
 
 (define* (feature-sway-screenshot)
   "Configure slurp, grim and other tools for screenshot capabilities.  Feature
