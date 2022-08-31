@@ -579,42 +579,49 @@ calendar."
 (define* (waybar-battery
           #:key
           (intense? #f)
+          (show-percentage? #f)
           (charging-icon "⚡"))
   "When INTENSE? is #t changes background color instead of text color when the
-battery is low or nearly empty."
-  (waybar-module
-   'battery
-   `((format . "{capacity}% {icon}")
-     (format-charging . ,(format #f "{capacity}~a {icon}" charging-icon))
-     ;; | icon |  range |
-     ;; |------+--------|
-     ;; |    0 | 0-10   |
-     ;; |   25 | 10-40  |
-     ;; |   50 | 40-60  |
-     ;; |   75 | 60-90  |
-     ;; |  100 | 90-100 |
-     (states . ((empty . 10)
-                (low . 20)
-                (half-low . 40)
-                (half . 60)
-                (high . 90)
-                (full . 100)))
-     (format-icons . ((empty . )
-                      (low . )
-                      (half-low . )
-                      (half . )
-                      (high . )
-                      (full . ))))
-   `((#{#battery.discharging.empty}#
-      ,(if intense?
-           `((color . @base02)
-             (background . @base08))
-           `((color . @base08))))
-     (#{#battery.discharging.low}#
-      ,(if intense?
-           `((color . @base02)
-             (background . @base09))
-           `((color . @base09)))))))
+battery is low or nearly empty.  SHOW-PERCENTAGE? controls if current capacity
+is displayed in label or not, in most cases it's not needed and disctracting,
+also this information can be obtained from tooltip if really needed.
+CHARGING-ICON is shown next to battery icon, when battery on AC and not full."
+  (let ((base-format (if show-percentage? "{capacity}" ""))
+        (percent-sign (if show-percentage? "% " "")))
+    (waybar-module
+     'battery
+     `((format . ,(format #f "~a~a{icon}" base-format percent-sign))
+       (format-charging . ,(format #f "~a~a {icon}" base-format charging-icon))
+       (tooltip-format . "Current capacity: {capacity}%\n\n{timeTo}")
+       ;; | icon |  range |
+       ;; |------+--------|
+       ;; |    0 | 0-10   |
+       ;; |   25 | 10-40  |
+       ;; |   50 | 40-60  |
+       ;; |   75 | 60-90  |
+       ;; |  100 | 90-100 |
+       (states . ((empty . 10)
+                  (low . 20)
+                  (half-low . 40)
+                  (half . 60)
+                  (high . 90)
+                  (full . 100)))
+       (format-icons . ((empty . )
+                        (low . )
+                        (half-low . )
+                        (half . )
+                        (high . )
+                        (full . ))))
+     `((#{#battery.discharging.empty}#
+        ,(if intense?
+             `((color . @base02)
+               (background . @base08))
+             `((color . @base08))))
+       (#{#battery.discharging.low}#
+        ,(if intense?
+             `((color . @base02)
+               (background . @base09))
+             `((color . @base09))))))))
 
 ;; https://www.reddit.com/r/swaywm/comments/sks343/pwvolume_pipewire_volume_control_and_waybar_module/
 ;; https://github.com/Alexays/Waybar/wiki/Module:-PulseAudio
