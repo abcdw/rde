@@ -35,6 +35,7 @@
   #:use-module (gnu packages terminals)
   #:use-module (gnu packages rust-apps)
   #:use-module (gnu packages fonts)
+  #:use-module (gnu packages pulseaudio)
   #:use-module (gnu services)
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
@@ -59,6 +60,7 @@
             waybar-sway-workspaces
             waybar-tray
             waybar-temperature
+            waybar-microphone
             waybar-volume
             waybar-idle-inhibitor
             waybar-clock
@@ -616,37 +618,46 @@ battery is low or nearly empty."
 
 ;; https://www.reddit.com/r/swaywm/comments/sks343/pwvolume_pipewire_volume_control_and_waybar_module/
 ;; https://github.com/Alexays/Waybar/wiki/Module:-PulseAudio
-(define* (waybar-volume)
-  ""
-  (waybar-module
-   'pulseaudio
-   `((format . "{format_source}{icon} {volume}%")
-     (format-muted . "{format_source}🔇")
-     (format-source . "🎙️ ")    ;; active mic
-     (format-source-muted . "") ;; muted mic
-     (format-bluetooth . "{format_source}{icon} {volume}% ")
-     (states . ((low . 1)
-                (half . 40)
-                (high . 75)
-                (full . 100)))
-     ;; TODO update serializer to allow (s . ((s . ( ... ))))
-     ;; https://github.com/Alexays/Waybar/wiki/Module:-PulseAudio#example
-     ;;
-     ;; The current serializer input format enforces (s . ((s . v)))
-     ;; which is not covering for these circumstances; in waybar,
-     ;; accepted structures can be either:
-     ;;
-     ;; (format-icons . (🔈 🔉 🔊 📢))
-     ;; (format-icons . ((default .  (🔈 🔉 🔊 📢))))
-     (format-icons . ((default . 🔊)
-                      ;; (low  . 🔈)
-                      ;; (half . 🔉)
-                      ;; (high . 🔊)
-                      ;; (full . 📢)
-                      ))
-     (scroll-step . 2)
-     (on-click . "pavucontrol"))
-   ))
+(define* (waybar-microphone)
+  "It's more minimalistic counterpart of waybar-volume, but for input audio
+device.  It has no configuration options yet."
+  (lambda (config)
+    (waybar-module
+     'pulseaudio#source
+     `((format . "{format_source}")
+       (format-source . "")    ;; active mic
+       (format-source-muted . "") ;; muted mic ;
+       (tooltip-format . "{source_desc} is on {source_volume}%")
+       (on-click . ,#~(format #f "~s"
+                              #$(file-append
+                                 (get-value 'pavucontrol config pavucontrol)
+                                 "/bin/pavucontrol --tab=4")))
+       (scroll-step . 0)))))
+
+(define* (waybar-volume
+          #:key
+          (show-percentage? #f)
+          (scroll-step 0))
+  "Left click opens pavucontrol, scroll changes volume, but it seems buggy and
+SCROLL-STEP is 0 by default.  People rarely care about precise percentage,
+only icons for every 25% is provided by default, controlled by
+SHOW-PERCENTAGE?."
+  (lambda (config)
+    (let ((base-format (string-append
+                        (if show-percentage? "{volume}% " "")
+                        "{icon}")))
+      (waybar-module
+       'pulseaudio#sink
+       `((format . ,base-format)
+         (format-muted . "🔇")
+         (format-bluetooth . ,(string-append base-format ""))
+         (tooltip-format . "{desc} is on {volume}%")
+         (format-icons . ((default .  #(🔈 🔉 🔊 📢))))
+         (on-click . ,#~(format #f "~s"
+                                #$(file-append
+                                   (get-value 'pavucontrol config pavucontrol)
+                                   "/bin/pavucontrol")))
+         (scroll-step . ,scroll-step))))))
 
 (define* (feature-waybar
           #:key
@@ -657,6 +668,7 @@ battery is low or nearly empty."
             (waybar-tray)
             (waybar-idle-inhibitor)
             (waybar-sway-language)
+            (waybar-microphone)
             (waybar-volume)
             (waybar-battery #:intense? #f)
             (waybar-clock)))
