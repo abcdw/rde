@@ -34,16 +34,16 @@
   #:use-module (ice-9 match)
 
   #:export (home-sway-service-type
-	    home-sway-configuration
+            home-sway-configuration
 
             home-swayidle-service-type
-	    home-swayidle-configuration
+            home-swayidle-configuration
 
             home-swaylock-service-type
-	    home-swaylock-configuration
+            home-swaylock-configuration
 
             home-waybar-service-type
-	    home-waybar-configuration
+            home-waybar-configuration
             home-waybar-extension
 
             sway-config?))
@@ -57,7 +57,7 @@
 (define (serialize-sway-config val)
   (define (aligner nestness)
     (apply string-append
-	   (map (const "    ") (iota nestness))))
+           (map (const "    ") (iota nestness))))
 
   (define (serialize-sway-term term)
     ;; (format #t "finval. ~a\n" term)
@@ -75,7 +75,7 @@ boolean, number, symbol, or gexp). Provided term is:\n ~a") lst)))
       (e e)))
 
   (define* (serialize-sway-expression
-	    expr #:optional (nestness 0))
+            expr #:optional (nestness 0))
     ;; (format #t "expres. ~a\n" expr)
     (match expr
       ;; subconfig has the same structure as config,
@@ -85,9 +85,9 @@ boolean, number, symbol, or gexp). Provided term is:\n ~a") lst)))
       ((term ((expressions ...) ...))
        ;; (format #t "subtop. ~a . ~a\n" term expressions)
        (append
-	(list (serialize-sway-term term) " {\n")
-	(serialize-sway-subconfig expressions (1+ nestness))
-	`(,(aligner nestness)
+        (list (serialize-sway-term term) " {\n")
+        (serialize-sway-subconfig expressions (1+ nestness))
+        `(,(aligner nestness)
           "}\n")))
 
       ;; subexpression:
@@ -95,7 +95,7 @@ boolean, number, symbol, or gexp). Provided term is:\n ~a") lst)))
       ((term rest ..1)
        ;; (format #t "inside. ~a . ~a\n" term rest)
        (cons* (serialize-sway-term term) " "
-	      (serialize-sway-expression rest)))
+              (serialize-sway-expression rest)))
 
       ;; last element of subexpression
       ((term)
@@ -109,19 +109,19 @@ optionally ending with subconfigs, but provided expression is:\n ~a")
                e)))))
 
   (define* (serialize-sway-subconfig
-	    subconfig #:optional (nestness 0))
+            subconfig #:optional (nestness 0))
     (match subconfig
       ;; config:
       ;; ((expr1) (expr2) (expr3))
       (((expressions ...) ...)
        (append-map
-	(lambda (e)
-	  (append (list (aligner nestness))
-	          (serialize-sway-expression e nestness)))
-	expressions))
+        (lambda (e)
+          (append (list (aligner nestness))
+                  (serialize-sway-expression e nestness)))
+        expressions))
       (e
        (raise (formatted-message
-	       (G_ "Sway (sub)config should be a list of expressions, \
+               (G_ "Sway (sub)config should be a list of expressions, \
 where each expression is also a list, but provided value is:\n ~a") e))) ))
 
   (serialize-sway-subconfig val))
@@ -134,8 +134,8 @@ where each expression is also a list, but provided value is:\n ~a") e))) ))
    ;;; TODO: make the default value thunked and use a sway package
    ;;; from package field. Requires patching define-configuration
    ;; `((include ,(file-append
-   ;; 		 (home-sway-configuration-package this-home-sway-configuration)
-   ;; 		 "/etc/sway/config")))
+   ;;            (home-sway-configuration-package this-home-sway-configuration)
+   ;;            "/etc/sway/config")))
    (sway-config
     `((include ,(file-append sway "/etc/sway/config"))))
    "List of expressions.  Each @dfn{expression} is a list of terms,
@@ -190,13 +190,13 @@ input * {
   (service-type (name 'home-sway)
                 (extensions
                  (list (service-extension
-			home-profile-service-type
-			add-sway-packages)
-		       (service-extension
+                        home-profile-service-type
+                        add-sway-packages)
+                       (service-extension
                         home-xdg-configuration-files-service-type
                         add-sway-configuration)))
-		(compose identity)
-		(extend home-sway-extensions)
+                (compose identity)
+                (extend home-sway-extensions)
                 (default-value (home-sway-configuration))
                 (description "\
 Install and configure Sway, a Wayland compositor compatible with i3.")))
@@ -248,13 +248,13 @@ The example configuration:
   (service-type (name 'home-swayidle)
                 (extensions
                  (list (service-extension
-			home-profile-service-type
-			add-swayidle-packages)
-		       (service-extension
+                        home-profile-service-type
+                        add-swayidle-packages)
+                       (service-extension
                         home-xdg-configuration-files-service-type
                         add-swayidle-configuration)))
-		(compose identity)
-		(extend home-swayidle-extensions)
+                (compose identity)
+                (extend home-swayidle-extensions)
                 (default-value (home-swayidle-configuration))
                 (description "\
 Install and configure swayidle, sway's idle management daemon")))
@@ -325,13 +325,13 @@ otherwise."))
   (service-type (name 'home-swaylock)
                 (extensions
                  (list (service-extension
-			home-profile-service-type
-			add-swaylock-packages)
-		       (service-extension
+                        home-profile-service-type
+                        add-swaylock-packages)
+                       (service-extension
                         home-xdg-configuration-files-service-type
                         add-swaylock-configuration)))
-		(compose identity)
-		(extend home-swaylock-extensions)
+                (compose identity)
+                (extend home-swaylock-extensions)
                 (default-value (home-swaylock-configuration))
                 (description "\
 Install and configure swaylock, screen locker for Wayland.")))
@@ -513,13 +513,13 @@ added to the end of original configuration of the bar.")
   (service-type (name 'home-waybar)
                 (extensions
                  (list (service-extension
-			home-profile-service-type
-			add-waybar-packages)
-		       (service-extension
+                        home-profile-service-type
+                        add-waybar-packages)
+                       (service-extension
                         home-xdg-configuration-files-service-type
                         add-waybar-configuration)))
-		(compose identity)
-		(extend home-waybar-extensions)
+                (compose identity)
+                (extend home-waybar-extensions)
                 (default-value (home-waybar-configuration))
                 (description "\
 Install and configure waybar, a highly customizible wayland bar for
