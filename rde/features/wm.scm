@@ -50,7 +50,7 @@
   #:use-module (srfi srfi-1)
 
   #:export (feature-sway
-	    feature-sway-run-on-tty
+            feature-sway-run-on-tty
             feature-sway-screenshot
 
             feature-sway-statusbar
@@ -80,23 +80,23 @@
 
 (define (keyboard-layout-to-sway-config keyboard-layout)
   (let ((kb-options (string-join
-		     (keyboard-layout-options keyboard-layout) ",")))
+                     (keyboard-layout-options keyboard-layout) ",")))
     `((input *
-	     ((xkb_layout  ,(keyboard-layout-name keyboard-layout))
-	      (xkb_variant ,(keyboard-layout-variant keyboard-layout))
-	      (xkb_options ,kb-options))))))
+             ((xkb_layout  ,(keyboard-layout-name keyboard-layout))
+              (xkb_variant ,(keyboard-layout-variant keyboard-layout))
+              (xkb_options ,kb-options))))))
 
 (define* (feature-sway
-	  #:key
-	  (extra-config '())
-	  (sway sway-latest)
+          #:key
+          (extra-config '())
+          (sway sway-latest)
           (foot foot)
           (bemenu bemenu)
           (xdg-desktop-portal xdg-desktop-portal)
           (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
           ;; Logo key. Use Mod1 for Alt.
           (sway-mod 'Mod4)
-	  (add-keyboard-layout-to-config? #t)
+          (add-keyboard-layout-to-config? #t)
           (xwayland? #f))
   "Setup and configure sway."
   (ensure-pred sway-config? extra-config)
@@ -111,9 +111,9 @@
   (define (sway-home-services config)
     "Returns home services related to sway."
     (let* ((kb-layout      (get-value 'keyboard-layout config))
-	   (layout-config  (if (and add-keyboard-layout-to-config? kb-layout)
-			       (keyboard-layout-to-sway-config kb-layout)
-			       '()))
+           (layout-config  (if (and add-keyboard-layout-to-config? kb-layout)
+                               (keyboard-layout-to-sway-config kb-layout)
+                               '()))
 
            (lock-cmd
             (get-value 'default-screen-locker config "loginctl lock-session"))
@@ -129,11 +129,11 @@
                         (file-append bemenu "/bin/bemenu-run -l 20 -p run:"))))
       (list
        (service
-	home-sway-service-type
-	(home-sway-configuration
-	 (package sway)
-	 (config
-	  `((xwayland ,(if xwayland? 'enable 'disable))
+        home-sway-service-type
+        (home-sway-configuration
+         (package sway)
+         (config
+          `((xwayland ,(if xwayland? 'enable 'disable))
             (,#~"")
             ,@layout-config
 
@@ -199,17 +199,17 @@
             (bindsym --to-code $mod+Shift+minus move scratchpad)
             (bindsym --to-code $mod+minus scratchpad show)
 
-	    (,#~"")
+            (,#~"")
             (default_border pixel)
             (default_floating_border pixel)
             (gaps inner ,(get-value 'emacs-margin config 8))))))
 
        (when (get-value 'swayidle-cmd config)
          (simple-service
-	  'sway-enable-swayidle
-	  home-sway-service-type
+          'sway-enable-swayidle
+          home-sway-service-type
           `((,#~"")
-	    (exec ,(get-value 'swayidle-cmd config)))))
+            (exec ,(get-value 'swayidle-cmd config)))))
 
        (when (get-value 'swayidle config)
          (let* ((swaymsg (file-append sway "/bin/swaymsg"))
@@ -223,10 +223,10 @@
                resume                ,(swaymsg-cmd "output * dpms on"))))))
 
        (simple-service
-	'sway-configuration
-	home-sway-service-type
+        'sway-configuration
+        home-sway-service-type
         `(,@extra-config
-	  (,#~"")))
+          (,#~"")))
 
        (simple-service
         'sway-reload-config-on-change
@@ -235,8 +235,8 @@
            ,#~(system* #$(file-append sway "/bin/swaymsg") "reload"))))
 
        (simple-service
-	'xdg-desktop-portal-wlr-configuration
-	home-xdg-configuration-files-service-type
+        'xdg-desktop-portal-wlr-configuration
+        home-xdg-configuration-files-service-type
         `(("xdg-desktop-portal-wlr/config"
            ,(mixed-text-file
              "xdg-desktop-portal-wlr-config"
@@ -250,18 +250,18 @@ chooser_type=simple"
 
        (simple-service
         'packages-for-sway
-	home-profile-service-type
+        home-profile-service-type
         (append
          (if (and (get-value 'default-terminal config)
                   (get-value 'backup-terminal config))
              '() (list foot))
          (if (get-value 'default-application-launcher config) '() (list bemenu))
-	 (list qtwayland swayhide
+         (list qtwayland swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
        (simple-service 'set-wayland-specific-env-vars
-		       home-environment-variables-service-type
-		       ;; export NO_AT_BRIDGE=1
-		       '(("XDG_CURRENT_DESKTOP" . "sway")
+                       home-environment-variables-service-type
+                       ;; export NO_AT_BRIDGE=1
+                       '(("XDG_CURRENT_DESKTOP" . "sway")
                          ("XDG_SESSION_TYPE" . "wayland")
                          ;; FIXME: Should be in feature-pipewire
                          ("RTC_USE_PIPEWIRE" . "true")
@@ -271,13 +271,13 @@ chooser_type=simple"
                          ("ELM_ENGINE" . "wayland_egl")
                          ("ECORE_EVAS_ENGINE" . "wayland-egl")
                          ("QT_QPA_PLATFORM" . "wayland-egl")
-			 ("_JAVA_AWT_WM_NONREPARENTING" . "1"))))))
+                         ("_JAVA_AWT_WM_NONREPARENTING" . "1"))))))
 
   (feature
    (name 'sway)
    (values `((sway . ,sway)
              (wl-clipboard . ,wl-clipboard)
-	     (wayland . #t)
+             (wayland . #t)
              (xwayland? . ,xwayland?)))
    (home-services-getter sway-home-services)))
 
@@ -316,8 +316,8 @@ automatically switch to SWAY-TTY-NUMBER on boot."
              (provision '(switch-to-sway-tty))
              (requirement '(virtual-terminal))
              (start #~(lambda ()
-			(invoke #$(file-append kbd "/bin/chvt")
-				#$(format #f "~a" sway-tty-number))))
+                        (invoke #$(file-append kbd "/bin/chvt")
+                                #$(format #f "~a" sway-tty-number))))
              (one-shot? #t))))))
 
   (feature
