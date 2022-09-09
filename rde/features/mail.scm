@@ -26,6 +26,7 @@
   #:use-module (rde features emacs)
   #:use-module (gnu packages mail)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (rde packages emacs-xyz)
   #:use-module (gnu services)
   #:use-module (gnu services configuration)
   #:use-module (gnu home services)
@@ -1004,7 +1005,8 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
         #:keywords '(convenience)
         #:elisp-packages
         (append
-         (list (get-value 'emacs-configure-rde-keymaps config) emacs-notmuch)
+         (list (get-value 'emacs-configure-rde-keymaps config)
+               emacs-notmuch emacs-ol-notmuch)
          (if (get-value 'emacs-consult config)
              (list emacs-consult-notmuch)
              '()))))))
