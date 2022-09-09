@@ -67,7 +67,7 @@
     (stop #~(make-kill-destructor)))))
 
 (define (home-goimapnotify-profile-service config)
-  (list (home-goimapnotify-configuration-package config)))
+  (list (home-goimapnotify-configuration-goimapnotify config)))
 
 (define home-goimapnotify-service-type
   (service-type
