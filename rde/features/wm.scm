@@ -2,6 +2,7 @@
 ;;;
 ;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
+;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -333,7 +334,8 @@ automatically switch to SWAY-TTY-NUMBER on boot."
 
 ;; TODO: Add saving to file https://github.com/jtheoof/swappy
 
-(define* (feature-sway-screenshot)
+(define* (feature-sway-screenshot
+          #:key (screenshot-key 'Print))
   "Configure slurp, grim and other tools for screenshot capabilities.  Feature
 is sway dependent, because it relies on swaymsg."
 
@@ -385,9 +387,11 @@ is sway dependent, because it relies on swaymsg."
      (simple-service
       'sway-screenshot
       home-sway-service-type
-      `((bindsym $mod+Print exec ,shot-output)
-        (bindsym $mod+Alt+Print exec ,swappy-clipboard)
-        (bindsym $mod+Shift+Print exec ,shot-window-or-selection)))))
+      `((bindsym ,(symbol-append '$mod+ screenshot-key) exec ,shot-output)
+        (bindsym ,(symbol-append '$mod+Alt+ screenshot-key)
+                 exec ,swappy-clipboard)
+        (bindsym ,(symbol-append '$mod+Shift+ screenshot-key)
+                 exec ,shot-window-or-selection)))))
 
   (feature
    (name f-name)
