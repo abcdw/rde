@@ -19,6 +19,7 @@
 
 (define-module (rde home services wm)
   #:use-module (gnu home services)
+  #:use-module (gnu home services shepherd)
   #:use-module (gnu packages wm)
   #:use-module (gnu services configuration)
   #:use-module (rde serializers json)
@@ -41,6 +42,9 @@
 
             home-swaylock-service-type
             home-swaylock-configuration
+
+            home-kanshi-service-type
+            home-kanshi-configuration
 
             home-waybar-service-type
             home-waybar-configuration
@@ -335,6 +339,79 @@ otherwise."))
                 (default-value (home-swaylock-configuration))
                 (description "\
 Install and configure swaylock, screen locker for Wayland.")))
+
+
+;;;
+;;; kanshi.
+;;;
+
+(define-configuration home-kanshi-configuration
+  (kanshi
+    (file-like kanshi)
+    "kanshi package to use.")
+  (config
+   (sway-config
+    `())
+   "This field has the same format as sway's config field, but in reality kanshi
+supports only a subset of sway config.  To get the complete list of available
+options see @code{man 5 kanshi}.
+
+The example configuration:
+
+@lisp
+()
+@end lisp"))
+
+(define (add-kanshi-packages config)
+  (list (home-kanshi-configuration-kanshi config)))
+
+(define (add-kanshi-configuration config)
+  `(("kanshi/config"
+     ,(apply
+       mixed-text-file
+       "kanshi-config"
+       (serialize-sway-config (home-kanshi-configuration-config config))))))
+
+(define (home-kanshi-shepherd-service config)
+  (let ((kanshi (home-kanshi-configuration-kanshi config)))
+    (list
+     (shepherd-service
+      (provision '(kanshi))
+      (start #~(make-forkexec-constructor
+                (list #$(file-append kanshi "/bin/kanshi"))
+                #:log-file (string-append
+                            (or (getenv "XDG_LOG_HOME")
+                                (string-append
+                                 (getenv "HOME")
+                                 "/.local/var/log"))
+                            "/kanshi.log")))
+      (stop #~(make-kill-destructor))
+      (documentation "Run Kanshi")))))
+
+(define (home-kanshi-extensions cfg extensions)
+  (home-kanshi-configuration
+   (inherit cfg)
+   (config
+    (append (home-kanshi-configuration-config cfg)
+            (append-map identity (reverse extensions))))))
+
+(define home-kanshi-service-type
+  (service-type (name 'home-kanshi)
+                (extensions
+                 (list (service-extension
+                        home-profile-service-type
+                        add-kanshi-packages)
+                       (service-extension
+                        home-shepherd-service-type
+                        home-kanshi-shepherd-service)
+                       (service-extension
+                        home-xdg-configuration-files-service-type
+                        add-kanshi-configuration)))
+                (compose identity)
+                (extend home-kanshi-extensions)
+                (default-value (home-kanshi-configuration))
+                (description "\
+Install and configure kanshi, output profile manager.")))
 
 
 ;;;
