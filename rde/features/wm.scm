@@ -41,9 +41,8 @@
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
   #:use-module (gnu home services)
-  #:use-module (gnu home-services-utils)
   #:use-module (rde home services wm)
-  #:use-module (gnu home-services shells)
+  #:use-module (rde home services shells)
 
   #:use-module (guix gexp)
   #:use-module (guix packages)
@@ -68,7 +67,8 @@
             waybar-battery
 
             feature-swayidle
-            feature-swaylock))
+            feature-swaylock
+            feature-kanshi))
 
 
 ;;;
@@ -868,6 +868,32 @@ animation."
                    '())))
    (home-services-getter get-home-services)
    (system-services-getter get-system-services)))
+
+
+;;;
+;;; kanshi.
+;;;
+
+(define* (feature-kanshi
+          #:key
+          (kanshi kanshi)
+          (extra-config '()))
+  "Configure kanshi."
+  (ensure-pred file-like? kanshi)
+
+  (define (get-home-services config)
+    (list
+     (service
+      home-kanshi-service-type
+      (home-kanshi-configuration
+       (kanshi kanshi)
+       (config
+        `(,@extra-config))))))
+
+  (feature
+   (name 'kanshi)
+   (values `((kanshi . ,kanshi)))
+   (home-services-getter get-home-services)))
 
 ;; [X] feature-sway-run-on-tty
 ;; [X] feature-sway-screenshot
