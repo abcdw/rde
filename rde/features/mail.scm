@@ -292,6 +292,8 @@ Citation line format, message signature, gpg and msmtp configurations. "
     (ovh . ((host . "ssl0.ovh.net")
             (port . 465)
             (tls_starttls . off)))
+    (ovh-pro2 . ((host . "pro2.mail.ovh.net")
+                 (port . 587)))
     (gmx-fr . ((host . "mail.gmx.net")
                (port . 587)))
     (generic . #f)))
@@ -530,6 +532,21 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
                              #:subfolders 'Legacy
                              #:auth-mechs 'LOGIN))
 
+(define outlook-fr-folder-mapping
+  '(("inbox"   . "INBOX")
+    ("sent"    . "&AMk-l&AOk-ments envoy&AOk-s") ;"Éléments envoyés"
+    ("drafts"  . "Brouillons")
+    ("archive" . "Notes")
+    ("trash"   . "&AMk-l&AOk-ments supprim&AOk-s") ;"Éléments supprimés"
+    ("spam"    . "Courrier ind&AOk-sirable"))) ;"Courrier indésirable"
+
+(define (ovh-pro-isync-settings n)
+  (generate-isync-serializer
+    (string-append "pro" n ".mail.ovh.net")
+    outlook-fr-folder-mapping
+    #:auth-mechs 'LOGIN
+    #:subfolders 'Legacy))
+
 (define (generic-isync-settings mail-directory mail-account)
   (let* ((user     (mail-account-fqda mail-account)))
     `(,#~"# Do not know how to serialize generic accounts :("
@@ -541,6 +558,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     (gandi . ,gandi-isync-settings)
     (gmx-fr . ,gmx-fr-isync-settings)
     (ovh . ,ovh-isync-settings)
+    (ovh-pro2 . ,(ovh-pro-isync-settings "2"))
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
