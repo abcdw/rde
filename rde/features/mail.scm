@@ -292,8 +292,8 @@ Citation line format, message signature, gpg and msmtp configurations. "
     (ovh . ((host . "ssl0.ovh.net")
             (port . 465)
             (tls_starttls . off)))
-    (ovh-pro2 . ((host . "pro2.mail.ovh.net")
-                 (port . 587)))
+    (ovh-pro2-fr . ((host . "pro2.mail.ovh.net")
+                    (port . 587)))
     (gmx-fr . ((host . "mail.gmx.net")
                (port . 587)))
     (generic . #f)))
@@ -502,9 +502,6 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     ("trash"   . "[Gmail]/Trash")
     ("spam"    . "[Gmail]/Spam")))
 
-(define gmail-isync-settings
-  (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
-
 (define gandi-folder-mapping
   '(("inbox"   . "INBOX")
     ("sent"    . "Sent")
@@ -512,9 +509,6 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     ("archive" . "Archive")
     ("trash"   . "Trash")
     ("spam"    . "Junk")))
-
-(define gandi-isync-settings
-  (generate-isync-serializer "mail.gandi.net" gandi-folder-mapping))
 
 (define gmx-fr-folder-mapping
   '(("inbox"   . "INBOX")
@@ -524,14 +518,6 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     ("trash"   . "Corbeille")
     ("spam"    . "Junk")))
 
-(define gmx-fr-isync-settings
-  (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
-
-(define ovh-isync-settings
-  (generate-isync-serializer "ssl0.ovh.net" gandi-folder-mapping
-                             #:subfolders 'Legacy
-                             #:auth-mechs 'LOGIN))
-
 (define outlook-fr-folder-mapping
   '(("inbox"   . "INBOX")
     ("sent"    . "&AMk-l&AOk-ments envoy&AOk-s") ;"Éléments envoyés"
@@ -540,12 +526,36 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     ("trash"   . "&AMk-l&AOk-ments supprim&AOk-s") ;"Éléments supprimés"
     ("spam"    . "Courrier ind&AOk-sirable"))) ;"Courrier indésirable"
 
-(define (ovh-pro-isync-settings n)
+
+(define gmx-fr-isync-settings
+  (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
+
+(define ovh-isync-settings
+  (generate-isync-serializer "ssl0.ovh.net" gandi-folder-mapping
+                             #:subfolders 'Legacy
+                             #:auth-mechs 'LOGIN))
+
+(define gmail-isync-settings
+  (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
+
+(define gandi-isync-settings
+  (generate-isync-serializer "mail.gandi.net" gandi-folder-mapping))
+
+(define* (get-ovh-pro-isync-settings
+          #:key
+          (folder-mapping #f)
+          (host-number #f))
+  (ensure-pred list? folder-mapping)
   (generate-isync-serializer
-    (string-append "pro" n ".mail.ovh.net")
-    outlook-fr-folder-mapping
+    (string-append "pro" host-number ".mail.ovh.net")
+    folder-mapping
     #:auth-mechs 'LOGIN
     #:subfolders 'Legacy))
+
+(define ovh-pro2-fr-isync-settings
+  (get-ovh-pro-isync-settings
+   #:host-number "2"
+   #:folder-mapping outlook-fr-folder-mapping))
 
 (define (generic-isync-settings mail-directory mail-account)
   (let* ((user     (mail-account-fqda mail-account)))
@@ -558,7 +568,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     (gandi . ,gandi-isync-settings)
     (gmx-fr . ,gmx-fr-isync-settings)
     (ovh . ,ovh-isync-settings)
-    (ovh-pro2 . ,(ovh-pro-isync-settings "2"))
+    (ovh-pro2-fr . ,ovh-pro2-fr-isync-settings)
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
