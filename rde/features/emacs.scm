@@ -147,6 +147,8 @@ argument, throw an exception otherwise."
 ;;; Emacs features.
 ;;;
 
+(define %default-emacs-package emacs-next-pgtk-latest)
+
 (define emacs-configure-rde-keymaps
   (rde-emacs-configuration-package
    'rde-keymaps
@@ -165,7 +167,7 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
 
 (define* (feature-emacs-portable
           #:key
-          (emacs emacs-next-pgtk-latest)
+          (emacs %default-emacs-package)
           (status-line-bg-color "#b5d0ff")
           (additional-elisp-packages '()))
   (ensure-pred maybe-string? status-line-bg-color)
@@ -202,7 +204,7 @@ environment outside of Guix Home."
 
 (define* (feature-emacs
           #:key
-          (emacs emacs-next-pgtk-latest)
+          (emacs %default-emacs-package)
           (emacs-server-mode? #t)
           (additional-elisp-packages '())
           (extra-init-el '())
