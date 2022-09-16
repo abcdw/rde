@@ -158,6 +158,7 @@
 
 (define* (feature-ssh-socks-proxy
           #:key
+          (auto-start? #t)
           (host #f)
           (proxy-port 8123))
   "Configure SSH SOCKS Proxy. To customize port and other settings use
@@ -175,6 +176,7 @@ feature-ssh."
       (list
        (shepherd-service
         (provision '(ssh-socks-proxy))
+        (auto-start? auto-start?)
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
                   (list #$(file-append ssh "/bin/ssh")
