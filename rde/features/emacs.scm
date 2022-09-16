@@ -142,6 +142,31 @@ argument, throw an exception otherwise."
     (ensure-pred list? res)
     res))
 
+;; This function was used, when shepherd get started before graphical
+;; environment.
+(define (update-emacs-server-env-variables emacs-client)
+  "Returns a PROGRAM-FILE, which get the current environment variables and make
+emacs servers' environment variables to same values."
+  (program-file
+   "update-emacs-server-env-variables"
+   #~(system*
+      #$emacs-client "--eval"
+      (string-append
+       "(mapcar (lambda (lst) (apply #'setenv lst)) '"
+       (let* ((port   ((@ (ice-9 popen) open-input-pipe)
+                       (string-append "env")))
+              (result ((@ (ice-9 rdelim) read-delimited) "" port))
+              (vars (map (lambda (x)
+                           (let ((si (string-index x #\=)))
+                             (list (string-take x si)
+                                   (string-drop x (+ 1 si)))))
+                         ((@ (srfi srfi-1) remove)
+                          string-null? (string-split
+                                        result #\newline)))))
+         (close-port port)
+         (format #f "~s" vars))
+       ")"))))
+
 
 ;;;
 ;;; Emacs features.
@@ -484,26 +509,7 @@ It can contain settings not yet moved to separate features."
           home-sway-service-type
           `((,#~"")
             (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
-             ,(program-file
-               "update-emacs-env-variables"
-               ;; TODO: Add support for multiple servers.
-               #~(system*
-                  #$emacs-client "--eval"
-                  (string-append
-                   "(mapcar (lambda (lst) (apply #'setenv lst)) '"
-                   (let* ((port   ((@ (ice-9 popen) open-input-pipe)
-                                   (string-append "env")))
-                          (result ((@ (ice-9 rdelim) read-delimited) "" port))
-                          (vars (map (lambda (x)
-                                       (let ((si (string-index x #\=)))
-                                         (list (string-take x si)
-                                               (string-drop x (+ 1 si)))))
-                                     ((@ (srfi srfi-1) remove)
-                                      string-null? (string-split
-                                                    result #\newline)))))
-                     (close-port port)
-                     (format #f "~s" vars))
-                   ")"))))
+                         ,(update-emacs-server-env-variables emacs-client))
             (for_window "[title=\".* - Emacs Client\"]"
                         floating enable,
                         resize set 80 ppt 80 ppt)))))))
