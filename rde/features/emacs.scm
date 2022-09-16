@@ -523,9 +523,6 @@ It can contain settings not yet moved to separate features."
                 '())))
    (home-services-getter emacs-home-services)))
 
-
-
-
-
+;; TODO: https://www.reddit.com/r/emacs/comments/xb6qdm/super_fast_emacs_start_up/
 
 ;;; emacs.scm end here
