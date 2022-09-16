@@ -235,12 +235,14 @@ environment outside of Guix Home."
           (extra-init-el '())
           (extra-early-init-el '())
           (default-terminal? #t)
+          (default-application-launcher? #t)
           (disable-warnings? #t)
           (auto-update-buffers? #t)
           (auto-clean-space? #t))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred boolean? default-terminal?)
+  (ensure-pred boolean? default-application-launcher?)
   (ensure-pred boolean? disable-warnings?)
   (ensure-pred boolean? auto-update-buffers?)
   (ensure-pred boolean? auto-clean-space?)
@@ -266,6 +268,18 @@ environment outside of Guix Home."
                            #$(file-append emacs "/bin/emacs")
                            "--no-splash"
                            (cdr (command-line)))))
+
+  (define emacs-application-launcher
+    (program-file "emacs-application-launcher"
+                  #~(system* #$emacs-client-create-frame
+                           "--eval" "(progn \
+(set-frame-name \"App Launcher - Emacs Client\") \
+(let ((current-frame (selected-frame))) \
+  (unwind-protect \
+      (command-execute 'app-launcher-run-app) \
+    (delete-frame current-frame))))"
+                           "-F"
+                           "((minibuffer . only) (width . 120) (height . 11))")))
 
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs."
@@ -479,7 +493,8 @@ It can contain settings not yet moved to separate features."
         #:elisp-packages
         (append (list (get-value 'emacs-configure-rde-keymaps config)
                       emacs-expand-region)
-                (if auto-clean-space? (list emacs-ws-butler) '())))
+                (if auto-clean-space? (list emacs-ws-butler) '())
+                (if default-application-launcher? (list emacs-app-launcher) '())))
 
        (service
         home-emacs-service-type
@@ -531,7 +546,10 @@ It can contain settings not yet moved to separate features."
              emacs-server-mode?)
             (if default-terminal?
                 `((default-terminal . ,emacs-client-create-frame))
-                '())))
+                '())
+            (if default-application-launcher?
+                   `((default-application-launcher . ,emacs-application-launcher))
+                   '())))
    (home-services-getter emacs-home-services)))
 
 ;; TODO: https://www.reddit.com/r/emacs/comments/xb6qdm/super_fast_emacs_start_up/
