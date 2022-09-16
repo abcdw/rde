@@ -184,10 +184,8 @@ environment outside of Guix Home."
        (package emacs)
        (elisp-packages additional-elisp-packages)
        ;;; TODO: Rebuilding packages with emacs will be useful for
-       ;;; native-comp, but for some reason dash.el fails to build,
-       ;;; need to investigate the issue.
-       ;; (rebuild-elisp-packages? #t)
-       ))
+       ;;; native-comp, but some packages fails to build, need to fix them.
+       (rebuild-elisp-packages? #f)))
      (rde-elisp-configuration-service
       'rde-emacs-portable
       config
@@ -466,10 +464,8 @@ It can contain settings not yet moved to separate features."
          (early-init-el
           `(,(slurp-file-like (local-file "./emacs/early-init.el"))))
          ;;; TODO: Rebuilding packages with emacs will be useful for
-         ;;; native-comp, but for some reason dash.el fails to build,
-         ;;; need to investigate the issue.
-         ;; (rebuild-elisp-packages? #t)
-         ))
+         ;;; native-comp, but some packages fails to build, need to fix them.
+         (rebuild-elisp-packages? #f)))
 
        (simple-service
         'emacs-add-to-init-el
