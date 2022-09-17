@@ -266,7 +266,8 @@ to manipulate and navigate hunks.")))
 
 (define telega-server-latest-instead-of-telega-server
   (package-input-rewriting/spec
-   `(("emacs-telega-server" . ,(const emacs-telega-server-latest)))))
+   `(("ffmpeg" . ,(const ffmpeg-5))
+     ("emacs-telega-server" . ,(const emacs-telega-server-latest)))))
 
 (define-public emacs-telega-latest
   (telega-server-latest-instead-of-telega-server
