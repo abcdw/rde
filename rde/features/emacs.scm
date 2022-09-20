@@ -112,12 +112,14 @@ of it, otherwise adds a require to @file{init.el}."
 
 ;; MAYBE: make handler to be actions instead of desktop entries?
 (define* (emacs-xdg-service
-          name xdg-name gexp
+          name xdg-name gexp-or-file-like
           #:key
           (default-for '())
           (exec-argument "%u"))
   (define file-name (string-append "emacs-" (symbol->string name)))
-  (define file-file (file-append (program-file file-name gexp)
+  (define file-file (file-append (if (file-like? gexp-or-file-like)
+                                     gexp-or-file-like
+                                     (program-file file-name gexp-or-file-like))
                                  (string-append " " exec-argument)))
   (define desktop-file (symbol-append 'emacs- name '.desktop))
   (simple-service
