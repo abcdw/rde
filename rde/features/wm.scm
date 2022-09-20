@@ -171,16 +171,22 @@
 
             (,#~"\n\n# General settings:")
             (set $mod ,sway-mod)
-            (set $term ,default-terminal)
-            (set $backup-term ,backup-terminal)
-            (set $menu ,default-application-launcher)
-            (set $lock ,lock-cmd)
 
             (floating_modifier $mod normal)
 
             (bindsym --to-code $mod+Shift+r reload)
 
             (,#~"\n\n# Launching external applications:")
+            (set $term ,default-terminal)
+            (set $backup-term ,backup-terminal)
+            (set $menu ,default-application-launcher)
+            (set $lock ,lock-cmd)
+
+            ,@(if (get-value 'default-pass-prompt-fn config)
+                  `((set $pass ,(get-value-eval 'default-pass-prompt-fn config))
+                    (bindsym --to-code $mod+Shift+p exec $pass))
+                  '())
+
             (bindsym $mod+Control+Shift+Return exec $backup-term)
             (bindsym $mod+Return exec $term)
 

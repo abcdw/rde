@@ -36,12 +36,28 @@
 (define* (feature-password-store
           #:key
           (password-store password-store)
-          (remote-password-store-url #f))
+          (remote-password-store-url #f)
+          (default-pass-prompt? #t))
   "Setup and configure password manager."
   ;; (ensure-pred maybe-url? remote-password-store-url)
 
   (define emacs-f-name 'pass)
   (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (emacs-pass-prompt config)
+    (require-value 'emacs config)
+    (program-file
+     "emacs-pass-prompt"
+     #~(system* #$(get-value 'emacs-client-create-frame config)
+                ;; https://git.sr.ht/~bruun/home/tree/master/item/.config/emacs/bruun/bruun-emacs-menu.el
+                "--eval" "(progn \
+(set-frame-name \"pass - Emacs Client\") \
+(let ((current-frame (selected-frame))) \
+  (unwind-protect \
+      (command-execute 'rde-consult-pass) \
+    (delete-frame current-frame))))"
+                "-F"
+                "((minibuffer . only) (width . 120) (height . 11))")))
 
   (define (password-store-home-services config)
     "Returns home services related to password-store."
@@ -65,16 +81,7 @@
             (emacs-xdg-service
              'pass
              "Emacs (Client) [pass]"
-             #~(system* #$(get-value 'emacs-client-create-frame config)
-;; https://git.sr.ht/~bruun/home/tree/master/item/.config/emacs/bruun/bruun-emacs-menu.el
-                        "--eval" "(progn \
-(set-frame-name \"pass - Emacs Client\") \
-(let ((current-frame (selected-frame))) \
-  (unwind-protect \
-      (command-execute 'rde-consult-pass) \
-    (delete-frame current-frame))))"
-                        "-F"
-                        "((minibuffer . only) (width . 120) (height . 11))")))
+             (emacs-pass-prompt config)))
 
           (when (get-value 'emacs config)
             (let ((emacs-embark (get-value 'emacs-embark config))
@@ -156,5 +163,8 @@ Keybinding for `rde-consult-pass' and embark actions for it."
   (feature
    (name 'password-store)
    (values `((pass . #t)
-             (password-store . ,password-store)))
+             (password-store . ,password-store)
+             ,@(if default-pass-prompt?
+                   `((default-pass-prompt-fn . ,emacs-pass-prompt))
+                   '())))
    (home-services-getter password-store-home-services)))
