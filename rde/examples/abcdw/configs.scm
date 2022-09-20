@@ -288,7 +288,7 @@
     #:extra-config '(;; (screenshots)
                      ;; (effect-blur . 7x5)
                      (clock)))
-   (feature-rofi)
+   ;; (feature-rofi)
 
    ;; TODO: Add an app for saving and reading articles and web pages
    ;; https://github.com/wallabag/wallabag
