@@ -170,6 +170,8 @@ emacs servers' environment variables to same values."
          (format #f "~s" vars))
        ")"))))
 
+;; MAYBE: Make a separate emacs server instance for some
+;; standalone-minibuffer-programs.
 (define* (emacs-minibuffer-program
           emacs-client-create-frame file-name-suffix title command
           #:key (height 10))
