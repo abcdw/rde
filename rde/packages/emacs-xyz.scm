@@ -276,16 +276,20 @@ to manipulate and navigate hunks.")))
      (version (package-version emacs-telega-server-latest))
      (source (package-source emacs-telega-server-latest)))))
 
-(define telega-latest-instead-of-telega
-  (package-input-rewriting/spec
-   `(("emacs-telega" . ,(const emacs-telega-latest)))))
-
 (define-public emacs-telega-contrib-latest
-  (telega-latest-instead-of-telega
-   (package
-     (inherit emacs-telega-contrib)
-     (version (package-version emacs-telega-latest))
-     (source (package-source emacs-telega-latest)))))
+  ;; TODO: Figure out while previous implementation was failing when built
+  ;; with grafts.
+  (package
+    (inherit emacs-telega-latest)
+    (name "emacs-telega-contrib")
+    (arguments (package-arguments emacs-telega-contrib))
+    (inputs '())
+    (native-inputs '())
+    (propagated-inputs
+     (list emacs-alert emacs-all-the-icons emacs-dashboard emacs-telega-latest))
+    (synopsis "Contributed packages to Telega")
+    (description "Telega-contrib is a collection of third-party
+contributed packages to Telega.")))
 
 ;; https://github.com/alexluigit/dirvish/blob/main/CUSTOMIZING.org
 (define-public emacs-dirvish
