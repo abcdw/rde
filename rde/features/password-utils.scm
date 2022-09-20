@@ -40,6 +40,8 @@
           (default-pass-prompt? #t))
   "Setup and configure password manager."
   ;; (ensure-pred maybe-url? remote-password-store-url)
+  (ensure-pred file-like? password-store)
+  (ensure-pred boolean? default-pass-prompt?)
 
   (define emacs-f-name 'pass)
   (define f-name (symbol-append 'emacs- emacs-f-name))
