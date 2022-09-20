@@ -2,7 +2,9 @@
 
 HOME_CONFIG=./rde/examples/abcdw/configs.scm
 RDE_TARGET=ixy-home
-GUILE_LOAD_PATH=./
+# GUIX=guix
+GUIX=./pre-inst-env guix
+# GUIX=./pre-inst-env ../../gnu/guix/pre-inst-env guix
 
 all: doc/rde.info
 	@echo default target
@@ -17,19 +19,19 @@ check: rde/channels/pull-latest
 target:
 	mkdir target
 
+rde/abcdw/home/reconfigure:
+	${GUIX} home --fallback reconfigure --no-grafts --allow-downgrades \
+	${HOME_CONFIG}
+
 rde/abcdw/home:
-	guix home --fallback reconfigure --no-grafts --allow-downgrades \
+	${GUIX} home --fallback build --no-grafts --allow-downgrades \
 	${HOME_CONFIG}
 
-rde/abcdw/home/build:
-	guix home --fallback build --no-grafts --allow-downgrades \
-	${HOME_CONFIG}
-
-rde/livecd/build:
+rde/livecd/system:
 	guix system --no-grafts \
 	-e '(@ (rde system install) rde-livecd)'
 
-rde/livecd/iso:
+rde/livecd/iso: target
 	guix system image -t iso9660 --no-grafts \
 	-e '(@ (rde system install) rde-livecd)' \
 	-r target/rde.iso
