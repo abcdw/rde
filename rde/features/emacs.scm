@@ -510,11 +510,14 @@ It can contain settings not yet moved to separate features."
           'emacs-update-environment-variables-on-sway-start
           home-sway-service-type
           `((,#~"")
-            (for_window "[title=\".* - Emacs Client\"]"
-                        floating enable,
-                        resize set 80 ppt 80 ppt)))))))
             ;; (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
             ;;              ,(update-emacs-server-env-variables emacs-client))
+
+            ;; TODO: Return back when sway bug is fixed
+            ;; <https://github.com/swaywm/sway/issues/6950>
+            ;; (for_window "[title=\".* - Emacs Client\"]"
+            ;;             floating enable)
+            ))))))
 
   (feature
    (name 'emacs)
