@@ -508,11 +508,11 @@ It can contain settings not yet moved to separate features."
           'emacs-update-environment-variables-on-sway-start
           home-sway-service-type
           `((,#~"")
-            (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
-                         ,(update-emacs-server-env-variables emacs-client))
             (for_window "[title=\".* - Emacs Client\"]"
                         floating enable,
                         resize set 80 ppt 80 ppt)))))))
+            ;; (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
+            ;;              ,(update-emacs-server-env-variables emacs-client))
 
   (feature
    (name 'emacs)

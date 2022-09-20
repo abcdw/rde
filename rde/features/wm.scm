@@ -37,10 +37,12 @@
   #:use-module (gnu packages rust-apps)
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages pulseaudio)
+  #:use-module (gnu packages glib)
   #:use-module (gnu services)
   #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
   #:use-module (gnu home services)
+  #:use-module (gnu home services shepherd)
   #:use-module (rde home services wm)
   #:use-module (rde home services shells)
 
@@ -127,8 +129,37 @@
                         (file-append foot "/bin/foot")))
            (default-application-launcher
              (get-value 'default-application-launcher config
-                        (file-append bemenu "/bin/bemenu-run -l 20 -p run:"))))
+                        (file-append bemenu "/bin/bemenu-run -l 20 -p run:")))
+
+           (shepherd-configuration (home-shepherd-configuration
+                                    (auto-start? #f)
+                                    (daemonize? #f)))
+           (shepherd (home-shepherd-configuration-shepherd shepherd-configuration)))
       (list
+       (service home-shepherd-service-type shepherd-configuration)
+       (simple-service
+        'sway-launch-shepherd
+        home-sway-service-type
+        `((,#~"\n\n# Launch shepherd:")
+          (exec ,(program-file
+                  "launch-shepherd"
+                  #~(let ((log-dir (or (getenv "XDG_LOG_HOME")
+                                       (format #f "~a/.local/var/log"
+                                               (getenv "HOME")))))
+                      (system*
+                       #$(file-append shepherd "/bin/shepherd")
+                       "--logfile"
+                       (string-append log-dir "/shepherd.log")))))))
+       (simple-service
+        'sway-dbus-update-activation-environmnet
+        home-sway-service-type
+        `(,@(if (get-value 'dbus config)
+                `((,#~"\n\n# Update dbus environment variables:")
+                  (exec ,(file-append
+                          (get-value 'dbus config)
+                          "/bin/dbus-update-activation-environment") --all))
+                '())))
+
        (service
         home-sway-service-type
         (home-sway-configuration
@@ -148,14 +179,6 @@
             (floating_modifier $mod normal)
 
             (bindsym --to-code $mod+Shift+r reload)
-
-            ,@(if (get-value 'dbus config)
-                  `((,#~"\n\n# Update dbus environment variables:")
-                    (exec ,(file-append
-                            (get-value 'dbus config)
-                            "/bin/dbus-update-activation-environment")
-                          WAYLAND_DISPLAY XDG_CURRENT_DESKTOP))
-                  '())
 
             (,#~"\n\n# Launching external applications:")
             (bindsym $mod+Control+Shift+Return exec $backup-term)
