@@ -279,6 +279,8 @@
      (waybar-idle-inhibitor)
      ;; (waybar-temperature)
      (waybar-sway-language)
+     (waybar-microphone)
+     (waybar-volume)
      (waybar-battery #:intense? #f)
      (waybar-clock)))
    (feature-swayidle)
