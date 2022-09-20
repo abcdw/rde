@@ -250,7 +250,7 @@
       ;; FIXME: Use absolute path, move to feature-network
       (exec nm-applet --indicator)
       (bindsym
-       --locked $mod+Shift+p exec
+       --locked $mod+Shift+t exec
        ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
        play-pause)
 
