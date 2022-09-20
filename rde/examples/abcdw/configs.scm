@@ -180,7 +180,7 @@
    (feature-qemu)
 
    (feature-pipewire)
-   (feature-backlight #:step 5)
+   (feature-backlight #:step 10)
 
    (feature-fonts
     #:font-monospace (font "Iosevka" #:size 11 #:weight 'regular)
