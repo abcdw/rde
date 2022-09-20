@@ -240,7 +240,8 @@
     ;; #:xwayland? #t
     #:extra-config
     `((output DP-2 scale 2)
-      ,@(map (lambda (x) `(workspace ,x output eDP-1)) (iota 8 1))
+      ;; (output eDP-1 disable)
+      ,@(map (lambda (x) `(workspace ,x output DP-2)) (iota 8 1))
 
       ;; (workspace 9 output DP-2)
       ;; (workspace 10 output DP-2)
@@ -290,6 +291,11 @@
     #:extra-config '(;; (screenshots)
                      ;; (effect-blur . 7x5)
                      (clock)))
+   (feature-kanshi
+    #:extra-config
+    `((profile laptop ((output eDP-1 enable)))
+      (profile docked ((output eDP-1 enable)
+                       (output DP-2 scale 2)))))
    ;; (feature-rofi)
 
    ;; TODO: Add an app for saving and reading articles and web pages
