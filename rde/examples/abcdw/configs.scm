@@ -139,7 +139,7 @@
 (define %main-features
   (list
    (feature-yggdrasil)
-   (feature-ssh-socks-proxy #:host "pinky-ygg")
+   (feature-ssh-socks-proxy #:host "pinky-ygg" #:auto-start? #f)
    (feature-i2pd
     #:outproxy 'http://acetone.i2p:8888
     ;; 'purokishi.i2p
@@ -224,7 +224,7 @@
         (ssh-host
          (host "pinky")
          (options
-          '((host-name . "23.184.48.219")
+          '((host-name . "23.137.249.202")
             (port . 50621)
             (compression . #t)))))))
      (toplevel-options
