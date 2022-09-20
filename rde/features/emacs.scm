@@ -46,7 +46,8 @@
 
             rde-elisp-configuration-service
             emacs-xdg-service
-            expand-extra-elisp))
+            expand-extra-elisp
+            emacs-minibuffer-program))
 
 
 ;;;
@@ -169,6 +170,26 @@ emacs servers' environment variables to same values."
          (format #f "~s" vars))
        ")"))))
 
+(define* (emacs-minibuffer-program
+          emacs-client-create-frame file-name-suffix title command
+          #:key (height 10))
+  (program-file
+   (string-append "emacs-" file-name-suffix)
+   #~(system* #$emacs-client-create-frame
+              "--eval"
+              #$(format
+                 #f "(progn \
+(set-frame-name \"~a - Emacs Client\") \
+(let ((current-frame (selected-frame))
+      (vertico-count ~a)) \
+  (unwind-protect \
+      (command-execute '~a) \
+    (delete-frame current-frame))))" title height command)
+              "-F"
+              #$(format
+                 #f "((minibuffer . only) (width . 120) (height . ~a))"
+                 (1+ height)))))
+
 
 ;;;
 ;;; Emacs features.
@@ -238,7 +259,8 @@ environment outside of Guix Home."
           (default-application-launcher? #t)
           (disable-warnings? #t)
           (auto-update-buffers? #t)
-          (auto-clean-space? #t))
+          (auto-clean-space? #t)
+          (standalone-minibuffer-height 100))
   "Setup and configure GNU Emacs."
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred boolean? default-terminal?)
@@ -246,6 +268,7 @@ environment outside of Guix Home."
   (ensure-pred boolean? disable-warnings?)
   (ensure-pred boolean? auto-update-buffers?)
   (ensure-pred boolean? auto-clean-space?)
+  (ensure-pred integer? standalone-minibuffer-height)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
   (ensure-pred any-package? emacs)
 
@@ -270,16 +293,9 @@ environment outside of Guix Home."
                            (cdr (command-line)))))
 
   (define emacs-application-launcher
-    (program-file "emacs-application-launcher"
-                  #~(system* #$emacs-client-create-frame
-                           "--eval" "(progn \
-(set-frame-name \"App Launcher - Emacs Client\") \
-(let ((current-frame (selected-frame))) \
-  (unwind-protect \
-      (command-execute 'app-launcher-run-app) \
-    (delete-frame current-frame))))"
-                           "-F"
-                           "((minibuffer . only) (width . 120) (height . 11))")))
+    (emacs-minibuffer-program
+     emacs-client-create-frame "application-launcher" "Application Launcher"
+     'app-launcher-run-app #:height standalone-minibuffer-height))
 
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs."
@@ -538,6 +554,7 @@ It can contain settings not yet moved to separate features."
    (name 'emacs)
    (values (append
             (make-feature-values
+             standalone-minibuffer-height
              emacs
              emacs-editor emacs-client
              emacs-client-create-frame

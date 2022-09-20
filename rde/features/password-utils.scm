@@ -46,18 +46,10 @@
 
   (define (emacs-pass-prompt config)
     (require-value 'emacs config)
-    (program-file
-     "emacs-pass-prompt"
-     #~(system* #$(get-value 'emacs-client-create-frame config)
-                ;; https://git.sr.ht/~bruun/home/tree/master/item/.config/emacs/bruun/bruun-emacs-menu.el
-                "--eval" "(progn \
-(set-frame-name \"pass - Emacs Client\") \
-(let ((current-frame (selected-frame))) \
-  (unwind-protect \
-      (command-execute 'rde-consult-pass) \
-    (delete-frame current-frame))))"
-                "-F"
-                "((minibuffer . only) (width . 120) (height . 11))")))
+    (emacs-minibuffer-program
+     (get-value 'emacs-client-create-frame config)
+     "pass-prompt" "pass" 'rde-consult-pass
+     #:height (get-value 'standalone-minibuffer-height config 10)))
 
   (define (password-store-home-services config)
     "Returns home services related to password-store."
