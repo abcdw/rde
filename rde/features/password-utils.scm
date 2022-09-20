@@ -14,9 +14,9 @@
 
 
 (define* (feature-password-store
-	  #:key
+          #:key
           (password-store password-store)
-	  (remote-password-store-url #f))
+          (remote-password-store-url #f))
   "Setup and configure password manager."
   ;; (ensure-pred maybe-url? remote-password-store-url)
 
@@ -30,16 +30,16 @@
     (list (service home-password-store-service-type
                    (home-password-store-configuration
                     (package password-store)))
-	  (simple-service
-	   'add-password-store-git-state
-	   home-state-service-type
-	   (list
-	    (state-git
-	    ;;; TODO: Rewrite it to xdg-state-home or rework states.
-	     (string-append
-	      (get-value 'home-directory config)
-	      "/.local/var/lib/password-store")
-	     remote-password-store-url)))
+          (simple-service
+           'add-password-store-git-state
+           home-state-service-type
+           (list
+            (state-git
+            ;;; TODO: Rewrite it to xdg-state-home or rework states.
+             (string-append
+              (get-value 'home-directory config)
+              "/.local/var/lib/password-store")
+             remote-password-store-url)))
 
           (when (get-value 'emacs config)
             (emacs-xdg-service
@@ -136,5 +136,5 @@ Keybinding for `rde-consult-pass' and embark actions for it."
   (feature
    (name 'password-store)
    (values `((pass . #t)
-	     (password-store . ,password-store)))
+             (password-store . ,password-store)))
    (home-services-getter password-store-home-services)))
