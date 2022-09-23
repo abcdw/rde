@@ -208,6 +208,7 @@ be a symbol, which will be used to construct feature name."
 
 (define* (feature-desktop-services
           #:key
+          (default-desktop-services %rde-desktop-services)
           (dbus dbus))
   "Provides desktop system services."
   (define (get-home-services _)
@@ -237,7 +238,7 @@ be a symbol, which will be used to construct feature name."
                                                 (getenv "HOME")))
                                     "/dbus.log"))))))))
   (define (get-system-services _)
-    %rde-desktop-services)
+    default-desktop-services)
 
   (feature
    (name 'desktop-services)
