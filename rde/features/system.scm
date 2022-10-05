@@ -39,6 +39,7 @@
    (bootloader grub-efi-bootloader)
    (targets '("/boot/efi"))))
 
+;; TODO: Add LUKS2 support https://lists.gnu.org/archive/html/grub-devel/2022-07/msg00037.html
 (define* (feature-bootloader
           #:key (bootloader-configuration %default-bootloader-configuration))
   "Provides custom bootloader configuration for operating-system.
