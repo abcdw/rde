@@ -930,10 +930,10 @@ animation."
 ;; [ ] feature-sway-input
 ;; [ ] feature-sway-keybindings
 ;; [ ] feature-sway-media-keys
-;; [ ] feature-sway-outputs (kanshi, workspaces, displays)
+;; [X] feature-sway-outputs (kanshi, workspaces, displays)
 
 ;; [ ] feature-wayland-appearance (sway, gtk, qt themes)
-;; [ ] feature-wayland-statusbar
+;; [X] feature-wayland-statusbar
 ;; [ ] feature-wayland-notifications
 ;; [ ] feature-wayland-clipboard
 
