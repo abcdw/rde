@@ -33,7 +33,8 @@
             font
             font-size
             font-name
-            font-weight))
+            font-weight
+            font-specification))
 
 (define %rde-default-font-packages
   (list font-iosevka
@@ -52,6 +53,14 @@
 
 (define* (font name #:key size weight)
   (%font name size weight))
+
+(define (font-specification font)
+  "Convert <font> record to string."
+  (string-join (list
+                (font-name font)
+                (string-capitalize (symbol->string (font-weight font)))
+                (number->string (font-size font)))
+               " "))
 
 (define* (feature-fonts
           #:key
