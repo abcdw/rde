@@ -30,10 +30,10 @@
 
   #:export (feature-fonts
 
-	    font
-	    font-size
-	    font-name
-	    font-weight))
+            font
+            font-size
+            font-name
+            font-weight))
 
 (define %rde-default-font-packages
   (list font-iosevka
