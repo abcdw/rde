@@ -1,6 +1,7 @@
 (define-module (rde features xdisorg)
   #:use-module (rde features)
   #:use-module (rde features predicates)
+  #:use-module (rde features fontutils)
   #:use-module (rde packages)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu services)
@@ -26,6 +27,10 @@
   (ensure-pred file-like-or-path? theme)
 
   (define (get-home-services config)
+    (define font
+      (and=> (get-value 'font-monospace config)
+             font-specification))
+
     (list
      (service
       home-rofi-service-type
@@ -36,6 +41,7 @@
            ((modi . "run,ssh,drun")
             (drun-show-actions . ,show-actions?)
             (show-icons . ,show-icons?)
+            ,@(if font `((font . ,font)) '())
             (kb-row-tab . "")
             (kb-row-select . "Tab")
             (kb-secondary-paste . "Control+y")
