@@ -116,22 +116,6 @@ installed by system or home services."
    (home-services-getter get-home-packages)
    (system-services-getter get-system-packages)))
 
-
-(define %rde-base-services
-  %base-services)
-
-(define %rde-desktop-services
-  (remove (lambda (service)
-            (member (service-kind service)
-                    (append
-                     (map service-kind %rde-base-services)
-                     (list gdm-service-type screen-locker-service-type
-                           pulseaudio-service-type alsa-service-type))))
-          %desktop-services))
-
-;; ((@ (ice-9 pretty-print) pretty-print)
-;;  (map service-kind  %base-services))
-
 (define* (feature-custom-services
           #:key
           (feature-name-prefix 'generic)
@@ -155,6 +139,24 @@ be a symbol, which will be used to construct feature name."
    (values `((,feature-name . #t)))
    (home-services-getter get-custom-home-services)
    (system-services-getter get-custom-system-services)))
+
+(define %rde-base-services
+  (cons*
+   (service greetd-service-type)
+   (remove (lambda (service)
+             (member (service-kind service)
+                     (list login-service-type mingetty-service-type
+                           agetty-service-type)))
+           %base-services)))
+
+(define %rde-desktop-services
+  (remove (lambda (service)
+            (member (service-kind service)
+                    (append
+                     (map service-kind %base-services)
+                     (list gdm-service-type screen-locker-service-type
+                           pulseaudio-service-type alsa-service-type))))
+          %desktop-services))
 
 (define %rde-default-substitute-urls %default-substitute-urls)
 (define %rde-default-authorized-guix-keys %default-authorized-guix-keys)
@@ -192,6 +194,14 @@ be a symbol, which will be used to construct feature name."
         (authorized-keys (append
                           guix-authorized-keys
                           default-authorized-guix-keys))))
+      (greetd-service-type
+       config =>
+       (greetd-configuration
+        (terminals
+         (map (lambda (x)
+                (greetd-terminal-configuration
+                 (terminal-vt (number->string x))))
+              (iota 6 1)))))
       (udev-service-type
        config =>
        (udev-configuration
