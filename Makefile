@@ -5,6 +5,9 @@ RDE_TARGET=ixy-home
 # GUIX=guix
 GUIX=./pre-inst-env guix
 # GUIX=./pre-inst-env ../../gnu/guix/pre-inst-env guix
+QEMU_BASE_ARGS= \
+-m 4096 -smp 1 -enable-kvm \
+-device virtio-gpu-pci -vga qxl
 
 all: doc/rde.info
 	@echo default target
@@ -54,18 +57,18 @@ guix/livecd/iso: target
 
 
 qemu/1/run:
-	qemu-system-x86_64 -m 4096 -smp 1 -enable-kvm \
+	qemu-system-x86_64 \
+	${QEMU_BASE_ARGS} \
 	-net user,hostfwd=tcp::10021-:22 -net nic -boot menu=on,order=d \
-	-vga qxl -display gtk,gl=on \
 	-drive file=tmp/system.img
 
 qemu/1/deploy:
 	guix deploy tmp/config.scm --no-grafts
 
 qemu/2/run-from-rde-iso: target/rde.iso
-	qemu-system-x86_64 -m 4096 -smp 1 -enable-kvm \
+	qemu-system-x86_64 \
+	${QEMU_BASE_ARGS} \
 	-net user,hostfwd=tcp::10022-:22 -net nic -boot menu=on,order=d \
-	-vga qxl -display gtk,gl=on \
 	-drive media=cdrom,file=target/rde.iso
 
 
