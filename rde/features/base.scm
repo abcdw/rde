@@ -26,11 +26,16 @@
   #:use-module (gnu services desktop)
   #:use-module (gnu services sound)
   #:use-module (gnu services xorg)
+  #:use-module (gnu services admin)
+  #:use-module (gnu services sysctl)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages bash)
+  #:use-module (gnu packages base)
+  #:use-module (gnu packages linux)
   #:use-module (rde packages)
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
@@ -141,13 +146,30 @@ be a symbol, which will be used to construct feature name."
    (system-services-getter get-custom-system-services)))
 
 (define %rde-base-services
-  (cons*
+  (list
    (service greetd-service-type)
-   (remove (lambda (service)
-             (member (service-kind service)
-                     (list login-service-type mingetty-service-type
-                           agetty-service-type)))
-           %base-services)))
+   (service virtual-terminal-service-type)
+   (service console-font-service-type '())
+   (service syslog-service-type (syslog-configuration))
+   (service static-networking-service-type
+            (list %loopback-static-networking))
+   (service urandom-seed-service-type)
+   (service guix-service-type)
+   (service nscd-service-type)
+
+   (service rottlog-service-type)
+   (service log-cleanup-service-type
+            (log-cleanup-configuration
+             (directory "/var/log/guix/drvs")))
+   (service udev-service-type
+            (udev-configuration
+             (rules (list lvm2 fuse alsa-utils crda))))
+
+   (service sysctl-service-type)
+
+   (service special-files-service-type
+            `(("/bin/sh" ,(file-append bash "/bin/sh"))
+              ("/usr/bin/env" ,(file-append coreutils "/bin/env"))))))
 
 (define %rde-desktop-services
   (remove (lambda (service)
