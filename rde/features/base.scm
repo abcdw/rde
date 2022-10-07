@@ -20,7 +20,9 @@
 (define-module (rde features base)
   #:use-module (rde features)
   #:use-module (rde features predicates)
+
   #:use-module (gnu system)
+  #:use-module (gnu system setuid)
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (gnu services desktop)
@@ -28,15 +30,24 @@
   #:use-module (gnu services xorg)
   #:use-module (gnu services admin)
   #:use-module (gnu services sysctl)
+  #:use-module (gnu services networking)
+  #:use-module (gnu services avahi)
+  #:use-module (gnu services dbus)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
+
   #:use-module (gnu packages certs)
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages glib)
   #:use-module (gnu packages bash)
   #:use-module (gnu packages base)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages libusb)
+  #:use-module (gnu packages nfs)
+  #:use-module (gnu packages gnome)
+  #:use-module (gnu packages freedesktop)
   #:use-module (rde packages)
+
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
 
@@ -172,13 +183,59 @@ be a symbol, which will be used to construct feature name."
               ("/usr/bin/env" ,(file-append coreutils "/bin/env"))))))
 
 (define %rde-desktop-services
-  (remove (lambda (service)
-            (member (service-kind service)
-                    (append
-                     (map service-kind %base-services)
-                     (list gdm-service-type screen-locker-service-type
-                           pulseaudio-service-type alsa-service-type))))
-          %desktop-services))
+  (list
+   ;; Add udev rules for MTP devices so that non-root users can access
+   ;; them.
+   (simple-service 'mtp udev-service-type (list libmtp))
+   ;; Add udev rules for scanners.
+   (service sane-service-type)
+   ;; Add polkti rules, so that non-root users in the wheel group can
+   ;; perform administrative tasks (similar to "sudo").
+   polkit-wheel-service
+
+   ;; Allow desktop users to also mount NTFS and NFS file systems
+   ;; without root.
+   (simple-service 'mount-setuid-helpers setuid-program-service-type
+                   (map (lambda (program)
+                          (setuid-program
+                           (program program)))
+                        (list (file-append nfs-utils "/sbin/mount.nfs")
+                              (file-append ntfs-3g "/sbin/mount.ntfs-3g"))))
+
+   ;; The global fontconfig cache directory can sometimes contain
+   ;; stale entries, possibly referencing fonts that have been GC'd,
+   ;; so mount it read-only.
+   (simple-service 'fontconfig-file-system
+                   file-system-service-type
+                   (list %fontconfig-file-system))
+
+
+   ;; TODO: Move to feature-networking
+   ;; NetworkManager and its applet.
+   (service network-manager-service-type)
+   (service wpa-supplicant-service-type)    ;needed by NetworkManager
+   (simple-service 'network-manager-applet
+                   profile-service-type
+                   (list network-manager-applet))
+   (service modem-manager-service-type)
+   (service usb-modeswitch-service-type)
+
+   ;; The D-Bus clique.
+   (service avahi-service-type)
+   (service udisks-service-type
+           (udisks-configuration (udisks udisks)))
+   (service upower-service-type)
+   (service accountsservice-service-type)
+   (service cups-pk-helper-service-type)
+   (service colord-service-type)
+   (geoclue-service)
+   ;; (service polkit-service-type)
+   (service elogind-service-type)
+   (service dbus-root-service-type)
+
+   (service ntp-service-type)
+
+   x11-socket-directory-service))
 
 (define %rde-default-substitute-urls %default-substitute-urls)
 (define %rde-default-authorized-guix-keys %default-authorized-guix-keys)
