@@ -5,10 +5,14 @@
   #:use-module (rde packages)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu services)
+  #:use-module (gnu services base)
   #:use-module (gnu home services)
+  #:use-module (gnu home services shepherd)
   #:use-module (rde home services xdisorg)
+  #:use-module (rde system services accounts)
   #:use-module (guix gexp)
-  #:export (feature-rofi))
+  #:export (feature-rofi
+            feature-ydotool))
 
 
 ;;;
@@ -61,3 +65,53 @@
                    '())))
    (home-services-getter get-home-services)))
 
+
+;;;
+;;; ydotool.
+;;;
+
+(define* (feature-ydotool
+          #:key
+          (ydotool ydotool))
+  "Configure Ydotool."
+  (ensure-pred file-like? ydotool)
+
+  (define (get-home-services config)
+    (list
+     (simple-service
+      'ydotool-add-ydotool-package
+      home-profile-service-type
+      (list ydotool))
+     (simple-service
+      'start-ydotoold-at-startup
+      home-shepherd-service-type
+      (list (shepherd-service
+             (documentation "Run the ydotool daemon (ydotoold).")
+             (provision '(ydotool))
+             (requirement '())
+             (start #~(make-forkexec-constructor
+                       (list (string-append
+                              #$ydotool "/bin/ydotoold"))))
+             (one-shot? #f)
+             (stop #~(make-kill-destructor)))))))
+
+  (define (get-system-services _)
+    (list
+     (simple-service
+      'ydotool-add-input-group-to-user
+      rde-account-service-type
+      (list "input"))
+     (udev-rules-service
+      'ydotool
+      (udev-rule
+       "80-uinput.rules"
+       ;; TODO: Take it from ydotool package
+       (string-append
+        "KERNEL==\"uinput\", MODE==\"0660\", "
+        "GROUP=\"input\", OPTIONS+=\"static_node=uinput\"")))))
+
+  (feature
+   (name 'ydotool)
+   (values `((ydotool . ,ydotool)))
+   (home-services-getter get-home-services)
+   (system-services-getter get-system-services)))
