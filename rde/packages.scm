@@ -41,7 +41,30 @@
   #:use-module (guix git-download)
   #:use-module (guix build-system meson)
   #:use-module (guix build-system gnu)
-  #:use-module ((guix licenses) #:prefix license:))
+  #:use-module ((guix licenses) #:prefix license:)
+  #:export (strings->packages
+            strings->packages-vanilla))
+
+;; Utils
+
+(define* (strings->packages #:rest lst)
+  (map specification->package+output lst))
+
+(define* (strings->packages-vanilla
+          #:key (commit "2b6af630d61dd5b16424be55088de2b079e9fbaf")
+          #:rest lst)
+  "Packages from guix channel."
+  (define channel-guix
+    `((channel
+       (name 'guix)
+       (url "https://git.savannah.gnu.org/git/guix.git")
+       (commit ,commit))))
+
+  (define inferior (inferior-for-channels channel-guix))
+  (define (get-inferior-pkg pkg-name)
+    (car (lookup-inferior-packages inferior pkg-name)))
+
+  (map get-inferior-pkg lst))
 
 (define (search-patch file-name)
   "Search the patch FILE-NAME.  Raise an error if not found."
