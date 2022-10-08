@@ -286,7 +286,7 @@ chooser_type=simple"
                   (get-value 'backup-terminal config))
              '() (list foot))
          (if (get-value 'default-application-launcher config) '() (list bemenu))
-         (list qtwayland swayhide
+         (list qtwayland-5 swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
        (simple-service 'set-wayland-specific-env-vars
                        home-environment-variables-service-type
