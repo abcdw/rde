@@ -59,6 +59,9 @@
 (define (json-s-string v)
   (list (format #f "~s" v)))
 
+(define (json-s-file-like v)
+  (list "\"" v "\""))
+
 (define (json-s-symbol v)
   (json-s-string (symbol->string v)))
 
@@ -128,7 +131,7 @@
     ((? string? v) (json-s-key v))
     ((? symbol? v) (json-s-key v))
     ((? gexp? v) (json-s-identity v))
-    ((? file-like? v) (json-s-identity v))
+    ((? file-like? v) (json-s-file-like v))
     ((? vector? v) (json-s-vector v level pretty?))
     ((? null? v) (json-s-null-alist v))
     ((? pairs? v) (json-s-alist v level pretty?))
