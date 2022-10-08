@@ -1,13 +1,17 @@
 (define-module (rde features gnupg)
   #:use-module (rde features)
   #:use-module (gnu packages gnupg)
+  #:use-module (gnu packages security-token)
   #:use-module (gnu services)
+  #:use-module (gnu services base)
+  #:use-module (gnu services security-token)
   #:use-module (gnu home-services gnupg)
   #:use-module (gnu home-services wm)
-  #:use-module (gnu services security-token)
+  #:use-module (rde system services accounts)
   #:use-module (guix gexp)
 
-  #:export (feature-gnupg))
+  #:export (feature-gnupg
+            feature-security-token))
 
 (define* (feature-gnupg
           #:key gpg-primary-key
@@ -15,7 +19,6 @@
           (gpg-ssh-agent? #t)
           (ssh-keys '())
           (pinentry-flavor 'qt)
-          (gpg-smart-card? #f)
           (default-ttl 86400)
           (gpg-extra-config '())
           (gpg-agent-extra-config '()))
@@ -24,7 +27,6 @@ and provides GPG-PRIMARY-KEY value for other features."
 
   (ensure-pred string? gpg-primary-key)
   (ensure-pred boolean? gpg-ssh-agent?)
-  (ensure-pred boolean? gpg-smart-card?)
   (ensure-pred pinentry-flavor? pinentry-flavor)
   (ensure-pred integer? default-ttl)
   (ensure-pred list? gpg-extra-config)
@@ -77,8 +79,8 @@ and provides GPG-PRIMARY-KEY value for other features."
        (gpg-agent-config
         (home-gpg-agent-configuration
          (extra-config
-          ;; TTL for smart-cards doesn't make sense
-          `(,@(if (not gpg-smart-card?)
+          ;; TTL for security-tokens doesn't make sense
+          `(,@(if (not (get-value 'security-token config))
                   `((default-cache-ttl . ,default-ttl)
                     (default-cache-ttl-ssh . ,default-ttl)
                     (max-cache-ttl . ,default-ttl)
@@ -89,13 +91,6 @@ and provides GPG-PRIMARY-KEY value for other features."
          (ssh-keys ssh-keys)
          (pinentry-flavor pinentry-flavor)))))))
 
-  (define (system-gnupg-services _)
-    "Return a list of home-services, required for gnupg to operate."
-    (list
-     (if gpg-smart-card?
-         (service pcscd-service-type)
-         #f)))
-
   (feature
    (name 'gnupg)
    (values (append
@@ -103,5 +98,28 @@ and provides GPG-PRIMARY-KEY value for other features."
             (if gpg-ssh-agent?
                 '((ssh-agent? . #t))
                 '())))
-   (home-services-getter home-gnupg-services)
-   (system-services-getter system-gnupg-services)))
+   (home-services-getter home-gnupg-services)))
+
+(define (feature-security-token)
+  "Add specific configuration to make security tokens work. It
+includes the configuration to be able to use the token as a user
+(without sudo)."
+
+  (define (get-system-services _)
+    (list
+     (service pcscd-service-type)
+     (simple-service
+      'security-token-add-plugdev-group-to-user
+      rde-account-service-type
+      (list "plugdev"))
+     (udev-rules-service
+      'yubikey
+      (file->udev-rule
+       "70-u2f.rules"
+       (file-append libfido2 "/udev/rules.d/70-u2f.rules"))
+      #:groups '("plugdev"))))
+
+  (feature
+   (name 'security-token)
+   (values `((security-token . #t)))
+   (system-services-getter get-system-services)))
