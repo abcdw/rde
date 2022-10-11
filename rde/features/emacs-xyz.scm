@@ -2340,37 +2340,29 @@ defaults."
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
+    (require-value 'emacs config)
     (define emacs-cmd (get-value 'emacs-client config))
 
     (list
-     (when (get-value 'emacs config)
-       (rde-elisp-configuration-service
-        emacs-f-name
-        config
-        `((require 'org-protocol))
-        #:summary "\
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((if after-init-time
+            (require 'org-protocol)
+            (add-hook 'after-init-hook (lambda () (require 'org-protocol)))))
+      #:summary "\
 Org Protocol Emacs"
-        #:commentary "\
+      #:commentary "\
 Adding xdg-mime-entry and loading org-protocol.
 This integrates well with elfeed for now."
-        #:keywords '(convenience)
-        #:elisp-packages '()))
+      #:keywords '(convenience)
+      #:elisp-packages '())
 
-     (when emacs-cmd
-       (simple-service
-        'home-xdg-applications
-        home-xdg-mime-applications-service-type
-        (home-xdg-mime-applications-configuration
-         ;; The imv entry is included in the package, but chromium was set as default.
-         (default '((x-scheme-handler/org-protocol . emacsclient.desktop)))
-         (desktop-entries
-          (list
-           (xdg-desktop-entry
-            (file "emacsclient")
-            (name "emacsclient")
-            (config `((exec . ,(file-append emacs-cmd " %u"))
-                      (icon . "emacs")))
-            (type 'application)))))))))
+     (emacs-xdg-service
+      emacs-f-name
+      "Emacs (Client) [Org-protocol]"
+      emacs-cmd
+      #:default-for '(x-scheme-handler/org-protocol))))
 
   (feature
    (name f-name)
