@@ -1939,13 +1939,15 @@ application/epub+zip mime-type will be openned with emacs client."
           #:key
           (emacs-org-modern emacs-org-modern-latest)
           (emacs-org-appear emacs-org-appear)
+          (emacs-org-make-toc emacs-org-make-toc)
           (org-directory "~/org")
           (org-capture-templates #f)
           (org-todo-keywords #f)
           (org-tag-alist #f)
           (org-rename-buffer-to-title? #t)
           (org-indent? #t)
-          (org-modern? #t))
+          (org-modern? #t)
+          (auto-update-toc? #f))
   "Configure org-mode for GNU Emacs."
   (ensure-pred path? org-directory)
   (ensure-pred maybe-list? org-capture-templates)
@@ -1954,8 +1956,10 @@ application/epub+zip mime-type will be openned with emacs client."
   (ensure-pred boolean? org-rename-buffer-to-title?)
   (ensure-pred boolean? org-indent?)
   (ensure-pred boolean? org-modern?)
+  (ensure-pred boolean? auto-update-toc?)
   (ensure-pred file-like? emacs-org-modern)
   (ensure-pred file-like? emacs-org-appear)
+  (ensure-pred file-like? emacs-org-make-toc)
 
   (define emacs-f-name 'org)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -2053,6 +2057,11 @@ Start an unlimited search at `point-min' otherwise."
                '((add-hook 'org-mode-hook 'rde-buffer-name-to-title-config))
                '())
 
+         ,@(if auto-update-toc?
+               `((eval-when-compile (require 'org-make-toc))
+                 (add-hook 'org-mode-hook 'org-make-toc-mode))
+               '())
+
          (with-eval-after-load 'notmuch (require 'ol-notmuch))
 
          (add-hook 'org-mode-hook 'org-appear-mode)
@@ -2071,9 +2080,12 @@ Sensible defaults for org mode"
       #:commentary "\
 Indentation and refile configurations, visual adjustment."
       #:keywords '(convenience org-mode org-modern)
-      #:elisp-packages (list emacs-org emacs-org-contrib
-                             (get-value 'emacs-olivetti config emacs-olivetti)
-                             emacs-org-appear emacs-org-modern))))
+      #:elisp-packages
+      (append
+       (list emacs-org emacs-org-contrib
+             (get-value 'emacs-olivetti config emacs-olivetti)
+             emacs-org-appear emacs-org-modern)
+       (if auto-update-toc? (list emacs-org-make-toc) '())))))
 
   (feature
    (name f-name)
