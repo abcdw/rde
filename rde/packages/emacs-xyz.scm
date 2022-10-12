@@ -241,7 +241,7 @@ sending Git patches via Email, without leaving Emacs."))))
 to manipulate and navigate hunks.")))
 
 (define tdlib-latest-instead-of-tdlib
-  (package-input-rewriting/spec `(("tdlib" . ,(const tdlib-latest)))))
+  (package-input-rewriting/spec `(("tdlib-1.8.0" . ,(const tdlib-latest)))))
 
 (define-public emacs-telega-server-latest
   (tdlib-latest-instead-of-tdlib
