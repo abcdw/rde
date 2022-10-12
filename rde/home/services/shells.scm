@@ -188,9 +188,9 @@ another process for example)."))
    "zprofile"
    "\
 # Setups system and user profiles and related variables
-source /etc/profile
+if [ -f /etc/profile ]; then source /etc/profile; fi
 # Setups home environment profile
-source ~/.profile
+if [ -f ~/.profile ]; then source ~/.profile; fi
 
 # It's only necessary if zsh is a login shell, otherwise profiles will
 # be already sourced by bash
