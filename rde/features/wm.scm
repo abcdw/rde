@@ -690,13 +690,17 @@ SHOW-PERCENTAGE?."
        'pulseaudio#sink
        `((format . ,base-format)
          (format-muted . "🔇")
-         (format-bluetooth . ,(string-append base-format ""))
+         (format-bluetooth . ,(string-append base-format " " ""))
          (tooltip-format . "{desc} is on {volume}%")
          (format-icons . ((default .  #(🔈 🔉 🔊 📢))))
          (on-click . ,#~(format #f "~s"
                                 #$(file-append
                                    (get-value 'pavucontrol config pavucontrol)
                                    "/bin/pavucontrol")))
+         (on-click-middle . ,#~(format #f "~s"
+                                #$(file-append
+                                   (get-value 'pulseaudio config pulseaudio)
+                                   "/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle")))
          (scroll-step . ,scroll-step))))))
 
 (define* (feature-waybar
