@@ -64,6 +64,9 @@
             waybar-temperature
             waybar-microphone
             waybar-volume
+            waybar-cpu
+            waybar-memory
+            waybar-disk
             waybar-idle-inhibitor
             waybar-clock
             waybar-battery
@@ -702,6 +705,36 @@ SHOW-PERCENTAGE?."
                                    (get-value 'pulseaudio config pulseaudio)
                                    "/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle")))
          (scroll-step . ,scroll-step))))))
+
+(define* (waybar-memory)
+  "Displays information about the memory."
+  (lambda (config)
+    (waybar-module
+     'memory
+     `((interval . 30)
+       (format . " {percentage}%")))))
+
+(define* (waybar-cpu)
+  "Displays information about the current CPU load."
+  (lambda (config)
+    (waybar-module
+     'cpu
+     `((interval . 2)
+       (format . " {usage}%")))))
+
+(define* (waybar-disk
+          #:key
+          (name 'root)
+          (path "/")
+          (disk-icon ""))
+  "Displays information about the specified disk.
+By default, NAME is root, PATH is /, and DISK-ICON is ."
+  (lambda (config)
+    (waybar-module
+     (symbol-append 'disk# name)
+     `((interval . 30)
+       (format . ,(string-append disk-icon " {percentage_used}%"))
+       (path . ,path)))))
 
 (define* (feature-waybar
           #:key
