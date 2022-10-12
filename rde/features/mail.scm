@@ -296,6 +296,8 @@ Citation line format, message signature, gpg and msmtp configurations. "
                     (port . 587)))
     (gmx-fr . ((host . "mail.gmx.net")
                (port . 587)))
+    (mailbox . ((host . "smtp.mailbox.org")
+                (port . 587)))
     (generic . #f)))
 
 (define %default-msmtp-settings
@@ -526,6 +528,13 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     ("trash"   . "&AMk-l&AOk-ments supprim&AOk-s") ;"Éléments supprimés"
     ("spam"    . "Courrier ind&AOk-sirable"))) ;"Courrier indésirable"
 
+(define mailbox-folder-mapping
+  '(("inbox"   . "INBOX")
+    ("sent"    . "Sent")
+    ("drafts"  . "Drafts")
+    ("trash"   . "Trash")
+    ("junk"    . "Junk")
+    ("archive" . "Archive")))
 
 (define gmx-fr-isync-settings
   (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
@@ -540,6 +549,9 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 
 (define gandi-isync-settings
   (generate-isync-serializer "mail.gandi.net" gandi-folder-mapping))
+
+(define mailbox-isync-settings
+  (generate-isync-serializer "imap.mailbox.org" mailbox-folder-mapping))
 
 (define* (get-ovh-pro-isync-settings
           #:key
@@ -569,6 +581,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     (gmx-fr . ,gmx-fr-isync-settings)
     (ovh . ,ovh-isync-settings)
     (ovh-pro2-fr . ,ovh-pro2-fr-isync-settings)
+    (mailbox . ,mailbox-isync-settings)
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
