@@ -301,31 +301,8 @@ be a symbol, which will be used to construct feature name."
           (dbus dbus))
   "Provides desktop system services."
   (define (get-home-services _)
-    (list
-     ;; TODO: Make home-dbus-service-type
-     (simple-service 'dbus-set-some-env-vars
-                     home-environment-variables-service-type
-                     '(("DBUS_SESSION_BUS_ADDRESS"
-                        . "unix:path=$XDG_RUNTIME_DIR/bus")))
-     (simple-service
-      'dbus-add-shepherd-daemon
-      home-shepherd-service-type
-      (list
-       (shepherd-service
-        (provision '(dbus))
-        (stop  #~(make-kill-destructor))
-        (start #~(make-forkexec-constructor
-                  (list #$(file-append dbus "/bin/dbus-daemon")
-                        "--nofork"
-                        "--session"
-                        (string-append
-                         "--address=" "unix:path="
-                         (getenv "XDG_RUNTIME_DIR") "/bus"))
-                  #:log-file (string-append
-                                    (or (getenv "XDG_LOG_HOME")
-                                        (format #f "~a/.local/var/log"
-                                                (getenv "HOME")))
-                                    "/dbus.log"))))))))
+    (list (service home-dbus-service-type)))
+
   (define (get-system-services _)
     default-desktop-services)
 
