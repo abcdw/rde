@@ -2259,11 +2259,13 @@ olivetti package."
 ;; TODO: rewrite to states
 (define* (feature-emacs-org-roam
           #:key
+          (emacs-org-roam emacs-org-roam)
           (org-roam-directory #f)
           (org-roam-dailies-directory #f)
           (org-roam-capture-templates #f)
           (use-node-types? #t))
   "Configure org-roam for GNU Emacs."
+  (ensure-pred file-like? emacs-org-roam)
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
   (ensure-pred maybe-path? org-roam-dailies-directory)
