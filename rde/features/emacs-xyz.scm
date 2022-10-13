@@ -2340,10 +2340,13 @@ marginalia annotations."
 (define* (feature-emacs-citar
           #:key
           (emacs-citar emacs-citar)
+          (emacs-citar-org-roam emacs-citar-org-roam)
           (citar-library-paths (list "~/docs/library"))
           (citar-notes-paths (list "~/docs/bib/notes"))
           (global-bibliography (list "~/docs/bib/biblio.bib")))
   "Configure org-cite and citar for GNU Emacs."
+  (ensure-pred file-like? emacs-citar)
+  (ensure-pred file-like? emacs-citar-org-roam)
   (ensure-pred list? citar-library-paths)
   (ensure-pred list? citar-notes-paths)
   (ensure-pred list? global-bibliography)
