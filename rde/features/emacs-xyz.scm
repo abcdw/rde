@@ -1482,21 +1482,25 @@ emacsclient feels more like a separate emacs instance."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((add-hook 'after-init-hook 'persp-mode)
+      `((if after-init-time
+            (persp-mode 1)
+            (add-hook 'after-init-hook 'persp-mode))
         ;; TODO: Show current perspective in some global space (tab-bar?).
-        (customize-set-variable
-         'persp-show-modestring ,(if persp-show-modestring? 't 'nil))
-        (customize-set-variable 'persp-modestring-dividers '(" [" "]" "|"))
 
-        ;; MAYBE: Move it to feature-project
-        ;; This is mostly a project-related functionality, which uses
-        ;; perspective as isolation mechanism.
+        ;; Should be defined before perspective loaded
+        (setq persp-mode-prefix-key (kbd "C-x P"))
+
+        (with-eval-after-load
+         'perspective
+         (setq persp-show-modestring ,(if persp-show-modestring? 't 'nil))
+         (setq persp-modestring-dividers '(" [" "]" "|")))
+
         ,@(if (get-value 'emacs-project config)
               `((defun rde-persp-switch-project (dir)
                    "Switch to a project in its own perspective."
                    (interactive (list (project-prompt-project-dir)))
                    (let ((name (file-name-nondirectory
-				(directory-file-name
+                                (directory-file-name
                                  (file-name-directory dir)))))
                      (persp-switch name)
                      (project-switch-project dir)))
