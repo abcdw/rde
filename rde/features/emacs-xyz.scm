@@ -219,9 +219,9 @@ value of background color for mode/header-line.")
                              'mode-line)
                        nil :background rde-status-line-bg-color))))
 
-        (menu-bar-mode 0)
-        (tool-bar-mode 0)
-        (scroll-bar-mode 0)
+        (with-eval-after-load 'menu-bar (menu-bar-mode 0))
+        (with-eval-after-load 'tool-bar (tool-bar-mode 0))
+        (with-eval-after-load 'scroll-bar (scroll-bar-mode 0))
 
         (set-frame-parameter (selected-frame) 'internal-border-width ,margin)
 
