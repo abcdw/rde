@@ -157,7 +157,7 @@ be a symbol, which will be used to construct feature name."
    (home-services-getter get-custom-home-services)
    (system-services-getter get-custom-system-services)))
 
-(define %rde-base-services
+(define %rde-base-system-services
   (list
    (service greetd-service-type)
    (service virtual-terminal-service-type)
@@ -183,7 +183,65 @@ be a symbol, which will be used to construct feature name."
             `(("/bin/sh" ,(file-append bash "/bin/sh"))
               ("/usr/bin/env" ,(file-append coreutils "/bin/env"))))))
 
-(define %rde-desktop-services
+(define %rde-default-substitute-urls %default-substitute-urls)
+(define %rde-default-authorized-guix-keys %default-authorized-guix-keys)
+
+(define* (feature-base-services
+          #:key
+          (default-substitute-urls %rde-default-substitute-urls)
+          (default-authorized-guix-keys %rde-default-authorized-guix-keys)
+          (guix-substitute-urls '())
+          (guix-authorized-keys '())
+          (udev-rules '())
+          (base-system-services %rde-base-system-services))
+  "Provides base system services."
+  (ensure-pred list-of-services? base-system-services)
+  (ensure-pred list-of-strings? guix-substitute-urls)
+  (ensure-pred list-of-file-likes? guix-authorized-keys)
+  (ensure-pred list-of-file-likes? udev-rules)
+
+  (define (get-base-system-services cfg)
+    (modify-services base-system-services
+      (console-font-service-type
+       config =>
+       (map (lambda (x)
+              (cons
+               (format #f "tty~a" x)
+               (get-value 'console-font cfg "LatGrkCyr-8x16")))
+            (iota (get-value 'number-of-ttys cfg 6) 1)))
+      (guix-service-type
+       config =>
+       (guix-configuration
+        (inherit config)
+        (substitute-urls (append
+                          guix-substitute-urls
+                          default-substitute-urls))
+        (authorized-keys (append
+                          guix-authorized-keys
+                          default-authorized-guix-keys))))
+      (greetd-service-type
+       config =>
+       (greetd-configuration
+        (terminals
+         (map (lambda (x)
+                (greetd-terminal-configuration
+                 (terminal-vt (number->string x))))
+              (iota 6 1)))))
+      (udev-service-type
+       config =>
+       (udev-configuration
+        (inherit config)
+        (rules (append
+                udev-rules
+                (udev-configuration-rules config)))))))
+
+  (feature
+   (name 'base-services)
+   (values `((base-services . #t)
+             (number-of-ttys . ,%number-of-ttys)))
+   (system-services-getter get-base-system-services)))
+
+(define %rde-desktop-system-services
   (list
    ;; Add udev rules for MTP devices so that non-root users can access
    ;; them.
@@ -238,74 +296,20 @@ be a symbol, which will be used to construct feature name."
 
    x11-socket-directory-service))
 
-(define %rde-default-substitute-urls %default-substitute-urls)
-(define %rde-default-authorized-guix-keys %default-authorized-guix-keys)
-
-(define* (feature-base-services
-          #:key
-          (default-substitute-urls %rde-default-substitute-urls)
-          (default-authorized-guix-keys %rde-default-authorized-guix-keys)
-          (guix-substitute-urls '())
-          (guix-authorized-keys '())
-          (udev-rules '())
-          (base-services %rde-base-services))
-  "Provides base system services."
-  (ensure-pred list-of-services? base-services)
-  (ensure-pred list-of-strings? guix-substitute-urls)
-  (ensure-pred list-of-file-likes? guix-authorized-keys)
-  (ensure-pred list-of-file-likes? udev-rules)
-
-  (define (get-base-system-services cfg)
-    (modify-services base-services
-      (console-font-service-type
-       config =>
-       (map (lambda (x)
-              (cons
-               (format #f "tty~a" x)
-               (get-value 'console-font cfg "LatGrkCyr-8x16")))
-            (iota (get-value 'number-of-ttys cfg 6) 1)))
-      (guix-service-type
-       config =>
-       (guix-configuration
-        (inherit config)
-        (substitute-urls (append
-                          guix-substitute-urls
-                          default-substitute-urls))
-        (authorized-keys (append
-                          guix-authorized-keys
-                          default-authorized-guix-keys))))
-      (greetd-service-type
-       config =>
-       (greetd-configuration
-        (terminals
-         (map (lambda (x)
-                (greetd-terminal-configuration
-                 (terminal-vt (number->string x))))
-              (iota 6 1)))))
-      (udev-service-type
-       config =>
-       (udev-configuration
-        (inherit config)
-        (rules (append
-                udev-rules
-                (udev-configuration-rules config)))))))
-
-  (feature
-   (name 'base-services)
-   (values `((base-services . #t)
-             (number-of-ttys . ,%number-of-ttys)))
-   (system-services-getter get-base-system-services)))
+(define %rde-desktop-home-services
+  (list (service home-dbus-service-type)))
 
 (define* (feature-desktop-services
           #:key
-          (default-desktop-services %rde-desktop-services)
+          (default-desktop-system-services %rde-desktop-system-services)
+          (default-desktop-home-services %rde-desktop-home-services)
           (dbus dbus))
   "Provides desktop system services."
   (define (get-home-services _)
-    (list (service home-dbus-service-type)))
+    default-desktop-home-services)
 
   (define (get-system-services _)
-    default-desktop-services)
+    default-desktop-system-services)
 
   (feature
    (name 'desktop-services)
