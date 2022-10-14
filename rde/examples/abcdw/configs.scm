@@ -456,12 +456,13 @@
 
       "alsa-utils" "youtube-dl" "imv" "cozy"
       "pavucontrol" "wev"
+      "imagemagick"
       "obs" "obs-wlrobs"
       "recutils" "binutils"
       "fheroes2"
       ;; TODO: Enable pipewire support to chromium by default
       ;; chrome://flags/#enable-webrtc-pipewire-capturer
-      "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-standard"
+      "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-extra"
       "papirus-icon-theme" "arc-theme"
       "thunar"
       ;; "glib:bin"
