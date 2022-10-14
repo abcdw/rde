@@ -34,6 +34,7 @@
   #:use-module (gnu services avahi)
   #:use-module (gnu services dbus)
   #:use-module (gnu home services)
+  #:use-module (gnu home services desktop)
   #:use-module (gnu home services shepherd)
 
   #:use-module (gnu packages certs)
