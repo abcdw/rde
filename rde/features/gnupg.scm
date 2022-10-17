@@ -1,17 +1,12 @@
 (define-module (rde features gnupg)
   #:use-module (rde features)
   #:use-module (gnu packages gnupg)
-  #:use-module (gnu packages security-token)
   #:use-module (gnu services)
-  #:use-module (gnu services base)
-  #:use-module (gnu services security-token)
   #:use-module (gnu home-services gnupg)
   #:use-module (gnu home-services wm)
-  #:use-module (rde system services accounts)
   #:use-module (guix gexp)
 
-  #:export (feature-gnupg
-            feature-security-token))
+  #:export (feature-gnupg))
 
 (define* (feature-gnupg
           #:key gpg-primary-key
@@ -36,6 +31,7 @@ and provides GPG-PRIMARY-KEY value for other features."
   (define (home-gnupg-services config)
     "Return a list of home-services, required for gnupg to operate."
     (list
+     ;; TODO: Move to sway feature
      (when (get-value 'sway config)
        (simple-service
         'gnupg-updatestartuptty-on-sway-launch
@@ -99,27 +95,3 @@ and provides GPG-PRIMARY-KEY value for other features."
                 '((ssh-agent? . #t))
                 '())))
    (home-services-getter home-gnupg-services)))
-
-(define (feature-security-token)
-  "Add specific configuration to make security tokens work. It
-includes the configuration to be able to use the token as a user
-(without sudo)."
-
-  (define (get-system-services _)
-    (list
-     (service pcscd-service-type)
-     (simple-service
-      'security-token-add-plugdev-group-to-user
-      rde-account-service-type
-      (list "plugdev"))
-     (udev-rules-service
-      'yubikey
-      (file->udev-rule
-       "70-u2f.rules"
-       (file-append libfido2 "/udev/rules.d/70-u2f.rules"))
-      #:groups '("plugdev"))))
-
-  (feature
-   (name 'security-token)
-   (values `((security-token . #t)))
-   (system-services-getter get-system-services)))
