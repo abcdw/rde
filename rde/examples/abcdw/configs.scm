@@ -2,6 +2,7 @@
   #:use-module (rde features)
   #:use-module (rde features base)
   #:use-module (rde features gnupg)
+  #:use-module (rde features security-token)
   #:use-module (rde features keyboard)
   #:use-module (rde features system)
   #:use-module (rde features wm)
@@ -83,8 +84,8 @@
     ;; it's not recommended to use it.
     #:emacs-advanced-user? #t)
    (feature-gnupg
-    #:gpg-primary-key "74830A276C328EC2"
-    #:gpg-smart-card? #t)
+    #:gpg-primary-key "74830A276C328EC2")
+   (feature-security-token)
    (feature-password-store
     #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
 
