@@ -77,7 +77,7 @@
               . (,clojure-lsp-binary))))
           (with-eval-after-load
            'clojure-mode
-           (customize-set-variable 'clojure-align-forms-automatically t)))
+           (setq clojure-align-forms-automatically t)))
         #:summary "\
 Clojure(Script) code style, CIDER, LSP, imenu and other tweaks"
         #:commentary "\
