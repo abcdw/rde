@@ -2,6 +2,7 @@
 
 HOME_CONFIG=./rde/examples/abcdw/configs.scm
 RDE_TARGET=ixy-home
+export RDE_TARGET
 # GUIX=guix
 GUIX=./pre-inst-env guix
 # GUIX=./pre-inst-env ../../gnu/guix/pre-inst-env guix
