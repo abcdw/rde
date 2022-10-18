@@ -496,20 +496,22 @@ module will be added to the BAR-ID."
                 (,name . ,config))))
     (style-css style))))
 
-(define* (waybar-sway-language)
-  (waybar-module 'sway/language))
+(define* (waybar-sway-language #:key (bar-id 'main))
+  (waybar-module 'sway/language #:bar-id bar-id))
 
-(define* (waybar-sway-window)
+(define* (waybar-sway-window #:key (bar-id 'main))
   (waybar-module
    'sway/window
    `()
    `((#{#window}#
       ((margin-left . 1em)
        (margin-right . 1em))))
-   #:placement 'modules-center))
+   #:placement 'modules-center
+   #:bar-id bar-id))
 
 (define* (waybar-sway-workspaces
           #:key
+          (bar-id 'main)
           (persistent-workspaces '())
           (format-icons '(("1" . )
                           ("2" . )
@@ -550,9 +552,10 @@ module will be added to the BAR-ID."
 
      ((#{#workspaces}# button.urgent)
       ((color . @base08))))
-   #:placement 'modules-left))
+   #:placement 'modules-left
+   #:bar-id bar-id))
 
-(define (waybar-tray)
+(define* (waybar-tray #:key (bar-id 'main))
   (waybar-module
    'tray
    `()
@@ -575,22 +578,26 @@ module will be added to the BAR-ID."
       ((background . @base03)
        (padding-top . 1px)
        (margin-top . 0.2em)
-       (margin-bottom . 0.2em))))))
+       (margin-bottom . 0.2em))))
+   #:bar-id bar-id))
 
-(define* (waybar-temperature) (waybar-module 'temperature))
+(define* (waybar-temperature #:key (bar-id 'main))
+  (waybar-module 'temperature #:bar-id bar-id))
 
-(define* (waybar-idle-inhibitor)
+(define* (waybar-idle-inhibitor #:key (bar-id 'main))
   (waybar-module
    'idle_inhibitor
    '((format . {icon})
      (format-icons . ((activated . )
-                      (deactivated . ))))))
+                      (deactivated . ))))
+   #:bar-id bar-id))
 
 (define* (waybar-clock
           #:key
           (format "{:%Y-%m-%d %H:%M}")
           (interval 60)
-          (timezone #f))
+          (timezone #f)
+          (bar-id 'main))
   "Returns a function, which accepts rde config and returns waybar clock module.
 Left click on the module open world-clock in emacs client, right click opens
 calendar."
@@ -610,13 +617,15 @@ calendar."
                (on-click-right . ,(ec-command "calendar")))
              '())
 
-       (interval . ,interval)))))
+       (interval . ,interval)))
+    #:bar-id bar-id))
 
 (define* (waybar-battery
           #:key
           (intense? #f)
           (show-percentage? #f)
-          (charging-icon "⚡"))
+          (charging-icon "⚡")
+          (bar-id 'main))
   "When INTENSE? is #t changes background color instead of text color when the
 battery is low or nearly empty.  SHOW-PERCENTAGE? controls if current capacity
 is displayed in label or not, in most cases it's not needed and disctracting,
@@ -657,11 +666,12 @@ CHARGING-ICON is shown next to battery icon, when battery on AC and not full."
         ,(if intense?
              `((color . @base02)
                (background . @base09))
-             `((color . @base09))))))))
+             `((color . @base09)))))
+     #:bar-id bar-id)))
 
 ;; https://www.reddit.com/r/swaywm/comments/sks343/pwvolume_pipewire_volume_control_and_waybar_module/
 ;; https://github.com/Alexays/Waybar/wiki/Module:-PulseAudio
-(define* (waybar-microphone)
+(define* (waybar-microphone #:key (bar-id 'main))
   "It's more minimalistic counterpart of waybar-volume, but for input audio
 device.  It has no configuration options yet."
   (lambda (config)
@@ -675,12 +685,14 @@ device.  It has no configuration options yet."
                               #$(file-append
                                  (get-value 'pavucontrol config pavucontrol)
                                  "/bin/pavucontrol --tab=4")))
-       (scroll-step . 0)))))
+       (scroll-step . 0))
+     #:bar-id bar-id)))
 
 (define* (waybar-volume
           #:key
           (show-percentage? #f)
-          (scroll-step 0))
+          (scroll-step 0)
+          (bar-id 'main))
   "Left click opens pavucontrol, scroll changes volume, but it seems buggy and
 SCROLL-STEP is 0 by default.  People rarely care about precise percentage,
 only icons for every 25% is provided by default, controlled by
@@ -704,29 +716,33 @@ SHOW-PERCENTAGE?."
                                 #$(file-append
                                    (get-value 'pulseaudio config pulseaudio)
                                    "/bin/pactl set-sink-mute @DEFAULT_SINK@ toggle")))
-         (scroll-step . ,scroll-step))))))
+         (scroll-step . ,scroll-step))
+       #:bar-id bar-id))))
 
-(define* (waybar-memory)
+(define* (waybar-memory #:key (bar-id 'main))
   "Displays information about the memory."
   (lambda (config)
     (waybar-module
      'memory
      `((interval . 30)
-       (format . " {percentage}%")))))
+       (format . " {percentage}%"))
+     #:bar-id bar-id)))
 
-(define* (waybar-cpu)
+(define* (waybar-cpu #:key (bar-id 'main))
   "Displays information about the current CPU load."
   (lambda (config)
     (waybar-module
      'cpu
      `((interval . 2)
-       (format . " {usage}%")))))
+       (format . " {usage}%"))
+     #:bar-id bar-id)))
 
 (define* (waybar-disk
           #:key
           (name 'root)
           (path "/")
-          (disk-icon ""))
+          (disk-icon "")
+          (bar-id 'main))
   "Displays information about the specified disk.
 By default, NAME is root, PATH is /, and DISK-ICON is ."
   (lambda (config)
@@ -734,7 +750,8 @@ By default, NAME is root, PATH is /, and DISK-ICON is ."
      (symbol-append 'disk# name)
      `((interval . 30)
        (format . ,(string-append disk-icon " {percentage_used}%"))
-       (path . ,path)))))
+       (path . ,path))
+     #:bar-id bar-id)))
 
 (define* (feature-waybar
           #:key
@@ -750,12 +767,15 @@ By default, NAME is root, PATH is /, and DISK-ICON is ."
             (waybar-battery #:intense? #f)
             (waybar-clock)))
           (base16-css (local-file "./wm/waybar/base16-default-dark.css"))
+          (extra-config '())
           (transitions? #f))
   "Configure waybar.  Each element of WAYBAR-MODULES is a home service or a
 function accepting an rde config and returning a home-service, which extends
 home-waybar-service-type.  Set TRANSITIONS? to #t if you prefer a smooth
-animation."
+animation.  Define a list of additional bars using EXTRA-CONFIG, you can use
+waybar modules with #:bar-id equal to the name of the bar."
 
+  (ensure-pred list? config)
   (define f-name 'waybar)
 
   (define (get-home-services config)
@@ -770,8 +790,10 @@ animation."
         home-waybar-service-type
         (home-waybar-configuration
          (waybar waybar)
-         (config #(((position . top)
-                    (name . main))))
+         (config `#(((position . top)
+                     (name . main))
+                    ,@extra-config))
+
          ;; TODO: fix tray menu styles.
          (style-css
           `(,#~(format #f "@import \"~a\";\n" #$base16-css)
