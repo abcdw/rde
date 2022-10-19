@@ -17,7 +17,7 @@ install:
 	@echo some installation will happen here
 
 check: rde/channels/pull-latest
-	guix home build \
+	guix home --fallback build \
 	./gnu/home/examples/minimal.tmpl
 
 target:
