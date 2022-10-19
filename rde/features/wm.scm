@@ -617,8 +617,8 @@ calendar."
                (on-click-right . ,(ec-command "calendar")))
              '())
 
-       (interval . ,interval)))
-    #:bar-id bar-id))
+       (interval . ,interval))
+     #:bar-id bar-id)))
 
 (define* (waybar-battery
           #:key
@@ -775,7 +775,7 @@ home-waybar-service-type.  Set TRANSITIONS? to #t if you prefer a smooth
 animation.  Define a list of additional bars using EXTRA-CONFIG, you can use
 waybar modules with #:bar-id equal to the name of the bar."
 
-  (ensure-pred list? config)
+  (ensure-pred list? extra-config)
   (define f-name 'waybar)
 
   (define (get-home-services config)
