@@ -768,14 +768,20 @@ By default, NAME is root, PATH is /, and DISK-ICON is ."
             (waybar-clock)))
           (base16-css (local-file "./wm/waybar/base16-default-dark.css"))
           (extra-config '())
-          (transitions? #f))
+          (transitions? #f)
+          (output #f)
+          (height #f))
   "Configure waybar.  Each element of WAYBAR-MODULES is a home service or a
 function accepting an rde config and returning a home-service, which extends
 home-waybar-service-type.  Set TRANSITIONS? to #t if you prefer a smooth
-animation.  Define a list of additional bars using EXTRA-CONFIG, you can use
-waybar modules with #:bar-id equal to the name of the bar."
+animation. Define a list of additional bars using EXTRA-CONFIG, you can use
+waybar modules with #:bar-id equal to the name of the bar. By default, the
+main bar will be shown on every output. Use OUTPUT to set a specific output
+for the main bar."
 
   (ensure-pred list? extra-config)
+  (ensure-pred maybe-symbol? output)
+  (ensure-pred maybe-integer? height)
   (define f-name 'waybar)
 
   (define (get-home-services config)
@@ -791,7 +797,9 @@ waybar modules with #:bar-id equal to the name of the bar."
         (home-waybar-configuration
          (waybar waybar)
          (config `#(((position . top)
-                     (name . main))
+                     (name . main)
+                     ,@(if height `((height . ,height)) '())
+                     ,@(if output `((output . ,output)) '()))
                     ,@extra-config))
 
          ;; TODO: fix tray menu styles.

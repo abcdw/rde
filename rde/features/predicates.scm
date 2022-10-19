@@ -15,6 +15,12 @@
   #:re-export (package?
                ini-config?))
 
+(define-public (maybe-integer? x)
+  (or (integer? x) (not x)))
+
+(define-public (maybe-symbol? x)
+  (or (symbol? x) (not x)))
+
 (define-public (maybe-string? x)
   (or (string? x) (not x)))
 
@@ -73,3 +79,4 @@
   (and (list? lst) (every mapped-device? lst)))
 (define-public (list-of-swap-devices? lst)
   (and (list? lst) (every swap-space? lst)))
+
