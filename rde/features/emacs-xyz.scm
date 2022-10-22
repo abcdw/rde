@@ -1979,7 +1979,7 @@ application/epub+zip mime-type will be openned with emacs client."
            (setq rmh-elfeed-org-files ',elfeed-org-files))
 
           (with-eval-after-load
-           'org
+           'org-capture
            (add-to-list
             'org-capture-templates
             '("r" "rssadd" entry
