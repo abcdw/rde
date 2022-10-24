@@ -878,6 +878,7 @@ relative line numbers, when narrowing is active."
          'marginalia
          (setq marginalia-align ',marginalia-align))
 
+        (autoload 'marginalia-mode "marginalia")
         (marginalia-mode 1))
       #:summary "\
 General settings related to completion"
@@ -1037,8 +1038,10 @@ calculation function for vertico buffer."
                  (Info-follow-reference buffer)
                  (consult-yank-pop buffer)))
 
+         (autoload 'vertico-multiform-mode "vertico-multiform")
          (vertico-multiform-mode))
 
+        (autoload 'vertico-mode "vertico")
         (if after-init-time
             (vertico-mode 1)
             (add-hook 'after-init-hook 'vertico-mode)))
@@ -1205,6 +1208,7 @@ This configuration packages is not actively maintained right now."
 
          (add-hook 'corfu-mode-hook 'corfu-doc-mode))
 
+        (autoload 'global-corfu-mode "corfu")
         ;; FIXME: Fix override of vertico completion in region.
         ,@(if turn-on?
               '((if after-init-time
@@ -1290,6 +1294,7 @@ features use `home-emacs-tempel-service-type'."
 
         (define-key global-map (kbd "M-+") 'tempel-insert)
 
+        (autoload 'global-tempel-abbrev-mode "tempel")
         (if after-init-time
              (global-tempel-abbrev-mode 1)
              (add-hook 'after-init-hook 'global-tempel-abbrev-mode)))
@@ -1483,10 +1488,7 @@ emacsclient feels more like a separate emacs instance."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((if after-init-time
-            (persp-mode 1)
-            (add-hook 'after-init-hook 'persp-mode))
-        ;; TODO: Show current perspective in some global space (tab-bar?).
+      `(;; TODO: Show current perspective in some global space (tab-bar?).
 
         ;; Should be defined before perspective loaded
         (setq persp-mode-prefix-key (kbd "C-x P"))
@@ -1510,7 +1512,12 @@ emacsclient feels more like a separate emacs instance."
                  (define-key project-prefix-map
                    (kbd "P")
                    'rde-persp-switch-project)))
-              '()))
+              '())
+
+        (autoload 'persp-mode "perspective")
+        (if after-init-time
+            (persp-mode 1)
+            (add-hook 'after-init-hook 'persp-mode)))
       #:summary "\
 Buffer isolation for separate project and emacs clients"
       #:commentary "\
@@ -1791,6 +1798,8 @@ Geiser is configured for the Guile scheme implementation.")))
                       ("(Guix)Programming Index" nil nil nil))))
 
         (eval-when-compile (require 'guix))
+        (autoload 'global-guix-prettify-mode "guix-prettify")
+        (autoload 'guix-prettify-mode "guix-prettify")
         (define-key rde-toggle-map (kbd "p") 'guix-prettify-mode)
         (define-key rde-toggle-map (kbd "P") 'global-guix-prettify-mode)
         (if after-init-time
@@ -2148,7 +2157,13 @@ Start an unlimited search at `point-min' otherwise."
           (setq org-modern-statistics nil)
           (setq org-modern-tag nil)
           (setq org-modern-priority nil))
-         ,@(if org-modern? `((global-org-modern-mode)) '())))
+
+         (autoload 'global-org-modern-mode "org-modern")
+         ,@(if org-modern?
+               `((if after-init-time
+                     (global-org-modern-mode)
+                     (add-hook 'after-init-hook 'global-org-modern-mode)))
+               '())))
       #:summary "\
 Sensible defaults for org mode"
       #:commentary "\
@@ -2379,12 +2394,14 @@ marginalia annotations."
         (setq citar-notes-paths (list ,@citar-notes-paths))
         (setq citar-bibliography org-cite-global-bibliography)
 
+        (autoload 'citar-embark-mode "citar-embark")
         ,@(if (get-value 'emacs-embark config)
-              `((citar-embark-mode 1))
+              `((with-eval-after-load 'embark (citar-embark-mode 1)))
               '())
 
+        (autoload 'citar-org-roam-mode "citar-org-roam")
         ,@(if (get-value 'emacs-org-roam config)
-              `((citar-org-roam-mode 1))
+              `((with-eval-after-load 'org-roam (citar-org-roam-mode 1)))
               '())
 
         (defun rde-find-main-bibliography ()
@@ -2585,6 +2602,9 @@ Less verbose output, nicks highlighted with different colors."
          (require 'cape))
 
         (require 'configure-rde-keymaps)
+
+        ;; Workaround to pass bytecompile guix emacs package phase
+        (setq telega-prefix-map nil)
         (define-key rde-app-map (kbd "t")
           (cons "telega-prefix" telega-prefix-map))
 
