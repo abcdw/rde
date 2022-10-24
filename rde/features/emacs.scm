@@ -76,6 +76,22 @@ dependency for other packages."
            #:authors (or authors '("Andrew Tropin <andrew@trop.in>")))))
       configure-package))
 
+(define (rde-emacs-extension service-name
+                             emacs-extension
+                             feature-loader-extension)
+  (service
+   (service-type (name service-name)
+                 (extensions
+                  (list (service-extension
+                         home-emacs-service-type
+                         (const emacs-extension))
+                        (service-extension
+                         home-emacs-feature-loader-service-type
+                         (const feature-loader-extension))))
+                 (default-value #f)
+                 (description "Extends home-emacs-service and
+ home-emacs-feature-loader-service-type."))))
+
 (define* (rde-elisp-configuration-service
           name config
           #:optional (elisp-expressions '())
@@ -87,8 +103,6 @@ dependency for other packages."
 emacs-portable? rde value is present adds autoloads cookies to each expression
 of it, otherwise adds a require to @file{init.el}."
   (let* ((pkg-name (symbol-append 'configure- name))
-         (autoloads? (get-value 'emacs-portable? config))
-         (require-in-init? (not autoloads?))
          (configure-package
           (rde-emacs-configuration-package
            name elisp-expressions
@@ -97,19 +111,17 @@ of it, otherwise adds a require to @file{init.el}."
            #:keywords keywords
            #:url url
            #:authors authors
-           #:elisp-packages elisp-packages
-           #:autoloads? autoloads?)))
-    (simple-service
+           #:elisp-packages elisp-packages)))
+    (rde-emacs-extension
      (symbol-append 'emacs- name '-configurations)
-     home-emacs-service-type
      (home-emacs-extension
-      (init-el (if require-in-init? `((require ',pkg-name)) '()))
       (early-init-el early-init)
       ;; It's necessary to explicitly add elisp-packages here, because
       ;; we want to overwrite builtin emacs packages.  Propagated
       ;; inputs have lowest priority on collisions, that's why we have
       ;; to list those package here in addition to propagated-inputs.
-      (elisp-packages (append elisp-packages (list configure-package)))))))
+      (elisp-packages elisp-packages))
+     `(,pkg-name . ,(list configure-package)))))
 
 ;; MAYBE: make handler to be actions instead of desktop entries?
 (define* (emacs-xdg-service
@@ -228,6 +240,9 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
     "Returns home services related to GNU Emacs, which usually used in development
 environment outside of Guix Home."
     (list
+     (service home-emacs-feature-loader-service-type
+              (home-emacs-feature-loader-configuration
+               (loader-feature-name 'feature-loader-portable)))
      (service
       home-emacs-service-type
       (home-emacs-configuration
@@ -311,6 +326,10 @@ environment outside of Guix Home."
        (emacs-xdg-service 'emacs-Q "Emacs (No init, no site-lisp: -Q)"
                           #~(system* "emacs" "-Q"))
 
+       (service home-emacs-feature-loader-service-type
+                (home-emacs-feature-loader-configuration
+                 ;; (autoloads? #t)
+                 (add-to-init-el? #t)))
        (rde-elisp-configuration-service
         'rde-emacs
         config
