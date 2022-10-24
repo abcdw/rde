@@ -254,7 +254,8 @@ environment outside of Guix Home."
      (rde-elisp-configuration-service
       'rde-emacs-portable
       config
-      `(,@(if status-line-bg-color
+      `((setq native-comp-deferred-compilation nil)
+        ,@(if status-line-bg-color
               `((with-eval-after-load
                  'configure-appearance
                  (setq rde-status-line-bg-color ,status-line-bg-color)))
@@ -334,6 +335,8 @@ environment outside of Guix Home."
         'rde-emacs
         config
         `((require 'configure-rde-keymaps)
+
+          (setq native-comp-deferred-compilation nil)
 
           (setq user-full-name ,full-name)
           (setq user-mail-address ,email)
