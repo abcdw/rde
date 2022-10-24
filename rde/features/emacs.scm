@@ -353,7 +353,6 @@ environment outside of Guix Home."
                    "/emacs/bookmarks"))
 
           ,#~""
-          (pixel-scroll-precision-mode 1)
           (column-number-mode 1)
           (save-place-mode 1)
           ;; MAYBE: Make it buffer local?
@@ -522,7 +521,11 @@ It can contain settings not yet moved to separate features."
          (emacs-servers (if emacs-server-mode? '(server) '()))
          (xdg-flavor? #t)
          (early-init-el
-          `(,(slurp-file-like (local-file "./emacs/early-init.el"))))
+          `(,(slurp-file-like (local-file "./emacs/early-init.el"))
+            ,#~""
+            ;; FIXME: Move it back to the configure-rde-emacs package, when it
+            ;; will be built with emacs-29
+            (pixel-scroll-precision-mode 1)))
          ;;; TODO: Rebuilding packages with emacs will be useful for
          ;;; native-comp, but some packages fails to build, need to fix them.
          (rebuild-elisp-packages? #f)))
