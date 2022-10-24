@@ -194,6 +194,7 @@ mouse-3: Toggle minor modes"
               `(,#~"\n;; Move modeline to the top"
                 (setq-default header-line-format mode-line-format)
                 (setq-default mode-line-format nil)
+                (setq mode-line-format nil)
 
                 (defun rde--move-mode-line-to-header ()
                   "Moves mode-line to header-line, the function is needed for
