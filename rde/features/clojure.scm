@@ -8,6 +8,7 @@
   #:use-module (gnu packages clojure)
   #:use-module (gnu packages java)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (rde packages emacs-xyz)
   #:use-module (guix gexp)
 
   #:export (feature-clojure))
@@ -75,6 +76,9 @@
                (clojurec-mode :language-id "clojure")
                (clojurescript-mode :language-id "clojurescript"))
               . (,clojure-lsp-binary))))
+
+          (add-hook 'clojure-mode-hook 'jarchive-setup)
+
           (with-eval-after-load
            'clojure-mode
            (setq clojure-align-forms-automatically t)))
@@ -86,6 +90,7 @@ Configure eglot, imenu, CIDER, flymake and other packages.
         #:keywords '(convenience clojure)
         #:elisp-packages
         (list emacs-cider emacs-clojure-mode
+              emacs-jarchive
               (get-value 'emacs-eglot config emacs-eglot)
               emacs-flymake-kondor emacs-html-to-hiccup)))))
 
