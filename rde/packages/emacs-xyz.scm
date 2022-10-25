@@ -367,3 +367,26 @@ full usability as a modern file manager.")
     (synopsis "Convert english words between singular and plural")
     (description "Convert english words between singular and plural.")
     (license license:gpl3+)))
+
+(define-public emacs-clj-refactor
+  (package
+    (name "emacs-clj-refactor")
+    (version "3.6.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/clojure-emacs/clj-refactor.el")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32 "15ya7hp5d2kwh1ig55d75vlghm1vsq99jh44i8q8v25vfmzjp7gp"))))
+    (build-system emacs-build-system)
+    (propagated-inputs
+     (list emacs-yasnippet emacs-paredit emacs-multiple-cursors emacs-cider
+           emacs-clojure-mode emacs-parseedn emacs-hydra emacs-inflections))
+    (home-page "https://github.com/clojure-emacs/clj-refactor.el")
+    (synopsis "Powerful refactoring functionality for Clojure projects")
+    (description "clj-refactor complements the refactoring functionality you'd
+find in clojure-mode and CIDER.")
+    (license license:gpl3+)))
