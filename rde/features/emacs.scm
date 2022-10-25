@@ -209,7 +209,7 @@ emacs servers' environment variables to same values."
 ;;; Emacs features.
 ;;;
 
-(define %default-emacs-package emacs-next-pgtk)
+(define %default-emacs-package emacs-next-pgtk-stable)
 
 (define emacs-configure-rde-keymaps
   (rde-emacs-configuration-package
