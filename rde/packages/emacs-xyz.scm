@@ -326,20 +326,3 @@ Dired.  It not only gives Dired an appealing and highly customizable user
 interface, but also comes together with almost all possible parts required for
 full usability as a modern file manager.")
     (license license:gpl3+)))
-
-(define-public emacs-org-modern-latest
-  (let* ((commit "c82b50a61d04571e11c242fb91944753d8bf945c")
-         (revision "0"))
-    (package
-     (inherit emacs-org-modern)
-     (name "emacs-org-modern")
-     (version (git-version "0.4" revision commit))
-     (source
-      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/minad/org-modern")
-             (commit commit)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "0x6i69balwp5gzalgfcnb0m6gz78ca6vdj7qlx354awnxsd70nhz")))))))

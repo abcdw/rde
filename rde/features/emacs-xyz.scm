@@ -2024,7 +2024,7 @@ document.title, body: window.getSelection()});\" as a web bookmark."
 
 (define* (feature-emacs-org
           #:key
-          (emacs-org-modern emacs-org-modern-latest)
+          (emacs-org-modern emacs-org-modern)
           (emacs-org-appear emacs-org-appear)
           (emacs-org-make-toc emacs-org-make-toc)
           (org-directory "~/org")
