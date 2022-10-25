@@ -347,3 +347,23 @@ full usability as a modern file manager.")
       (synopsis "Jarchive teaches Emacs how to navigate to files inside jars")
       (description "Jarchive teaches Emacs how to navigate to files inside jars.")
       (license license:gpl3+))))
+
+(define-public emacs-inflections
+  (package
+    (name "emacs-inflections")
+    (version "2.6")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/eschulte/jump.el")
+             (commit version)))
+       (file-name (git-file-name name version))
+       (snippet #~(begin (delete-file "jump.el")))
+       (sha256
+        (base32 "03fh7i6blnbc0zbmp83fk095hr3q4fdvrvfxad74zghcbc2nk7b7"))))
+    (build-system emacs-build-system)
+    (home-page "https://github.com/eschulte/jump.el")
+    (synopsis "Convert english words between singular and plural")
+    (description "Convert english words between singular and plural.")
+    (license license:gpl3+)))
