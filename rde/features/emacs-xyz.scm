@@ -229,7 +229,7 @@ value of background color for mode/header-line.")
         (setq use-dialog-box nil)
         (setq use-file-dialog nil)
 
-        (customize-set-variable 'window-divider-default-right-width ,margin)
+        (setq window-divider-default-right-width ,margin)
         (window-divider-mode)
 
         ,@(expand-extra-elisp extra-elisp config))
@@ -783,26 +783,30 @@ parses its input."
                      ((t (:background "#000000")))))
                   (put 'child-frame-border 'saved-face nil)
 
-                  (customize-set-variable
-                   'mini-frame-show-parameters
-                   (lambda ()
-                     `((top . 0.2)
-                       (width . 0.8)
-                       (left . 0.5)
-                       (child-frame-border-width . 1))))
-                  (customize-set-variable 'mini-frame-detach-on-hide nil)
-                  (customize-set-variable 'mini-frame-color-shift-step 0)
-                  (customize-set-variable 'mini-frame-advice-functions
-                                          '(read-from-minibuffer
-                                            read-key-sequence
-                                            save-some-buffers yes-or-no-p))
-                  (customize-set-variable 'mini-frame-ignore-commands '()))
-                 (mini-frame-mode 1))
+                  (setq
+                   mini-frame-show-parameters
+                   `((top . 0.2)
+                     (width . 0.8)
+                     (left . 0.5)
+                     (child-frame-border-width . 1)))
+                  (setq mini-frame-detach-on-hide nil)
+                  (setq mini-frame-color-shift-step 0)
+                  (setq mini-frame-advice-functions
+                        '(read-from-minibuffer
+                          read-key-sequence
+                          save-some-buffers yes-or-no-p))
+                  (setq mini-frame-ignore-commands '()))
+
+                 (autoload 'mini-frame-mode "mini-frame")
+                 (if after-init-time
+                     (mini-frame-mode 1)
+                     (add-hook 'after-init-hook 'mini-frame-mode)))
              '()))
 
-        (customize-set-variable 'history-length 10000)
-        (customize-set-variable
-         'savehist-file (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+        (setq history-length 10000)
+        (setq
+         savehist-file
+         (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                                 "/emacs/history"))
 
         ;; (savehist-mode 1)
@@ -866,8 +870,8 @@ relative line numbers, when narrowing is active."
          'consult
          (require 'embark-consult)
 
-         (customize-set-variable
-          'consult-ripgrep-args
+         (setq
+          consult-ripgrep-args
           (concat ,(file-append ripgrep "/bin/rg")
                   " --null --line-buffered --color=never --max-columns=1000 \
 --path-separator / --smart-case --no-heading --line-number ."))
@@ -955,7 +959,7 @@ Annotations for completion candidates using marginalia."
          ;; TODO: Bind vertico-next/previous-group to more usual keys?
 
          (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
-         (customize-set-variable 'vertico-cycle t)
+         (setq vertico-cycle t)
 
          ;; (defvar rde--vertico-monocle-previous-window-configuration nil
          ;;   "Window configuration for restoring on vertico monocle exit.")
@@ -1346,9 +1350,10 @@ just start typing `tempel-trigger-prefix' (default is \"<\") and use
              (apply orig-fun r)
              (olivetti-mode olivetti-p)))
          (advice-add 'org-agenda-redo-all :around 'ensure-olivetti))
+
         (with-eval-after-load
          'hide-mode-line
-         (customize-set-variable 'hide-mode-line-excluded-modes '()))
+         (setq hide-mode-line-excluded-modes '()))
 
         (defun rde--match-modes (modes)
           "Check if current mode is derived from one of the MODES."
@@ -1601,8 +1606,8 @@ their behavior."
         (with-eval-after-load
          'eglot
          (add-hook 'eglot-managed-mode-hook
-                   (lambda () (setq consult-imenu--cache nil))))
-        (customize-set-variable 'eglot-extend-to-xref t))
+                   (lambda () (setq consult-imenu--cache nil)))
+         (setq eglot-extend-to-xref t)))
       #:summary "\
 Refactoring, completion, navigation, documentation via LSP"
       #:commentary "\
@@ -1645,16 +1650,11 @@ git-link, git-timemachine."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((eval-when-compile
-         (require 'git-gutter))
-
-        (defun rde-git-link ()
+      `((defun rde-git-link ()
           "Same as `git-link', but with commit hash specified."
           (interactive)
           (let ((git-link-use-commit t))
             (call-interactively 'git-link)))
-
-        (customize-set-variable 'git-gutter:lighter " GG")
 
         (require 'configure-rde-keymaps)
         (define-key rde-toggle-map (kbd "g") 'git-gutter-mode)
@@ -1686,6 +1686,8 @@ git-link, git-timemachine."
                  dir)))
 
          (setq magit-clone-default-directory 'rde-get-local-repo-path-from-url))
+
+        (setq git-gutter:lighter " GG")
 
         (with-eval-after-load
          'git-gutter
@@ -1848,11 +1850,13 @@ S to show services and other guix items.")))
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((customize-set-variable 'pdf-view-use-scaling t)
-        (autoload 'pdf-view-mode "pdf-view" "")
+      `((autoload 'pdf-view-mode "pdf-view" "")
         (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
         (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
         (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
+        (with-eval-after-load
+         'pdf-view
+         (setq pdf-view-use-scaling t))
         (with-eval-after-load
          'saveplace
          (require 'saveplace-pdf-view)))
