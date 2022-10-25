@@ -326,3 +326,24 @@ Dired.  It not only gives Dired an appealing and highly customizable user
 interface, but also comes together with almost all possible parts required for
 full usability as a modern file manager.")
     (license license:gpl3+)))
+
+(define-public emacs-jarchive
+  (let* ((commit "4aa2e5d394d10b183813f4aa0b65156b8c660d6b")
+         (revision "0"))
+    (package
+      (name "emacs-jarchive")
+      (version (git-version "0.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://git.sr.ht/~dannyfreeman/jarchive")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0j6fpcbcqzy4rbn4lc4b6cs6qf9wrriynfrqgkj0car3mcqcnvz4"))))
+      (build-system emacs-build-system)
+      (home-page "https://git.sr.ht/~dannyfreeman/jarchive")
+      (synopsis "Jarchive teaches Emacs how to navigate to files inside jars")
+      (description "Jarchive teaches Emacs how to navigate to files inside jars.")
+      (license license:gpl3+))))
