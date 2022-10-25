@@ -18,6 +18,7 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (rde packages emacs)
+  #:use-module (gnu packages)
   #:use-module (gnu packages emacs)
 
   #:use-module (guix packages)
@@ -27,11 +28,11 @@
   #:use-module (guix build-system trivial)
   #:use-module ((guix licenses) #:prefix license:))
 
-(define-public emacs-next-pgtk-latest
-  (let ((commit "9ff2f0be32be621a0a1953cac2d552afebafe226")
-        (revision "3"))
+(define-public emacs-next-pgtk-stable
+  (let ((commit "0a5477b448e6b62bcedc1803e531ec7686eea48d")
+        (revision "4"))
     (package
-      (inherit emacs-next-pgtk)
+      (inherit emacs)
       (name "emacs-next-pgtk-latest")
       (version (git-version "29.0.50" revision commit))
       (source
@@ -41,17 +42,21 @@
                (url "https://git.savannah.gnu.org/git/emacs.git/")
                (commit commit)))
          (file-name (git-file-name name version))
+         (patches (search-patches "emacs-pgtk-super-key-fix.patch"
+                                  "emacs-exec-path.patch"
+                                  "emacs-fix-scheme-indent-function.patch"
+                                  "emacs-source-date-epoch.patch"))
          (sha256
           (base32
-           "0kj252ywhc0jw0j7mr3dwx4q5mi5rrlm4jlhc8mbx66ylfvxi9qg"))))
+           "0dqmrawkvbypxp8gcnspnhhmfamzp3l62gfgp1pw2l6svz58v991"))))
       (arguments
        (substitute-keyword-arguments (package-arguments emacs-next)
          ((#:configure-flags flags ''())
           `(cons* "--with-pgtk" ,flags))))
-      ;; (propagated-inputs
-      ;;  (list gsettings-desktop-schemas glib-networking))
       (inputs
        (package-inputs emacs-next)))))
+
+(define-public emacs-next-pgtk-latest emacs-next-pgtk-stable)
 
 (define-public emacs-consumer
   (package
