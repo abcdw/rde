@@ -2607,10 +2607,7 @@ Less verbose output, nicks highlighted with different colors."
 
         (require 'configure-rde-keymaps)
 
-        ;; Workaround to pass bytecompile guix emacs package phase
-        (setq telega-prefix-map nil)
-        (define-key rde-app-map (kbd "t")
-          (cons "telega-prefix" telega-prefix-map))
+        (define-key rde-app-map (kbd "t") 'telega)
 
         (with-eval-after-load
          'telega
