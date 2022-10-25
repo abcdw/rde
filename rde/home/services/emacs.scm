@@ -431,15 +431,16 @@ details can be changed later.")
          (feature-entries
           (home-emacs-feature-loader-configuration-feature-entries config))
          (loader-package (elisp-configuration-package
-                          "feature-loader"
+                          (symbol->string loader-feature-name)
                           (map (lambda (x)
                                  `(require ',(car x)))
                                feature-entries)
                           #:elisp-packages (append-map cdr feature-entries)
                           #:autoloads? autoloads?
                           #:summary "Just loads all necessary features."
-                          #:commentary "Depending on configuration it either \
-loads features, when required or do it automatically with autoload cookies.")))
+                          #:commentary "\
+Depending on configuration it either loads features, when required or do it
+automatically with autoload cookies.")))
 
     (when (and autoloads? add-to-init-el?)
       (raise (formatted-message
