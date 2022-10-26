@@ -501,9 +501,7 @@ by mapping characters to default emacs keybindings."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-tramp
-          #:key
-          (emacs-tramp emacs-tramp))
+(define* (feature-emacs-tramp)
   "Configure tramp for emacs."
 
   (define emacs-f-name 'tramp)
@@ -524,7 +522,6 @@ by mapping characters to default emacs keybindings."
          ,#~";; Allows to use /sudo:HOST:/path if the user in sudoers."
          (set-default 'tramp-default-proxies-alist
                       '((".*" "\\`root\\'" "/ssh:%h:")))))
-      #:elisp-packages (list emacs-tramp)
       #:summary "\
 Transparently accessing remote files from within Emacs."
       #:commentary "\
