@@ -455,6 +455,7 @@ subject:/home:/) and tag:new}\"'")
       "thunar"
       ;; "glib:bin"
 
+      "libreoffice"
       ;; TODO: Fix telega package!
       "ffmpeg"
       "ripgrep" "curl")))))
