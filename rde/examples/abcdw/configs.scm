@@ -383,12 +383,18 @@
    (feature-notmuch
     #:extra-tag-updates-post
     '("notmuch tag +guix-home -- 'thread:\"\
-{((subject:guix and subject:home) or subject:/home:/) and tag:new}\"'")
+{((subject:guix and subject:home) or (subject:service and subject:home) or \
+subject:/home:/) and tag:new}\"'")
     #:notmuch-saved-searches
     (cons*
-     '(:name "Work Inbox" :query "tag:work and tag:inbox" :key "W")
+     ;; TODO: Add tag:unread to all inboxes.  Revisit archive workflow.
+     '(:name "Work Inbox" :query "tag:work and tag:inbox and tag:unread" :key "W")
      '(:name "Personal Inbox" :query "tag:personal and tag:inbox" :key "P")
      '(:name "Guix Home Inbox" :key "H" :query "tag:guix-home and tag:unread")
+     '(:name "RDE Inbox"       :key "R"
+             :query "(to:/rde/ or cc:/rde/) and tag:unread")
+
+     ;; '(:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "tw")
      %rde-notmuch-saved-searches))
 
    (feature-transmission #:auto-start? #f)
