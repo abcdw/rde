@@ -394,11 +394,7 @@
    (feature-transmission #:auto-start? #f)
 
    (feature-emacs
-    #:emacs
-    (if (string=? (or (getenv "BUILD_SUBMITTER") "") "git.sr.ht")
-        (@ (gnu packages emacs) emacs-next-pgtk)
-        emacs-next-pgtk-latest)
-    ;; #:extra-init-el `((load ,(local-file "./tmp.el")))
+    #:default-application-launcher? #t
     #:additional-elisp-packages
     (append
      (list emacs-dirvish)
