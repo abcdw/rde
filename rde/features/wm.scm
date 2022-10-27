@@ -539,7 +539,7 @@ module will be added to the BAR-ID."
       ((background . none)
        (border-radius . 0.2em)
        (margin . (0.4em 0.2em))
-       (padding . (0.1em 0.2em))
+       (padding . (0.2em 0.2em))
        (color . @base05)))
 
      ((#{#workspaces}# button:hover)
