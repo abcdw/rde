@@ -123,6 +123,10 @@
   (list
    (feature-yggdrasil)
    (feature-ssh-socks-proxy #:host "pinky-ygg" #:auto-start? #f)
+   (feature-ssh-socks-proxy #:host "pinky-ygg" #:name "hundredrps"
+                            #:proxy-string "50080:localhost:8080"
+                            #:reverse? #t
+                            #:auto-start? #f)
    (feature-i2pd
     #:outproxy 'http://acetone.i2p:8888
     ;; 'purokishi.i2p
@@ -231,7 +235,7 @@
 
       ;; (bindswitch --reload --locked lid:on exec /run/setuid-programs/swaylock)
 
-      ;; FIXME: Use absolute path, move to feature-network
+      ;; FIXME: Use absolute path, move to feature-network, fix permissions issue
       (exec nm-applet --indicator)
       (bindsym
        --locked $mod+Shift+t exec
@@ -243,7 +247,8 @@
        ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
        next)
 
-      (bindsym $mod+Shift+o ,#~"[floating]" kill)
+      (bindsym $mod+Shift+o move workspace to output left)
+      (bindsym $mod+Ctrl+o focus output left)
       (input type:touchpad
              ;; TODO: Move it to feature-sway or feature-mouse?
              (;; (natural_scroll enabled)
