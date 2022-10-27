@@ -116,24 +116,6 @@
 
 ;;; Generic features should be applicable for various hosts/users/etc
 
-(define* (pkgs #:rest lst)
-  (map specification->package+output lst))
-
-(define* (pkgs-vanilla #:rest lst)
-  "Packages from guix channel."
-  (define channel-guix
-    (list (channel
-           (name 'guix)
-           (url "https://git.savannah.gnu.org/git/guix.git")
-           (commit
-            "2b6af630d61dd5b16424be55088de2b079e9fbaf"))))
-
-  (define inferior (inferior-for-channels channel-guix))
-  (define (get-inferior-pkg pkg-name)
-    (car (lookup-inferior-packages inferior pkg-name)))
-
-   (map get-inferior-pkg lst))
-
 
 ;;; WARNING: The order can be important for features extending
 ;;; services of other features.  Be careful changing it.
@@ -420,18 +402,21 @@
     #:additional-elisp-packages
     (append
      (list emacs-dirvish)
-     (pkgs "emacs-elfeed" "emacs-hl-todo"
-           "emacs-consult-dir"
-           "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
-           "emacs-kind-icon"
-           "emacs-nginx-mode" "emacs-yaml-mode"
-           "emacs-lispy"
-           "emacs-ytdl"
-           "emacs-multitran"
-           "emacs-minimap"
-           "emacs-ement"
-           "emacs-restart-emacs"
-           "emacs-org-present")))
+     (strings->packages
+      "emacs-elfeed" "emacs-hl-todo"
+      "emacs-yasnippet"
+      ;; "emacs-company"
+      "emacs-consult-dir"
+      ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
+      "emacs-kind-icon"
+      "emacs-nginx-mode" "emacs-yaml-mode"
+      ;; "emacs-lispy"
+      "emacs-ytdl"
+      "emacs-multitran"
+      "emacs-minimap"
+      "emacs-ement"
+      "emacs-restart-emacs"
+      "emacs-org-present")))
 
    (feature-xdg
     #:xdg-user-directories-configuration
@@ -447,7 +432,7 @@
    (feature-base-packages
     #:home-packages
     (append
-     (pkgs
+     (strings->packages
       "figlet" ;; TODO: Move to emacs-artist-mode
       "calibre"
       "icecat" "nyxt"
