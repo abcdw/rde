@@ -35,7 +35,7 @@
 
   #:export (feature-i2pd
             feature-yggdrasil
-            feature-ssh-socks-proxy))
+            feature-ssh-proxy))
 
 ;; TODO: Migrate to iwd
 ;; iwd: https://git.sr.ht/~akagi/guixrc/tree/master/item/magi/system/services/networking.scm
@@ -156,34 +156,41 @@
 ;;; SSH SOCKS Proxy.
 ;;;
 
-(define* (feature-ssh-socks-proxy
+(define* (feature-ssh-proxy
           #:key
           (auto-start? #t)
           (host #f)
-          (proxy-port 8123))
-  "Configure SSH SOCKS Proxy. To customize port and other settings use
+          (name host)
+          (reverse? #f)
+          (proxy-port 8123)
+          (proxy-string (number->string proxy-port)))
+  "Configure SSH SOCKS Proxy. To customize ssh host port and other settings use
 feature-ssh."
   (ensure-pred string? host)
   (ensure-pred integer? proxy-port)
+  (ensure-pred string? proxy-string)
 
+  (define f-name
+    (symbol-append (string->symbol name) '-ssh-
+                   (if reverse? 'reverse 'socks) '-proxy))
   (define (get-home-services config)
     (define ssh (get-value 'ssh config openssh))
     (ensure-pred file-like? ssh)
     (list
      (simple-service
-      'ssh-socks-proxy-add-shepherd-service
+      (symbol-append f-name '-add-shepherd-service)
       home-shepherd-service-type
       (list
        (shepherd-service
-        (provision '(ssh-socks-proxy))
+        (provision `(,f-name))
         (auto-start? auto-start?)
         (stop  #~(make-kill-destructor))
         (start #~(make-forkexec-constructor
                   (list #$(file-append ssh "/bin/ssh")
-                        "-ND" #$(number->string proxy-port)
-                        #$(format #f "~a" host)))))))))
+                        "-N" #$(if reverse? "-R" "-D")
+                        #$proxy-string #$host))))))))
 
   (feature
-   (name 'ssh-socks-proxy)
-   (values `((ssh-socks-proxy . #t)))
+   (name f-name)
+   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))

@@ -122,11 +122,11 @@
 (define %main-features
   (list
    (feature-yggdrasil)
-   (feature-ssh-socks-proxy #:host "pinky-ygg" #:auto-start? #f)
-   (feature-ssh-socks-proxy #:host "pinky-ygg" #:name "hundredrps"
-                            #:proxy-string "50080:localhost:8080"
-                            #:reverse? #t
-                            #:auto-start? #f)
+   (feature-ssh-proxy #:host "pinky-ygg" #:auto-start? #f)
+   (feature-ssh-proxy #:host "pinky-ygg" #:name "hundredrps"
+                      #:proxy-string "50080:localhost:8080"
+                      #:reverse? #t
+                      #:auto-start? #f)
    (feature-i2pd
     #:outproxy 'http://acetone.i2p:8888
     ;; 'purokishi.i2p
