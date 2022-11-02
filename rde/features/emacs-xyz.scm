@@ -619,7 +619,7 @@ Small tweaks, xdg entry for openning directories in emacs client."
          (add-hook
           'eshell-mode-hook
           (lambda ()
-            (if envrc-global-mode
+            (if (and (boundp 'envrc-global-mode) envrc-global-mode)
                 (add-hook 'envrc-mode-hook (lambda () (setenv "PAGER" "")))
                 (setenv "PAGER" ""))
 
