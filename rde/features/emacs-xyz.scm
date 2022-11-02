@@ -2184,11 +2184,7 @@ Indentation and refile configurations, visual adjustment."
 
 (define %rde-org-agenda-custom-commands
   ``((,(kbd "C-d") "Agenda for the day"
-      ((todo
-        "NEXT"
-        ((org-agenda-block-separator nil)
-         (org-agenda-overriding-header "\nCurrent Tasks\n")))
-       (agenda
+      ((agenda
         ""
         ((org-agenda-span 1)
          (org-agenda-scheduled-leaders '("" "Sched.%2dx: "))
@@ -2202,7 +2198,11 @@ Indentation and refile configurations, visual adjustment."
          ;; (org-agenda-skip-function
          ;;  '(org-agenda-skip-entry-if 'todo '("NEXT")))
          (org-agenda-format-date "%A %-e %B %Y")
-         (org-agenda-overriding-header "\nAgenda for the day\n")))))
+         (org-agenda-overriding-header "\nAgenda for the day\n")))
+       (todo
+        "NEXT"
+        ((org-agenda-block-separator nil)
+         (org-agenda-overriding-header "\nCurrent Tasks\n")))))
      (,(kbd "C-o") "Overview"
       ;; TODO: Add A priority to the top.
       ((agenda
