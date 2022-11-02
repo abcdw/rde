@@ -432,9 +432,14 @@ details can be changed later.")
           (home-emacs-feature-loader-configuration-feature-entries config))
          (loader-package (elisp-configuration-package
                           (symbol->string loader-feature-name)
-                          (map (lambda (x)
-                                 `(require ',(car x)))
-                               feature-entries)
+                          (append
+                           (map (lambda (x)
+                                  `(require ',(car x)))
+                                feature-entries)
+                           `(,#~";;;###autoload"
+                             (defun ,loader-feature-name ()
+                               (interactive)
+                               (message "Everything should be loaded now."))))
                           #:elisp-packages (append-map cdr feature-entries)
                           #:autoloads? autoloads?
                           #:summary "Just loads all necessary features."
