@@ -90,7 +90,7 @@ Configure eglot, imenu, CIDER, flymake and other packages.
         #:keywords '(convenience clojure)
         #:elisp-packages
         (list emacs-cider emacs-clojure-mode
-              emacs-jarchive
+              emacs-jarchive emacs-clj-refactor
               (get-value 'emacs-eglot config emacs-eglot)
               emacs-flymake-kondor emacs-html-to-hiccup)))))
 
