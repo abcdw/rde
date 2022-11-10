@@ -140,6 +140,7 @@ and overall looks cool."
         (setq modus-themes-mode-line '(borderless))
         (setq modus-themes-diffs 'desaturated)
         (setq modus-themes-deuteranopia ,(if deuteranopia? 't 'nil))
+        (setq modus-themes-fringes nil)
         (setq modus-themes-operandi-color-overrides
               `((fg-window-divider-inner . "#ffffff")
                 (fg-window-divider-outer . "#ffffff")))
