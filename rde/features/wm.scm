@@ -290,21 +290,7 @@ chooser_type=simple"
              '() (list foot))
          (if (get-value 'default-application-launcher config) '() (list bemenu))
          (list qtwayland-5 swayhide
-               xdg-desktop-portal xdg-desktop-portal-wlr)))
-       (simple-service 'set-wayland-specific-env-vars
-                       home-environment-variables-service-type
-                       ;; export NO_AT_BRIDGE=1
-                       '(("XDG_CURRENT_DESKTOP" . "sway")
-                         ("XDG_SESSION_TYPE" . "wayland")
-                         ;; FIXME: Should be in feature-pipewire
-                         ("RTC_USE_PIPEWIRE" . "true")
-                         ("SDL_VIDEODRIVER" . "wayland")
-                         ("MOZ_ENABLE_WAYLAND" . "1")
-                         ("CLUTTER_BACKEND" . "wayland")
-                         ("ELM_ENGINE" . "wayland_egl")
-                         ("ECORE_EVAS_ENGINE" . "wayland-egl")
-                         ("QT_QPA_PLATFORM" . "wayland-egl")
-                         ("_JAVA_AWT_WM_NONREPARENTING" . "1"))))))
+               xdg-desktop-portal xdg-desktop-portal-wlr))))))
 
   (feature
    (name 'sway)
@@ -330,6 +316,28 @@ automatically switch to SWAY-TTY-NUMBER on boot."
 
   (define (sway-run-on-tty-home-services config)
     (require-value 'sway config)
+
+    (define env-vars
+      '(("XDG_CURRENT_DESKTOP" . "sway")
+        ("XDG_SESSION_TYPE" . "wayland")
+        ;; FIXME: Should be in feature-pipewire
+        ("RTC_USE_PIPEWIRE" . "true")
+        ("SDL_VIDEODRIVER" . "wayland")
+        ("MOZ_ENABLE_WAYLAND" . "1")
+        ("CLUTTER_BACKEND" . "wayland")
+        ("ELM_ENGINE" . "wayland_egl")
+        ("ECORE_EVAS_ENGINE" . "wayland-egl")
+        ("QT_QPA_PLATFORM" . "wayland-egl")
+        ("_JAVA_AWT_WM_NONREPARENTING" . "1")))
+
+    (define sway-with-env-vars
+      (program-file
+       "sway-with-env-vars"
+       #~(begin
+           (for-each (lambda (x)
+                       (setenv (car x) (cdr x)))
+                     '#$env-vars)
+           (system* #$(file-append (get-value 'sway config) "/bin/sway")))))
     (list
      (simple-service
       'run-sway-on-login-to-sway-tty
@@ -337,7 +345,7 @@ automatically switch to SWAY-TTY-NUMBER on boot."
       (list
        #~(format #f "[ $(tty) = /dev/tty~a ] && exec ~a~a~a"
                  #$sway-tty-number
-                 #$(file-append (get-value 'sway config) "/bin/sway")
+                 #$sway-with-env-vars
                  #$(if (positive? (string-length launch-arguments)) " " "")
                  #$launch-arguments)))))
 
