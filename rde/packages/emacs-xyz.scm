@@ -328,8 +328,8 @@ full usability as a modern file manager.")
     (license license:gpl3+)))
 
 (define-public emacs-jarchive
-  (let* ((commit "4aa2e5d394d10b183813f4aa0b65156b8c660d6b")
-         (revision "0"))
+  (let* ((commit "a5ab89db3f7bf248f3f0ff0ad97767f2c9fe01e5")
+         (revision "1"))
     (package
       (name "emacs-jarchive")
       (version (git-version "0.1" revision commit))
@@ -341,7 +341,7 @@ full usability as a modern file manager.")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0j6fpcbcqzy4rbn4lc4b6cs6qf9wrriynfrqgkj0car3mcqcnvz4"))))
+          (base32 "013br2fvfca6gr0hkz1argf791hw2j319wlg8kprn8a2kqwf4jim"))))
       (build-system emacs-build-system)
       (home-page "https://git.sr.ht/~dannyfreeman/jarchive")
       (synopsis "Jarchive teaches Emacs how to navigate to files inside jars")
