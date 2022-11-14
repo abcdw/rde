@@ -835,7 +835,8 @@ for the main bar."
              ((color . @base04)
               (background . @base01)))
 
-            (#((.modules-right label)
+            (#((.modules-right button)
+               (.modules-right label)
                (.modules-right image))
              ((margin . (0.4em 0.2em))
               (padding . (0 0.4em))
