@@ -840,6 +840,7 @@ for the main bar."
                (.modules-right image))
              ((margin . (0.4em 0.2em))
               (padding . (0 0.4em))
+              (color . @base04)
               (background . @base02)
               (border-radius . 0.2em)))
 
