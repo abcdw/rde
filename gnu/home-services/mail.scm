@@ -334,7 +334,7 @@ a particular public-inbox repository."))
 
   (define (l2md-repo->alist repos)
     (match repos
-      (($ <l2md-repo> _ name urls maildir pipe initial-import sync-enabled?)
+      (($ <l2md-repo> name urls maildir pipe initial-import sync-enabled? _)
        (begin
          `(repo ,name
                 (,@(map (lambda (url)
@@ -346,7 +346,7 @@ a particular public-inbox repository."))
                  (sync-enabled . ,sync-enabled?)))))))
 
   (match config
-    (($ <home-l2md-configuration> _ package autostart? period oneshot maildir pipe base repos)
+    (($ <home-l2md-configuration> package autostart? period oneshot maildir pipe base repos _)
      (begin
        (generic-serialize-git-ini-config
         #:combine-ini (compose flatten list)
@@ -370,7 +370,7 @@ a particular public-inbox repository."))
 
 (define l2md-shepherd-service
   (match-lambda
-    (($ <home-l2md-configuration> _ package autostart?)
+    (($ <home-l2md-configuration> package autostart? _)
      (if autostart?
          (list (shepherd-service
                 (documentation
@@ -411,4 +411,3 @@ a particular public-inbox repository."))
       (l2md-repo l2md-repo))
      (l2md-repo ,l2md-repo-fields))
    'home-l2md-configuration))
-

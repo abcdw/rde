@@ -132,8 +132,8 @@ be the default profile.")))))
   ;; (user.js, userChrome.css, userContent.css)
   (define (serialize-profiles profiles)
     (match profiles
-      (($ <icecat-profile> location default? name id
-                           settings user-chrome user-content)
+      (($ <icecat-profile> default? name id settings
+                           user-chrome user-content location)
        (let ((profile-path (if default? "default" name))
              (file-name (string-append "icecat-" name "-profile")))
          (filter
@@ -169,7 +169,7 @@ be the default profile.")))))
                  '())))))))
 
   (match config
-    (($ <home-icecat-configuration> location package profiles)
+    (($ <home-icecat-configuration> package profiles location)
      (begin
        (check-only-one-default (map icecat-profile-default? profiles))
        (check-duplicate-field "name" (map icecat-profile-name profiles))

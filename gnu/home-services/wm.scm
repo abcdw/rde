@@ -48,14 +48,14 @@ documentation} for how to configure it."))
 
 (define xmonad-profile-service
   (match-lambda
-    (($ <home-xmonad-configuration> _ package xmonad-contrib?)
+    (($ <home-xmonad-configuration> package xmonad-contrib? _)
      (if xmonad-contrib?
          (list package ghc-xmonad-contrib)
          (list package)))))
 
 (define xmonad-files-service
   (match-lambda
-    (($ <home-xmonad-configuration> _ package xmonad-contrib? config)
+    (($ <home-xmonad-configuration> package xmonad-contrib? config _)
      (if (null? config)
          '()
          `(("xmonad/xmonad.hs"
@@ -64,7 +64,7 @@ documentation} for how to configure it."))
 
 (define xmonad-run-on-change-service
   (match-lambda
-    (($ <home-xmonad-configuration> _ package xmonad-contrib? config)
+    (($ <home-xmonad-configuration> package xmonad-contrib? config _)
      `(("files/.config/xmonad/xmonad.hs"
         ,#~(let ((executable #$(file-append package "/bin/xmonad")))
              (system* executable "--recompile")

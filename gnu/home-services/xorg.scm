@@ -144,7 +144,7 @@ URxvt.secondaryScroll: 0
 
 (define (home-xresources-extension old-config extension-configs)
   (match old-config
-    (($ <home-xresources-configuration> _ package* config*)
+    (($ <home-xresources-configuration> package* config* _)
      (home-xresources-configuration
       (package package*)
       (config (append config*

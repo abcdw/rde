@@ -115,14 +115,14 @@ as the @code{default-options} field in @code{home-ssh-configuration}."))
 
 (define serialize-ssh-host
   (match-lambda
-    (($ <ssh-host> _ host options)
+    (($ <ssh-host> host options _)
      #~(string-append
       #$(serialize-field 'host host)
       #$(serialize-alist #f options)))))
 
 (define serialize-ssh-match
   (match-lambda
-    (($ <ssh-match> _ match options)
+    (($ <ssh-match> match options _)
      #~(string-append
         #$(serialize-field
            'match
