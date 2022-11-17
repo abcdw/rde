@@ -16,9 +16,9 @@ all: doc/rde.info
 install:
 	@echo some installation will happen here
 
-check: rde/channels/pull-latest
-	guix home --fallback build \
-	./gnu/home/examples/minimal.tmpl
+check:
+	guix time-machine -C ./rde/examples/channels.tmpl -- \
+	home --fallback build ./gnu/home/examples/minimal.tmpl
 
 target:
 	mkdir target
