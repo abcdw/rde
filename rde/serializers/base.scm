@@ -17,7 +17,7 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (rde serializers elisp)
+(define-module (rde serializers base)
   #:use-module (ice-9 match)
   #:use-module (ice-9 format)
   #:use-module (srfi srfi-1)
@@ -26,12 +26,12 @@
 
   #:use-module (guix gexp)
 
-  #:export (serialize-elisp-config
-            elisp-serialize
-            elisp-config?))
+  #:export (serialize-sexp-config
+            sexp-serialize
+            sexp-config?))
 
-(define elisp-config? list?)
-(define (elisp-serialize elisp)
+(define sexp-config? list?)
+(define (sexp-serialize sexps)
   (define (serialize-list-element elem)
     (cond
      ((gexp? elem)
@@ -47,8 +47,8 @@
 
   #~(string-append
      #$@(interpose
-         (map serialize-list-element elisp)
+         (map serialize-list-element sexps)
          "\n" 'suffix)))
 
-(define (serialize-elisp-config field-name elisp)
-  (elisp-serialize elisp))
+(define (serialize-sexp-config field-name sexps)
+  (sexp-serialize sexps))
