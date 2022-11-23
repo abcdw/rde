@@ -17,7 +17,6 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (rde home services emacs-xyz)
-  #:use-module (rde serializers elisp)
   #:use-module (rde home services emacs)
   #:use-module (gnu home services)
   #:use-module (gnu packages emacs-xyz)

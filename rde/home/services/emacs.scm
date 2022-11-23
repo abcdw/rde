@@ -18,7 +18,7 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (rde home services emacs)
-  #:use-module (rde serializers elisp)
+  #:use-module (rde serializers base)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu packages emacs)
@@ -36,7 +36,10 @@
   #:use-module (guix utils)
   #:use-module (guix build-system emacs)
   #:use-module ((guix licenses) #:prefix license:)
-  #:export (home-emacs-service-type
+  #:export (elisp-config?
+            elisp-serialize
+            serialize-elisp-config
+            home-emacs-service-type
             home-emacs-configuration
             home-emacs-extension
             elisp-configuration-package
@@ -44,6 +47,9 @@
             home-emacs-feature-loader-configuration
             home-emacs-feature-loader-service-type))
 
+(define elisp-serialize sexp-serialize)
+(define serialize-elisp-config serialize-sexp-config)
+(define elisp-config? sexp-config?)
 (define file-likes? (list-of file-like?))
 
 (define serialize-file-likes empty-serializer)
