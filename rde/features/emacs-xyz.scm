@@ -818,7 +818,7 @@ parses its input."
         (define-key global-map (kbd "M-y") 'consult-yank-pop)
         (define-key global-map (kbd "s-B") 'consult-buffer)
         (define-key global-map (kbd "C-x C-r") 'consult-recent-file)
-        (define-key minibuffer-local-map (kbd "s-B") 'embark-become)
+        (define-key minibuffer-local-map (kbd "s-g") 'embark-become)
         ;; (define-key global-map (kbd "M-.") 'embark-dwim)
 
         (let ((map goto-map))
