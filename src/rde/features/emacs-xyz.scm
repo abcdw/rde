@@ -650,10 +650,46 @@ Aliases, keybindings, small hack and tweaks."
 
 (define --Completion--)
 
+(define (consult-initial-narrowing _)
+  `((defcustom rde-completion-initial-narrow-alist '()
+      "Alist of MODE . KEY to present an initial completion narrowing via
+ `consult'."
+      :group 'rde-completion
+      :type 'list)
+
+    (defun rde-completion--mode-buffers (&rest modes)
+      "Return a list of buffers that are derived from MODES in `buffer-list'."
+      (cl-remove-if-not
+       (lambda (buffer)
+         (with-current-buffer buffer
+                              (cl-some 'derived-mode-p modes)))
+       (buffer-list)))
+
+    (defun rde-completion-initial-narrow ()
+      "Set initial narrow source for buffers under a specific mode."
+      (let* ((buffer-mode-assoc rde-completion-initial-narrow-alist)
+             (key (and (eq this-command 'consult-buffer)
+                       (or (alist-get
+                            (buffer-local-value
+                             'major-mode
+                             (window-buffer (minibuffer-selected-window)))
+                                      buffer-mode-assoc)
+                           (cdr (cl-find-if
+                                 (lambda (mode)
+                                   (with-current-buffer
+                                    (window-buffer (minibuffer-selected-window))
+                                    (derived-mode-p (car mode))))
+                                 buffer-mode-assoc))))))
+        (when key
+          (setq unread-command-events
+                (append unread-command-events (list key 32))))))
+    (add-hook 'minibuffer-setup-hook 'rde-completion-initial-narrow)))
+
 (define* (feature-emacs-completion
           #:key
           (mini-frame? #f)
           (marginalia-align 'left)
+          (consult-initial-narrowing? #t)
           (emacs-orderless emacs-orderless)
           (emacs-cape emacs-cape)
           (emacs-consult emacs-consult)
@@ -664,6 +700,7 @@ Aliases, keybindings, small hack and tweaks."
   (define (marginalia-align? marginalia-align)
     (memq marginalia-align '(left right)))
   (ensure-pred marginalia-align? marginalia-align)
+  (ensure-pred boolean? consult-initial-narrowing?)
   (ensure-pred file-like? emacs-orderless)
   (ensure-pred file-like? emacs-cape)
   (ensure-pred file-like? emacs-consult)
@@ -683,6 +720,9 @@ Aliases, keybindings, small hack and tweaks."
       `((eval-when-compile
          (require 'marginalia)
          (require 'consult))
+        (defgroup rde-completion nil
+          "Tweaks to the built-in Emacs completion."
+          :group 'rde)
 
         (with-eval-after-load
          'minibuffer
@@ -751,6 +791,10 @@ parses its input."
              '(orderless-literal . "~"))
             ((string-suffix-p "~" pattern)
              (cons 'orderless-flex (substring pattern 0 -1)))))
+
+         ,@(if consult-initial-narrowing?
+               (consult-initial-narrowing config)
+              '())
 
          (setq orderless-style-dispatchers
           '(rde-orderless-literal-dispatcher
@@ -914,7 +958,8 @@ Annotations for completion candidates using marginalia."
    (values `((,f-name . #t)
              (emacs-cape . ,emacs-cape)
              (emacs-embark . ,emacs-embark)
-             (emacs-consult . ,emacs-consult)))
+             (emacs-consult . ,emacs-consult)
+             (emacs-consult-initial-narrowing? . ,consult-initial-narrowing?)))
    (home-services-getter get-home-services)))
 
 
