@@ -2,7 +2,11 @@
   #:use-module (gnu)
   #:use-module (gnu system)
   #:use-module (gnu system install)
-  #:export (guix-with-substitute-mirror))
+  #:use-module (rde features)
+  #:use-module (rde features system)
+  #:use-module (rde features base)
+  #:export (guix-with-substitute-mirror
+            live-os))
 
 (define guix-with-substitute-mirror
   (operating-system
@@ -16,4 +20,42 @@
         (substitute-urls '("http://ci.guix.trop.in"
                            "https://bordeaux.guix.gnu.org"))))))))
 
-guix-with-substitute-mirror
+(define live-file-systems
+  (list (file-system
+          (mount-point "/")
+          (device (file-system-label "Guix_image"))
+          (type "ext4"))
+        (file-system
+          (mount-point "/tmp")
+          (device "none")
+          (type "tmpfs")
+          (check? #f))))
+
+(define* (live-os
+          #:key
+          (kernel linux-libre)
+          (kernel-firmware '())
+          (guix-substitute-urls '())
+          (guix-authorized-keys '())
+          (custom-system-services '())
+          (supplementary-system-packages '())
+          (supplementary-features '())) ;; user-preferences
+  (rde-config
+   (initial-os installation-os)
+   (features
+    (append
+     supplementary-features
+     (list
+      (feature-file-systems
+       #:file-systems live-file-systems)
+      (feature-kernel
+       #:kernel kernel
+       #:firmware kernel-firmware)
+      (feature-base-packages
+       #:system-packages supplementary-packages)
+      (feature-custom-services
+       #:feature-name-prefix 'live
+       #:system-services custom-system-services)
+      (feature-base-services
+       #:guix-substitute-urls guix-substitute-urls
+       #:guix-authorized-keys guix-authorized-keys))))))
