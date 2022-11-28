@@ -4,6 +4,7 @@
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2022 conses <contact@conses.eu>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -80,6 +81,7 @@
             feature-emacs-org-agenda
             feature-emacs-citar
             feature-emacs-org-protocol
+            feature-emacs-spelling
 
             ;; Communication
             feature-emacs-erc
@@ -2464,6 +2466,82 @@ This integrates well with elfeed for now."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-spelling
+          #:key
+          (spelling-program (@ (gnu packages aspell) aspell))
+          (spelling-dictionaries (list (@ (gnu packages aspell) aspell-dict-en)))
+          (flyspell-hooks #f)
+          (flyspell-prog-hooks #f)
+          (ispell-program-name (file-append spelling-program "/bin/"
+                                            (package-name spelling-program)))
+          (ispell-standard-dictionary #f)
+          (ispell-personal-dictionary #f)
+          (dictionary-server "dict.org")
+          (dictionary-key "d"))
+  "Configure spell-checking features in Emacs.
+SPELLING-PROGRAM will be used to detect spelling mistakes based on
+SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
+(prose) and in docstrings of modes defined in FLYSPELL-PROG-HOOKS (programming)."
+  (ensure-pred file-like? spelling-program)
+  (ensure-pred list-of-file-likes? spelling-dictionaries)
+  (ensure-pred maybe-list? flyspell-hooks)
+  (ensure-pred maybe-list? flyspell-prog-hooks)
+  (ensure-pred file-like-or-path? ispell-program-name)
+  (ensure-pred maybe-string? ispell-standard-dictionary)
+  (ensure-pred maybe-path? ispell-personal-dictionary)
+  (ensure-pred string? dictionary-key)
+
+  (define emacs-f-name 'spelling)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to spelling in Emacs."
+    (list
+     (simple-service
+      'add-spelling-packages
+      home-profile-service-type
+      `(,spelling-program
+        ,@spelling-dictionaries))
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((require 'configure-rde-keymaps)
+        ,@(if flyspell-hooks
+              `((mapcar (lambda (hook)
+                          (add-hook hook 'flyspell-mode))
+                        ',flyspell-hooks))
+              '())
+        ,@(if flyspell-prog-hooks
+              `((mapcar (lambda (hook)
+                          (add-hook hook 'flyspell-prog-mode))
+                        ',flyspell-prog-hooks))
+              '())
+        (with-eval-after-load 'flyspell
+          (setq ispell-program-name ,ispell-program-name)
+          ,@(if ispell-standard-dictionary
+                `((setq ispell-dictionary ,ispell-standard-dictionary))
+                '())
+          ,@(if ispell-personal-dictionary
+                `((setq ispell-personal-dictionary ,ispell-personal-dictionary))
+                '())
+          (setq flyspell-issue-welcome-flag nil)
+          (setq flyspell-issue-message-flag nil)
+          (define-key rde-app-map (kbd ,dictionary-key) 'dictionary-search)
+          (with-eval-after-load 'dictionary
+            (setq dictionary-server ,dictionary-server))))
+      #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)))))
+
+  (feature
+   (name f-name)
+   (values
+    (append
+      `((,f-name . #t))
+      (make-feature-values
+       spelling-program
+       spelling-dictionaries flyspell-hooks flyspell-prog-hooks
+       ispell-standard-dictionary ispell-personal-dictionary)))
    (home-services-getter get-home-services)))
 
 
