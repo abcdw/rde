@@ -247,27 +247,44 @@ predefined configurations, practices and workflows.")
 
 (use-modules (gnu packages freedesktop)
              (gnu packages xdisorg)
+             (gnu packages pciutils)
+             (gnu packages pcre)
              (gnu packages wm))
 
 (define-public wayland-protocols-latest
   (package
     (inherit wayland-protocols)
     (name "wayland-protocols")
-    (version "1.26")
+    (version "1.30")
     (source (origin
               (method url-fetch)
-              (uri (string-append
-                    "https://wayland.freedesktop.org/releases/"
-                    "wayland-protocols-" version ".tar.xz"))
+              (uri (string-append "https://gitlab.freedesktop.org/wayland"
+                           "/" name "/-/releases/" version "/downloads/"
+                           name "-" version ".tar.xz"))
               (sha256
                (base32
-                "04vgllmpmrv14x3x64ns01vgwx4hriljayjkz9idgbv83i63hly5"))))))
+                "0q5w66472j548pdabnycn9byjsjy477qfzkd6yq80azxcpxrh51w"))))))
+
+(define-public libinput-minimal-latest
+  (package
+    (inherit libinput-minimal)
+    (name "libinput-minimal")
+    (version "1.22.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://gitlab.freedesktop.org/libinput/libinput/-/archive"
+             "/" version "/libinput-" version ".tar.gz"))
+       (sha256
+        (base32
+         "0yqdrp29v804vyy9n8wnbdimijmgbi8gpnvacrcjz8gjdjb5mgpb"))))))
 
 (define-public libdrm-latest
   (package
     (inherit libdrm)
     (name "libdrm")
-    (version "2.4.112")
+    (version "2.4.114")
     (source (origin
               (method url-fetch)
               (uri (string-append
@@ -275,11 +292,28 @@ predefined configurations, practices and workflows.")
                     version ".tar.xz"))
               (sha256
                (base32
-                "1zr0hi7k5s7my4q9hyj6ryzg89zyjx24zbqfv3c5rcq9pl87gc00"))))))
+                "09nhk3jx3qzggl5vyii3yh4zm0npjqsbxhzvxrg2xla77a2cyj9h"))))))
+
+(define-public wayland-latest
+  (package
+    (inherit wayland)
+    (name "wayland")
+    (version "1.21.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append "https://gitlab.freedesktop.org/wayland"
+                           "/" name "/-/releases/" version "/downloads/"
+                           name "-" version ".tar.xz"))
+       (sha256
+        (base32
+         "1b0ixya9bfw5c9jx8mzlr7yqnlyvd3jv5z8wln9scdv8q5zlvikd"))))))
 
 (define freshup-wayland-protocols
   (package-input-rewriting/spec
    `(("libdrm" . ,(const libdrm-latest))
+     ("libinput-minimal" . ,(const libinput-minimal-latest))
+     ("wayland" . ,(const wayland-latest))
      ("wayland-protocols" . ,(const wayland-protocols-latest)))))
 
 (define-public wlroots-latest
@@ -287,7 +321,21 @@ predefined configurations, practices and workflows.")
    (package
      (inherit wlroots)
      (name "wlroots")
-     (version "0.15.1")
+     (version "0.16.0")
+     (arguments
+      (list
+       #:phases
+       #~(modify-phases %standard-phases
+           (add-before 'configure 'hardcode-paths
+             (lambda* (#:key inputs #:allow-other-keys)
+               (substitute* "backend/drm/meson.build"
+                 (("/usr/share")
+                  (string-append #$hwdata:pnp "/share")))
+               (substitute* "xwayland/server.c"
+                 (("Xwayland") (string-append (assoc-ref inputs
+                                                         "xorg-server-xwayland")
+                                              "/bin/Xwayland")))
+               #t)))))
      (source
       (origin
         (method git-fetch)
@@ -296,11 +344,13 @@ predefined configurations, practices and workflows.")
               (commit version)))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "00s73nhi3sc48l426jdlqwpclg41kx1hv0yk4yxhbzw19gqpfm1h")))))))
+         (base32 "18rfr3wfm61dv9w8m4xjz4gzq2v3k5vx35ymbi1cggkgbk3lbc4k")))))))
 
 (define freshup-wlroots
   (package-input-rewriting/spec
    `(("libdrm" . ,(const libdrm-latest))
+     ("libinput-minimal" . ,(const libinput-minimal-latest))
+     ("wayland" . ,(const wayland-latest))
      ("wayland-protocols" . ,(const wayland-protocols-latest))
      ("wlroots" . ,(const wlroots-latest)))))
 
@@ -309,14 +359,35 @@ predefined configurations, practices and workflows.")
    (package
      (inherit sway)
      (name "sway")
-     (version "1.7")
+     (version "1.8-rc1")
+     (inputs (append (package-inputs sway)
+                     (list (list "pcre" pcre2)
+                           (list "glibc" glibc))))
+         (arguments
+     `(;; elogind is propagated by wlroots -> libseat
+       ;; and would otherwise shadow basu.
+       #:configure-flags '("-Dsd-bus-provider=basu")
+       #:phases
+       (modify-phases %standard-phases
+         (add-before 'configure 'hardcode-paths
+           (lambda* (#:key inputs #:allow-other-keys)
+             ;; Hardcode path to swaybg.
+             (substitute* "sway/config.c"
+               (("strdup..swaybg..")
+                (string-append "strdup(\"" (assoc-ref inputs "swaybg")
+                               "/bin/swaybg\")")))
+             ;; Hardcode path to scdoc.
+             (substitute* "meson.build"
+               (("scdoc.get_pkgconfig_variable..scdoc..")
+                (string-append "'" (assoc-ref inputs "scdoc")
+                               "/bin/scdoc'")))
+             #t)))))
      (source
       (origin
         (method git-fetch)
         (uri (git-reference
               (url "https://github.com/swaywm/sway")
-              (commit version)))
+              (commit "baf027fc5b32c914864e3ee34b85f96c3089cd1e")))
         (file-name (git-file-name name version))
         (sha256
-         (base32 "0ss3l258blyf2d0lwd7pi7ga1fxfj8pxhag058k7cmjhs3y30y5l")))))))
-
+         (base32 "0g7pjancp5xny0fjdy2vs4pnsp21rffdha3v4lkzja2yfbpj0yb1")))))))
