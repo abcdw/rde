@@ -15,7 +15,8 @@
           (docker-cli docker-cli)
           (emacs-docker emacs-docker)
           (emacs-dockerfile-mode emacs-dockerfile-mode)
-          (containerd containerd))
+          (containerd containerd)
+          (docker-key "D"))
   "Configure docker and related packages."
 
   (define f-name 'docker)
@@ -27,7 +28,7 @@
       `((eval-when-compile (require 'configure-rde-keymaps))
         (with-eval-after-load
          'configure-rde-keymaps
-         (define-key rde-app-map (kbd "d") 'docker))
+         (define-key rde-app-map (kbd ,docker-key) 'docker))
         (add-to-list 'auto-mode-alist '(".*Dockerfile\\'" . dockerfile-mode)))
       #:summary "\
 Docker interface and Dockerfile syntax"
