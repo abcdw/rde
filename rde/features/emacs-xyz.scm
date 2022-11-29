@@ -917,7 +917,7 @@ Annotations for completion candidates using marginalia."
 
 (define* (feature-emacs-vertico
           #:key
-          (emacs-vertico emacs-vertico-latest)
+          (emacs-vertico emacs-vertico)
           (completion-in-region? #t))
   "Configure vertico completion UI for GNU Emacs."
   (define emacs-f-name 'vertico)
