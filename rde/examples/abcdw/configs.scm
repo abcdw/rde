@@ -290,6 +290,28 @@
    ;; https://github.com/wallabag/wallabag
    ;; https://github.com/chenyanming/wallabag.el
 
+   ;; (feature-emacs-portable)
+   (feature-emacs
+    #:default-application-launcher? #t
+    #:additional-elisp-packages
+    (append
+     (strings->packages
+      "emacs-dirvish"
+      "emacs-elfeed" "emacs-hl-todo"
+      "emacs-yasnippet"
+      ;; "emacs-company"
+      "emacs-consult-dir"
+      ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
+      "emacs-kind-icon"
+      "emacs-nginx-mode" "emacs-yaml-mode"
+      ;; "emacs-lispy"
+      "emacs-ytdl"
+      "emacs-multitran"
+      "emacs-minimap"
+      "emacs-ement"
+      "emacs-restart-emacs"
+      "emacs-org-present")))
+
    (feature-emacs-appearance
     #:extra-elisp
     `((setq modus-themes-syntax '(faint))
@@ -403,27 +425,6 @@ subject:/home:/) and tag:new}\"'")
      %rde-notmuch-saved-searches))
 
    (feature-transmission #:auto-start? #f)
-
-   (feature-emacs
-    #:default-application-launcher? #t
-    #:additional-elisp-packages
-    (append
-     (list emacs-dirvish)
-     (strings->packages
-      "emacs-elfeed" "emacs-hl-todo"
-      "emacs-yasnippet"
-      ;; "emacs-company"
-      "emacs-consult-dir"
-      ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
-      "emacs-kind-icon"
-      "emacs-nginx-mode" "emacs-yaml-mode"
-      ;; "emacs-lispy"
-      "emacs-ytdl"
-      "emacs-multitran"
-      "emacs-minimap"
-      "emacs-ement"
-      "emacs-restart-emacs"
-      "emacs-org-present")))
 
    (feature-xdg
     #:xdg-user-directories-configuration
