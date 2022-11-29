@@ -82,40 +82,6 @@
       "This package implements links to notmuch messages and searches. A search is a query to be performed by notmuch; it is the equivalent to folders in other mail clients. Similarly, mails are referred to by a query, so both a link can refer to several mails.")
      (license license:gpl3+))))
 
-(define-public emacs-vertico-latest
-  (let* ((commit "2de617a9199d152533ce280c6eb653147f15f8d1")
-         (revision "2"))
-    (package
-     (inherit emacs-vertico)
-     (name "emacs-vertico")
-     (version (git-version "0.20" revision commit))
-     (source
-      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/minad/vertico")
-             (commit commit)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "08h1lv63dkrfk3m94z73xmjabch6699kd9qm3cvkcr8n67h6j6fp")))))))
-
-(define-public emacs-marginalia-latest
-  (let* ((commit "5767b6ff49e26ecd6aa26f552397d5d2b8213d25")
-         (revision "0"))
-    (package
-     (inherit emacs-marginalia)
-     (name "emacs-marginalia")
-     (version (git-version "0.12" revision commit))
-     (source
-      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/minad/marginalia")
-             (commit commit)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32 "143d57fy5i5ziwfxxix595k0f98ay5l57x5z69g8lkp6nb7b1rq7")))))))
-
 (define-public emacs-vterm-latest
   (let ((version "0.0.1")
         (revision "1")
