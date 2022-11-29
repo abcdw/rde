@@ -445,7 +445,7 @@ keybindings and adjust some minor settings."
 
 (define* (feature-emacs-input-methods
           #:key
-          (toggle-keybinding "s-SPC")
+          (toggle-key "s-SPC")
           (enable-reverse-im #f)
           (default-input-method "cyrillic-dvorak")
           (input-method-packages (list emacs-cyrillic-dvorak-im)))
@@ -476,7 +476,7 @@ utilizing reverse-im package."
                 input-method-packages)
 
          (setq default-input-method ,default-input-method)
-         (define-key global-map (kbd ,toggle-keybinding) 'toggle-input-method))
+         (define-key global-map (kbd ,toggle-key) 'toggle-input-method))
 
         ,@(if enable-reverse-im
               `((with-eval-after-load
