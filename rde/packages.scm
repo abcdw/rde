@@ -43,17 +43,17 @@
   #:use-module (guix build-system gnu)
   #:use-module ((guix licenses) #:prefix license:)
   #:export (strings->packages
-            strings->packages-vanilla))
+            strings->inferior-packages))
 
 ;; Utils
 
 (define* (strings->packages #:rest lst)
   (map specification->package+output lst))
 
-(define* (strings->packages-vanilla
+(define* (strings->inferior-packages
           #:key (commit "2b6af630d61dd5b16424be55088de2b079e9fbaf")
           #:rest lst)
-  "Packages from guix channel."
+  "Packages from specific guix channel version."
   (define channel-guix
     `((channel
        (name 'guix)
