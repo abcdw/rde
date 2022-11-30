@@ -1037,7 +1037,6 @@ not appear in the pop-up buffer."
 
 ;;            (add-hook 'notmuch-hello-mode-hook 'rde--add-notmuch-hello-hooks)
 
-           (setq notmuch-show-header-line nil)
            (setq notmuch-show-logo nil)))
         #:summary "\
 Tons of configurations and additions for notmuch email client"
