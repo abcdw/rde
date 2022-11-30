@@ -29,7 +29,7 @@
   #:use-module (gnu home-services wm)
   #:use-module (gnu services)
   #:use-module (rde packages)
-  #:use-module (rde packages emacs-xyz)
+  #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages terminals)
   #:use-module (guix gexp)
 
@@ -92,7 +92,7 @@
 
 (define* (feature-vterm
           #:key
-          (emacs-vterm emacs-vterm-latest))
+          (emacs-vterm emacs-vterm))
   "Configure emacs-vterm and shells."
   (ensure-pred file-like? emacs-vterm)
 
