@@ -867,6 +867,10 @@ relative line numbers, when narrowing is active."
          (require 'embark-consult))
 
         (with-eval-after-load
+            'xref
+          (setq xref-show-xrefs-function 'consult-xref))
+
+        (with-eval-after-load
          'consult
          (require 'embark-consult)
 
@@ -1028,6 +1032,7 @@ calculation function for vertico buffer."
                  (consult-org-heading buffer)
                  (consult-history buffer)
                  (consult-lsp-symbols buffer)
+                 (consult-xref buffer)
                  (embark-keybinding buffer)
                  (consult-location buffer)))
 
