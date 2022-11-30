@@ -87,6 +87,51 @@
 
           (with-eval-after-load
            'cider-mode
+           ;; Make cider-completion work together with orderless and eglot
+           ;; https://github.com/clojure-emacs/cider/issues/3019
+           ;; https://github.com/oantolin/orderless/issues/89
+           (require 'cider-completion)
+           (defun rde--cider-complete-at-point ()
+             "Complete the symbol at point."
+             (require 'thingatpt)
+             (when (and (cider-connected-p)
+                        (not (cider-in-string-p)))
+               (let*
+                ((bounds
+                  (or (bounds-of-thing-at-point 'symbol)
+                      ;; It may be too expensive to calculate it every time
+                      `(cons ,(point) ,(point))))
+                 (beg (car bounds))
+                 (end (cdr bounds))
+                 (completion
+                  (append
+                   (cider-complete
+                    ;; Use only namespace as a prefix for nrepl completions,
+                    ;; the rest will be filtered with orderless
+                    (replace-regexp-in-string
+                     "/.*" "/" (buffer-substring beg end)))
+                   (get-text-property (point) 'cider-locals))))
+                (message "=> %s %s" (buffer-substring beg end) completion)
+                (list beg end (completion-table-dynamic (lambda (_) completion))
+                 :annotation-function 'cider-annotate-symbol))))
+
+           (advice-add 'cider-complete-at-point
+                       :override 'rde--cider-complete-at-point)
+
+           (with-eval-after-load 'orderless
+             (defun rde-orderless-clojure (component)
+               "Match namespace and symbol separately by changing `/' to `.*'."
+               (orderless--separated-by
+                '(zero-or-more nonl)
+                (split-string component "/")))
+
+             (defun rde--setup-clojure-orderless-matching-style ()
+               "hehe"
+               (make-local-variable 'orderless-matching-styles)
+               (add-hook 'orderless-matching-styles 'rde-orderless-clojure 0 t))
+
+             (add-hook 'cider-mode-hook
+                       'rde--setup-clojure-orderless-matching-style))
 
            (setq cider-doc-auto-select-buffer nil)
            (setq cider-auto-select-error-buffer nil)
