@@ -248,3 +248,23 @@ contributed packages to Telega.")))
     (propagated-inputs
      (modify-inputs (package-propagated-inputs emacs-consult-eglot)
        (delete "emacs-eglot")))))
+
+(define-public emacs-docker-latest
+  (let ((commit "cc0046e6a557dce0ccc4108dd22e04f21ba8b0dc")
+        (revision "0"))
+    (package
+      (inherit emacs-docker)
+      (name "emacs-docker")
+      (version (git-version "2.2.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/Silex/docker.el")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "11l8jpqj6m04ndhnfz41nhph1rqjvqbfd5vw334mph776aq1baln"))))
+      (propagated-inputs
+       (modify-inputs (package-propagated-inputs emacs-docker)
+         (delete "emacs-docker-tramp"))))))
