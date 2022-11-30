@@ -346,6 +346,9 @@ environment outside of Guix Home."
           (setq user-full-name ,full-name)
           (setq user-mail-address ,email)
 
+          ,#~"\n;; Disable messages, when minibuffer is active"
+          (setq minibuffer-message-timeout 0)
+
           ,#~""
           (setq custom-file
                 (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
