@@ -958,6 +958,7 @@ Annotations for completion candidates using marginalia."
          (define-key global-map (kbd "s-s") 'vertico-repeat)
          ;; TODO: Bind vertico-next/previous-group to more usual keys?
 
+         (require 'vertico-repeat)
          (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
          (setq vertico-cycle t)
 
