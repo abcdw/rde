@@ -54,6 +54,7 @@
           (add-hook 'clojure-mode-hook
                     'rde--clojure-disable-eglot-parts-in-favor-of-cider)
 
+          ;; TODO: Check if this hack is still needed
           (with-eval-after-load
            'consult-imenu
            (add-to-list
