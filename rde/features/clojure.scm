@@ -19,6 +19,8 @@
           #:key
           (clojure-tools-cli clojure-tools-cli)
           (clojure-lsp #f)
+          (cljr-clojure-test-declaration
+           "[clojure.test :refer [deftest are is testing]]")
           (jdk (list openjdk17 "jdk")))
   "Setup and configure environment for Clojure. "
   (ensure-pred file-like? clojure-tools-cli)
@@ -79,6 +81,9 @@
 
           (add-hook 'clojure-mode-hook 'jarchive-setup)
 
+          (with-eval-after-load
+           'clj-refactor
+           (setq cljr-clojure-test-declaration ,cljr-clojure-test-declaration))
           (with-eval-after-load
            'clojure-mode
            (setq clojure-align-forms-automatically t)))
