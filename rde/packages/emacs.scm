@@ -29,26 +29,28 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-next-pgtk-stable
-  (let ((commit "0a5477b448e6b62bcedc1803e531ec7686eea48d")
-        (revision "4"))
+  (let ((commit "32615c9bc124970aade150e81c2ed4a5c0492ef7")
+        (revision "5"))
     (package
       (inherit emacs)
-      (name "emacs-next-pgtk-latest")
-      (version (git-version "29.0.50" revision commit))
+      (name "emacs-next-pgtk-stable")
+      (version (git-version "30.0.50" revision commit))
       (source
        (origin
          (method git-fetch)
          (uri (git-reference
-               (url "https://git.savannah.gnu.org/git/emacs.git/")
+               (url "https://github.com/emacs-mirror/emacs")
                (commit commit)))
          (file-name (git-file-name name version))
          (patches (search-patches "emacs-pgtk-super-key-fix.patch"
                                   "emacs-exec-path.patch"
                                   "emacs-fix-scheme-indent-function.patch"
-                                  "emacs-source-date-epoch.patch"))
+                                  "emacs-native-comp-driver-options.patch"
+                                  ;; "emacs-source-date-epoch.patch"
+                                  ))
          (sha256
           (base32
-           "0dqmrawkvbypxp8gcnspnhhmfamzp3l62gfgp1pw2l6svz58v991"))))
+           "1gv4ihns0vbghi0d34by436qxqgms96593sahb45qy4dbwxibjza"))))
       (arguments
        (substitute-keyword-arguments (package-arguments emacs-next)
          ((#:configure-flags flags ''())
