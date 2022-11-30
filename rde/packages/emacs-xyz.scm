@@ -82,24 +82,6 @@
       "This package implements links to notmuch messages and searches. A search is a query to be performed by notmuch; it is the equivalent to folders in other mail clients. Similarly, mails are referred to by a query, so both a link can refer to several mails.")
      (license license:gpl3+))))
 
-(define-public emacs-vterm-latest
-  (let ((version "0.0.1")
-        (revision "1")
-        (commit "a940dd2ee8a82684860e320c0f6d5e15d31d916f"))
-    (package
-     (inherit emacs-vterm)
-     (name "emacs-vterm")
-     (version (git-version version revision commit))
-     (source (origin
-              (method git-fetch)
-              (uri (git-reference
-                    (url "https://github.com/akermu/emacs-libvterm")
-                    (commit commit)))
-              (file-name (git-file-name name version))
-              (sha256
-               (base32
-                "0r1iz92sn2ddi11arr9s8z7cdpjli7pn55yhaswvp4sdch7chb5r")))))))
-
 
 (define-public emacs-cyrillic-dvorak-im
   (package
