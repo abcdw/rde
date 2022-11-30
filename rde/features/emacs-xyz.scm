@@ -1596,8 +1596,7 @@ their behavior."
 
 (define* (feature-emacs-eglot
           #:key
-          (emacs-eglot emacs-eglot)
-          (emacs-consult-eglot emacs-consult-eglot))
+          (emacs-consult-eglot emacs-consult-eglot-sans-eglot))
   "Configure eglot, an LSP package for emacs."
 
   (define emacs-f-name 'eglot)
@@ -1619,7 +1618,7 @@ Refactoring, completion, navigation, documentation via LSP"
       #:commentary "\
 Mostly workarounds and integratios with other packages."
       #:keywords '(convenience completion lsp editing languages)
-      #:elisp-packages (list emacs-eglot emacs-consult-eglot))))
+      #:elisp-packages (list emacs-consult-eglot))))
 
   (feature
    (name f-name)
