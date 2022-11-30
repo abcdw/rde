@@ -841,6 +841,7 @@ not appear in the pop-up buffer."
           #:key
           (get-notmuch-configuration default-get-notmuch-configuration)
           (notmuch-saved-searches %rde-notmuch-saved-searches)
+          (notmuch-search-oldest-first #t)
           (extra-tag-updates-post '()))
   "Configure notmuch and Emacs UI for it if emacs enabled."
   (ensure-pred procedure? get-notmuch-configuration)
@@ -891,7 +892,8 @@ not appear in the pop-up buffer."
 
           (define-key global-map (kbd "s-m") 'notmuch-jump-search)
           (setq notmuch-saved-searches ',notmuch-saved-searches)
-          (setq notmuch-search-oldest-first nil)
+          (setq notmuch-search-oldest-first
+                ,(if notmuch-search-oldest-first 't 'nil))
 
           (with-eval-after-load
            'notmuch-mua
