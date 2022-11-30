@@ -239,6 +239,8 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs, which usually used in development
 environment outside of Guix Home."
+    (define full-name (get-value 'full-name config))
+    (define email (get-value 'email config))
     (list
      (service home-emacs-feature-loader-service-type
               (home-emacs-feature-loader-configuration
@@ -255,6 +257,9 @@ environment outside of Guix Home."
       'rde-emacs-portable
       config
       `((setq native-comp-deferred-compilation nil)
+        ,@(if full-name `((setq user-full-name ,full-name)) '())
+        ,@(if email `((setq user-mail-address ,email)) '())
+
         ,@(if status-line-bg-color
               `((with-eval-after-load
                  'configure-appearance
