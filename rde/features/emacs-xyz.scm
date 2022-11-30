@@ -2532,6 +2532,9 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
           (setq flyspell-issue-welcome-flag nil)
           (setq flyspell-issue-message-flag nil))
 
+        ;; TODO: It either should be in a separate feature or feature should
+        ;; be called differently, because word definitions is not about
+        ;; spelling, however spelling seems related to dictionaries.
         (with-eval-after-load 'dictionary
           (setq dictionary-server ,dictionary-server))
         (define-key rde-app-map (kbd ,dictionary-key) 'dictionary-search))
