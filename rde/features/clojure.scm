@@ -14,6 +14,7 @@
   #:export (feature-clojure))
 
 ;; https://github.com/jpe90/emacs-clj-deps-new
+;; https://practical.li/spacemacs/ :: some emacs clojure tips
 
 (define* (feature-clojure
           #:key
@@ -84,6 +85,14 @@
           ;; can be useful in many other situations.
           (add-hook 'after-init-hook 'jarchive-setup)
 
+          (with-eval-after-load
+           'cider-mode
+
+           (setq cider-doc-auto-select-buffer nil)
+           (setq cider-auto-select-error-buffer nil)
+           (setq cider-inspector-auto-select-buffer nil)
+           (setq cider-auto-select-test-report-buffer nil)
+           (setq cider-print-options '(("right-margin" 70) ("length" 50))))
 
           (with-eval-after-load
            'clj-refactor
