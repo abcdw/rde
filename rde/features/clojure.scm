@@ -79,7 +79,10 @@
                (clojurescript-mode :language-id "clojurescript"))
               . (,clojure-lsp-binary))))
 
-          (add-hook 'clojure-mode-hook 'jarchive-setup)
+          ;; MAYBE: Move it to configure-rde-emacs?  It's very generic and
+          ;; can be useful in many other situations.
+          (add-hook 'after-init-hook 'jarchive-setup)
+
 
           (with-eval-after-load
            'clj-refactor
