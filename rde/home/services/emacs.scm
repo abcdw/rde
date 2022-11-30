@@ -367,8 +367,9 @@ Elisp expression to make it evaluated on Emacs startup."
       #f
       (append
        ;; <https://www.gnu.org/software/emacs/manual/html_node/elisp/Library-Headers.html>
-       (list #~(format #f ";;; ~a.el --- ~a\n" #$package-name
-                       (or #$summary "No description provided")))
+       (list #~(format #f ";;; ~a.el --- ~a ~a\n" #$package-name
+                       (or #$summary "No description provided")
+                       "-*- lexical-binding:t -*-"))
        (if authors
            (list #~(format #f ";; Author: ~a\n;;"
                            #$(string-join authors "\n;;         ")))

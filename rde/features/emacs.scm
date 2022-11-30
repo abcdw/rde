@@ -399,8 +399,10 @@ environment outside of Guix Home."
             (interactive)
             (if (and (featurep 'whitespace) whitespace-mode)
                 (whitespace-mode 0)
-                (let ((whitespace-style '(face tabs)))
-                  (whitespace-mode 1))))
+                (progn
+                 (defvar whitespace-style) ; dynamically bind
+                 (let ((whitespace-style '(face tabs)))
+                   (whitespace-mode 1)))))
           (add-hook 'prog-mode-hook
                     (lambda ()
                       (rde-whitespace-mode)
