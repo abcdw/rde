@@ -238,3 +238,13 @@ to manipulate and navigate hunks.")))
     (synopsis "Contributed packages to Telega")
     (description "Telega-contrib is a collection of third-party
 contributed packages to Telega.")))
+
+(define-public emacs-consult-eglot-sans-eglot
+  (package
+    (inherit emacs-consult-eglot)
+    (inputs
+     (modify-inputs (package-inputs emacs-consult-eglot)
+       (append emacs-eglot)))
+    (propagated-inputs
+     (modify-inputs (package-propagated-inputs emacs-consult-eglot)
+       (delete "emacs-eglot")))))
