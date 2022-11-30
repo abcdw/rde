@@ -2518,19 +2518,23 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
                           (add-hook hook 'flyspell-prog-mode))
                         ',flyspell-prog-hooks))
               '())
-        (with-eval-after-load 'flyspell
+
+        (with-eval-after-load 'ispell
           (setq ispell-program-name ,ispell-program-name)
           ,@(if ispell-standard-dictionary
                 `((setq ispell-dictionary ,ispell-standard-dictionary))
                 '())
           ,@(if ispell-personal-dictionary
                 `((setq ispell-personal-dictionary ,ispell-personal-dictionary))
-                '())
+                '()))
+
+        (with-eval-after-load 'flyspell
           (setq flyspell-issue-welcome-flag nil)
-          (setq flyspell-issue-message-flag nil)
-          (define-key rde-app-map (kbd ,dictionary-key) 'dictionary-search)
-          (with-eval-after-load 'dictionary
-            (setq dictionary-server ,dictionary-server))))
+          (setq flyspell-issue-message-flag nil))
+
+        (with-eval-after-load 'dictionary
+          (setq dictionary-server ,dictionary-server))
+        (define-key rde-app-map (kbd ,dictionary-key) 'dictionary-search))
       #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)))))
 
   (feature
