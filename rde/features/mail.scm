@@ -911,6 +911,8 @@ not appear in the pop-up buffer."
              nil)
            (advice-add 'notmuch-address-setup :override
                        'rde-notmuch-address-setup)
+
+           (require 'cape)
            (defun rde-notmuch-message-mode ()
              "Add completion at point functions made from company backends."
              (setq-local
@@ -1048,6 +1050,7 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
         #:elisp-packages
         (append
          (list (get-value 'emacs-configure-rde-keymaps config)
+               (get-value 'emacs-cape config emacs-cape)
                emacs-notmuch emacs-ol-notmuch)
          (if (get-value 'emacs-consult config)
              (list emacs-consult-notmuch)
