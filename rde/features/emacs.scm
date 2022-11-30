@@ -458,6 +458,7 @@ C-h C-a to open About Emacs buffer."
                   ("Europe/Paris" "Paris")
                   ("Europe/Helsinki" "Helsinki")
                   ("Europe/Moscow" "Moscow")
+                  ("Asia/Tbilisi" "Tbilisi")
                   ("Asia/Tokyo" "Tokyo")))
           (define-key rde-app-map (kbd "w") 'world-clock)
 
