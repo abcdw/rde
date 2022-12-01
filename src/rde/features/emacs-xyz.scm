@@ -84,7 +84,6 @@
             feature-emacs-spelling
 
             ;; Communication
-            feature-emacs-erc
             feature-emacs-telega
             feature-emacs-elpher))
 
@@ -2610,101 +2609,6 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
 ;;;
 
 (define --Communication--)
-
-(define* (feature-emacs-erc
-          #:key
-          ;; (emacs-client? #f)
-          (erc-server "irc.libera.chat")
-          (erc-port 6697)
-          (erc-nick #f)
-          (erc-autojoin-channels-alist '())
-          (erc-kill-buffers-on-quit #t)
-          (align-nicknames? #t)
-          (log? #f)
-          (extra-config '()))
-  "Configure GNU Emacs IRC client."
-  (ensure-pred string? erc-server)
-  (ensure-pred integer? erc-port)
-  (ensure-pred maybe-string? erc-nick)
-  (ensure-pred list? erc-autojoin-channels-alist)
-
-  (define emacs-f-name 'erc)
-  (define f-name (symbol-append 'emacs- emacs-f-name))
-
-  (define (get-home-services config)
-    (require-value 'emacs-client-create-frame config)
-    (define emacs-cmd (get-value 'emacs-client-create-frame config))
-    (list
-     (rde-elisp-configuration-service
-      emacs-f-name
-      config
-      `((eval-when-compile
-         (require 'erc-join)
-         (require 'erc-fill)
-         (require 'erc-track))
-        (with-eval-after-load
-         'erc-status-sidebar
-         (setq-default erc-status-sidebar-header-line-format
-                       (concat " " erc-status-sidebar-mode-line-format))
-         (setq-default erc-status-sidebar-mode-line-format nil)
-         (setq erc-status-sidebar-width 18))
-
-        (with-eval-after-load
-         'erc-log
-         (setq erc-log-insert-log-on-open t)
-         (setq erc-log-channels-directory
-               (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                       "/emacs/erc-logs")))
-
-        (with-eval-after-load
-         'erc
-         (setq erc-server ,erc-server)
-         (setq erc-port ,erc-port)
-         ,@(if erc-nick `((setq erc-nick ,erc-nick)) '())
-         (setq erc-autojoin-channels-alist
-               ',erc-autojoin-channels-alist)
-
-         ,@(if align-nicknames?
-               '((setq erc-fill-static-center 14)
-                 (setq erc-fill-function 'erc-fill-static)
-                 (setq erc-fill-column 82))
-               '())
-
-         (setq erc-hide-list '())
-         (setq erc-track-exclude-types
-               '("324" ; channel mode is
-                 "329" ; creation time
-                 ;; "332" "333" "353" "477"
-                 ;; "MODE"
-                 "JOIN" "PART" "QUIT"))
-         ,@(if erc-kill-buffers-on-quit
-               '((setq erc-kill-server-buffer-on-quit t)
-                 ;; (setq erc-kill-buffer-on-part t)
-                 (setq erc-kill-queries-on-quit t))
-               '())
-
-         ,@(if log? '((add-to-list 'erc-modules 'log)) '())
-         ;; (erc-update-modules) Probably not needed, because the module
-         ;; added before erc starts.
-
-         (setq erc-header-line-format " %n on %t (%m,%l)"))
-
-        ,@extra-config)
-            #:summary "\
-Reasonable defaults for ERC and some enhancements"
-      #:commentary "\
-Less verbose output, nicks highlighted with different colors."
-      #:keywords '(convenience)
-      #:elisp-packages (list emacs-erc-hl-nicks))
-     (emacs-xdg-service
-      emacs-f-name
-      "Emacs (Client) [IRC]"
-      #~(system* #$emacs-cmd "--eval" "(erc-tls)"))))
-
-  (feature
-   (name f-name)
-   (values `((,f-name . #t)))
-   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-telega
           #:key
