@@ -35,6 +35,8 @@
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages mail)
+  #:use-module (gnu packages xdisorg)
+  #:use-module (gnu packages base)
 
   #:use-module (guix gexp)
   #:use-module (rde gexp)
@@ -270,6 +272,37 @@ environment outside of Guix Home."
    (values (append (make-feature-values emacs emacs-configure-rde-keymaps)
                    `((emacs-portable? . #t))))
    (home-services-getter emacs-home-services)))
+
+(define (wayland-clipboard-fix config)
+  (let* ((wl-cb (get-value 'wl-clipboard config wl-clipboard))
+         (wl-copy (file-append wl-cb "/bin/wl-copy"))
+         (wl-paste (file-append wl-cb "/bin/wl-paste"))
+
+         (cu-fallback (get-value 'coreutils config coreutils-minimal))
+         (cu-min (get-value 'coreutils-minimal config cu-fallback))
+         (tr (file-append cu-min "/bin/tr")))
+    `((setq wl-copy-process nil)
+      (setq wl-copy-binary ,wl-copy)
+      (setq wl-paste-binary ,wl-paste)
+      (setq tr-binary ,tr)
+      (setq wl-paste-command
+            (format "%s -n | %s -d \r" wl-paste-binary tr-binary))
+
+      (defun wl-copy (text)
+        (setq wl-copy-process (make-process :name "wl-copy"
+                                            :buffer nil
+                                            :command `(,wl-copy-binary "-n")
+                                            :connection-type 'pipe))
+        (process-send-string wl-copy-process text)
+        (process-send-eof wl-copy-process))
+
+      (defun wl-paste ()
+        (if (and wl-copy-process (process-live-p wl-copy-process))
+            nil ; should return nil if we're the current paste owner
+            (shell-command-to-string wl-paste-command)))
+
+      (setq interprogram-cut-function 'wl-copy)
+      (setq interprogram-paste-function 'wl-paste))))
 
 (define* (feature-emacs
           #:key
@@ -559,7 +592,9 @@ It can contain settings not yet moved to separate features."
             ,#~""
             ;; FIXME: Move it back to the configure-rde-emacs package, when it
             ;; will be built with emacs-29
-            (pixel-scroll-precision-mode 1)))
+            (pixel-scroll-precision-mode 1)
+
+            ,@(wayland-clipboard-fix config)))
          ;;; TODO: Rebuilding packages with emacs will be useful for
          ;;; native-comp, but some packages fails to build, need to fix them.
          (rebuild-elisp-packages? #f)))
