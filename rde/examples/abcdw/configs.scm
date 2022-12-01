@@ -452,13 +452,13 @@ subject:/home:/) and tag:new}\"'")
       "pavucontrol" "wev"
       "imagemagick"
       "obs" "obs-wlrobs"
-      "recutils" "binutils"
+      "recutils" "binutils" "make"
       "fheroes2"
       ;; TODO: Enable pipewire support to chromium by default
       ;; chrome://flags/#enable-webrtc-pipewire-capturer
       "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-extra"
       "papirus-icon-theme" "arc-theme"
-      "thunar"
+      "thunar" "fd"
       ;; "glib:bin"
 
       "libreoffice"
