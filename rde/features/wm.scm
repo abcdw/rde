@@ -154,15 +154,6 @@
                        #$(file-append shepherd "/bin/shepherd")
                        "--logfile"
                        (string-append log-dir "/shepherd.log")))))))
-       (simple-service
-        'sway-dbus-update-activation-environmnet
-        home-sway-service-type
-        `(,@(if (get-value 'dbus config)
-                `((,#~"\n\n# Update dbus environment variables:")
-                  (exec ,(file-append
-                          (get-value 'dbus config)
-                          "/bin/dbus-update-activation-environment") --all))
-                '())))
 
        (service
         home-sway-service-type
