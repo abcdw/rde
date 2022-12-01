@@ -168,6 +168,7 @@
 
    (feature-pipewire)
    (feature-backlight #:step 10)
+   (feature-networking)
 
    (feature-fonts
     #:font-monospace (font "Iosevka" #:size 11 #:weight 'regular)
@@ -235,8 +236,6 @@
 
       ;; (bindswitch --reload --locked lid:on exec /run/setuid-programs/swaylock)
 
-      ;; FIXME: Use absolute path, move to feature-network, fix permissions issue
-      (exec nm-applet --indicator)
       (bindsym
        --locked $mod+Shift+t exec
        ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
