@@ -3,6 +3,7 @@
   #:use-module (rde features emacs)
   #:use-module (gnu packages docker)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (rde packages emacs-xyz)
   #:use-module (gnu services)
   #:use-module (gnu services docker)
   #:use-module (rde system services accounts)
@@ -13,7 +14,7 @@
           #:key
           (docker docker)
           (docker-cli docker-cli)
-          (emacs-docker emacs-docker)
+          (emacs-docker emacs-docker-latest)
           (emacs-dockerfile-mode emacs-dockerfile-mode)
           (containerd containerd)
           (docker-key "D"))
