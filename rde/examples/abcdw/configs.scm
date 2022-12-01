@@ -296,7 +296,7 @@
     #:additional-elisp-packages
     (append
      (strings->packages
-      "emacs-dirvish"
+      ;; "emacs-dirvish"
       "emacs-elfeed" "emacs-hl-todo"
       "emacs-yasnippet"
       ;; "emacs-company"
