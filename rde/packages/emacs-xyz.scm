@@ -268,6 +268,13 @@ contributed packages to Telega.")))
      (modify-inputs (package-propagated-inputs emacs-consult-eglot)
        (delete "emacs-eglot")))))
 
+(define-public emacs-dirvish-latest
+  (package
+    (inherit emacs-dirvish)
+    (propagated-inputs
+     (modify-inputs (package-propagated-inputs emacs-dirvish)
+       (replace "emacs-transient" emacs-transient-latest)))))
+
 (define-public emacs-docker-latest
   (let ((commit "cc0046e6a557dce0ccc4108dd22e04f21ba8b0dc")
         (revision "0"))
