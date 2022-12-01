@@ -22,10 +22,13 @@
           (clojure-lsp #f)
           (cljr-clojure-test-declaration
            "[clojure.test :refer [deftest are is testing]]")
+          (eglot-stay-out-of '())
           (jdk (list openjdk17 "jdk")))
   "Setup and configure environment for Clojure. "
   (ensure-pred file-like? clojure-tools-cli)
   (ensure-pred file-like? clojure-lsp)
+  ;; (ensure-pred file-like? jdk)
+  (ensure-pred list? eglot-stay-out-of)
 
   (define (get-home-services config)
     (define emacs-f-name 'clojure)
@@ -51,7 +54,7 @@
         emacs-f-name
         config
         `((defun rde--clojure-disable-eglot-parts-in-favor-of-cider ()
-            (setq-local eglot-stay-out-of '(eldoc flymake)))
+            (setq-local eglot-stay-out-of ',eglot-stay-out-of))
           (add-hook 'clojure-mode-hook
                     'rde--clojure-disable-eglot-parts-in-favor-of-cider)
 
@@ -111,7 +114,6 @@
                     (replace-regexp-in-string
                      "/.*" "/" (buffer-substring beg end)))
                    (get-text-property (point) 'cider-locals))))
-                (message "=> %s %s" (buffer-substring beg end) completion)
                 (list beg end (completion-table-dynamic (lambda (_) completion))
                  :annotation-function 'cider-annotate-symbol))))
 
