@@ -1622,7 +1622,7 @@ Mostly workarounds and integratios with other packages."
 
   (feature
    (name f-name)
-   (values `((,f-name . ,emacs-eglot)))
+   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
 ;; MAYBE: Merge it with feature-git
