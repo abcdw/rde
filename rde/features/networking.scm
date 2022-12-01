@@ -237,8 +237,9 @@ feature-ssh."
 
   (define (get-system-services config)
     (list
-     (service network-manager-service-type)
-     (service wpa-supplicant-service-type)    ;needed by NetworkManager
+     (service network-manager-service-type
+              (network-manager-configuration (iwd? #t)))
+     (service iwd-service-type)
      (service modem-manager-service-type)
      (service usb-modeswitch-service-type)))
 
