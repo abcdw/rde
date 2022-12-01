@@ -170,6 +170,25 @@
       (description "This package provides utilities for formatting and
 sending Git patches via Email, without leaving Emacs."))))
 
+(define-public emacs-transient-latest
+  (let ((commit "72d30284ab75c1497e23be310dcc53a4ecefa401")
+        (revision "0"))
+    (package
+      (name "emacs-transient")
+      (version (git-version "0.3.7" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/magit/transient")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0qilxy1kmsfr0j177ic7nhyh4lq7s88455bs9iv9j48qrjf7wwcl"))))
+      (propagated-inputs
+       (modify-inputs (package-propagated-inputs emacs-transient)
+         (append emacs-compat))))))
+
 (define-public emacs-git-gutter-transient
   (package
    (name "emacs-git-gutter-transient")
@@ -181,7 +200,7 @@ sending Git patches via Email, without leaving Emacs."))))
     `(("emacs-magit" ,emacs-magit)))
    (propagated-inputs
     `(("emacs-git-gutter" ,emacs-git-gutter)
-      ("emacs-transient" ,emacs-transient)))
+      ("emacs-transient" ,emacs-transient-latest)))
    (license license:gpl3+)
    (home-page "https://sr.ht/~abcdw/git-gutter-transient")
    (synopsis "Navigate, stage and revert hunks with ease")
@@ -267,4 +286,5 @@ contributed packages to Telega.")))
           (base32 "11l8jpqj6m04ndhnfz41nhph1rqjvqbfd5vw334mph776aq1baln"))))
       (propagated-inputs
        (modify-inputs (package-propagated-inputs emacs-docker)
-         (delete "emacs-docker-tramp"))))))
+         (delete "emacs-docker-tramp")
+         (append emacs-transient-latest))))))
