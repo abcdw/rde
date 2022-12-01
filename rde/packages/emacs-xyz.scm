@@ -174,6 +174,7 @@ sending Git patches via Email, without leaving Emacs."))))
   (let ((commit "72d30284ab75c1497e23be310dcc53a4ecefa401")
         (revision "0"))
     (package
+      (inherit emacs-transient)
       (name "emacs-transient")
       (version (git-version "0.3.7" revision commit))
       (source
