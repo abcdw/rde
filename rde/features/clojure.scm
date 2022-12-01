@@ -100,7 +100,7 @@
                 ((bounds
                   (or (bounds-of-thing-at-point 'symbol)
                       ;; It may be too expensive to calculate it every time
-                      `(cons ,(point) ,(point))))
+                      (cons (point) (point))))
                  (beg (car bounds))
                  (end (cdr bounds))
                  (completion
