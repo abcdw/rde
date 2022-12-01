@@ -20,22 +20,27 @@
 (define-module (rde features networking)
   #:use-module (rde features)
   #:use-module (rde features predicates)
-  #:use-module (rde home services i2p)
+
+  #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
+  #:use-module (rde home services i2p)
+  #:use-module (gnu services networking)
   #:use-module (rde system services networking)
   #:use-module (rde system services accounts)
+
   #:use-module (gnu packages i2p)
   #:use-module (gnu packages networking)
   #:use-module (gnu packages ssh)
+  #:use-module (gnu packages gnome)
   #:use-module (rde packages)
-  #:use-module (gnu services)
 
   #:use-module (guix gexp)
 
   #:export (feature-i2pd
             feature-yggdrasil
-            feature-ssh-proxy))
+            feature-ssh-proxy
+            feature-networking))
 
 ;; TODO: Migrate to iwd
 ;; iwd: https://git.sr.ht/~akagi/guixrc/tree/master/item/magi/system/services/networking.scm
@@ -194,3 +199,51 @@ feature-ssh."
    (name f-name)
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
+
+
+;;;
+;;; networking
+;;;
+
+(define* (feature-networking
+          #:key
+          (network-manager-applet network-manager-applet))
+  "Configure iwd and everything."
+  (ensure-pred file-like? network-manager-applet)
+
+  (define f-name 'networking)
+  (define (get-home-services config)
+
+    (list
+     (simple-service 'network-manager-applet-package
+                     home-profile-service-type
+                     (list network-manager-applet))
+     (simple-service
+      'nm-applet-shepherd-service
+      home-shepherd-service-type
+      (list
+       (shepherd-service
+        (provision '(nm-applet))
+        (requirement '(dbus))
+        (stop  #~(make-kill-destructor))
+        (start #~(make-forkexec-constructor
+                  (list #$(file-append network-manager-applet "/bin/nm-applet")
+                        "--indicator")
+                  #:log-file (string-append
+                              (or (getenv "XDG_LOG_HOME")
+                                  (format #f "~a/.local/var/log"
+                                          (getenv "HOME")))
+                              "/nm-applet.log"))))))))
+
+  (define (get-system-services config)
+    (list
+     (service network-manager-service-type)
+     (service wpa-supplicant-service-type)    ;needed by NetworkManager
+     (service modem-manager-service-type)
+     (service usb-modeswitch-service-type)))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)
+   (system-services-getter get-system-services)))

@@ -269,16 +269,6 @@ be a symbol, which will be used to construct feature name."
                    (list %fontconfig-file-system))
 
 
-   ;; TODO: Move to feature-networking
-   ;; NetworkManager and its applet.
-   (service network-manager-service-type)
-   (service wpa-supplicant-service-type)    ;needed by NetworkManager
-   (simple-service 'network-manager-applet
-                   profile-service-type
-                   (list network-manager-applet))
-   (service modem-manager-service-type)
-   (service usb-modeswitch-service-type)
-
    ;; The D-Bus clique.
    (service avahi-service-type)
    (service udisks-service-type
