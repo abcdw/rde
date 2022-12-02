@@ -142,7 +142,9 @@
   (iwd (file-like iwd) "")
   (openresolv (file-like openresolv) "")
   (coreutils (file-like coreutils) "")
-  (config (ini-config '()) ""))
+  (main-conf
+   (ini-config '())
+   "Will be serialized to /etc/iwd/main.conf"))
 
 (define (iwd-shepherd-service config)
   "Return a shepherd service for iwd"
@@ -166,7 +168,7 @@
       (stop #~(make-kill-destructor))))))
 
 (define (iwd-etc-service config)
-  (let ((cfg (iwd-configuration-config config)))
+  (let ((cfg (iwd-configuration-main-conf config)))
     `(("iwd/main.conf"
        ,(apply mixed-text-file
                "main.conf"
