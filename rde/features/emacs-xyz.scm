@@ -2391,17 +2391,20 @@ marginalia annotations."
          (require 'oc-biblatex)
          (require 'oc-csl))
 
-        (setq org-cite-global-bibliography (list ,@global-bibliography))
-        (setq org-cite-insert-processor 'citar)
-        (setq org-cite-follow-processor 'citar)
-        (setq org-cite-activate-processor 'citar)
-        (setq org-cite-export-processors
-              '((latex biblatex)
-                (t csl)))
+        (with-eval-after-load 'oc
+          (require 'oc-csl)
+          (setq org-cite-global-bibliography (list ,@global-bibliography))
+          (setq org-cite-insert-processor 'citar)
+          (setq org-cite-follow-processor 'citar)
+          (setq org-cite-activate-processor 'citar)
+          (setq org-cite-export-processors
+                '((latex biblatex)
+                  (t csl))))
 
-        (setq citar-library-paths (list ,@citar-library-paths))
-        (setq citar-notes-paths (list ,@citar-notes-paths))
-        (setq citar-bibliography org-cite-global-bibliography)
+        (with-eval-after-load 'citar
+          (setq citar-library-paths (list ,@citar-library-paths))
+          (setq citar-notes-paths (list ,@citar-notes-paths))
+          (setq citar-bibliography org-cite-global-bibliography))
 
         (autoload 'citar-embark-mode "citar-embark")
         ,@(if (get-value 'emacs-embark config)
