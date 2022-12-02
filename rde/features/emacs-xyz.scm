@@ -1658,6 +1658,7 @@ git-link, git-timemachine."
       `((defun rde-git-link ()
           "Same as `git-link', but with commit hash specified."
           (interactive)
+          (defvar git-link-use-commit) ;; dynamically bind
           (let ((git-link-use-commit t))
             (call-interactively 'git-link)))
 
