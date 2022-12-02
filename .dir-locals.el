@@ -33,7 +33,7 @@
  (scheme-mode
   .
   ((indent-tabs-mode . nil)
-   (eval . (put 'with-eval-after-load 'scheme-indent-function 1))
+   (eval . (put 'with-eval-after-load 'scheme-indent-function 0))
 
    (eval . (put 'eval-when 'scheme-indent-function 1))
    (eval . (put 'call-with-prompt 'scheme-indent-function 1))
