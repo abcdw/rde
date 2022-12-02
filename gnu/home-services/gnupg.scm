@@ -159,6 +159,9 @@ default-preference-list SHA512 SHA384
 have a configuration for gpg."))
 
 (define-configuration home-gpg-agent-configuration
+  (shepherd?
+   (boolean #t)
+   "Add shepherd services or not.")
   (ssh-agent?
    (ssh-agent #f)
    "Whether to use gpg-agent for SSH keys.  If you enable this option,
@@ -225,9 +228,6 @@ have a configuration for gpg-agent."))
   (package
     (package gnupg)
     "GnuPG package to use.")
-  (shepherd?
-   (boolean #t)
-   "Add shepherd services or not.")
   (gpg-config
    (home-gpg-configuration (home-gpg-configuration))
    "Configuration for the @code{gpg} executable")
@@ -288,11 +288,14 @@ have a configuration for gpg-agent."))
              ,(home-gpg-file config)))))
 
 (define (home-gnupg-shepherd-service config)
-  (let ((package (home-gnupg-configuration-package config))
-        (provision-list `(gpg-agent
-                          ,@(optional (home-gpg-agent-configuration-ssh-agent?
-                                       (home-gnupg-configuration-gpg-agent-config config))
-                                      '(ssh-agent)))))
+  (let* ((package (home-gnupg-configuration-package config))
+         (gpg-agent-config (home-gnupg-configuration-gpg-agent-config config))
+         (shepherd? (home-gpg-agent-configuration-shepherd? gpg-agent-config))
+         (provision-list
+          `(gpg-agent
+            ,@(if (home-gpg-agent-configuration-ssh-agent? gpg-agent-config)
+                  '(ssh-agent)
+                  '()))))
     (if shepherd?
         (list
          (shepherd-service

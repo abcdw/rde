@@ -70,7 +70,6 @@ and provides GPG-PRIMARY-KEY value for other features."
       home-gnupg-service-type
       (home-gnupg-configuration
        (package gnupg)
-       (shepherd? #f)
        (gpg-config
         (home-gpg-configuration
          (extra-config
@@ -97,6 +96,7 @@ and provides GPG-PRIMARY-KEY value for other features."
             ,@gpg-extra-config))))
        (gpg-agent-config
         (home-gpg-agent-configuration
+         (shepherd? #f)
          (extra-config
           ;; TTL for security-tokens doesn't make sense
           `(,@(if (not (get-value 'security-token config))
