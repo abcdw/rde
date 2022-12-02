@@ -2087,9 +2087,10 @@ document.title, body: window.getSelection()});\" as a web bookmark."
 
         (define-key mode-specific-map (kbd "c") 'org-capture)
 
-        (with-eval-after-load 'org
-         (setq org-crypt-key user-full-name)
+        (with-eval-after-load 'org-crypt
+          (setq org-crypt-key user-mail-address))
 
+        (with-eval-after-load 'org
          (setq org-adapt-indentation nil)
          (setq org-edit-src-content-indentation 0)
          (setq org-startup-indented ,(if org-indent? 't 'nil))
