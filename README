@@ -60,7 +60,7 @@ that blindly copying snippets of code from the internet can have a huge
 security implications on your setup.
 
 - [[https://hg.sr.ht/~yoctocell/guixrc/browse/yoctocell/home][yoctocell]]'s full-blown configuration with variety of software.
-- [[https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/home/yggdrasil][krevedkokun]]'s Emacs(Evil)/Wayland(Sway) compact and clean config.
+- [[https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/config/home/yggdrasil][krevedkokun]]'s Emacs(Evil)/Wayland(Sway) compact and clean config.
 - [[https://github.com/nicolas-graves/dotfiles][Nicolas Graves]]' dotfiles forked from krevedkokun's.
 - [[https://git.sr.ht/~akagi/guixrc][akagi]]'s configurations, home and system services and packages.
 
