@@ -207,6 +207,7 @@ feature-ssh."
 
 (define* (feature-networking
           #:key
+          (iwd-autoconnect? #t)
           (network-manager-applet network-manager-applet))
   "Configure iwd and everything."
   (ensure-pred file-like? network-manager-applet)
@@ -239,7 +240,10 @@ feature-ssh."
     (list
      (service network-manager-service-type
               (network-manager-configuration (iwd? #t)))
-     (service iwd-service-type)
+     (service iwd-service-type
+              (iwd-configuration
+               (main-conf
+                `((Settings ((AutoConnect . ,iwd-autoconnect?)))))))
      (service modem-manager-service-type)
      (service usb-modeswitch-service-type)))
 
