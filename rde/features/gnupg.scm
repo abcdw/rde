@@ -70,6 +70,7 @@ and provides GPG-PRIMARY-KEY value for other features."
       home-gnupg-service-type
       (home-gnupg-configuration
        (package gnupg)
+       (shepherd? #f)
        (gpg-config
         (home-gpg-configuration
          (extra-config
