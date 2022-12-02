@@ -30,7 +30,7 @@
 
 (define* (feature-gnupg
           #:key gpg-primary-key
-          (package gnupg)
+          (gnupg gnupg)
           (gpg-ssh-agent? #t)
           (ssh-keys '())
           (pinentry-flavor 'qt)
@@ -47,6 +47,7 @@ and provides GPG-PRIMARY-KEY value for other features."
   (ensure-pred list? gpg-extra-config)
   (ensure-pred list? gpg-agent-extra-config)
   (ensure-pred ssh-keys-list? ssh-keys)
+  (ensure-pred file-like? gnupg)
 
   (define (home-gnupg-services config)
     "Return a list of home-services, required for gnupg to operate."
@@ -68,6 +69,7 @@ and provides GPG-PRIMARY-KEY value for other features."
      (service
       home-gnupg-service-type
       (home-gnupg-configuration
+       (package gnupg)
        (gpg-config
         (home-gpg-configuration
          (extra-config
