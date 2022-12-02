@@ -381,6 +381,7 @@ idea is still the same.
 
 @section Navigation
 
+@anchor{Completion}
 @section Completion
 There are a lot of places, where completion happens, but most of the
 heavy work is usually done in Emacs, and this section is focused on it.
@@ -408,6 +409,13 @@ built-in styles, rde uses Orderless package and respective completion
 styles (@pxref{Orderless,,,}).
 
 The second completion mechanism is In-buffer Completion
+
+@subsection Completing Files
+You can use future history @kbd{M-n} to insert file under the point into
+minibuffer prompt.  Place a point on file, type @kbd{C-x C-f M-n C-m},
+boom, you are viewing/editing a file!  If there is no file under the
+cursor or you type @kbd{M-n} twice, current file will be inserted to the
+prompt by future history. (@pxref{Minibuffer History,,,Emacs})
 
 @subsection Sources of Completion
 
