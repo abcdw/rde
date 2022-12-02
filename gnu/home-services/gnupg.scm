@@ -225,6 +225,9 @@ have a configuration for gpg-agent."))
   (package
     (package gnupg)
     "GnuPG package to use.")
+  (shepherd?
+   (boolean #t)
+   "Add shepherd services or not.")
   (gpg-config
    (home-gpg-configuration (home-gpg-configuration))
    "Configuration for the @code{gpg} executable")
@@ -290,34 +293,35 @@ have a configuration for gpg-agent."))
                           ,@(optional (home-gpg-agent-configuration-ssh-agent?
                                        (home-gnupg-configuration-gpg-agent-config config))
                                       '(ssh-agent)))))
-    (list
-     (shepherd-service
-      (documentation "Run and control gpg-agent.")
-      (provision provision-list)
-      ;; TODO: Use --supervised gpg-agent and sockets
-      ;; (start #~(make-forkexec-constructor
-      ;;           (append (list #$(file-append gnupg "/bin/gpg-agent")
-      ;;                         ;; "--supervised"
-      ;;                         "--options"
-      ;;                         #$(home-gpg-agent-file config))
-      ;; (quote #$(home-gpg-agent-configuration-extra-options
-      ;;         (home-gnupg-configuration-gpg-agent-config config))))))
-      ;;
-      ;; FIXME: any command using gpg hangs up and waiting for
-      ;; something if updatestartuptty wasn't executed. Necessary to
-      ;; restart gpg-agent.  With gpgconf and without updatestartuptty
-      ;; it just throws: "agent refused operation".
-      (start #~(make-system-constructor
-                (string-join
-                 (append
-                  (list #$(file-append package "/bin/gpg-agent")
-                        "--daemon"
-                        "--options"
-                        #$(home-gpg-agent-file config))
-                  (quote #$(home-gpg-agent-configuration-extra-options
-                            (home-gnupg-configuration-gpg-agent-config config)))))))
-      ;; (stop #~(make-kill-destructor))
-      (stop #~(make-system-destructor "gpgconf --kill gpg-agent"))))))
+    (if shepherd?
+        (list
+         (shepherd-service
+          (documentation "Run and control gpg-agent.")
+          (provision provision-list)
+          ;; TODO: Use --supervised gpg-agent and sockets
+          ;; (start #~(make-forkexec-constructor
+          ;;           (append (list #$(file-append gnupg "/bin/gpg-agent")
+          ;;                         ;; "--supervised"
+          ;;                         "--options"
+          ;;                         #$(home-gpg-agent-file config))
+          ;; (quote #$(home-gpg-agent-configuration-extra-options
+          ;;         (home-gnupg-configuration-gpg-agent-config config))))))
+          ;;
+          ;; FIXME: any command using gpg hangs up and waiting for
+          ;; something if updatestartuptty wasn't executed. Necessary to
+          ;; restart gpg-agent.  With gpgconf and without updatestartuptty
+          ;; it just throws: "agent refused operation".
+          (start #~(make-system-constructor
+                    (string-join
+                     (append
+                      (list #$(file-append package "/bin/gpg-agent")
+                            "--daemon"
+                            "--options"
+                            #$(home-gpg-agent-file config))
+                      (quote #$(home-gpg-agent-configuration-extra-options
+                                (home-gnupg-configuration-gpg-agent-config config)))))))
+          (stop #~(make-system-destructor "gpgconf --kill gpg-agent"))))
+        '())))
 
 (define (home-gnupg-profile-service config)
   (list (home-gnupg-configuration-package config)))
