@@ -636,6 +636,25 @@ object, etc) or save it to the file use @kbd{s-M-@key{print}}.
 @node Contributing
 @chapter Contributing
 
+@section Sending Patches
+The process is similiar to many FLOSS projects, just send patch or
+series of patches on rde-devel mailing list.
+@c TODO: Elaborate more on that?
+
+@section Commit Messages
+There are a few subsystem @code{system:} for system services,
+@code{home:} for home services, @code{packages:} for packages,
+@code{rde:} for rde features, use them and module/object you modify
+without prefix.  Use present simple, add period at the end of the
+subject line.  Elaborate on the reason behind change in the message
+body.  For example:
+
+@example
+rde: emacs: Update %default-emacs-package to emacs-next-stable.
+
+This prevent clipboard issue from happening.
+@end example
+
 @c TODO: Add process similar to srfi?
 @c https://srfi.schemers.org/srfi-process.html
 
