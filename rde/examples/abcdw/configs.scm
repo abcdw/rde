@@ -318,7 +318,12 @@
    (feature-emacs-perspective)
    (feature-emacs-input-methods)
    (feature-emacs-which-key)
-   (feature-emacs-keycast #:turn-on? #f)
+   (feature-emacs-keycast #:turn-on? #t)
+   (feature-emacs-spelling
+    #:spelling-program (@ (gnu packages libreoffice) hunspell)
+    #:spelling-dictionaries (strings->packages
+                             "hunspell-dict-en"
+                             "hunspell-dict-ru"))
 
    (feature-emacs-dired)
    (feature-emacs-eshell)
