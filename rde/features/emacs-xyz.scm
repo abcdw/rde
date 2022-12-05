@@ -1610,6 +1610,9 @@ their behavior."
       `((define-key goto-map (kbd "s") 'consult-eglot-symbols)
         (with-eval-after-load
          'eglot
+         ;; MAYBE: Move to other feature?
+         (setq eldoc-echo-area-use-multiline-p nil)
+         (setq eglot-confirm-server-initiated-edits nil)
          (add-hook 'eglot-managed-mode-hook
                    (lambda () (setq consult-imenu--cache nil)))
          (setq eglot-extend-to-xref t)))
