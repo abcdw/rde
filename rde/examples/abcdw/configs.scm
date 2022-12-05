@@ -258,25 +258,13 @@
    (feature-sway-screenshot)
    ;; (feature-sway-statusbar
    ;;  #:use-global-fonts? #f)
-   (feature-waybar
-    #:waybar-modules
-    (list
-     (waybar-sway-workspaces)
-     ;; (waybar-sway-window)
-     (waybar-tray)
-     (waybar-idle-inhibitor)
-     ;; (waybar-temperature)
-     (waybar-sway-language)
-     (waybar-microphone)
-     (waybar-volume)
-     (waybar-battery #:intense? #f)
-     (waybar-clock)))
+   (feature-waybar)
    (feature-swayidle)
    (feature-swaylock
     #:swaylock (@ (gnu packages wm) swaylock-effects)
     ;; The blur on lock screen is not privacy-friendly.
-    #:extra-config '(;; (screenshots)
-                     ;; (effect-blur . 7x5)
+    #:extra-config '((screenshots)
+                     (effect-blur . 7x5)
                      (clock)))
    (feature-kanshi
     #:extra-config
