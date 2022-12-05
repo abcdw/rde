@@ -602,6 +602,14 @@ emulator isn't needed and you can just spawn eshell directly with
 
 @subsection vterm
 
+@section Emacs Regular Expressions Cheatsheet
+[[:space:]]
++? non-hungry version
+(@pxref{Regular Expressions,,,Elisp})
+(@pxref{Regexps,,,Emacs})
+
+@section Programming Languages
+@subsection Clojure
 
 @section Finances
 @ref{,,,ledger3} and @ref{,,,ledger-mode}.
