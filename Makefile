@@ -1,6 +1,6 @@
 # pipefail is not POSIX complaint
 
-HOME_CONFIG=./rde/examples/abcdw/configs.scm
+HOME_CONFIG=./src/rde/examples/abcdw/configs.scm
 RDE_TARGET=ixy-home
 export RDE_TARGET
 # GUIX=guix
@@ -17,8 +17,8 @@ install:
 	@echo some installation will happen here
 
 check:
-	guix time-machine -C ./rde/examples/channels.tmpl -- \
-	home --fallback build ./gnu/home/examples/minimal.tmpl
+	guix time-machine -C ./examples/channels.tmpl -- \
+	home --fallback build ./src/gnu/home/examples/minimal.tmpl
 
 target:
 	mkdir target
