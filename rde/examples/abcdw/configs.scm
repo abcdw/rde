@@ -392,9 +392,15 @@
    (feature-emacs-guix)
    (feature-emacs-tempel
     #:default-templates? #t
-    #:templates `(fundamental-mode
-                  ,#~""
-                  (t (format-time-string "%Y-%m-%d"))))
+    #:templates
+    `(fundamental-mode
+      ,#~""
+      (t (format-time-string "%Y-%m-%d"))
+      ;; TODO: Move to feature-guix
+      ,((@ (rde gexp) slurp-file-like)
+        (file-append ((@ (guix packages) package-source)
+                      (@ (gnu packages package-management) guix))
+                     "/etc/snippets/tempel/text-mode"))))
 
 
    (feature-ledger)
