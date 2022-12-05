@@ -1,13 +1,12 @@
 (define-module (rde features tmux)
   #:use-module (rde features)
   #:use-module (rde features predicates)
-  #:use-module (gnu home-services base)
   #:use-module (gnu services)
+  #:use-module (gnu home services)
   #:use-module (gnu packages tmux)
   #:use-module (guix gexp)
 
   #:export (feature-tmux))
-
 
 (define* (feature-tmux
 	  #:key
@@ -19,16 +18,17 @@
 
   (define (tmux-home-services config)
     "Returns home services related to tmux."
-    ;; TODO: Implement home service and rewrite to it to make this
-    ;; feature extendable.
     (list
-     (home-generic-service
-      'home-tmux
-      #:files
+     (simple-service
+      'home-tmux-tmux-conf
+      home-xdg-configuration-files-service-type
       (filter list?
-	      (list (when config-file
-		      (list ".config/tmux/tmux.conf" config-file))))
-      #:packages (list package))))
+              (list (when config-file
+                      (list "tmux/tmux.conf" config-file)))))
+     (simple-service
+      'home-tmux-package
+      home-profile-service-type
+      (list package))))
 
   (feature
    (name 'tmux)
