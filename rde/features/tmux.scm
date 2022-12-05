@@ -9,12 +9,12 @@
   #:export (feature-tmux))
 
 (define* (feature-tmux
-	  #:key
-	  config-file
-	  (package tmux))
+          #:key
+          tmux-conf
+          (tmux tmux))
   "Configure tmux."
-  (ensure-pred maybe-file-like? config-file)
-  (ensure-pred any-package? package)
+  (ensure-pred maybe-file-like? tmux-conf)
+  (ensure-pred file-like? tmux)
 
   (define (tmux-home-services config)
     "Returns home services related to tmux."
@@ -23,14 +23,14 @@
       'home-tmux-tmux-conf
       home-xdg-configuration-files-service-type
       (filter list?
-              (list (when config-file
-                      (list "tmux/tmux.conf" config-file)))))
+              (list (when tmux-conf
+                      (list "tmux/tmux.conf" tmux-conf)))))
      (simple-service
       'home-tmux-package
       home-profile-service-type
-      (list package))))
+      (list tmux))))
 
   (feature
    (name 'tmux)
-   (values `((tmux . #t)))
+   (values `((tmux . ,tmux)))
    (home-services-getter tmux-home-services)))

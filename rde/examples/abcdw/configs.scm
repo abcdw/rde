@@ -182,7 +182,7 @@
     #:software-rendering? #f)
    (feature-vterm)
    (feature-tmux
-    #:config-file (local-file "./config/tmux/tmux.conf"))
+    #:tmux-conf (local-file "./config/tmux/tmux.conf"))
    (feature-zsh
     #:enable-zsh-autosuggestions? #t)
    (feature-bash)
