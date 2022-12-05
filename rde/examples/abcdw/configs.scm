@@ -382,6 +382,10 @@
    (feature-emacs-org-agenda
     #:org-agenda-files '("~/work/abcdw/private/todo.org"
                          "~/work/abcdw/rde/TODO"))
+   (feature-emacs-org-protocol)
+   (feature-emacs-elfeed
+    #:elfeed-org-files '("~/work/abcdw/private/rss.org"))
+   (feature-emacs-citar)
    (feature-emacs-smartparens
     #:show-smartparens? #t)
    (feature-emacs-geiser)
