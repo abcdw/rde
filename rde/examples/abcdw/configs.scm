@@ -149,16 +149,7 @@
                       (port . 6669)
                       (destination . irc.ilita.i2p)
                       (destinationport . 6667)
-                      (keys . ilita-keys.dat)))))))
-
-     ;; ((@ (gnu services) simple-service)
-     ;;  'extend-shell-profile
-     ;;  (@ (gnu home-services shells) home-shell-profile-service-type)
-     ;;  (list
-     ;;   #~(string-append
-     ;;      "alias superls="
-     ;;      #$(file-append (@ (gnu packages base) coreutils) "/bin/ls"))))
-     ))
+                      (keys . ilita-keys.dat)))))))))
 
    (feature-base-services)
    (feature-desktop-services)
