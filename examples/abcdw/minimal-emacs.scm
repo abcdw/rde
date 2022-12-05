@@ -1,4 +1,4 @@
-(define-module (rde examples abcdw minimal-emacs)
+(define-module (abcdw minimal-emacs)
   #:use-module (rde features)
   #:use-module (rde features base)
   #:use-module (rde features emacs)

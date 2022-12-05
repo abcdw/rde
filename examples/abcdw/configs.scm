@@ -1,4 +1,4 @@
-(define-module (rde examples abcdw configs)
+(define-module (abcdw configs)
   #:use-module (rde features)
   #:use-module (rde features base)
   #:use-module (rde features gnupg)

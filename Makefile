@@ -1,6 +1,7 @@
 # pipefail is not POSIX complaint
 
-HOME_CONFIG=./src/rde/examples/abcdw/configs.scm
+ABCDW_DIR=./examples/abcdw
+HOME_CONFIG=${ABCDW_DIR}/configs.scm
 RDE_TARGET=ixy-home
 export RDE_TARGET
 # GUIX=guix
@@ -41,14 +42,14 @@ rde/livecd/iso: target
 	-r target/rde.iso
 
 rde/channels/pull-latest:
-	guix pull -C ./rde/examples/channels.tmpl
+	guix pull -C ./examples/channels.tmpl
 
 rde/channels/pull-locked:
-	guix pull -C ./rde/examples/channels-lock.tmpl
+	guix pull -C ./examples/channels-lock.tmpl
 
 rde/channels/update-locked:
-	guix time-machine -C ./rde/examples/channels.tmpl -- \
-	describe -f channels > ./rde/examples/channels-lock.tmpl
+	guix time-machine -C ./examples/channels.tmpl -- \
+	describe -f channels > ./examples/channels-lock.tmpl
 
 
 guix/livecd/iso: target
