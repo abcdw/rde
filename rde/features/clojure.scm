@@ -20,8 +20,6 @@
           #:key
           (clojure-tools-cli clojure-tools-cli)
           (clojure-lsp #f)
-          (cljr-clojure-test-declaration
-           "[clojure.test :refer [deftest are is testing]]")
           (eglot-stay-out-of '())
           (jdk (list openjdk17 "jdk")))
   "Setup and configure environment for Clojure. "
@@ -142,9 +140,6 @@
            (setq cider-print-options '(("right-margin" 70) ("length" 50))))
 
           (with-eval-after-load
-           'clj-refactor
-           (setq cljr-clojure-test-declaration ,cljr-clojure-test-declaration))
-          (with-eval-after-load
            'clojure-mode
            (setq clojure-align-forms-automatically t)))
         #:summary "\
@@ -155,8 +150,7 @@ Configure eglot, imenu, CIDER, flymake and other packages.
         #:keywords '(convenience clojure)
         #:elisp-packages
         (list emacs-cider emacs-clojure-mode
-              emacs-jarchive emacs-clj-refactor
-              emacs-flymake-kondor emacs-html-to-hiccup)))))
+              emacs-jarchive emacs-html-to-hiccup)))))
 
   (feature
    (name 'clojure)
