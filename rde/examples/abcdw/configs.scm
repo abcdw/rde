@@ -208,6 +208,8 @@
          (options
           '((host-name . "200:554d:3eb1:5bc5:6d7b:42f4:8792:efb8")
             (port . 50621)
+            (control-master . "auto")
+            (control-path . "~/.ssh/master-%r@%h:%p")
             (compression . #t))))
         (ssh-host
          (host "pinky")
