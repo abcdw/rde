@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022 conses <contact@conses.eu>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -17,7 +18,7 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (rde serializers base)
+(define-module (rde serializers lisp)
   #:use-module (ice-9 match)
   #:use-module (ice-9 format)
   #:use-module (srfi srfi-1)
