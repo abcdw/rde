@@ -26,7 +26,6 @@
   #:use-module (rde features video)
   #:use-module (rde features finance)
   #:use-module (rde features markup)
-  ;; #:use-module (gnu services)
   #:use-module (rde features networking)
   #:use-module (gnu services)
   #:use-module (rde home services i2p)
@@ -412,6 +411,8 @@
    (feature-l2md)
    (feature-msmtp)
    (feature-notmuch
+    ;; TODO: Add integration with mail-lists
+    ;; `notmuch-show-stash-mlarchive-link-alist'
     #:extra-tag-updates-post
     '("notmuch tag +guix-home -- 'thread:\"\
 {((subject:guix and subject:home) or (subject:service and subject:home) or \
