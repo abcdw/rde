@@ -26,7 +26,8 @@
                      (defvar geiser-guile-load-path '()))
                    (make-local-variable 'geiser-guile-load-path)
                    (require 'cl-lib)
-                   (cl-pushnew root-dir* geiser-guile-load-path
+                   (cl-pushnew (expand-file-name "src" root-dir*)
+                               geiser-guile-load-path
                                :test #'string-equal)))))))
 
  (c-mode          . ((c-file-style . "gnu")))
