@@ -879,6 +879,7 @@ relative line numbers, when narrowing is active."
           (concat ,(file-append ripgrep "/bin/rg")
                   " --null --line-buffered --color=never --max-columns=1000 \
 --path-separator / --smart-case --no-heading --line-number ."))
+         (consult-customize consult-buffer :preview-key (kbd "M-."))
          (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
 
