@@ -36,6 +36,7 @@
 
 (define* (feature-javascript
           #:key
+          (node node)
           (node-typescript node-typescript)
           (node-typescript-language-server node-typescript-language-server)
           (eglot-stay-out-of '()))
@@ -139,7 +140,13 @@
         (list emacs-js2-mode
               emacs-npm-mode
               emacs-typescript-mode
-              emacs-web-mode)))))
+              emacs-web-mode)))
+     (simple-service
+      'javascript-add-packages
+      home-profile-service-type
+      (list
+       node
+       node-typescript))))
   (feature
    (name 'javascript)
    (values `((javascript . #t)))
