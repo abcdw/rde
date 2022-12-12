@@ -81,7 +81,7 @@
           (erc-header-line-format " %n on %t (%m,%l)")
           (erc-hide-list '("NICK" "JOIN" "PART" "QUIT" "MODE" "AWAY"))
           (erc-track-exclude-types '("324" "329" "JOIN" "MODE" "NICK" "PART" "QUIT"))
-          (erc-key "I"))
+          (erc-key "i"))
   "Configure ERC, the extensible IRC client for Emacs.
 ERC-AUTO-QUERY, ERC-QUERY-DISPLAY, and ERC-JOIN-BUFFER determine the
 window behavior upon receiving a message, talking to someone, and joining
