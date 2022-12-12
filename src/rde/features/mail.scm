@@ -883,8 +883,8 @@ not appear in the pop-up buffer."
             'notmuch-mua-send-hook)
           (setq mail-user-agent 'notmuch-user-agent)
 
-          (require 'configure-rde-keymaps)
-          (define-key rde-app-map (kbd "n") 'notmuch)
+          (with-eval-after-load 'rde-keymaps
+            (define-key rde-app-map (kbd "n") 'notmuch))
 
           ,@(if (get-value 'emacs-consult config)
                 '((define-key global-map (kbd "M-s n") 'consult-notmuch-tree))
@@ -1049,8 +1049,7 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
         #:keywords '(convenience)
         #:elisp-packages
         (append
-         (list (get-value 'emacs-configure-rde-keymaps config)
-               (get-value 'emacs-cape config emacs-cape)
+         (list (get-value 'emacs-cape config emacs-cape)
                emacs-notmuch emacs-ol-notmuch)
          (if (get-value 'emacs-consult config)
              (list emacs-consult-notmuch)

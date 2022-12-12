@@ -90,8 +90,8 @@
                        '())
                  (add-hook 'pass-mode-hook (lambda () (setq truncate-lines t)))
 
-                 (require 'configure-rde-keymaps)
-                 (define-key rde-app-map (kbd "p") 'pass)
+                 (with-eval-after-load 'rde-keymaps
+                   (define-key rde-app-map (kbd "p") 'pass))
 
                  (with-eval-after-load
                   'auth-source
@@ -149,8 +149,7 @@ Keybinding for `rde-consult-pass' and embark actions for it."
                #:keywords '(convenience)
                #:elisp-packages
                (append
-                (list emacs-pass emacs-password-store emacs-password-store-otp
-                      (get-value 'emacs-configure-rde-keymaps config))
+                (list emacs-pass emacs-password-store emacs-password-store-otp)
                 (if emacs-embark (list emacs-embark) '())
                 (if emacs-consult (list emacs-consult) '())))))))
 

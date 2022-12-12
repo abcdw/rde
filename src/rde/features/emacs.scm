@@ -67,7 +67,7 @@
 dependency for other packages."
     (let* ((configure-package
           (elisp-configuration-package
-           (string-append "configure-" (symbol->string name))
+           (string-append "rde-" (symbol->string name))
            elisp-expressions
            #:elisp-packages elisp-packages
            #:autoloads? autoloads?
@@ -104,7 +104,7 @@ dependency for other packages."
   "Adds a configure-NAME package to the profile and emacs load path and if
 emacs-portable? rde value is present adds autoloads cookies to each expression
 of it, otherwise adds a require to @file{init.el}."
-  (let* ((pkg-name (symbol-append 'configure- name))
+  (let* ((pkg-name (symbol-append 'rde- name))
          (configure-package
           (rde-emacs-configuration-package
            name elisp-expressions
@@ -215,7 +215,7 @@ emacs servers' environment variables to same values."
 
 (define emacs-configure-rde-keymaps
   (rde-emacs-configuration-package
-   'rde-keymaps
+   'keymaps
    `((defvar rde-app-map nil "Prefix keymap for applications.")
      (define-prefix-command 'rde-app-map nil)
      (defvar rde-toggle-map nil "\
@@ -372,7 +372,7 @@ environment outside of Guix Home."
        (rde-elisp-configuration-service
         'rde-emacs
         config
-        `((require 'configure-rde-keymaps)
+        `((require 'rde-keymaps)
 
           (setq native-comp-deferred-compilation nil)
 

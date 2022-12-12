@@ -27,8 +27,8 @@
        (rde-elisp-configuration-service
         emacs-f-name
         config
-        `((require 'configure-rde-keymaps)
-          (define-key rde-app-map (kbd "T") 'transmission)
+        `((with-eval-after-load 'rde-keymaps
+            (define-key rde-app-map (kbd "T") 'transmission))
           (with-eval-after-load
            'transmission
            (let ((map transmission-mode-map))
@@ -39,8 +39,7 @@ Transmission Emacs interface"
 Keybinding in `rde-app-map', R for `transmission-move', xdg entry for magnet
 links and torrent files."
         #:keywords '(convenience)
-        #:elisp-packages (list emacs-transmission
-                               (get-value 'emacs-configure-rde-keymaps config))))
+        #:elisp-packages (list emacs-transmission)))
 
      (when emacs-cmd
        (emacs-xdg-service

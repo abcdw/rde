@@ -171,7 +171,7 @@ and overall looks cool."
               '((modus-themes-load-operandi)))
 
         (with-eval-after-load
-         'configure-rde-keymaps
+         'rde-keymaps
          (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle))
 
         (setq bookmark-set-fringe-mark nil)
@@ -273,8 +273,7 @@ Modeline is simplified and moved to the top of the window.
 
 Almost all visual elements are disabled."
       #:elisp-packages
-      (list emacs-modus-themes
-            (get-value 'emacs-configure-rde-keymaps config)))))
+      (list emacs-modus-themes))))
 
   (feature
    (name f-name)
@@ -421,17 +420,16 @@ enable rde-keycast-mode on configure-keycast package load."
         ,@(if turn-on?
               '((rde-keycast-mode 1))
               '())
-        (require 'configure-rde-keymaps)
-        (define-key rde-toggle-map (kbd "k") 'rde-keycast-mode)
-        (define-key rde-toggle-map (kbd "K") 'rde-keycast-mode))
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-toggle-map (kbd "k") 'rde-keycast-mode)
+          (define-key rde-toggle-map (kbd "K") 'rde-keycast-mode)))
       #:summary "\
 Show commands and keybindings in header-line"
       #:commentary "\
 Make `keycast-mode' work with header line instead of modeline, provides
 keybindings and adjust some minor settings."
       #:keywords '(convenience)
-      #:elisp-packages (list emacs-moody emacs-keycast
-                             (get-value 'emacs-configure-rde-keymaps config)))))
+      #:elisp-packages (list emacs-moody emacs-keycast))))
 
   (feature
    (name f-name)
@@ -1421,11 +1419,11 @@ previous window layout otherwise.  With universal argument toggles
                         (current-window-configuration))
                   (delete-other-windows))))
 
-        (require 'configure-rde-keymaps)
-        (define-key rde-toggle-map (kbd "o") 'olivetti-mode)
-        (define-key rde-toggle-map (kbd "O") 'global-olivetti-mode)
-        (define-key rde-toggle-map (kbd "m") 'hide-mode-line-mode)
-        (define-key rde-toggle-map (kbd "M") 'global-hide-mode-line-mode)
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-toggle-map (kbd "o") 'olivetti-mode)
+          (define-key rde-toggle-map (kbd "O") 'global-olivetti-mode)
+          (define-key rde-toggle-map (kbd "m") 'hide-mode-line-mode)
+          (define-key rde-toggle-map (kbd "M") 'global-hide-mode-line-mode))
         (define-key global-map (kbd "s-f") 'rde-toggle-monocle))
       #:summary "\
 Focused editing and reading"
@@ -1433,8 +1431,7 @@ Focused editing and reading"
 Various functions, keybindings and settings for creating distraction free
 working environemnt."
       #:keywords '(convenience reading editing)
-      #:elisp-packages (list emacs-olivetti emacs-hide-header-line
-                             (get-value 'emacs-configure-rde-keymaps config)))))
+      #:elisp-packages (list emacs-olivetti emacs-hide-header-line))))
 
   (feature
    (name f-name)
@@ -1666,9 +1663,9 @@ git-link, git-timemachine."
           (let ((git-link-use-commit t))
             (call-interactively 'git-link)))
 
-        (require 'configure-rde-keymaps)
-        (define-key rde-toggle-map (kbd "g") 'git-gutter-mode)
-        (define-key rde-toggle-map (kbd "G") 'global-git-gutter-mode)
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-toggle-map (kbd "g") 'git-gutter-mode)
+          (define-key rde-toggle-map (kbd "G") 'global-git-gutter-mode))
         (define-key global-map (kbd ,git-gutter-transient-key)
           'git-gutter-transient)
 
@@ -1736,7 +1733,6 @@ changes using git-gutter-transient.
 Almost all other operations are covered by magit."
       #:keywords '(convenience faces)
       #:elisp-packages (list emacs-magit emacs-magit-todos
-                             (get-value 'emacs-configure-rde-keymaps config)
                              emacs-git-link emacs-git-timemachine
                              emacs-git-gutter-fringe
                              emacs-git-gutter-transient))))
@@ -1825,8 +1821,7 @@ Geiser is configured for the Guile scheme implementation.")))
              '()))
 
         (global-set-key (kbd ,guix-key) 'guix))
-      #:elisp-packages (list emacs-guix
-                             (get-value 'emacs-configure-rde-keymaps config))
+      #:elisp-packages (list emacs-guix)
       #:summary "\
 Configure emacs for guix usage and development."
       #:commentary "\
@@ -1984,7 +1979,7 @@ application/epub+zip mime-type will be openned with emacs client."
         emacs-f-name
         config
         `((with-eval-after-load
-           'configure-rde-keymaps
+           'rde-keymaps
            (define-key rde-app-map (kbd "e") 'elfeed))
 
           (with-eval-after-load
@@ -2017,8 +2012,7 @@ URLSearchParams({template: %27r%27, url: window.location.href,title:
 document.title, body: window.getSelection()});\" as a web bookmark."
         #:keywords '(convenience)
         #:elisp-packages
-        (list emacs-elfeed emacs-elfeed-org
-              (get-value 'emacs-configure-rde-keymaps config))))))
+        (list emacs-elfeed emacs-elfeed-org)))))
 
   (feature
    (name f-name)
@@ -2522,8 +2516,7 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((require 'configure-rde-keymaps)
-        ,@(if flyspell-hooks
+      `(,@(if flyspell-hooks
               `((mapcar (lambda (hook)
                           (add-hook hook 'flyspell-mode))
                         ',flyspell-hooks))
@@ -2552,8 +2545,8 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
         ;; spelling, however spelling seems related to dictionaries.
         (with-eval-after-load 'dictionary
           (setq dictionary-server ,dictionary-server))
-        (define-key rde-app-map (kbd ,dictionary-key) 'dictionary-search))
-      #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)))))
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,dictionary-key) 'dictionary-search))))))
 
   (feature
    (name f-name)
@@ -2703,9 +2696,8 @@ Less verbose output, nicks highlighted with different colors."
          (require 'telega)
          (require 'cape))
 
-        (require 'configure-rde-keymaps)
-
-        (define-key rde-app-map (kbd "t") 'telega)
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd "t") 'telega))
 
         (with-eval-after-load
          'telega
@@ -2749,8 +2741,7 @@ Telegram client in Emacs"
 A few keybindings and small adjustments."
       #:keywords '(convenience faces)
       #:elisp-packages (list emacs-telega emacs-telega-contrib
-                             (get-value 'emacs-cape config emacs-cape)
-                             (get-value 'emacs-configure-rde-keymaps config)))
+                             (get-value 'emacs-cape config emacs-cape)))
 
      (emacs-xdg-service emacs-f-name "Emacs (Client) [tg:]" xdg-gexp
                         #:default-for '(x-scheme-handler/tg))))

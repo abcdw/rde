@@ -46,8 +46,7 @@ Tweaks for ledger-mode"
         #:commentary "\
 Use ISO date."
         #:keywords '(convenience)
-        #:elisp-packages (list (get-value 'emacs-configure-rde-keymaps config)
-                               emacs-ledger-mode)))))
+        #:elisp-packages (list emacs-ledger-mode)))))
 
   (feature
    (name 'ledger)
