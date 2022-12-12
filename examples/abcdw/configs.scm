@@ -21,6 +21,7 @@
   #:use-module (rde features linux)
   #:use-module (rde features bittorrent)
   #:use-module (rde features mail)
+  #:use-module (rde features irc)
   #:use-module (rde features docker)
   #:use-module (rde features virtualization)
   #:use-module (rde features video)
@@ -97,6 +98,22 @@
                                     '("https://yhetil.org/guix-bugs/0"))
                           (mail-lst 'guix-patches "guix-patches@gnu.org"
                                     '("https://yhetil.org/guix-patches/1"))))
+
+   (feature-irc-settings
+    #:irc-accounts (list
+                    (irc-account
+                     (id 'srht)
+                     (network "chat.sr.ht")
+                     (bouncer? #t)
+                     (nick "abcdw"))
+                    (irc-account
+                     (id 'libera)
+                     (network "irc.libera.chat")
+                     (nick "abcdw"))
+                    (irc-account
+                     (id 'oftc)
+                     (network "irc.oftc.net")
+                     (nick "abcdw"))))
 
    (feature-keyboard
     ;; To get all available options, layouts and variants run:
@@ -322,35 +339,8 @@
    (feature-emacs-monocle)
    (feature-emacs-message)
    (feature-emacs-erc
-    #:erc-kill-buffers-on-quit #t
-    #:erc-nick "abcdw"
-    #:align-nicknames? #f
-    #:log? #t
-    ;; #:erc-autojoin-channels-alist
-    ;; '((Libera.Chat "#guix" "#emacs" "#tropin" "#rde" "#sway")
-    ;;   (OFTC        "#pipewire" "#wayland"))
+    #:erc-log? #t)
 
-    ;; #:erc-server "chat.sr.ht"
-    #:extra-config
-    `((setq rde-bouncer-network-alist
-            `((irc.libera.chat . "abcdw")
-              (irc.oftc.net . "abcdw")))
-      (setq rde-bouncer-nick "abcdw")
-
-      ;; Rename server buffers to reflect the current network name instead
-      ;; of SERVER:PORT (e.g., "freenode" instead of "irc.freenode.net:6667").
-      ;; This is useful when using a bouncer like ZNC where you have multiple
-      ;; connections to the same server.
-      (setq erc-rename-buffers t)
-
-      (defun rde-erc-connect-bouncer-oftc ()
-        (interactive)
-        (setq erc-email-userid "abcdw/irc.oftc.net")
-        (erc-tls :server "chat.sr.ht" :nick rde-bouncer-nick))
-      (defun rde-erc-connect-bouncer-libera ()
-        (interactive)
-        (setq erc-email-userid "abcdw/irc.libera.chat")
-        (erc-tls :server "chat.sr.ht" :nick rde-bouncer-nick))))
    (feature-emacs-elpher)
    (feature-emacs-telega)
    (feature-emacs-pdf-tools)
