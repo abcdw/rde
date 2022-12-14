@@ -30,11 +30,10 @@
   #:use-module (rde features networking)
   #:use-module (gnu services)
   #:use-module (rde home services i2p)
+  #:use-module (rde home services emacs)
 
   ;; #:use-module (gnu services nix)
   #:use-module (gnu system keyboard)
-  #:use-module (gnu system file-systems)
-  #:use-module (gnu system mapped-devices)
   #:use-module (gnu packages)
   #:use-module (rde packages)
   #:use-module (rde packages emacs)
@@ -152,6 +151,28 @@
     #:home-services
     ;; MAYBE: move to feature-irc-settings
     (list
+     (simple-service
+      'additional-emacs-packages
+      home-emacs-service-type
+      (home-emacs-extension
+       (elisp-packages
+        (append
+         (strings->packages
+          ;; "emacs-dirvish"
+          "emacs-elfeed" "emacs-hl-todo"
+          "emacs-yasnippet"
+          ;; "emacs-company"
+          "emacs-consult-dir"
+          ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
+          "emacs-kind-icon"
+          "emacs-nginx-mode" "emacs-yaml-mode"
+          ;; "emacs-lispy"
+          "emacs-ytdl"
+          "emacs-multitran"
+          "emacs-minimap"
+          "emacs-ement"
+          "emacs-restart-emacs"
+          "emacs-org-present")))))
      (simple-service
       'i2pd-add-ilita-irc
       home-i2pd-service-type
@@ -282,70 +303,28 @@
    ;; https://github.com/wallabag/wallabag
    ;; https://github.com/chenyanming/wallabag.el
 
-   ;; (feature-emacs-portable)
-   (feature-emacs
-    #:default-application-launcher? #t
-    #:additional-elisp-packages
-    (append
-     (strings->packages
-      ;; "emacs-dirvish"
-      "emacs-elfeed" "emacs-hl-todo"
-      "emacs-yasnippet"
-      ;; "emacs-company"
-      "emacs-consult-dir"
-      ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
-      "emacs-kind-icon"
-      "emacs-nginx-mode" "emacs-yaml-mode"
-      ;; "emacs-lispy"
-      "emacs-ytdl"
-      "emacs-multitran"
-      "emacs-minimap"
-      "emacs-ement"
-      "emacs-restart-emacs"
-      "emacs-org-present")))
-
-   (feature-emacs-appearance
-    #:extra-elisp
-    `((setq modus-themes-syntax '(faint))
-      ;; (setq modus-themes-region '(bg-only))
-      ;; (setq modus-themes-paren-match '(underline))
-      (setq modus-themes-org-blocks 'tinted-background)))
-   (feature-emacs-faces)
-   (feature-emacs-tramp)
-   (feature-emacs-completion
-    #:mini-frame? #f
-    #:marginalia-align 'right)
-
-   (feature-emacs-corfu
-    #:corfu-doc-auto #f)
-   (feature-emacs-vertico)
-   (feature-emacs-project)
-   (feature-emacs-perspective)
-   (feature-emacs-input-methods)
-   (feature-emacs-which-key)
    (feature-emacs-keycast #:turn-on? #t)
+
+   (feature-emacs-tempel
+    #:default-templates? #t
+    #:templates
+    `(fundamental-mode
+      ,#~""
+      (t (format-time-string "%Y-%m-%d"))
+      ;; TODO: Move to feature-guix
+      ,((@ (rde gexp) slurp-file-like)
+        (file-append ((@ (guix packages) package-source)
+                      (@ (gnu packages package-management) guix))
+                     "/etc/snippets/tempel/text-mode"))))
    (feature-emacs-spelling
     #:spelling-program (@ (gnu packages libreoffice) hunspell)
     #:spelling-dictionaries (strings->packages
                              "hunspell-dict-en"
                              "hunspell-dict-ru"))
-
-   (feature-emacs-dired)
-   (feature-emacs-eshell)
-   (feature-emacs-monocle)
-   (feature-emacs-message)
-   (feature-emacs-erc
-    #:erc-log? #t)
-
-   (feature-emacs-elpher)
-   (feature-emacs-telega)
-   (feature-emacs-pdf-tools)
-   (feature-emacs-nov-el)
-
    ;; TODO: Revisit <https://en.wikipedia.org/wiki/Git-annex>
+   ;; TODO: <https://www.labri.fr/perso/nrougier/GTD/index.html#table-of-contents>
    (feature-emacs-git
     #:project-directory "~/work")
-   ;; TODO: <https://www.labri.fr/perso/nrougier/GTD/index.html#table-of-contents>
    (feature-emacs-org
     #:org-directory "~/work/abcdw/private"
     #:org-indent? #f
@@ -358,26 +337,8 @@
    (feature-emacs-org-agenda
     #:org-agenda-files '("~/work/abcdw/private/todo.org"
                          "~/work/abcdw/rde/TODO"))
-   (feature-emacs-org-protocol)
    (feature-emacs-elfeed
     #:elfeed-org-files '("~/work/abcdw/private/rss.org"))
-   (feature-emacs-citar)
-   (feature-emacs-smartparens
-    #:show-smartparens? #t)
-   (feature-emacs-geiser)
-   (feature-emacs-guix)
-   (feature-emacs-tempel
-    #:default-templates? #t
-    #:templates
-    `(fundamental-mode
-      ,#~""
-      (t (format-time-string "%Y-%m-%d"))
-      ;; TODO: Move to feature-guix
-      ,((@ (rde gexp) slurp-file-like)
-        (file-append ((@ (guix packages) package-source)
-                      (@ (gnu packages package-management) guix))
-                     "/etc/snippets/tempel/text-mode"))))
-
 
    (feature-ledger)
    (feature-markdown)
@@ -450,56 +411,11 @@ subject:/home:/) and tag:new}\"'")
   (list ))
 
 
-;;; Hardware/host specifis features
-
-;; TODO: Switch from UUIDs to partition labels For better
-;; reproducibilty and easier setup.  Grub doesn't support luks2 yet.
-
-(define ixy-mapped-devices
-  (list (mapped-device
-         (source (uuid "0e51ee1e-49ef-45c6-b0c3-6307e9980fa9"))
-         (target "enc")
-         (type luks-device-mapping))))
-
-(define ixy-file-systems
-  (append
-   (map (match-lambda
-          ((subvol . mount-point)
-           (file-system
-             (type "btrfs")
-             (device "/dev/mapper/enc")
-             (mount-point mount-point)
-             (options (format #f "subvol=~a" subvol))
-             (dependencies ixy-mapped-devices))))
-        '((root . "/")
-          (boot . "/boot")
-          (gnu  . "/gnu")
-          (home . "/home")
-          (data . "/data")
-          (log  . "/var/log")))
-   (list
-    (file-system
-      (mount-point "/boot/efi")
-      (type "vfat")
-      (device (uuid "8C99-0704" 'fat32))))))
-
-(define %ixy-features
-  (list
-   (feature-host-info
-    #:host-name "ixy"
-    ;; ls `guix build tzdata`/share/zoneinfo
-    #:timezone  "Asia/Tbilisi")
-   ;;; Allows to declare specific bootloader configuration,
-   ;;; grub-efi-bootloader used by default
-   ;; (feature-bootloader)
-   (feature-file-systems
-    #:mapped-devices ixy-mapped-devices
-    #:file-systems   ixy-file-systems)
-   (feature-hidpi)))
-
-
 ;;; rde-config and helpers for generating home-environment and
 ;;; operating-system records.
+
+(use-modules (abcdw hosts ixy)
+             (abcdw emacs))
 
 (define-public ixy-config
   (rde-config
@@ -507,6 +423,7 @@ subject:/home:/) and tag:new}\"'")
     (append
      %abcdw-features
      %main-features
+     %emacs-features
      %ixy-features))))
 
 ;; TODISCUSS: Make rde-config-os/he to be a feature instead of getter?
