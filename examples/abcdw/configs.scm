@@ -464,19 +464,19 @@ subject:/home:/) and tag:new}\"'")
 (define ixy-file-systems
   (append
    (map (match-lambda
-	  ((subvol . mount-point)
-	   (file-system
-	     (type "btrfs")
-	     (device "/dev/mapper/enc")
-	     (mount-point mount-point)
-	     (options (format #f "subvol=~a" subvol))
-	     (dependencies ixy-mapped-devices))))
-	'((root . "/")
-	  (boot . "/boot")
-	  (gnu  . "/gnu")
-	  (home . "/home")
-	  (data . "/data")
-	  (log  . "/var/log")))
+          ((subvol . mount-point)
+           (file-system
+             (type "btrfs")
+             (device "/dev/mapper/enc")
+             (mount-point mount-point)
+             (options (format #f "subvol=~a" subvol))
+             (dependencies ixy-mapped-devices))))
+        '((root . "/")
+          (boot . "/boot")
+          (gnu  . "/gnu")
+          (home . "/home")
+          (data . "/data")
+          (log  . "/var/log")))
    (list
     (file-system
       (mount-point "/boot/efi")
@@ -527,11 +527,11 @@ subject:/home:/) and tag:new}\"'")
 
 ;; (pretty-print-rde-config ixy-config)
 ;; (use-modules (gnu services)
-;; 	     (gnu services base))
+;;           (gnu services base))
 ;; (display
 ;;  (filter (lambda (x)
-;; 	   (eq? (service-kind x) console-font-service-type))
-;; 	 (rde-config-system-services ixy-config)))
+;;         (eq? (service-kind x) console-font-service-type))
+;;       (rde-config-system-services ixy-config)))
 
 ;; (use-modules (rde features))
 ;; ((@ (ice-9 pretty-print) pretty-print)
