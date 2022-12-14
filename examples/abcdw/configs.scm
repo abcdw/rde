@@ -149,12 +149,8 @@
     #:less-anonymous? #t)
    (feature-custom-services
     #:feature-name-prefix 'ixy
-    #:system-services
-    (list
-     ;; (service nix-service-type)
-     )
     #:home-services
-    ;; TODO: move to feature-irc-settings
+    ;; MAYBE: move to feature-irc-settings
     (list
      (simple-service
       'i2pd-add-ilita-irc
@@ -440,15 +436,13 @@ subject:/home:/) and tag:new}\"'")
       "obs" "obs-wlrobs"
       "recutils" "binutils" "make"
       "fheroes2"
-      ;; TODO: Enable pipewire support to chromium by default
-      ;; chrome://flags/#enable-webrtc-pipewire-capturer
+
       "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-extra"
       "papirus-icon-theme" "arc-theme"
       "thunar" "fd"
       ;; "glib:bin"
 
       "libreoffice"
-      ;; TODO: Fix telega package!
       "ffmpeg"
       "ripgrep" "curl")))))
 
