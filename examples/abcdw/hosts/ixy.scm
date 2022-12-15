@@ -1,6 +1,7 @@
 (define-module (abcdw hosts ixy)
   #:use-module (rde features base)
   #:use-module (rde features system)
+  #:use-module (rde features wm)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
   #:use-module (ice-9 match))
@@ -51,4 +52,9 @@
    (feature-file-systems
     #:mapped-devices ixy-mapped-devices
     #:file-systems   ixy-file-systems)
+   (feature-kanshi
+    #:extra-config
+    `((profile laptop ((output eDP-1 enable)))
+      (profile docked ((output eDP-1 enable)
+                       (output DP-2 scale 2)))))
    (feature-hidpi)))

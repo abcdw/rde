@@ -31,6 +31,10 @@
   #:use-module (gnu services)
   #:use-module (rde home services i2p)
   #:use-module (rde home services emacs)
+  #:use-module (rde home services wm)
+  #:use-module (gnu home services)
+
+  #:use-module (gnu home-services ssh)
 
   ;; #:use-module (gnu services nix)
   #:use-module (gnu system keyboard)
@@ -47,9 +51,8 @@
 
 ;;; User-specific features
 
-;; Initial user's password hash will be available in store, so it's
-;; use this feature with care
-;; (display (crypt "hi" "$6$abc"))
+;; Initial user's password hash will be available in store, so use this
+;; feature with care (display (crypt "hi" "$6$abc"))
 
 (define* (mail-acc id user #:optional (type 'gmail))
   "Make a simple mail-account with gmail type by default."
@@ -131,6 +134,138 @@
 
 ;;; Generic features should be applicable for various hosts/users/etc
 
+(define emacs-extra-packages-service
+  (simple-service
+   'additional-emacs-packages
+   home-emacs-service-type
+   (home-emacs-extension
+    (elisp-packages
+     (append
+      (strings->packages
+       ;; "emacs-dirvish"
+       "emacs-hl-todo"
+       "emacs-yasnippet"
+       ;; "emacs-company"
+       "emacs-consult-dir"
+       ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
+       "emacs-kind-icon"
+       "emacs-nginx-mode" "emacs-yaml-mode"
+       ;; "emacs-lispy"
+       "emacs-ytdl"
+       "emacs-multitran"
+       "emacs-minimap"
+       "emacs-ement"
+       "emacs-restart-emacs"
+       "emacs-org-present"))))))
+
+(define home-extra-packages-service
+  (simple-service
+   'additional-packages
+   home-profile-service-type
+   (append
+    (strings->packages
+     "figlet" ;; TODO: Move to emacs-artist-mode
+     "calibre"
+     "icecat" "nyxt"
+     "ungoogled-chromium-wayland" "ublock-origin-chromium"
+
+     "utox" "qtox" "jami"
+
+     "alsa-utils" "youtube-dl" "imv" "cozy"
+     "pavucontrol" "wev"
+     "imagemagick"
+     "obs" "obs-wlrobs"
+     "recutils" "binutils" "make"
+     "fheroes2"
+
+     "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-extra"
+     "papirus-icon-theme" "arc-theme"
+     "thunar" "fd"
+     ;; "glib:bin"
+
+     "libreoffice"
+     "ffmpeg"
+     "ripgrep" "curl"))))
+
+(define sway-extra-config-service
+  (simple-service
+   'sway-extra-config
+   home-sway-service-type
+   `((output DP-2 scale 2)
+     ;; (output eDP-1 disable)
+     ,@(map (lambda (x) `(workspace ,x output DP-2)) (iota 8 1))
+
+     ;; (workspace 9 output DP-2)
+     ;; (workspace 10 output DP-2)
+
+     ;; (bindswitch --reload --locked lid:on exec /run/setuid-programs/swaylock)
+
+     (bindsym
+      --locked $mod+Shift+t exec
+      ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
+      play-pause)
+
+     (bindsym
+      --locked $mod+Shift+n exec
+      ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
+      next)
+
+     (bindsym $mod+Shift+o move workspace to output left)
+     (bindsym $mod+Ctrl+o focus output left)
+     (input type:touchpad
+            ;; TODO: Move it to feature-sway or feature-mouse?
+            (;; (natural_scroll enabled)
+             (tap enabled)))
+     (bindsym $mod+Shift+Return exec emacs)
+     ;; (xwayland disable)
+     )))
+
+(define i2pd-add-ilita-irc-service
+  (simple-service
+   'i2pd-add-ilita-irc
+   home-i2pd-service-type
+   (home-i2pd-extension
+    (tunnels-conf
+     `((IRC-ILITA ((type . client)
+                   (address . 127.0.0.1)
+                   (port . 6669)
+                   (destination . irc.ilita.i2p)
+                   (destinationport . 6667)
+                   (keys . ilita-keys.dat))))))))
+
+(define ssh-extra-config-service
+  (simple-service
+   'ssh-extra-config
+   home-ssh-service-type
+   (home-ssh-configuration
+    (extra-config
+     (append
+      ;; TODO: Move it feature-qemu?
+      (map (lambda (id)
+             (ssh-host
+              (host (format #f "qemu~a" id))
+              (options
+               `((host-name . "localhost")
+                 (port . ,(+ 10020 id))))))
+           (iota 4))
+      (list
+       (ssh-host
+        (host "pinky-ygg")
+        (options
+         '((host-name . "200:554d:3eb1:5bc5:6d7b:42f4:8792:efb8")
+           (port . 50621)
+           (control-master . "auto")
+           (control-path . "~/.ssh/master-%r@%h:%p")
+           (compression . #t))))
+       (ssh-host
+        (host "pinky")
+        (options
+         '((host-name . "23.137.249.202")
+           (port . 50621)
+           (compression . #t)))))))
+    (toplevel-options
+     '((host-key-algorithms . "+ssh-rsa")
+       (pubkey-accepted-key-types . "+ssh-rsa"))))))
 
 ;;; WARNING: The order can be important for features extending
 ;;; services of other features.  Be careful changing it.
@@ -147,156 +282,14 @@
     ;; 'purokishi.i2p
     #:less-anonymous? #t)
    (feature-custom-services
-    #:feature-name-prefix 'ixy
+    #:feature-name-prefix 'abcdw
     #:home-services
-    ;; MAYBE: move to feature-irc-settings
     (list
-     (simple-service
-      'additional-emacs-packages
-      home-emacs-service-type
-      (home-emacs-extension
-       (elisp-packages
-        (append
-         (strings->packages
-          ;; "emacs-dirvish"
-          "emacs-elfeed" "emacs-hl-todo"
-          "emacs-yasnippet"
-          ;; "emacs-company"
-          "emacs-consult-dir"
-          ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
-          "emacs-kind-icon"
-          "emacs-nginx-mode" "emacs-yaml-mode"
-          ;; "emacs-lispy"
-          "emacs-ytdl"
-          "emacs-multitran"
-          "emacs-minimap"
-          "emacs-ement"
-          "emacs-restart-emacs"
-          "emacs-org-present")))))
-     (simple-service
-      'i2pd-add-ilita-irc
-      home-i2pd-service-type
-      (home-i2pd-extension
-       (tunnels-conf
-        `((IRC-ILITA ((type . client)
-                      (address . 127.0.0.1)
-                      (port . 6669)
-                      (destination . irc.ilita.i2p)
-                      (destinationport . 6667)
-                      (keys . ilita-keys.dat)))))))))
+     emacs-extra-packages-service
+     home-extra-packages-service
+     sway-extra-config-service
+     i2pd-add-ilita-irc-service))
 
-   (feature-base-services)
-   (feature-desktop-services)
-   (feature-docker)
-   (feature-qemu)
-
-   (feature-pipewire)
-   (feature-backlight #:step 10)
-   (feature-networking)
-
-   (feature-fonts
-    #:font-monospace (font "Iosevka" #:size 11 #:weight 'regular)
-    ;; #:font-monospace (font "Fira Mono" #:size 14 #:weight 'semi-light)
-    ;; #:font-packages (list font-fira-mono)
-    #:default-font-size 11)
-
-   (feature-alacritty
-    #:config-file (local-file "./config/alacritty/alacritty.yml")
-    #:default-terminal? #f
-    #:backup-terminal? #t
-    #:software-rendering? #f)
-   (feature-vterm)
-   (feature-tmux
-    #:tmux-conf (local-file "./config/tmux/tmux.conf"))
-   (feature-zsh
-    #:enable-zsh-autosuggestions? #t)
-   (feature-bash)
-   (feature-direnv)
-   (feature-git)
-   (feature-ssh
-    #:ssh-configuration
-    (home-ssh-configuration
-     (extra-config
-      (append
-       ;; TODO: Move it feature-qemu?
-       (map (lambda (id)
-              (ssh-host
-               (host (format #f "qemu~a" id))
-               (options
-                `((host-name . "localhost")
-                  (port . ,(+ 10020 id))))))
-              (iota 4))
-       (list
-        (ssh-host
-         (host "pinky-ygg")
-         (options
-          '((host-name . "200:554d:3eb1:5bc5:6d7b:42f4:8792:efb8")
-            (port . 50621)
-            (control-master . "auto")
-            (control-path . "~/.ssh/master-%r@%h:%p")
-            (compression . #t))))
-        (ssh-host
-         (host "pinky")
-         (options
-          '((host-name . "23.137.249.202")
-            (port . 50621)
-            (compression . #t)))))))
-     (toplevel-options
-      '((host-key-algorithms . "+ssh-rsa")
-        (pubkey-accepted-key-types . "+ssh-rsa")))))
-
-   ;; https://sr.ht/~tsdh/swayr/
-   ;; https://github.com/ErikReider/SwayNotificationCenter
-   ;; https://github.com/swaywm/sway/wiki/i3-Migration-Guide
-
-   ;; https://github.com/natpen/awesome-wayland
-   (feature-sway
-    ;; #:xwayland? #t
-    #:extra-config
-    `((output DP-2 scale 2)
-      ;; (output eDP-1 disable)
-      ,@(map (lambda (x) `(workspace ,x output DP-2)) (iota 8 1))
-
-      ;; (workspace 9 output DP-2)
-      ;; (workspace 10 output DP-2)
-
-      ;; (bindswitch --reload --locked lid:on exec /run/setuid-programs/swaylock)
-
-      (bindsym
-       --locked $mod+Shift+t exec
-       ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
-       play-pause)
-
-      (bindsym
-       --locked $mod+Shift+n exec
-       ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
-       next)
-
-      (bindsym $mod+Shift+o move workspace to output left)
-      (bindsym $mod+Ctrl+o focus output left)
-      (input type:touchpad
-             ;; TODO: Move it to feature-sway or feature-mouse?
-             (;; (natural_scroll enabled)
-              (tap enabled)))
-      (bindsym $mod+Shift+Return exec emacs)))
-   (feature-sway-run-on-tty
-    #:sway-tty-number 2)
-   (feature-sway-screenshot)
-   ;; (feature-sway-statusbar
-   ;;  #:use-global-fonts? #f)
-   (feature-waybar)
-   (feature-swayidle)
-   (feature-swaylock
-    #:swaylock (@ (gnu packages wm) swaylock-effects)
-    ;; The blur on lock screen is not privacy-friendly.
-    #:extra-config '((screenshots)
-                     (effect-blur . 7x5)
-                     (clock)))
-   (feature-kanshi
-    #:extra-config
-    `((profile laptop ((output eDP-1 enable)))
-      (profile docked ((output eDP-1 enable)
-                       (output DP-2 scale 2)))))
    ;; (feature-rofi)
 
    ;; TODO: Add an app for saving and reading articles and web pages
@@ -340,14 +333,6 @@
    (feature-emacs-elfeed
     #:elfeed-org-files '("~/work/abcdw/private/rss.org"))
 
-   (feature-ledger)
-   (feature-markdown)
-
-   (feature-mpv
-    #:extra-mpv-conf '((speed . 1.61)))
-   (feature-isync #:isync-verbose #t)
-   (feature-l2md)
-   (feature-msmtp)
    (feature-notmuch
     ;; TODO: Add integration with mail-lists
     ;; `notmuch-show-stash-mlarchive-link-alist'
@@ -380,42 +365,15 @@ subject:/home:/) and tag:new}\"'")
      (desktop "$HOME")
      (publicshare "$HOME")
      (templates "$HOME")))
-   (feature-base-packages
-    #:home-packages
-    (append
-     (strings->packages
-      "figlet" ;; TODO: Move to emacs-artist-mode
-      "calibre"
-      "icecat" "nyxt"
-      "ungoogled-chromium-wayland" "ublock-origin-chromium"
-
-      "utox" "qtox" "jami"
-
-      "alsa-utils" "youtube-dl" "imv" "cozy"
-      "pavucontrol" "wev"
-      "imagemagick"
-      "obs" "obs-wlrobs"
-      "recutils" "binutils" "make"
-      "fheroes2"
-
-      "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-extra"
-      "papirus-icon-theme" "arc-theme"
-      "thunar" "fd"
-      ;; "glib:bin"
-
-      "libreoffice"
-      "ffmpeg"
-      "ripgrep" "curl")))))
-
-(define %laptop-features
-  (list ))
+   (feature-base-packages)))
 
 
 ;;; rde-config and helpers for generating home-environment and
 ;;; operating-system records.
 
 (use-modules (abcdw hosts ixy)
-             (abcdw emacs))
+             (abcdw emacs)
+             (abcdw general))
 
 (define-public ixy-config
   (rde-config
@@ -424,6 +382,7 @@ subject:/home:/) and tag:new}\"'")
      %abcdw-features
      %main-features
      %emacs-features
+     %general-features
      %ixy-features))))
 
 ;; TODISCUSS: Make rde-config-os/he to be a feature instead of getter?
