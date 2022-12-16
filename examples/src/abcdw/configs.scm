@@ -75,7 +75,7 @@
 
 (define emacs-extra-packages-service
   (simple-service
-   'additional-emacs-packages
+   'emacs-extra-packages
    home-emacs-service-type
    (home-emacs-extension
     (elisp-packages
@@ -99,7 +99,7 @@
 
 (define home-extra-packages-service
   (simple-service
-   'additional-packages
+   'home-profile-extra-packages
    home-profile-service-type
    (append
     (strings->packages

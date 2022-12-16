@@ -176,14 +176,14 @@ feature-ssh."
   (ensure-pred string? proxy-string)
 
   (define f-name
-    (symbol-append (string->symbol name) '-ssh-
+    (symbol-append 'ssh- (string->symbol name) '-
                    (if reverse? 'reverse 'socks) '-proxy))
   (define (get-home-services config)
     (define ssh (get-value 'ssh config openssh))
     (ensure-pred file-like? ssh)
     (list
      (simple-service
-      (symbol-append f-name '-add-shepherd-service)
+      (symbol-append f-name '-shepherd-service)
       home-shepherd-service-type
       (list
        (shepherd-service
@@ -220,7 +220,7 @@ feature-ssh."
                      home-profile-service-type
                      (list network-manager-applet))
      (simple-service
-      'nm-applet-shepherd-service
+      'networking-nm-applet-shepherd-service
       home-shepherd-service-type
       (list
        (shepherd-service

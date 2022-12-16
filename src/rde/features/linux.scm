@@ -59,9 +59,7 @@
 			  "set" (string-append
 				 (number->string #$default-brightness) "%"))))
              (one-shot? #t))))
-     (udev-rules-service
-      'backlight-add-udev-rules
-      brightnessctl)))
+     (udev-rules-service 'backlight brightnessctl)))
 
   (feature
    (name 'backlight)
@@ -181,9 +179,7 @@ ctl_type.pipewire {
 
   (define (system-pipewire-services _)
     (list
-     (udev-rules-service
-      'pipewire-add-udev-rules
-      pipewire)))
+     (udev-rules-service 'pipewire pipewire)))
 
   (feature
    (name 'pipewire)

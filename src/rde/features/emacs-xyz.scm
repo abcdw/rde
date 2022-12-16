@@ -2553,7 +2553,7 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
     "Return home services related to spelling in Emacs."
     (list
      (simple-service
-      'add-spelling-packages
+      'emacs-spelling-packages
       home-profile-service-type
       `(,spelling-program
         ,@spelling-dictionaries))

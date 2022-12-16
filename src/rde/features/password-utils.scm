@@ -61,7 +61,7 @@
                    (home-password-store-configuration
                     (package password-store)))
           (simple-service
-           'add-password-store-git-state
+           'password-store-add-git-state
            home-state-service-type
            (list
             (state-git

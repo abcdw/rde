@@ -115,7 +115,7 @@ of it, otherwise adds a require to @file{init.el}."
            #:authors authors
            #:elisp-packages elisp-packages)))
     (rde-emacs-extension
-     (symbol-append 'emacs- name '-configurations)
+     (symbol-append 'emacs-rde- name)
      (home-emacs-extension
       (early-init-el early-init)
       ;; It's necessary to explicitly add elisp-packages here, because

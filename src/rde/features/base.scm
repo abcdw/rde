@@ -115,7 +115,7 @@ installed by system or home services."
   (define (get-home-packages values)
     (list
      (simple-service
-      'add-base-package-to-home-profile
+      'base-packages-for-home-profile
       home-profile-service-type
       (append home-packages
               base-home-packages))))
@@ -123,7 +123,7 @@ installed by system or home services."
   (define (get-system-packages values)
     (list
      (simple-service
-      'add-base-packages-to-system-profile
+      'base-packages-for-system-profile
       profile-service-type
       (append system-packages
               base-system-packages))))

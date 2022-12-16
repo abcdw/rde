@@ -332,7 +332,7 @@ automatically switch to SWAY-TTY-NUMBER on boot."
            (system* #$(file-append (get-value 'sway config) "/bin/sway")))))
     (list
      (simple-service
-      'run-sway-on-login-to-sway-tty
+      'sway-run-sway-on-login-to-sway-tty
       home-shell-profile-service-type
       (list
        #~(format #f "[ $(tty) = /dev/tty~a ] && exec ~a~a~a"
@@ -344,7 +344,8 @@ automatically switch to SWAY-TTY-NUMBER on boot."
   (define (sway-run-on-tty-system-services _)
     (list
      (simple-service
-      'switch-to-sway-tty-after-boot shepherd-root-service-type
+      'sway-switch-to-sway-tty-after-boot
+      shepherd-root-service-type
       (list (shepherd-service
              (provision '(switch-to-sway-tty))
              (requirement '(virtual-terminal))

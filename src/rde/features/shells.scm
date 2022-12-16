@@ -57,7 +57,7 @@
     (list
      (when default-shell?
        (simple-service
-        'set-default-shell-to-zsh
+        'zsh-set-default-shell-to-zsh
         home-environment-variables-service-type
         `(("SHELL" . ,(file-append zsh "/bin/zsh")))))
 
@@ -137,7 +137,7 @@ bindkey -e '^Y' rde-yank
     "Returns home services related to Bash."
     (list
      (simple-service
-      'set-bash-histfile
+      'bash-set-bash-histfile
       home-environment-variables-service-type
       `(("HISTFILE" . "$XDG_CACHE_HOME/.bash_history")))
 

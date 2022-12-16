@@ -49,13 +49,13 @@ it.  No other environment variables allowed in user directories."
   (define (xdg-home-services config)
     (list
      (simple-service
-      'add-xdg-packages
+      'xdg-extra-packages
       home-profile-service-type
       (list xdg-utils xdg-user-dirs desktop-file-utils))
      ;; This service always present in essential services, that is why
      ;; we need to extend it to override configuration.
      (simple-service
-      'set-xdg-base-directories-values
+      'xdg-base-directories-values
       home-xdg-base-directories-service-type
       xdg-base-directories-configuration)
      (service
