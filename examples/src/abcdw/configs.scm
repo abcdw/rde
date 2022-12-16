@@ -29,7 +29,7 @@
   #:use-module (rde features markup)
   #:use-module (rde features networking)
   #:use-module (rde features clojure)
-  #:use-module (rde features javascript)
+  #:use-module (contrib features javascript)
 
   #:use-module (gnu services)
   #:use-module (rde home services i2p)

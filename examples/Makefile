@@ -1,6 +1,6 @@
 GUIX=./pre-inst-env guix
 
-ABCDW_DIR=./abcdw
+ABCDW_DIR=./src/abcdw
 HOME_CONFIG=${ABCDW_DIR}/configs.scm
 
 ixy/home/reconfigure:
