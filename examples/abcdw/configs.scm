@@ -28,6 +28,9 @@
   #:use-module (rde features finance)
   #:use-module (rde features markup)
   #:use-module (rde features networking)
+  #:use-module (rde features clojure)
+  #:use-module (rde features javascript)
+
   #:use-module (gnu services)
   #:use-module (rde home services i2p)
   #:use-module (rde home services emacs)
@@ -49,10 +52,7 @@
   #:use-module (ice-9 match))
 
 
-;;; User-specific features
-
-;; Initial user's password hash will be available in store, so use this
-;; feature with care (display (crypt "hi" "$6$abc"))
+;;; Helpers
 
 (define* (mail-acc id user #:optional (type 'gmail))
   "Make a simple mail-account with gmail type by default."
@@ -70,69 +70,8 @@
             (name (symbol->string id))
             (urls urls)))))
 
-(define %abcdw-features
-  (list
-   (feature-user-info
-    #:user-name "bob"
-    #:full-name "Andrew Tropin"
-    #:email "andrew@trop.in"
-    #:user-initial-password-hash
-    "$6$abc$3SAZZQGdvQgAscM2gupP1tC.SqnsaLSPoAnEOb2k6jXMhzQqS1kCSplAJ/vUy2rrnpHtt6frW2Ap5l/tIvDsz."
-    ;; (crypt "bob" "$6$abc")
-
-    ;; WARNING: This option can reduce the explorability by hiding
-    ;; some helpful messages and parts of the interface for the sake
-    ;; of minimalistic, less distractive and clean look.  Generally
-    ;; it's not recommended to use it.
-    #:emacs-advanced-user? #t)
-   (feature-gnupg
-    #:gpg-primary-key "74830A276C328EC2")
-   (feature-security-token)
-   (feature-password-store
-    #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
-
-   (feature-mail-settings
-    #:mail-accounts (list (mail-acc 'work       "andrew@trop.in" 'gandi)
-                          (mail-acc 'personal   "andrewtropin@gmail.com"))
-    #:mailing-lists (list (mail-lst 'guix-devel "guix-devel@gnu.org"
-                                    '("https://yhetil.org/guix-devel/0"))
-                          (mail-lst 'guix-bugs "guix-bugs@gnu.org"
-                                    '("https://yhetil.org/guix-bugs/0"))
-                          (mail-lst 'guix-patches "guix-patches@gnu.org"
-                                    '("https://yhetil.org/guix-patches/1"))))
-
-   (feature-irc-settings
-    #:irc-accounts (list
-                    (irc-account
-                     (id 'srht)
-                     (network "chat.sr.ht")
-                     (bouncer? #t)
-                     (nick "abcdw"))
-                    (irc-account
-                     (id 'libera)
-                     (network "irc.libera.chat")
-                     (nick "abcdw"))
-                    (irc-account
-                     (id 'oftc)
-                     (network "irc.oftc.net")
-                     (nick "abcdw"))))
-
-   (feature-keyboard
-    ;; To get all available options, layouts and variants run:
-    ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
-    #:keyboard-layout
-    (keyboard-layout
-     "us,ru" "dvorak,"
-     #:options '("grp:shifts_toggle" "ctrl:nocaps")))))
-
-;;; TODO: feature-wallpapers https://wallhaven.cc/
-;;; TODO: feature-icecat
-;; PipeWire/iwd:
-;; https://github.com/J-Lentz/iwgtk
-;; https://github.com/krevedkokun/guix-config/blob/master/system/yggdrasil.scm
-
 
-;;; Generic features should be applicable for various hosts/users/etc
+;;; Service extensions
 
 (define emacs-extra-packages-service
   (simple-service
@@ -267,20 +206,59 @@
      '((host-key-algorithms . "+ssh-rsa")
        (pubkey-accepted-key-types . "+ssh-rsa"))))))
 
-;;; WARNING: The order can be important for features extending
-;;; services of other features.  Be careful changing it.
-(define %main-features
+
+;;; User-specific features with personal preferences
+
+;; Initial user's password hash will be available in store, so use this
+;; feature with care (display (crypt "hi" "$6$abc"))
+
+(define %abcdw-features
   (list
-   (feature-yggdrasil)
-   (feature-ssh-proxy #:host "pinky-ygg" #:auto-start? #f)
-   (feature-ssh-proxy #:host "pinky-ygg" #:name "hundredrps"
-                      #:proxy-string "50080:localhost:8080"
-                      #:reverse? #t
-                      #:auto-start? #f)
-   (feature-i2pd
-    #:outproxy 'http://acetone.i2p:8888
-    ;; 'purokishi.i2p
-    #:less-anonymous? #t)
+   (feature-user-info
+    #:user-name "bob"
+    #:full-name "Andrew Tropin"
+    #:email "andrew@trop.in"
+    #:user-initial-password-hash
+    "$6$abc$3SAZZQGdvQgAscM2gupP1tC.SqnsaLSPoAnEOb2k6jXMhzQqS1kCSplAJ/vUy2rrnpHtt6frW2Ap5l/tIvDsz."
+    ;; (crypt "bob" "$6$abc")
+
+    ;; WARNING: This option can reduce the explorability by hiding
+    ;; some helpful messages and parts of the interface for the sake
+    ;; of minimalistic, less distractive and clean look.  Generally
+    ;; it's not recommended to use it.
+    #:emacs-advanced-user? #t)
+   (feature-gnupg
+    #:gpg-primary-key "74830A276C328EC2")
+   (feature-security-token)
+   (feature-password-store
+    #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
+
+   (feature-mail-settings
+    #:mail-accounts (list (mail-acc 'work       "andrew@trop.in" 'gandi)
+                          (mail-acc 'personal   "andrewtropin@gmail.com"))
+    #:mailing-lists (list (mail-lst 'guix-devel "guix-devel@gnu.org"
+                                    '("https://yhetil.org/guix-devel/0"))
+                          (mail-lst 'guix-bugs "guix-bugs@gnu.org"
+                                    '("https://yhetil.org/guix-bugs/0"))
+                          (mail-lst 'guix-patches "guix-patches@gnu.org"
+                                    '("https://yhetil.org/guix-patches/1"))))
+
+   (feature-irc-settings
+    #:irc-accounts (list
+                    (irc-account
+                     (id 'srht)
+                     (network "chat.sr.ht")
+                     (bouncer? #t)
+                     (nick "abcdw"))
+                    (irc-account
+                     (id 'libera)
+                     (network "irc.libera.chat")
+                     (nick "abcdw"))
+                    (irc-account
+                     (id 'oftc)
+                     (network "irc.oftc.net")
+                     (nick "abcdw"))))
+
    (feature-custom-services
     #:feature-name-prefix 'abcdw
     #:home-services
@@ -290,11 +268,53 @@
      sway-extra-config-service
      i2pd-add-ilita-irc-service))
 
+   (feature-ssh-proxy #:host "pinky-ygg" #:auto-start? #f)
+   (feature-ssh-proxy #:host "pinky-ygg" #:name "hundredrps"
+                      #:proxy-string "50080:localhost:8080"
+                      #:reverse? #t
+                      #:auto-start? #f)
+
+   (feature-xdg
+    #:xdg-user-directories-configuration
+    (home-xdg-user-directories-configuration
+     (music "$HOME/music")
+     (videos "$HOME/vids")
+     (pictures "$HOME/pics")
+     (documents "$HOME/docs")
+     (download "$HOME/dl")
+     (desktop "$HOME")
+     (publicshare "$HOME")
+     (templates "$HOME")))
+
+   (feature-keyboard
+    ;; To get all available options, layouts and variants run:
+    ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
+    #:keyboard-layout
+    (keyboard-layout
+     "us,ru" "dvorak,"
+     #:options '("grp:shifts_toggle" "ctrl:nocaps")))))
+
+
+;;; Generic features should be applicable for various hosts/users/etc
+
+;;; WARNING: The order can be important for features extending
+;;; services of other features.  Be careful changing it.
+(define %main-features
+  (list
+   (feature-yggdrasil)
+   (feature-i2pd
+    #:outproxy 'http://acetone.i2p:8888
+    ;; 'purokishi.i2p
+    #:less-anonymous? #t)
+
    ;; (feature-rofi)
 
    ;; TODO: Add an app for saving and reading articles and web pages
    ;; https://github.com/wallabag/wallabag
    ;; https://github.com/chenyanming/wallabag.el
+
+   ;; TODO: feature-wallpapers https://wallhaven.cc/
+   ;; TODO: feature-icecat
 
    (feature-emacs-keycast #:turn-on? #t)
 
@@ -333,6 +353,8 @@
    (feature-emacs-elfeed
     #:elfeed-org-files '("~/work/abcdw/private/rss.org"))
 
+   (feature-javascript)
+
    (feature-notmuch
     ;; TODO: Add integration with mail-lists
     ;; `notmuch-show-stash-mlarchive-link-alist'
@@ -350,19 +372,7 @@ subject:/home:/) and tag:new}\"'")
              :query "(to:/rde/ or cc:/rde/) and tag:unread")
 
      ;; '(:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "tw")
-     %rde-notmuch-saved-searches))
-
-   (feature-xdg
-    #:xdg-user-directories-configuration
-    (home-xdg-user-directories-configuration
-     (music "$HOME/music")
-     (videos "$HOME/vids")
-     (pictures "$HOME/pics")
-     (documents "$HOME/docs")
-     (download "$HOME/dl")
-     (desktop "$HOME")
-     (publicshare "$HOME")
-     (templates "$HOME")))))
+     %rde-notmuch-saved-searches))))
 
 
 ;;; rde-config and helpers for generating home-environment and
@@ -382,7 +392,6 @@ subject:/home:/) and tag:new}\"'")
      %general-features
      %ixy-features))))
 
-;; TODISCUSS: Make rde-config-os/he to be a feature instead of getter?
 (define-public ixy-os
   (rde-config-operating-system ixy-config))
 
@@ -390,6 +399,8 @@ subject:/home:/) and tag:new}\"'")
   (rde-config-home-environment ixy-config))
 
 
+;;; Dispatcher, which helps to return various values based on environment
+;;; variable value.
 
 (define (dispatcher)
   (let ((rde-target (getenv "RDE_TARGET")))
@@ -397,17 +408,5 @@ subject:/home:/) and tag:new}\"'")
       ("ixy-home" ixy-he)
       ("ixy-system" ixy-os)
       (_ ixy-he))))
-
-;; (pretty-print-rde-config ixy-config)
-;; (use-modules (gnu services)
-;;           (gnu services base))
-;; (display
-;;  (filter (lambda (x)
-;;         (eq? (service-kind x) console-font-service-type))
-;;       (rde-config-system-services ixy-config)))
-
-;; (use-modules (rde features))
-;; ((@ (ice-9 pretty-print) pretty-print)
-;;  (map feature-name (rde-config-features ixy-config)))
 
 (dispatcher)
