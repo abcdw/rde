@@ -28,23 +28,23 @@
   #:export (feature-xdg)
 
   #:re-export (home-xdg-base-directories-configuration
-	       home-xdg-user-directories-configuration))
+               home-xdg-user-directories-configuration))
 
 
 (define* (feature-xdg
-	  #:key
-	  (xdg-base-directories-configuration
-	   (home-xdg-base-directories-configuration))
-	  (xdg-user-directories-configuration
-	   (home-xdg-user-directories-configuration)))
+          #:key
+          (xdg-base-directories-configuration
+           (home-xdg-base-directories-configuration))
+          (xdg-user-directories-configuration
+           (home-xdg-user-directories-configuration)))
   "Set XDG base (with a few extensions) and user directories.
 
 Set the value to \"$HOME\" for any user directory if you don't need
 it.  No other environment variables allowed in user directories."
   (ensure-pred home-xdg-base-directories-configuration?
-	       xdg-base-directories-configuration)
+               xdg-base-directories-configuration)
   (ensure-pred home-xdg-user-directories-configuration?
-	       xdg-user-directories-configuration)
+               xdg-user-directories-configuration)
 
   (define (xdg-home-services config)
     (list
@@ -67,4 +67,4 @@ it.  No other environment variables allowed in user directories."
    (home-services-getter xdg-home-services)
    (values
     (make-feature-values xdg-base-directories-configuration
-			 xdg-user-directories-configuration))))
+                         xdg-user-directories-configuration))))
