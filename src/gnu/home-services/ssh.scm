@@ -16,6 +16,7 @@
 
   #:export (home-ssh-service-type
             home-ssh-configuration
+            home-ssh-extension
 	    home-ssh-configuration?
             ssh-host
             ssh-match))
@@ -226,6 +227,18 @@ Match exec \"grep key secret.txt\"
   Compression yes
 @end example"))
 
+(define-configuration home-ssh-extension
+  (default-options
+    (alist '()) "")
+  (toplevel-options
+   (alist '())
+   ""
+   (lambda (field-name val)
+     (serialize-alist field-name val #:toplevel? #t)))
+  (extra-config
+   (list-of-ssh-host-or-ssh-match '())
+   ""))
+
 (define (add-ssh-configuration config)
   `((".ssh/config"
      ,(mixed-text-file "ssh-config"
@@ -235,6 +248,23 @@ Match exec \"grep key secret.txt\"
 
 (define (add-ssh-packages config)
   (list (home-ssh-configuration-package config)))
+
+(define (home-ssh-extensions original-config extensions)
+  (let ((extensions (reverse extensions)))
+    (home-ssh-configuration
+     (inherit original-config)
+     (default-options
+      (append (home-ssh-configuration-default-options original-config)
+              (append-map
+               home-ssh-extension-default-options extensions)))
+     (toplevel-options
+      (append (home-ssh-configuration-toplevel-options original-config)
+              (append-map
+               home-ssh-extension-toplevel-options extensions)))
+     (extra-config
+      (append (home-ssh-configuration-extra-config original-config)
+              (append-map
+               home-ssh-extension-extra-config extensions))))))
 
 (define home-ssh-service-type
   (service-type (name 'home-ssh)
@@ -246,6 +276,8 @@ Match exec \"grep key secret.txt\"
                         home-profile-service-type
                         add-ssh-packages)))
                 (default-value (home-ssh-configuration))
+                (compose identity)
+                (extend home-ssh-extensions)
                 (description "Install and configure SSH")))
 
 (define (generate-home-ssh-documentation)
