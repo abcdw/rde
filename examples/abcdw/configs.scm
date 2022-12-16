@@ -352,8 +352,6 @@ subject:/home:/) and tag:new}\"'")
      ;; '(:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "tw")
      %rde-notmuch-saved-searches))
 
-   (feature-transmission #:auto-start? #f)
-
    (feature-xdg
     #:xdg-user-directories-configuration
     (home-xdg-user-directories-configuration
@@ -364,8 +362,7 @@ subject:/home:/) and tag:new}\"'")
      (download "$HOME/dl")
      (desktop "$HOME")
      (publicshare "$HOME")
-     (templates "$HOME")))
-   (feature-base-packages)))
+     (templates "$HOME")))))
 
 
 ;;; rde-config and helpers for generating home-environment and

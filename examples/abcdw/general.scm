@@ -8,6 +8,7 @@
   #:use-module (rde features finance)
   #:use-module (rde features markup)
   #:use-module (rde features video)
+  #:use-module (rde features bittorrent)
   #:use-module (rde features mail)
   #:use-module (rde features wm)
 
@@ -22,13 +23,16 @@
 
 (define-public %base-features
   (list
+   ;; TODO: merge them into feature-base
    (feature-base-services)
+   (feature-base-packages)
    (feature-desktop-services)
 
    (feature-pipewire)
    (feature-backlight #:step 10)
    (feature-networking)
 
+   (feature-transmission #:auto-start? #f)
    (feature-ledger)
    (feature-mpv
     #:extra-mpv-conf '((speed . 1.61)))
