@@ -176,7 +176,7 @@
   (simple-service
    'ssh-extra-config
    home-ssh-service-type
-   (home-ssh-configuration
+   (home-ssh-extension
     (extra-config
      (append
       ;; TODO: Move it feature-qemu?
@@ -266,6 +266,7 @@
      emacs-extra-packages-service
      home-extra-packages-service
      sway-extra-config-service
+     ssh-extra-config-service
      i2pd-add-ilita-irc-service))
 
    (feature-ssh-proxy #:host "pinky-ygg" #:auto-start? #f)
