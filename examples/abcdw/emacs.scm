@@ -16,14 +16,15 @@
       ;; (setq modus-themes-paren-match '(underline))
       (setq modus-themes-org-blocks 'tinted-background)))
    (feature-emacs-faces)
-   (feature-emacs-tramp)
+
    (feature-emacs-completion
     #:mini-frame? #f
     #:marginalia-align 'right)
-
    (feature-emacs-corfu
     #:corfu-doc-auto #f)
    (feature-emacs-vertico)
+
+   (feature-emacs-tramp)
    (feature-emacs-project)
    (feature-emacs-perspective)
    (feature-emacs-input-methods)
@@ -42,9 +43,9 @@
    (feature-emacs-nov-el)
    (feature-emacs-org-protocol)
    (feature-emacs-citar)
+
    (feature-emacs-smartparens
     #:show-smartparens? #t)
    (feature-emacs-geiser)
    (feature-emacs-guix)
-
    (feature-emacs-eglot)))
