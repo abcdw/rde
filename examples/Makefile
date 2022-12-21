@@ -2,12 +2,12 @@ GUIX_PROFILE=./rde/profiles/guix
 GUIX=./pre-inst-env ${GUIX_PROFILE}/bin/guix
 
 ABCDW_DIR=./src/abcdw
-HOME_CONFIG=${ABCDW_DIR}/configs.scm
+CONFIGS=${ABCDW_DIR}/configs.scm
 
 ixy/home/reconfigure:
 	RDE_TARGET=ixy-home ${GUIX} home \
-	--fallback reconfigure --no-grafts \
-	${HOME_CONFIG}
+	reconfigure --no-grafts \
+	${CONFIGS}
 
 rde/profiles:
 	mkdir -p rde/profiles
