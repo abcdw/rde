@@ -95,7 +95,6 @@
 (define %rde-base-system-packages
   (append
    (list nss-certs)
-   %base-packages-disk-utilities
    %base-packages))
 
 (define* (feature-base-packages
