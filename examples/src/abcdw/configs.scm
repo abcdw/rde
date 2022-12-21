@@ -1,4 +1,8 @@
 (define-module (abcdw configs)
+  #:use-module (abcdw emacs)
+  #:use-module (abcdw general)
+  #:use-module (abcdw hosts ixy)
+
   #:use-module (rde features)
   #:use-module (rde features base)
   #:use-module (rde features gnupg)
@@ -358,9 +362,6 @@ subject:/home:/) and tag:new}\"'")
 ;;; rde-config and helpers for generating home-environment and
 ;;; operating-system records.
 
-(use-modules (abcdw hosts ixy)
-             (abcdw emacs)
-             (abcdw general))
 
 (define-public ixy-config
   (rde-config
