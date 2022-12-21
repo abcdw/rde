@@ -9,6 +9,10 @@ ixy/home/reconfigure:
 	reconfigure --no-grafts \
 	${CONFIGS}
 
+live/image/build:
+	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
+	${CONFIGS}
+
 rde/profiles:
 	mkdir -p rde/profiles
 

@@ -2,6 +2,7 @@
   #:use-module (abcdw emacs)
   #:use-module (abcdw general)
   #:use-module (abcdw hosts ixy)
+  #:use-module (abcdw hosts live)
 
   #:use-module (rde features)
   #:use-module (rde features base)
@@ -380,6 +381,23 @@ subject:/home:/) and tag:new}\"'")
   (rde-config-home-environment ixy-config))
 
 
+;;; live
+
+(define-public live-config
+  (rde-config
+   (integrate-he-in-os? #t)
+   (features
+    (append
+     %abcdw-features
+     %main-features
+     %emacs-features
+     %general-features
+     %live-features))))
+
+(define-public live-os
+  (rde-config-operating-system live-config))
+
+
 ;;; Dispatcher, which helps to return various values based on environment
 ;;; variable value.
 
@@ -388,6 +406,7 @@ subject:/home:/) and tag:new}\"'")
     (match rde-target
       ("ixy-home" ixy-he)
       ("ixy-system" ixy-os)
+      ("live-system" live-os)
       (_ ixy-he))))
 
 (dispatcher)
