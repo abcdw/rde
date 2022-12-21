@@ -271,35 +271,11 @@
      (publicshare "$HOME")
      (templates "$HOME")))
 
-   (feature-keyboard
-    ;; To get all available options, layouts and variants run:
-    ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
-    #:keyboard-layout
-    (keyboard-layout
-     "us,ru" "dvorak,"
-     #:options '("grp:shifts_toggle" "ctrl:nocaps")))))
-
-
-;;; Generic features should be applicable for various hosts/users/etc
-
-;;; WARNING: The order can be important for features extending
-;;; services of other features.  Be careful changing it.
-(define %main-features
-  (list
    (feature-yggdrasil)
    (feature-i2pd
     #:outproxy 'http://acetone.i2p:8888
     ;; 'purokishi.i2p
     #:less-anonymous? #t)
-
-   ;; (feature-rofi)
-
-   ;; TODO: Add an app for saving and reading articles and web pages
-   ;; https://github.com/wallabag/wallabag
-   ;; https://github.com/chenyanming/wallabag.el
-
-   ;; TODO: feature-wallpapers https://wallhaven.cc/
-   ;; TODO: feature-icecat
 
    (feature-emacs-keycast #:turn-on? #t)
 
@@ -319,8 +295,6 @@
     #:spelling-dictionaries (strings->packages
                              "hunspell-dict-en"
                              "hunspell-dict-ru"))
-   ;; TODO: Revisit <https://en.wikipedia.org/wiki/Git-annex>
-   ;; TODO: <https://www.labri.fr/perso/nrougier/GTD/index.html#table-of-contents>
    (feature-emacs-git
     #:project-directory "~/work")
    (feature-emacs-org
@@ -340,6 +314,7 @@
 
    (feature-javascript)
 
+   ;; TODO: move feature to general, move extra configuration to service.
    (feature-notmuch
     ;; TODO: Add integration with mail-lists
     ;; `notmuch-show-stash-mlarchive-link-alist'
@@ -357,19 +332,37 @@ subject:/home:/) and tag:new}\"'")
              :query "(to:/rde/ or cc:/rde/) and tag:unread")
 
      ;; '(:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "tw")
-     %rde-notmuch-saved-searches))))
+     %rde-notmuch-saved-searches))
+
+   (feature-keyboard
+    ;; To get all available options, layouts and variants run:
+    ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
+    #:keyboard-layout
+    (keyboard-layout
+     "us,ru" "dvorak,"
+     #:options '("grp:shifts_toggle" "ctrl:nocaps")))))
+
 
 
-;;; rde-config and helpers for generating home-environment and
-;;; operating-system records.
+;;; Some TODOs
 
+;; TODO: Add an app for saving and reading articles and web pages
+;; https://github.com/wallabag/wallabag
+;; https://github.com/chenyanming/wallabag.el
+
+;; TODO: feature-wallpapers https://wallhaven.cc/
+;; TODO: feature-icecat
+;; TODO: Revisit <https://en.wikipedia.org/wiki/Git-annex>
+;; TODO: <https://www.labri.fr/perso/nrougier/GTD/index.html#table-of-contents>
+
+
+;;; ixy
 
 (define-public ixy-config
   (rde-config
    (features
     (append
      %abcdw-features
-     %main-features
      %emacs-features
      %general-features
      %ixy-features))))
@@ -389,7 +382,6 @@ subject:/home:/) and tag:new}\"'")
    (features
     (append
      %abcdw-features
-     %main-features
      %emacs-features
      %general-features
      %live-features))))
