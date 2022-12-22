@@ -18,7 +18,7 @@ install:
 	@echo some installation will happen here
 
 check:
-	guix time-machine -C ./examples/channels.tmpl -- \
+	guix time-machine -C ./examples/rde/channels-lock.scm -- \
 	home --fallback build ./src/gnu/home/examples/minimal.tmpl
 
 target:
