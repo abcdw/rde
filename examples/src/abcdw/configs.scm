@@ -364,7 +364,7 @@ subject:/home:/) and tag:new}\"'")
     (append
      %abcdw-features
      %emacs-features
-     %general-features
+     %all-features
      %ixy-features))))
 
 (define-public ixy-os

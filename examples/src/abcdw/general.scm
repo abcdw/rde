@@ -35,14 +35,20 @@
    (feature-transmission #:auto-start? #f)
    (feature-ledger)
    (feature-mpv
-    #:extra-mpv-conf '((speed . 1.61)))
+    #:extra-mpv-conf '((speed . 1.61)))))
+
+(define-public %mail-features
+  (list
    (feature-isync #:isync-verbose #t)
    (feature-l2md)
    (feature-msmtp)))
 
 (define-public %dev-features
   (list
-   (feature-markdown)
+   (feature-markdown)))
+
+(define-public %virtualization-features
+  (list
    (feature-docker)
    (feature-qemu)))
 
@@ -72,9 +78,7 @@
     ;; The blur on lock screen is not privacy-friendly.
     #:extra-config '((screenshots)
                      (effect-blur . 7x5)
-                     (clock)))
-
-   ))
+                     (clock)))))
 
 (define-public %cli-features
   (list
@@ -98,5 +102,14 @@
   (append
    %base-features
    %dev-features
+   %cli-features
+   %ui-features))
+
+(define-public %all-features
+  (append
+   %base-features
+   %dev-features
+   %virtualization-features
+   %mail-features
    %cli-features
    %ui-features))
