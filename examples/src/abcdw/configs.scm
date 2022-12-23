@@ -139,9 +139,9 @@
             ;; TODO: Move it to feature-sway or feature-mouse?
             (;; (natural_scroll enabled)
              (tap enabled)))
-     (bindsym $mod+Shift+Return exec emacs)
+
      ;; (xwayland disable)
-     )))
+     (bindsym $mod+Shift+Return exec emacs))))
 
 (define i2pd-add-ilita-irc-service
   (simple-service
@@ -342,6 +342,35 @@ subject:/home:/) and tag:new}\"'")
      "us,ru" "dvorak,"
      #:options '("grp:shifts_toggle" "ctrl:nocaps")))))
 
+(define %guest-features
+  (list
+   (feature-user-info
+    #:user-name "guest"
+    #:full-name "rde user"
+    #:email "guest@rde"
+    ;; (crypt "guest" "$6$abc")
+    #:user-initial-password-hash
+    "$6$abc$9a9KlQ2jHee45D./UOzUZWLHjI/atvz2Dp6.Zz6hjRcP2KJv\
+G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
+
+   (feature-keyboard
+    ;; To get all available options, layouts and variants run:
+    ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
+    #:keyboard-layout
+    (keyboard-layout
+     "us,ru" "dvorak,"
+     #:options '("grp:shifts_toggle" "ctrl:nocaps")))
+
+   (feature-irc-settings
+    #:irc-accounts (list
+                    (irc-account
+                     (id 'libera)
+                     (network "irc.libera.chat")
+                     (nick "rde-user"))
+                    (irc-account
+                     (id 'oftc)
+                     (network "irc.oftc.net")
+                     (nick "rde-user"))))))
 
 
 ;;; Some TODOs
@@ -376,14 +405,35 @@ subject:/home:/) and tag:new}\"'")
 
 ;;; live
 
+(use-modules (srfi srfi-1)
+             (rde features version-control))
+
+(define sway-wlr-renderer-allow-software
+  (simple-service
+   'sway-wlr-renderer-allow-software
+   home-environment-variables-service-type
+   ;; Make sway work on virtual gpu in qemu
+   `(("WLR_RENDERER_ALLOW_SOFTWARE" . "1"))))
+
 (define-public live-config
   (rde-config
    (integrate-he-in-os? #t)
    (features
     (append
-     %abcdw-features
+     %guest-features
      %emacs-features
-     %general-features
+     (list
+      (feature-custom-services
+       #:feature-name-prefix 'live
+       #:home-services (list sway-wlr-renderer-allow-software)))
+
+     (remove
+      (lambda (f) (member (feature-name f) '(git)))
+      %general-features)
+     (list
+      (feature-git #:sign-commits? #f)
+      (feature-hidpi))
+
      %live-features))))
 
 (define-public live-os
