@@ -29,6 +29,7 @@
   #:use-module (gnu system shadow)
   #:use-module (gnu services home)
   #:use-module (rde system services accounts)
+  #:use-module (rde system services admin)
 
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)
@@ -305,6 +306,7 @@ to config one more time."
                 (targets '("/boot/efi"))))
    (issue "This is rde.  Welcome.\n")
    (services '())
+   (sudoers-file #f)
    (file-systems %base-file-systems)))
 
 (define (get-operating-system config)
@@ -410,6 +412,7 @@ to config one more time."
                                         user-name
                                         (get-home-environment config)))))
                      '())
+                 (list (service sudoers-service-type))
                  (if user-name
                      (list (service rde-account-service-type user))
                      '()))))))
