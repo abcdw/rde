@@ -444,6 +444,16 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
 
      "ripgrep" "curl"))))
 
+(define live-custom-services
+  (feature-custom-services
+    #:feature-name-prefix 'live
+    #:home-services
+    (list
+     example-configs-service
+     sway-live-extra-config-service
+     sway-wlr-settings-service
+     home-profile-live-extra-packages-service)))
+
 (define-public live-config
   (rde-config
    (integrate-he-in-os? #t)
@@ -451,15 +461,7 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
     (append
      %guest-features
      %emacs-features
-     (list
-      (feature-custom-services
-       #:feature-name-prefix 'live
-       #:home-services
-       (list
-        example-configs-service
-        sway-live-extra-config-service
-        sway-wlr-settings-service
-        home-profile-live-extra-packages-service)))
+     (list live-custom-services)
 
      (remove
       (lambda (f) (member (feature-name f) '(git)))
