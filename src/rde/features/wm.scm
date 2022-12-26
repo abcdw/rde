@@ -590,7 +590,11 @@ module will be added to the BAR-ID."
    'idle_inhibitor
    '((format . {icon})
      (format-icons . ((activated . )
-                      (deactivated . ))))
+                      (deactivated . )))
+     (tooltip-format-activated
+      . "Idle inhibitor {status}.  It prevents automatic screen locking and \
+hibernation.")
+     (tooltip-format-deactivated . "Idle inhibitor {status}."))
    #:bar-id bar-id))
 
 (define* (waybar-clock
