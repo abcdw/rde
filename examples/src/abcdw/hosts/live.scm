@@ -1,7 +1,10 @@
 (define-module (abcdw hosts live)
   #:use-module (rde features base)
   #:use-module (rde features system)
-  ;; #:use-module (rde features wm)
+
+  #:use-module (rde system services admin)
+
+  #:use-module (gnu services)
   #:use-module (gnu system file-systems))
 
 
@@ -21,14 +24,25 @@
           (type "tmpfs")
           (check? #f))))
 
+(define sudoers-extra-service
+  (simple-service
+   'sudoers-extra
+   sudoers-service-type
+   (list "%wheel ALL=(ALL) NOPASSWD: ALL")))
+
+(define live-extra-services
+  (feature-custom-services
+   #:feature-name-prefix 'live-extra
+   #:system-services
+   (list
+    sudoers-extra-service)))
+
 (define-public %live-features
   (list
    (feature-host-info
     #:host-name "live"
     ;; ls `guix build tzdata`/share/zoneinfo
     #:timezone  "Europe/Kiev")
-   ;;; Allows to declare specific bootloader configuration,
-   ;;; grub-efi-bootloader used by default
-   ;; (feature-bootloader)
+   live-extra-services
    (feature-file-systems
     #:file-systems live-file-systems)))
