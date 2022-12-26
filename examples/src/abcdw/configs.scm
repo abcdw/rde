@@ -408,12 +408,41 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
 (use-modules (srfi srfi-1)
              (rde features version-control))
 
-(define sway-wlr-renderer-allow-software
+(define example-configs-service
   (simple-service
-   'sway-wlr-renderer-allow-software
+   'live-example-configs
+   home-files-service-type
+   `(("example-configs" ,(local-file "../.." "example-configs"
+                                     #:recursive? #t)))))
+
+(define sway-wlr-settings-service
+  (simple-service
+   'sway-wlr-settings
    home-environment-variables-service-type
    ;; Make sway work on virtual gpu in qemu
-   `(("WLR_RENDERER_ALLOW_SOFTWARE" . "1"))))
+   `(("WLR_RENDERER_ALLOW_SOFTWARE" . "1")
+     ("WLR_NO_HARDWARE_CURSORS" . "1"))))
+
+(define sway-live-extra-config-service
+  (simple-service
+   'sway-output-settings
+   home-sway-service-type
+   `((output Virtual-1 mode 1920x1080 scale 2)
+     (exec emacs --eval "'(info \"rde\")'"))))
+
+(define home-profile-live-extra-packages-service
+  (simple-service
+   'home-profile-live-extra-packages
+   home-profile-service-type
+   (append
+    (strings->packages
+     "icecat"
+     "ungoogled-chromium-wayland" "ublock-origin-chromium"
+     "imv" "wev"
+     "make"
+     "adwaita-icon-theme" "gnome-themes-extra"
+
+     "ripgrep" "curl"))))
 
 (define-public live-config
   (rde-config
@@ -425,7 +454,12 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
      (list
       (feature-custom-services
        #:feature-name-prefix 'live
-       #:home-services (list sway-wlr-renderer-allow-software)))
+       #:home-services
+       (list
+        example-configs-service
+        sway-live-extra-config-service
+        sway-wlr-settings-service
+        home-profile-live-extra-packages-service)))
 
      (remove
       (lambda (f) (member (feature-name f) '(git)))
