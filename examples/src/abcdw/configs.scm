@@ -464,7 +464,7 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
      (list live-custom-services)
 
      (remove
-      (lambda (f) (member (feature-name f) '(git)))
+      (lambda (f) (member (feature-name f) '(git markdown)))
       %general-features)
      (list
       (feature-git #:sign-commits? #f)
