@@ -7,7 +7,16 @@ stick, boot from it and try it.
 
 The image is available here:
 
-@value{WEB-PAGE}/current-live/amd64/rde-live-latest-amd64.iso
+@c @value{WEB-PAGE}/current-live/amd64/rde-live-latest-amd64.iso
+@value{ISO-URL}
+
+To set keyboard layout open an emacs @kbd{s-@key{RET}}, open eshell
+@kbd{s-e} and type the following commands:
+
+@example
+swaymsg 'input type:keyboard xkb_layout "us,ru"'
+swaymsg 'input type:keyboard xkb_variant "dvorak,"'
+@end example
 
 After all or some of the corners of live operating system are explored,
 you can proceed with installation (@pxref{Installation}).
@@ -48,3 +57,7 @@ In that case you can add the following channel to @file{channels.scm}.
 @end example
 
 @section Installation
+
+@subsection Writing Config
+
+@subsection Applying Config
