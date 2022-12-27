@@ -12,9 +12,12 @@ ixy/home/reconfigure:
 	reconfigure --no-grafts \
 	${CONFIGS}
 
-live/image/build:
+target:
+	mkdir -p target
+
+live/image/build: target
 	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
-	${CONFIGS}
+	${CONFIGS} -r target/rde.iso
 
 rde/profiles:
 	mkdir -p rde/profiles
@@ -41,5 +44,10 @@ rde/channels-lock-local.scm: rde/channels-local.scm
 	describe -f channels >> ./rde/channels-lock-tmp.scm
 	mv ./rde/channels-lock-tmp.scm ./rde/channels-lock-local.scm
 
-clean:
+clean-target:
+	rm -rf ./target
+
+clean-profiles:
 	rm ./rde/profiles
+
+clean: clean-target clean-profiles
