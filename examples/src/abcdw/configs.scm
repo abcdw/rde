@@ -1,6 +1,5 @@
 (define-module (abcdw configs)
-  #:use-module (abcdw emacs)
-  #:use-module (abcdw general)
+  #:use-module (abcdw feature-lists)
   #:use-module (abcdw hosts ixy)
   #:use-module (abcdw hosts live)
 
@@ -392,7 +391,6 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
    (features
     (append
      %abcdw-features
-     %emacs-features
      %all-features
      %ixy-features))))
 
@@ -460,7 +458,6 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
    (features
     (append
      %guest-features
-     %emacs-features
      (list live-custom-services)
 
      (remove

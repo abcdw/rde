@@ -1,4 +1,4 @@
-(define-module (abcdw general)
+(define-module (abcdw feature-lists)
   #:use-module (rde features base)
   #:use-module (rde features linux)
   #:use-module (rde features networking)
@@ -10,7 +10,11 @@
   #:use-module (rde features video)
   #:use-module (rde features bittorrent)
   #:use-module (rde features mail)
+  #:use-module (rde features irc)
   #:use-module (rde features wm)
+
+  #:use-module (rde features emacs)
+  #:use-module (rde features emacs-xyz)
 
   #:use-module (rde features terminals)
   #:use-module (rde features shells)
@@ -52,6 +56,24 @@
    (feature-docker)
    (feature-qemu)))
 
+(define-public %cli-features
+  (list
+   (feature-alacritty
+    ;; TODO: Rename to alacritty-yml
+    #:config-file (local-file "./config/alacritty/alacritty.yml")
+    #:default-terminal? #f
+    #:backup-terminal? #t
+    #:software-rendering? #f)
+   (feature-vterm)
+   (feature-tmux
+    #:tmux-conf (local-file "./config/tmux/tmux.conf"))
+   (feature-zsh
+    #:enable-zsh-autosuggestions? #t)
+   (feature-bash)
+   (feature-direnv)
+   (feature-git)
+   (feature-ssh)))
+
 (define-public %ui-features
   (list
    (feature-fonts
@@ -80,30 +102,59 @@
                      (effect-blur . 7x5)
                      (clock)))))
 
-(define-public %cli-features
+(define-public %emacs-features
   (list
-   (feature-alacritty
-    ;; TODO: Rename to alacritty-yml
-    #:config-file (local-file "./config/alacritty/alacritty.yml")
-    #:default-terminal? #f
-    #:backup-terminal? #t
-    #:software-rendering? #f)
-   (feature-vterm)
-   (feature-tmux
-    #:tmux-conf (local-file "./config/tmux/tmux.conf"))
-   (feature-zsh
-    #:enable-zsh-autosuggestions? #t)
-   (feature-bash)
-   (feature-direnv)
-   (feature-git)
-   (feature-ssh)))
+   (feature-emacs
+    #:default-application-launcher? #t)
+
+   (feature-emacs-appearance
+    #:extra-elisp
+    `((setq modus-themes-syntax '(faint))
+      ;; (setq modus-themes-region '(bg-only))
+      ;; (setq modus-themes-paren-match '(underline))
+      (setq modus-themes-org-blocks 'tinted-background)))
+   (feature-emacs-faces)
+
+   (feature-emacs-completion
+    #:mini-frame? #f
+    #:marginalia-align 'right)
+   (feature-emacs-corfu
+    #:corfu-doc-auto #f)
+   (feature-emacs-vertico)
+
+   (feature-emacs-tramp)
+   (feature-emacs-project)
+   (feature-emacs-perspective)
+   (feature-emacs-input-methods)
+   (feature-emacs-which-key)
+   (feature-emacs-dired)
+   (feature-emacs-eshell)
+   (feature-emacs-monocle)
+
+   (feature-emacs-message)
+   (feature-emacs-erc
+    #:erc-log? #t)
+   (feature-emacs-telega)
+   (feature-emacs-elpher)
+
+   (feature-emacs-pdf-tools)
+   (feature-emacs-nov-el)
+   (feature-emacs-org-protocol)
+   (feature-emacs-citar)
+
+   (feature-emacs-smartparens
+    #:show-smartparens? #t)
+   (feature-emacs-geiser)
+   (feature-emacs-guix)
+   (feature-emacs-eglot)))
 
 (define-public %general-features
   (append
    %base-features
    %dev-features
    %cli-features
-   %ui-features))
+   %ui-features
+   %emacs-features))
 
 (define-public %all-features
   (append
@@ -112,4 +163,5 @@
    %virtualization-features
    %mail-features
    %cli-features
-   %ui-features))
+   %ui-features
+   %emacs-features))
