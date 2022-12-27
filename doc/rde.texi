@@ -55,7 +55,6 @@ practices and workflows.
 * Community::                   The best rde part.
 * Getting Started::             Try, customize and install.
 * Features::                    All the parts of rde.
-* Installation::
 * Contributing::                Tips and guidelines.
 * Tips and Tricks::
 * FAQ::                         Frequently asked questions.
@@ -249,58 +248,7 @@ It's also possible to connect to IRC channel via Matrix bridge using
 @node Getting Started
 @chapter Getting Started
 
-@c TODO: Explain how to fork rde
-
-@section Trying it
-There are several ways to use rde.
-
-@subsection rde Live Image
-The primary one is to get the latest ISO image, write it to DVD or USB
-stick, boot from it and try it.
-
-The image is available here:
-
-@value{WEB-PAGE}/current-live/amd64/rde-live-latest-amd64.iso
-
-TODO: Actually make a live ISO and upload it.
-
-After all or some of the corners of live operating system are explored,
-you can proceed with installation (@pxref{Installation}).
-Alternatively, you can use a current Guix System installation and just
-use rde on top of it, the steps will be similiar.
-
-@subsection rde home on Foreign Distro
-The secondary option is to use rde on already existing non-Guix
-operating system with @command{guix} command available.  On Debian
-GNU/Linux and derivatives Guix can be installed and started in two
-commands:
-
-@example
-sudo apt update && sudo apt install guix
-sudo systemctl start guix-daemon
-@end example
-
-After that you can use rde home as usual or even proceed with full
-operating system installation (@pxref{Installation}).
-
-@subsection rde as a Channel
-Some advanced users may prefer to use only parts of rde they are
-interested: features, services, or just packages.
-
-In that case you can add the following channel to @file{channels.scm}.
-
-@example
-(cons*
- (channel
-  (name 'rde)
-  (url "@value{GIT-REPO}")
-  (introduction
-   (make-channel-introduction
-    "257cebd587b66e4d865b3537a9a88cccd7107c95"
-    (openpgp-fingerprint
-     "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
- %default-channels)
-@end example
+@include getting-started.texi
 
 @node Features
 @chapter Features
@@ -637,9 +585,6 @@ insert the content of clipboard to any application you want (browser,
 instant messanger, etc).  If you need to modify the content of clipboard
 (add a label, highlight something or make an arrow pointing to important
 object, etc) or save it to the file use @kbd{s-M-@key{print}}.
-
-@node Installation
-@chapter Installation
 
 @node Contributing
 @chapter Contributing
