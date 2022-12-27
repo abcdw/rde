@@ -9,6 +9,7 @@
 
 @include version.texi
 @set WEB-PAGE https://trop.in/rde
+@set ISO-URL http://files.trop.in/rde/iso/rde-live-0.3-amd64.iso
 @set GIT-REPO https://git.sr.ht/~abcdw/rde
 
 @copying
