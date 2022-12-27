@@ -5,7 +5,7 @@ QEMU_BASE_ARGS= \
 -vga none -device virtio-gpu-pci
 # -vga qxl
 
-all: rde/abcdw/home/reconfigure # doc/rde.info
+all: doc/rde.info
 	@echo default target
 
 install:
