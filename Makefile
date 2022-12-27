@@ -1,17 +1,11 @@
 # pipefail is not POSIX complaint
 
-ABCDW_DIR=./examples/abcdw
-HOME_CONFIG=${ABCDW_DIR}/configs.scm
-RDE_TARGET=ixy-home
-export RDE_TARGET
-# GUIX=guix
-GUIX=./pre-inst-env guix
-# GUIX=./pre-inst-env ../../gnu/guix/pre-inst-env guix
 QEMU_BASE_ARGS= \
 -m 4096 -smp 1 -enable-kvm \
--device virtio-gpu-pci -vga qxl
+-vga none -device virtio-gpu-pci
+# -vga qxl
 
-all: doc/rde.info
+all: rde/abcdw/home/reconfigure # doc/rde.info
 	@echo default target
 
 install:
@@ -21,42 +15,11 @@ check:
 	guix time-machine -C ./examples/rde/channels-lock.scm -- \
 	home --fallback build ./src/gnu/home/examples/minimal.tmpl
 
-target:
-	mkdir target
+examples/ixy/home/reconfigure:
+	make -C examples ixy/home/reconfigure
 
-rde/abcdw/home/reconfigure:
-	${GUIX} home --fallback reconfigure --no-grafts --allow-downgrades \
-	${HOME_CONFIG}
-
-rde/abcdw/home:
-	${GUIX} home --fallback build --no-grafts --allow-downgrades \
-	${HOME_CONFIG}
-
-rde/livecd/system:
-	guix system --no-grafts \
-	-e '(@ (rde system install) rde-livecd)'
-
-rde/livecd/iso: target
-	guix system image -t iso9660 --no-grafts \
-	-e '(@ (rde system install) rde-livecd)' \
-	-r target/rde.iso
-
-rde/channels/pull-latest:
-	guix pull -C ./examples/channels.tmpl
-
-rde/channels/pull-locked:
-	guix pull -C ./examples/channels-lock.tmpl
-
-rde/channels/update-locked:
-	guix time-machine -C ./examples/channels.tmpl -- \
-	describe -f channels > ./examples/channels-lock.tmpl
-
-
-guix/livecd/iso: target
-	guix system image -t iso9660 \
-	-e '(@ (rde system install) guix-with-substitute-mirror)' \
-	-r target/guix.iso
-
+examples/live/image/build:
+	make -C examples live/image/build
 
 qemu/1/run:
 	qemu-system-x86_64 \
@@ -67,16 +30,11 @@ qemu/1/run:
 qemu/1/deploy:
 	guix deploy tmp/config.scm --no-grafts
 
-qemu/2/run-from-rde-iso: target/rde.iso
+qemu/live/run-from-rde-iso: examples/target/rde.iso
 	qemu-system-x86_64 \
 	${QEMU_BASE_ARGS} \
 	-net user,hostfwd=tcp::10022-:22 -net nic -boot menu=on,order=d \
 	-drive media=cdrom,file=target/rde.iso
-
-
-system:
-	make -C ../nonrde install
-
 
 doc/rde-tool-list.texi: doc/rde-tool-list.org
 	pandoc doc/rde-tool-list.org -f org -t texinfo \
