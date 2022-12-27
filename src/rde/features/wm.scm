@@ -86,12 +86,14 @@
 ;; https://github.com/swaywm/sway/wiki/Useful-add-ons-for-sway
 
 (define (keyboard-layout-to-sway-config keyboard-layout)
-  (let ((kb-options (string-join
-                     (keyboard-layout-options keyboard-layout) ",")))
+  (let* ((kb-options (keyboard-layout-options keyboard-layout))
+         (xkb-options (and (not (null? kb-options))
+                           (string-join kb-options ",")))
+         (xkb-variant (keyboard-layout-variant keyboard-layout)))
     `((input *
              ((xkb_layout  ,(keyboard-layout-name keyboard-layout))
-              (xkb_variant ,(keyboard-layout-variant keyboard-layout))
-              (xkb_options ,kb-options))))))
+              ,@(if xkb-variant `((xkb_variant ,xkb-variant)) '())
+              ,@(if xkb-options `((xkb_options ,xkb-options)) '()))))))
 
 (define* (feature-sway
           #:key
