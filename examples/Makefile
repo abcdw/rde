@@ -1,5 +1,5 @@
 # Also defined in .envrc
-GUIX_PROFILE=rde/profiles/guix
+GUIX_PROFILE=target/profiles/guix
 GUIX=./pre-inst-env ${GUIX_PROFILE}/bin/guix
 
 SRC_DIR=./src
@@ -9,22 +9,24 @@ PULL_EXTRA_OPTIONS=
 
 ROOT_MOUNT_POINT=/mnt
 
-ixy/home/build:
+guix: target/profiles/guix
+
+ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
 	build ${CONFIGS}
 
-ixy/home/reconfigure:
+ixy/home/reconfigure: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
 	reconfigure ${CONFIGS}
 
-ixy/system/reconfigure:
+ixy/system/reconfigure: guix
 	RDE_TARGET=ixy-system ${GUIX} system \
 	reconfigure ${CONFIGS}
 
 cow-store:
 	sudo herd start cow-store ${ROOT_MOUNT_POINT}
 
-ixy/system/init:
+ixy/system/init: guix
 	RDE_TARGET=ixy-system ${GUIX} system \
 	init ${CONFIGS} ${ROOT_MOUNT_POINT}
 
@@ -40,14 +42,14 @@ target/rde-live.iso: target
 	${CONFIGS} -r target/rde-live-tmp.iso
 	mv -f target/rde-live-tmp.iso target/rde-live.iso
 
-rde/profiles:
-	mkdir -p rde/profiles
+target/profiles:
+	mkdir -p target/profiles
 
-rde/profiles/guix: rde/profiles rde/channels-lock.scm
+target/profiles/guix: target/profiles rde/channels-lock.scm
 	guix pull -C rde/channels-lock.scm -p ${GUIX_PROFILE} \
 	${PULL_EXTRA_OPTIONS}
 
-rde/profiles/guix-local: rde/profiles rde/channels-lock-local.scm
+target/profiles/guix-local: target/profiles rde/channels-lock-local.scm
 	guix pull -C rde/channels-lock-local.scm -p ${GUIX_PROFILE} \
 	${PULL_EXTRA_OPTIONS}
 
@@ -68,7 +70,4 @@ rde/channels-lock-local.scm: rde/channels-local.scm
 clean-target:
 	rm -rf ./target
 
-clean-profiles:
-	rm ./rde/profiles
-
-clean: clean-target clean-profiles
+clean: clean-target
