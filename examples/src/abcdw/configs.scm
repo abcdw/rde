@@ -458,6 +458,9 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
      sway-wlr-settings-service
      home-profile-live-extra-packages-service)))
 
+;; TODO: Pull channels from lock file in advance and link them to example-config
+;; TODO: Add auto-login
+
 (define-public live-config
   (rde-config
    (integrate-he-in-os? #t)
