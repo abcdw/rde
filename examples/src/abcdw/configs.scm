@@ -408,13 +408,6 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
 (use-modules (srfi srfi-1)
              (rde features version-control))
 
-(define example-configs-service
-  (simple-service
-   'live-example-configs
-   home-files-service-type
-   `(("example-configs" ,(local-file "../.." "example-configs"
-                                     #:recursive? #t)))))
-
 (define sway-wlr-settings-service
   (simple-service
    'sway-wlr-settings
@@ -444,6 +437,16 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
      "hicolor-icon-theme" ;; needed for nm icons
 
      "ripgrep" "curl"))))
+
+(define example-configs-service
+  (simple-service
+   'live-example-configs
+   home-activation-service-type
+   #~(begin
+       (mkdir-p (string-append (getenv "HOME") "/rde-configs"))
+       (copy-recursively
+        #$(local-file "../../." "rde-configs" #:recursive? #t)
+        (string-append (getenv "HOME") "/rde-configs")))))
 
 (define live-custom-services
   (feature-custom-services
