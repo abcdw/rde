@@ -1,5 +1,5 @@
 @section Trying it
-There are several ways to get a taste of rde.
+There are several ways to get the taste of rde.
 
 @subsection rde Live Image
 The primary one is to get the latest ISO image, write it to DVD or USB
@@ -8,10 +8,19 @@ stick, boot from it and try it.
 The image is available here:
 
 @c @value{WEB-PAGE}/current-live/amd64/rde-live-latest-amd64.iso
-@value{ISO-URL}
+@value{ISO-DIRECTORY-URL}
 
-To set keyboard layout open an emacs @kbd{s-@key{RET}}, open eshell
-@kbd{s-e} and type the following commands:
+Download it, write to flash drive and boot from it.
+
+@example
+sudo dd if=@value{ISO-NAME} of=/dev/sdX status=progress
+sync
+@end example
+
+By default qwerty and dvorak layouts are available.
+
+To set other keyboard layouts open Emacs @kbd{s-@key{RET}}, open eshell
+@kbd{s-e}, adjust to your preference and type the following commands:
 
 @example
 swaymsg 'input type:keyboard xkb_layout "us,ru"'
@@ -59,6 +68,45 @@ In that case you can add the following channel to @file{channels.scm}.
 @anchor{Installation}
 @section Installation
 
+For now this section will be just a bare minimum to get started, later
+more details will be added.
+
 @subsection Writing Config
+The simpliest way is to take example configuration, explore it and edit
+according to your needs.  Live image contains @file{~/rde-configs},
+which is a real-world full-blown rde configuration.
+
+The other option is to craft the configuration from scratch, take
+rde-config record declaration from example configuration and remove all
+the features and start adding them one by one, expanding the scope
+covered by the configuration.
 
 @subsection Applying Config
+There is a @file{Makefile} in example configuration, it contains various
+targets for reconfiguration, building and initialization of home
+environment, operating system and guix profiles, use them directly or
+just as an example to create your own targets.  To navigate through the
+list of targets can use @code{imenu} (@kbd{M-g i}).  To actually run the
+target use @code{compile} emacs command, just type @kbd{M-x compile RET}
+and type the name of the target, after you started typing part of the
+target name, corfu (@pxref{Corfu}) will show a tooltip with a list of
+available options.
+
+Most of the targets uses @code{$@{GUIX@}}, which points to the
+@command{guix} binary, it helps to make sure builds are reproducible,
+but you need to create this binary by calling @code{make
+rde/profiles/guix}, it will generate a guix binary based on the content
+of @file{rde/channels-lock.scm}.  After that feel free to experiment
+with other targets.
+
+On foreign system you are mostly interested in @code{*/home/*} targets,
+but if you manage your whole operating system with GNU Guix pay
+attention to @code{*/system/reconfigure} or if installing a fresh OS
+take a look at @code{cow-store} and @code{*/system/init} targets.
+
+To get more information about installation process read @xref{Manual
+Installation,,, guix,}, skip unrelated sections like keyboard
+configuration and keep in mind that we already have @code{cow-store} and
+@code{*/system/init} targets in Makefile for you.
+
+Happy hacking, see you in a bit in the next section.
