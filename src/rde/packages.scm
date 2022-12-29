@@ -202,16 +202,16 @@ keyboard input like xdotool type for X11.")
 (define-public rde
   (package
     (name "rde")
-    (version "0.1.0")
+    (version "0.3.0")
     (home-page "https://trop.in/rde")
     (source
      (origin
       (method git-fetch)
       (uri (git-reference (url "https://git.sr.ht/~abcdw/rde")
-                          (commit "0d72e180b7eb92ea5a23d8dd481bde93b6ec252c")))
+                          (commit "bb580995a3ace2ecf4e3ef33d200d5b8faad751e")))
       (sha256
        (base32
-        "0vcsgbziv6cm4b4sccllsg67anpxg0q9mm3d80nms60ng6ld3i6b"))
+        "16xs407jhf93m4nn6ysbyfbfnxf2g7g9c5sbiblngckdhiwkjll9"))
       (file-name (string-append "rde-" version "-checkout"))))
     (build-system gnu-build-system)
     (native-inputs
