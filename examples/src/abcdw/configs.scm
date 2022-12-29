@@ -441,6 +441,7 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
      "imv" "wev"
      "make"
      "adwaita-icon-theme" "gnome-themes-extra"
+     "hicolor-icon-theme" ;; needed for nm icons
 
      "ripgrep" "curl"))))
 
