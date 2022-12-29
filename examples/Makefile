@@ -46,7 +46,7 @@ rde/profiles/guix-local: rde/profiles rde/channels-lock-local.scm
 	guix pull -C rde/channels-lock-local.scm -p ${GUIX_PROFILE} \
 	${PULL_EXTRA_OPTIONS}
 
-.PHONY: rde/channels-lock.scm rde/channels-lock-local.scm
+# .PHONY: rde/channels-lock.scm rde/channels-lock-local.scm
 
 rde/channels-lock.scm: rde/channels.scm
 	echo -e "(use-modules (guix channels))\n" > ./rde/channels-lock-tmp.scm
