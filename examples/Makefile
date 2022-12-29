@@ -35,10 +35,10 @@ live/image/build:
 	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
 	${CONFIGS}
 
-target/rde.iso: target
+target/rde-live.iso: target
 	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
-	${CONFIGS} -r target/rde-tmp.iso
-	mv -f target/rde-tmp.iso target/rde.iso
+	${CONFIGS} -r target/rde-live-tmp.iso
+	mv -f target/rde-live-tmp.iso target/rde-live.iso
 
 rde/profiles:
 	mkdir -p rde/profiles

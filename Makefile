@@ -18,8 +18,8 @@ check:
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure
 
-examples/live/image/build:
-	make -C examples live/image/build
+examples/target/rde-live.iso:
+	make -C examples target/rde-live.iso
 
 qemu/1/run:
 	qemu-system-x86_64 \
@@ -30,11 +30,11 @@ qemu/1/run:
 qemu/1/deploy:
 	guix deploy tmp/config.scm --no-grafts
 
-qemu/live/run-from-rde-iso: examples/target/rde.iso
+qemu/live/run-from-rde-iso: examples/target/rde-live.iso
 	qemu-system-x86_64 \
 	${QEMU_BASE_ARGS} \
 	-net user,hostfwd=tcp::10022-:22 -net nic -boot menu=on,order=d \
-	-drive media=cdrom,file=examples/target/rde.iso
+	-drive media=cdrom,file=examples/target/rde-live.iso
 
 doc/rde-tool-list.texi: doc/rde-tool-list.org
 	pandoc doc/rde-tool-list.org -f org -t texinfo \
