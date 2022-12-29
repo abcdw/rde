@@ -34,7 +34,7 @@ qemu/live/run-from-rde-iso: examples/target/rde.iso
 	qemu-system-x86_64 \
 	${QEMU_BASE_ARGS} \
 	-net user,hostfwd=tcp::10022-:22 -net nic -boot menu=on,order=d \
-	-drive media=cdrom,file=target/rde.iso
+	-drive media=cdrom,file=examples/target/rde.iso
 
 doc/rde-tool-list.texi: doc/rde-tool-list.org
 	pandoc doc/rde-tool-list.org -f org -t texinfo \
