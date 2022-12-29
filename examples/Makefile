@@ -7,10 +7,26 @@ CONFIGS=${SRC_DIR}/abcdw/configs.scm
 PULL_EXTRA_OPTIONS=
 # --allow-downgrades
 
+ROOT_MOUNT_POINT=/mnt
+
+ixy/home/build:
+	RDE_TARGET=ixy-home ${GUIX} home \
+	build ${CONFIGS}
+
 ixy/home/reconfigure:
 	RDE_TARGET=ixy-home ${GUIX} home \
-	reconfigure --no-grafts \
-	${CONFIGS}
+	reconfigure ${CONFIGS}
+
+ixy/system/reconfigure:
+	RDE_TARGET=ixy-system ${GUIX} system \
+	reconfigure ${CONFIGS}
+
+cow-store:
+	sudo herd start cow-store ${ROOT_MOUNT_POINT}
+
+ixy/system/init:
+	RDE_TARGET=ixy-system ${GUIX} system \
+	init ${CONFIGS} ${ROOT_MOUNT_POINT}
 
 target:
 	mkdir -p target
