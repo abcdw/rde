@@ -442,11 +442,22 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
   (simple-service
    'live-example-configs
    home-activation-service-type
-   #~(begin
-       (mkdir-p (string-append (getenv "HOME") "/rde-configs"))
-       (copy-recursively
-        #$(local-file "../../." "rde-configs" #:recursive? #t)
-        (string-append (getenv "HOME") "/rde-configs")))))
+   (with-imported-modules '((guix build utils))
+     #~(let ((rde-configs #$(local-file
+                             "../.." "rde-configs"
+                             #:recursive? #t
+                             #:select?
+                             (lambda (file _)
+                               (not (string=? (basename file) "target")))))
+             (output (string-append (getenv "HOME") "/rde-configs")))
+         (when (not (file-exists? output))
+           (mkdir-p output)
+           (copy-recursively
+            rde-configs
+            output
+            #:copy-file (lambda (f t)
+                          (copy-file f t)
+                          (make-file-writable t))))))))
 
 (define live-custom-services
   (feature-custom-services
