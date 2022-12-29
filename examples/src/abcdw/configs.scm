@@ -285,10 +285,11 @@
       ,#~""
       (t (format-time-string "%Y-%m-%d"))
       ;; TODO: Move to feature-guix
-      ,((@ (rde gexp) slurp-file-like)
-        (file-append ((@ (guix packages) package-source)
-                      (@ (gnu packages package-management) guix))
-                     "/etc/snippets/tempel/text-mode"))))
+      ;; ,((@ (rde gexp) slurp-file-like)
+      ;;   (file-append ((@ (guix packages) package-source)
+      ;;                 (@ (gnu packages package-management) guix))
+      ;;                "/etc/snippets/tempel/text-mode"))
+      ))
    (feature-emacs-spelling
     #:spelling-program (@ (gnu packages libreoffice) hunspell)
     #:spelling-dictionaries (strings->packages
