@@ -31,9 +31,14 @@ ixy/system/init:
 target:
 	mkdir -p target
 
-live/image/build: target
+live/image/build:
 	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
-	${CONFIGS} -r target/rde.iso
+	${CONFIGS}
+
+target/rde.iso: target
+	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
+	${CONFIGS} -r target/rde-tmp.iso
+	mv -f target/rde-tmp.iso target/rde.iso
 
 rde/profiles:
 	mkdir -p rde/profiles
