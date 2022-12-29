@@ -358,7 +358,8 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
     ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
     #:keyboard-layout
     (keyboard-layout
-     "us,ru" "dvorak,"
+     "us,us"
+     ",dvorak"
      #:options '("grp:shifts_toggle" "ctrl:nocaps")))
 
    (feature-irc-settings
