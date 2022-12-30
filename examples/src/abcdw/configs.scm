@@ -421,7 +421,7 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
    'sway-output-settings
    home-sway-service-type
    `((output Virtual-1 mode 1920x1080 scale 2)
-     (exec emacs --eval "'(info \"rde\")'"))))
+     (exec emacs --eval "'(info \"(rde)Getting Started\")'"))))
 
 (define home-profile-live-extra-packages-service
   (simple-service
