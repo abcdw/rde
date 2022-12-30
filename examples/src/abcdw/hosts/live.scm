@@ -3,6 +3,7 @@
   #:use-module (rde features system)
 
   #:use-module (rde system services admin)
+  #:use-module (rde system services guix)
 
   #:use-module (gnu services)
   #:use-module (gnu system file-systems))
@@ -35,7 +36,8 @@
    #:feature-name-prefix 'live-extra
    #:system-services
    (list
-    sudoers-extra-service)))
+    sudoers-extra-service
+    (service cow-store-service-type))))
 
 (define-public %live-features
   (list
