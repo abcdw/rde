@@ -9,7 +9,9 @@ PULL_EXTRA_OPTIONS=
 
 ROOT_MOUNT_POINT=/mnt
 
-guix: target/profiles/guix
+# Store items doesn't have useful mtime, so we rely on guix.lock to prevent
+# unecessary rebuilds
+guix: target/profiles/guix.lock
 
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
@@ -33,17 +35,21 @@ ixy/system/init: guix
 target:
 	mkdir -p target
 
-live/image/build:
+live/image/build: guix
 	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
 	${CONFIGS}
 
-target/rde-live.iso: target
+target/rde-live.iso: guix target
 	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
 	${CONFIGS} -r target/rde-live-tmp.iso
 	mv -f target/rde-live-tmp.iso target/rde-live.iso
 
+
 target/profiles:
 	mkdir -p target/profiles
+
+target/profiles/guix.lock: rde/channels-lock.scm
+	make target/profiles/guix
 
 target/profiles/guix: target/profiles rde/channels-lock.scm
 	guix pull -C rde/channels-lock.scm -p ${GUIX_PROFILE} \
@@ -52,8 +58,6 @@ target/profiles/guix: target/profiles rde/channels-lock.scm
 target/profiles/guix-local: target/profiles rde/channels-lock-local.scm
 	guix pull -C rde/channels-lock-local.scm -p ${GUIX_PROFILE} \
 	${PULL_EXTRA_OPTIONS}
-
-# .PHONY: rde/channels-lock.scm rde/channels-lock-local.scm
 
 rde/channels-lock.scm: rde/channels.scm
 	echo -e "(use-modules (guix channels))\n" > ./rde/channels-lock-tmp.scm
@@ -66,6 +70,7 @@ rde/channels-lock-local.scm: rde/channels-local.scm
 	guix time-machine -C ./rde/channels-local.scm -- \
 	describe -f channels >> ./rde/channels-lock-tmp.scm
 	mv ./rde/channels-lock-tmp.scm ./rde/channels-lock-local.scm
+
 
 clean-target:
 	rm -rf ./target
