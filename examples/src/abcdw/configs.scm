@@ -457,7 +457,10 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
             output
             #:copy-file (lambda (f t)
                           (copy-file f t)
-                          (make-file-writable t))))))))
+                          (make-file-writable t)))
+           ;; MAYBE: take this value from rde-config
+           (system* #$(file-append (@ (gnu packages shellutils) direnv)
+                                   "/bin/direnv") "allow" output))))))
 
 (define live-custom-services
   (feature-custom-services
