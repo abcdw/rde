@@ -10,21 +10,54 @@ The image is available here:
 @c @value{WEB-PAGE}/current-live/amd64/rde-live-latest-amd64.iso
 @value{ISO-DIRECTORY-URL}
 
-Download it, write to flash drive and boot from it.
+To write it to usb stick you can use any software, we provide you with
+@command{dd} example:
 
 @example
+# /dev/sdX is your USB stick device, which can be found in sudo dmesg
 sudo dd if=@value{ISO-NAME} of=/dev/sdX status=progress
 sync
 @end example
 
-By default qwerty and dvorak layouts are available.
+After boot in live system, you can want to adjust a few settings.
 
-To set other keyboard layouts open Emacs @kbd{s-@key{RET}}, open eshell
-@kbd{s-e}, adjust to your preference and type the following commands:
+By default qwerty and dvorak layouts are available.  Ctrl is bound to
+Caps in adition to usual position.  Layout can be changed by pressing
+both shifts simultaneosly.  @kbd{s} means a key with a logo, usually
+placed between Alt and Ctrl.  @kbd{C} is for Ctrl, @kbd{M} is for Alt,
+@kbd{S} is for Shift.
+
+To set other keyboard layouts switch to the fourth workspace (@kbd{s-4})
+open Emacs (@kbd{s-@key{RET}}), open eshell (@kbd{s-e}), adjust to your
+preference and type the following commands:
 
 @example
 swaymsg 'input type:keyboard xkb_layout "us,ru"'
 swaymsg 'input type:keyboard xkb_variant "dvorak,"'
+@end example
+
+To jump back and forth between workspaces type @kbd{s-@key{TAB}}, to
+launch application use @kbd{s-S-d}.
+
+To get more information about sway settings and keybinding visit
+@file{~/.config/sway/config} by typing @kbd{C-x C-f ~/.c/s/c RET}.
+
+There are a bunch of useful keybindings for Emacs: @kbd{s-o} for jumping
+between Emacs windows (usually called panes in other programs),
+@kbd{C-g} for aborting/cancel actions, @kbd{M-x} for executing Emacs
+commands (interactive functions), @kbd{s-r} for @command{recompile},
+@kbd{C-c C-k} for interrupting compilation, @kbd{C-x C-f} for openning
+file, @kbd{M-n/p} for next/previous thing in minibuffer/eshell history,
+@kbd{M-s g} for searching a text in files, @kbd{M-g l} for searching
+text in current file.
+
+To change timezone use eshell and the following commands:
+
+@example
+ls $TZDIR
+# Select appropriate timezone, Etc/UTC for example
+sudo cp Etc/UTC /etc/localtime
+swaymsg reload
 @end example
 
 After all or some of the corners of live operating system are explored,
