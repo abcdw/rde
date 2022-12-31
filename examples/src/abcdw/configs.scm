@@ -20,6 +20,7 @@
 
   #:use-module (gnu services)
   #:use-module (gnu home services)
+  #:use-module (gnu home services shepherd)
   #:use-module (rde home services i2p)
   #:use-module (rde home services emacs)
   #:use-module (rde home services wm)
@@ -441,26 +442,34 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
 (define example-configs-service
   (simple-service
    'live-example-configs
-   home-activation-service-type
-   (with-imported-modules '((guix build utils))
-     #~(let ((rde-configs #$(local-file
-                             "../.." "rde-configs"
-                             #:recursive? #t
-                             #:select?
-                             (lambda (file _)
-                               (not (string=? (basename file) "target")))))
-             (output (string-append (getenv "HOME") "/rde-configs")))
-         (when (not (file-exists? output))
-           (mkdir-p output)
-           (copy-recursively
-            rde-configs
-            output
-            #:copy-file (lambda (f t)
-                          (copy-file f t)
-                          (make-file-writable t)))
-           ;; MAYBE: take this value from rde-config
-           (system* #$(file-append (@ (gnu packages shellutils) direnv)
-                                   "/bin/direnv") "allow" output))))))
+   home-shepherd-service-type
+   (list
+    (shepherd-service
+     (documentation "Create ~/rde-configs.")
+     (requirement '())
+     (provision '(rde-configs))
+     (start
+      (with-imported-modules '((guix build utils))
+        #~(lambda ()
+            (let ((rde-configs #$(local-file
+                                  "../.." "rde-configs"
+                                  #:recursive? #t
+                                  #:select?
+                                  (lambda (file _)
+                                    (not (string=? (basename file) "target")))))
+                  (output (string-append (getenv "HOME") "/rde-configs")))
+              (when (not (file-exists? output))
+                (mkdir-p output)
+                (copy-recursively
+                 rde-configs
+                 output
+                 #:copy-file (lambda (f t)
+                               (copy-file f t)
+                               (make-file-writable t)))
+                ;; MAYBE: take this value from rde-config
+                (system* #$(file-append (@ (gnu packages shellutils) direnv)
+                                        "/bin/direnv") "allow" output))))))
+     (one-shot? #t)))))
 
 (define live-custom-services
   (feature-custom-services
