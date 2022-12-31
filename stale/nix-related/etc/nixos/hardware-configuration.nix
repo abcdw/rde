@@ -1,1 +1,0 @@
-hardware-configuration.ixy.nix

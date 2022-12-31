@@ -1,6 +1,0 @@
--*- mode: org -*-
-
-* Install
-This namespace contains installation-os, which can be used as argument
-to ~guix system disk-image~ command or inherited for more
-customizations.
