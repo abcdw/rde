@@ -8,7 +8,7 @@ stick, boot from it and try it.
 The image is available here:
 
 @c @value{WEB-PAGE}/current-live/amd64/rde-live-latest-amd64.iso
-@value{ISO-DIRECTORY-URL}
+@uref{@value{ISO-DIRECTORY-URL}}
 
 To write it to usb stick you can use any software, we provide you with
 @command{dd} example:
@@ -49,7 +49,13 @@ commands (interactive functions), @kbd{s-r} for @command{recompile},
 @kbd{C-c C-k} for interrupting compilation, @kbd{C-x C-f} for openning
 file, @kbd{M-n/p} for next/previous thing in minibuffer/eshell history,
 @kbd{M-s g} for searching a text in files, @kbd{M-g l} for searching
-text in current file.
+text in current file.  @kbd{C-h m} to see keybindings and other
+information about enabled modes.
+
+There are a few keys, which can be useful for navigating info: @kbd{C-h
+i} to open info, @kbd{m} for menu, @kbd{i} or @kbd{I} for working with
+indecies, @kbd{^} or @kbd{u} go up in the document structure, @kbd{l} go
+back to previous place.
 
 To change timezone use eshell and the following commands:
 
@@ -59,6 +65,10 @@ ls $TZDIR
 sudo cp Etc/UTC /etc/localtime
 swaymsg reload
 @end example
+
+To start interacting with the community you can join IRC by calling
+@kbd{M-x} @command{rde-erc-connect} or @command{erc-tls}.  Say hi, ask
+for help or just hangout around.
 
 After all or some of the corners of live operating system are explored,
 you can proceed with installation (@pxref{Installation}).
