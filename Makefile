@@ -18,6 +18,8 @@ check:
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure
 
+.PHONY: examples/target/rde-live.iso
+
 examples/target/rde-live.iso:
 	make -C examples target/rde-live.iso
 
@@ -40,6 +42,8 @@ doc/rde-tool-list.texi: doc/rde-tool-list.org
 	pandoc doc/rde-tool-list.org -f org -t texinfo \
 	-o doc/rde-tool-list.texi
 	sed -i '1,3d' doc/rde-tool-list.texi
+
+doc/rde.texi: doc/rde-tool-list.texi doc/getting-started.texi
 
 doc/rde.info: doc/rde.texi
 	makeinfo -o doc/rde.info doc/rde.texi
