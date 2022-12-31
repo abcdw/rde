@@ -2,8 +2,10 @@
 #+OPTIONS: toc:nil
 
 * rde
-Developers and power user friendly GNU/Linux distribution.  More info
-is available at [[http://trop.in/rde][trop.in/rde]].
+Developers and power user friendly GNU/Linux distribution based on [[https://guix.gnu.org/][GNU Guix]]
+package manager.
+
+More info is available at [[http://trop.in/rde][trop.in/rde]].
 
 #+BEGIN_EXPORT html
 <p><a href="https://builds.sr.ht/~abcdw/rde?">
@@ -14,10 +16,12 @@ is available at [[http://trop.in/rde][trop.in/rde]].
 </a></p>
 #+END_EXPORT
 
-*Disclaimer:* The project is in an active development stage.
+*Disclaimer:* The rde project is stable and usable, but still under active
+development and API is a subject to change.
 
 ** Principles
-More detailed description can be found in the [[https://trop.in/rde/manual#Principles][manual]].
+This is a brief list of principles, more detailed description can be found in
+the [[https://trop.in/rde/manual#Principles][manual]].
 *** Main
 - Ergonomic :: Sane keybindings, good contrast, readable fonts.
 - Reproducible :: Setup can be easily replicated.
@@ -30,43 +34,12 @@ More detailed description can be found in the [[https://trop.in/rde/manual#Princ
   distractive things.
 
 ** Usage
-rde heavily relies on Guix Home and Guix System, it's able to provide
-both a ~home-environment~ and ~operating-system~ records, which can be
-used by ~guix home~ and ~guix system~ respectively.  It's not ready for
-wide audience yet, but for very curious people: my current [[file:rde/examples/abcdw/configs.scm][config]] is
-here and I use following commands to apply it:
-
-#+begin_src shell
-git clone https://git.sr.ht/~abcdw/rde
-cd rde
-make home
-#+end_src
-
-Read more about ~home-environment~ at [[http://guix.gnu.org/en/manual/devel/en/guix.html#Home-Configuration][Home Configuration]].
-
-GNU Guix and git should be installed before invoking commands above.
-
-The alternative and more apropriate way to use rde will be described
-later.
-
-** Guix Home
-~Guix Home~ is a part of GNU Guix now, no additional installation steps
-are required.
-
-*** People's Guix Home configurations
-Those repositories are not affilated with rde or Guix, they are provided as
-real-world Guix Home usage examples, but be careful and thoughtful, remember
-that blindly copying snippets of code from the internet can have a huge
-security implications on your setup.
-
-- [[https://hg.sr.ht/~yoctocell/guixrc/browse/yoctocell/home][yoctocell]]'s full-blown configuration with variety of software.
-- [[https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/config/home/yggdrasil][krevedkokun]]'s Emacs(Evil)/Wayland(Sway) compact and clean config.
-- [[https://github.com/nicolas-graves/dotfiles][Nicolas Graves]]' dotfiles forked from krevedkokun's.
-- [[https://git.sr.ht/~akagi/guixrc][akagi]]'s configurations, home and system services and packages.
+Read [[https://trop.in/rde/manual#Getting-Started][Getting Started]] section of the manual, skim through the source code and
+enjoy the thing!
 
 ** Channel introduction
-In case you want to use rde as a channel, add the following code to
-your ~~/.config/guix/channels.scm~, and call ~guix pull~.
+In case you want to use rde as a channel, there is a channel definition:
+
 #+begin_src scheme
 (cons*
  (channel
@@ -79,6 +52,9 @@ your ~~/.config/guix/channels.scm~, and call ~guix pull~.
      "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
  %default-channels)
 #+end_src
+
+Add it to ~~/.config/guix/channels.scm~, and call ~guix pull~ or manage it any
+other way you want.
 
 ** Just a screenshot
 A picture to catch your eye)
@@ -97,9 +73,26 @@ existing email account:
 - [[https://lists.sr.ht/~abcdw/rde-devel/][~abcdw/rde-devel@lists.sr.ht]] :: for patches and development related
   discussions.
 
-** Contributing
-*** New features, fixes or ideas
-Send mails, optionally with inline patches to rde-devel mailing list.
+Join #rde IRC channel on [[https://libera.chat/][libera.chat]].
 
-*** Documentation
-For Guix Home documentation maintained in [[https://git.savannah.gnu.org/cgit/guix.git/tree/doc][guix repo]].
+Check out [[https://trop.in/rde/manual#Community][Community]] section of the [[https://trop.in/rde/manual][manual]].
+
+** Contributing
+To propose new features, fixes or ideas send emails, optionally with inline
+patches to rde-devel mailing list.  As usual more info is available in
+[[https://trop.in/rde/manual#Contributing][Contributing]] section of the [[https://trop.in/rde/manual][manual]].
+
+** Guix Home
+~Guix Home~ is a part of GNU Guix now, no additional installation steps are
+required anymore.
+
+*** People's Guix Home configurations
+Those repositories are not affilated with rde or Guix, they are provided as
+real-world Guix Home usage examples, but be careful and thoughtful, remember
+that blindly copying snippets of code from the internet can have a huge
+security implications on your setup.
+
+- [[https://hg.sr.ht/~yoctocell/guixrc/browse/yoctocell/home][yoctocell]]'s full-blown configuration with variety of software.
+- [[https://git.sr.ht/~krevedkokun/dotfiles/tree/master/item/config/home/yggdrasil][krevedkokun]]'s Emacs(Evil)/Wayland(Sway) compact and clean config.
+- [[https://github.com/nicolas-graves/dotfiles][Nicolas Graves]]' dotfiles forked from krevedkokun's.
+- [[https://git.sr.ht/~akagi/guixrc][akagi]]'s configurations, home and system services and packages.
