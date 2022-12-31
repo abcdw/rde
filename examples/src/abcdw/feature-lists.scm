@@ -133,7 +133,8 @@
 
    (feature-emacs-message)
    (feature-emacs-erc
-    #:erc-log? #t)
+    #:erc-log? #t
+    #:erc-autojoin-channels-alist '((Libera.Chat "#rde")))
    (feature-emacs-telega)
    (feature-emacs-elpher)
 
