@@ -1,3 +1,4 @@
+VERSION=latest
 # Also defined in .envrc
 GUIX_PROFILE=target/profiles/guix
 GUIX=./pre-inst-env ${GUIX_PROFILE}/bin/guix
@@ -43,6 +44,14 @@ target/rde-live.iso: guix target
 	RDE_TARGET=live-system ${GUIX} system image --image-type=iso9660 \
 	${CONFIGS} -r target/rde-live-tmp.iso
 	mv -f target/rde-live-tmp.iso target/rde-live.iso
+
+target/release:
+	mkdir -p target/release
+
+# TODO: Prevent is rebuilds.
+release/rde-live-x86_64: target/rde-live.iso target/release
+	cp -df $< target/release/rde-live-${VERSION}-x86_64.iso
+	gpg -ab target/release/rde-live-${VERSION}-x86_64.iso
 
 
 target/profiles:
