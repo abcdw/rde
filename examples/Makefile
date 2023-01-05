@@ -10,10 +10,6 @@ PULL_EXTRA_OPTIONS=
 
 ROOT_MOUNT_POINT=/mnt
 
-# Store items doesn't have useful mtime, so we rely on guix.lock to prevent
-# unecessary rebuilds
-guix: target/profiles/guix.lock
-
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
 	build ${CONFIGS}
@@ -53,6 +49,14 @@ release/rde-live-x86_64: target/rde-live.iso target/release
 	cp -df $< target/release/rde-live-${VERSION}-x86_64.iso
 	gpg -ab target/release/rde-live-${VERSION}-x86_64.iso
 
+
+#
+# Profiles
+#
+
+# Store items doesn't have useful mtime, so we rely on guix.lock to prevent
+# unecessary rebuilds
+guix: target/profiles/guix.lock
 
 target/profiles:
 	mkdir -p target/profiles
