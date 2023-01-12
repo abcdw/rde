@@ -593,6 +593,11 @@ object, etc) or save it to the file use @kbd{s-M-@key{print}}.
 @node Contributing
 @chapter Contributing
 
+@section Sharing Feedback
+The easiest way to contribute is to let us know you use rde.  Explaining
+how you use it and sharing constructive feedback will help the project
+even more.
+
 @section Sending Patches
 The process is similiar to many FLOSS projects, just send patch or
 series of patches on rde-devel mailing list.
