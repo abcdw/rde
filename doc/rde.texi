@@ -208,7 +208,9 @@ modifications or even experimental prototypes (@pxref{Contributing}).
 The primary way of communication is mailing lists.  The development,
 support, announcements happens here, and there are a few reasons why
 (@pxref{Mailing Lists}).  For casual discussions, more interactive
-support or just pleasant pastime we use IRC and Matrix.
+support or just pleasant pastime we use IRC and Matrix.  Don't be shy,
+jump in and let us know that you use rde, it will help you make new
+friends, and will help the project to grow the community and awareness.
 
 @anchor{Mailing Lists}
 @subsection Mailing Lists
