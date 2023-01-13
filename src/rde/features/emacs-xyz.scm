@@ -47,6 +47,7 @@
 
             ;; Generic
             feature-emacs-input-methods
+            feature-emacs-time
             feature-emacs-tramp
             feature-emacs-dired
             feature-emacs-eshell
