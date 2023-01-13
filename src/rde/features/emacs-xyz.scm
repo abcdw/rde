@@ -1713,6 +1713,8 @@ their behavior."
          (setq eglot-confirm-server-initiated-edits nil)
          (add-hook 'eglot-managed-mode-hook
                    (lambda () (setq consult-imenu--cache nil)))
+         ;; Potentially can speed up eglot:
+         ;; (setq eglot-events-buffer-size 0)
          (setq eglot-extend-to-xref t)))
       #:summary "\
 Refactoring, completion, navigation, documentation via LSP"
