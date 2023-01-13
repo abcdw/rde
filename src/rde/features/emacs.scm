@@ -490,20 +490,6 @@ C-h C-a to open About Emacs buffer."
                 '())
 
           ,#~""
-          (eval-when-compile
-           (require 'time))
-          (setq world-clock-list
-                '(("America/Los_Angeles" "Los Angeles")
-                  ("America/Boise" "Boise")
-                  ("America/New_York" "New York")
-                  ("UTC" "UTC")
-                  ("Europe/London" "London")
-                  ("Europe/Paris" "Paris")
-                  ("Europe/Helsinki" "Helsinki")
-                  ("Europe/Moscow" "Moscow")
-                  ("Asia/Tbilisi" "Tbilisi")
-                  ("Asia/Tokyo" "Tokyo")))
-          (define-key rde-app-map (kbd "w") 'world-clock)
 
           ;; TODO: Move to feature-sane-bindings
           (let ((map goto-map))
