@@ -49,6 +49,7 @@
             mail-account-id
             mail-account-type
             mail-account-fqda
+            mail-account-user
             mail-account-synchronizer
             mail-account-get-pass-cmd
 
@@ -87,6 +88,9 @@ scenarios, during generation of @file{mbsyncrc} for example.")
   (fqda
    (string #f)
    "Email address. @code{\"someone@example.com\"} for example.")
+  (user
+   (maybe-string #f)
+   "User name.  Will default to @code{fqda}.")
   ;; TODO: Add sign? field. or maybe just annoy users, which doesn't
   ;; have a gpg key for all emails they use?
   (pass-cmd
@@ -347,7 +351,9 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
               "\n"
               "account " (symbol->string (mail-account-id acc)) "\n"
               "from " (mail-account-fqda acc) "\n"
-              "user " (mail-account-fqda acc) "\n"
+              "user " (or (mail-account-user acc)
+                          (mail-account-fqda acc))
+                       "\n"
               "passwordeval " (mail-account-get-pass-cmd acc) "\n"
               (msmtp-serializer msmtp-provider-settings acc)))
            mail-accs)))))
@@ -471,7 +477,8 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 
   (define (isync-settings mail-directory mail-account)
     (let* ((id       (mail-account-id mail-account))
-           (user     (mail-account-fqda mail-account))
+           (user     (or (mail-account-user mail-account)
+                         (mail-account-fqda mail-account)))
            (pass-cmd (mail-account-get-pass-cmd mail-account)))
       `(,#~(string-append "# Account '" #$(symbol->string id)
                           " starts here")
