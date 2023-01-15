@@ -298,6 +298,8 @@ Citation line format, message signature, gpg and msmtp configurations. "
                (port . 587)))
     (mailbox . ((host . "smtp.mailbox.org")
                 (port . 587)))
+    (hosteurope-de . ((host . "smtp.hosteurope.de")
+                      (port . 587)))
     (generic . #f)))
 
 (define %default-msmtp-settings
@@ -536,6 +538,14 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     ("junk"    . "Junk")
     ("archive" . "Archive")))
 
+(define hosteurope-de-folder-mapping
+  '(("inbox"   . "INBOX")
+    ("sent"    . "Sent")
+    ("drafts"  . "Entwurf")
+    ("trash"   . "Trash")
+    ("spam"    . "Spam")
+    ("archive" . "All")))
+
 (define gmx-fr-isync-settings
   (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
 
@@ -552,6 +562,9 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
 
 (define mailbox-isync-settings
   (generate-isync-serializer "imap.mailbox.org" mailbox-folder-mapping))
+
+(define hosteurope-de-isync-settings
+  (generate-isync-serializer "imap.hosteurope.de" hosteurope-de-folder-mapping))
 
 (define* (get-ovh-pro-isync-settings
           #:key
@@ -582,6 +595,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
     (ovh . ,ovh-isync-settings)
     (ovh-pro2-fr . ,ovh-pro2-fr-isync-settings)
     (mailbox . ,mailbox-isync-settings)
+    (hosteurope-de . ,hosteurope-de-isync-settings)
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
