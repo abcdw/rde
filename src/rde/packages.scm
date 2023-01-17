@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -43,7 +43,8 @@
   #:use-module (guix build-system gnu)
   #:use-module ((guix licenses) #:prefix license:)
   #:export (strings->packages
-            strings->inferior-packages))
+            strings->inferior-packages
+            %rde-patch-path))
 
 ;; Utils
 
@@ -66,27 +67,13 @@
 
   (map get-inferior-pkg lst))
 
-(define (search-patch file-name)
-  "Search the patch FILE-NAME.  Raise an error if not found."
-  (or (search-path (%rde-patch-path) file-name)
-      (raise (formatted-message (G_ "~a: patch not found")
-                                file-name))))
-
-(define-syntax-rule (search-patches file-name ...)
-  "Return the list of absolute file names corresponding to each
-FILE-NAME found in %PATCH-PATH."
-  (list (search-patch file-name) ...))
-
 (define %channel-root
   (find (lambda (path)
           (file-exists? (string-append path "/rde/packages.scm")))
         %load-path))
 
 (define %rde-patch-path
-  (make-parameter
-   (append
-    (list (string-append %channel-root "rde/packages/patches"))
-    (%patch-path))))
+  (list (string-append %channel-root "/rde/packages/patches")))
 
 
 (define-public wtype
