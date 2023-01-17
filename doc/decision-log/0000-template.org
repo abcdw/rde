@@ -1,0 +1,14 @@
+#+TITLE: Record Architecure Decisions
+#+Date: 2022-12-19
+
+* Status
+RFC by DATE, Accepted, Superseded/Deprecated.
+
+* Context
+Forces at play.
+
+* Decision
+We will ...
+
+* Consequences
+Positive and negative outcomes.

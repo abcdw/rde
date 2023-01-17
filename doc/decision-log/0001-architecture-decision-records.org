@@ -1,0 +1,43 @@
+#+TITLE: Architecure Decision Records
+#+Date: 2022-12-19
+
+* Status
+RFC by 2023-01-27
+
+* Context
+Many important decisions, which have long term consequences are made during
+the development of the project, but it's hard to remember them exactly,
+especially without a context, why the decision was made and understand if it
+should be revisited and possibly changed.
+
+One possible solution is to maintain Architecure Decision Records.  ADR is a
+short text file 1-2 page long.  Status can be RFC by June 22, Proposed,
+Accepted[, superseds XXXX], Superseded by XXXX.  The context explains the
+forces at play.  Decision section is a justified response to those forces.
+Consequences provide a context after the decision is applied, highlighting
+both positive and negative effects.  Metadata/Notes - who is author, when
+approved, who approved, what parts of ADR was changed, when and by whom.  Once
+ADR is accepted it MUST NOT be changed, the wording/context can be enhanced,
+but the decision itself still the same and now can only be superseded.
+
+Another possible solution is to write down arch decisions in the manual, but
+it may provide unnecessary information to people who are not interested in it
+and also spread and hide releveant info from people who are intersted in it.
+Also, manual shows only the most actual and recent state of the project, but
+we need to keep track of all decisions.
+
+https://cognitect.com/blog/2011/11/15/documenting-architecture-decisions
+
+* Decision
+We will write ADR to doc/decision-log/XXXX-noun-phrase.org every time an
+important/architectural decision is made (the one, which affects how we
+program, how we work, how the components of the project interacts, etc).
+Also, we will write down some of decisions already made.
+
+* Consequences
+We currently have a dozen of things, which are justified in some conversations
+on IRC/ML, but not in a centralaized place and thus are hard to discuss or
+grasp by necommers.  By writing ADRs we will be able to easily reference them
+in the discussions.
+
+We will need to spend additional time writing ADRs.
