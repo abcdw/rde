@@ -2670,8 +2670,8 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
 
 (define* (feature-emacs-telega
           #:key
-          (emacs-telega emacs-telega-latest)
-          (emacs-telega-contrib emacs-telega-contrib-latest))
+          (emacs-telega emacs-telega)
+          (emacs-telega-contrib emacs-telega-contrib))
   "Configure telega.el for GNU Emacs"
   (define emacs-f-name 'telega)
   (define f-name (symbol-append 'emacs- emacs-f-name))

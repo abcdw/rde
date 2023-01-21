@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;;
 ;;; This file is part of rde.
@@ -208,56 +208,11 @@ sending Git patches via Email, without leaving Emacs."))))
    (description "This package provides transient interface for git-gutter function
 to manipulate and navigate hunks.")))
 
-(define tdlib-latest-instead-of-tdlib
-  (package-input-rewriting/spec `(("tdlib-1.8.0" . ,(const tdlib-latest)))))
+(define-public emacs-telega-server-latest emacs-telega-server)
 
-(define-public emacs-telega-server-latest
-  (tdlib-latest-instead-of-tdlib
-   (let ((commit "733194c4ed16f57e2b4e66a79be842a5d0731012")
-         (revision "0"))
-     (package
-       (inherit emacs-telega-server)
-       (name "emacs-telega-server")
-       (version (git-version "0.8.03" revision commit))
-       (source
-        (origin
-          (method git-fetch)
-          (uri (git-reference
-                (url "https://github.com/zevlg/telega.el")
-                (commit "733194c4ed16f57e2b4e66a79be842a5d0731012")))
-          (sha256
-           (base32 "0l3a2qbqwf6rrnnkranclqq9fig3ki176ddj02azr9360ps46xly"))
-          (file-name (git-file-name "emacs-telega" version))
-          (patches
-           (search-patches "emacs-telega-path-placeholder.patch"
-                           "emacs-telega-test-env.patch"))))))))
+(define-public emacs-telega-latest emacs-telega)
 
-(define telega-server-latest-instead-of-telega-server
-  (package-input-rewriting/spec
-   `(("ffmpeg" . ,(const ffmpeg-5))
-     ("emacs-telega-server" . ,(const emacs-telega-server-latest)))))
-
-(define-public emacs-telega-latest
-  (telega-server-latest-instead-of-telega-server
-   (package
-     (inherit emacs-telega)
-     (version (package-version emacs-telega-server-latest))
-     (source (package-source emacs-telega-server-latest)))))
-
-(define-public emacs-telega-contrib-latest
-  ;; TODO: Figure out while previous implementation was failing when built
-  ;; with grafts.
-  (package
-    (inherit emacs-telega-latest)
-    (name "emacs-telega-contrib")
-    (arguments (package-arguments emacs-telega-contrib))
-    (inputs '())
-    (native-inputs '())
-    (propagated-inputs
-     (list emacs-alert emacs-all-the-icons emacs-dashboard emacs-telega-latest))
-    (synopsis "Contributed packages to Telega")
-    (description "Telega-contrib is a collection of third-party
-contributed packages to Telega.")))
+(define-public emacs-telega-contrib-latest emacs-telega-contrib)
 
 (define-public emacs-consult-eglot-sans-eglot
   (package
