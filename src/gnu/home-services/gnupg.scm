@@ -251,7 +251,7 @@ have a configuration for gpg-agent."))
        (serialize-configuration
         (home-gnupg-configuration-gpg-agent-config config)
         (filter-configuration-fields home-gpg-agent-configuration-fields
-                                     '(ssh-keys)
+                                     '(ssh-keys shepherd?)
                                      #t))
        (home-gpg-agent-configuration-extra-content
         (home-gnupg-configuration-gpg-agent-config config))))
