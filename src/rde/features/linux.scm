@@ -70,7 +70,7 @@
 
 (define* (feature-pipewire
           #:key
-          (pipewire pipewire-0.3)
+          (pipewire pipewire)
           (wireplumber wireplumber)
           (pulseaudio pulseaudio))
   ""
