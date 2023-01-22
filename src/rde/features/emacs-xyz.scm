@@ -3,7 +3,7 @@
 ;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
-;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2022, 2023 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2022 conses <contact@conses.eu>
 ;;;
 ;;; This file is part of rde.
@@ -136,39 +136,66 @@ and overall looks cool."
         (blink-cursor-mode 0)
         (setq-default cursor-in-non-selected-windows nil)
 
-        (require 'modus-themes)
-        ;; Doesn't see the effect.
+        (defvar modus-themes-common-palette-overrides)
+        (with-eval-after-load 'modus-themes
+          (setq modus-themes-common-palette-overrides
+                `((border-mode-line-active unspecified)
+                  (border-mode-line-inactive unspecified)
+                  (fringe unspecified))))
 
-        (setq modus-themes-mode-line '(borderless))
-        (setq modus-themes-diffs 'desaturated)
-        (setq modus-themes-deuteranopia ,(if deuteranopia? 't 'nil))
-        (setq modus-themes-fringes nil)
-        (setq modus-themes-operandi-color-overrides
-              `((fg-window-divider-inner . "#ffffff")
-                (fg-window-divider-outer . "#ffffff")))
-        (setq modus-themes-vivendi-color-overrides
-              `((fg-window-divider-inner . "#000000")
-                (fg-window-divider-outer . "#000000")))
+        (defvar modus-operandi-palette-overrides)
+        (with-eval-after-load 'modus-operandi-themes
+          (setq modus-operandi-palette-overrides
+                `((fg-window-divider-inner "#ffffff")
+                  (fg-window-divider-outer "#ffffff"))))
 
-        (defun rde-modus-themes-custom-faces ()
-          (modus-themes-with-colors
-           (custom-set-faces
-            ;; Replace green with blue if you use `modus-themes-deuteranopia'.
-            `(git-gutter-fr:added ((,class :foreground ,,(if deuteranopia?
-                                                             'blue-fringe-bg
-                                                             'green-fringe-bg)
-                                     :background ,bg-main)))
-            `(git-gutter-fr:deleted ((,class :foreground ,red-fringe-bg
-                                       :background ,bg-main)))
-            `(git-gutter-fr:modified ((,class :foreground ,yellow-fringe-bg
-                                        :background ,bg-main))))))
+        (defvar modus-vivendi-palette-overrides)
+        (with-eval-after-load 'modus-vivendi-themes
+          (setq modus-vivendi-palette-overrides
+                `((fg-window-divider-inner "#000000")
+                  (fg-window-divider-outer "#000000"))))
+        ;; (setq modus-themes-diffs 'desaturated)
 
-        (add-hook 'modus-themes-after-load-theme-hook
-                  'rde-modus-themes-custom-faces)
+        ;; Somehow needed here.
+        (eval-when-compile
+         (require 'cl-seq))
 
-        ,@(if dark?
-              '((modus-themes-load-vivendi))
-              '((modus-themes-load-operandi)))
+        ;; Theme-agnostic setup (see modus manual)
+
+        (defvar after-enable-theme-hook nil
+          "Normal hook run after enabling a theme.")
+        (defun run-after-enable-theme-hook (&rest _args)
+          "Run `after-enable-theme-hook'."
+          (run-hooks 'after-enable-theme-hook))
+        (advice-add 'enable-theme :after 'run-after-enable-theme-hook)
+
+        ,@(let ((theme
+                 (if dark?
+                     (if deuteranopia?
+                         'modus-vivendi-deuteranopia
+                         'modus-vivendi)
+                     (if deuteranopia?
+                         'modus-operandi-deuteranopia
+                         'modus-operandi))))
+            `((if (load-theme ',theme t)
+
+                  (defun rde-modus-themes-custom-faces ()
+                    (modus-themes-with-colors
+                     (custom-set-faces
+                      ;; Replace green with blue if you use `modus-themes-deuteranopia'.
+                      `(git-gutter-fr:added ((,c :foreground ,,(if deuteranopia?
+                                                                   'blue-fringe-bg
+                                                                   'green-fringe-bg)
+                                                 :background ,bg-main)))
+                      `(git-gutter-fr:deleted ((,c :foreground ,red-fringe-bg
+                                                   :background ,bg-main)))
+                      `(git-gutter-fr:modified ((,c :foreground ,yellow-fringe-bg
+                                                    :background ,bg-main))))))
+
+                  (add-hook 'after-enable-theme-hook
+                            'rde-modus-themes-custom-faces)
+
+                  (enable-theme ',theme))))
 
         (with-eval-after-load
          'rde-keymaps
