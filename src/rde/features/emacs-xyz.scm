@@ -632,6 +632,7 @@ Small tweaks, xdg entry for openning directories in emacs client."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+;; TODO: Integrate with eat https://codeberg.org/akib/emacs-eat
 (define* (feature-emacs-eshell)
   "Configure Eshell, the Emacs shell."
   (define emacs-f-name 'eshell)
