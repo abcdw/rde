@@ -251,3 +251,20 @@ to manipulate and navigate hunks.")))
        (modify-inputs (package-propagated-inputs emacs-docker)
          (delete "emacs-docker-tramp")
          (append emacs-transient-latest))))))
+
+(define-public emacs-modus-themes-latest
+  (let ((commit "2dacdf901304be95a86786135a4f3e797d3cb4fe")
+        (revision "0"))
+    (package
+      (inherit emacs-modus-themes)
+      (name "emacs-modus-themes")
+      (version (git-version "4.0.1" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://git.sr.ht/~protesilaos/modus-themes")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1yk4i0n0zzdql6irb34nf3y60ilsckf2ahw4pq9py3vihf05zp2m")))))))
