@@ -128,6 +128,13 @@ and overall looks cool."
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
+    (define dark-theme
+      (if deuteranopia? 'modus-vivendi-deuteranopia 'modus-vivendi))
+    (define light-theme
+      (if deuteranopia? 'modus-operandi-deuteranopia 'modus-operandi))
+    (define theme
+      (if dark? dark-theme light-theme))
+
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -136,31 +143,37 @@ and overall looks cool."
         (blink-cursor-mode 0)
         (setq-default cursor-in-non-selected-windows nil)
 
-        (defvar modus-themes-common-palette-overrides)
+        (eval-when-compile (require 'modus-themes))
         (with-eval-after-load 'modus-themes
           (setq modus-themes-common-palette-overrides
                 `((border-mode-line-active unspecified)
                   (border-mode-line-inactive unspecified)
                   (fringe unspecified))))
 
-        (defvar modus-operandi-palette-overrides)
-        (with-eval-after-load 'modus-operandi-themes
-          (setq modus-operandi-palette-overrides
-                `((fg-window-divider-inner "#ffffff")
-                  (fg-window-divider-outer "#ffffff"))))
+        (setq modus-themes-to-toggle '(,light-theme ,dark-theme))
 
-        (defvar modus-vivendi-palette-overrides)
-        (with-eval-after-load 'modus-vivendi-themes
-          (setq modus-vivendi-palette-overrides
-                `((fg-window-divider-inner "#000000")
-                  (fg-window-divider-outer "#000000"))))
-        ;; (setq modus-themes-diffs 'desaturated)
-
-        ;; Somehow needed here.
+        ;; Needed by modus-themes internals
         (eval-when-compile
          (require 'cl-seq))
 
-        ;; Theme-agnostic setup (see modus manual)
+        (require ',(symbol-append theme '-theme))
+        (load-theme ',theme t)
+
+        (eval-when-compile
+         (enable-theme ',theme))
+        (defun rde-modus-themes-custom-faces ()
+          (when (modus-themes--current-theme)
+            (modus-themes-with-colors
+             (custom-set-faces
+              `(window-divider ((,c :foreground ,bg-main)))
+              `(window-divider-first-pixel ((,c :foreground ,bg-main)))
+              `(window-divider-last-pixel ((,c :foreground ,bg-main)))
+              `(git-gutter-fr:added ((,c :foreground ,bg-added-intense
+                                         :background ,bg-main)))
+              `(git-gutter-fr:deleted ((,c :foreground ,bg-removed-intense
+                                           :background ,bg-main)))
+              `(git-gutter-fr:modified ((,c :foreground ,bg-changed-intense
+                                            :background ,bg-main)))))))
 
         (defvar after-enable-theme-hook nil
           "Normal hook run after enabling a theme.")
@@ -169,33 +182,8 @@ and overall looks cool."
           (run-hooks 'after-enable-theme-hook))
         (advice-add 'enable-theme :after 'run-after-enable-theme-hook)
 
-        ,@(let ((theme
-                 (if dark?
-                     (if deuteranopia?
-                         'modus-vivendi-deuteranopia
-                         'modus-vivendi)
-                     (if deuteranopia?
-                         'modus-operandi-deuteranopia
-                         'modus-operandi))))
-            `((if (load-theme ',theme t)
-
-                  (defun rde-modus-themes-custom-faces ()
-                    (modus-themes-with-colors
-                     (custom-set-faces
-                      ;; Replace green with blue if you use `modus-themes-deuteranopia'.
-                      `(git-gutter-fr:added ((,c :foreground ,,(if deuteranopia?
-                                                                   'blue-fringe-bg
-                                                                   'green-fringe-bg)
-                                                 :background ,bg-main)))
-                      `(git-gutter-fr:deleted ((,c :foreground ,red-fringe-bg
-                                                   :background ,bg-main)))
-                      `(git-gutter-fr:modified ((,c :foreground ,yellow-fringe-bg
-                                                    :background ,bg-main))))))
-
-                  (add-hook 'after-enable-theme-hook
-                            'rde-modus-themes-custom-faces)
-
-                  (enable-theme ',theme))))
+        (add-hook 'after-enable-theme-hook 'rde-modus-themes-custom-faces)
+        (enable-theme ',theme)
 
         (with-eval-after-load
          'rde-keymaps
@@ -203,9 +191,9 @@ and overall looks cool."
 
         (setq bookmark-set-fringe-mark nil)
 
-        ;; (setq header-line-format (delete 'mode-line-modes header-line-format))
         (setq mode-line-modes
-              (let ((recursive-edit-help-echo "Recursive edit, type C-M-c to get out"))
+              (let ((recursive-edit-help-echo
+                     "Recursive edit, type C-M-c to get out"))
                 (list (propertize "%[" 'help-echo recursive-edit-help-echo)
                       "("
                       `(:propertize ("" mode-name)
