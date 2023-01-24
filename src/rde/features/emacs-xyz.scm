@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022, 2023 Nicolas Graves <ngraves@ngraves.fr>
@@ -113,7 +113,7 @@
           (deuteranopia? #t)
           (dark? #f)
           (header-line-as-mode-line? #t)
-          (emacs-modus-themes emacs-modus-themes)
+          (emacs-modus-themes emacs-modus-themes-latest)
           (extra-elisp '()))
   "Make Emacs looks modern and minimalistic. `deuteranopia?' substitutes
 red/green colors with red/blue, which helps people with colorblindness
