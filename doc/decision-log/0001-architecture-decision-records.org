@@ -2,7 +2,7 @@
 #+Date: 2022-12-19
 
 * Status
-RFC by 2023-01-27
+Accepted.
 
 * Context
 Many important decisions, which have long term consequences are made during
