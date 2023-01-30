@@ -12,8 +12,7 @@ install:
 	@echo some installation will happen here
 
 check:
-	guix time-machine -C ./examples/rde/channels-lock.scm -- \
-	home --fallback build ./src/gnu/home/examples/minimal.tmpl
+	./pre-inst-env guile -c '((@ (rde test-runners) run-project-tests))'
 
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure
