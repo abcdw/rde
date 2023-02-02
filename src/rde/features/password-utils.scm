@@ -121,24 +121,24 @@
                        '())
 
                  ,@(if emacs-embark
-                       `((eval-when-compile
-                          (require 'embark))
+                       `((with-eval-after-load
+                             'password-store
+                           (defvar pass-embark-actions
+                             (let ((map (make-sparse-keymap)))
+                               (define-key map "f" 'password-store-copy-field)
+                               (define-key map "b" 'password-store-url)
+                               (define-key map "e" 'password-store-edit)
+                               (define-key map "g" 'password-store-generate)
+                               (define-key map "r" 'password-store-rename)
+                               (define-key map "d" 'password-store-remove)
+                               map)
+                             "Keymap for actions for pass entries."))
 
                          (with-eval-after-load
-                          'embark
-                          (require 'password-store)
-                          (embark-define-keymap
-                           embark-pass-actions
-                           "Keymap for actions for pass entries."
-                           ("f" password-store-copy-field)
-                           ("b" password-store-url)
-                           ("e" password-store-edit)
-                           ("g" password-store-generate)
-                           ("r" password-store-rename)
-                           ("d" password-store-remove))
-
-                          (add-to-list 'embark-keymap-alist
-                                       '(pass . embark-pass-actions))))
+                             'embark
+                           (require 'password-store)
+                           (add-to-list 'embark-keymap-alist
+                                        '(pass . pass-embark-actions))))
                        '()))
                #:summary "\
 Password store emacs interfaces"
