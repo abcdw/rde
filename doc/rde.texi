@@ -560,6 +560,21 @@ emulator isn't needed and you can just spawn eshell directly with
 (@pxref{Regular Expressions,,,Elisp})
 (@pxref{Regexps,,,Emacs})
 
+@anchor{Messaging}
+@section Messaging
+@anchor{Slack}
+@subsection Slack
+There is a Slack feature which allows you to access Slack workspaces via
+the @uref{https://github.com/yuya373/emacs-slack,emacs-slack} client.
+
+For authentication to work, you need to ensure you have set an Auth
+source back-end (@pxref{,,,Auth}) in Emacs.  If you use password-store
+(@pxref{The Unix password store,,,Auth}), you should have an entry of
+the form `nick@@workspace` for your Slack token and, if you need a
+cookie (consult
+@uref{https://github.com/yuya373/emacs-slack#how-to-get-token-and-cookie}
+for details), an entry of the form `nick^cookie@@workspace`.
+
 @section Programming Languages
 @subsection Clojure
 
