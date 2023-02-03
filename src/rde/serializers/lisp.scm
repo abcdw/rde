@@ -29,7 +29,10 @@
 
   #:export (serialize-sexp-config
             sexp-serialize
-            sexp-config?))
+            sexp-config?
+            serialize-lisp-config
+            lisp-serialize
+            lisp-config?))
 
 (define sexp-config? list?)
 (define (sexp-serialize sexps)
@@ -53,3 +56,7 @@
 
 (define (serialize-sexp-config field-name sexps)
   (sexp-serialize sexps))
+
+(define lisp-config? sexp-config?)
+(define lisp-serialize sexp-serialize)
+(define serialize-lisp-config serialize-sexp-config)
