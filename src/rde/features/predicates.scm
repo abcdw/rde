@@ -18,6 +18,9 @@
 (define-public (maybe-integer? x)
   (or (integer? x) (not x)))
 
+(define-public (maybe-procedure? x)
+  (or (procedure? x) (not x)))
+
 (define-public (maybe-symbol? x)
   (or (symbol? x) (not x)))
 
