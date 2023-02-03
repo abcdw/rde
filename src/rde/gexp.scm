@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023 conses <contact@conses.eu>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -21,9 +22,22 @@
   #:use-module (guix gexp)
   #:use-module (guix diagnostics)
   #:use-module (guix i18n)
-
-  #:export (slurp-file-like
+  #:use-module (ice-9 match)
+  #:export (file-like->name
+            slurp-file-like
             template-file))
+
+(define (file-like->name file)
+  "Takes a file-like FILE and returns the corresponding file-like name."
+  (match file
+    ((? local-file?)
+     (local-file-name file))
+    ((? plain-file?)
+     (plain-file-name file))
+    ((? computed-file?)
+     (computed-file-name file))
+    (_ (leave (G_ "~a is not a local-file, plain-file or \
+computed-file object~%") file))))
 
 (define* (slurp-file-like file #:key (encoding "UTF-8"))
   "Returns a gexp, which reads all the content of the FILE and returns it as a
@@ -55,4 +69,3 @@ is alist of regex patterns and values."
            'pre (cadr pattern) 'post))
         (call-with-input-file #$file get-string-all #:encoding #$encoding)
         '#$substitutes))))
-
