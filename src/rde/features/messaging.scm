@@ -91,7 +91,7 @@ the RDE manual) correctly."
 
   (define (get-home-services config)
     "Return home services related to the Slack.el client."
-    (require-value 'slack-accounts)
+    (require-value 'slack-accounts config)
 
     (list
      (rde-elisp-configuration-service
