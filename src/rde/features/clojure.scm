@@ -133,6 +133,7 @@
              (add-hook 'cider-mode-hook
                        'rde--setup-clojure-orderless-matching-style))
 
+           (setq cider-use-xref nil) ;; eglot will handle it
            (setq cider-doc-auto-select-buffer nil)
            (setq cider-auto-select-error-buffer nil)
            (setq cider-inspector-auto-select-buffer nil)
