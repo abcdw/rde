@@ -142,8 +142,8 @@ See @code{sly-mrepl-default-prompt} for its arguments and return value."
                      `(,(rx "*sly-mrepl" (* any) "*")
                        (display-buffer-no-window)
                        (allow-no-window . t)))
-        (sly-setup)
         (with-eval-after-load 'sly
+          (sly-setup)
           (setq sly-words-of-encouragement '(""))
           (setq sly-command-switch-to-existing-lisp 'always)
           (setq sly-description-autofocus t)
