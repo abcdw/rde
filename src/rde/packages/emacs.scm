@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -29,8 +29,8 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-next-pgtk-stable
-  (let ((commit "32615c9bc124970aade150e81c2ed4a5c0492ef7")
-        (revision "5"))
+  (let ((commit "ac7ec87a7a0db887e4ae7fe9005aea517958b778")
+        (revision "6"))
     (package
       (inherit emacs)
       (name "emacs-next-pgtk-stable")
@@ -50,7 +50,7 @@
                                   ))
          (sha256
           (base32
-           "1gv4ihns0vbghi0d34by436qxqgms96593sahb45qy4dbwxibjza"))))
+           "1akq6dbllwwqwx21wnwnv6aax1nsi2ypbd7j3i79sw62s3gf399z"))))
       (arguments
        (substitute-keyword-arguments (package-arguments emacs-next)
          ((#:configure-flags flags ''())
