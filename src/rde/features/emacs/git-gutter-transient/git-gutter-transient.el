@@ -93,6 +93,8 @@
   (git-gutter-transient:quit)
   (magit-file-dispatch))
 
+;; transient tutorial: https://github.com/positron-solutions/transient-showcase
+
 ;;;###autoload (autoload 'git-gutter-transient "git-gutter-transient" nil t)
 (transient-define-prefix git-gutter-transient ()
   :transient-suffix     'transient--do-stay
