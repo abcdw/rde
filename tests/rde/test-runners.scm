@@ -215,8 +215,9 @@ given string in an ANSI escape code."
 (define (submodules module)
   (hash-map->list (lambda (k v) v) (module-submodules module)))
 
+(test-runner-factory test-runner-default)
+
 (define (run-project-tests)
-  (test-runner-factory test-runner-default)
   ;; (test-runner-current (test-runner-create))
   ;; ;; (test-runner-current)
 
