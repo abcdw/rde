@@ -68,6 +68,7 @@
      (append
       (strings->packages
        ;; "emacs-dirvish"
+       "emacs-rainbow-mode"
        "emacs-hl-todo"
        "emacs-yasnippet"
        ;; "emacs-company"
