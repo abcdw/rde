@@ -1877,10 +1877,12 @@ Almost all other operations are covered by magit."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((eval-when-compile (require 'geiser))
-        (setq geiser-default-implementation 'guile)
-        (setq geiser-active-implementations '(guile))
-        (setq geiser-implementations-alist '(((regexp "\\.scm$") guile))))
+      `((with-eval-after-load 'geiser-repl
+          (setq geiser-repl-add-project-paths nil))
+        (with-eval-after-load 'geiser-impl
+          (setq geiser-default-implementation 'guile)
+          (setq geiser-active-implementations '(guile))
+          (setq geiser-implementations-alist '(((regexp "\\.scm$") guile)))))
       #:elisp-packages
       (list emacs-geiser emacs-geiser-guile)
       #:summary "\
