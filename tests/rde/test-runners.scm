@@ -224,9 +224,7 @@ given string in an ANSI escape code."
   (test-begin "PROJECT TESTS")
   (define this-module-file
     (canonicalize-path
-     (search-path %load-path
-                  (module-filename
-                   (resolve-module '(rde test-runners))))))
+     (search-path %load-path "rde/test-runners.scm")))
   (define test-files
     (discover-tests (dirname this-module-file)))
 
