@@ -115,10 +115,12 @@
           (dark? #f)
           (header-line-as-mode-line? #t)
           (emacs-modus-themes emacs-modus-themes)
+          (deuteranopia-red-blue-diffs? #f)
           (extra-elisp '()))
-  "Make Emacs looks modern and minimalistic. `deuteranopia?' substitutes
-red/green colors with red/blue, which helps people with colorblindness
-and overall looks cool."
+  "Make Emacs looks modern and minimalistic. DEUTERANOPIA? substitutes
+red/green colors with yellow/blue, which helps people with colorblindness and
+overall looks cool, if DEUTERANOPIA-RED-BLUE-DIFFS? is set red/blue colors
+will be used instead."
   (ensure-pred integer? margin)
   (ensure-pred boolean? deuteranopia?)
   (ensure-pred boolean? dark?)
@@ -149,7 +151,38 @@ and overall looks cool."
           (setq modus-themes-common-palette-overrides
                 `((border-mode-line-active unspecified)
                   (border-mode-line-inactive unspecified)
-                  (fringe unspecified))))
+                  (fringe unspecified)))
+          ,(if deuteranopia-red-blue-diffs?
+               `((setq modus-operandi-deuteranopia-palette-overrides
+                       '((bg-changed         "#ffdfa9")
+                         (bg-changed-faint   "#ffefbf")
+                         (bg-changed-refine  "#fac090")
+                         (bg-changed-fringe  "#d7c20a")
+                         (fg-changed         "#553d00")
+                         (fg-changed-intense "#655000")
+
+                         (bg-removed         "#ffd8d5")
+                         (bg-removed-faint   "#ffe9e9")
+                         (bg-removed-refine  "#f3b5af")
+                         (bg-removed-fringe  "#d84a4f")
+                         (fg-removed         "#8f1313")
+                         (fg-removed-intense "#aa2222")))
+
+                 (setq modus-vivendi-deuteranopia-palette-overrides
+                       '((bg-changed         "#363300")
+                         (bg-changed-faint   "#2a1f00")
+                         (bg-changed-refine  "#4a4a00")
+                         (bg-changed-fringe  "#8a7a00")
+                         (fg-changed         "#efef80")
+                         (fg-changed-intense "#c0b05f")
+
+                         (bg-removed         "#4f1119")
+                         (bg-removed-faint   "#380a0f")
+                         (bg-removed-refine  "#781a1f")
+                         (bg-removed-fringe  "#b81a1f")
+                         (fg-removed         "#ffbfbf")
+                         (fg-removed-intense "#ff9095"))))
+               '()))
 
         (setq modus-themes-to-toggle '(,light-theme ,dark-theme))
 
