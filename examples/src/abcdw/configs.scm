@@ -292,7 +292,7 @@
       ;;                "/etc/snippets/tempel/text-mode"))
       ))
    (feature-emacs-spelling
-    #:spelling-program (@ (gnu packages libreoffice) hunspell)
+    #:spelling-program (@ (gnu packages hunspell) hunspell)
     #:spelling-dictionaries (strings->packages
                              "hunspell-dict-en"
                              "hunspell-dict-ru"))
