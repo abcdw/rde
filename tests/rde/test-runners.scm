@@ -247,6 +247,13 @@ given string in an ANSI escape code."
 ;; Common lisp testing frameworks:
 ;; https://sabracrolleton.github.io/testing-framework
 
+;; Clojure testing libraries:
+;; https://jakemccrary.com/blog/2014/06/22/comparing-clojure-testing-libraries-output/
+
+;; Scheme testing libraries:
+;; https://github.com/tali713/mit-scheme/blob/master/tests/unit-testing.scm
+;; https://code.call-cc.org/svn/chicken-eggs/release/5/test/trunk/test.scm
+
 ;; (define-test our-super-test-suite
 ;;   (test-group "Something"
 ;;     (few asserts)))
