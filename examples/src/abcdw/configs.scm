@@ -273,7 +273,7 @@
 
    (feature-yggdrasil)
    (feature-i2pd
-    #:outproxy 'http://acetone.i2p:8888
+    #:outproxy 'http://acetone.i2p:3128
     ;; 'purokishi.i2p
     #:less-anonymous? #t)
 
