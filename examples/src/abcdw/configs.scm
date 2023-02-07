@@ -33,6 +33,8 @@
   #:use-module (guix gexp)
   #:use-module (guix inferior)
   #:use-module (guix channels)
+  #:use-module (guix packages)
+  #:use-module (guix downloads)
   #:use-module (ice-9 match))
 
 
@@ -110,11 +112,27 @@
      "ffmpeg"
      "ripgrep" "curl"))))
 
+(define (wallpaper url hash)
+  (origin
+    (method url-fetch)
+    (uri url)
+    (file-name "wallpaper.png")
+    (sha256 (base32 hash))))
+
+(define wallpaper-ai-art
+  (wallpaper "https://w.wallhaven.cc/full/j3/wallhaven-j3m8y5.png"
+             "0qqx6cfx0krlp0pxrrw0kvwg6x40qq9jic90ln8k4yvwk8fl1nyw"))
+
+(define wallpaper-dark-rider
+  (wallpaper "https://w.wallhaven.cc/full/lm/wallhaven-lmlzwl.jpg"
+             "01j5z3al8zvzqpig8ygvf7pxihsj2grsazg9yjiqyjgsmp00hpaf"))
+
 (define sway-extra-config-service
   (simple-service
    'sway-extra-config
    home-sway-service-type
    `((output DP-2 scale 2)
+     ;; (output * bg ,wallpaper-ai-art center)
      ;; (output eDP-1 disable)
      ,@(map (lambda (x) `(workspace ,x output DP-2)) (iota 8 1))
 
