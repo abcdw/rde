@@ -34,7 +34,7 @@
   #:use-module (guix inferior)
   #:use-module (guix channels)
   #:use-module (guix packages)
-  #:use-module (guix downloads)
+  #:use-module (guix download)
   #:use-module (ice-9 match))
 
 
