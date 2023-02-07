@@ -393,9 +393,9 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
   (rde-config
    (features
     (append
-     %abcdw-features
      %all-features
-     %ixy-features))))
+     %ixy-features
+     %abcdw-features))))
 
 (define-public ixy-os
   (rde-config-operating-system ixy-config))
