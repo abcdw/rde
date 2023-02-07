@@ -114,7 +114,7 @@
           (deuteranopia? #t)
           (dark? #f)
           (header-line-as-mode-line? #t)
-          (emacs-modus-themes emacs-modus-themes-latest)
+          (emacs-modus-themes emacs-modus-themes)
           (extra-elisp '()))
   "Make Emacs looks modern and minimalistic. `deuteranopia?' substitutes
 red/green colors with red/blue, which helps people with colorblindness
@@ -162,6 +162,7 @@ and overall looks cool."
 
         (eval-when-compile
          (enable-theme ',theme))
+
         (defun rde-modus-themes-custom-faces ()
           (when (modus-themes--current-theme)
             (modus-themes-with-colors
@@ -169,11 +170,11 @@ and overall looks cool."
               `(window-divider ((,c :foreground ,bg-main)))
               `(window-divider-first-pixel ((,c :foreground ,bg-main)))
               `(window-divider-last-pixel ((,c :foreground ,bg-main)))
-              `(git-gutter-fr:added ((,c :foreground ,bg-added-intense
+              `(git-gutter-fr:added ((,c :foreground ,bg-added-fringe
                                          :background ,bg-main)))
-              `(git-gutter-fr:deleted ((,c :foreground ,bg-removed-intense
+              `(git-gutter-fr:deleted ((,c :foreground ,bg-removed-fringe
                                            :background ,bg-main)))
-              `(git-gutter-fr:modified ((,c :foreground ,bg-changed-intense
+              `(git-gutter-fr:modified ((,c :foreground ,bg-changed-fringe
                                             :background ,bg-main)))))))
 
         (defvar after-enable-theme-hook nil
