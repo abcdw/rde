@@ -5,7 +5,7 @@
         (url "https://git.sr.ht/~abcdw/rde")
         (branch "master")
         (commit
-          "7fa3798b32968a46ba19d076561124ff86e0f450")
+          "c72fcec7a1af0bc64495fc6ee7feec20a90ee4a3")
         (introduction
           (make-channel-introduction
             "257cebd587b66e4d865b3537a9a88cccd7107c95"
@@ -16,7 +16,7 @@
         (url "https://git.savannah.gnu.org/git/guix.git")
         (branch "master")
         (commit
-          "f912d5c740815bff89a70d54b592c6173519003c")
+          "b5956cb13dd689c766fc47c51945f3f182bdd93a")
         (introduction
           (make-channel-introduction
             "9edb3f66fd807b096b48283debdcddccfea34bad"
