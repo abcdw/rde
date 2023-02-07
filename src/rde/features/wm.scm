@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
@@ -162,7 +162,7 @@
         (home-sway-configuration
          (package sway)
          (config
-          `((xwayland ,(if xwayland? 'enable 'disable))
+          `(,@(if xwayland? `((xwayland enable)) '())
             (,#~"")
             ,@layout-config
 
