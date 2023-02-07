@@ -94,7 +94,7 @@
 
      "utox" "qtox" "jami"
 
-     "alsa-utils" "youtube-dl" "imv" "cozy"
+     "alsa-utils" "yt-dlp" "imv" "cozy"
      "pavucontrol" "wev"
      "imagemagick"
      "obs" "obs-wlrobs"
