@@ -552,9 +552,21 @@ by mapping characters to default emacs keybindings."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define %rde-default-timezones
+  '(("America/Los_Angeles" "Los Angeles")
+    ("America/Boise" "Boise")
+    ("America/New_York" "New York")
+    ("UTC" "UTC")
+    ("Europe/London" "London")
+    ("Europe/Paris" "Paris")
+    ("Europe/Helsinki" "Helsinki")
+    ("Europe/Moscow" "Moscow")
+    ("Asia/Tbilisi" "Tbilisi")
+    ("Asia/Tokyo" "Tokyo")))
+
 (define* (feature-emacs-time
           #:key
-          (world-clock-timezones #f)
+          (world-clock-timezones %rde-default-timezones)
           (world-clock-key "C")
           (world-clock-time-format "%A %d %B %R %Z")
           (display-time? #f)
