@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
@@ -1028,6 +1028,15 @@ not appear in the pop-up buffer."
                    (equal (plist-get notmuch-part :content-type) value)))))
               (notmuch-show-view-part)))
            (define-key notmuch-show-part-map "h" 'rde-notmuch-show-view-html-part)
+
+           (mapcar
+            (lambda (x)
+              (add-to-list 'notmuch-show-stash-mlarchive-link-alist x))
+            `(("yhetil" . "https://yhetil.org/")
+              ("rde-devel" .
+               (lambda (x)
+                 (concat "https://lists.sr.ht/~abcdw/rde-devel/<" x ">")))))
+           (setq notmuch-show-stash-mlarchive-link-default "yhetil")
 
            ,@(notmuch-redefined-functions config)
 
