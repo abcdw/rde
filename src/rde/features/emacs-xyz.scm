@@ -43,6 +43,7 @@
   #:export (;; UI
             feature-emacs-appearance
             feature-emacs-modus-themes
+            feature-emacs-circadian
             feature-emacs-faces
             feature-emacs-which-key
             feature-emacs-keycast
@@ -425,6 +426,60 @@ with references to researches.")))
    (values `((,f-name . ,emacs-modus-themes)
              (emacs-light-theme . ,light-theme)
              (emacs-dark-theme . ,dark-theme)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-circadian
+          #:key
+          (emacs-circadian emacs-circadian))
+  "Configure the circadian.el Emacs package for theme-switching
+based on the time of the day."
+  (ensure-pred file-like? emacs-circadian)
+
+  (define emacs-f-name 'circadian)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to circadian."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((defun rde-circadian--get-geolocation ()
+          "Get current location coordinates through Mozilla's Geolocation API."
+          (let ((response
+                 (ignore-errors
+                   (url-retrieve-synchronously
+                    "https://location.services.mozilla.com/v1/geolocate?key=geoclue"
+                    t))))
+            (when response
+              (with-current-buffer response
+                (goto-char (point-min))
+                (re-search-forward (rx bol "\n") nil t)
+                (delete-region (point) (point-min))
+                (let* ((location (car (cdr (json-parse-string
+                                            (buffer-string)
+                                            :object-type 'plist))))
+                       (latitude (plist-get location :lat))
+                       (longitude (plist-get location :lng)))
+                  (cons longitude latitude))))))
+
+        (with-eval-after-load 'solar
+          (setq calendar-longitude (car (rde-circadian--get-geolocation)))
+          (setq calendar-latitude (cdr (rde-circadian--get-geolocation))))
+        ,@(if (get-value 'emacs-modus-themes config)
+              '((add-hook 'circadian-after-load-theme-hook
+                          'rde-modus-themes-set-custom-faces))
+              '())
+        (with-eval-after-load 'circadian-autoloads
+          (setq circadian-themes
+                '((:sunrise . ,(get-value 'emacs-light-theme config))
+                  (:sunset . ,(get-value 'emacs-dark-theme config))))
+          (circadian-setup)))
+      #:elisp-packages (list emacs-circadian))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-circadian)))
    (home-services-getter get-home-services)))
 
 ;; TODO: Can be useful to have different presets for different
