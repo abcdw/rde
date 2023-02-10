@@ -111,8 +111,21 @@
 (define* (feature-emacs-appearance
           #:key
           (margin 8)
+          (fringes #f)
+          (mode-line-padding 4)
+          (header-line-padding 4)
+          (tab-bar-padding 4)
           (header-line-as-mode-line? #t))
+  "Make Emacs look more modern and minimalistic.
+It achieves this by removing most UI elements and allows you to add MARGIN,
+FRINGES, and various padding values for MODE-LINE-PADDING, HEADER-LINE-PADDING,
+and TAB-BAR-PADDING.
+Move the mode line to the top by setting HEADER-LINE-AS-MODE-LINE? to #t."
   (ensure-pred integer? margin)
+  (ensure-pred maybe-integer? fringes)
+  (ensure-pred number? mode-line-padding)
+  (ensure-pred number? header-line-padding)
+  (ensure-pred number? tab-bar-padding)
   (ensure-pred boolean? header-line-as-mode-line?)
 
   (define emacs-f-name 'appearance)
@@ -144,40 +157,30 @@ mouse-3: Toggle minor modes"
                       ")"
                       (propertize "%]" 'help-echo recursive-edit-help-echo)
                       " ")))
+        (setq mode-line-compact 'long)
 
         ,@(if header-line-as-mode-line?
-              `(,#~"\n;; Move modeline to the top"
-                (setq-default header-line-format mode-line-format)
-                (setq-default mode-line-format nil)
-                (setq mode-line-format nil)
-
-                (defun rde--move-mode-line-to-header ()
-                  "Moves mode-line to header-line, the function is needed for
-various modes, which setups mode-line late."
+              `((defun rde--move-mode-line-to-header ()
+                  "Move mode-line to header-line.
+This function is needed for various modes to set up the mode-line late."
                   (setq-local header-line-format mode-line-format)
                   (setq-local mode-line-format nil))
 
                 (add-hook 'calendar-initial-window-hook
-                          'rde--move-mode-line-to-header))
+                          'rde--move-mode-line-to-header)
+                (setq-default header-line-format mode-line-format)
+                (setq-default mode-line-format nil)
+                (setq mode-line-format nil))
               '())
 
-        (defvar rde-status-line-bg-color
-          nil
-          "A string containing a color, which will be used to set initial
-value of background color for mode/header-line.")
-
-        (add-hook 'after-init-hook
-                  (lambda ()
-                    (when rde-status-line-bg-color
-                      (set-face-attribute
-                       ',(if header-line-as-mode-line?
-                             'header-line
-                             'mode-line)
-                       nil :background rde-status-line-bg-color))))
-
-        (with-eval-after-load 'menu-bar (menu-bar-mode 0))
-        (with-eval-after-load 'tool-bar (tool-bar-mode 0))
-        (with-eval-after-load 'scroll-bar (scroll-bar-mode 0))
+        (with-eval-after-load 'menu-bar
+          (menu-bar-mode 0))
+        (with-eval-after-load 'tool-bar
+          (tool-bar-mode 0))
+        (with-eval-after-load 'scroll-bar
+          (scroll-bar-mode 0))
+        (with-eval-after-load 'fringe
+          (fringe-mode ,(or fringes 0)))
 
         (set-frame-parameter (selected-frame) 'internal-border-width ,margin)
 
@@ -185,44 +188,45 @@ value of background color for mode/header-line.")
         (setq use-file-dialog nil)
 
         (setq window-divider-default-right-width ,margin)
-        (window-divider-mode))
 
+        (window-divider-mode))
       #:early-init
-      `(,#~"\n;; Disable ui elements, add margins."
-        (push '(menu-bar-lines . 0) default-frame-alist)
+      `((push '(menu-bar-lines . 0) default-frame-alist)
         (push '(tool-bar-lines . 0) default-frame-alist)
         (push '(vertical-scroll-bars) default-frame-alist)
+        (push '(horizontal-scroll-bars) default-frame-alist)
+        (push (cons 'left-fringe ,(or fringes 0)) default-frame-alist)
+        (push (cons 'right-fringe ,(or fringes 0)) default-frame-alist)
+        (push '(no-special-glyphs) default-frame-alist)
+        (push '(undecorated) default-frame-alist)
         (setq menu-bar-mode nil
               tool-bar-mode nil
               scroll-bar-mode nil)
 
-        ,#~""
         (push '(internal-border-width . ,margin) default-frame-alist)
         ;; (setq-default fringes-outside-margins t)
-        ;; (setq-default left-margin-width 1)
-        ;; (setq-default right-margin-width 1)
 
-        ,#~""
         ,@(if (get-value 'emacs-advanced-user? config)
-              '((setq inhibit-startup-screen t))
+              '((setq inhibit-startup-screen t)
+                (setq inhibit-startup-message t)
+                (setq initial-scratch-message nil))
               '()))
       #:keywords '(appearance mode-line faces accessibility)
-      #:summary "\
-Sets theme, fonts, faces and provides different visual tweaks"
+      #:summary "Set more visually appealing defaults"
       #:commentary "\
-The goal is to provide non-distractive and safe visual design.
+The goal is to provide a non-distractive and safe visual design.
 
-Modus operandi is light, high-contrast, calm, colorblind-friendly.
-The light colorschemes are better for productivity according to
-various researchs, more eye-friendly and works better with other apps
-and media like PDFs, web pages, etc, which are also light by default.
-Later here will be a link to rde manual with more in-depth explanation
-with references to researches.")))
+Modeline is simplified and moved to the top of the window.
+
+Almost all visual elements are disabled.")))
 
   (feature
    (name f-name)
    (values `((,f-name . #t)
              (emacs-header-line-as-mode-line? . ,header-line-as-mode-line?)
+             (emacs-mode-line-padding . ,mode-line-padding)
+             (emacs-header-line-padding . ,header-line-padding)
+             (emacs-tab-bar-padding . ,tab-bar-padding)
              (emacs-margin . ,margin)))
    (home-services-getter get-home-services)))
 
