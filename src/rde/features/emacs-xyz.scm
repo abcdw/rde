@@ -4,7 +4,7 @@
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022, 2023 Nicolas Graves <ngraves@ngraves.fr>
-;;; Copyright © 2022 conses <contact@conses.eu>
+;;; Copyright © 2022, 2023 conses <contact@conses.eu>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -111,33 +111,14 @@
 (define* (feature-emacs-appearance
           #:key
           (margin 8)
-          (deuteranopia? #t)
-          (dark? #f)
-          (header-line-as-mode-line? #t)
-          (emacs-modus-themes emacs-modus-themes)
-          (deuteranopia-red-blue-diffs? #f)
-          (extra-elisp '()))
-  "Make Emacs looks modern and minimalistic. DEUTERANOPIA? substitutes
-red/green colors with yellow/blue, which helps people with colorblindness and
-overall looks cool, if DEUTERANOPIA-RED-BLUE-DIFFS? is set red/blue colors
-will be used instead."
+          (header-line-as-mode-line? #t))
   (ensure-pred integer? margin)
-  (ensure-pred boolean? deuteranopia?)
-  (ensure-pred boolean? dark?)
   (ensure-pred boolean? header-line-as-mode-line?)
-  (ensure-pred file-like? emacs-modus-themes)
 
   (define emacs-f-name 'appearance)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
-    (define dark-theme
-      (if deuteranopia? 'modus-vivendi-deuteranopia 'modus-vivendi))
-    (define light-theme
-      (if deuteranopia? 'modus-operandi-deuteranopia 'modus-operandi))
-    (define theme
-      (if dark? dark-theme light-theme))
-
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -145,85 +126,6 @@ will be used instead."
       `((set-default 'cursor-type  '(bar . 1))
         (blink-cursor-mode 0)
         (setq-default cursor-in-non-selected-windows nil)
-
-        (eval-when-compile (require 'modus-themes))
-        (with-eval-after-load 'modus-themes
-          (setq modus-themes-common-palette-overrides
-                `((border-mode-line-active unspecified)
-                  (border-mode-line-inactive unspecified)
-                  (fringe unspecified)))
-          ,(if deuteranopia-red-blue-diffs?
-               `((setq modus-operandi-deuteranopia-palette-overrides
-                       '((bg-changed         "#ffdfa9")
-                         (bg-changed-faint   "#ffefbf")
-                         (bg-changed-refine  "#fac090")
-                         (bg-changed-fringe  "#d7c20a")
-                         (fg-changed         "#553d00")
-                         (fg-changed-intense "#655000")
-
-                         (bg-removed         "#ffd8d5")
-                         (bg-removed-faint   "#ffe9e9")
-                         (bg-removed-refine  "#f3b5af")
-                         (bg-removed-fringe  "#d84a4f")
-                         (fg-removed         "#8f1313")
-                         (fg-removed-intense "#aa2222")))
-
-                 (setq modus-vivendi-deuteranopia-palette-overrides
-                       '((bg-changed         "#363300")
-                         (bg-changed-faint   "#2a1f00")
-                         (bg-changed-refine  "#4a4a00")
-                         (bg-changed-fringe  "#8a7a00")
-                         (fg-changed         "#efef80")
-                         (fg-changed-intense "#c0b05f")
-
-                         (bg-removed         "#4f1119")
-                         (bg-removed-faint   "#380a0f")
-                         (bg-removed-refine  "#781a1f")
-                         (bg-removed-fringe  "#b81a1f")
-                         (fg-removed         "#ffbfbf")
-                         (fg-removed-intense "#ff9095"))))
-               '()))
-
-        (setq modus-themes-to-toggle '(,light-theme ,dark-theme))
-
-        ;; Needed by modus-themes internals
-        (eval-when-compile
-         (require 'cl-seq))
-
-        (require ',(symbol-append theme '-theme))
-        (load-theme ',theme t)
-
-        (eval-when-compile
-         (enable-theme ',theme))
-
-        (defun rde-modus-themes-custom-faces ()
-          (when (modus-themes--current-theme)
-            (modus-themes-with-colors
-             (custom-set-faces
-              `(window-divider ((,c :foreground ,bg-main)))
-              `(window-divider-first-pixel ((,c :foreground ,bg-main)))
-              `(window-divider-last-pixel ((,c :foreground ,bg-main)))
-              `(git-gutter-fr:added ((,c :foreground ,bg-added-fringe
-                                         :background ,bg-main)))
-              `(git-gutter-fr:deleted ((,c :foreground ,bg-removed-fringe
-                                           :background ,bg-main)))
-              `(git-gutter-fr:modified ((,c :foreground ,bg-changed-fringe
-                                            :background ,bg-main)))))))
-
-        (defvar after-enable-theme-hook nil
-          "Normal hook run after enabling a theme.")
-        (defun run-after-enable-theme-hook (&rest _args)
-          "Run `after-enable-theme-hook'."
-          (run-hooks 'after-enable-theme-hook))
-        (advice-add 'enable-theme :after 'run-after-enable-theme-hook)
-
-        (add-hook 'after-enable-theme-hook 'rde-modus-themes-custom-faces)
-        (enable-theme ',theme)
-
-        (with-eval-after-load
-         'rde-keymaps
-         (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle))
-
         (setq bookmark-set-fringe-mark nil)
 
         (setq mode-line-modes
@@ -283,9 +185,7 @@ value of background color for mode/header-line.")
         (setq use-file-dialog nil)
 
         (setq window-divider-default-right-width ,margin)
-        (window-divider-mode)
-
-        ,@(expand-extra-elisp extra-elisp config))
+        (window-divider-mode))
 
       #:early-init
       `(,#~"\n;; Disable ui elements, add margins."
@@ -317,13 +217,7 @@ The light colorschemes are better for productivity according to
 various researchs, more eye-friendly and works better with other apps
 and media like PDFs, web pages, etc, which are also light by default.
 Later here will be a link to rde manual with more in-depth explanation
-with references to researches.
-
-Modeline is simplified and moved to the top of the window.
-
-Almost all visual elements are disabled."
-      #:elisp-packages
-      (list emacs-modus-themes))))
+with references to researches.")))
 
   (feature
    (name f-name)
