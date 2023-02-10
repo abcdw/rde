@@ -44,6 +44,7 @@
             feature-emacs-appearance
             feature-emacs-modus-themes
             feature-emacs-circadian
+            feature-emacs-minions
             feature-emacs-faces
             feature-emacs-which-key
             feature-emacs-keycast
@@ -480,6 +481,34 @@ based on the time of the day."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-circadian)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-minions
+          #:key
+          (emacs-minions emacs-minions)
+          (minions-lighter ";"))
+  "Set up minions mode, a minor-mode menu for the Emacs mode line."
+  (ensure-pred file-like? emacs-minions)
+  (ensure-pred string? minions-lighter)
+
+  (define emacs-f-name 'minions)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to minions-mode."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'minions-autoloads
+          (minions-mode))
+        (with-eval-after-load 'minions
+          (setq minions-mode-line-lighter ,minions-lighter)))
+      #:elisp-packages (list emacs-minions))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-minions)))
    (home-services-getter get-home-services)))
 
 ;; TODO: Can be useful to have different presets for different
