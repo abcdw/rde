@@ -34,6 +34,7 @@
   #:use-module (rde packages)
   #:use-module (rde packages emacs-xyz)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (rde serializers elisp)
 
   #:use-module (guix gexp)
   #:use-module (rde gexp)
@@ -41,6 +42,7 @@
 
   #:export (;; UI
             feature-emacs-appearance
+            feature-emacs-modus-themes
             feature-emacs-faces
             feature-emacs-which-key
             feature-emacs-keycast
@@ -228,6 +230,201 @@ Almost all visual elements are disabled.")))
              (emacs-header-line-padding . ,header-line-padding)
              (emacs-tab-bar-padding . ,tab-bar-padding)
              (emacs-margin . ,margin)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-modus-themes
+          #:key
+          (emacs-modus-themes emacs-modus-themes)
+          (extra-after-enable-theme-hooks '())
+          (dark? #f)
+          (deuteranopia? #f)
+          (deuteranopia-red-blue-diffs? #f)
+          (extra-modus-themes-overrides '()))
+  "Configure modus-themes, a pair of elegant and highly accessible
+themes for Emacs.  DEUTERANOPIA replaces red/green tones with red/blue,
+which helps people with color blindness.  If DEUTERANOPIA-RED-BLUE-DIFFS?
+is set red/blue colors will be used instead"
+  (ensure-pred file-like? emacs-modus-themes)
+  (ensure-pred list? extra-after-enable-theme-hooks)
+  (ensure-pred boolean? dark?)
+  (ensure-pred boolean? deuteranopia?)
+  (ensure-pred elisp-config? extra-modus-themes-overrides)
+
+  (define emacs-f-name 'modus-themes)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+  (define dark-theme
+    (if deuteranopia? 'modus-vivendi-deuteranopia 'modus-vivendi))
+  (define light-theme
+    (if deuteranopia? 'modus-operandi-deuteranopia 'modus-operandi))
+
+  (define (get-home-services config)
+    "Return home services related to modus-themes."
+    (define mode-line-padding (get-value 'emacs-mode-line-padding config))
+    (define header-line-padding (get-value 'emacs-header-line-padding config))
+    (define tab-bar-padding (get-value 'emacs-tab-bar-padding config))
+    (define theme
+      (if dark? dark-theme light-theme))
+
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile
+          (require 'modus-themes)
+          (require 'cl-seq))
+        (require ',(symbol-append theme '-theme))
+        (eval-when-compile
+         (enable-theme ',theme))
+        (defgroup rde-modus-themes nil
+          "Configuration related to `modus-themes'."
+          :group 'rde)
+        (defcustom rde-modus-themes-mode-line-padding 1
+          "The padding of the mode line."
+          :type 'number
+          :group 'rde-modus-themes)
+        (defcustom rde-modus-themes-tab-bar-padding 1
+          "The padding of the tab bar."
+          :type 'number
+          :group 'rde-modus-themes)
+        (defcustom rde-modus-themes-header-line-padding 1
+          "The padding of the header line."
+          :type 'number
+          :group 'rde-modus-themes)
+        (defcustom rde-modus-themes-after-enable-theme-hook nil
+          "Normal hook run after enabling a theme."
+          :type 'hook
+          :group 'rde-modus-themes)
+
+        (defun rde-modus-themes-run-after-enable-theme-hook (&rest _args)
+          "Run `rde-modus-themes-after-enable-theme-hook'."
+          (run-hooks 'rde-modus-themes-after-enable-theme-hook))
+
+        (defun rde-modus-themes-set-custom-faces (&optional _theme)
+          "Set faces based on the current theme."
+          (interactive)
+          (when (modus-themes--current-theme)
+            (modus-themes-with-colors
+              (custom-set-faces
+               `(window-divider ((,c :foreground ,bg-main)))
+               `(window-divider-first-pixel ((,c :foreground ,bg-main)))
+               `(window-divider-last-pixel ((,c :foreground ,bg-main)))
+               `(vertical-border ((,c :foreground ,bg-main)))
+               `(tab-bar
+                 ((,c :background ,bg-dim
+                      :box (:line-width ,rde-modus-themes-tab-bar-padding
+                            :color ,bg-dim
+                            :style unspecified))))
+               `(mode-line
+                 ((,c :box (:line-width ,rde-modus-themes-mode-line-padding
+                            :color ,bg-mode-line-active))))
+               `(mode-line-inactive
+                 ((,c :box (:line-width ,rde-modus-themes-mode-line-padding
+                            :color ,bg-mode-line-inactive))))
+               `(header-line
+                 ((,c :box (:line-width ,rde-modus-themes-header-line-padding
+                            :color ,bg-dim))))
+               `(git-gutter-fr:added ((,c :foreground ,bg-added-intense
+                                         :background ,bg-main)))
+               `(git-gutter-fr:deleted ((,c :foreground ,bg-removed-intense
+                                           :background ,bg-main)))
+               `(git-gutter-fr:modified ((,c :foreground ,bg-changed-intense
+                                            :background ,bg-main)))
+               `(aw-leading-char-face ((,c :height 1.0
+                                           :foreground ,blue-cooler)))))))
+
+        (defun rde-modus-themes--dark-theme-p (&optional theme)
+          "Indicate if there is a curently-active dark THEME."
+          (if theme
+              (eq theme ',light-theme)
+            (eq (car custom-enabled-themes) ',dark-theme)))
+
+        (setq rde-modus-themes-header-line-padding ,header-line-padding)
+        (setq rde-modus-themes-tab-bar-padding ,tab-bar-padding)
+        (setq rde-modus-themes-mode-line-padding ,mode-line-padding)
+        (advice-add 'enable-theme
+                    :after 'rde-modus-themes-run-after-enable-theme-hook)
+        ,@(map (lambda (hook)
+                 `(add-hook 'rde-modus-themes-after-enable-theme-hook ',hook))
+               (append
+                '(rde-modus-themes-set-custom-faces)
+                 extra-after-enable-theme-hooks))
+        (load-theme ',theme t)
+        (enable-theme ',theme)
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle))
+        (with-eval-after-load 'modus-themes
+          (setq modus-themes-common-palette-overrides
+                '((border-mode-line-active unspecified)
+                  (border-mode-line-inactive unspecified)
+                  (fringe unspecified)
+                  (fg-line-number-inactive "gray50")
+                  (fg-line-number-active fg-main)
+                  (bg-line-number-inactive unspecified)
+                  (bg-line-number-active unspecified)
+                  (bg-region bg-ochre)
+                  (fg-region unspecified)
+                  ,@extra-modus-themes-overrides))
+          ,@(if deuteranopia-red-blue-diffs?
+                `((setq modus-operandi-deuteranopia-palette-overrides
+                        '((bg-changed         "#ffdfa9")
+                          (bg-changed-faint   "#ffefbf")
+                          (bg-changed-refine  "#fac090")
+                          (bg-changed-fringe  "#d7c20a")
+                          (fg-changed         "#553d00")
+                          (fg-changed-intense "#655000")
+
+                          (bg-removed         "#ffd8d5")
+                          (bg-removed-faint   "#ffe9e9")
+                          (bg-removed-refine  "#f3b5af")
+                          (bg-removed-fringe  "#d84a4f")
+                          (fg-removed         "#8f1313")
+                          (fg-removed-intense "#aa2222")))
+
+                  (setq modus-vivendi-deuteranopia-palette-overrides
+                        '((bg-changed         "#363300")
+                          (bg-changed-faint   "#2a1f00")
+                          (bg-changed-refine  "#4a4a00")
+                          (bg-changed-fringe  "#8a7a00")
+                          (fg-changed         "#efef80")
+                          (fg-changed-intense "#c0b05f")
+
+                          (bg-removed         "#4f1119")
+                          (bg-removed-faint   "#380a0f")
+                          (bg-removed-refine  "#781a1f")
+                          (bg-removed-fringe  "#b81a1f")
+                          (fg-removed         "#ffbfbf")
+                          (fg-removed-intense "#ff9095"))))
+                '())
+          (setq modus-themes-to-toggle '(,light-theme ,dark-theme))
+          (setq modus-themes-italic-constructs t)
+          (setq modus-themes-bold-constructs t)
+          (setq modus-themes-org-blocks 'gray-background)
+          (setq modus-themes-mixed-fonts t)
+          (setq modus-themes-headings (quote ((1 . (1.15))
+                                              (2 . (1.1))
+                                              (3 . (1.1))
+                                              (4 . (1.0))
+                                              (5 . (1.0))
+                                              (6 . (1.0))
+                                              (7 . (0.9))
+                                              (8 . (0.9)))))))
+      #:elisp-packages (list emacs-modus-themes)
+      #:summary "Modus Themes extensions"
+      #:commentary "Customizations to Modus Themes, the elegant,
+highly legible Emacs themes.\
+
+Modus operandi is light, high-contrast, calm, colorblind-friendly.
+The light colorschemes are better for productivity according to
+various researchs, more eye-friendly and works better with other apps
+and media like PDFs, web pages, etc, which are also light by default.
+Later here will be a link to rde manual with more in-depth explanation
+with references to researches.")))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-modus-themes)
+             (emacs-light-theme . ,light-theme)
+             (emacs-dark-theme . ,dark-theme)))
    (home-services-getter get-home-services)))
 
 ;; TODO: Can be useful to have different presets for different
