@@ -109,6 +109,7 @@
 
    (feature-emacs-appearance)
    (feature-emacs-faces)
+   (feature-emacs-modus-themes)
 
    (feature-emacs-completion
     #:mini-frame? #f
