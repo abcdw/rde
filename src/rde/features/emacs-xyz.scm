@@ -239,11 +239,11 @@ Almost all visual elements are disabled.")))
           (emacs-modus-themes emacs-modus-themes)
           (extra-after-enable-theme-hooks '())
           (dark? #f)
-          (deuteranopia? #f)
+          (deuteranopia? #t)
           (deuteranopia-red-blue-diffs? #f)
           (extra-modus-themes-overrides '()))
-  "Configure modus-themes, a pair of elegant and highly accessible
-themes for Emacs.  DEUTERANOPIA replaces red/green tones with red/blue,
+  "Configure modus-themes, a set of elegant and highly accessible
+themes for Emacs.  DEUTERANOPIA? replaces red/green tones with yellow/blue,
 which helps people with color blindness.  If DEUTERANOPIA-RED-BLUE-DIFFS?
 is set red/blue colors will be used instead"
   (ensure-pred file-like? emacs-modus-themes)
