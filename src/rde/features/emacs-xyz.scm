@@ -115,7 +115,7 @@
 (define* (feature-emacs-appearance
           #:key
           (margin 8)
-          (fringes #f)
+          (fringes 8)
           (mode-line-padding 4)
           (header-line-padding 4)
           (tab-bar-padding 4)
