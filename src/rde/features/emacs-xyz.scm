@@ -338,7 +338,7 @@ is set red/blue colors will be used instead"
           "Indicate if there is a curently-active dark THEME."
           (if theme
               (eq theme ',light-theme)
-            (eq (car custom-enabled-themes) ',dark-theme)))
+              (eq (car custom-enabled-themes) ',dark-theme)))
 
         (setq rde-modus-themes-header-line-padding ,header-line-padding)
         (setq rde-modus-themes-tab-bar-padding ,tab-bar-padding)
@@ -350,10 +350,10 @@ is set red/blue colors will be used instead"
                (append
                 '(rde-modus-themes-set-custom-faces)
                  extra-after-enable-theme-hooks))
-        (load-theme ',theme t)
-        (enable-theme ',theme)
+
         (with-eval-after-load 'rde-keymaps
           (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle))
+
         (with-eval-after-load 'modus-themes
           (setq modus-themes-common-palette-overrides
                 '((border-mode-line-active unspecified)
@@ -409,7 +409,8 @@ is set red/blue colors will be used instead"
                                               (5 . (1.0))
                                               (6 . (1.0))
                                               (7 . (0.9))
-                                              (8 . (0.9)))))))
+                                              (8 . (0.9))))))
+        (load-theme ',theme t))
       #:elisp-packages (list emacs-modus-themes)
       #:summary "Modus Themes extensions"
       #:commentary "Customizations to Modus Themes, the elegant,
