@@ -104,8 +104,28 @@ autoload -z edit-command-line
 zle -N edit-command-line
 bindkey "^X^E" edit-command-line
 
+# Do not require sudo for some system commands.
+for command in mount umount sv updatedb su ; do
+	alias $command="sudo $command"
+done; unset command
+
+# Verbosity and common settings.
+alias \
+      cp='cp -iv' \
+      mv='mv -iv' \
+      rm='rm -vI' \
+      mkdir='mkdir -pv' \
+      ffmpeg='ffmpeg -hide_banner'
+
+# Colorize commands when possible.
+alias \
+      ls='ls -hp --color=auto' \
+      ll='ls -lAh --group-directories-first --color=auto' \
+      grep='grep --color=auto' \
+      diff='diff --color=auto'
+
+# Useful aliases.
 alias help=run-help
 alias try='guix shell man-db coreutils'
-alias ls='ls -p --color=auto'
-alias ll='ls -l'
-alias grep='grep --color=auto'
+alias ka='killall'
+alias sdn='sudo shutdown'
