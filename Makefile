@@ -13,7 +13,7 @@ install:
 
 check:
 	./pre-inst-env guile -L ./tests -c \
-	'((@ (rde test-runners) run-project-tests))'
+	'(exit ((@ (rde test-runners) run-project-tests)))'
 
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure

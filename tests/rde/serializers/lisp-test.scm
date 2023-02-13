@@ -19,6 +19,7 @@
 
 (define-module (rde serializers lisp-test)
   #:use-module (srfi srfi-64)
+  #:use-module (rde tests)
   #:use-module (rde tests store)
 
   #:use-module (rde serializers lisp)
@@ -26,9 +27,6 @@
   #:use-module (guix gexp)
   #:use-module (guix read-print))
 
-;; TODO: Figure out the problem and remove this import
-;; WHAT THE HECK? Tests start failing without this use-modules.
-(use-modules (ice-9 pretty-print))
 
 (define (serialize-config config)
   "Returns a string representing serialized config."
@@ -39,63 +37,62 @@
   (call-with-input-string (serialize-config config)
     (lambda (port) (read-with-comments/sequence port))))
 
-(test-begin (format #f "~a" (module-name (current-module))))
+(define-test basic-types
+  (test-group "basic types"
+    (test-equal "symbols"
+      '(hello there)
+      (serialize-and-read-config `(hello there)))
 
-(test-group "basic types"
-  (test-equal "symbols"
-    '(hello there)
-    (serialize-and-read-config `(hello there)))
+    (test-equal "numbers"
+      '(1 1/3 4.5)
+      (serialize-and-read-config `(1 1/3 4.5)))
 
-  (test-equal "numbers"
-    '(1 1/3 4.5)
-    (serialize-and-read-config `(1 1/3 4.5)))
+    (test-equal "booleans"
+      '(#f #t)
+      (serialize-and-read-config `(#f #t)))
 
-  (test-equal "booleans"
-    '(#f #t)
-    (serialize-and-read-config `(#f #t)))
+    (test-equal "strings"
+      '("hello" "there")
+      (serialize-and-read-config `("hello" "there")))))
 
-  (test-equal "strings"
-    '("hello" "there")
-    (serialize-and-read-config `("hello" "there"))))
+(define-test reader-macros
+  (test-group "reader macros"
+    (test-equal "quote"
+      "'(hello there)\n"
+      (serialize-config `('(hello there))))
 
-(test-group "reader macros"
-  (test-equal "quote"
-    "'(hello there)\n"
-    (serialize-config `('(hello there))))
+    (test-equal "quasiquote and unquote"
+      "`(hello ,there)\n"
+      (serialize-config `(`(hello ,there))))
 
-  (test-equal "quasiquote and unquote"
-    "`(hello ,there)\n"
-    (serialize-config `(`(hello ,there))))
+    (test-expect-fail 1)
+    ;; We should update pretty-printer used in serialization code or workaround
+    ;; it some other way.  Now, it's impossible to use this construction with
+    ;; emacs-lisp.
+    (test-equal "syntax"
+      "#'symbol\n"
+      (serialize-config `(#'symbol)))))
 
-  (test-expect-fail 1)
-  ;; We should update pretty-printer used in serialization code or workaround
-  ;; it some other way.  Now, it's impossible to use this construction with
-  ;; emacs-lisp.
-  (test-equal "syntax"
-    "#'symbol\n"
-    (serialize-config `(#'symbol))))
-
-(test-group "gexps"
-  (test-equal "newlines and comments"
-    "
+(define-test gexps
+  (test-group "gexps"
+    (test-equal "newlines and comments"
+      "
 ;;; Hello there
 
 ;; more comments here
 "
-    (serialize-config `(,#~""
-                        ,#~";;; Hello there"
-                        ,#~""
-                        ,#~";; more comments here")))
+      (serialize-config `(,#~""
+                          ,#~";;; Hello there"
+                          ,#~""
+                          ,#~";; more comments here")))
 
-  (test-equal "top-level gexp eval"
-    ";; hello there\n"
-    (serialize-config `(,#~(format #f ";; hello there"))))
+    (test-equal "top-level gexp eval"
+      ";; hello there\n"
+      (serialize-config `(,#~(format #f ";; hello there"))))
 
-  (test-expect-fail 1)
-  ;; Due to incomplete implementation of the serializer this test fails, more
-  ;; accurate implementation should pass this test.
-  (test-equal "nested gexp eval"
-    "(message \"message\")\n"
-    (serialize-config `((message ,#~(format #f "~s" "message"))))))
-
-(test-end (format #f "~a" (module-name (current-module))))
+    (test-expect-fail 1)
+    ;; Due to incomplete implementation of the serializer this test fails, more
+    ;; accurate implementation should pass this test.
+    (test-equal "nested gexp eval"
+      "(message \"message\")\n"
+      (serialize-config `((message ,#~(format #f "~s" "message")))))))

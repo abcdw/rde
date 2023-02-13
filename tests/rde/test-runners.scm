@@ -176,46 +176,23 @@ given string in an ANSI escape code."
 (define (run-tests-for-file file)
   (primitive-load file))
 
-(define (discover-tests directory)
-  #| Return a list of paths to testing scripts in the given directory.
-
-  Two kinds of files are included:
-
-  + Any ".scm" file suffixed "-test".
-
-  DIRECTORY (string)
-    Absolute path to a directory containing a test suite.
-
-  RETURN VALUE (list of string)
-    A list where every element represents a path to a testing
-    script. |#
-  ;; Enter to any directory.
-  (define (enter? name stat result) #true)
-
-  (define (leaf name stat result)
-    (if (string-suffix? "-test.scm" (basename name))
-        (cons name result)
-        result))
-
-  ;; Don't append directories to the resulting list.
-  (define (down name stat result) result)
-  (define (up name stat result) result)
-
-  ;; Likewise for skipped directories.
-  (define (skip name stat result) result)
-
-  ;; Ignore unreadable files/directories but warn the user.
-  (define (error name stat errno result)
-    (format (current-error-port) "warning: ~a: ~a~%"
-            name (strerror errno))
-    result)
-
-  (file-system-fold enter? leaf down up skip error (list) directory))
-
 (define (submodules module)
   (hash-map->list (lambda (k v) v) (module-submodules module)))
 
 (test-runner-factory test-runner-default)
+
+(use-modules (guix discovery))
+
+(define (test? proc)
+  "Checks if PROC is a test."
+  (and (procedure? proc) (procedure-property proc 'srfi-64-test?)))
+
+(define (get-module-tests module)
+  (fold-module-public-variables
+   (lambda (variable acc)
+     (if (test? variable) (cons variable acc) acc))
+   '()
+   (list module)))
 
 (define (run-project-tests)
   ;; (test-runner-current (test-runner-create))
@@ -225,14 +202,26 @@ given string in an ANSI escape code."
   (define this-module-file
     (canonicalize-path
      (search-path %load-path "rde/test-runners.scm")))
-  (define test-files
-    (discover-tests (dirname this-module-file)))
 
-  (map primitive-load test-files)
+  (define tests-root-dir
+    (dirname (dirname this-module-file)))
+
+  (define test-modules
+    (all-modules (list tests-root-dir)))
+
+  (map (lambda (m)
+         (define module-tests (get-module-tests m))
+         (when (not (null? module-tests))
+           (test-group
+               (module-name m)
+             (map (lambda (p) (p)) module-tests))))
+       test-modules)
 
   (define fail-count (test-runner-fail-count (test-runner-current)))
   (test-end "PROJECT TESTS")
-  (exit (zero? fail-count)))
+  (zero? fail-count))
+
+;; (run-project-tests)
 
 ;; https://www.mail-archive.com/geiser-users%40nongnu.org/msg00323.html
 ;; https://rednosehacker.com/revisiting-guile-xunit
