@@ -27,6 +27,9 @@
   #:use-module (guix gexp)
   #:use-module (guix read-print))
 
+;; TODO: Figure out the problem and remove this import
+;; WHAT THE HECK? Tests start failing without this use-modules.
+(use-modules (ice-9 pretty-print))
 
 (define (serialize-config config)
   "Returns a string representing serialized config."
