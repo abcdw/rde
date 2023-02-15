@@ -1175,11 +1175,9 @@ relative line numbers, when narrowing is active."
          'consult
          (require 'embark-consult)
 
-         (setq
-          consult-ripgrep-args
-          (concat ,(file-append ripgrep "/bin/rg")
-                  " --null --line-buffered --color=never --max-columns=1000 \
---path-separator / --smart-case --no-heading --line-number ."))
+         (setq consult-ripgrep-args
+               (replace-regexp-in-string "^rg" ,(file-append ripgrep "/bin/rg")
+                                         consult-ripgrep-args))
          (consult-customize consult-buffer :preview-key "M-.")
          (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
