@@ -580,7 +580,9 @@ It can contain settings not yet moved to separate features."
             ;; will be built with emacs-29
             (pixel-scroll-precision-mode 1)
 
-            ,@(wayland-clipboard-fix config)))
+            ,@(if (get-value 'wayland config)
+                  (wayland-clipboard-fix config)
+                  '())))
          ;;; TODO: Rebuilding packages with emacs will be useful for
          ;;; native-comp, but some packages fails to build, need to fix them.
          (rebuild-elisp-packages? #f)))
