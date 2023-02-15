@@ -3,7 +3,8 @@
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 ftw)
 
-  #:export (run-project-tests))
+  #:export (run-module-tests
+            run-project-tests))
 
 (define (string-repeat s n)
   "Returns string S repeated N times."
@@ -167,12 +168,6 @@ given string in an ANSI escape code."
 
 ;;; Run project tests
 
-(define (run-tests-for-module module)
-  (let ((test-name (format #f "module ~a" (module-name module))))
-    (test-begin test-name)
-    (reload-module module)
-    (test-end test-name)))
-
 (test-runner-factory test-runner-default)
 
 (use-modules (guix discovery)
@@ -185,9 +180,15 @@ given string in an ANSI escape code."
    '()
    (list module)))
 
+(define (run-module-tests module)
+  (define module-tests (get-module-tests module))
+  (let ((test-name (format #f "module ~a" (module-name module))))
+    (test-begin test-name)
+    (map (lambda (p) (p)) module-tests)
+    (test-end test-name)))
+
 (define (run-project-tests)
   ;; (test-runner-current (test-runner-create))
-  ;; ;; (test-runner-current)
 
   (test-begin "PROJECT TESTS")
   (define this-module-file
@@ -203,9 +204,7 @@ given string in an ANSI escape code."
   (map (lambda (m)
          (define module-tests (get-module-tests m))
          (when (not (null? module-tests))
-           (test-group
-               (module-name m)
-             (map (lambda (p) (p)) module-tests))))
+           (run-module-tests m)))
        test-modules)
 
   (define fail-count (test-runner-fail-count (test-runner-current)))
