@@ -2920,8 +2920,8 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
                        ,(file-append (get-value 'mpv config) "/bin/mpv")))
                '())
 
-         ,@(if (get-value 'emacs-consult config)
-               '((setq telega-open-file-function 'consult-file-externally))
+         ,@(if (get-value 'emacs-embark config)
+               '((setq telega-open-file-function 'embark-open-externally))
                '())
          (setq telega-open-message-as-file
                '(video audio voice-note animation video-note))
