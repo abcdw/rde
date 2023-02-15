@@ -116,7 +116,6 @@ the RDE manual) correctly."
                   `(:name "Slack"
                     :narrow ?s
                     :category buffer
-                    :preview-key ,(kbd "M-.")
                     :state ,'consult--buffer-state
                     :items ,(lambda ()
                               (mapcar 'buffer-name
