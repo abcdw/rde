@@ -173,19 +173,10 @@ given string in an ANSI escape code."
     (reload-module module)
     (test-end test-name)))
 
-(define (run-tests-for-file file)
-  (primitive-load file))
-
-(define (submodules module)
-  (hash-map->list (lambda (k v) v) (module-submodules module)))
-
 (test-runner-factory test-runner-default)
 
-(use-modules (guix discovery))
-
-(define (test? proc)
-  "Checks if PROC is a test."
-  (and (procedure? proc) (procedure-property proc 'srfi-64-test?)))
+(use-modules (guix discovery)
+             (rde tests))
 
 (define (get-module-tests module)
   (fold-module-public-variables
