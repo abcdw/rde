@@ -134,7 +134,6 @@ is a list of message types to ignore."
                   `(:name "ERC"
                     :narrow ?i
                     :category buffer
-                    :preview-key ,(kbd "M-.")
                     :state ,'consult--buffer-state
                     :items ,(lambda () (mapcar 'buffer-name (erc-buffer-list))))
                   "Source for ERC buffers to be set in
