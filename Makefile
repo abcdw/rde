@@ -15,6 +15,10 @@ check:
 	./pre-inst-env guile -L ./tests -c \
 	'(exit ((@ (rde test-runners) run-project-tests)))'
 
+repl:
+	./pre-inst-env examples/target/profiles/guix/bin/guix repl -L ./tests \
+	--listen=tcp:37146
+
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure
 
