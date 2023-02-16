@@ -152,7 +152,13 @@ Move the mode line to the top by setting HEADER-LINE-AS-MODE-LINE? to #t."
         (setq mode-line-compact 'long)
 
         ,@(if header-line-as-mode-line?
-              `((defun rde--move-mode-line-to-header ()
+              `((setq minions-mode-line-minor-modes-map
+                      (let ((map (make-sparse-keymap)))
+                        ;; Make minions menu work in header line
+                        (define-key map (vector 'header-line 'down-mouse-1)
+                          'minions-minor-modes-menu)
+                        map))
+                (defun rde--move-mode-line-to-header ()
                   "Move mode-line to header-line.
 This function is needed for various modes to set up the mode-line late."
                   (setq-local header-line-format mode-line-format)
