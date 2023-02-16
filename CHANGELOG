@@ -1,0 +1,33 @@
+# -*- mode: org; org-archive-reversed-order: t -*-
+
+* TODO Questions
+- Do we want to use ~!~ in commit messages?
+- What is a better format for new feature commit message?
+- Add links to the info/websites?
+- How to split long list of changelog items into more manageable pieces?
+
+* Notes
+Items starting with ~!~ means BREAKING CHANGES.  It's not a dump of commit log,
+it's carefully crafted list of items, which usually takes some of commit
+messages as a foundation.
+
+* Unreleased
+- test: Added test infrastructure and tooling.
+- contrib: age: Add feature.
+- rde: completion: Reuse original ripgrep options. Now it can search in
+  compressed files, including el source code bundled with Emacs and so on.
+- rde: emacs: Add tree-sitter support.
+
+- !rde: Move [[https://protesilaos.com/emacs/modus-themes][modus-theme]] related stuff to feature-emacs-modus-themes.
+- rde: emacs-modus-themes: Add feature.
+- rde: emacs-circadian: Add feature.
+- rde: emacs-ebdb: Add feature.
+- rde: emacs-time: Add feature.
+- rde: emacs-appearance: Update to use with modus-themes@4.  4th version makes
+  configuration much more flexible.
+- rde: mail: Allow username to be different from email.
+- doc: Add Decision Log.  Important decision are now will be captured with the
+  context and recorded.
+
+* TODO 0.3.0 (2022-12-31)
+- Write some information here.
