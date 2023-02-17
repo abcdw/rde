@@ -33,7 +33,6 @@
 
   #:export (feature-clojure))
 
-;; https://github.com/jpe90/emacs-clj-deps-new
 ;; https://practical.li/spacemacs/ :: some emacs clojure tips
 
 (define* (feature-clojure
@@ -42,6 +41,7 @@
           (clojure-lsp #f)
           (eglot-stay-out-of '())
           (jdk (list openjdk17 "jdk"))
+          (clj-deps-new-key "J")
           (leiningen #f))
   "Setup and configure an environment for Clojure.
 If you want Leiningen support, make sure to pass in the LEININGEN package."
@@ -49,6 +49,7 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
   (ensure-pred maybe-file-like? clojure-lsp)
   ;; (ensure-pred file-like? jdk)
   (ensure-pred list? eglot-stay-out-of)
+  (ensure-pred string? clj-deps-new-key)
   (ensure-pred maybe-file-like? leiningen)
 
   (define (get-home-services config)
@@ -184,6 +185,10 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
                 ,@(if (get-value 'emacs-advanced-user? config)
                       '((setq cider-repl-display-help-banner nil))
                       '()))
+
+              (with-eval-after-load 'rde-keymaps
+                (define-key rde-app-map (kbd ,clj-deps-new-key) 'clj-deps-new))
+
               ,@(if (get-value 'emacs-org config)
                     '((with-eval-after-load 'org
                         (add-to-list 'org-structure-template-alist
@@ -205,12 +210,12 @@ Clojure(Script) code style, CIDER, LSP, imenu and other tweaks"
             #:commentary "\
 Configure eglot, imenu, CIDER, flymake and other packages.
 "
-
-        #:keywords '(convenience clojure)
-        #:elisp-packages
-        (list emacs-cider emacs-clojure-mode
-              emacs-jarchive emacs-html-to-hiccup)))))
-          '())
+            #:keywords '(convenience clojure)
+            #:elisp-packages
+            (list emacs-cider emacs-clojure-mode
+                  emacs-jarchive emacs-html-to-hiccup
+                  emacs-clj-deps-new)))
+          '())))
 
   (feature
    (name 'clojure)
