@@ -41,11 +41,15 @@
           (clojure-tools clojure-tools)
           (clojure-lsp #f)
           (eglot-stay-out-of '())
-          (jdk (list openjdk17 "jdk")))
+          (jdk (list openjdk17 "jdk"))
+          (leiningen #f))
+  "Setup and configure an environment for Clojure.
+If you want Leiningen support, make sure to pass in the LEININGEN package."
   (ensure-pred file-like? clojure-tools)
   (ensure-pred maybe-file-like? clojure-lsp)
   ;; (ensure-pred file-like? jdk)
   (ensure-pred list? eglot-stay-out-of)
+  (ensure-pred maybe-file-like? leiningen)
 
   (define (get-home-services config)
     (define emacs-f-name 'clojure)
@@ -59,13 +63,23 @@
        (simple-service
         'add-clojure-packages
         home-profile-service-type
+        (append
+         (if leiningen
+             (list leiningen)
+           '())
          (list
           ;; for go-to-definition
           ;; MAYBE: Add as a dependency to cider?
           (@ (gnu packages compression) unzip)
           clojure-tools
           jdk))))
+      (if leiningen
           (list
+           (simple-service
+            'add-leiningen-xdg-home-envs
+            home-environment-variables-service-type
+            '(("LEIN_HOME" . "$XDG_DATA_HOME/lein"))))
+          '())
       ;; https://github.com/DogLooksGood/meomacs/blob/master/programming.org#fix-clojure-syntax-highlighting
       (if (get-value 'emacs config)
           (list
