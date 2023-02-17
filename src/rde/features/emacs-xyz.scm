@@ -40,6 +40,8 @@
   #:use-module (rde gexp)
   #:use-module (guix packages)
 
+  #:use-module (ice-9 match)
+
   #:export (;; UI
             feature-emacs-appearance
             feature-emacs-modus-themes
@@ -89,8 +91,11 @@
 
             ;; Communication
             feature-emacs-telega
-            feature-emacs-ebdb
-            feature-emacs-elpher))
+            feature-emacs-elpher
+
+            ;; Multimedia
+            feature-emacs-dashboard))
+
 
 ;;;
 ;;; Helpers.
@@ -3072,6 +3077,149 @@ gemini:// links will be automatically openned in emacs client."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; Multimedia.
+;;;
+
+(define (file-like-or-path-or-symbol-or-boolean? x)
+  (or (boolean? x) (symbol? x) (file-like-or-path? x)))
+
+(define* (feature-emacs-dashboard
+          #:key
+          (emacs-dashboard emacs-dashboard)
+          (show-on-startup? #t)
+          (items #f)
+          (item-generators #f)
+          (item-shortcuts #f)
+          (item-names #f)
+          (navigator-buttons #f)
+          (banner #f)
+          (banner-max-height 0)
+          (banner-max-width 0)
+          (dashboard-agenda-weekly? #t)
+          (dashboard-agenda-prefix-format #f)
+          (path-max-length 70)
+          (dashboard-key "h"))
+  "Configure Emacs Dashboard, an extensible startup screen.
+Choose whether to be prompted by the dashboard on startup by setting
+SHOW-ON-STARTUP?.
+Set up the visible sections via ITEMS, where each entry is
+of the form (LIST-TYPE . LIST-SIZE).  See @code{dashboard-items} to get
+an idea of the format.  For the aforementioned to work, you also need to
+configure ITEM-GENERATORS, where each entry is of the form
+(LIST-TYPE . LIST-GENERATOR-FUNCTION).  You can quickly navigate
+to each section with ITEM-SHORTCUTS and set a custom name for each one via
+ITEM-NAMES.
+
+NAVIGATOR-BUTTONS are custom buttons that you can display below the BANNER, to
+include quick shortcuts to things like web bookmarks.  BANNER can be either
+`official' for the official Emacs logo, `logo' for an alternative Emacs logo,
+#f to hide the banner, or a custom file path to an image whose dimensions you
+can constrain with BANNER-MAX-HEIGHT and BANNER-MAX-WIDTH.
+
+Remind yourself of tasks by setting DASHBOARD-AGENDA-WEEKLY? to #t and customize
+the format of task entries with DASHBOARD-AGENDA-PREFIX-FORMAT (see
+@code{org-agenda-prefix-format} for information on the format strings).
+
+You can truncate paths whose character length is greater than PATH-MAX-LENGTH."
+  (ensure-pred file-like? emacs-dashboard)
+  (ensure-pred boolean? show-on-startup?)
+  (ensure-pred maybe-list? items)
+  (ensure-pred maybe-list? item-generators)
+  (ensure-pred maybe-list? item-shortcuts)
+  (ensure-pred maybe-list? item-names)
+  (ensure-pred maybe-list? navigator-buttons)
+  (ensure-pred file-like-or-path-or-symbol-or-boolean? banner)
+  (ensure-pred number? banner-max-height)
+  (ensure-pred number? banner-max-width)
+  (ensure-pred boolean? dashboard-agenda-weekly?)
+  (ensure-pred maybe-string? dashboard-agenda-prefix-format)
+  (ensure-pred integer? path-max-length)
+  (ensure-pred string? dashboard-key)
+
+  (define emacs-f-name 'dashboard)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((require 'dashboard)
+        (defun rde-dashboard-open ()
+          "Jump to a dashboard buffer, creating one if it doesn't exist."
+          (interactive)
+          (when (get-buffer-create dashboard-buffer-name)
+            (switch-to-buffer dashboard-buffer-name)
+            (dashboard-mode)
+            (dashboard-insert-startupify-lists)
+            (dashboard-refresh-buffer)))
+
+        ,@(if show-on-startup?
+              '((add-hook 'after-init-hook 'rde-dashboard-open))
+              '())
+
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,dashboard-key) 'rde-dashboard-open))
+        (with-eval-after-load 'dashboard
+          (setq dashboard-center-content t))
+        (with-eval-after-load 'dashboard-widgets
+          (setq dashboard-bookmarks-show-base nil)
+          (setq dashboard-projects-backend 'project-el)
+          (setq dashboard-path-max-length ,path-max-length)
+          (setq dashboard-path-style 'truncate-beginning)
+          (setq dashboard-set-init-info nil)
+          (setq dashboard-set-heading-icons nil)
+          (setq dashboard-set-file-icons nil)
+          (setq dashboard-set-footer nil)
+          ,@(if items
+                `((setq dashboard-items ',items))
+                '())
+          ,@(if item-generators
+                `((setq dashboard-item-generators ',item-generators))
+                '())
+          ,@(if item-shortcuts
+                `((setq dashboard-item-generators ',item-shortcuts))
+                '())
+          ,@(if item-names
+                `((setq dashboard-item-generators ',item-names))
+                '())
+          ,@(if (symbol? banner)
+                `((setq dashboard-startup-banner ',banner))
+                `((setq dashboard-startup-banner ,(match banner
+                                                    (#f 'nil)
+                                                    (e e)))))
+          (setq dashboard-banner-logo-title "")
+          (setq dashboard-image-banner-max-height ,banner-max-height)
+          (setq dashboard-image-banner-max-width ,banner-max-width)
+          ,@(if (get-value 'emacs-advanced-user? config)
+                '((setq dashboard-show-shortcuts nil))
+                '())
+          ,@(if (and (get-value 'emacs-org-agenda config)
+                     dashboard-agenda-weekly?)
+                '((setq dashboard-week-agenda t))
+                '())
+          (setq dashboard-agenda-release-buffers t)
+          ,@(if dashboard-agenda-prefix-format
+                `((setq dashboard-agenda-prefix-format
+                        ,dashboard-agenda-prefix-format))
+                '())
+          ,@(if navigator-buttons
+                `((setq dashboard-set-navigator t)
+                  (setq dashboard-navigator-buttons ',navigator-buttons))
+                '())))
+      #:summary "Minimalist defaults for the extensible Emacs dashboard"
+      #:keywords '(applications)
+      #:commentary "Removes icons and visual clutter for a simpler\
+Emacs dashboard which allows you to focus on the section items."
+      #:elisp-packages (list emacs-dashboard))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-dashboard)))
    (home-services-getter get-home-services)))
 
 ;;; emacs-xyz.scm end here
