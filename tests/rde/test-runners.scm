@@ -173,6 +173,12 @@ given string in an ANSI escape code."
 (use-modules (guix discovery)
              (rde tests))
 
+
+(define* (run-test
+          t
+          #:key (runner (test-runner-current)))
+  (test-with-runner runner (t)))
+
 (define (get-module-tests module)
   (fold-module-public-variables
    (lambda (variable acc)
@@ -184,8 +190,10 @@ given string in an ANSI escape code."
   (define module-tests (get-module-tests module))
   (let ((test-name (format #f "module ~a" (module-name module))))
     (test-begin test-name)
-    (map (lambda (p) (p)) module-tests)
-    (test-end test-name)))
+    (map (lambda (t) (run-test t)) module-tests)
+    (define fail-count (test-runner-fail-count (test-runner-current)))
+    (test-end test-name)
+    fail-count))
 
 (define (get-test-modules)
   (define this-module-file
