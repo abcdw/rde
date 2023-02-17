@@ -187,19 +187,20 @@ given string in an ANSI escape code."
     (map (lambda (p) (p)) module-tests)
     (test-end test-name)))
 
-(define (run-project-tests)
-  ;; (test-runner-current (test-runner-create))
-
-  (test-begin "PROJECT TESTS")
+(define (get-test-modules)
   (define this-module-file
     (canonicalize-path
      (search-path %load-path "rde/test-runners.scm")))
 
   (define tests-root-dir
     (dirname (dirname this-module-file)))
+  (all-modules (list tests-root-dir)))
 
-  (define test-modules
-    (all-modules (list tests-root-dir)))
+(define (run-project-tests)
+  ;; (test-runner-current (test-runner-create))
+
+  (test-begin "PROJECT TESTS")
+  (define test-modules (get-test-modules))
 
   (map (lambda (m)
          (define module-tests (get-module-tests m))
