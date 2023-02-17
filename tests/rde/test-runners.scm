@@ -168,6 +168,21 @@ given string in an ANSI escape code."
 
 ;;; Run project tests
 
+(define (get-test-module)
+  ;; TODO: Handle the case, when test module doesn't exist.
+  "Return a test module related to the current one.  Usually it's a module with
+-test prefix.  Return current module if it already contains -test prefix."
+  (let* ((m-name (module-name (current-module)))
+         (m-tail (last m-name))
+         (test-m-tail
+          (if (string-suffix? "-test" (symbol->string m-tail))
+              m-tail
+              (symbol-append m-tail '-test))))
+    (resolve-module
+     (append
+      (drop-right m-name 1)
+      (list test-m-tail)))))
+
 (test-runner-factory test-runner-default)
 
 (use-modules (guix discovery)
