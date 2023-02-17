@@ -197,7 +197,7 @@ given string in an ANSI escape code."
 
 (define* (run-test
           t
-          #:key (runner (test-runner-current)))
+          #:key (runner (test-runner-create)))
   (test-with-runner runner (t)))
 
 (define (get-module-tests module)
@@ -207,14 +207,15 @@ given string in an ANSI escape code."
    '()
    (list module)))
 
-(define (run-module-tests module)
+(define* (run-module-tests
+          module
+          #:key (runner (test-runner-create)))
   (define module-tests (get-module-tests module))
-  (let ((test-name (format #f "module ~a" (module-name module))))
-    (test-begin test-name)
-    (map (lambda (t) (run-test t)) module-tests)
-    (define summary (test-runner-summary (test-runner-current)))
-    (test-end test-name)
-    summary))
+  (test-with-runner runner
+    (let ((test-name (format #f "module ~a" (module-name module))))
+      (test-group test-name
+        (map (lambda (t) (run-test t #:runner runner)) module-tests))
+      (test-runner-summary (test-runner-current)))))
 
 (define (get-test-modules)
   (define this-module-file
@@ -225,21 +226,18 @@ given string in an ANSI escape code."
     (dirname (dirname this-module-file)))
   (all-modules (list tests-root-dir)))
 
-(define (run-project-tests)
-  ;; (test-runner-current (test-runner-create))
-
-  (test-begin "PROJECT TESTS")
+;; (test-runner-current #f)
+(define* (run-project-tests
+          #:key (runner (test-runner-create)))
   (define test-modules (get-test-modules))
-
-  (map (lambda (m)
-         (define module-tests (get-module-tests m))
-         (when (not (null? module-tests))
-           (run-module-tests m)))
-       test-modules)
-
-  (define summary (test-runner-summary (test-runner-current)))
-  (test-end "PROJECT TESTS")
-  summary)
+  (test-with-runner runner
+    (test-group "PROJECT TEST"
+      (map (lambda (m)
+             (let ((module-tests (get-module-tests m)))
+               (when (not (null? module-tests))
+                 (run-module-tests m #:runner runner))))
+           test-modules))
+    (test-runner-summary (test-runner-current))))
 
 (define (run-project-tests-cli)
   (let* ((summary (run-project-tests))
