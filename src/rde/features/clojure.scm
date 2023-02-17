@@ -192,10 +192,10 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
               ,@(if (get-value 'emacs-org config)
                     '((with-eval-after-load 'org
                         (add-to-list 'org-structure-template-alist
-                                     '("clj" . "src clojure"))
-                        (require 'ob-clojure)
-                        (require 'ob-java))
+                                     '("clj" . "src clojure")))
                       (with-eval-after-load 'ob-core
+                        (require 'ob-clojure)
+                        (require 'ob-java)
                         (setq org-babel-default-header-args:clojure
                               '((:results . "scalar")
                                 (:session . ""))))
