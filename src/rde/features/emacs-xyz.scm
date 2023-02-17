@@ -91,6 +91,7 @@
 
             ;; Communication
             feature-emacs-telega
+            feature-emacs-ebdb
             feature-emacs-elpher
 
             ;; Multimedia
