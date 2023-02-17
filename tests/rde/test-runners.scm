@@ -188,6 +188,12 @@ given string in an ANSI escape code."
 (use-modules (guix discovery)
              (rde tests))
 
+(define (test-runner-summary runner)
+  "Return alist of helpful statistics for the test-runner RUNNER."
+  `((pass . ,(test-runner-pass-count runner))
+    (xfail . ,(test-runner-xfail-count runner))
+    (xpass . ,(test-runner-xpass-count runner))
+    (fail . ,(test-runner-fail-count runner))))
 
 (define* (run-test
           t
@@ -206,9 +212,9 @@ given string in an ANSI escape code."
   (let ((test-name (format #f "module ~a" (module-name module))))
     (test-begin test-name)
     (map (lambda (t) (run-test t)) module-tests)
-    (define fail-count (test-runner-fail-count (test-runner-current)))
+    (define summary (test-runner-summary (test-runner-current)))
     (test-end test-name)
-    fail-count))
+    summary))
 
 (define (get-test-modules)
   (define this-module-file
@@ -231,9 +237,14 @@ given string in an ANSI escape code."
            (run-module-tests m)))
        test-modules)
 
-  (define fail-count (test-runner-fail-count (test-runner-current)))
+  (define summary (test-runner-summary (test-runner-current)))
   (test-end "PROJECT TESTS")
-  (zero? fail-count))
+  summary)
+
+(define (run-project-tests-cli)
+  (let* ((summary (run-project-tests))
+         (fail-count (assoc-ref summary 'fail)))
+    (exit (zero? fail-count))))
 
 ;; (run-project-tests)
 
