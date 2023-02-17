@@ -198,7 +198,9 @@ given string in an ANSI escape code."
 (define* (run-test
           t
           #:key (runner (test-runner-create)))
-  (test-with-runner runner (t)))
+  (test-with-runner runner
+    (t)
+    (test-runner-summary runner)))
 
 (define (get-module-tests module)
   (fold-module-public-variables
