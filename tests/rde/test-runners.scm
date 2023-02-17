@@ -246,7 +246,16 @@ given string in an ANSI escape code."
          (fail-count (assoc-ref summary 'fail)))
     (exit (zero? fail-count))))
 
-;; (run-project-tests)
+(define* (rerun-tests
+          previous-runner
+          #:key
+          (runner (test-runner-create))
+          (filter-fn (const #t)))
+  (when previous-runner
+    (let* ((test-results (test-runner-test-results previous-runner))
+           (filtered-tests (map car (filter filter-fn test-results))))
+      (map (lambda (t) (run-test t #:runner runner)) filtered-tests)))
+  runner)
 
 ;; https://www.mail-archive.com/geiser-users%40nongnu.org/msg00323.html
 ;; https://rednosehacker.com/revisiting-guile-xunit
