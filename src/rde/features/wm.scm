@@ -516,6 +516,7 @@ module will be added to the BAR-ID."
           #:key
           (bar-id 'main)
           (persistent-workspaces '())
+          (all-outputs? #f)
           (format-icons '(("1" . )
                           ("2" . )
                           ("3" . )
@@ -537,6 +538,7 @@ module will be added to the BAR-ID."
      (format . {icon})
      ;; FIXME: Height becomes higher when icons are not used.
      (format-icons . ,format-icons)
+     (all-outputs . ,all-outputs?)
      (persistent_workspaces . ,persistent-workspaces))
    `(((#{#workspaces}# button)
       ((background . none)
