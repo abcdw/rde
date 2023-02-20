@@ -195,11 +195,30 @@ given string in an ANSI escape code."
     (xpass . ,(test-runner-xpass-count runner))
     (fail . ,(test-runner-fail-count runner))))
 
+(define (test-runner-test-results-stack runner)
+  (or (assoc-ref (test-runner-aux-value runner) 'test-results-stack)
+      '()))
+
+(define (test-runner-test-results runner)
+  (reverse (test-runner-test-results-stack runner)))
+
+(define (record-test-run-result runner old-fail-count t)
+  (let* ((aux-value (test-runner-aux-value runner))
+         (test-result (if (< old-fail-count (test-runner-fail-count runner))
+                          `((test . ,t) (status . fail))
+                          `((test . ,t) (status . pass))))
+         (test-results-stack (test-runner-test-results-stack runner))
+         (new-test-results (cons test-result test-results-stack)))
+    (test-runner-aux-value! runner
+     (assoc-set! aux-value 'test-results-stack new-test-results))))
+
 (define* (run-test
           t
           #:key (runner (test-runner-create)))
-  (test-with-runner runner
-    (t))
+  (let ((old-fail-count (test-runner-fail-count runner)))
+    (test-with-runner runner
+      (t)
+      (record-test-run-result runner old-fail-count t)))
   runner)
 
 (define (get-module-tests module)
@@ -253,8 +272,12 @@ given string in an ANSI escape code."
           (filter-fn (const #t)))
   (when previous-runner
     (let* ((test-results (test-runner-test-results previous-runner))
-           (filtered-tests (map car (filter filter-fn test-results))))
-      (map (lambda (t) (run-test t #:runner runner)) filtered-tests)))
+           (get-test (lambda (x) (assoc-ref x 'test)))
+           (filtered-tests (map get-test (filter filter-fn test-results))))
+      (pretty-print test-results)
+      (test-with-runner runner
+        (test-group "RERUN TESTS"
+          (map (lambda (t) (run-test t #:runner runner)) filtered-tests)))))
   runner)
 
 ;; https://www.mail-archive.com/geiser-users%40nongnu.org/msg00323.html
