@@ -3,8 +3,16 @@
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 ftw)
 
-  #:export (run-module-tests
-            run-project-tests))
+  #:export (%previous-runner
+            get-test-module
+
+            rerun-tests
+            run-test
+            run-module-tests
+            run-project-tests
+            run-project-tests-cli
+
+            test-runner-summary))
 
 (define (string-repeat s n)
   "Returns string S repeated N times."
