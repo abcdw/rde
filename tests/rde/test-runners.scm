@@ -199,8 +199,8 @@ given string in an ANSI escape code."
           t
           #:key (runner (test-runner-create)))
   (test-with-runner runner
-    (t)
-    (test-runner-summary runner)))
+    (t))
+  runner)
 
 (define (get-module-tests module)
   (fold-module-public-variables
@@ -216,8 +216,8 @@ given string in an ANSI escape code."
   (test-with-runner runner
     (let ((test-name (format #f "module ~a" (module-name module))))
       (test-group test-name
-        (map (lambda (t) (run-test t #:runner runner)) module-tests))
-      (test-runner-summary (test-runner-current)))))
+        (map (lambda (t) (run-test t #:runner runner)) module-tests))))
+  runner)
 
 (define (get-test-modules)
   (define this-module-file
@@ -238,11 +238,11 @@ given string in an ANSI escape code."
              (let ((module-tests (get-module-tests m)))
                (when (not (null? module-tests))
                  (run-module-tests m #:runner runner))))
-           test-modules))
-    (test-runner-summary (test-runner-current))))
+           test-modules)))
+  runner)
 
 (define (run-project-tests-cli)
-  (let* ((summary (run-project-tests))
+  (let* ((summary (test-runner-summary (run-project-tests)))
          (fail-count (assoc-ref summary 'fail)))
     (exit (zero? fail-count))))
 
