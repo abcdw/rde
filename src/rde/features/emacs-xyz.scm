@@ -1188,6 +1188,7 @@ relative line numbers, when narrowing is active."
         (autoload 'consult-customize "consult" "" nil 'macro)
         (autoload 'consult--customize-set "consult")
 
+        (autoload 'embark-open-externally "embark")
         (with-eval-after-load
          'embark
          (require 'embark-consult))
