@@ -1004,11 +1004,24 @@ Aliases, keybindings, small hack and tweaks."
          (setq minibuffer-prompt-properties
                '(read-only t cursor-intangible t face minibuffer-prompt))
          (add-hook 'minibuffer-setup-hook 'cursor-intangible-mode)
+         (setq completion-show-help nil)
+         (setq completions-format 'one-column)
+         (setq completions-header-format nil)
+
+         (let ((map minibuffer-mode-map))
+           (define-key map (vector 'remap 'next-line)
+             'minibuffer-next-completion)
+           (define-key map (vector 'remap 'previous-line)
+             'minibuffer-previous-completion))
+         (let ((map completion-in-region-mode-map))
+           (define-key map (kbd "C-n") 'minibuffer-next-completion)
+           (define-key map (kbd "C-p") 'minibuffer-previous-completion))
 
          ;; Shows hidden prefix when completing candidates with partial style
          ;; (setq file-name-shadow-properties
          ;;       '(invisible t intangible t face file-name-shadow field shadow))
 
+         ;; Will work if vertico is available, won't affect if it doesn't
          (add-hook 'rfn-eshadow-update-overlay-hook 'vertico-directory-tidy)
 
          ;; (advice-add 'completing-read-multiple
