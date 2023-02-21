@@ -55,6 +55,10 @@
           (file-append node-typescript-language-server
                        "/bin/typescript-language-server")
           node-typescript-language-server))
+    (define node-executable
+      (if (any-package? node)
+          (file-append node "/bin/node")
+          node))
     (list
      (when (get-value 'emacs config)
        (rde-elisp-configuration-service
@@ -82,6 +86,26 @@
                        (rde--javascript-disable-eglot-parts)
                        (js2-minor-mode)
                        (npm-mode))))
+
+          ;; repl
+          (with-eval-after-load
+              'nodejs-repl
+            (setq nodejs-repl-command ,node-executable))
+
+          (add-hook 'js-mode-hook
+                    (lambda ()
+                      (defvar nodejs-repl-mode-command-map
+                        (let ((map (make-sparse-keymap)))
+                          (define-key map (kbd "e") 'nodejs-repl-send-last-expression)
+                          (define-key map (kbd "j") 'nodejs-repl-send-line)
+                          (define-key map (kbd "r") 'nodejs-repl-send-region)
+                          (define-key map (kbd "C-c") 'nodejs-repl-send-buffer)
+                          (define-key map (kbd "C-l") 'nodejs-repl-load-file)
+                          (define-key map (kbd "C-z") 'nodejs-repl-switch-to-repl)
+                          map))
+                      (fset 'nodejs-repl-mode-command-map nodejs-repl-mode-command-map)
+                      (define-key js-mode-map (kbd "C-c r")
+                        '("repl" . nodejs-repl-mode-command-map))))
 
           ;; js2-mode
           (with-eval-after-load
@@ -141,7 +165,8 @@
         (list emacs-js2-mode
               emacs-npm-mode
               emacs-typescript-mode
-              emacs-web-mode)))
+              emacs-web-mode
+              emacs-nodejs-repl)))
      (simple-service
       'javascript-add-packages
       home-profile-service-type
