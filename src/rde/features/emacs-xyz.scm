@@ -242,15 +242,18 @@ Almost all visual elements are disabled.")))
           (dark? #f)
           (deuteranopia? #t)
           (deuteranopia-red-blue-diffs? #f)
+          (headings-scaling? #f)
           (extra-modus-themes-overrides '()))
   "Configure modus-themes, a set of elegant and highly accessible
 themes for Emacs.  DEUTERANOPIA? replaces red/green tones with yellow/blue,
-which helps people with color blindness.  If DEUTERANOPIA-RED-BLUE-DIFFS?
-is set red/blue colors will be used instead"
+which helps people with color blindness.  If DEUTERANOPIA-RED-BLUE-DIFFS?  is
+set, red/blue colors will be used instead.  If HEADINGS-SCALING? is set,
+different level headings will have different size."
   (ensure-pred file-like? emacs-modus-themes)
   (ensure-pred list? extra-after-enable-theme-hooks)
   (ensure-pred boolean? dark?)
   (ensure-pred boolean? deuteranopia?)
+  (ensure-pred boolean? headings-scaling?)
   (ensure-pred elisp-config? extra-modus-themes-overrides)
 
   (define emacs-f-name 'modus-themes)
@@ -401,16 +404,18 @@ is set red/blue colors will be used instead"
           (setq modus-themes-to-toggle '(,light-theme ,dark-theme))
           (setq modus-themes-italic-constructs t)
           (setq modus-themes-bold-constructs t)
-          (setq modus-themes-org-blocks 'gray-background)
           (setq modus-themes-mixed-fonts t)
-          (setq modus-themes-headings (quote ((1 . (1.15))
-                                              (2 . (1.1))
-                                              (3 . (1.1))
-                                              (4 . (1.0))
-                                              (5 . (1.0))
-                                              (6 . (1.0))
-                                              (7 . (0.9))
-                                              (8 . (0.9))))))
+          (setq modus-themes-org-blocks 'gray-background)
+          ,@(if headings-scaling?
+                `((setq modus-themes-headings (quote ((1 . (1.15))
+                                                      (2 . (1.1))
+                                                      (3 . (1.1))
+                                                      (4 . (1.0))
+                                                      (5 . (1.0))
+                                                      (6 . (1.0))
+                                                      (7 . (0.9))
+                                                      (8 . (0.9))))))
+                '()))
         (load-theme ',theme t))
       #:elisp-packages (list emacs-modus-themes)
       #:summary "Modus Themes extensions"
