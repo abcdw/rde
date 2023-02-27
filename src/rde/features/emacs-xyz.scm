@@ -2295,16 +2295,14 @@ application/epub+zip mime-type will be openned with emacs client."
           (emacs-elfeed emacs-elfeed)
           (emacs-elfeed-org emacs-elfeed-org)
           (elfeed-org-files '())
-          ;; (capture-in-browser? #f)
-          )
+          (capture-key "e"))
   "Setup and configure Elfeed for Emacs."
   (ensure-pred list-of-strings? elfeed-org-files)
   (define (not-empty? x) (not (null? x)))
   (ensure-pred not-empty? elfeed-org-files)
   (ensure-pred file-like? emacs-elfeed)
   (ensure-pred file-like? emacs-elfeed-org)
-
-  ;; (ensure-pred boolean? capture-in-browser?)
+  (ensure-pred string? capture-key)
 
   (define emacs-f-name 'elfeed)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -2327,7 +2325,7 @@ application/epub+zip mime-type will be openned with emacs client."
            'org-capture
            (add-to-list
             'org-capture-templates
-            '("r" "rssadd" entry
+            '(,capture-key "Elfeed" entry
               (file+headline ,(car elfeed-org-files)
                              "Untagged")
               "*** %:annotation\n"
