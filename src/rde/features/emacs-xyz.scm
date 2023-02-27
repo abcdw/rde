@@ -326,12 +326,12 @@ is set red/blue colors will be used instead"
                `(header-line
                  ((,c :box (:line-width ,rde-modus-themes-header-line-padding
                             :color ,bg-dim))))
-               `(git-gutter-fr:added ((,c :foreground ,fg-added-intense
-                                         :background ,bg-main)))
-               `(git-gutter-fr:deleted ((,c :foreground ,fg-removed-intense
-                                           :background ,bg-main)))
-               `(git-gutter-fr:modified ((,c :foreground ,fg-changed-intense
+               `(git-gutter-fr:added ((,c :foreground ,bg-added-fringe
+                                          :background ,bg-main)))
+               `(git-gutter-fr:deleted ((,c :foreground ,bg-removed-fringe
                                             :background ,bg-main)))
+               `(git-gutter-fr:modified ((,c :foreground ,bg-changed-fringe
+                                             :background ,bg-main)))
                `(aw-leading-char-face ((,c :height 1.0
                                            :foreground ,blue-cooler)))))))
 
