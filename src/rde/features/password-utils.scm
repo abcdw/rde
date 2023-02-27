@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
 ;;;
 ;;; This file is part of rde.
@@ -36,12 +36,16 @@
 (define* (feature-password-store
           #:key
           (password-store password-store)
+          (pass-key "p")
+          (consult-pass-key "M-g P")
           (remote-password-store-url #f)
           (default-pass-prompt? #t))
   "Setup and configure password manager."
   ;; (ensure-pred maybe-url? remote-password-store-url)
   (ensure-pred file-like? password-store)
   (ensure-pred boolean? default-pass-prompt?)
+  (ensure-pred string? pass-key)
+  (ensure-pred string? consult-pass-key)
 
   (define emacs-f-name 'pass)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -91,7 +95,7 @@
                  (add-hook 'pass-mode-hook (lambda () (setq truncate-lines t)))
 
                  (with-eval-after-load 'rde-keymaps
-                   (define-key rde-app-map (kbd "p") 'pass))
+                   (define-key rde-app-map (kbd ,pass-key) 'pass))
 
                  (with-eval-after-load 'auth-source
                    (auth-source-pass-enable))
@@ -117,7 +121,8 @@
                                         'password-store-copy)
                                     pass))
 
-                         (define-key global-map (kbd "M-g p") 'rde-consult-pass))
+                         (define-key global-map (kbd ,consult-pass-key)
+                           'rde-consult-pass))
                        '())
 
                  ,@(if emacs-embark
