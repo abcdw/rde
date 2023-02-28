@@ -92,6 +92,7 @@
             feature-emacs-pdf-tools
             feature-emacs-nov-el
             feature-emacs-elfeed
+            feature-emacs-info
 
             ;; Notetaking
             feature-emacs-org
@@ -3150,6 +3151,67 @@ built-in help that provides much more contextual information."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-helpful)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-info
+          #:key
+          (emacs-info-plus emacs-info-plus))
+  "Configure Info and Info+ for reading Info documents in Emacs."
+  (ensure-pred file-like? emacs-info-plus)
+
+  (define emacs-f-name 'info)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Info."
+    (define theme (get-value 'emacs-light-theme config))
+    (define emacs-modus-themes (get-value 'emacs-modus-themes config))
+
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `(,@(if emacs-modus-themes
+              `((eval-when-compile
+                 (require 'modus-themes)
+                 (require 'cl-seq))
+                (require ',(symbol-append theme '-theme))
+                (eval-when-compile
+                 (enable-theme ',theme))
+                (defun rde-info-set-custom-faces ()
+                  "Apply more pleasant faces to `Info-mode' and `Info+-mode'."
+                  (interactive)
+                  (face-remap-add-relative 'default :inherit 'variable-pitch)
+                  (when (modus-themes--current-theme)
+                    (modus-themes-with-colors
+                     (custom-set-faces
+                      `(info-reference-item
+                        ((,c :background unspecified)))
+                      `(info-function-ref-item
+                        ((,c :background unspecified)))
+                      `(info-command-ref-item ((,c :background unspecified)))
+                      `(info-macro-ref-item ((,c :background unspecified)))
+                      `(info-variable-ref-item ((,c :background unspecified)))))))
+                (add-hook 'Info-mode-hook 'rde-info-set-custom-faces))
+              '())
+        (with-eval-after-load 'info
+          (define-key Info-mode-map "q" 'kill-this-buffer)
+          (setq Info-use-header-line nil)
+          (require 'info+)
+          (add-hook 'Info-mode-hook 'visual-line-mode)
+          (setq info-manual+node-buffer-name-mode t)
+          (setq Info-persist-history-mode t)
+          (setq Info-fontify-isolated-quote-flag nil)
+          (setq Info-fontify-reference-items-flag t)
+          (setq Info-fontify-quotations t)
+          (setq Info-breadcrumbs-in-mode-line-mode nil)))
+      #:elisp-packages (append
+                         (list emacs-info-plus)
+                         (or (and=> emacs-modus-themes list) '())))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-info-plus)))
    (home-services-getter get-home-services)))
 
 
