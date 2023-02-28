@@ -53,6 +53,7 @@
             ;; Generic
             feature-emacs-input-methods
             feature-emacs-time
+            feature-emacs-calendar
             feature-emacs-tramp
             feature-emacs-dired
             feature-emacs-eshell
@@ -772,6 +773,71 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
         ,@(if display-time?
               '((display-time-mode))
               '())))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-calendar
+          #:key
+          (diary-file "~/docs/diary")
+          (calendar-date-style 'iso)
+          (week-numbers? #t)
+          (calendar-key "c")
+          (appt-key "A"))
+  "Configure the calendar and diary facilities in Emacs."
+  (ensure-pred path? diary-file)
+  (ensure-pred symbol? calendar-date-style)
+  (ensure-pred boolean? week-numbers?)
+  (ensure-pred string? calendar-key)
+  (ensure-pred string? appt-key)
+
+  (define emacs-f-name 'calendar)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to the Emacs Calendar/Diary."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((defvar rde-calendar-appt-map nil
+          "Map to bind `appt' commands under.")
+        (define-prefix-command 'rde-calendar-appt-map)
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,calendar-key) 'calendar))
+        (with-eval-after-load 'calendar
+          (setq diary-file ,diary-file)
+          (setq calendar-week-start-day 1)
+          (setq calendar-view-diary-initially-flag t)
+          (setq calendar-date-style ',calendar-date-style)
+          (setq calendar-mark-diary-entries-flag t)
+          ,@(if week-numbers?
+                '((setq calendar-intermonth-header
+                        (propertize "WK" 'font-lock-face
+                                    'font-lock-function-name-face))
+                  (setq calendar-intermonth-text
+                        '(propertize
+                          (format "%2d"
+                                  (car
+                                   (calendar-iso-from-absolute
+                                    (calendar-absolute-from-gregorian
+                                     (list month day year)))))
+                          'font-lock-face 'font-lock-function-name-face)))
+                '()))
+        (appt-activate 1)
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,appt-key) 'rde-calendar-appt-map)
+          (let ((map rde-calendar-appt-map))
+            (define-key map "a" 'appt-add)
+            (define-key map "d" 'appt-delete)))
+        (with-eval-after-load 'appt
+          (setq appt-display-format 'echo)
+          (setq appt-audible nil)
+          (setq appt-message-warning-time 10)
+          (setq appt-display-interval 2)
+          (setq appt-display-diary nil))))))
 
   (feature
    (name f-name)
