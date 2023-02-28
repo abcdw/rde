@@ -99,7 +99,8 @@
             feature-emacs-elpher
 
             ;; Multimedia
-            feature-emacs-dashboard))
+            feature-emacs-dashboard
+            feature-emacs-pulseaudio-control))
 
 
 ;;;
@@ -3509,6 +3510,76 @@ Emacs dashboard which allows you to focus on the section items."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-dashboard)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-pulseaudio-control
+          #:key
+          (emacs-pulseaudio-control emacs-pulseaudio-control)
+          (volume-step "5%")
+          (display-volume? #f))
+  "Configure pulseaudio-control for PulseAudio integration in Emacs."
+  (ensure-pred file-like? emacs-pulseaudio-control)
+  (ensure-pred string? volume-step)
+  (ensure-pred boolean? display-volume?)
+
+  (define emacs-f-name 'pulseaudio-control)
+  (define f-name (symbol-append 'emacs emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to PulseAudio Control."
+    (define pactl
+      (file-append
+       (get-value 'pulseaudio config
+                  (@ (gnu packages pulseaudio) pulseaudio))
+       "/bin/pactl"))
+
+    (let ((emacs-all-the-icons (get-value 'emacs-all-the-icons config)))
+      (list
+       (rde-elisp-configuration-service
+        emacs-f-name
+        config
+        `((autoload 'pulseaudio-control-default-keybindings
+                    "pulseaudio-control")
+          (pulseaudio-control-default-keybindings)
+          (with-eval-after-load 'pulseaudio-control
+            (define-key pulseaudio-control-map "L"
+              'pulseaudio-control-toggle-sink-input-mute-by-index)
+            ,@(if emacs-all-the-icons
+                  '((eval-when-compile
+                     (require 'all-the-icons))
+                    (with-eval-after-load 'all-the-icons
+                      (let ((all-the-icons-default-adjust -0.15))
+                        (setq pulseaudio-control-sink-mute-string
+                              (all-the-icons-material "volume_off" :height 1))
+                        (setq pulseaudio-control-sink-volume-strings
+                              (list
+                               (all-the-icons-material "volume_mute" :height 1)
+                               (all-the-icons-material "volume_down" :height 1)
+                               (all-the-icons-material "volume_up" :height 1)))
+                        (setq pulseaudio-control-source-mute-string
+                              (all-the-icons-material "mic_off" :height 1))
+                        (setq pulseaudio-control-source-volume-strings
+                              (list
+                               (all-the-icons-material "mic_none" :height 1)
+                               (all-the-icons-material "mic" :height 1))))))
+                  '())
+            (setq pulseaudio-control-pactl-path ,pactl)
+            (setq pulseaudio-control--volume-maximum '(("percent" . 100)
+                                                       ("decibels" . 10)
+                                                       ("raw" . 98000)))
+            (setq pulseaudio-control-volume-step ,volume-step)
+            (setq pulseaudio-control-volume-verbose nil)
+            (pulseaudio-control-default-sink-mode)
+            (pulseaudio-control-default-source-mode)
+            ,@(if display-volume?
+                  '((pulseaudio-control-display-mode))
+                  '())))
+        #:elisp-packages (append (list emacs-pulseaudio-control)
+                                 (or (and=> emacs-all-the-icons list) '()))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-pulseaudio-control)))
    (home-services-getter get-home-services)))
 
 ;;; emacs-xyz.scm end here
