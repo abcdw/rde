@@ -90,6 +90,7 @@
             feature-emacs-citar
             feature-emacs-org-protocol
             feature-emacs-spelling
+            feature-emacs-org-recur
 
             ;; Communication
             feature-emacs-telega
@@ -3083,6 +3084,39 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
        spelling-program
        spelling-dictionaries flyspell-hooks flyspell-prog-hooks
        ispell-standard-dictionary ispell-personal-dictionary)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-org-recur
+          #:key
+          (emacs-org-recur emacs-org-recur))
+  "Configure org-recur, a simple mode for recurring org-mode tasks."
+  (ensure-pred file-like? emacs-org-recur)
+
+  (define f-name 'org-recur)
+  (define emacs-f-name (symbol-append 'emacs- f-name))
+
+  (define (get-home-services config)
+    "Return home services related to org-recur."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((add-hook 'org-mode-hook 'org-recur-mode)
+        (add-hook 'org-agenda-mode-hook 'org-recur-agenda-mode)
+        (with-eval-after-load 'org-recur
+          (let ((map org-recur-mode-map))
+            (define-key map (kbd "C-c d") 'org-recur-finish)
+            (define-key map (kbd "C-c 0") 'org-recur-schedule-today))
+          (let ((map org-recur-agenda-mode-map))
+            (define-key map (kbd "d") 'org-recur-finish)
+            (define-key map (kbd "C-c d") 'org-recur-finish))
+          (setq org-recur-finish-done t)
+          (setq org-recur-finish-archive t)))
+      #:elisp-packages (list emacs-org-recur))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-org-recur)))
    (home-services-getter get-home-services)))
 
 
