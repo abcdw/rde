@@ -71,6 +71,7 @@
             feature-emacs-monocle
             feature-emacs-project
             feature-emacs-perspective
+            feature-emacs-ednc
 
             ;; Development
             feature-emacs-smartparens
@@ -2081,6 +2082,79 @@ Provide basic adjustments and integration with project.el."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-ednc
+          #:key
+          (emacs-ednc emacs-ednc)
+          (notifications-icon #f)
+          (notifications-application-name "Emacs")
+          (ednc-key "n"))
+  "Configure the Emacs Desktop Notification Center (EDNC)."
+  (ensure-pred file-like? emacs-ednc)
+  (ensure-pred maybe-path? notifications-icon)
+  (ensure-pred string? notifications-application-name)
+  (ensure-pred string? ednc-key)
+
+  (define emacs-f-name 'ednc)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to EDNC."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((defvar rde-ednc-map nil)
+        (define-prefix-command 'rde-ednc-map)
+        (defun rde-ednc--notify ()
+          "Display the latest EDNC notification."
+          (when (ednc-notifications)
+            (ednc-format-notification (car (ednc-notifications)))))
+
+        (defun rde-ednc-show-notification-log ()
+          "Switch to the EDNC log buffer."
+          (interactive)
+          (when (bufferp (get-buffer ednc-log-name))
+            (switch-to-buffer ednc-log-name)))
+
+        (defun rde-ednc-close-last-notification ()
+          "Close the latest notification provided by the notification daemon."
+          (interactive)
+          (when-let* ((notification (car (ednc-notifications))))
+            (ednc--close-notification notification 2)))
+
+        (defun rde-ednc-close-all-notifications ()
+          "Dismiss all EDNC notifications."
+          (interactive)
+          (mapc 'ednc-dismiss-notification (cdr ednc--state)))
+
+        (defun rde-ednc-update-notifications (&rest _)
+          "Update the display of EDNC notifications."
+          (interactive)
+          (force-mode-line-update t))
+
+        (add-hook 'after-init-hook 'ednc-mode)
+        (add-hook 'ednc-notification-presentation-functions
+                  'rde-ednc-update-notifications)
+        (add-hook 'ednc-notification-presentation-functions
+                  'ednc--update-log-buffer)
+        (with-eval-after-load 'notifications
+          (setq notifications-application-name ,notifications-application-name)
+          ,@(if notifications-icon
+                `((setq notifications-application-icon ,notifications-icon))
+                '()))
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,ednc-key) 'rde-ednc-map))
+        (let ((map rde-ednc-map))
+          (define-key map "c" 'rde-ednc-close-last-notification)
+          (define-key map "l" 'rde-ednc-show-notification-log)
+          (define-key map "d" 'rde-ednc-close-all-notifications)))
+      #:elisp-packages (list emacs-ednc))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-ednc)))
    (home-services-getter get-home-services)))
 
 
