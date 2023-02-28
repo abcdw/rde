@@ -49,6 +49,7 @@
             feature-emacs-faces
             feature-emacs-which-key
             feature-emacs-keycast
+            feature-emacs-all-the-icons
 
             ;; Generic
             feature-emacs-input-methods
@@ -645,6 +646,47 @@ keybindings and adjust some minor settings."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-keycast)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-all-the-icons
+          #:key
+          (emacs-all-the-icons emacs-all-the-icons)
+          (emacs-all-the-icons-completion emacs-all-the-icons-completion))
+  "Configure all-the-icons, a collection of fonts for Emacs."
+  (ensure-pred file-like? emacs-all-the-icons)
+  (ensure-pred file-like? emacs-all-the-icons-completion)
+
+  (define emacs-f-name 'all-the-icons)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to all-the-icons."
+    (list
+     (let ((emacs-completion (get-value 'emacs-completion config)))
+       (rde-elisp-configuration-service
+        emacs-f-name
+        config
+        `((when (and (display-graphic-p)
+                     (not (find-font (font-spec :name "all-the-icons"))))
+            (all-the-icons-install-fonts t))
+          (with-eval-after-load 'all-the-icons
+            (setq all-the-icons-scale-factor 1.0)
+            (setq all-the-icons-default-adjust 0)
+            (setq all-the-icons-octicon-scale-factor 0.9))
+          ,@(if emacs-completion
+                '((all-the-icons-completion-mode)
+                  (add-hook 'marginalia-mode-hook
+                            'all-the-icons-completion-marginalia-setup))
+                '()))
+        #:elisp-packages (append
+                          (list emacs-all-the-icons)
+                          (if emacs-completion
+                              (list emacs-all-the-icons-completion)
+                              '()))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-all-the-icons)))
    (home-services-getter get-home-services)))
 
 
