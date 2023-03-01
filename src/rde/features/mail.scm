@@ -3,6 +3,7 @@
 ;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2023 conses <contact@conses.eu>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -27,6 +28,7 @@
   #:use-module (gnu packages mail)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (rde packages emacs-xyz)
+  #:use-module (rde serializers elisp)
   #:use-module (gnu services)
   #:use-module (gnu services configuration)
   #:use-module (gnu home services)
@@ -44,6 +46,7 @@
             feature-notmuch
             feature-msmtp
             feature-l2md
+            feature-emacs-gnus
 
             mail-account
             mail-account-id
@@ -440,6 +443,237 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
    (name 'l2md)
    (home-services-getter get-home-services)
    (values `((l2md . #t)))))
+
+
+;;;
+;;; feature-emacs-gnus
+;;;
+
+(define* (feature-emacs-gnus
+          #:key
+          (posting-styles '())
+          (group-parameters '())
+          (gnus-directory "~/.cache/emacs/gnus")
+          (topic-alist '())
+          (topic-topology '())
+          (mail-account-ids #f)
+          (message-archive-method #f)
+          (message-archive-group #f)
+          (gnus-key "g"))
+  "Configure the Gnus newsreader.
+If MAIL-ACCOUNT-IDS is not provided, use all the mail accounts.
+POSTING-STYLES allow you to set different email posting information based on
+the current newsgroup or article.  See @pxref{Posting Styles,,,gnus} for more
+details on how to write them.
+GROUP-PARAMETERS allow you to tailor the settings of particular groups.  See
+@pxref{Group Parameters,,,gnus} for more information on its syntax.
+TOPIC-ALIST and TOPIC-TOPOLOGY let you declaratively categorize groups into
+topics with your preferred hierarchy."
+  (ensure-pred elisp-config? posting-styles)
+  (ensure-pred path? gnus-directory)
+  (ensure-pred elisp-config? group-parameters)
+  (ensure-pred elisp-config? topic-alist)
+  (ensure-pred elisp-config? topic-topology)
+  (ensure-pred maybe-list? mail-account-ids)
+  (ensure-pred maybe-list? message-archive-method)
+  (ensure-pred maybe-list? message-archive-group)
+  (ensure-pred string? gnus-key)
+
+  (define emacs-f-name 'gnus)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Gnus."
+    (require-value 'mail-accounts config)
+
+    (define mail-accounts
+      (if mail-account-ids
+          (filter (lambda (x)
+                    (member (mail-account-id x) mail-account-ids))
+                  (get-value 'mail-accounts config))
+          (get-value 'mail-accounts config)))
+    (define mail-dir ((get-value 'mail-directory-fn config) config))
+
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((defgroup rde-gnus nil
+          "Customizations for the Gnus newsreader."
+          :group 'rde)
+        (defcustom rde-gnus-topic-topology nil
+          "Topics topology for Gnus."
+          :group 'rde-gnus
+          :type 'list)
+        (defcustom rde-gnus-topic-alist nil
+          "Alist of Gnus topics."
+          :group 'rde-gnus
+          :type 'list)
+        (defvar rde-gnus-subscribed-p nil
+          "Whether we're currently subscribed to Gnus groups.")
+        (defun rde-gnus--get-topic-groups ()
+          "Return a flattened list of groups from `rde-gnus-topic-alist'."
+          (flatten-list (mapcar (lambda (topic)
+                                  (cdr topic))
+                                rde-gnus-topic-alist)))
+
+        (defun rde-gnus-get-article-participants ()
+          "Retrieve the participants from the current article."
+          (if (and (gnus-alive-p)
+                   (message-fetch-field "from")
+                   (message-fetch-field "to"))
+              (with-current-buffer gnus-article-buffer
+                (string-join
+                 (remove-if
+                  (lambda (address)
+                    (string-match user-mail-address address))
+                  (append
+                   (split-string (message-fetch-field "from") ", ")
+                   (split-string (message-fetch-field "to") ", ")))
+                 ", "))
+            ""))
+
+        (defun rde-gnus-shr-browse-url-new-window ()
+          "When using shr, open links in a new window."
+          (interactive)
+          (shr-browse-url nil nil t))
+
+        (define-minor-mode rde-gnus-topic-mode
+          "Apply Gnus topic settings declaratively and subscribe to groups."
+          :group 'rde-gnus
+          (setq gnus-topic-topology rde-gnus-topic-topology)
+          (setq gnus-topic-alist rde-gnus-topic-alist)
+          (unless rde-gnus-subscribed-p
+            (mapc (lambda (topic)
+                    (gnus-subscribe-hierarchically topic))
+                  (rde-gnus--get-topic-groups)))
+          (setq rde-gnus-subscribed-p t))
+
+        (setq rde-gnus-topic-alist ',topic-alist)
+        (setq rde-gnus-topic-topology ',topic-topology)
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,gnus-key) 'gnus))
+        (setq mail-user-agent 'gnus-user-agent)
+        ,@(if (get-value 'emacs-dired config)
+              '((add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode))
+              '())
+        (with-eval-after-load 'gnus
+          (setq gnus-use-full-window nil)
+          (setq gnus-use-cache t)
+          ,@(if (get-value 'emacs-advanced-user? config)
+                `((setq gnus-novice-user nil))
+              '())
+          (setq gnus-interactive-exit nil)
+          (setq gnus-thread-sort-functions
+                '(gnus-thread-sort-by-most-recent-date
+                  (not gnus-thread-sort-by-number)))
+          (setq gnus-permanently-visible-groups "^nnmaildir")
+          (setq gnus-parameters ',group-parameters)
+          (setq gnus-directory ,gnus-directory)
+          (setq gnus-home-directory (locate-user-emacs-file "gnus"))
+          (setq gnus-cache-directory
+                ,(string-append gnus-directory "/news/cache"))
+          (setq gnus-kill-files-directory
+                ,(string-append gnus-directory "/news"))
+          (setq gnus-article-save-directory
+                ,(string-append gnus-directory "/news"))
+          (setq gnus-large-newsgroup 100)
+          ,@(if message-archive-method
+                `((setq gnus-message-archive-method ',message-archive-method))
+                '())
+          ,@(if message-archive-group
+                `((setq gnus-message-archive-group ',message-archive-group))
+                '())
+          (setq gnus-update-message-archive-method t)
+          (setq gnus-posting-styles
+                '(,@(if (get-value 'msmtp config)
+                        '()
+                        (map (lambda (mail-acc)
+                               `(,(symbol->string (mail-account-id mail-acc))
+                                 (name ,(get-value 'full-name config))
+                                 (signature
+                                  ,(match (get-value 'message-signature config)
+                                     ((? procedure? e) (e config))
+                                     ((? string? e) e)
+                                     (#f 'nil)
+                                     (_ 't)))
+                                 ("X-Message-SMTP-Method"
+                                  ,(format
+                                    #f "smtp ~a ~a ~a"
+                                    (assoc-ref
+                                     (assoc-ref %default-msmtp-provider-settings
+                                                (mail-account-type mail-acc))
+                                     'host)
+                                    (assoc-ref
+                                     (assoc-ref %default-msmtp-provider-settings
+                                                (mail-account-type mail-acc))
+                                     'port)
+                                    (mail-account-fqda mail-acc)))))
+                             mail-accounts))
+                  ,@posting-styles))
+          (setq gnus-select-method '(nnnil))
+          (setq gnus-secondary-select-methods
+                '(,@(if (get-value 'isync config)
+                        (map (lambda (mail-acc)
+                               `(nnmaildir
+                                 ,(symbol->string (mail-account-id mail-acc))
+                                 (directory
+                                  ,(string-append
+                                    mail-dir "/accounts/"
+                                    (mail-account-fqda mail-acc)))))
+                             mail-accounts)
+                      '())
+                  (nntp "gwene"
+                        (nntp-address "news.gwene.org"))
+                  (nnfolder "archive"
+                            (nnfolder-directory
+                             ,(string-append mail-dir "/archive"))
+                            (nnfolder-active-file
+                             ,(string-append mail-dir "/archive/active"))
+                            (nnfolder-get-new-mail nil)
+                            (nnfolder-inhibit-expiry t)))))
+        (with-eval-after-load 'mail-source
+          (setq mail-source-directory ,(string-append gnus-directory "/mail"))
+          (setq mail-default-directory ,gnus-directory))
+        (with-eval-after-load 'gnus-start
+          (setq gnus-dribble-directory ,gnus-directory)
+          (setq gnus-startup-file ,(string-append gnus-directory "/.newsrc"))
+          (setq gnus-subscribe-newsgroup-method
+                'gnus-subscribe-hierarchically)
+          (setq gnus-check-new-newsgroups nil)
+          (setq gnus-save-killed-list nil))
+        (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
+        (add-hook 'gnus-group-mode-hook 'hl-line-mode)
+        (with-eval-after-load 'gnus-sum
+          (setq gnus-thread-hide-subtree t))
+        (with-eval-after-load 'nndraft
+          (setq nndraft-directory
+                ,(string-append gnus-directory "/mail/drafts")))
+        (add-hook 'gnus-topic-mode-hook 'rde-gnus-topic-mode)
+        (with-eval-after-load 'gnus-topic
+          (setq gnus-gcc-mark-as-read t)
+          (setq gnus-server-alist
+                '(("archive" nnfolder "archive"
+                   (nnfolder-directory
+                    ,(string-append gnus-directory "/mail/archive"))
+                   (nnfolder-get-new-mail nil)
+                   (nnfolder-inhibit-expiry t)))))
+        (with-eval-after-load 'gnus-art
+          (let ((map gnus-article-mode-map))
+            (define-key map (vector 'remap 'shr-mouse-browse-url)
+              'shr-mouse-browse-url-new-window)
+            (define-key map (vector 'remap 'shr-browse-url)
+              'rde-gnus-shr-browse-url-new-window))
+          (setq gnus-visible-headers
+                '("^From:" "^To:" "^Cc:" "^Subject:" "^Newsgroups:" "^Date:"
+                  "Followup-To:" "Reply-To:" "^Organization:" "^X-Newsreader:"
+                  "^X-Mailer:" "^Message-ID:" "^In-Reply-To:" "^References:"))
+          (setq gnus-sorted-header-list gnus-visible-headers))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 
 ;;;
