@@ -49,6 +49,7 @@
             feature-msmtp
             feature-l2md
             feature-emacs-gnus
+            feature-emacs-debbugs
             feature-emacs-smtpmail
             feature-emacs-org-mime
             feature-goimapnotify
@@ -705,6 +706,48 @@ topics with your preferred hierarchy."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; feature-emacs-debbugs
+;;;
+
+(define* (feature-emacs-debbugs
+          #:key
+          (emacs-debbugs emacs-debbugs)
+          (default-packages
+           (list "emacs" "guix" "guix-patches"))
+          (default-severities
+           (list "serious" "important" "normal" "tagged")))
+  "Configure the Debbugs user interface for Emacs.
+Set the default packages to retrieve bugs for with DEFAULT-PACKAGES and the
+default severities with which bugs should be filered with DEFAULT-SEVERITIES."
+  (ensure-pred file-like? emacs-debbugs)
+  (ensure-pred list? default-packages)
+  (ensure-pred list? default-severities)
+
+  (define emacs-f-name 'debbugs)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Debbugs."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'debbugs-gnu
+          (require 'xdg)
+          (setq debbugs-gnu-persistency-file
+                (expand-file-name "emacs/debbugs"
+                                  (or (xdg-cache-home) "~/.cache")))
+          (setq debbugs-gnu-default-packages (list ,@default-packages))
+          (setq debbugs-gnu-default-severities (list ,@default-severities))))
+      #:elisp-packages (list emacs-debbugs))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-debbugs)))
    (home-services-getter get-home-services)))
 
 
