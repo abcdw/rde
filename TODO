@@ -7,11 +7,7 @@
 
 * ~Guix Home~                                                            :guix:
 ** Browsers
-*** TODO Implement home service ungoogled-chromium
-- Browser extension
-*** TODO Implement home service nyxt
-- Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-** TODO Make gtk home service
+** DONE Make gtk home service
 ** DONE Make system service for Guix Home
 SCHEDULED: <2022-07-21 Thu>
 - [X] Install Guix on qemu and make it accessible via guix deploy.
@@ -35,11 +31,16 @@ creation.
 *** DONE Add a package with rde info file
 *** DONE Add integrate-he-in-os? flag to rde-config
 SCHEDULED: <2022-08-03 Wed>
-*** TODO Move live-os to install or other apropriate place
+*** DONE Move live-os to install or other apropriate place
 *** DONE Setup ci
-*** TODO Setup substitutes
-*** TODO Place a release-tag tag
-** TODO Visually separate sway workspaces for different workflows
+*** CANCELLED Setup substitutes
+:LOGBOOK:
+- State "CANCELLED"  from "CANCELLED"  [2023-03-01 Wed 11:55] \\
+  We can live without it, also someday distribution substitutes will appear.
+:END:
+
+*** DONE Place a release-tag tag
+** CANCELLED Visually separate sway workspaces for different workflows
 - code
 - communication
 - multimedia
@@ -52,14 +53,24 @@ SCHEDULED: <2022-08-03 Wed>
 - Generate shorter state names
 - Make a bigger state include substates (hierarchy sync)
 - Move notmuch tags and mbsync to state
-** TODO Investigate Fedora XDG problem
+** DONE Investigate Fedora XDG problem
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2023-03-01 Wed 11:56] \\
+  Probably fixed
+:END:
 - [[notmuch:id:ada8cf01-5eca-46ea-b0aa-efec4db9a486@www.fastmail.com][Email from Gerry Agbobada: Re: Guix home on foreign distribution; handling XDG env]]
-** TODO Make a thread on elisp serialization and use-package macro
+** CANCELLED Make a thread on elisp serialization and use-package macro
+:LOGBOOK:
+- State "CANCELLED"  from "TODO"       [2023-03-01 Wed 11:57] \\
+  It's a long standing task, depending on bigger tasks.  A few discussions already
+  happend, there are smaller steps happening in this direction.  It doesn't make
+  too much sense to have this task.
+:END:
 https://framagit.org/tyreunom/guix-home-manager/-/merge_requests/7/diffs#fde31578cd2c6e21ef33b87b3182bb9192c03a32
 ** TODO Add feature-emacs-sdcv
 Dictionaries: http://download.huzheng.org/
 See also emacs-multitran
-** TODO Add user field to email account
+** DONE Add user field to email account
 ** DONE Add feature-emacs-corfu or extend feature-completion
 SCHEDULED: <2022-06-27 Mon>
 https://kristofferbalintona.me/posts/202202270056/
@@ -71,6 +82,11 @@ SCHEDULED: <2022-07-14 Thu>
 https://github.com/oantolin/orderless
 https://github.com/minad/consult/wiki#minads-orderless-configuration
 ** TODO Configure icecat profiles
+** TODO Implement home service ungoogled-chromium
+- Browser extension
+** TODO Implement home service nyxt
+- Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
+*
 * Archive                                                           :ARCHIVE:
 
 ** DONE Add rde documentation template [2/2]                 :rde:release_1:
