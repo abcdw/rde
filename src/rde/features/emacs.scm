@@ -444,16 +444,9 @@ C-h C-a to open About Emacs buffer."
           (setq search-whitespace-regexp ".*?")
 
           ,#~""
-          ;; TODO: Move it to feature-compile
-          (defun rde-compilation-colorizer ()
-            "Prevent color escape sequences to popup in compilation buffer."
-            (ansi-color-apply-on-region (point-min) (point-max)))
-          (add-hook 'compilation-filter-hook 'rde-compilation-colorizer)
 
-          (dolist (mode-hook '(prog-mode-hook compilation-mode-hook))
+          (dolist (mode-hook '(prog-mode-hook))
                   (add-hook mode-hook (lambda () (setq truncate-lines t))))
-          (setq compilation-scroll-output 'first-error)
-          (define-key global-map (kbd "s-r") 'recompile)
 
           ,#~""
           (define-key global-map (kbd "s-b") 'switch-to-buffer)
