@@ -5,29 +5,131 @@
 #+CATEGORY: rde
 #+ARCHIVE: ::* Archive
 
-* ~Guix Home~                                                            :guix:
-** Browsers
-** DONE Make gtk home service
-** DONE Make system service for Guix Home
-SCHEDULED: <2022-07-21 Thu>
-- [X] Install Guix on qemu and make it accessible via guix deploy.
-
-Allows to make home-environment a part of operating-system and thus
-use without ~guix home~ subcommand.
-** CANCELLED Make it possible to specify the verbosity for ~guix home reconfigure~
-By default, only the path to the home environment should be shown,
-~/gnu/store/...-home~.
-** CANCELLED Implement pam_shepherd.so
-Start user-space shepherd on first user login and exit on last logout.
-- [[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
-- https://www.opennet.ru/base/dev/pam_linux.txt.html
-Take a look at mpd service for user-service example and /run/user/ID
-creation.
 * ~rde~                                                                   :rde:
 :PROPERTIES:
 :VISIBILITY: content
 :END:
-** First Release                                                 :release_1:
+** TODO Refactor state service
+:PROPERTIES:
+:Effort:   2:00
+:END:
+- Make a state to be a record
+- Add -fn path support
+- Generate shorter state names
+- Make a bigger state include substates (hierarchy sync)
+- Move notmuch tags and mbsync to state
+** TODO Add feature-emacs-sdcv
+Dictionaries: http://download.huzheng.org/
+See also emacs-multitran
+** TODO Configure icecat profiles
+** TODO Implement home service ungoogled-chromium
+- Browser extension
+** TODO Implement home service nyxt
+- Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
+*
+* Archive                                                           :ARCHIVE:
+
+** DONE Configure orderless                                              :rde:
+SCHEDULED: <2022-07-14 Thu>
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:05
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+https://github.com/oantolin/orderless
+https://github.com/minad/consult/wiki#minads-orderless-configuration
+** DONE Debug screensharing and xdg portals                              :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:05
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+** DONE Add feature-emacs-smartparens                                    :rde:
+SCHEDULED: <2022-06-20 Mon>
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:05
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+** DONE Add feature-emacs-corfu or extend feature-completion             :rde:
+SCHEDULED: <2022-06-27 Mon>
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:05
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+https://kristofferbalintona.me/posts/202202270056/
+** DONE Add user field to email account                                  :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:05
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+** CANCELLED Make a thread on elisp serialization and use-package macro  :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:05
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: CANCELLED
+:ARCHIVE_ITAGS: rde
+:END:
+:LOGBOOK:
+- State "CANCELLED"  from "TODO"       [2023-03-01 Wed 11:57] \\
+  It's a long standing task, depending on bigger tasks.  A few discussions already
+  happend, there are smaller steps happening in this direction.  It doesn't make
+  too much sense to have this task.
+:END:
+https://framagit.org/tyreunom/guix-home-manager/-/merge_requests/7/diffs#fde31578cd2c6e21ef33b87b3182bb9192c03a32
+** DONE Investigate Fedora XDG problem                                   :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:05
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+:LOGBOOK:
+- State "DONE"       from "TODO"       [2023-03-01 Wed 11:56] \\
+  Probably fixed
+:END:
+- [[notmuch:id:ada8cf01-5eca-46ea-b0aa-efec4db9a486@www.fastmail.com][Email from Gerry Agbobada: Re: Guix home on foreign distribution; handling XDG env]]
+** CANCELLED Visually separate sway workspaces for different workflows   :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:04
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: CANCELLED
+:ARCHIVE_ITAGS: rde
+:END:
+- code
+- communication
+- multimedia
+** First Release                                               :rde:release_1:
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-03-01 Wed 12:03
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_ITAGS: rde
+:END:
 *** DONE Add a package with rde info file
 *** DONE Add integrate-he-in-os? flag to rde-config
 SCHEDULED: <2022-08-03 Wed>
@@ -40,55 +142,6 @@ SCHEDULED: <2022-08-03 Wed>
 :END:
 
 *** DONE Place a release-tag tag
-** CANCELLED Visually separate sway workspaces for different workflows
-- code
-- communication
-- multimedia
-** TODO Refactor state service
-:PROPERTIES:
-:Effort:   2:00
-:END:
-- Make a state to be a record
-- Add -fn path support
-- Generate shorter state names
-- Make a bigger state include substates (hierarchy sync)
-- Move notmuch tags and mbsync to state
-** DONE Investigate Fedora XDG problem
-:LOGBOOK:
-- State "DONE"       from "TODO"       [2023-03-01 Wed 11:56] \\
-  Probably fixed
-:END:
-- [[notmuch:id:ada8cf01-5eca-46ea-b0aa-efec4db9a486@www.fastmail.com][Email from Gerry Agbobada: Re: Guix home on foreign distribution; handling XDG env]]
-** CANCELLED Make a thread on elisp serialization and use-package macro
-:LOGBOOK:
-- State "CANCELLED"  from "TODO"       [2023-03-01 Wed 11:57] \\
-  It's a long standing task, depending on bigger tasks.  A few discussions already
-  happend, there are smaller steps happening in this direction.  It doesn't make
-  too much sense to have this task.
-:END:
-https://framagit.org/tyreunom/guix-home-manager/-/merge_requests/7/diffs#fde31578cd2c6e21ef33b87b3182bb9192c03a32
-** TODO Add feature-emacs-sdcv
-Dictionaries: http://download.huzheng.org/
-See also emacs-multitran
-** DONE Add user field to email account
-** DONE Add feature-emacs-corfu or extend feature-completion
-SCHEDULED: <2022-06-27 Mon>
-https://kristofferbalintona.me/posts/202202270056/
-** DONE Add feature-emacs-smartparens
-SCHEDULED: <2022-06-20 Mon>
-** DONE Debug screensharing and xdg portals
-** DONE Configure orderless
-SCHEDULED: <2022-07-14 Thu>
-https://github.com/oantolin/orderless
-https://github.com/minad/consult/wiki#minads-orderless-configuration
-** TODO Configure icecat profiles
-** TODO Implement home service ungoogled-chromium
-- Browser extension
-** TODO Implement home service nyxt
-- Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-*
-* Archive                                                           :ARCHIVE:
-
 ** DONE Add rde documentation template [2/2]                 :rde:release_1:
 SCHEDULED: <2022-01-13 Thu>
 :PROPERTIES:
@@ -125,6 +178,35 @@ SCHEDULED: <2022-01-21 Fri>
 :ARCHIVE_TODO: DONE
 :ARCHIVE_ITAGS: rde release_1
 :END:
+** DONE Create clean example configuration                             :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-01-20 Thu 08:56
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~/General
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+~rde/config.scm~ is a ready to use configuration, but requires few
+helpers to make it customizable by the end user.
+** DONE Implement features -> he/os converter                          :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-01-12 Wed 08:49
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~ Backlog/Extensions mechanism
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+** DONE Remove previous rde implementation                             :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2022-01-12 Wed 08:48
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~ Backlog/General
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
 ** Archive                                                    :guix:ARCHIVE:
 :PROPERTIES:
 :ARCHIVE_TIME: 2022-01-20 Thu 08:59
@@ -158,17 +240,6 @@ For some apps to run some commands like restart if their configs updated
 *** DONE Make fonts service
 *** DONE SMTP client
 - msmtp/sendmail
-** DONE Create clean example configuration                             :rde:
-:PROPERTIES:
-:ARCHIVE_TIME: 2022-01-20 Thu 08:56
-:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
-:ARCHIVE_OLPATH: ~rde~/General
-:ARCHIVE_CATEGORY: rde
-:ARCHIVE_TODO: DONE
-:ARCHIVE_ITAGS: rde
-:END:
-~rde/config.scm~ is a ready to use configuration, but requires few
-helpers to make it customizable by the end user.
 ** ~guix home~ Before Upstream Checklist
 :PROPERTIES:
 :ARCHIVE_TIME: 2022-01-20 Thu 08:54
@@ -232,21 +303,26 @@ Add copyrights to source code
 **** DONE Cleanup utils module
 Split into utils and configuration related helper?
 **** DONE Add home-services to service or keep them separate?
-** DONE Implement features -> he/os converter                          :rde:
+** ~Guix Home~                                                             :guix:
 :PROPERTIES:
-:ARCHIVE_TIME: 2022-01-12 Wed 08:49
+:ARCHIVE_TIME: 2023-03-01 Wed 12:02
 :ARCHIVE_FILE: ~/work/abcdw/rde/TODO
-:ARCHIVE_OLPATH: ~rde~ Backlog/Extensions mechanism
 :ARCHIVE_CATEGORY: rde
-:ARCHIVE_TODO: DONE
-:ARCHIVE_ITAGS: rde
 :END:
-** DONE Remove previous rde implementation                             :rde:
-:PROPERTIES:
-:ARCHIVE_TIME: 2022-01-12 Wed 08:48
-:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
-:ARCHIVE_OLPATH: ~rde~ Backlog/General
-:ARCHIVE_CATEGORY: rde
-:ARCHIVE_TODO: DONE
-:ARCHIVE_ITAGS: rde
-:END:
+*** Browsers
+*** DONE Make gtk home service
+*** DONE Make system service for Guix Home
+SCHEDULED: <2022-07-21 Thu>
+- [X] Install Guix on qemu and make it accessible via guix deploy.
+
+Allows to make home-environment a part of operating-system and thus
+use without ~guix home~ subcommand.
+*** CANCELLED Make it possible to specify the verbosity for ~guix home reconfigure~
+By default, only the path to the home environment should be shown,
+~/gnu/store/...-home~.
+*** CANCELLED Implement pam_shepherd.so
+Start user-space shepherd on first user login and exit on last logout.
+- [[https://github.com/systemd/systemd/blob/c5b6b4b6d08cf4c16a871401358faeb5a186c02a/src/login/pam_systemd.c][pam_systemd.c]]
+- https://www.opennet.ru/base/dev/pam_linux.txt.html
+Take a look at mpd service for user-service example and /run/user/ID
+creation.
