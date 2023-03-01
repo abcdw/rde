@@ -26,11 +26,48 @@
   #:use-module (rde home services shells)
   #:use-module (rde home services shellutils)
   #:use-module (gnu services)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages shellutils)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (guix gexp)
 
-  #:export (feature-direnv))
+  #:export (feature-compile
+            feature-direnv))
+
+(define* (feature-compile
+          #:key
+          (make gnu-make))
+  "Configure compilation tooling."
+  (ensure-pred file-like? make)
+
+  (define f-name 'compile)
+
+  (define (get-home-services config)
+    "Return home services related to compilation."
+    (list
+     (simple-service
+      'add-compilation-packages
+      home-profile-service-type
+      (list make))
+     (rde-elisp-configuration-service
+      f-name
+      config
+      `((defun rde-compile-ansi-color-apply ()
+          "Translate control sequences into text properties in compile buffer."
+          (interactive)
+          (ansi-color-apply-on-region (point-min) (point-max)))
+
+        (define-key global-map (kbd "s-r") 'recompile)
+        (add-hook 'compilation-mode-hook 'toggle-truncate-lines)
+        (add-hook 'compilation-filter-hook 'rde-compile-ansi-color-apply)
+        (with-eval-after-load 'compile
+          (setq compilation-scroll-output 'first-error)
+          (setq compilation-ask-about-save nil))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-direnv
           #:key
