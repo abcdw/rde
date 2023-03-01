@@ -87,6 +87,7 @@
             feature-emacs-git
             feature-emacs-geiser
             feature-emacs-guix
+            feature-emacs-xref
 
             ;; Reading
             feature-emacs-pdf-tools
@@ -2875,6 +2876,34 @@ S to show services and other guix items.")))
   (feature
    (name f-name)
    (values `((,f-name . 'emacs-guix)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-xref)
+  "Configure Xref, an Emacs mechanism to find definitions
+and references in your programs."
+  (define emacs-f-name 'xref)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Xref."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'xref
+          (setq xref-auto-jump-to-first-definition 'move)
+          (setq xref-auto-jump-to-first-xref 'move)
+          (setq xref-prompt-for-identifier
+                '(not xref-find-definitions-other-window
+                      xref-find-definitions-other-frame))
+          ,@(if (get-value 'emacs-consult config)
+                '((setq xref-show-xrefs-function 'consult-xref)
+                  (setq xref-show-definitions-function 'consult-xref))
+                '()))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
 
