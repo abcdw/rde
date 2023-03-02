@@ -56,6 +56,7 @@
             feature-emacs-tramp
             feature-emacs-dired
             feature-emacs-eshell
+            feature-emacs-calc
 
             ;; Completion
             feature-emacs-completion
@@ -917,6 +918,44 @@ Aliases, keybindings, small hack and tweaks."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-calc
+          #:key
+          (emacs-calc-currency emacs-calc-currency)
+          (currency 'EUR)
+          (exchange-update-interval 7))
+  "Configure Calc, an advanced desk calculator and mathematical tool for Emacs.
+You can compute the current exchange rate for your preferred CURRENCY and update
+it every EXCHANGE-UPDATE-INTERVAL days."
+  (ensure-pred file-like? emacs-calc-currency)
+  (ensure-pred symbol? currency)
+  (ensure-pred number? exchange-update-interval)
+
+  (define emacs-f-name 'calc)
+  (define f-name (symbol-append 'emacs emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Calc."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'calc-currency-autoloads
+          (add-hook 'calc-start-hook 'calc-currency-load))
+        (with-eval-after-load 'calc-currency
+          (require 'xdg)
+          (setq calc-currency-exchange-rates-file
+                (expand-file-name "emacs/calc-currency-rates.el"
+                                  (or (xdg-cache-home) "~/.cache")))
+          (setq calc-currency-base-currency ',currency)
+          (setq calc-currency-update-interval ,exchange-update-interval)))
+      #:elisp-packages (list emacs-calc-currency))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)
+             (emacs-calc-currency . ,emacs-calc-currency)))
    (home-services-getter get-home-services)))
 
 
