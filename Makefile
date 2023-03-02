@@ -13,7 +13,7 @@ install:
 
 check:
 	./pre-inst-env guile -L ./tests -c \
-	'(exit ((@ (rde test-runners) run-project-tests)))'
+	'((@ (rde test-runners) run-project-tests-cli))'
 
 repl:
 	./pre-inst-env examples/target/profiles/guix/bin/guix repl -L ./tests \
