@@ -84,6 +84,7 @@
             ;; Development
             feature-emacs-smartparens
             feature-emacs-eglot
+            feature-emacs-flymake
             feature-emacs-git
             feature-emacs-geiser
             feature-emacs-guix
@@ -2663,6 +2664,28 @@ Refactoring, completion, navigation, documentation via LSP"
 Mostly workarounds and integratios with other packages."
       #:keywords '(convenience completion lsp editing languages)
       #:elisp-packages (list emacs-consult-eglot))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-flymake)
+  "Set up Flymake, the built-in on-the-fly syntax checker for Emacs."
+
+  (define emacs-f-name 'flymake)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Flymake."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'flymake
+          (let ((map flymake-mode-map))
+            (define-key map (kbd "M-n") 'flymake-goto-next-error)
+            (define-key map (kbd "M-p") 'flymake-goto-prev-error)))))))
 
   (feature
    (name f-name)
