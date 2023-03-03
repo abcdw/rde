@@ -5,6 +5,7 @@
 - What is a better format for new feature commit message?
 - Add links to the info/websites?
 - How to split long list of changelog items into more manageable pieces?
+- Check out https://gitlab.com/spritely/goblins/-/blob/master/CHANGELOG.org
 
 * Notes
 Items starting with ~!~ means BREAKING CHANGES.  It's not a dump of commit log,
@@ -12,6 +13,8 @@ it's carefully crafted list of items, which usually takes some of commit
 messages as a foundation.
 
 * Unreleased
+- rde: password-store: Changed key to M-g P.
+- rde: emacs-elfeed: Changed capture key to e.
 - test: Added test infrastructure and tooling.
 - contrib: age: Add feature.
 - rde: completion: Reuse original ripgrep options. Now it can search in
