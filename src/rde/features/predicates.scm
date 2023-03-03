@@ -83,3 +83,10 @@
 (define-public (list-of-swap-devices? lst)
   (and (list? lst) (every swap-space? lst)))
 
+(define-public (rde-procedure? x)
+  "Checks if procedure have exactly one required argument, no optional and no
+rest arguments."
+  (and (procedure? x)
+       (equal?
+        (procedure-minimum-arity x)
+        '(1 0 #f))))
