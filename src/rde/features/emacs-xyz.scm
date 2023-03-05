@@ -1046,10 +1046,12 @@ path /sudo:HOST:/path if the user in sudoers.")))
           #:key
           (emacs-all-the-icons-dired emacs-all-the-icons-dired)
           (kill-when-opening-new-buffer? #f)
-          (icons? #f))
+          (icons? #f)
+          (group-directories-first? #f))
   "Configure dired, the Emacs' directory browser and editor."
   (ensure-pred boolean? kill-when-opening-new-buffer?)
   (ensure-pred boolean? icons?)
+  (ensure-pred boolean? group-directories-first?)
 
   (define emacs-f-name 'dired)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1062,6 +1064,16 @@ path /sudo:HOST:/path if the user in sudoers.")))
          "--eval"
          (string-append
           "(dired \"" (car (cdr (command-line))) "\")")))
+    (define dired-listing-switches
+      (string-join
+       (list "-l -h"
+             (if (get-value 'emacs-advanced-user? config)
+                 "-A --time-style=long-iso"
+                 "-a")
+             (if group-directories-first?
+                 "--group-directories-first"
+                 ""))
+       " "))
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -1073,6 +1085,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
         (with-eval-after-load
          'dired
          (setq dired-dwim-target t)
+         (setq dired-listing-switches ,dired-listing-switches)
          ,@(if kill-when-opening-new-buffer?
                '((setq dired-kill-when-opening-new-dired-buffer t))
                '())
@@ -1080,8 +1093,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
                '((add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
                '())
          ,@(if (get-value 'emacs-advanced-user? config)
-               '((add-hook 'dired-mode-hook 'dired-hide-details-mode)
-                 (setq dired-listing-switches "-l --time-style=long-iso -h -A"))
+               `((add-hook 'dired-mode-hook 'dired-hide-details-mode))
                '())
 
          (add-hook 'dired-mode-hook (lambda () (setq truncate-lines t)))
