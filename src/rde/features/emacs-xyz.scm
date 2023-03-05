@@ -1044,9 +1044,12 @@ path /sudo:HOST:/path if the user in sudoers.")))
 
 (define* (feature-emacs-dired
           #:key
-          (kill-when-opening-new-buffer? #f))
+          (emacs-all-the-icons-dired emacs-all-the-icons-dired)
+          (kill-when-opening-new-buffer? #f)
+          (icons? #f))
   "Configure dired, the Emacs' directory browser and editor."
   (ensure-pred boolean? kill-when-opening-new-buffer?)
+  (ensure-pred boolean? icons?)
 
   (define emacs-f-name 'dired)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1064,11 +1067,17 @@ path /sudo:HOST:/path if the user in sudoers.")))
       emacs-f-name
       config
       `((eval-when-compile (require 'dired))
+        ,@(if icons?
+              '((eval-when-compile (require 'all-the-icons-dired)))
+              '())
         (with-eval-after-load
          'dired
          (setq dired-dwim-target t)
          ,@(if kill-when-opening-new-buffer?
                '((setq dired-kill-when-opening-new-dired-buffer t))
+               '())
+         ,@(if icons?
+               '((add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
                '())
          ,@(if (get-value 'emacs-advanced-user? config)
                '((add-hook 'dired-mode-hook 'dired-hide-details-mode)
@@ -1077,6 +1086,9 @@ path /sudo:HOST:/path if the user in sudoers.")))
 
          (add-hook 'dired-mode-hook (lambda () (setq truncate-lines t)))
          (setq dired-hide-details-hide-symlink-targets nil)))
+      #:elisp-packages `(,@(if icons?
+                               (list emacs-all-the-icons-dired)
+                               '()))
       #:summary "\
 Configurations for emacs built-in file manager"
       #:commentary "\
