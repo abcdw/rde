@@ -1042,8 +1042,12 @@ path /sudo:HOST:/path if the user in sudoers.")))
    (values `((,f-name . ,emacs-tramp)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-dired)
+(define* (feature-emacs-dired
+          #:key
+          (kill-when-opening-new-buffer? #f))
   "Configure dired, the Emacs' directory browser and editor."
+  (ensure-pred boolean? kill-when-opening-new-buffer?)
+
   (define emacs-f-name 'dired)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
@@ -1063,6 +1067,9 @@ path /sudo:HOST:/path if the user in sudoers.")))
         (with-eval-after-load
          'dired
          (setq dired-dwim-target t)
+         ,@(if kill-when-opening-new-buffer?
+               '((setq dired-kill-when-opening-new-dired-buffer t))
+               '())
          ,@(if (get-value 'emacs-advanced-user? config)
                '((add-hook 'dired-mode-hook 'dired-hide-details-mode)
                  (setq dired-listing-switches "-l --time-style=long-iso -h -A"))
