@@ -1811,8 +1811,12 @@ working environemnt."
              (olivetti-body-width . ,olivetti-body-width)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-project)
   "Configure project.el for GNU Emacs."
+(define* (feature-emacs-project
+          #:key
+          (project-extra-dominating-files
+           '(".project.el" ".dir-locals.el" ".gitignore")))
+  (ensure-pred list? project-extra-dominating-files)
 
   (define emacs-f-name 'project)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1826,14 +1830,33 @@ working environemnt."
       ;; MAYBE: Rework the binding approach
       `((eval-when-compile
          (require 'project)
-         (require 'consult))
+         (require 'consult)
+         (require 'cl-lib))
+        (defgroup rde-project nil
+          "Custom `project.el' enhancements."
+          :group 'rde)
+        (defcustom rde-project-dominating-files '()
+          "List of root files that indicate a directory is a project."
+          :group 'rde-project
+          :type '(repeat string))
 
         (define-key global-map (kbd "s-p") project-prefix-map)
+        (cl-defmethod project-root ((project (head explicit)))
+          "Determine the PROJECT root."
+          (cdr project))
 
         (with-eval-after-load
          'project
          (add-to-list 'project-switch-commands '(project-compile "Compile") t)
          (setq project-switch-use-entire-map t)
+        (defun rde-project-custom-root (dir)
+          "Search in project's DIR for a set of project dominating files."
+          (let* ((files rde-project-dominating-files)
+                 (root (cl-find-if (lambda (file)
+                                     (locate-dominating-file dir file))
+                                   files)))
+            (when root
+              (cons 'explicit (locate-dominating-file dir root)))))
 
          (with-eval-after-load
           'consult
@@ -1841,6 +1864,8 @@ working environemnt."
                 (lambda ()
                   (when-let (project (project-current))
                             (car (project-roots project))))))))
+        (setq rde-project-dominating-files ',project-extra-dominating-files)
+        (add-hook 'project-find-functions 'rde-project-custom-root)
       #:summary "\
 Enchancements for project management with project.el"
       #:commentary "\
