@@ -2049,11 +2049,14 @@ Provide basic adjustments and integration with project.el."
 (define* (feature-emacs-smartparens
           #:key
           (emacs-smartparens emacs-smartparens)
-          (enable-in-prog-mode? #t)
+          (smartparens-hooks '(prog-mode-hook))
+          (smartparens-strict-hooks '(prog-mode-hook))
           (show-smartparens? #f)
           (smartparens-bindings? #t))
   "Configure smartparens for structured code navigation, automatic string escape
 and pair management."
+  (ensure-pred list? smartparens-hooks)
+  (ensure-pred list? smartparens-strict-hooks)
 
   (define emacs-f-name 'smartparens)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -2063,10 +2066,7 @@ and pair management."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(,@(if enable-in-prog-mode?
-              `((add-hook 'prog-mode-hook 'smartparens-mode))
-              '())
-        (with-eval-after-load
+      `((with-eval-after-load
          'smartparens
          (require 'smartparens-config)
          ,@(if smartparens-bindings? '((sp-use-smartparens-bindings)) '())
@@ -2074,7 +2074,17 @@ and pair management."
          ,@(if show-smartparens?
                '((show-paren-mode 0)
                  (show-smartparens-global-mode 1))
-               '())))
+               '()))
+        ,@(if smartparens-hooks
+              `((mapcar (lambda (hook)
+                          (add-hook hook 'smartparens-mode))
+                        ',smartparens-hooks))
+              '())
+        ,@(if smartparens-strict-hooks
+              `((mapcar (lambda (hook)
+                          (add-hook hook 'smartparens-strict-mode))
+                        ',smartparens-strict-hooks))
+              '()))
       #:summary "\
 Structured editing and navigation, automatic string escaping and pair management"
       #:commentary "\
