@@ -1033,6 +1033,7 @@ not appear in the pop-up buffer."
             (lambda (x)
               (add-to-list 'notmuch-show-stash-mlarchive-link-alist x))
             `(("yhetil" . "https://yhetil.org/")
+              ("mail-archive" . "https://www.mail-archive.com/search?l=mid&q=")
               ("rde-devel" .
                (lambda (x)
                  (concat "https://lists.sr.ht/~abcdw/rde-devel/<" x ">")))))
