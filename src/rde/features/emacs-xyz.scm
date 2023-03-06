@@ -2984,6 +2984,8 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
         (with-eval-after-load
          'telega
 
+         ;; The real telega width will be 81
+         (setq telega-chat-fill-column 70)
          (define-key telega-chat-mode-map (kbd "s-B") 'telega-chat-with)
          (define-key telega-root-mode-map (kbd "s-B") 'telega-chat-with)
          ,@(if (get-value 'mpv config)
