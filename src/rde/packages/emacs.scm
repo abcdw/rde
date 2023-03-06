@@ -60,24 +60,16 @@
 
 (define-public emacs-consumer
   (package
-   (name "emacs-consumer")
-   (version "0.1.0")
-   (source (local-file "./packages.scm"))
-   (build-system trivial-build-system)
-   (arguments
-    `(#:builder
-      (let ((out (assoc-ref %outputs "out")))
-        (mkdir out)
-        #t)))
-   (native-search-paths
-    (list (search-path-specification
-           (variable "EMACSLOADPATH")
-           (files '("share/emacs/site-lisp")))
-          (search-path-specification
-           (variable "INFOPATH")
-           (files '("share/info")))))
-   (license license:gpl3+)
-   (home-page "https://sr.ht/~abcdw/rde")
-   (synopsis "Apropriate values for @env{EMACSLOADPATH} and @env{INFOPATH}.")
-   (description "This package helps to set environment variables, which make
+    (inherit emacs)
+    (name "emacs-consumer")
+    (build-system trivial-build-system)
+    (arguments
+     `(#:builder
+       (let ((out (assoc-ref %outputs "out")))
+         (mkdir out)
+         #t)))
+    (license license:gpl3+)
+    (home-page "https://sr.ht/~abcdw/rde")
+    (synopsis "Apropriate values for @env{EMACSLOADPATH} and @env{INFOPATH}.")
+    (description "This package helps to set environment variables, which make
 emacs packages of current profile explorable by external Emacs.")))
