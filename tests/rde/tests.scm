@@ -18,7 +18,9 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (rde tests)
-  #:export (define-test test?))
+  #:use-module (srfi srfi-64)
+  #:export (define-test test?)
+  #:re-export (test-equal test-error test-group))
 
 (define-syntax define-test
   (syntax-rules ()
