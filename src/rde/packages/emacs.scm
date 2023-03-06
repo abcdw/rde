@@ -45,9 +45,7 @@
          (patches (search-patches "emacs-pgtk-super-key-fix.patch"
                                   "emacs-exec-path.patch"
                                   "emacs-fix-scheme-indent-function.patch"
-                                  "emacs-native-comp-driver-options.patch"
-                                  ;; "emacs-source-date-epoch.patch"
-                                  ))
+                                  "emacs-native-comp-driver-options.patch"))
          (sha256
           (base32
            "1akq6dbllwwqwx21wnwnv6aax1nsi2ypbd7j3i79sw62s3gf399z"))))
@@ -56,7 +54,7 @@
          ((#:configure-flags flags ''())
           `(cons* "--with-pgtk" ,flags))))
       (inputs
-       (package-inputs emacs-next)))))
+       (package-inputs emacs-next-tree-sitter)))))
 
 (define-public emacs-next-pgtk-latest emacs-next-pgtk-stable)
 
