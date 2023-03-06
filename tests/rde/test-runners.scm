@@ -282,7 +282,6 @@ given string in an ANSI escape code."
     (let* ((test-results (test-runner-test-results previous-runner))
            (get-test (lambda (x) (assoc-ref x 'test)))
            (filtered-tests (map get-test (filter filter-fn test-results))))
-      (pretty-print test-results)
       (test-with-runner runner
         (test-group "RERUN TESTS"
           (map (lambda (t) (run-test t #:runner runner)) filtered-tests)))))
