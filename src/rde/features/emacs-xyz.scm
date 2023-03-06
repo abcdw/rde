@@ -1830,7 +1830,6 @@ working environemnt."
       ;; MAYBE: Rework the binding approach
       `((eval-when-compile
          (require 'project)
-         (require 'consult)
          (require 'cl-lib))
         (defgroup rde-project nil
           "Custom `project.el' enhancements."
@@ -1855,13 +1854,6 @@ working environemnt."
             (when root
               (cons 'explicit (locate-dominating-file dir root)))))
 
-         (with-eval-after-load
-          'consult
-          (setq consult-project-root-function
-                (lambda ()
-                  (when-let (project (project-current))
-                            (car (project-roots project))))))
-
          (defun rde-project-ripgrep ()
           "Run `consult-ripgrep' in the current project root."
           (interactive)
@@ -1881,6 +1873,18 @@ working environemnt."
         (add-hook 'project-find-functions 'rde-project-custom-root)
         (advice-add 'project-compile :override 'rde-project-compile)
         (with-eval-after-load 'project
+          ,@(if (get-value 'emacs-consult config)
+                '((eval-when-compile
+                   (require 'consult))
+                  (with-eval-after-load 'consult
+                    (define-key project-prefix-map "F" 'consult-find)
+                    (add-to-list 'project-switch-commands
+                                 '(consult-find "Find file consult"))
+                    (setq consult-project-root-function
+                          (lambda ()
+                            (when-let (project (project-current))
+                                      (car (project-roots project)))))))
+                '())
           (define-key project-prefix-map "R" 'rde-project-ripgrep)
           (add-to-list 'project-switch-commands
                        '(rde-project-ripgrep
