@@ -1136,8 +1136,8 @@ parses its input."
          (setq completion-category-overrides
                ;; basic is required for /ssh: completion to work, but
                ;; keep the same values for project-file too.
-               '((project-file (styles . (partial-completion basic orderless)))
-                 (file (styles . (partial-completion basic orderless)))))
+               '((project-file (styles . (orderless partial-completion basic)))
+                 (file (styles . (orderless partial-completion basic)))))
          (setq enable-recursive-minibuffers t)
 
          ;; (setq resize-mini-windows nil)
