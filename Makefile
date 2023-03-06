@@ -22,6 +22,9 @@ repl:
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure
 
+examples/ixy/home/build:
+	make -C examples ixy/home/build
+
 .PHONY: examples/target/rde-live.iso
 
 examples/target/rde-live.iso:
