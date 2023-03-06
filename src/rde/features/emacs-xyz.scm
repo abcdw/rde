@@ -2055,6 +2055,7 @@ Provide basic adjustments and integration with project.el."
           (paredit-bindings? #f))
   "Configure smartparens for structured code navigation, automatic string escape
 and pair management."
+  (ensure-pred file-like? emacs-smartparens)
   (ensure-pred list? smartparens-hooks)
   (ensure-pred list? smartparens-strict-hooks)
   (ensure-pred boolean? show-smartparens?)
@@ -2068,16 +2069,7 @@ and pair management."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((with-eval-after-load
-         'smartparens
-         (require 'smartparens-config)
-         ,@(if smartparens-bindings? '((sp-use-smartparens-bindings)) '())
-         (define-key smartparens-mode-map (kbd "M-S") 'sp-forward-slurp-sexp)
-         ,@(if show-smartparens?
-               '((show-paren-mode 0)
-                 (show-smartparens-global-mode 1))
-               '()))
-        ,@(if smartparens-hooks
+      `(,@(if smartparens-hooks
               `((mapcar (lambda (hook)
                           (add-hook hook 'smartparens-mode))
                         ',smartparens-hooks))
@@ -2097,7 +2089,13 @@ and pair management."
           ,@(if show-smartparens?
                 '((show-paren-mode -1)
                   (show-smartparens-global-mode 1))
-                '((show-paren-mode 1)))))
+                '((show-paren-mode 1))))
+
+        (with-eval-after-load 'smartparens
+          (require 'smartparens-config)
+          (define-key smartparens-mode-map (kbd "M-s") nil)
+          (setq sp-highlight-pair-overlay nil)
+          (define-key smartparens-mode-map (kbd "M-S") 'sp-forward-slurp-sexp)))
       #:summary "\
 Structured editing and navigation, automatic string escaping and pair management"
       #:commentary "\
