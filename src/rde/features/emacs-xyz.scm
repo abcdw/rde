@@ -2057,6 +2057,7 @@ Provide basic adjustments and integration with project.el."
 and pair management."
   (ensure-pred list? smartparens-hooks)
   (ensure-pred list? smartparens-strict-hooks)
+  (ensure-pred boolean? show-smartparens?)
   (ensure-pred boolean? paredit-bindings?)
 
   (define emacs-f-name 'smartparens)
@@ -2089,7 +2090,14 @@ and pair management."
 
         ,@(if paredit-bindings?
               '((sp-use-paredit-bindings))
-              '((sp-use-smartparens-bindings))))
+              '((sp-use-smartparens-bindings)))
+
+        (with-eval-after-load 'paren
+          (setq show-paren-style 'mixed)
+          ,@(if show-smartparens?
+                '((show-paren-mode -1)
+                  (show-smartparens-global-mode 1))
+                '((show-paren-mode 1)))))
       #:summary "\
 Structured editing and navigation, automatic string escaping and pair management"
       #:commentary "\
