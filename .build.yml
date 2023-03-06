@@ -7,3 +7,6 @@ tasks:
   - check: |
       cd rde
       make check
+  - build-example-home: |
+      cd rde
+      make examples/ixy/home/build
