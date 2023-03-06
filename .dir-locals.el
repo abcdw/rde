@@ -2,35 +2,8 @@
 
 ((nil
   . ((fill-column . 78)
-     (sentence-end-double-space . t)
+     (sentence-end-double-space . t)))
 
-     ;; Geiser
-     ;; This allows automatically setting the `geiser-guile-load-path'
-     ;; variable when using various Guix checkouts (e.g., via git worktrees).
-     (eval . (let ((root-dir-unexpanded (locate-dominating-file
-                                         default-directory ".dir-locals.el")))
-               ;; While Guix should in theory always have a .dir-locals.el
-               ;; (we are reading this file, after all) there seems to be a
-               ;; strange problem where this code "escapes" to some other buffers,
-               ;; at least vc-mode.  See:
-               ;;   https://lists.gnu.org/archive/html/guix-devel/2020-11/msg00296.html
-               ;; Upstream report: <https://bugs.gnu.org/44698>
-               ;; Hence the following "when", which might otherwise be unnecessary;
-               ;; it prevents causing an error when root-dir-unexpanded is nil.
-               (when root-dir-unexpanded
-                 (let* ((root-dir (expand-file-name root-dir-unexpanded))
-                        ;; Workaround for bug https://issues.guix.gnu.org/43818.
-                        (root-dir* (directory-file-name root-dir)))
-
-                   (unless (boundp 'geiser-guile-load-path)
-                     (defvar geiser-guile-load-path '()))
-                   (make-local-variable 'geiser-guile-load-path)
-                   (require 'cl-lib)
-                   (cl-pushnew (expand-file-name "src" root-dir*)
-                               geiser-guile-load-path
-                               :test #'string-equal)))))))
-
- (c-mode          . ((c-file-style . "gnu")))
  (scheme-mode
   .
   ((indent-tabs-mode . nil)
