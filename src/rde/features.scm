@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -58,6 +58,8 @@
             feature-values
             feature-home-services-getter
             feature-system-services-getter
+
+            merge-features
 
             make-feature-values
             require-value
@@ -431,6 +433,19 @@ to config one more time."
    (map service-kind
         (rde-config-system-services
          config))))
+
+(define (merge-features features)
+  "Combine a few features into one."
+  (feature
+   (values (append-map feature-values features))
+   (home-services-getter
+    (lambda (config)
+      (append-map
+       (lambda (f) ((feature-home-services-getter f) config)) features)))
+   (system-services-getter
+    (lambda (config)
+      (append-map
+       (lambda (f) ((feature-system-services-getter f) config)) features)))))
 
 ;; (pretty-print-rde-config
 ;;  (rde-config

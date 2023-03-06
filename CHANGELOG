@@ -13,6 +13,7 @@ it's carefully crafted list of items, which usually takes some of commit
 messages as a foundation.
 
 * Unreleased
+- rde: features: Add merge-features function.
 - rde: emacs-calc: Add feature.
 - rde: password-store: Changed key to M-g P.
 - rde: emacs-elfeed: Changed capture key to e.
