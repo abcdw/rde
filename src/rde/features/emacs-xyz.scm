@@ -1845,9 +1845,6 @@ working environemnt."
           "Determine the PROJECT root."
           (cdr project))
 
-        (with-eval-after-load
-         'project
-         (add-to-list 'project-switch-commands '(project-compile "Compile") t)
          (setq project-switch-use-entire-map t)
         (defun rde-project-custom-root (dir)
           "Search in project's DIR for a set of project dominating files."
@@ -1863,9 +1860,21 @@ working environemnt."
           (setq consult-project-root-function
                 (lambda ()
                   (when-let (project (project-current))
-                            (car (project-roots project))))))))
+                            (car (project-roots project))))))
+        (defun rde-project-compile (&optional comint)
+          "Compile current project and choose if buffer will be in COMINT mode."
+          (interactive "P")
+          (let ((default-directory (project-root (project-current t)))
+                (compilation-buffer-name-function
+                 (or project-compilation-buffer-name-function
+                     compilation-buffer-name-function)))
+            (call-interactively 'compile nil (and comint (vector (list 4))))))
+
         (setq rde-project-dominating-files ',project-extra-dominating-files)
         (add-hook 'project-find-functions 'rde-project-custom-root)
+        (advice-add 'project-compile :override 'rde-project-compile)
+        (with-eval-after-load 'project
+          (add-to-list 'project-switch-commands '(project-compile "Compile") t)))
       #:summary "\
 Enchancements for project management with project.el"
       #:commentary "\
