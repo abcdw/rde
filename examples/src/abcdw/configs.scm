@@ -210,15 +210,6 @@
      '((host-key-algorithms . "+ssh-rsa")
        (pubkey-accepted-key-types . "+ssh-rsa"))))))
 
-;; TODO: Move it to feature-chromium/icecat or
-;; feature-browser/general-settings
-(define chromium-xdg-defaults
-  (simple-service
-   'chromium-xdg-defaults
-   home-xdg-mime-applications-service-type
-   (home-xdg-mime-applications-configuration
-    (default (list (cons "text/html" "chromium.desktop"))))))
-
 
 ;;; User-specific features with personal preferences
 
