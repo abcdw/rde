@@ -68,6 +68,12 @@
       "`(hello ,there)\n"
       (serialize-config `(`(hello ,there))))
 
+    ;; TODO: Move it elisp serializer test
+    (test-expect-fail 1)
+    (test-equal "square brackets"
+      "[hello there]\n"
+      (serialize-config `([hello there])))
+
     (test-expect-fail 1)
     ;; We should update pretty-printer used in serialization code or workaround
     ;; it some other way.  Now, it's impossible to use this construction with
