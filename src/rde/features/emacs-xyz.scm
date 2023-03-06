@@ -2052,11 +2052,12 @@ Provide basic adjustments and integration with project.el."
           (smartparens-hooks '(prog-mode-hook))
           (smartparens-strict-hooks '(prog-mode-hook))
           (show-smartparens? #f)
-          (smartparens-bindings? #t))
+          (paredit-bindings? #f))
   "Configure smartparens for structured code navigation, automatic string escape
 and pair management."
   (ensure-pred list? smartparens-hooks)
   (ensure-pred list? smartparens-strict-hooks)
+  (ensure-pred boolean? paredit-bindings?)
 
   (define emacs-f-name 'smartparens)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -2084,7 +2085,11 @@ and pair management."
               `((mapcar (lambda (hook)
                           (add-hook hook 'smartparens-strict-mode))
                         ',smartparens-strict-hooks))
-              '()))
+              '())
+
+        ,@(if paredit-bindings?
+              '((sp-use-paredit-bindings))
+              '((sp-use-smartparens-bindings))))
       #:summary "\
 Structured editing and navigation, automatic string escaping and pair management"
       #:commentary "\
