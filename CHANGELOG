@@ -13,6 +13,11 @@ it's carefully crafted list of items, which usually takes some of commit
 messages as a foundation.
 
 * Unreleased
+- rde: emacs-org-recur: Add feature.
+- rde: emacs-smartparens: Add paredit bindings support, introduce a more flexible approach to its normal and strict mode hooks, and refine paren highlighting.
+- rde: emacs-calendar: Add feature.
+- rde: ungoogled-chromium: Add feature.
+- rde: emacs-project: Add support for extra project dominating files, improve project-wide compilation, add project-wide ripgrep and consult integration.
 - rde: features: Add merge-features function.
 - rde: emacs-calc: Add feature.
 - rde: password-store: Changed key to M-g P.
