@@ -1811,11 +1811,12 @@ working environemnt."
              (olivetti-body-width . ,olivetti-body-width)))
    (home-services-getter get-home-services)))
 
-  "Configure project.el for GNU Emacs."
 (define* (feature-emacs-project
           #:key
           (project-extra-dominating-files
            '(".project.el" ".dir-locals.el" ".gitignore")))
+  "Configure project.el, a library to perform operations
+on the current project."
   (ensure-pred list? project-extra-dominating-files)
 
   (define emacs-f-name 'project)
@@ -1839,12 +1840,10 @@ working environemnt."
           :group 'rde-project
           :type '(repeat string))
 
-        (define-key global-map (kbd "s-p") project-prefix-map)
         (cl-defmethod project-root ((project (head explicit)))
           "Determine the PROJECT root."
           (cdr project))
 
-         (setq project-switch-use-entire-map t)
         (defun rde-project-custom-root (dir)
           "Search in project's DIR for a set of project dominating files."
           (let* ((files rde-project-dominating-files)
@@ -1860,6 +1859,13 @@ working environemnt."
           (when-let ((default-dir (project-root (project-current t))))
             (consult-ripgrep default-dir)))
 
+        (defun rde-project-org-capture ()
+          "Run `org-capture' in the current project root."
+          (interactive)
+          (when-let ((default-dir (project-root (project-current t))))
+            (dir-locals-read-from-dir default-dir)
+            (org-capture)))
+
         (defun rde-project-compile (&optional comint)
           "Compile current project and choose if buffer will be in COMINT mode."
           (interactive "P")
@@ -1870,9 +1876,13 @@ working environemnt."
             (call-interactively 'compile nil (and comint (vector (list 4))))))
 
         (setq rde-project-dominating-files ',project-extra-dominating-files)
+        (add-hook 'project-find-functions 'project-try-vc)
         (add-hook 'project-find-functions 'rde-project-custom-root)
         (advice-add 'project-compile :override 'rde-project-compile)
         (with-eval-after-load 'project
+          (define-key global-map (kbd "s-p") project-prefix-map)
+          (require 'xdg)
+          (setq project-switch-use-entire-map t)
           ,@(if (get-value 'emacs-consult config)
                 '((eval-when-compile
                    (require 'consult))
@@ -1885,6 +1895,9 @@ working environemnt."
                             (when-let (project (project-current))
                                       (car (project-roots project)))))))
                 '())
+          (setq project-list-file
+                (expand-file-name "emacs/projects"
+                                  (or (xdg-cache-home) "~/.cache")))
           (define-key project-prefix-map "R" 'rde-project-ripgrep)
           (add-to-list 'project-switch-commands
                        '(rde-project-ripgrep
