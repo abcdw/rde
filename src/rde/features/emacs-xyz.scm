@@ -2540,7 +2540,10 @@ Start an unlimited search at `point-min' otherwise."
           (setq org-modern-timestamp nil)
           (setq org-modern-statistics nil)
           (setq org-modern-tag nil)
-          (setq org-modern-priority nil))
+          (setq org-modern-priority nil)
+          ;; There is a bug, which breaks various operations due to invisible
+          ;; chars: https://github.com/minad/org-modern/issues/106
+          (setq org-modern-hide-stars nil))
 
          (autoload 'global-org-modern-mode "org-modern")
          ,@(if org-modern?
