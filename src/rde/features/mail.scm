@@ -422,6 +422,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
          #~(begin (for-each system '#$add-ml-tag))))))
 
      ;; TODO: Move it to a separate feature and make it conditional
+     ;; https://lists.sr.ht/~abcdw/rde-devel/<20221118013128.6520-1-shilling.jake@gmail.com>
      (service home-mcron-service-type
               (home-mcron-configuration
                (jobs (list #~(job '(next-hour)
@@ -1011,6 +1012,7 @@ not appear in the pop-up buffer."
            (define-key notmuch-search-mode-map "T"
              (lambda ()
                (interactive)
+               ;; TODO: Change it to only matched, not the whole thread
                (notmuch-search-add-tag rde-notmuch-todo-tags)
                (notmuch-tree-next-message)))
 
