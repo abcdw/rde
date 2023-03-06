@@ -1861,6 +1861,13 @@ working environemnt."
                 (lambda ()
                   (when-let (project (project-current))
                             (car (project-roots project))))))
+
+         (defun rde-project-ripgrep ()
+          "Run `consult-ripgrep' in the current project root."
+          (interactive)
+          (when-let ((default-dir (project-root (project-current t))))
+            (consult-ripgrep default-dir)))
+
         (defun rde-project-compile (&optional comint)
           "Compile current project and choose if buffer will be in COMINT mode."
           (interactive "P")
@@ -1874,6 +1881,10 @@ working environemnt."
         (add-hook 'project-find-functions 'rde-project-custom-root)
         (advice-add 'project-compile :override 'rde-project-compile)
         (with-eval-after-load 'project
+          (define-key project-prefix-map "R" 'rde-project-ripgrep)
+          (add-to-list 'project-switch-commands
+                       '(rde-project-ripgrep
+                         "Search for regexp with rg"))
           (add-to-list 'project-switch-commands '(project-compile "Compile") t)))
       #:summary "\
 Enchancements for project management with project.el"
