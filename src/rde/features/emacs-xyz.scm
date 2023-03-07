@@ -2070,7 +2070,9 @@ and pair management."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(,@(if smartparens-hooks
+      `((eval-when-compile
+         (require 'smartparens))
+        ,@(if smartparens-hooks
               `((mapcar (lambda (hook)
                           (add-hook hook 'smartparens-mode))
                         ',smartparens-hooks))
