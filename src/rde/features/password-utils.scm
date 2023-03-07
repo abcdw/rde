@@ -136,6 +136,7 @@
                                (define-key map "g" 'password-store-generate)
                                (define-key map "r" 'password-store-rename)
                                (define-key map "d" 'password-store-remove)
+                               (define-key map "i" 'password-store-insert)
                                map)
                              "Keymap for actions for pass entries."))
 
