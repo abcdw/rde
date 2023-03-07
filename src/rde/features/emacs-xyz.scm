@@ -2081,10 +2081,6 @@ and pair management."
                         ',smartparens-strict-hooks))
               '())
 
-        ,@(if paredit-bindings?
-              '((sp-use-paredit-bindings))
-              '((sp-use-smartparens-bindings)))
-
         (with-eval-after-load 'paren
           (setq show-paren-style 'mixed)
           ,@(if show-smartparens?
@@ -2093,6 +2089,10 @@ and pair management."
                 '((show-paren-mode 1))))
 
         (with-eval-after-load 'smartparens
+          ,@(if paredit-bindings?
+                '((sp-use-paredit-bindings))
+                '((sp-use-smartparens-bindings)))
+
           (require 'smartparens-config)
           (define-key smartparens-mode-map (kbd "M-s") nil)
           (setq sp-highlight-pair-overlay nil)
