@@ -2485,8 +2485,14 @@ S to show services and other guix items.")))
 
 (define --Reading--)
 
-(define* (feature-emacs-pdf-tools)
+(define* (feature-emacs-pdf-tools
+          #:key
+          (emacs-pdf-tools emacs-pdf-tools)
+          (emacs-saveplace-pdf-view emacs-saveplace-pdf-view))
   "Configure pdf-tools, to work with pdfs inside Emacs."
+  (ensure-pred file-like? emacs-pdf-tools)
+  (ensure-pred file-like? emacs-saveplace-pdf-view)
+
   (define emacs-f-name 'pdf-tools)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
