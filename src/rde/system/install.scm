@@ -52,7 +52,7 @@
        #:kernel kernel
        #:firmware kernel-firmware)
       (feature-base-packages
-       #:system-packages supplementary-packages)
+       #:system-packages supplementary-system-packages)
       (feature-custom-services
        #:feature-name-prefix 'live
        #:system-services custom-system-services)
