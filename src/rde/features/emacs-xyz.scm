@@ -2081,17 +2081,17 @@ and pair management."
                         ',smartparens-strict-hooks))
               '())
 
-        (with-eval-after-load 'paren
-          (setq show-paren-style 'mixed)
-          ,@(if show-smartparens?
-                '((show-paren-mode -1)
-                  (show-smartparens-global-mode 1))
-                '((show-paren-mode 1))))
-
         (with-eval-after-load 'smartparens
           ,@(if paredit-bindings?
                 '((sp-use-paredit-bindings))
                 '((sp-use-smartparens-bindings)))
+
+          (with-eval-after-load 'paren
+            (setq show-paren-style 'mixed)
+            ,@(if show-smartparens?
+                  '((show-paren-mode -1)
+                    (show-smartparens-global-mode 1))
+                  '((show-paren-mode 1))))
 
           (require 'smartparens-config)
           (define-key smartparens-mode-map (kbd "M-s") nil)
