@@ -2509,6 +2509,40 @@ S to show services and other guix items.")))
       `((autoload 'pdf-loader-install "pdf-loader")
         (pdf-loader-install)
 
+        (defun rde-pdf-tools--list-buffers ()
+          "List all currently-opened `pdf-view' mode buffers."
+          (cl-remove-if-not
+           (lambda (buffer)
+             (with-current-buffer buffer
+               (derived-mode-p 'pdf-view-mode)))
+           (buffer-list)))
+
+        (defun rde-pdf-tools-update-buffers (&optional _theme)
+          "Apply `rde-pdf-tools-mode' to currently open `pdf-view' mode buffers."
+          (dolist (buffer (rde-pdf-tools--list-buffers))
+            (with-current-buffer buffer
+              (rde-pdf-tools-mode 1))))
+
+        ,@(if (get-value 'emacs-modus-themes config)
+              '((defgroup rde-pdf-tools nil
+                  "Custom tweaks for PDF Tools."
+                  :group 'rde)
+                (define-minor-mode rde-pdf-tools-mode
+                  "Apply `pdf-tools' settings based on the current theme."
+                  :group 'rde-pdf-tools
+                  (if rde-pdf-tools-mode
+                      (if (rde-modus-themes--dark-theme-p)
+                          (pdf-view-themed-minor-mode 1)
+                        (pdf-view-themed-minor-mode -1))
+                    (pdf-view-themed-minor-mode -1)))
+                (add-hook 'pdf-view-mode-hook 'rde-pdf-tools-mode))
+            '())
+
+        ,@(if (get-value 'emacs-circadian config)
+              '((add-hook 'circadian-after-load-theme-hook
+                          'rde-pdf-tools-update-buffers))
+            '())
+
         (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
         (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
         (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
