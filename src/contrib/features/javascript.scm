@@ -77,6 +77,7 @@
               typescript-tsx-mode-hook))
            (add-hook hook
                      (lambda ()
+                       (eglot-ensure)
                        (rde--javascript-setup-electric-pairs-for-jsx-tsx)
                        (rde--javascript-disable-eglot-parts)
                        (js2-minor-mode)
