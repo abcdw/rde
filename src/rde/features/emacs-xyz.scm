@@ -2512,11 +2512,11 @@ S to show services and other guix items.")))
         (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
         (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
         (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
-        (with-eval-after-load
-         'pdf-view
-         (setq pdf-view-use-scaling t))
-        (with-eval-after-load
-         'saveplace
+        (with-eval-after-load 'pdf-view
+         (setq pdf-view-use-scaling t)
+         (setq pdf-view-display-size 'fit-page)
+         (setq pdf-view-resize-factor 1.025))
+        (with-eval-after-load 'saveplace
          (require 'saveplace-pdf-view)))
       #:summary "\
 PDF reading in Emacs"
