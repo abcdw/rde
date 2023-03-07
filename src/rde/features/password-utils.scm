@@ -2,6 +2,7 @@
 ;;;
 ;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
+;;; Copyright © 2023 conses <contact@conses.eu>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -40,11 +41,13 @@
           (pass-key "p")
           (consult-pass-key "M-g P")
           (remote-password-store-url #f)
+          (password-store-directory "~/.local/var/lib/password-store")
           (default-pass-prompt? #t))
   "Setup and configure password manager."
   ;; (ensure-pred maybe-url? remote-password-store-url)
   (ensure-pred file-like? password-store)
   (ensure-pred boolean? default-pass-prompt?)
+  (ensure-pred path? password-store-directory)
   (ensure-pred string? pass-key)
   (ensure-pred string? consult-pass-key)
 
@@ -64,16 +67,15 @@
     (require-value 'home-directory config)
     (list (service home-password-store-service-type
                    (home-password-store-configuration
-                    (package password-store)))
+                    (package password-store)
+                    (directory password-store-directory)))
           (simple-service
            'password-store-add-git-state
            home-state-service-type
            (list
             (state-git
             ;;; TODO: Rewrite it to xdg-state-home or rework states.
-             (string-append
-              (get-value 'home-directory config)
-              "/.local/var/lib/password-store")
+             password-store-directory
              remote-password-store-url)))
           (simple-service
            'add-password-store-extensions
