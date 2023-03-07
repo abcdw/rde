@@ -22,6 +22,7 @@
   #:use-module (rde features)
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
+  #:use-module (gnu home services)
   #:use-module (gnu home-services password-utils)
   #:use-module (gnu home-services state)
   #:use-module (gnu packages emacs-xyz)
@@ -74,6 +75,10 @@
               (get-value 'home-directory config)
               "/.local/var/lib/password-store")
              remote-password-store-url)))
+          (simple-service
+           'add-password-store-extensions
+           home-profile-service-type
+           (list pass-otp))
 
           (when (get-value 'emacs config)
             (emacs-xdg-service
