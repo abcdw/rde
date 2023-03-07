@@ -210,6 +210,30 @@ function, which accepts config with rde values and returns a string."
          (require 'message)
          (require 'sendmail))
 
+        ,@(if (get-value 'emacs-gnus config)
+              '((defun rde-message-add-gcc-header ()
+                  "Prompt for a Gcc header from `rde-gnus-topic-alist'.
+This will allow a message to be stored in the right directory
+of the IMAP server (usually \"Sent\").
+If this header is missing, the outgoing message will go through,
+but it won't appear on the right Maildir directory."
+                  (if (gnus-alive-p)
+                      (unless (message-fetch-field "Gcc")
+                        (message-add-header
+                         (format "Gcc: %s"
+                                 (let ((groups
+                                        (cl-remove-if-not
+                                         (lambda (group)
+                                           (string-match (rx "Sent" eol) group))
+                                         (rde-gnus--get-topic-groups))))
+                                   (if (> 1 (length groups))
+                                       (completing-read "Account: " groups)
+                                     (car groups))))))
+                    (error "Gnus is not running.  No GCC header will be inserted")))
+
+                (add-hook 'message-header-setup-hook 'rde-message-add-gcc-header))
+              '())
+
         (with-eval-after-load 'message
           (setq message-kill-buffer-on-exit t)
           (setq message-signature
