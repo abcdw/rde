@@ -209,8 +209,27 @@ function, which accepts config with rde values and returns a string."
       `((eval-when-compile
          (require 'message)
          (require 'sendmail))
-        (with-eval-after-load
-         'message
+
+        (with-eval-after-load 'message
+          (setq message-kill-buffer-on-exit t)
+          (setq message-signature
+                ,(match message-signature
+                   ((? procedure? e) (e config))
+                   ((? string? e) e)
+                   (#f 'nil)
+                   (_ 't)))
+          ,@(cond
+             ((get-value 'msmtp config)
+              `((setq sendmail-program
+                      ,(file-append (get-value 'msmtp config) "/bin/msmtp"))
+                (setq message-send-mail-function
+                      'message-send-mail-with-sendmail)
+                (setq message-sendmail-f-is-evil t)
+                (setq message-sendmail-extra-arguments
+                      '("--read-envelope-from"))))
+             ((get-value 'emacs-smtpmail config)
+              `((setq message-send-mail-function 'smtpmail-send-it)))
+             (#t '()))
 
          ;; MAYBE: Move to feature-sourcehut
          ;; <https://git.sr.ht/~protesilaos/dotfiles/tree/a72ed49ea8/item/emacs/.emacs.d/prot-lisp/prot-notmuch.el#L352>
@@ -232,23 +251,6 @@ is among `rde-notmuch-patch-control-codes'."
                                              control-code)))
                (user-error "%s is not specified in
 `rde-notmuch-patch-control-codes'" control-code)))
-
-         ,@(if msmtp
-             `((setq
-                sendmail-program ,(file-append msmtp "/bin/msmtp")
-                message-send-mail-function 'message-send-mail-with-sendmail
-                message-sendmail-f-is-evil t
-                message-sendmail-extra-arguments '("--read-envelope-from")))
-             '())
-
-         (setq message-signature
-               ,(match message-signature
-                 ((? procedure? e) (e config))
-                 ((? string? e) e)
-                 (#f 'nil)
-                 (_ 't)))
-
-         (setq message-kill-buffer-on-exit t)
 
          ,@(if gpg-primary-key
              `((setq mml-secure-openpgp-signers '(,gpg-primary-key))
