@@ -2500,7 +2500,9 @@ S to show services and other guix items.")))
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((autoload 'pdf-view-mode "pdf-view" "")
+      `((autoload 'pdf-loader-install "pdf-loader")
+        (pdf-loader-install)
+
         (add-to-list 'auto-mode-alist '("\\.[pP][dD][fF]\\'" . pdf-view-mode))
         (add-to-list 'magic-mode-alist '("%PDF" . pdf-view-mode))
         (add-hook 'pdf-view-mode-hook 'pdf-tools-enable-minor-modes)
