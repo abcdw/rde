@@ -72,6 +72,7 @@
             feature-emacs-project
             feature-emacs-perspective
             feature-emacs-ednc
+            feature-emacs-ace-window
 
             ;; Development
             feature-emacs-smartparens
@@ -2155,6 +2156,38 @@ Provide basic adjustments and integration with project.el."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-ednc)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-ace-window
+          #:key
+          (emacs-ace-window emacs-ace-window)
+          (ace-window-key "M-o"))
+  "Configure ace-window, an Emacs package to quickly switch between windows."
+  (ensure-pred file-like? emacs-ace-window)
+  (ensure-pred string? ace-window-key)
+
+  (define emacs-f-name 'window)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Emacs's windows."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((define-key global-map (kbd ,ace-window-key) 'ace-window)
+        (with-eval-after-load 'ace-window
+          (setq aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
+          (setq aw-background nil)
+          (setq aw-scope 'frame)
+          (setq aw-ignore-current nil)
+          (setq aw-display-mode-overlay nil)))
+      #:elisp-packages (list emacs-ace-window))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)
+             (emacs-ace-window . ,emacs-ace-window)))
    (home-services-getter get-home-services)))
 
 
