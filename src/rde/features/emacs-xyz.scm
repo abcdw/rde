@@ -2539,8 +2539,7 @@ S to show services and other guix items.")))
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((autoload 'pdf-loader-install "pdf-loader")
-        (pdf-loader-install)
+      `((autoload 'pdf-view-mode "pdf-view" "")
 
         (defun rde-pdf-tools--list-buffers ()
           "List all currently-opened `pdf-view' mode buffers."
