@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
@@ -78,22 +78,8 @@ dependency for other packages."
            #:authors (or authors '("Andrew Tropin <andrew@trop.in>")))))
       configure-package))
 
-(define (rde-emacs-extension service-name
-                             emacs-extension
-                             feature-loader-extension)
-  (service
-   (service-type (name service-name)
-                 (extensions
-                  (list (service-extension
-                         home-emacs-service-type
-                         (const emacs-extension))
-                        (service-extension
-                         home-emacs-feature-loader-service-type
-                         (const feature-loader-extension))))
-                 (default-value #f)
-                 (description "Extends home-emacs-service and
- home-emacs-feature-loader-service-type."))))
-
+;; TDOO: Deprecate and get rid of this wrapper in favor of explicit service
+;; declaration?  Maybe provide a wrapper for home-elisp-configuration instead.
 (define* (rde-elisp-configuration-service
           name config
           #:optional (elisp-expressions '())
@@ -104,26 +90,19 @@ dependency for other packages."
   "Adds a configure-NAME package to the profile and emacs load path and if
 emacs-portable? rde value is present adds autoloads cookies to each expression
 of it, otherwise adds a require to @file{init.el}."
-  (let* ((pkg-name (symbol-append 'rde- name))
-         (configure-package
-          (rde-emacs-configuration-package
-           name elisp-expressions
-           #:summary summary
-           #:commentary commentary
-           #:keywords keywords
-           #:url url
-           #:authors authors
-           #:elisp-packages elisp-packages)))
-    (rde-emacs-extension
-     (symbol-append 'emacs-rde- name)
-     (home-emacs-extension
-      (early-init-el early-init)
-      ;; It's necessary to explicitly add elisp-packages here, because
-      ;; we want to overwrite builtin emacs packages.  Propagated
-      ;; inputs have lowest priority on collisions, that's why we have
-      ;; to list those package here in addition to propagated-inputs.
-      (elisp-packages elisp-packages))
-     `(,pkg-name . ,(list configure-package)))))
+  (service
+   (make-home-elisp-service-type (symbol-append 'emacs-rde- name))
+   (home-elisp-configuration
+    (name (symbol-append 'rde- name))
+    ;; TODO: Rename the field to elisp-expressions for cosistency?
+    (config elisp-expressions)
+    (early-init early-init)
+    (elisp-packages elisp-packages)
+    (authors (or authors '("Andrew Tropin <andrew@trop.in>")))
+    (url (or url "https://trop.in/rde"))
+    (summary summary)
+    (commentary commentary)
+    (keywords (or keywords '())))))
 
 ;; MAYBE: make handler to be actions instead of desktop entries?
 (define* (emacs-xdg-service
