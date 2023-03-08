@@ -1972,12 +1972,6 @@ on the current project."
             (when root
               (cons 'explicit (locate-dominating-file dir root)))))
 
-         (defun rde-project-ripgrep ()
-          "Run `consult-ripgrep' in the current project root."
-          (interactive)
-          (when-let ((default-dir (project-root (project-current t))))
-            (consult-ripgrep default-dir)))
-
         (defun rde-project-org-capture ()
           "Run `org-capture' in the current project root."
           (interactive)
@@ -2007,8 +2001,11 @@ on the current project."
                    (require 'consult))
                   (with-eval-after-load 'consult
                     (define-key project-prefix-map "F" 'consult-find)
+                    (define-key project-prefix-map "R" 'consult-ripgrep)
                     (add-to-list 'project-switch-commands
                                  '(consult-find "Find file consult"))
+                    (add-to-list 'project-switch-commands
+                                 '(consult-ripgrep "Search for regexp with rg"))
                     (setq consult-project-root-function
                           (lambda ()
                             (when-let (project (project-current))
@@ -2017,10 +2014,6 @@ on the current project."
           (setq project-list-file
                 (expand-file-name "emacs/projects"
                                   (or (xdg-cache-home) "~/.cache")))
-          (define-key project-prefix-map "R" 'rde-project-ripgrep)
-          (add-to-list 'project-switch-commands
-                       '(rde-project-ripgrep
-                         "Search for regexp with rg"))
           (add-to-list 'project-switch-commands '(project-compile "Compile") t)))
       #:summary "\
 Enchancements for project management with project.el"
