@@ -1142,6 +1142,8 @@ it every EXCHANGE-UPDATE-INTERVAL days."
   (define (get-home-services config)
     (define ripgrep (get-value 'ripgrep config
                                (@ (gnu packages rust-apps) ripgrep)))
+    (define fd (get-value 'fd config
+                          (@ (gnu packages rust-apps) fd)))
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -1362,6 +1364,9 @@ relative line numbers, when narrowing is active."
          (setq consult-ripgrep-args
                (replace-regexp-in-string "^rg" ,(file-append ripgrep "/bin/rg")
                                          consult-ripgrep-args))
+         (setq consult-find-args
+               (replace-regexp-in-string "^find" ,(file-append fd "/bin/fd")
+                                         consult-find-args))
          (consult-customize consult-buffer :preview-key "M-.")
          (consult-customize consult-history :category 'consult-history)
          (consult-customize consult-line :inherit-input-method t))
