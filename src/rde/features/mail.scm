@@ -28,7 +28,9 @@
   #:use-module (gnu packages mail)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (rde packages emacs-xyz)
+  #:use-module (rde packages mail)
   #:use-module (rde serializers elisp)
+  #:use-module (rde home services mail)
   #:use-module (gnu services)
   #:use-module (gnu services configuration)
   #:use-module (gnu home services)
@@ -49,6 +51,7 @@
             feature-emacs-gnus
             feature-emacs-smtpmail
             feature-emacs-org-mime
+            feature-goimapnotify
 
             mail-account
             mail-account-id
@@ -819,6 +822,91 @@ to offset block quotes."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-org-mime)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; feature-goimapnotify
+;;;
+
+(define* (feature-goimapnotify
+          #:key
+          (mail-account-ids #f)
+          (goimapnotify go-gitlab.com-shackra-goimapnotify-next)
+          (notify? #f))
+  "Set up and configure goimapnotify to listen on IMAP mailbox changes.  If
+MAIL-ACCOUNT-IDS is not provided, use all the mail accounts.  You can also
+control whether to NOTIFY? when new emails arrive."
+  (ensure-pred maybe-list? mail-account-ids)
+  (ensure-pred any-package? goimapnotify)
+  (ensure-pred boolean? notify?)
+
+  (define (get-home-services config)
+    "Return home services related to goimapnotify."
+    (require-value 'mail-accounts config)
+
+    (define mail-accounts
+      (if mail-account-ids
+          (filter (lambda (x)
+                    (member (mail-account-id x) mail-account-ids))
+                  (get-value 'mail-accounts config))
+          (get-value 'mail-accounts config)))
+
+    (list
+     (service
+      home-goimapnotify-service-type
+      (home-goimapnotify-configuration
+       (goimapnotify goimapnotify)
+       (config
+        `#(,@(map
+              (lambda (acc)
+                `((host . ,(assoc-ref
+                            (assoc-ref %default-msmtp-provider-settings
+                                       (mail-account-type acc))
+                                      'host))
+                  (port . 143)
+                  (tls . #f)
+                  (tlsOptions . ((rejectUnauthorized . #t)))
+                  (username . ,(mail-account-fqda acc))
+                  (passwordCmd . ,(mail-account-pass-cmd acc))
+                  (xoauth2 . #f)
+                  (alias . ,(mail-account-id acc))
+                  (trigger . 20)
+                  (boxes .
+                         #(((mailbox . "Inbox")
+                            ,@(if (get-value 'isync config)
+                                  (list
+                                   (cons 'onNewMail
+                                         ((get-value
+                                           'isync-synchronize-cmd-fn config)
+                                          acc)))
+                                  '())
+                            ,@(if notify?
+                                  (cond
+                                   ((get-value 'emacs-ednc config)
+                                    (list
+                                     (cons 'onNewMailPost
+                                           #~(format
+                                              #f "~s"
+                                              (string-join
+                                               (list
+                                                #$(file-append
+                                                   (get-value 'emacs config)
+                                                   "/bin/emacsclient")
+                                                "-e"
+                                                (format
+                                                 #f "'~s'"
+                                                 '(notifications-notify
+                                                   :app-name "goimapnotify"
+                                                   :title "New email received"
+                                                   :timeout 5000))))))))
+                                   (else '()))
+                                  '()))))))
+              mail-accounts)))))))
+
+  (feature
+   (name 'goimapnotify)
+   (values `((goimapnotify . ,goimapnotify)))
    (home-services-getter get-home-services)))
 
 
