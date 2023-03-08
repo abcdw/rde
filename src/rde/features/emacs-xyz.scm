@@ -28,6 +28,7 @@
   #:use-module (rde features fontutils)
 
   #:use-module (gnu home services)
+  #:use-module (gnu home services xdg)
   #:use-module (rde home services emacs-xyz)
   #:use-module (gnu services)
 
@@ -102,6 +103,7 @@
 
             ;; Multimedia
             feature-emacs-dashboard
+            feature-emacs-emms
             feature-emacs-pulseaudio-control))
 
 
@@ -3661,6 +3663,226 @@ Emacs dashboard which allows you to focus on the section items."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-dashboard)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-emms
+          #:key
+          (emacs-emms emacs-emms)
+          (emms-info-method 'emms-info-libtag)
+          (emms-key "E"))
+  "Configure the Emacs MultiMedia System.  Choose what method to use to
+retrieve information about tracks via EMMS-INFO-METHOD."
+  (ensure-pred file-like? emacs-emms)
+  (ensure-pred symbol? emms-info-method)
+  (ensure-pred string? emms-key)
+
+  (define emacs-f-name 'emms)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to EMMS."
+    (define atomicparsley-bin
+      (file-append
+       (get-value 'atomicparsley config
+                  (@ (gnu packages video) atomicparsley))
+       "/bin/AtomicParsley"))
+
+    (require-value 'xdg-user-directories-configuration config)
+    (define music-dir
+      (home-xdg-user-directories-configuration-music
+       (get-value 'xdg-user-directories-configuration config)))
+    (define emacs-ytdl (get-value 'emacs-ytdl config))
+
+    (append
+     (list
+      (rde-elisp-configuration-service
+       emacs-f-name
+       config
+       `((eval-when-compile
+           (require 'emms))
+         (defvar rde-emms-map nil
+          "Map to bind `emms' commands under.")
+         (define-prefix-command 'rde-emms-map)
+
+         (defun rde-emms-source-playlist ()
+           "Load a playlist with media files from emms' default directory."
+           (interactive)
+           (require 'emms)
+           (ignore-errors
+             (if (not emms-playlist-buffer)
+                 (progn
+                   (emms-add-directory-tree emms-source-file-default-directory)
+                   (emms-playlist-mode-go))
+               (with-current-emms-playlist
+                 (unless (emms-playlist-selected-track)
+                   (emms-add-directory-tree
+                    emms-source-file-default-directory))
+                 (emms-playlist-mode-go)))))
+
+         (defun rde-emms-source-track (url title &optional length play)
+           "Append or PLAY track with URL, TITLE, and LENGTH to the playlist."
+           (interactive "sURL: \nsTitle: \nP")
+           (if length
+               (emms-add-rde-emms-track url title length)
+             (emms-add-rde-emms-track url title nil))
+           (when play
+             (emms-stop)
+             (emms-playlist-current-select-last)
+             (emms-start)))
+
+         (defun rde-emms-toggle-random-repeat ()
+           "Toggle the random and repeat state for the current EMMS playlist."
+           (interactive)
+           (emms-toggle-random-playlist)
+           (if (and emms-repeat-track emms-random-playlist)
+               (progn
+                 (setq emms-repeat-track nil)
+                 (message "Will play tracks randomly and repeat the track"))
+             (setq emms-repeat-track t)
+             (message "Will play tracks sequentially and repeat the track")))
+
+         (defun rde-emms-seek-to-beginning ()
+           "Seek to beginning of current EMMS track."
+           (interactive)
+           (emms-seek-to 0))
+
+         (defun rde-emms-next ()
+           "Move to the next track depending on the current playlist state."
+           (interactive)
+           (if emms-random-playlist
+               (emms-random)
+             (emms-next)))
+
+         (defun rde-emms-previous ()
+           "Move to the previous track based on the current playlist state."
+           (interactive)
+           (if emms-random-playlist
+               (emms-random)
+             (emms-previous)))
+
+         (define-emms-source rde-emms-track (url title &optional length)
+           (let ((emms-track (emms-track 'url url)))
+             (emms-track-set emms-track 'info-title title)
+             (when length
+               (emms-track-set emms-track 'info-playing-time length))
+             (emms-playlist-insert-track emms-track)))
+
+         ,@(if emacs-ytdl
+             '((eval-when-compile
+                 (require 'ytdl))
+               (defun rde-emms-download-track ()
+                 "Download EMMS track at point using `ytdl'."
+                 (interactive)
+                 (emms-playlist-ensure-playlist-buffer)
+                 (with-current-emms-playlist
+                   (let* ((dl-type (ytdl--get-download-type))
+                          (track (emms-playlist-track-at))
+                          (title (emms-track-get track 'info-title))
+                          (source (emms-track-get track 'name)))
+                     (if (equal (emms-track-get track 'type) 'url)
+                         (ytdl--download-async
+                          source
+                          (expand-file-name
+                           title (ytdl--eval-field (nth 1 dl-type)))
+                          (ytdl--eval-list (ytdl--eval-field (nth 2 dl-type)))
+                          'ignore
+                          (car dl-type))
+                       (error "Track `%s' is not a remote track to download"
+                              title)))))
+               (with-eval-after-load 'emms
+                 (define-key emms-playlist-mode-map "m"
+                   'rde-emms-download-track)))
+             '())
+
+         ,@(if (get-value 'emacs-dired config)
+               '((with-eval-after-load 'dired
+                   (define-key dired-mode-map "e" 'emms-play-dired)))
+               '())
+
+         (with-eval-after-load 'rde-keymaps
+           (define-key rde-app-map (kbd ,emms-key) 'rde-emms-map))
+
+         (let ((map rde-emms-map))
+           (define-key map "b" 'emms-smart-browse)
+           (define-key map "h" 'emms-history-save)
+           (define-key map "q" 'emms-stop)
+           (define-key map "s" 'emms-toggle-random-playlist)
+           (define-key map "t" 'emms-seek-to)
+           (define-key map (kbd "SPC") 'emms-pause)
+           (define-key map "r" 'emms-toggle-repeat-track)
+           (define-key map "R" 'emms-toggle-repeat-playlist)
+           (define-key map "d" 'rde-emms-toggle-random-repeat)
+           (define-key map "l" 'rde-emms-source-playlist)
+           (define-key map "n" 'rde-emms-next)
+           (define-key map "p" 'rde-emms-previous)
+           (define-key map "a" 'rde-emms-seek-to-beginning))
+
+         (with-eval-after-load 'emms
+           (eval-when-compile
+            (require 'emms-browser))
+           (require 'emms-setup)
+           (require 'xdg)
+           (require ',emms-info-method)
+
+           ,@(if (get-value 'mpv config)
+                 '((require 'emms-player-mpv)
+                   (setq emms-player-list '(emms-player-mpv))
+                   (add-to-list 'emms-player-mpv-parameters
+                                "--ytdl-format=best")
+                   (add-to-list 'emms-player-mpv-parameters
+                                "--force-window=no"))
+                 '())
+
+           (emms-browser-make-filter
+            "all-files" (emms-browser-filter-only-type 'file))
+           (emms-browser-make-filter
+            "last-week" (emms-browser-filter-only-recent 7))
+
+           (let ((mp3-function (assoc "mp3"
+                                      emms-tag-editor-tagfile-functions)))
+             (add-to-list
+              'emms-tag-editor-tagfile-functions
+              `("aac" ,(cadr mp3-function) ,(caddr mp3-function))))
+           (add-to-list
+            'emms-tag-editor-tagfile-functions
+            '("m4a" ,atomicparsley-bin
+              ((info-artist . "--artist")
+               (info-title . "--title")
+               (info-album . "--album")
+               (info-tracknumber . "--tracknum")
+               (info-year . "--year")
+               (info-genre . "--genre")
+               (info-note . "--comment")
+               (info-albumartist . "--albumArtist")
+               (info-composer . "--composer"))))
+
+           (setq emms-playlist-buffer-name "*EMMS Playlist*")
+           (setq emms-playlist-mode-center-when-go t)
+           (setq emms-history-file
+                 (expand-file-name "emacs/emms-history"
+                                   (or (xdg-cache-home) "~/.cache")))
+           (setq emms-seek-seconds 15)
+           (setq emms-source-file-default-directory ,music-dir)
+           (setq emms-repeat-playlist t)
+           (setq emms-info-functions '(,emms-info-method))
+           (setq emms-mode-line-format "%s")
+           (setq emms-mode-line-icon-enabled-p nil)
+
+           (with-eval-after-load 'emms-browser
+             (setq emms-browser-covers 'emms-browser-cache-thumbnail-async)
+             (setq emms-browser-switch-to-playlist-on-add t)
+             (setq emms-browser-thumbnail-small-size 64)
+             (setq emms-browser-thumbnail-medium-size 128))))
+       #:elisp-packages (append
+                         (or (and=> emacs-ytdl list) '())
+                         (list emacs-emms))
+       #:summary "Sensible defaults for EMMS"
+       #:commentary "Basic setup and extensions for EMMS, the Emacs MultiMedia \
+System."))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-emms)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-pulseaudio-control
