@@ -30,6 +30,7 @@
   #:use-module (gnu home services)
   #:use-module (gnu home services xdg)
   #:use-module (rde home services emacs-xyz)
+  #:use-module (rde home services emacs)
   #:use-module (gnu services)
 
   #:use-module (rde packages)
@@ -801,35 +802,47 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
   (define emacs-f-name 'time)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
+  (define emacs-rde-time-service-type
+    (make-home-elisp-service-type 'rde-time))
   (define (get-home-services config)
     "Return home services related to time.el."
     (list
-     (rde-elisp-configuration-service
-      emacs-f-name
-      config
-      `((eval-when-compile
-         (require 'time))
-        (with-eval-after-load 'rde-keymaps
-          (define-key rde-app-map (kbd ,world-clock-key) 'world-clock))
-        ,@(if world-clock-timezones
-              `((setq world-clock-list ',world-clock-timezones))
-              '())
-        (setq display-time-world-time-format ,world-clock-time-format)
-        (setq display-time-default-load-average nil)
-        (setq display-time-load-average-threshold 0)
-        ,@(if display-time-date?
-              '((setq display-time-day-and-date t))
-              '())
-        ,@(if display-time-24hr?
-              '((setq display-time-24hr-format t))
-              '())
-        ,@(if display-time?
-              '((display-time-mode))
-              '())))))
+     (simple-service
+      'rde-time-extension
+      emacs-rde-time-service-type
+      (home-elisp-extension
+       (config `(,#~";; hello there"
+                 (setq something 'huiamthing)
+                 ,#~";; unhello there"))))
+     (service
+      emacs-rde-time-service-type
+      (home-elisp-configuration
+       (name 'rde-time)
+       (config
+        `((eval-when-compile
+           (require 'time))
+          (with-eval-after-load 'rde-keymaps
+            (define-key rde-app-map (kbd ,world-clock-key) 'world-clock))
+          ,@(if world-clock-timezones
+                `((setq world-clock-list ',world-clock-timezones))
+                '())
+          (setq display-time-world-time-format ,world-clock-time-format)
+          (setq display-time-default-load-average nil)
+          (setq display-time-load-average-threshold 0)
+          ,@(if display-time-date?
+                '((setq display-time-day-and-date t))
+                '())
+          ,@(if display-time-24hr?
+                '((setq display-time-24hr-format t))
+                '())
+          ,@(if display-time?
+                '((display-time-mode))
+                '())))))))
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((,f-name . #t)
+             (emacs-rde-time-service-type . ,emacs-rde-time-service-type)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-calendar
