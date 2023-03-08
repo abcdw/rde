@@ -47,6 +47,7 @@
             feature-msmtp
             feature-l2md
             feature-emacs-gnus
+            feature-emacs-smtpmail
 
             mail-account
             mail-account-id
@@ -669,6 +670,59 @@ topics with your preferred hierarchy."
                   "Followup-To:" "Reply-To:" "^Organization:" "^X-Newsreader:"
                   "^X-Mailer:" "^Message-ID:" "^In-Reply-To:" "^References:"))
           (setq gnus-sorted-header-list gnus-visible-headers))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; feature-emacs-smtpmail
+;;;
+
+(define* (feature-emacs-smtpmail
+          #:key
+          (mail-account-id #f))
+  "Configure smtpmail, a simple mail protocol for sending mail from Emacs.
+If no MAIL-ACCOUNT-ID is provided, the first mail account will be used."
+  (ensure-pred maybe-symbol? mail-account-id)
+
+  (define emacs-f-name 'smtpmail)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to smtpmail."
+    (require-value 'mail-accounts config)
+
+    (define mail-acc
+      (if mail-account-id
+          (filter (lambda (acc)
+                    (= (mail-account-id acc) mail-account-id))
+                  (get-value 'mail-accounts config))
+          (car (get-value 'mail-accounts config))))
+    (define smtp-provider
+      (assoc-ref %default-msmtp-provider-settings
+                 (mail-account-type mail-acc)))
+    (define smtp-host (assoc-ref smtp-provider 'host))
+    (define smtp-port (assoc-ref smtp-provider 'port))
+
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'smtpmail
+          (require 'xdg)
+          (setq smtpmail-smtp-user ,(or (mail-account-user mail-acc)
+                                        (mail-account-fqda mail-acc)))
+          (setq smtpmail-smtp-service ,smtp-port)
+          (setq smtpmail-stream-type 'starttls)
+          (setq smtpmail-queue-dir
+                (expand-file-name "emacs/smtpmail/queued-mail"
+                                  (xdg-cache-home)))
+          (setq smtpmail-debug-info t)
+          (setq smtpmail-smtp-server ,smtp-host)
+          (setq smtpmail-default-smtp-server ,smtp-host))))))
 
   (feature
    (name f-name)
