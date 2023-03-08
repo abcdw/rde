@@ -370,20 +370,20 @@ Elisp expression to make it evaluated on Emacs startup."
        (list #~(format #f ";;; ~a.el --- ~a ~a\n" #$package-name
                        (or #$summary "No description provided")
                        "-*- lexical-binding:t -*-"))
-       (if authors
+       (if (and=> authors (compose not null?))
            (list #~(format #f ";; Author: ~a\n;;"
                            #$(string-join authors "\n;;         ")))
            '())
-       (if maintainers
+       (if (and=> maintainers (compose not null?))
            (list #~(format #f ";; Maintainer: ~a\n;;"
                            #$(string-join maintainers "\n;;             ")))
            '())
        (if url (list #~(format #f ";; URL: ~a" #$url)) '())
-       (if keywords
+       (if (and=> keywords (compose not null?))
            (list #~#$(format #f ";; Keywords: ~a"
                              (string-join (map object->string keywords) ", ")))
            '())
-       (if commentary
+       (if (and=> commentary (compose not null?))
            (list #~"\n;;; Commentary:\n"
                  #~#$(string-join
                       (map
