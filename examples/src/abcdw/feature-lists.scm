@@ -12,6 +12,7 @@
   #:use-module (rde features mail)
   #:use-module (rde features irc)
   #:use-module (rde features wm)
+  #:use-module (rde features web-browsers)
 
   #:use-module (rde features emacs)
   #:use-module (rde features emacs-xyz)
@@ -37,6 +38,8 @@
    (feature-networking)
 
    (feature-transmission #:auto-start? #f)
+   (feature-ungoogled-chromium
+    #:default-browser? #t)
    (feature-ledger)
    (feature-mpv
     #:extra-mpv-conf '((speed . 1.61)))))

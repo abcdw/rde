@@ -271,8 +271,7 @@
      home-extra-packages-service
      sway-extra-config-service
      ssh-extra-config-service
-     i2pd-add-ilita-irc-service
-     chromium-xdg-defaults))
+     i2pd-add-ilita-irc-service))
 
    (feature-ssh-proxy #:host "pinky-ygg" #:auto-start? #f)
    (feature-ssh-proxy #:host "pinky-ygg" #:name "hundredrps"
