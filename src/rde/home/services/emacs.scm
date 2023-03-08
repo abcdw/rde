@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;; This file is part of rde.
 ;;;
@@ -42,9 +42,17 @@
             elisp-configuration-package
 
             home-emacs-feature-loader-configuration
-            home-emacs-feature-loader-service-type))
+            home-emacs-feature-loader-service-type
+
+            home-elisp-configuration
+            home-elisp-extension
+            make-home-elisp-service-type))
 
 (define file-likes? (list-of file-like?))
+(define list-of-symbols? (list-of symbol?))
+
+(define (maybe-string? x)
+  (or (string? x) (not x)))
 
 (define serialize-file-likes empty-serializer)
 (define serialize-boolean empty-serializer)
@@ -152,6 +160,8 @@ packages with proper GNU Emacs version."
 (define (emacs-argument-updater target-emacs)
   "Recursively updates @code{#:emacs} argument for package and all the
 inputs."
+  ;; Alternative solution compilation with other emacs version
+  ;; https://yhetil.org/20221021192458.4956-1-paren@disroot.org
   (package-mapping (update-emacs-argument-for-package target-emacs)
                    (lambda (p) #f)))
 
@@ -479,3 +489,108 @@ time."))))
                 (description "Extends emacs with feauter-loader elisp package,
 which have specified packages as propagated inputs, loads specified emacs
 feaures and optionally adds a require of itself to init-el.")))
+
+
+;;;
+;;; Elisp configuration.
+;;;
+
+(define-configuration/no-serialization home-elisp-configuration
+  (name
+   (symbol #f)
+   "A name of the configuration package.")
+  (config
+   (elisp-config '())
+   "List of expressions.  See
+@code{home-emacs-service-type} for more information.")
+  (early-init
+   (elisp-config '())
+   "List of expressions.  See
+@code{home-emacs-service-type} for more information.")
+  (elisp-packages
+   (file-likes '())
+   "List of additional Emacs Lisp packages.")
+  (autoloads?
+   (boolean #f)
+   "Add autoload cookies to all items in config.  Usually not needed as
+feature-loader take care of it.")
+  (summary
+   (maybe-string #f)
+   "A brief summary of the configuration package.")
+  (commentary
+   (maybe-string #f)
+   "A brief description of the configuration package.")
+  (keywords
+   (list-of-symbols '())
+   "A list of keyword for the configuration package.")
+  (url
+   (maybe-string "https://trop.in/rde")
+   "A url of the configuration package.")
+  (authors
+   (list-of-strings '("Andrew Tropin <andrew@trop.in>"))
+   "A list of authors of configuration package."))
+
+(define-configuration home-elisp-extension
+  (config
+   (elisp-config '())
+   "List of expressions.  See
+@code{home-emacs-service-type} for more information.")
+  (elisp-packages
+   (file-likes '())
+   "List of additional Emacs Lisp packages."))
+
+(define (home-elisp-feature config)
+  (let ((name (home-elisp-configuration-name config)))
+    (cons
+     name
+     (list
+      (elisp-configuration-package
+       (symbol->string name)
+       (home-elisp-configuration-config config)
+       #:elisp-packages (home-elisp-configuration-elisp-packages config)
+       #:autoloads? (home-elisp-configuration-autoloads? config)
+       #:summary (home-elisp-configuration-summary config)
+       #:commentary (home-elisp-configuration-commentary config)
+       #:keywords (home-elisp-configuration-keywords config)
+       #:url (home-elisp-configuration-url config)
+       #:authors (home-elisp-configuration-authors config))))))
+
+(define (home-elisp-emacs-extension config)
+  (home-emacs-extension
+   (early-init-el (home-elisp-configuration-early-init config))
+   ;; It's necessary to explicitly add elisp-packages here, because
+   ;; we want to overwrite builtin emacs packages.  Propagated
+   ;; inputs have lowest priority on collisions, that's why we have
+   ;; to list those package here in addition to propagated-inputs.
+   (elisp-packages (home-elisp-configuration-elisp-packages config))))
+
+(define (home-elisp-extensions original-config extensions)
+  (let ((extensions (reverse extensions)))
+    (home-elisp-configuration
+     (inherit original-config)
+     (elisp-packages
+      (append (home-elisp-configuration-elisp-packages original-config)
+              (append-map
+               home-elisp-extension-elisp-packages extensions)))
+     (config
+      (append (home-elisp-configuration-config original-config)
+              (append-map
+               home-elisp-extension-config extensions))))))
+
+(define (make-home-elisp-service-type name)
+  (service-type (name name)
+                (extensions
+                 (list (service-extension
+                        home-emacs-feature-loader-service-type
+                        home-elisp-feature)
+                       (service-extension
+                        home-emacs-service-type
+                        home-elisp-emacs-extension)))
+                (compose identity)
+                (extend home-elisp-extensions)
+                (default-value #f)
+                (description (format #f "\
+Creates emacs-~a configuration package, extends emacs and feature-loader to
+make provided configuration available/loaded at startup time.  Can be extended
+with home-elisp-extension."
+                                     name))))
