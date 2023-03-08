@@ -48,6 +48,7 @@
             feature-l2md
             feature-emacs-gnus
             feature-emacs-smtpmail
+            feature-emacs-org-mime
 
             mail-account
             mail-account-id
@@ -727,6 +728,70 @@ If no MAIL-ACCOUNT-ID is provided, the first mail account will be used."
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; feature-emacs-org-mime
+;;;
+
+(define* (feature-emacs-org-mime
+          #:key
+          (emacs-org-mime emacs-org-mime)
+          (html-element-styles '()))
+  "Configure org-mime for wysiwyg html mime mail composition via Org Mode.
+You can change the exported HTML-ELEMENT-STYLES by providing an association
+list of ELEMENT . STYLE such as:
+
+@lisp
+'((\"pre\" . \"color: #E6E1Dc; background-color: #232323; padding: 0.5em;\")
+  (\"blockquote\" . \"border-left: 2px solid gray; padding-left: 4px;\"))
+@end lisp
+
+The above darkens exported code-blocks and adds a border and some padding
+to offset block quotes."
+  (ensure-pred file-like? emacs-org-mime)
+  (ensure-pred alist? html-element-styles)
+
+  (define emacs-f-name 'org-mime)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to org-mime."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile
+         (require 'org-mime))
+        (defun rde-org-mime-change-element-styles ()
+          "Apply extra css styles when exporting html email."
+          ,@(map (lambda (el)
+                   `(org-mime-change-element-style
+                     ,(car el) ,(cdr el)))
+                 html-element-styles))
+
+        ,@(if (null? html-element-styles)
+              '()
+              '((add-hook 'org-mime-html-hook
+                          'rde-org-mime-change-element-styles)))
+        (with-eval-after-load 'org
+          (define-key org-mode-map (kbd "C-c M-o")
+            'org-mime-org-buffer-htmlize))
+        (add-hook 'message-send-hook
+                  'org-mime-confirm-when-no-multipart)
+        (with-eval-after-load 'message
+          (let ((map message-mode-map))
+            (define-key map (kbd "C-c M-z") 'org-mime-htmlize)
+            (define-key map (kbd "C-c M-o") 'org-mime-edit-mail-in-org-mode)))
+        (with-eval-after-load 'org-mime
+          (setq org-mime-export-options
+                '(:section-numbers nil :with-author nil :with-toc nil))))
+      #:elisp-packages (list emacs-org-mime))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-org-mime)))
    (home-services-getter get-home-services)))
 
 
