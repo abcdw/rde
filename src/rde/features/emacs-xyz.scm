@@ -95,6 +95,7 @@
             feature-emacs-org-protocol
             feature-emacs-spelling
             feature-emacs-org-recur
+            feature-emacs-graphviz
 
             ;; Communication
             feature-emacs-telega
@@ -3310,6 +3311,50 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-org-recur)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-graphviz
+          #:key
+          (emacs-graphviz-dot-mode emacs-graphviz-dot-mode))
+  "Configure Graphviz, the open source graph visualization software."
+  (ensure-pred file-like? emacs-graphviz-dot-mode)
+
+  (define emacs-f-name 'graphviz)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Graphviz."
+    (define graphviz (@ (gnu packages graphviz) graphviz))
+
+    (list
+     (simple-service
+      'add-graphviz-home-package
+      home-profile-service-type
+      (list graphviz))
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((defun rde-graphviz-fix-inline-images ()
+          "Display inline images automatically."
+          (interactive)
+          (when org-inline-image-overlays
+            (org-redisplay-inline-images)))
+
+        (add-hook 'org-babel-after-execute-hook
+                  'rde-graphviz-fix-inline-images)
+        (require 'graphviz-dot-mode)
+        ,@(if (get-value 'emacs-org config)
+              '((with-eval-after-load 'ob-core
+                  (require 'ob-dot))
+                (with-eval-after-load 'ob-dot
+                  (add-to-list 'org-babel-default-header-args:dot
+                               '(:cmdline . "-Kdot -Tpng"))))
+              '()))
+      #:elisp-packages (list emacs-graphviz-dot-mode))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-graphviz-dot-mode)))
    (home-services-getter get-home-services)))
 
 
