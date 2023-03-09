@@ -1112,14 +1112,17 @@ Small tweaks, xdg entry for openning directories in emacs client."
         (define-key global-map (kbd "s-e") 'eshell)
         (with-eval-after-load
          'eshell
-         (add-hook
-          'eshell-hist-mode-hook
-          (lambda ()
-            (when (fboundp 'consult-history)
-              (define-key eshell-hist-mode-map (kbd "M-r") 'consult-history))))
           (autoload 'eshell-syntax-highlighting-global-mode
                     "eshell-syntax-highlighting")
           (eshell-syntax-highlighting-global-mode)
+
+          ,@(if (get-value 'emacs-consult config)
+                '((add-hook
+                   'eshell-hist-mode-hook
+                   (lambda ()
+                     (define-key eshell-hist-mode-map (kbd "M-r")
+                       'consult-history))))
+                '())
 
          ;;; <https://www.emacswiki.org/emacs/AnsiColor#h5o-2>
          (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
