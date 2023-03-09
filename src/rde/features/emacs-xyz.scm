@@ -677,10 +677,7 @@ keybindings and adjust some minor settings."
        (rde-elisp-configuration-service
         emacs-f-name
         config
-        `((when (and (display-graphic-p)
-                     (not (find-font (font-spec :name "all-the-icons"))))
-            (all-the-icons-install-fonts t))
-          (with-eval-after-load 'all-the-icons
+        `((with-eval-after-load 'all-the-icons
             (setq all-the-icons-scale-factor 1.0)
             (setq all-the-icons-default-adjust 0)
             (setq all-the-icons-octicon-scale-factor 0.9))
