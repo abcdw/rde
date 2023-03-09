@@ -1056,6 +1056,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
+    "Return home services related to Dired."
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
     (define xdg-gexp
       #~(system*
@@ -1086,15 +1087,24 @@ path /sudo:HOST:/path if the user in sudoers.")))
       emacs-f-name
       config
       `((eval-when-compile (require 'dired))
-        (with-eval-after-load
-         'dired
-        ,@(if emacs-all-the-icons
-              '((add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
-                (with-eval-after-load 'all-the-icons-dired
-                  (setq all-the-icons-dired-monochrome nil)))
-            '())
+
+        (defun rde-dired-open-externally ()
+          "Open files in Dired through their corresponding external program."
+          (interactive)
+          (let ((files (dired-get-marked-files)))
+            (mapc 'consult-file-externally files)))
+
+        (define-key global-map (kbd "s-d") 'dired-jump)
+        (with-eval-after-load 'dired
+          ,@(if emacs-all-the-icons
+                '((add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+                  (with-eval-after-load 'all-the-icons-dired
+                    (setq all-the-icons-dired-monochrome nil)))
+                '())
           (let ((map dired-mode-map))
-            (define-key map (kbd "C-c C-r") 'dired-rsync))
+            (define-key map (kbd "C-c C-r") 'dired-rsync)
+            (define-key map "q" 'kill-current-buffer)
+            (define-key map "V" 'rde-dired-open-externally))
          (setq dired-dwim-target t)
          (setq dired-listing-switches ,dired-listing-switches)
          ,@(if kill-when-opening-new-buffer?
@@ -1104,12 +1114,19 @@ path /sudo:HOST:/path if the user in sudoers.")))
                `((add-hook 'dired-mode-hook 'dired-hide-details-mode))
                '())
 
-         (add-hook 'dired-mode-hook (lambda () (setq truncate-lines t)))
-         (setq dired-hide-details-hide-symlink-targets nil))
+         (add-hook 'dired-mode-hook 'toggle-truncate-lines)
+         (setq dired-hide-details-hide-symlink-targets nil)
+         (setq delete-by-moving-to-trash nil)
+         (setq dired-recursive-deletes 'always)
+         (setq dired-clean-confirm-killing-deleted-buffers nil)
+         (setq dired-recursive-copies 'always)
+         (setq dired-deletion-confirmer 'y-or-n-p))
 
         (with-eval-after-load 'dired-rsync
           (setq dired-rsync-options
-                "--exclude .git/ --exclude .gitignore -az --info=progress2 --delete")))
+                "--exclude .git/ --exclude .gitignore -az --info=progress2 --delete"))
+        (with-eval-after-load 'ls-lisp
+          (setq ls-lisp-use-insert-directory-program nil)))
       #:elisp-packages (append
                         (list emacs-dired-rsync)
                         (if emacs-all-the-icons
