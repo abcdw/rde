@@ -35,10 +35,12 @@
 (define* (feature-mpv
           #:key
           (mpv mpv)
+          (extra-bindings '())
           (extra-mpv-conf '()))
   "Setup and configure mpv."
   (ensure-pred file-like? mpv)
   (ensure-pred alist? extra-mpv-conf)
+  (ensure-pred alist? extra-bindings)
 
   (define (get-home-services config)
     (require-value 'fonts config)
@@ -49,6 +51,7 @@
       home-mpv-service-type
       (home-mpv-configuration
        (package mpv)
+       (bindings extra-bindings)
        (default-options
          `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
            (keep-open . #t)
