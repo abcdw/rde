@@ -60,6 +60,7 @@
             feature-emacs-dired
             feature-emacs-eshell
             feature-emacs-calc
+            feature-emacs-re-builder
 
             ;; Completion
             feature-emacs-completion
@@ -1071,6 +1072,36 @@ it every EXCHANGE-UPDATE-INTERVAL days."
    (name f-name)
    (values `((,f-name . #t)
              (emacs-calc-currency . ,emacs-calc-currency)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-re-builder
+          #:key
+          (re-syntax 'rx)
+          (re-builder-key "r"))
+  "Configure re-builder, an Emacs mode to build Regexps with visual feedback.
+RE-SYNTAX can be either 'read, 'string, or 'rx."
+  (ensure-pred symbol? re-syntax)
+  (ensure-pred string? re-builder-key)
+
+  (define emacs-f-name 're-builder)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to re-builder."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,re-builder-key) 're-builder))
+        (with-eval-after-load 're-builder
+          (setq reb-re-syntax ',re-syntax)
+          (setq reb-blink-delay 0)
+          (setq reb-auto-match-limit nil))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
 
