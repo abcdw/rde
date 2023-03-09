@@ -62,6 +62,7 @@
             feature-emacs-eshell
             feature-emacs-calc
             feature-emacs-re-builder
+            feature-emacs-comint
 
             ;; Completion
             feature-emacs-completion
@@ -1237,6 +1238,45 @@ RE-SYNTAX can be either 'read, 'string, or 'rx."
           (setq reb-re-syntax ',re-syntax)
           (setq reb-blink-delay 0)
           (setq reb-auto-match-limit nil))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-comint)
+  "Configure the general command-intepreter-in-a-buffer (comint) for
+process-in-a-buffer derived packages like shell, REPLs, etc."
+
+  (define emacs-f-name 'comint)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Comint."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `(,@(if (get-value 'emacs-consult-initial-narrowing? config)
+              '((defvar rde-comint-buffer-source
+                  `(:name "Comint"
+                          :narrow ?c
+                          :category buffer
+                          :state ,'consult--buffer-state
+                          :items ,(lambda ()
+                                    (mapcar 'buffer-name
+                                            (rde-completion--mode-buffers
+                                             'comint-mode))))
+                  "Source for `comint-mode' buffers to be set in \
+`consult-buffer-sources'.")
+                (with-eval-after-load 'consult
+                  (add-to-list 'consult-buffer-sources
+                               rde-comint-buffer-source))
+                (with-eval-after-load 'rde-completion
+                  (add-to-list 'rde-completion-initial-narrow-alist
+                               '(comint-mode . ?c))))
+              '())
+        (add-hook 'comint-preoutput-filter-functions 'ansi-color-apply nil t)))))
 
   (feature
    (name f-name)
