@@ -88,7 +88,7 @@
                (define-prefix-command 'rde-mpv-map)
 
                ,@(if (get-value 'emacs-ytdl config)
-                     '((eval-when-compile
+                     `((eval-when-compile
                          (require 'ytdl)
                          (require 'cl-lib))
                        (cl-defun rde-mpv-play-url (url &optional format
@@ -135,6 +135,11 @@ do with the file, and whether to add the file to the current PLAYLIST."
                               'ignore
                               (car dl-type))
                            (error "Mpv is not currently active")))
+
+                       ,@(if emacs-embark
+                             '((with-eval-after-load 'embark
+                                 (define-key embark-url-map "v" 'rde-mpv-play-url)))
+                             '())
 
                        (let ((map rde-mpv-map))
                          (define-key map (kbd "RET") 'rde-mpv-play-url)
@@ -250,6 +255,22 @@ do with the file, and whether to add the file to the current PLAYLIST."
                                  'rde-mpv-connect-to-emms-on-startup))
                    '())
 
+               ,@(if emacs-embark
+                     `((with-eval-after-load 'embark
+                         (defvar rde-mpv-chapter-embark-actions
+                           (let ((map (make-sparse-keymap)))
+                             (define-key map "r" 'mpv-set-chapter-ab-loop)))
+                         (add-to-list 'embark-keymap-alist
+                                      (cons 'mpv-chapter
+                                            'rde-mpv-chapter-embark-actions))
+                         (defvar rde-mpv-file-embark-actions
+                           (let ((map (make-sparse-keymap)))
+                             (define-key map "d" 'mpv-remove-playlist-entry)))
+                         (add-to-list 'embark-keymap-alist
+                                      (cons 'mpv-file
+                                            'rde-mpv-file-embark-actions))))
+                     '())
+
                (with-eval-after-load 'rde-keymaps
                  (define-key rde-app-map (kbd ,mpv-key) 'rde-mpv-map))
                (let ((map rde-mpv-map))
@@ -274,6 +295,7 @@ do with the file, and whether to add the file to the current PLAYLIST."
                (with-eval-after-load 'mpv
                  (setq mpv-seek-step 3)))
              #:elisp-packages (append
+                               (or (and=> emacs-embark list) '())
                                (or (and=> (get-value 'emacs-ytdl config) list)
                                    '())
                                (list emacs-mpv)))))
