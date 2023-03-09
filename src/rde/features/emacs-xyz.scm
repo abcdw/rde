@@ -3138,6 +3138,8 @@ marginalia annotations."
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
+    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config))
+
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -3158,6 +3160,23 @@ marginalia annotations."
                   (t csl))))
 
         (with-eval-after-load 'citar
+          ,@(if emacs-all-the-icons
+                '((eval-when-compile
+                   (require 'all-the-icons))
+                  (setq citar-symbols
+                        `((file ,(all-the-icons-faicon
+                                  "file-o"
+                                  :face 'all-the-icons-green
+                                  :v-adjust -0.1) . " ")
+                          (note ,(all-the-icons-material
+                                  "speaker_notes"
+                                  :face 'all-the-icons-blue
+                                  :v-adjust -0.3) . " ")
+                          (link ,(all-the-icons-octicon
+                                  "link"
+                                  :face 'all-the-icons-orange
+                                  :v-adjust 0.01) . " "))))
+                '())
           (setq citar-library-paths (list ,@citar-library-paths))
           (setq citar-notes-paths (list ,@citar-notes-paths))
           (setq citar-bibliography org-cite-global-bibliography))
@@ -3189,6 +3208,7 @@ defaults."
       #:elisp-packages
       (append
        (if (get-value 'emacs-org-roam config) (list emacs-citar-org-roam) '())
+       (or (and=> emacs-all-the-icons list) '())
        (list emacs-citar)))))
 
   (feature
