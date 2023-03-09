@@ -1643,7 +1643,7 @@ calculation function for vertico buffer."
                    (setq-local header-line-format mode-line-format)
                    (setq-local mode-line-format nil))
 
-                 (advice-add 'vertico-buffer--setup :after
+                 (advice-add 'vertico--setup :after
                              'rde--vertico-prepare-header-line))
                '())
 
