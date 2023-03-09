@@ -1102,6 +1102,30 @@ Small tweaks, xdg entry for openning directories in emacs client."
          (require 'em-alias)
          (require 'em-hist)
          (require 'project))
+        (defgroup rde-eshell nil
+          "Eshell customizations for a better integration with Emacs tooling."
+          :group 'rde)
+
+        (define-minor-mode rde-eshell-mode-setup
+          "Set up environment on `eshell-mode' invocation."
+          :group 'rde-eshell
+          (if rde-eshell-mode-setup
+              (progn
+                (if (and (boundp 'envrc-global-mode) envrc-global-mode)
+                    (add-hook 'envrc-mode-hook (lambda () (setenv "PAGER" "")))
+                    (setenv "PAGER" ""))
+
+                (eshell/alias "e" "find-file $1")
+                (eshell/alias "ee" "find-file-other-window $1")
+                (eshell/alias "d" "dired $1")
+                (with-eval-after-load 'magit
+                  (eshell/alias "gd" "magit-diff-unstaged"))
+
+                (define-key eshell-mode-map (kbd "C-c M-o") 'eshell/clear)
+                (define-key eshell-mode-map (kbd "s-e")
+                            'switch-to-prev-buffer-or-eshell))
+              (local-unset-key 'eshell/clear)))
+
         (defun rde-project-eshell-or-eshell (&optional arg)
           "If there is a project open project-eshell"
           (interactive "P")
@@ -1110,8 +1134,9 @@ Small tweaks, xdg entry for openning directories in emacs client."
               (eshell arg)))
 
         (define-key global-map (kbd "s-e") 'eshell)
-        (with-eval-after-load
-         'eshell
+        (add-hook 'eshell-mode-hook 'rde-eshell-mode-setup)
+        (with-eval-after-load 'eshell
+          (setq eshell-banner-message "")
           (autoload 'eshell-syntax-highlighting-global-mode
                     "eshell-syntax-highlighting")
           (eshell-syntax-highlighting-global-mode)
@@ -1136,23 +1161,7 @@ Small tweaks, xdg entry for openning directories in emacs client."
            (interactive "P")
            (if arg
                (eshell arg)
-               (switch-to-buffer (other-buffer (current-buffer) 1))))
-
-         (add-hook
-          'eshell-mode-hook
-          (lambda ()
-            (if (and (boundp 'envrc-global-mode) envrc-global-mode)
-                (add-hook 'envrc-mode-hook (lambda () (setenv "PAGER" "")))
-                (setenv "PAGER" ""))
-
-            (eshell/alias "e" "find-file $1")
-            (eshell/alias "ee" "find-file-other-window $1")
-            (eshell/alias "d" "dired $1")
-            (with-eval-after-load
-             'magit (eshell/alias "gd" "magit-diff-unstaged"))
-
-            (define-key eshell-mode-map (kbd "s-e")
-              'switch-to-prev-buffer-or-eshell)))))
+               (switch-to-buffer (other-buffer (current-buffer) 1))))))
       #:elisp-packages (list emacs-eshell-syntax-highlighting
                              emacs-eshell-prompt-extras)
       #:summary "\
