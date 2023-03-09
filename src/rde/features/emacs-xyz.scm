@@ -3028,9 +3028,10 @@ Start an unlimited search at `point-min' otherwise."
           (setq org-modern-statistics nil)
           (setq org-modern-tag nil)
           (setq org-modern-priority nil)
-          ;; There is a bug, which breaks various operations due to invisible
-          ;; chars: https://github.com/minad/org-modern/issues/106
-          (setq org-modern-hide-stars nil))
+          (setq org-modern-hide-stars nil)
+          ;; Instead of making leading stars really invisible, let's just use
+          ;; the same color as bg and keep them accessible/editable.
+          (setq org-hide-leading-stars t))
 
          (autoload 'global-org-modern-mode "org-modern")
          ,@(if org-modern?
