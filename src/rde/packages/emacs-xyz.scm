@@ -102,21 +102,6 @@
     (description "Cyrillic input method for dvorak layout.")
     (license license:gpl3+)))
 
-(define-public emacs-mini-frame
-  (package
-   (inherit emacs-unfill)
-   (name "emacs-mini-frame")
-   (version "1.0.0")
-   (source (origin
-            (method git-fetch)
-            (uri (git-reference
-                  (url "https://github.com/muffinmad/emacs-mini-frame.git")
-                  (commit "41afb3d79cd269726e955ef0896dc077562de0f5")))
-            (file-name (git-file-name name version))
-            (sha256
-             (base32
-              "0yghz9pdjsm9v6lbjckm6c5h9ak7iylx8sqgyjwl6nihkpvv4jyp"))))))
-
 (define-public emacs-hide-header-line
   (package
     (inherit emacs-hide-mode-line)
