@@ -3595,8 +3595,10 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
         (with-eval-after-load 'rde-keymaps
           (define-key rde-app-map (kbd "t") 'telega))
 
-        (with-eval-after-load
-         'telega
+        (with-eval-after-load 'telega
+          (require 'xdg)
+          (setq telega-directory
+                (expand-file-name "emacs/telega" (or (xdg-cache-home) "~/.cache")))
 
          ;; The real telega width will be 81
          (setq telega-chat-fill-column 70)
