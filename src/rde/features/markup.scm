@@ -14,9 +14,19 @@
   #:export (feature-markdown
             feature-tex))
 
+
+;;;
+;;; feature-markdown
+;;;
+
 (define* (feature-markdown
           #:key
-          (emacs-markdown-mode emacs-markdown-mode))
+          (emacs-markdown-mode emacs-markdown-mode)
+          (headings-scaling? #f))
+  "Configure rendering of Markdown files."
+  (ensure-pred file-like? emacs-markdown-mode)
+  (ensure-pred boolean? headings-scaling?)
+
   (define emacs-f-name 'markdown)
   (define f-name emacs-f-name)
 
@@ -27,11 +37,17 @@
         emacs-f-name
         config
         `(;; The package updates auto-mode-list automatically via autoloads
-          (with-eval-after-load
-           'markdown-mode
-           ;; TODO: Package js/css for prettier previews
-           (setq markdown-command ,(file-append pandoc "/bin/pandoc"))
-           (setq markdown-fontify-code-blocks-natively t)))
+          (with-eval-after-load 'markdown-mode
+            ,@(if headings-scaling?
+                  '((setq markdown-header-scaling t)
+                    (setq markdown-header-scaling-values
+                          '(1.2 1.1 1.1 1.0 1.0 0.9)))
+                  '())
+            (setq markdown-hide-urls t)
+            (setq markdown-hide-markup t)
+            ;; TODO: Package js/css for prettier previews
+            (setq markdown-command ,(file-append pandoc "/bin/pandoc"))
+            (setq markdown-fontify-code-blocks-natively t)))
         #:summary "\
 Markdown tweaks"
         #:commentary "\
