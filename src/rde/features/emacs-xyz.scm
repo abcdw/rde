@@ -1074,7 +1074,14 @@ path /sudo:HOST:/path if the user in sudoers.")))
                  "--group-directories-first"
                  ""))
        " "))
+    (define zip (get-value 'zip config (@ (gnu packages compression) zip)))
+    (define rsync (get-value 'rsync config (@ (gnu packages rsync) rsync)))
+
     (list
+     (simple-service
+      'add-dired-cli-utils
+      home-profile-service-type
+      (list zip rsync))
      (rde-elisp-configuration-service
       emacs-f-name
       config
