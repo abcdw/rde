@@ -912,8 +912,53 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
     (list
      (rde-elisp-configuration-service
       emacs-f-name
-     config
-      `((eval-when-compile (require 'tramp))
+      config
+      `((eval-when-compile
+         (require 'tramp)
+         (require 'cl-lib))
+        (defvar rde-tramp-map nil
+          "Map to bind `tramp' commands under.")
+        (define-prefix-command 'rde-tramp-map)
+
+        (defun rde-tramp--parse-sconfig-hosts ()
+          "Parse SSH configuration file and return a list of host definitions."
+          (when-let ((file (expand-file-name "~/.ssh/config")))
+            (with-temp-buffer
+              (insert-file-contents-literally file)
+              (goto-char (point-min))
+              (delete
+               nil
+               (cl-loop
+                while (not (eobp))
+                when (re-search-forward
+                      (rx bol (* space) "Host" space
+                          (group (+ (any "a-z" "A-Z" "0-9" "_.%*" "-"))))
+                      (pos-eol) t)
+                collect (match-string 1)
+                unless (> (skip-chars-forward "\t") 0)
+                do (forward-line 1))))))
+
+        (cl-defun rde-tramp-run (command &rest args &key thing &allow-other-keys)
+          "Execute COMMAND with ARGS in TRAMP session and manipulate remote THING."
+          (let* ((host (completing-read
+                        "SSH host: " (rde-tramp--parse-sconfig-hosts)))
+                 (read-thing
+                  (if thing
+                      (pcase thing
+                        (:directory (read-directory-name
+                                     (format "Directory (%s): " host)
+                                     (format "/-:%s:" host)))
+                        (:file (read-file-name
+                                (format "File (%s): " host)
+                                (format "/-:%s:" host))))
+                    (format "/-:%s:" host)))
+                 (default-directory read-thing))
+            (cond
+             ((and args thing)
+              (apply command read-thing (cddr args)))
+             (args (apply command args))
+             (t (funcall command)))))
+
         ,@(if (get-value 'emacs-consult-initial-narrowing? config)
               '((defvar rde-tramp-buffer-source
                   `(:name "Tramp"
@@ -929,6 +974,34 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
                   (add-to-list 'consult-buffer-sources
                                rde-tramp-buffer-source)))
             '())
+
+        (defun rde-tramp-shell (&optional arg)
+          "Open a shell buffer inside a TRAMP host with ARG."
+          (interactive "P")
+          (rde-tramp-run 'shell arg))
+
+        (defun rde-tramp-eshell (&optional arg)
+          "Open an eshell buffer inside a TRAMP host with ARG."
+          (interactive "P")
+          (rde-tramp-run 'eshell arg))
+
+        (defun rde-tramp-dired ()
+          "Open a Dired buffer inside a TRAMP host."
+          (interactive)
+          (rde-tramp-run 'dired :thing :directory))
+
+        (defun rde-tramp-find-file ()
+          "Open a file inside a TRAMP host."
+          (interactive)
+          (rde-tramp-run 'find-file :thing :file))
+
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,tramp-key) 'rde-tramp-map))
+        (let ((map rde-tramp-map))
+          (define-key map "f" 'rde-tramp-find-file)
+          (define-key map "d" 'rde-tramp-dired)
+          (define-key map "s" 'rde-tramp-shell)
+          (define-key map "e" 'rde-tramp-eshell))
 
         (with-eval-after-load 'tramp
           (setq tramp-verbose 1)
