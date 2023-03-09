@@ -897,8 +897,13 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-tramp)
-  "Configure tramp for emacs."
+(define* (feature-emacs-tramp
+          #:key
+          (default-method "ssh")
+          (tramp-key "R"))
+  "Configure TRAMP, a remote file editing tool for Emacs."
+  (ensure-pred string? default-method)
+  (ensure-pred string? tramp-key)
 
   (define emacs-f-name 'tramp)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -909,15 +914,15 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
       emacs-f-name
      config
       `((eval-when-compile (require 'tramp))
-        (with-eval-after-load
-         'tramp
-         ,#~";; Should be faster for small files."
-         (setq tramp-default-method "ssh")
-         ,#~";; Obtain remote machine's PATH from login shell."
-         (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
-         ,#~";; Allows to use /sudo:HOST:/path if the user in sudoers."
-         (set-default 'tramp-default-proxies-alist
-                      '((".*" "\\`root\\'" "/ssh:%h:")))))
+        (with-eval-after-load 'tramp
+          (setq tramp-verbose 1)
+          ,#~";; Should be faster for small files."
+          (setq tramp-default-method ,default-method)
+          ,#~";; Obtain remote machine's PATH from login shell."
+          (add-to-list 'tramp-remote-path 'tramp-own-remote-path)
+          ,#~";; Allows to use /sudo:HOST:/path if the user in sudoers."
+          (set-default 'tramp-default-proxies-alist
+                       '((".*" "\\`root\\'" "/ssh:%h:")))))
       #:summary "\
 Transparently accessing remote files from within Emacs."
       #:commentary "\
