@@ -1047,10 +1047,8 @@ path /sudo:HOST:/path if the user in sudoers.")))
           (emacs-all-the-icons-dired emacs-all-the-icons-dired)
           (emacs-dired-rsync emacs-dired-rsync)
           (kill-when-opening-new-buffer? #f)
-          (icons? #f)
           (group-directories-first? #f))
   (ensure-pred boolean? kill-when-opening-new-buffer?)
-  (ensure-pred boolean? icons?)
   (ensure-pred boolean? group-directories-first?)
   (ensure-pred file-like? emacs-dired-rsync)
 
@@ -1077,6 +1075,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
        " "))
     (define zip (get-value 'zip config (@ (gnu packages compression) zip)))
     (define rsync (get-value 'rsync config (@ (gnu packages rsync) rsync)))
+    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config))
 
     (list
      (simple-service
@@ -1087,20 +1086,19 @@ path /sudo:HOST:/path if the user in sudoers.")))
       emacs-f-name
       config
       `((eval-when-compile (require 'dired))
-        ,@(if icons?
-              '((eval-when-compile (require 'all-the-icons-dired)))
-              '())
         (with-eval-after-load
          'dired
+        ,@(if emacs-all-the-icons
+              '((add-hook 'dired-mode-hook 'all-the-icons-dired-mode)
+                (with-eval-after-load 'all-the-icons-dired
+                  (setq all-the-icons-dired-monochrome nil)))
+            '())
           (let ((map dired-mode-map))
             (define-key map (kbd "C-c C-r") 'dired-rsync))
          (setq dired-dwim-target t)
          (setq dired-listing-switches ,dired-listing-switches)
          ,@(if kill-when-opening-new-buffer?
                '((setq dired-kill-when-opening-new-dired-buffer t))
-               '())
-         ,@(if icons?
-               '((add-hook 'dired-mode-hook 'all-the-icons-dired-mode))
                '())
          ,@(if (get-value 'emacs-advanced-user? config)
                `((add-hook 'dired-mode-hook 'dired-hide-details-mode))
@@ -1114,7 +1112,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
                 "--exclude .git/ --exclude .gitignore -az --info=progress2 --delete")))
       #:elisp-packages (append
                         (list emacs-dired-rsync)
-                        (if icons?
+                        (if emacs-all-the-icons
                             (list emacs-all-the-icons-dired)
                             '()))
       #:summary "\
