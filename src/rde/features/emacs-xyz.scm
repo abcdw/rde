@@ -3560,7 +3560,8 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
 (define* (feature-emacs-telega
           #:key
           (emacs-telega emacs-telega)
-          (emacs-telega-contrib emacs-telega-contrib))
+          (emacs-telega-contrib emacs-telega-contrib)
+          (notify? #f))
   "Configure telega.el for GNU Emacs"
   (define emacs-f-name 'telega)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -3594,6 +3595,10 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
 
         (with-eval-after-load 'rde-keymaps
           (define-key rde-app-map (kbd "t") 'telega))
+
+        ,@(if notify?
+               '((add-hook 'telega-load-hook 'telega-notifications-mode))
+               '())
 
         (with-eval-after-load 'telega
           (require 'xdg)
