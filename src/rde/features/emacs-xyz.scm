@@ -1045,13 +1045,14 @@ path /sudo:HOST:/path if the user in sudoers.")))
 (define* (feature-emacs-dired
           #:key
           (emacs-all-the-icons-dired emacs-all-the-icons-dired)
+          (emacs-dired-rsync emacs-dired-rsync)
           (kill-when-opening-new-buffer? #f)
           (icons? #f)
           (group-directories-first? #f))
-  "Configure dired, the Emacs' directory browser and editor."
   (ensure-pred boolean? kill-when-opening-new-buffer?)
   (ensure-pred boolean? icons?)
   (ensure-pred boolean? group-directories-first?)
+  (ensure-pred file-like? emacs-dired-rsync)
 
   (define emacs-f-name 'dired)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1091,6 +1092,8 @@ path /sudo:HOST:/path if the user in sudoers.")))
               '())
         (with-eval-after-load
          'dired
+          (let ((map dired-mode-map))
+            (define-key map (kbd "C-c C-r") 'dired-rsync))
          (setq dired-dwim-target t)
          (setq dired-listing-switches ,dired-listing-switches)
          ,@(if kill-when-opening-new-buffer?
@@ -1104,10 +1107,16 @@ path /sudo:HOST:/path if the user in sudoers.")))
                '())
 
          (add-hook 'dired-mode-hook (lambda () (setq truncate-lines t)))
-         (setq dired-hide-details-hide-symlink-targets nil)))
-      #:elisp-packages `(,@(if icons?
-                               (list emacs-all-the-icons-dired)
-                               '()))
+         (setq dired-hide-details-hide-symlink-targets nil))
+
+        (with-eval-after-load 'dired-rsync
+          (setq dired-rsync-options
+                "--exclude .git/ --exclude .gitignore -az --info=progress2 --delete")))
+      #:elisp-packages (append
+                        (list emacs-dired-rsync)
+                        (if icons?
+                            (list emacs-all-the-icons-dired)
+                            '()))
       #:summary "\
 Configurations for emacs built-in file manager"
       #:commentary "\
