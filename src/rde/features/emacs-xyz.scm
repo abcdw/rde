@@ -3600,6 +3600,29 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
                '((add-hook 'telega-load-hook 'telega-notifications-mode))
                '())
 
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+              '((defvar rde-telega-buffer-source
+                        `(:name "Telega"
+                          :narrow ?t
+                          :category buffer
+                          :state ,'consult--buffer-state
+                          :items ,(lambda ()
+                                    (mapcar 'buffer-name
+                                            (rde-completion--mode-buffers
+                                             'telega-chat-mode
+                                             'telega-root-mode))))
+                        "Source for Telega buffers to be set in \
+`consult-buffer-sources'.")
+                (with-eval-after-load 'consult
+                  (add-to-list 'consult-buffer-sources
+                               rde-telega-buffer-source))
+                (with-eval-after-load 'rde-completion
+                  (add-to-list 'rde-completion-initial-narrow-alist
+                               '(telega-root-mode . ?t))
+                  (add-to-list 'rde-completion-initial-narrow-alist
+                               '(telega-chat-mode . ?t))))
+              '())
+
         (with-eval-after-load 'telega
           (require 'xdg)
           (setq telega-directory
