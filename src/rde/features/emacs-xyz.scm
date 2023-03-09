@@ -682,7 +682,9 @@ keybindings and adjust some minor settings."
             (setq all-the-icons-default-adjust 0)
             (setq all-the-icons-octicon-scale-factor 0.9))
           ,@(if emacs-completion
-                '((all-the-icons-completion-mode)
+                '((autoload 'all-the-icons-completion-mode
+                            "all-the-icons-completion")
+                  (all-the-icons-completion-mode)
                   (add-hook 'marginalia-mode-hook
                             'all-the-icons-completion-marginalia-setup))
                 '()))
