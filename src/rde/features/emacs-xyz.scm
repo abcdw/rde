@@ -108,7 +108,8 @@
             ;; Multimedia
             feature-emacs-dashboard
             feature-emacs-emms
-            feature-emacs-pulseaudio-control))
+            feature-emacs-pulseaudio-control
+            feature-emacs-webpaste))
 
 
 ;;;
@@ -4259,6 +4260,47 @@ System."))))
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-pulseaudio-control)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-webpaste
+          #:key
+          (emacs-webpaste emacs-webpaste)
+          (webpaste-providers '("bpa.st" "paste.mozilla.org" "ix.io"))
+          (webpaste-key "P"))
+  "Configure Webpaste.el, a mode to paste whole buffers or
+parts of buffers to pastebin-like services.
+WEBPASTE-PROVIDERS denotes the list of providers that will
+be used in descending order of priority."
+  (ensure-pred file-like? emacs-webpaste)
+  (ensure-pred list? webpaste-providers)
+  (ensure-pred string? webpaste-key)
+
+  (define emacs-f-name 'webpaste)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Webpaste."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((defvar rde-webpaste-map nil
+          "Map to bind `webpaste' commands under.")
+        (define-prefix-command 'rde-webpaste-map)
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,webpaste-key) 'rde-webpaste-map))
+        (let ((map rde-webpaste-map))
+          (define-key map "b" 'webpaste-paste-buffer)
+          (define-key map "r" 'webpaste-paste-region)
+          (define-key map "p" 'webpaste-paste-buffer-or-region))
+        (with-eval-after-load 'webpaste
+          (setq webpaste-provider-priority ',webpaste-providers)
+          (setq webpaste-paste-confirmation t)))
+      #:elisp-packages (list emacs-webpaste))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-webpaste)))
    (home-services-getter get-home-services)))
 
 ;;; emacs-xyz.scm end here
