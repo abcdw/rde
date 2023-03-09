@@ -569,11 +569,14 @@ Values are sourced from feature-fonts."
 
 (define* (feature-emacs-which-key
           #:key
-          (min-height 1))
+          (min-height 1)
+          (idle-delay 1.0))
   "Configure which-key. MIN-HEIGHT can be used to adjust the look of which-key
 popup, when there are not many items in it, can be easier to look through
-available options."
+available options.  IDLE-DELAY is the amount of seconds to wait for the
+which-key buffer to popup."
   (ensure-pred integer? min-height)
+  (ensure-pred number? idle-delay)
 
   (define emacs-f-name 'which-key)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -587,6 +590,7 @@ available options."
         (setq which-key-min-display-lines ,min-height)
         ;; … takes the space of two characters, which missaligns some popups
         (setq which-key-ellipsis "...")
+        (setq which-key-idle-delay ,idle-delay)
         (which-key-mode 1)
         (define-key global-map (kbd "C-h C-k") 'which-key-show-top-level))
       #:summary "\
