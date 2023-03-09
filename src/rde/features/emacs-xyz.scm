@@ -914,6 +914,22 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
       emacs-f-name
      config
       `((eval-when-compile (require 'tramp))
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+              '((defvar rde-tramp-buffer-source
+                  `(:name "Tramp"
+                          :narrow ?r
+                          :category buffer
+                          :state ,'consult--buffer-state
+                          :items ,(lambda ()
+                                    (mapcar 'buffer-name
+                                            (tramp-list-remote-buffers))))
+                  "Source for TRAMP buffers to be set in \
+`consult-buffer-sources'.")
+                (with-eval-after-load 'consult
+                  (add-to-list 'consult-buffer-sources
+                               rde-tramp-buffer-source)))
+            '())
+
         (with-eval-after-load 'tramp
           (setq tramp-verbose 1)
           ,#~";; Should be faster for small files."
