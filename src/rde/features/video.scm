@@ -23,6 +23,7 @@
   #:use-module (rde features predicates)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (rde features fontutils)
+  #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages video)
   #:use-module (gnu services)
   #:use-module (gnu home services)
@@ -35,12 +36,18 @@
 (define* (feature-mpv
           #:key
           (mpv mpv)
+          (emacs-mpv emacs-mpv)
+          (mpv-key "m")
           (extra-bindings '())
           (extra-mpv-conf '()))
-  "Setup and configure mpv."
+  "Setup and configure the mpv command-line player."
   (ensure-pred file-like? mpv)
+  (ensure-pred file-like? emacs-mpv)
   (ensure-pred alist? extra-mpv-conf)
   (ensure-pred alist? extra-bindings)
+  (ensure-pred string? mpv-key)
+
+  (define f-name 'mpv)
 
   (define (get-home-services config)
     (require-value 'fonts config)
@@ -53,17 +60,75 @@
        (package mpv)
        (bindings extra-bindings)
        (default-options
-         `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
-           (keep-open . #t)
-           (save-position-on-quit . #t)
-           (osd-font . ,font-sans-serif)
-           (sub-font . ,font-sans-serif)
-           ,@extra-mpv-conf))))))
+        `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
+          (keep-open . #t)
+          (save-position-on-quit . #t)
+          (osd-font . ,font-sans-serif)
+          (sub-font . ,font-sans-serif)
+          ,@extra-mpv-conf))))
+     (if (get-value 'emacs config)
+         (let ((emacs-embark (get-value 'emacs-embark config)))
+           (list
+            (rde-elisp-configuration-service
+             f-name
+             config
+             `((eval-when-compile
+                 (require 'mpv))
+               (defvar rde-mpv-map nil
+                 "Map to bind `mpv' commands under.")
+               (define-prefix-command 'rde-mpv-map)
 
-  (feature
-   (name 'mpv)
-   (values (make-feature-values mpv))
-   (home-services-getter get-home-services)))
+               (defun rde-mpv-seek-start ()
+                 "Seek to the start of the current MPV stream."
+                 (interactive)
+                 (mpv-seek 0))
+
+               (defun rde-mpv-playlist-shuffle ()
+                 "Toggle the shuffle state for the current playlist."
+                 (interactive)
+                 (mpv-run-command "playlist-shuffle"))
+
+               (defun rde-mpv-kill-path ()
+                 "Copy the path of the current mpv stream to the clibpoard."
+                 (interactive)
+                 (when-let* ((title (mpv-get-property "media-title"))
+                             (path (mpv-get-property "path")))
+                   (kill-new path)
+                   (message (format "Copied \"%s\" to the system clipboard"
+                                    title))
+                   path))
+
+               (with-eval-after-load 'rde-keymaps
+                 (define-key rde-app-map (kbd ,mpv-key) 'rde-mpv-map))
+               (let ((map rde-mpv-map))
+                 (define-key map (kbd "a") 'rde-mpv-seek-start)
+                 (define-key map (kbd "w") 'rde-mpv-kill-path)
+                 (define-key map (kbd "c") 'mpv-jump-to-chapter)
+                 (define-key map (kbd "l") 'mpv-jump-to-playlist-entry)
+                 (define-key map (kbd "n") 'mpv-playlist-next)
+                 (define-key map (kbd "p") 'mpv-playlist-prev)
+                 (define-key map (kbd "N") 'mpv-chapter-next)
+                 (define-key map (kbd "P") 'mpv-chapter-prev)
+                 (define-key map (kbd "f") 'mpv-seek-forward)
+                 (define-key map (kbd "b") 'mpv-seek-backward)
+                 (define-key map (kbd "q") 'mpv-quit)
+                 (define-key map (kbd "R") 'mpv-set-ab-loop)
+                 (define-key map (kbd "SPC") 'mpv-pause)
+                 (define-key map (kbd "r") 'mpv-toggle-loop)
+                 (define-key map (kbd "v") 'mpv-toggle-video)
+                 (put 'mpv-seek-forward 'repeat-map 'rde-mpv-map)
+                 (put 'mpv-seek-backward 'repeat-map 'rde-mpv-map)
+                 (put 'mpv-pause 'repeat-map 'rde-mpv-map))
+               (with-eval-after-load 'mpv
+                 (setq mpv-seek-step 3)))
+             #:elisp-packages (append
+                               (list emacs-mpv)))))
+      '())))
+
+    (feature
+     (name f-name)
+     (values (make-feature-values mpv emacs-mpv))
+     (home-services-getter get-home-services)))
 
 (define* (feature-youtube-dl
           #:key
