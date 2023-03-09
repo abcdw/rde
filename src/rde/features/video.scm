@@ -22,6 +22,7 @@
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (rde features fontutils)
   #:use-module (gnu packages video)
   #:use-module (gnu services)
   #:use-module (gnu home services)
@@ -40,6 +41,9 @@
   (ensure-pred alist? extra-mpv-conf)
 
   (define (get-home-services config)
+    (require-value 'fonts config)
+    (define font-sans-serif (font-name (get-value 'font-sans config)))
+
     (list
      (service
       home-mpv-service-type
@@ -49,6 +53,8 @@
          `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
            (keep-open . #t)
            (save-position-on-quit . #t)
+           (osd-font . ,font-sans-serif)
+           (sub-font . ,font-sans-serif)
            ,@extra-mpv-conf))))))
 
   (feature
