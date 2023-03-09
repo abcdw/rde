@@ -1080,8 +1080,15 @@ Small tweaks, xdg entry for openning directories in emacs client."
    (home-services-getter get-home-services)))
 
 ;; TODO: Integrate with eat https://codeberg.org/akib/emacs-eat
-(define* (feature-emacs-eshell)
+(define* (feature-emacs-eshell
+          #:key
+          (emacs-eshell-syntax-highlighting
+           emacs-eshell-syntax-highlighting)
+          (emacs-eshell-promt-extras emacs-eshell-prompt-extras))
   "Configure Eshell, the Emacs shell."
+  (ensure-pred file-like? emacs-eshell-syntax-highlighting)
+  (ensure-pred file-like? emacs-eshell-prompt-extras)
+
   (define emacs-f-name 'eshell)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
@@ -1110,9 +1117,17 @@ Small tweaks, xdg entry for openning directories in emacs client."
           (lambda ()
             (when (fboundp 'consult-history)
               (define-key eshell-hist-mode-map (kbd "M-r") 'consult-history))))
+          (autoload 'eshell-syntax-highlighting-global-mode
+                    "eshell-syntax-highlighting")
+          (eshell-syntax-highlighting-global-mode)
 
          ;;; <https://www.emacswiki.org/emacs/AnsiColor#h5o-2>
          (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
+
+         (with-eval-after-load 'em-prompt
+          (autoload 'epe-theme-lambda "eshell-prompt-extras")
+          (setq eshell-prompt-function 'epe-theme-lambda)
+          (setq eshell-highlight-prompt nil))
 
          (defun switch-to-prev-buffer-or-eshell (arg)
            (interactive "P")
@@ -1135,6 +1150,8 @@ Small tweaks, xdg entry for openning directories in emacs client."
 
             (define-key eshell-mode-map (kbd "s-e")
               'switch-to-prev-buffer-or-eshell)))))
+      #:elisp-packages (list emacs-eshell-syntax-highlighting
+                             emacs-eshell-prompt-extras)
       #:summary "\
 Eshell configurations, aliases, tweaks"
       #:commentary "\
