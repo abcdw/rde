@@ -63,6 +63,7 @@
             feature-emacs-calc
             feature-emacs-re-builder
             feature-emacs-comint
+            feature-emacs-help
 
             ;; Completion
             feature-emacs-completion
@@ -2948,6 +2949,57 @@ document.title, body: window.getSelection()});\" as a web bookmark."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-elfeed)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-help
+          #:key
+          (emacs-helpful emacs-helpful))
+  "Configure the help system in Emacs.  Set up Helpful, an alternative to the
+built-in help that provides much more contextual information."
+  (ensure-pred file-like? emacs-helpful)
+
+  (define emacs-f-name 'help)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to the Emacs help system."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((let ((map help-map))
+          (define-key map (vector 'remap 'describe-function) 'helpful-callable)
+          (define-key map (vector 'remap 'describe-variable) 'helpful-variable)
+          (define-key map (vector 'remap 'describe-key) 'helpful-key)
+          (define-key map (vector 'remap 'describe-command) 'helpful-command)
+          (define-key map (vector 'Info-goto-emacs-command-node)
+            'helpful-function)
+          (define-key map "o" 'helpful-at-point))
+        ,@(if (get-value 'emacs-embark config)
+              '((with-eval-after-load 'embark
+                  (define-key embark-symbol-map (vector 'remap 'describe-symbol)
+                    'helpful-symbol)
+                  (let ((map embark-become-help-map))
+                    (define-key map (vector 'remap 'describe-function)
+                      'helpful-callable)
+                    (define-key map (vector 'remap 'describe-variable)
+                      'helpful-variable)
+                    (define-key map (vector 'remap 'describe-symbol)
+                      'helpful-symbol)
+                    (define-key map (vector 'remap 'describe-command)
+                      'helpful-command))))
+              '())
+        (add-hook 'helpful-mode-hook 'visual-line-mode)
+        (with-eval-after-load 'helpful
+          (define-key helpful-mode-map "q" 'kill-this-buffer))
+        (with-eval-after-load 'help-mode
+          (define-key help-mode-map "q" 'kill-this-buffer)
+          (setq help-window-select t)))
+      #:elisp-packages (list emacs-helpful))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-helpful)))
    (home-services-getter get-home-services)))
 
 
