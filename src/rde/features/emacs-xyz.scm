@@ -2134,8 +2134,10 @@ on the current project."
         (add-hook 'project-find-functions 'project-try-vc)
         (add-hook 'project-find-functions 'rde-project-custom-root)
         (advice-add 'project-compile :override 'rde-project-compile)
+
+        (define-key global-map (kbd "s-p") project-prefix-map)
+
         (with-eval-after-load 'project
-          (define-key global-map (kbd "s-p") project-prefix-map)
           (require 'xdg)
           (setq project-switch-use-entire-map t)
           ,@(if (get-value 'emacs-consult config)
