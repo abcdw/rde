@@ -111,7 +111,9 @@
             feature-emacs-dashboard
             feature-emacs-emms
             feature-emacs-pulseaudio-control
-            feature-emacs-webpaste))
+            feature-emacs-webpaste
+            feature-emacs-display-wttr))
+
 
 
 ;;;
@@ -4455,6 +4457,40 @@ be used in descending order of priority."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-webpaste)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-display-wttr
+          #:key
+          (emacs-display-wttr emacs-display-wttr)
+          (wttr-format "%c %t")
+          (wttr-locations '())
+          (wttr-interval 3600))
+  "Configure the display of weather in Emacs.  If you don't provide
+WTTR-LOCATIONS you will get a weather report based on your IP address."
+  (ensure-pred file-like? emacs-display-wttr)
+  (ensure-pred string? wttr-format)
+  (ensure-pred list? wttr-locations)
+  (ensure-pred integer? wttr-interval)
+
+  (define emacs-f-name 'display-wttr)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to display-wttr."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((setq display-wttr-format ,wttr-format)
+        (setq display-wttr-locations ',wttr-locations)
+        (setq display-wttr-interval ,wttr-interval)
+        (autoload 'display-wttr-mode "display-wttr")
+        (display-wttr-mode))
+      #:elisp-packages (list emacs-display-wttr))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-display-wttr)))
    (home-services-getter get-home-services)))
 
 ;;; emacs-xyz.scm end here
