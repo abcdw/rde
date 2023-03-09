@@ -53,19 +53,28 @@
     (require-value 'fonts config)
     (define font-sans-serif (font-name (get-value 'font-sans config)))
 
-    (list
-     (service
-      home-mpv-service-type
-      (home-mpv-configuration
-       (package mpv)
-       (bindings extra-bindings)
-       (default-options
-        `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
-          (keep-open . #t)
-          (save-position-on-quit . #t)
-          (osd-font . ,font-sans-serif)
-          (sub-font . ,font-sans-serif)
-          ,@extra-mpv-conf))))
+    (append
+     (list
+      (service
+       home-mpv-service-type
+       (home-mpv-configuration
+        (package mpv)
+        (bindings extra-bindings)
+        (default-options
+         `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
+           (keep-open . #t)
+           (save-position-on-quit . #t)
+           (osd-font . ,font-sans-serif)
+           (sub-font . ,font-sans-serif)
+           ,@extra-mpv-conf))))
+      (simple-service
+       'add-mpv-mime-entries
+       home-xdg-mime-applications-service-type
+       (home-xdg-mime-applications-configuration
+        (default
+         '((video/mp4 . mpv.desktop)
+           (video/mkv . mpv.desktop)
+           (audio/mpeg . mpv.desktop))))))
      (if (get-value 'emacs config)
          (let ((emacs-embark (get-value 'emacs-embark config)))
            (list
