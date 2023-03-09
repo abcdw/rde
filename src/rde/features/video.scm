@@ -178,6 +178,78 @@ do with the file, and whether to add the file to the current PLAYLIST."
                                     title))
                    path))
 
+               ,@(if (get-value 'emacs-emms config)
+                     '((defun rde-mpv-kill ()
+                         "Kill mpv process unless it's `emms-player-mpv-proc'."
+                         (interactive)
+                         (require 'emms-player-mpv)
+                         (when (equal mpv--process
+                                      emms-player-mpv-proc)
+                           (emms-stop))
+                         (when mpv--queue
+                           (tq-close mpv--queue))
+                         (when (and (mpv-live-p)
+                                    (not (equal mpv--process
+                                                emms-player-mpv-proc)))
+                           (kill-process mpv--process))
+                         (with-timeout
+                             (0.5 (error "Failed to kill mpv"))
+                           (while (and (mpv-live-p)
+                                       (not (equal mpv--process
+                                                   emms-player-mpv-proc)))
+                             (sleep-for 0.05)))
+                         (setq mpv--process nil)
+                         (setq mpv--queue nil)
+                         (run-hooks 'mpv-finished-hook))
+
+                       (defun rde-mpv-connect-to-emms-proc ()
+                         "Connect to a running emms mpv process."
+                         (interactive)
+                         (setq mpv-playing-time-string "")
+                         (when (not (equal mpv--process
+                                           emms-player-mpv-proc))
+                           (mpv-kill))
+                         (setq mpv--process emms-player-mpv-proc)
+                         (set-process-query-on-exit-flag mpv--process nil)
+                         (set-process-sentinel
+                          mpv--process
+                          (lambda (p _e)
+                            (when (memq (process-status p) '(exit signal))
+                              (when (not (equal mpv--process
+                                                emms-player-mpv-proc))
+                                (mpv-kill))
+                              (run-hooks 'mpv-on-exit-hook))))
+                         (unless mpv--queue
+                           (setq mpv--queue
+                                 (tq-create
+                                  (make-network-process
+                                   :name "emms-mpv-socket"
+                                   :family 'local
+                                   :service emms-player-mpv-ipc-socket
+                                   :coding '(utf-8 . utf-8)
+                                   :noquery t
+                                   :filter 'emms-player-mpv-ipc-filter
+                                   :sentinel 'emms-player-mpv-ipc-sentinel)))
+                           (set-process-filter
+                            (tq-process mpv--queue)
+                            (lambda (_proc string)
+                              (ignore-errors
+                                (mpv--tq-filter mpv--queue string)))))
+                         (run-hooks 'mpv-on-start-hook)
+                         (run-hooks 'mpv-started-hook)
+                         t)
+
+                       (defun rde-mpv-connect-to-emms-on-startup (data)
+                         "Connect to the emms process with DATA."
+                         (interactive)
+                         (when (string= (alist-get 'event data) "start-file")
+                           (rde-mpv-connect-to-emms-proc)))
+
+                       (advice-add 'mpv-kill :override 'rde-mpv-kill)
+                       (add-hook 'emms-player-mpv-event-functions
+                                 'rde-mpv-connect-to-emms-on-startup))
+                   '())
+
                (with-eval-after-load 'rde-keymaps
                  (define-key rde-app-map (kbd ,mpv-key) 'rde-mpv-map))
                (let ((map rde-mpv-map))
