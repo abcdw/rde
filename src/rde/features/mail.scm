@@ -235,6 +235,7 @@ but it won't appear on the right Maildir directory."
               '())
 
         (with-eval-after-load 'message
+          (setq message-hidden-headers '())
           (setq message-kill-buffer-on-exit t)
           (setq message-signature
                 ,(match message-signature
