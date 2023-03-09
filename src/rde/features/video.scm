@@ -78,6 +78,60 @@
                  "Map to bind `mpv' commands under.")
                (define-prefix-command 'rde-mpv-map)
 
+               ,@(if (get-value 'emacs-ytdl config)
+                     '((eval-when-compile
+                         (require 'ytdl)
+                         (require 'cl-lib))
+                       (cl-defun rde-mpv-play-url (url &optional format
+                                                       &key
+                                                       audio repeat
+                                                       (formats t) (select t)
+                                                       playlist)
+                         "Play URL with `mpv-start'.
+You can specify whether to PLAY the file as AUDIO, if you want to be
+prompted for FORMATS or use FORMAT, to REPEAT the file, manually SELECT what to
+do with the file, and whether to add the file to the current PLAYLIST."
+                         (interactive "sURI: ")
+                         (let* ((sel-format
+                                 (or format (and formats
+                                                 (ytdl-select-format url))))
+                                (extra-args
+                                 (split-string
+                                  (concat
+                                   (format "--ytdl-format=%s"
+                                           (or sel-format "best"))
+                                   (and audio " --video=no")
+                                   (and repeat " --loop-file=inf")))))
+                           (if (and select (mpv-get-property "playlist"))
+                               (pcase (completing-read "Play or Enqueue: "
+                                                       '("Play" "Enqueue"))
+                                 ("Play" (apply 'mpv-start url extra-args))
+                                 ("Enqueue" (apply 'mpv-playlist-append-url url
+                                                   extra-args)))
+                             (if (and playlist (mpv-get-property "playlist"))
+                                 (apply 'mpv-playlist-append-url url extra-args)
+                               (apply 'mpv-start url extra-args)))))
+
+                       (defun rde-mpv-download ()
+                         "Download current mpv playback via `ytdl'."
+                         (interactive)
+                         (if-let* ((dl-type (ytdl--get-download-type))
+                                   (track (mpv-get-property "path"))
+                                   (title (mpv-get-property "media-title")))
+                             (ytdl--download-async
+                              track
+                              (expand-file-name title
+                                                (ytdl--eval-field (nth 1 dl-type)))
+                              (ytdl--eval-list (ytdl--eval-field (nth 2 dl-type)))
+                              'ignore
+                              (car dl-type))
+                           (error "Mpv is not currently active")))
+
+                       (let ((map rde-mpv-map))
+                         (define-key map (kbd "RET") 'rde-mpv-play-url)
+                         (define-key map (kbd "s") 'rde-mpv-download)))
+                     '())
+
                (defun rde-mpv-seek-start ()
                  "Seek to the start of the current MPV stream."
                  (interactive)
@@ -122,6 +176,8 @@
                (with-eval-after-load 'mpv
                  (setq mpv-seek-step 3)))
              #:elisp-packages (append
+                               (or (and=> (get-value 'emacs-ytdl config) list)
+                                   '())
                                (list emacs-mpv)))))
       '())))
 
