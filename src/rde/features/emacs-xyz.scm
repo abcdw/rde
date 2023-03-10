@@ -85,6 +85,7 @@
             feature-emacs-smartparens
             feature-emacs-eglot
             feature-emacs-flymake
+            feature-emacs-elisp
             feature-emacs-git
             feature-emacs-geiser
             feature-emacs-guix
@@ -2686,6 +2687,55 @@ Mostly workarounds and integratios with other packages."
           (let ((map flymake-mode-map))
             (define-key map (kbd "M-n") 'flymake-goto-next-error)
             (define-key map (kbd "M-p") 'flymake-goto-prev-error)))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-elisp
+          #:key
+          (ielm-key "I"))
+  "Configure tooling for Emacs Lisp, the programming
+language for GNU Emacs."
+  (ensure-pred string? ielm-key)
+
+  (define emacs-f-name 'elisp)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Emacs Lisp."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `(,@(if (get-value 'emacs-flymake config)
+              '((add-hook 'emacs-lisp-mode-hook 'flymake-mode))
+              '())
+        (with-eval-after-load 'elisp-mode
+          (let ((map emacs-lisp-mode-map))
+            (define-key map (kbd "C-x C-e") 'pp-eval-last-sexp)
+            (define-key map (kbd "M-:") 'pp-eval-expression)
+            (define-key map (kbd "C-c C-m") 'pp-macroexpand-last-sexp)
+            (define-key map (kbd "C-c C-b") 'eval-buffer)
+            ,@(if (get-value 'emacs-embark config)
+                  '((autoload 'embark-pp-eval-defun "embark")
+                    (define-key map (kbd "C-c C-c") 'embark-pp-eval-defun))
+                  '())))
+        (with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,ielm-key) 'ielm))
+        (with-eval-after-load 'ielm
+          (setq ielm-header "")
+          (setq ielm-noisy nil))
+        ,@(if (get-value 'emacs-org config)
+              '((with-eval-after-load 'org
+                  (add-to-list 'org-structure-template-alist
+                               '("el" . "src elisp")))
+                (with-eval-after-load 'ob-emacs-lisp
+                  (setq org-babel-default-header-args:elisp
+                        '((:lexical . "t")
+                          (:results . "scalar")))))
+              '())))))
 
   (feature
    (name f-name)
