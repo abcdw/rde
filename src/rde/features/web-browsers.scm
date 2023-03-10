@@ -31,7 +31,7 @@
 
 (define* (feature-ungoogled-chromium
           #:key
-          (ungoogled-chromium ungoogled-chromium)
+          (ungoogled-chromium ungoogled-chromium/wayland)
           (default-browser? #f)
           (startup-flags '()))
   "Configure the Chromium browser."
