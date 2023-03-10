@@ -55,14 +55,14 @@ release/rde-live-x86_64: target/rde-live.iso target/release
 	cp -df $< target/release/rde-live-${VERSION}-x86_64.iso
 	gpg -ab target/release/rde-live-${VERSION}-x86_64.iso
 
-minimal-emacs:
+minimal-emacs: guix
 	${GUIX} shell --pure -Df ./src/abcdw/minimal-emacs.scm \
 	-E '.*GTK.*|.*XDG.*|.*DISPLAY.*' \
 	--rebuild-cache -- emacs -q \
 	--eval "(load \"~/.config/emacs/early-init.el\")"
 	#--eval "(require 'feature-loader-portable)"
 
-minimal/home/build:
+minimal/home/build: guix
 	${GUIX} home build ./src/abcdw/minimal.scm
 
 clean-target:
