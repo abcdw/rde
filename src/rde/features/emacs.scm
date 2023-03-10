@@ -351,7 +351,11 @@ environment outside of Guix Home."
        (rde-elisp-configuration-service
         'rde-emacs
         config
-        `((require 'rde-keymaps)
+        `((defgroup rde nil
+            "Base customization group for rde."
+            :group 'external
+            :prefix 'rde-)
+          (require 'rde-keymaps)
 
           (setq native-comp-deferred-compilation nil)
 
