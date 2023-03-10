@@ -55,6 +55,8 @@ release/rde-live-x86_64: target/rde-live.iso target/release
 	cp -df $< target/release/rde-live-${VERSION}-x86_64.iso
 	gpg -ab target/release/rde-live-${VERSION}-x86_64.iso
 
+minimal/home/build:
+	${GUIX} home build ./src/abcdw/minimal.scm
 
 clean-target:
 	rm -rf ./target
