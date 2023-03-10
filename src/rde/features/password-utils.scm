@@ -41,7 +41,7 @@
           (pass-key "p")
           (consult-pass-key "M-g P")
           (remote-password-store-url #f)
-          (password-store-directory "~/.local/var/lib/password-store")
+          (password-store-directory "$HOME/.local/var/lib/password-store")
           (default-pass-prompt? #t))
   "Setup and configure password manager."
   ;; (ensure-pred maybe-url? remote-password-store-url)
