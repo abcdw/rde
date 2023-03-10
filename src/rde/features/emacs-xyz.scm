@@ -55,6 +55,7 @@
 
             ;; Generic
             feature-emacs-input-methods
+            feature-emacs-battery
             feature-emacs-time
             feature-emacs-calendar
             feature-emacs-tramp
@@ -766,6 +767,51 @@ by mapping characters to default emacs keybindings."
       #:keywords '(convenience faces)
       #:elisp-packages `(,@(if enable-reverse-im (list emacs-reverse-im) '())
                          ,@input-method-packages))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-battery
+          #:key
+          (battery-format "%b%p%% "))
+  "Configure the display of battery status in Emacs."
+  (ensure-pred string? battery-format)
+
+  (define emacs-f-name 'battery)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Battery mode."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `(,@(if (get-value 'emacs-all-the-icons config)
+              '((defun rde-battery-add-unicode-indicator (data)
+                  "Add a unicode indicator to the battery status."
+                  (let* ((bat (car (read-from-string (cdr (assq ?p data)))))
+                         (index (cl-position-if
+                                 (lambda (e)
+                                   (> bat e))
+                                 '(75 50 25 10 -1)))
+                         (symbol
+                          (nth index
+                               (list
+                                (all-the-icons-faicon "battery-full")
+                                (all-the-icons-faicon "battery-three-quarters")
+                                (all-the-icons-faicon "battery-half")
+                                (all-the-icons-faicon "battery-quarter")
+                                (all-the-icons-faicon "battery-empty")))))
+                    (setq battery-mode-line-string
+                          (format "%s %s" symbol battery-mode-line-string))))
+                (add-hook 'battery-update-functions
+                          'rde-battery-add-unicode-indicator))
+              '())
+
+        (setq battery-mode-line-format ,battery-format)
+        (display-battery-mode)))))
 
   (feature
    (name f-name)
