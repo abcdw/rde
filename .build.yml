@@ -7,7 +7,6 @@ tasks:
   - check: |
       cd rde
       make check
-  # # It takes too much time rn.
-  # - build-example-home: |
-  #     cd rde
-  #     make examples/ixy/home/build
+  - build-minimal-example-home: |
+      cd rde/examples
+      make minimal/home/build
