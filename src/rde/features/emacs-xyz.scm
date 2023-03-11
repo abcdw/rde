@@ -2950,6 +2950,10 @@ Geiser is configured for the Guile scheme implementation.")))
             (global-guix-prettify-mode 1)
             (add-hook 'after-init-hook 'global-guix-prettify-mode))
 
+        (with-eval-after-load 'daemons
+          (setq daemons-init-system-submodules '(daemons-shepherd))
+          (setq daemons-always-sudo nil))
+
         (with-eval-after-load
          'guix
          (if ,guix-directory
@@ -2957,7 +2961,8 @@ Geiser is configured for the Guile scheme implementation.")))
              '()))
 
         (global-set-key (kbd ,guix-key) 'guix))
-      #:elisp-packages (list emacs-guix)
+      #:elisp-packages (list emacs-guix
+                             emacs-daemons)
       #:summary "\
 Configure emacs for guix usage and development."
       #:commentary "\
