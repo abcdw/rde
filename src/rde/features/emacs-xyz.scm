@@ -2878,6 +2878,11 @@ Almost all other operations are covered by magit."
       emacs-f-name
       config
       `((with-eval-after-load 'geiser-repl
+          (require 'xdg)
+          (setq geiser-repl-query-on-kill-p nil)
+          (setq geiser-repl-history-filename
+                (expand-file-name "emacs/geiser_history"
+                                  (or (xdg-cache-home) "~/.cache")))
           (setq geiser-repl-add-project-paths nil))
         (with-eval-after-load 'geiser-impl
           (setq geiser-default-implementation 'guile)
