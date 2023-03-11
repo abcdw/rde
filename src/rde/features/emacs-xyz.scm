@@ -1140,11 +1140,13 @@ path /sudo:HOST:/path if the user in sudoers.")))
       config
       `((eval-when-compile (require 'dired))
 
-        (defun rde-dired-open-externally ()
-          "Open files in Dired through their corresponding external program."
-          (interactive)
-          (let ((files (dired-get-marked-files)))
-            (mapc 'consult-file-externally files)))
+        ,@(if (get-value 'emacs-embark config)
+              '((defun rde-dired-open-externally ()
+                  "Open marked files in Dired through an external program."
+                  (interactive)
+                  (let ((files (dired-get-marked-files)))
+                    (mapc 'embark-open-externally files))))
+              '())
 
         (define-key global-map (kbd "s-d") 'dired-jump)
         (with-eval-after-load 'dired
