@@ -1145,7 +1145,9 @@ path /sudo:HOST:/path if the user in sudoers.")))
                   "Open marked files in Dired through an external program."
                   (interactive)
                   (let ((files (dired-get-marked-files)))
-                    (mapc 'embark-open-externally files))))
+                    (mapc 'embark-open-externally files)))
+                (with-eval-after-load 'dired
+                  (define-key dired-mode-map "V" 'rde-dired-open-externally)))
               '())
 
         (define-key global-map (kbd "s-d") 'dired-jump)
@@ -1157,8 +1159,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
                 '())
           (let ((map dired-mode-map))
             (define-key map (kbd "C-c C-r") 'dired-rsync)
-            (define-key map "q" 'kill-current-buffer)
-            (define-key map "V" 'rde-dired-open-externally))
+            (define-key map "q" 'kill-current-buffer))
          (setq dired-dwim-target t)
          (setq dired-listing-switches ,dired-listing-switches)
          ,@(if kill-when-opening-new-buffer?
