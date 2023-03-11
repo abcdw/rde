@@ -2887,7 +2887,17 @@ Almost all other operations are covered by magit."
         (with-eval-after-load 'geiser-impl
           (setq geiser-default-implementation 'guile)
           (setq geiser-active-implementations '(guile))
-          (setq geiser-implementations-alist '(((regexp "\\.scm$") guile)))))
+          (setq geiser-implementations-alist '(((regexp "\\.scm$") guile))))
+        ,@(if (get-value 'emacs-org config)
+              '((with-eval-after-load 'org
+                  (add-to-list 'org-structure-template-alist
+                               '("sc" . "src scheme")))
+                (with-eval-after-load 'ob-core
+                  (require 'ob-scheme))
+                (with-eval-after-load 'ob-scheme
+                  (setq org-babel-default-header-args:scheme
+                        '((:results . "scalar")))))
+              '()))
       #:elisp-packages
       (list emacs-geiser emacs-geiser-guile)
       #:summary "\
