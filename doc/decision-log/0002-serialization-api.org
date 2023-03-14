@@ -1,0 +1,27 @@
+#+TITLE: Serialization API
+#+Date: 2023-03-13
+
+* Status
+RFC by 2023-03-20
+
+* Context
+Many different home services and some other modules use same target
+configuration format and it seems logical to extract serialization to a
+separate module, in rde we have (rde serializers ...).
+
+All of them have slightly different number of functions exposed with slightly
+different return values, and to make it more consistent it's necessary to
+define a shared API.
+
+* Decision
+For each serializer module we will provide:
+
+- FORMAT-serialize :: a public function returning a g-expression, which
+  produce a string being written to configuration file.
+- FORMAT-merge :: a public function taking two or more configurations and
+  merging them into one with respect to underlying format.
+- FORMAT-config? :: a public function for checking if provided data looks
+  suitable for this format.
+
+* Consequences
+We get unified API across serializers modules.
