@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -36,9 +36,11 @@
 
 (define* (feature-compile
           #:key
-          (make gnu-make))
+          (make gnu-make)
+          (recompile-key "s-r"))
   "Configure compilation tooling."
   (ensure-pred file-like? make)
+  (ensure-pred string? recompile-key)
 
   (define f-name 'compile)
 
@@ -57,7 +59,9 @@
           (interactive)
           (ansi-color-apply-on-region (point-min) (point-max)))
 
-        (define-key global-map (kbd "s-r") 'recompile)
+        (autoload 'recompile "compile")
+        (define-key global-map (kbd ,recompile-key) 'recompile)
+
         (add-hook 'compilation-mode-hook 'toggle-truncate-lines)
         (add-hook 'compilation-filter-hook 'rde-compile-ansi-color-apply)
         (with-eval-after-load 'compile
