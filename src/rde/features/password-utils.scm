@@ -74,8 +74,11 @@
            home-state-service-type
            (list
             (state-git
-            ;;; TODO: Rewrite it to xdg-state-home or rework states.
-             password-store-directory
+             ;; TODO: Update the implementation of rde states
+             ;; FIXME: It's a workaround, don't reuse it anywhere
+             ((@ (ice-9 string-fun) string-replace-substring)
+              password-store-directory
+              "$HOME" (get-value 'home-directory config))
              remote-password-store-url)))
           (simple-service
            'add-password-store-extensions
