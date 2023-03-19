@@ -5,6 +5,7 @@
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022, 2023 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2022, 2023 conses <contact@conses.eu>
+;;; Copyright © 2023 Benoit Joly <benoit@benoitj.ca>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -108,6 +109,7 @@
             feature-emacs-spelling
             feature-emacs-org-recur
             feature-emacs-graphviz
+            feature-emacs-denote
 
             ;; Communication
             feature-emacs-telega
@@ -4297,6 +4299,117 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
    (name f-name)
    (values `((,f-name . ,emacs-graphviz-dot-mode)))
    (home-services-getter get-home-services)))
+
+(define* (feature-emacs-denote
+          #:key
+          (emacs-denote emacs-denote)
+          (denote-key "N")
+          (denote-directory #f)
+          (denote-prompts '(title keywords))
+          (denote-file-type 'org)
+          (denote-date-prompt-use-org? #t)
+          (denote-dired-hook 'denote-dired-mode-in-directories))
+  "Configure denote, Prot's great note taking package."
+  (ensure-pred file-like? emacs-denote)
+  (ensure-pred maybe-string? denote-key)
+  (ensure-pred path? denote-directory)
+  (ensure-pred list? denote-prompts)
+  (ensure-pred symbol? denote-file-type)
+  (ensure-pred boolean? denote-date-prompt-use-org?)
+  (ensure-pred symbol? denote-dired-hook)
+
+  (define emacs-f-name 'denote)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to denote."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile
+         (require 'denote))
+
+        (setq denote-directory (expand-file-name ,denote-directory))
+        (setq denote-prompts ',denote-prompts)
+
+        (setq denote-known-keywords '())
+        (setq denote-infer-keywords t)
+        (setq denote-sort-keywords t)
+        (setq denote-file-type ',denote-file-type)
+
+        (setq denote-excluded-keywords-regexp nil)
+        (setq denote-excluded-directories-regexp nil)
+
+        ,@(if denote-date-prompt-use-org?
+              '((setq denote-date-prompt-use-org-read-date t))
+              '((setq denote-date-prompt-use-org-read-date nil)))
+
+
+        ,@(if (member denote-file-type '(text markdown-toml markdown-yaml))
+              '((add-hook 'find-file-hook 'denote-link-buttonize-buffer))
+              '())
+
+        (setq denote-dired-directories (list denote-directory))
+
+        (with-eval-after-load 'dired
+          (add-hook 'dired-mode-hook ',denote-dired-hook))
+
+        (defun rde-denote-project-find-file (&optional note-dir)
+          "Denote find-file using project.el's find-file.
+When NOTE-DIR is not set, uses denote-directory, otherwise uses the specified
+NOTE-DIR as the notes project directory. The command assumes your notes are
+stored in directory understood by project.el."
+          (interactive)
+          (let* ((pr (project-current t (or note-dir denote-directory)))
+                 (root (project-root pr))
+                 (dirs (list root)))
+            (project-find-file-in nil dirs pr nil)))
+
+        (defun rde-find-denote ()
+          "find-file on denote directory"
+          (interactive)
+          (find-file denote-directory))
+
+        (defvar denote-mode-map
+          (let ((map (make-sparse-keymap)))
+            (define-key map (kbd "n") 'denote)
+            (define-key map (kbd "N t") 'denote-type)
+            (define-key map (kbd "N d") 'denote-date)
+            (define-key map (kbd "N s") 'denote-subdirectory)
+
+            (define-key map (kbd "i") 'denote-link)
+            (define-key map (kbd "I") 'denote-link-add-links)
+            (define-key map (kbd "b") 'denote-link-backlinks)
+            (define-key map (kbd "d") 'rde-find-denote)
+            (define-key map (kbd "f") 'rde-denote-project-find-file)
+            (define-key map (kbd "l f") 'denote-link-find-file)
+            (define-key map (kbd "l b") 'denote-link-find-backlink)
+            (define-key map (kbd "r") 'denote-rename-file)
+            (define-key map (kbd "R") 'denote-rename-file-using-front-matter)
+            map)
+          "Keymap for binding denote functionality.")
+
+        ,@(if denote-key
+              `((define-key mode-specific-map
+                  (kbd ,denote-key) denote-mode-map))
+              '())
+
+        (with-eval-after-load
+            'dired
+          (let ((map dired-mode-map))
+            (define-key map (kbd "C-c C-d C-i")
+              'denote-link-dired-marked-notes)
+            (define-key map (kbd "C-c C-d C-r")
+              'denote-dired-rename-marked-files))))
+
+      #:keywords '(convenience)
+      #:elisp-packages (list emacs-denote))))
+
+    (feature
+     (name f-name)
+     (values `((,f-name . ,emacs-denote)))
+     (home-services-getter get-home-services)))
 
 
 ;;;
