@@ -29,32 +29,7 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-next-pgtk-stable
-  (let ((commit "ac7ec87a7a0db887e4ae7fe9005aea517958b778")
-        (revision "6"))
-    (package
-      (inherit emacs)
-      (name "emacs-next-pgtk-stable")
-      (version (git-version "30.0.50" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/emacs-mirror/emacs")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (patches (search-patches "emacs-pgtk-super-key-fix.patch"
-                                  "emacs-exec-path.patch"
-                                  "emacs-fix-scheme-indent-function.patch"
-                                  "emacs-native-comp-driver-options.patch"))
-         (sha256
-          (base32
-           "1akq6dbllwwqwx21wnwnv6aax1nsi2ypbd7j3i79sw62s3gf399z"))))
-      (arguments
-       (substitute-keyword-arguments (package-arguments emacs-next)
-         ((#:configure-flags flags ''())
-          `(cons* "--with-pgtk" ,flags))))
-      (inputs
-       (package-inputs emacs-next-tree-sitter)))))
+  emacs-next-pgtk)
 
 (define-public emacs-next-pgtk-latest emacs-next-pgtk-stable)
 
