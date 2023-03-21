@@ -1204,8 +1204,11 @@ Small tweaks, xdg entry for openning directories in emacs client."
 ;; TODO: Integrate with eat https://codeberg.org/akib/emacs-eat
 (define* (feature-emacs-eshell
           #:key
+          (emacs-eshell-syntax-highlighting
+           emacs-eshell-syntax-highlighting)
           (emacs-eshell-promt-extras emacs-eshell-prompt-extras))
   "Configure Eshell, the Emacs shell."
+  (ensure-pred file-like? emacs-eshell-syntax-highlighting)
   (ensure-pred file-like? emacs-eshell-prompt-extras)
 
   (define emacs-f-name 'eshell)
@@ -1256,6 +1259,9 @@ Small tweaks, xdg entry for openning directories in emacs client."
         (add-hook 'eshell-mode-hook 'rde-eshell-mode-setup)
         (with-eval-after-load 'eshell
           (setq eshell-banner-message "")
+          (autoload 'eshell-syntax-highlighting-global-mode
+                    "eshell-syntax-highlighting")
+          (eshell-syntax-highlighting-global-mode)
 
           ,@(if (get-value 'emacs-consult config)
                 '((add-hook
@@ -1278,7 +1284,8 @@ Small tweaks, xdg entry for openning directories in emacs client."
            (if arg
                (eshell arg)
                (switch-to-buffer (other-buffer (current-buffer) 1))))))
-      #:elisp-packages (list emacs-eshell-prompt-extras)
+      #:elisp-packages (list emacs-eshell-syntax-highlighting
+                             emacs-eshell-prompt-extras)
       #:summary "\
 Eshell configurations, aliases, tweaks"
       #:commentary "\
