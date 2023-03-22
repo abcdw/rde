@@ -155,25 +155,7 @@
       (description "This package provides utilities for formatting and
 sending Git patches via Email, without leaving Emacs."))))
 
-(define-public emacs-transient-latest
-  (let ((commit "72d30284ab75c1497e23be310dcc53a4ecefa401")
-        (revision "0"))
-    (package
-      (inherit emacs-transient)
-      (name "emacs-transient")
-      (version (git-version "0.3.7" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/magit/transient")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "0qilxy1kmsfr0j177ic7nhyh4lq7s88455bs9iv9j48qrjf7wwcl"))))
-      (propagated-inputs
-       (modify-inputs (package-propagated-inputs emacs-transient)
-         (append emacs-compat))))))
+(define-public emacs-transient-latest emacs-transient)
 
 (define-public emacs-git-gutter-transient
   (package
@@ -209,12 +191,7 @@ to manipulate and navigate hunks.")))
      (modify-inputs (package-propagated-inputs emacs-consult-eglot)
        (delete "emacs-eglot")))))
 
-(define-public emacs-dirvish-latest
-  (package
-    (inherit emacs-dirvish)
-    (propagated-inputs
-     (modify-inputs (package-propagated-inputs emacs-dirvish)
-       (replace "emacs-transient" emacs-transient-latest)))))
+(define-public emacs-dirvish-latest emacs-dirvish)
 
 (define-public emacs-docker-latest
   (let ((commit "cc0046e6a557dce0ccc4108dd22e04f21ba8b0dc")
