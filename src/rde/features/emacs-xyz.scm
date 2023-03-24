@@ -2871,7 +2871,8 @@ Almost all other operations are covered by magit."
 (define* (feature-emacs-geiser
           #:key
           (emacs-geiser emacs-geiser)
-          (emacs-geiser-guile emacs-geiser-guile))
+          (emacs-geiser-guile emacs-geiser-guile)
+          (emacs-geiser-eros emacs-geiser-eros))
   "Configure geiser for emacs."
   (ensure-pred file-like? emacs-geiser)
   (ensure-pred file-like? emacs-geiser-guile)
@@ -2891,6 +2892,8 @@ Almost all other operations are covered by magit."
                 (expand-file-name "emacs/geiser_history"
                                   (or (xdg-cache-home) "~/.cache")))
           (setq geiser-repl-add-project-paths nil))
+        (with-eval-after-load 'geiser-mode
+          (geiser-eros-mode))
         (with-eval-after-load 'geiser-impl
           (setq geiser-default-implementation 'guile)
           (setq geiser-active-implementations '(guile))
@@ -2906,7 +2909,7 @@ Almost all other operations are covered by magit."
                         '((:results . "scalar")))))
               '()))
       #:elisp-packages
-      (list emacs-geiser emacs-geiser-guile)
+      (list emacs-geiser emacs-geiser-guile emacs-geiser-eros)
       #:summary "\
 Scheme interpreter, giving access to a REPL and live metadata."
       #:commentary "\
