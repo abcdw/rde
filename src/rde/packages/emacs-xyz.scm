@@ -167,8 +167,7 @@ sending Git patches via Email, without leaving Emacs."))))
    (inputs
     `(("emacs-magit" ,emacs-magit)))
    (propagated-inputs
-    `(("emacs-git-gutter" ,emacs-git-gutter)
-      ("emacs-transient" ,emacs-transient-latest)))
+    `(("emacs-git-gutter" ,emacs-git-gutter)))
    (license license:gpl3+)
    (home-page "https://sr.ht/~abcdw/git-gutter-transient")
    (synopsis "Navigate, stage and revert hunks with ease")
@@ -229,5 +228,4 @@ to manipulate and navigate hunks.")))
           (base32 "11l8jpqj6m04ndhnfz41nhph1rqjvqbfd5vw334mph776aq1baln"))))
       (propagated-inputs
        (modify-inputs (package-propagated-inputs emacs-docker)
-         (delete "emacs-docker-tramp")
-         (append emacs-transient-latest))))))
+         (delete "emacs-docker-tramp"))))))
