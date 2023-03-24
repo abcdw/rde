@@ -2874,11 +2874,14 @@ Almost all other operations are covered by magit."
 (define* (feature-emacs-geiser
           #:key
           (emacs-geiser emacs-geiser)
+          (emacs-gider emacs-gider)
           (emacs-geiser-guile emacs-geiser-guile)
           (emacs-geiser-eros emacs-geiser-eros))
   "Configure geiser for emacs."
   (ensure-pred file-like? emacs-geiser)
+  (ensure-pred file-like? emacs-gider)
   (ensure-pred file-like? emacs-geiser-guile)
+  (ensure-pred file-like? emacs-geiser-eros)
 
   (define emacs-f-name 'geiser)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -2896,11 +2899,13 @@ Almost all other operations are covered by magit."
                                   (or (xdg-cache-home) "~/.cache")))
           (setq geiser-repl-add-project-paths nil))
         (with-eval-after-load 'geiser-mode
-          (geiser-eros-mode))
+          (geiser-eros-mode)
+          (gider-mode))
         (with-eval-after-load 'geiser-impl
           (setq geiser-default-implementation 'guile)
           (setq geiser-active-implementations '(guile))
           (setq geiser-implementations-alist '(((regexp "\\.scm$") guile))))
+
         ,@(if (get-value 'emacs-org config)
               '((with-eval-after-load 'org
                   (add-to-list 'org-structure-template-alist
@@ -2912,7 +2917,7 @@ Almost all other operations are covered by magit."
                         '((:results . "scalar")))))
               '()))
       #:elisp-packages
-      (list emacs-geiser emacs-geiser-guile emacs-geiser-eros)
+      (list emacs-geiser emacs-geiser-guile emacs-geiser-eros emacs-gider)
       #:summary "\
 Scheme interpreter, giving access to a REPL and live metadata."
       #:commentary "\
