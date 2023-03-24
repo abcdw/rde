@@ -1176,8 +1176,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
          (setq delete-by-moving-to-trash nil)
          (setq dired-recursive-deletes 'always)
          (setq dired-clean-confirm-killing-deleted-buffers nil)
-         (setq dired-recursive-copies 'always)
-         (setq dired-deletion-confirmer 'y-or-n-p))
+         (setq dired-recursive-copies 'always))
 
         (with-eval-after-load 'dired-rsync
           (setq dired-rsync-options
