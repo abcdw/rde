@@ -1789,6 +1789,9 @@ Annotations for completion candidates using marginalia."
           (emacs-vertico emacs-vertico)
           (completion-in-region? #t))
   "Configure vertico completion UI for GNU Emacs."
+  (ensure-pred file-like? emacs-vertico)
+  (ensure-pred boolean? completion-in-region?)
+
   (define emacs-f-name 'vertico)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
