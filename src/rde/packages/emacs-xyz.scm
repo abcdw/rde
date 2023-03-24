@@ -192,6 +192,44 @@ to manipulate and navigate hunks.")))
     (synopsis "Guile Interactive Development Enviroment")
     (description "Right now it's just a few helpers on top of geiser.")))
 
+(define-public emacs-geiser-latest
+  (let ((commit "bd12f2dc6c5949e260f094fb60737498cd0ae9a5")
+        (revision "1"))
+    (package
+      (inherit emacs-geiser)
+      (name "emacs-geiser")
+      (version (git-version "0.28.2" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://gitlab.com/emacs-geiser/geiser")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "16qi3vk1yps4f5v98ipdl5kq0jq5qlnlpx8c598csj9yk86p1hsw")))))))
+
+(define-public emacs-geiser-guile-latest
+  ((package-input-rewriting/spec
+    `(("emacs-geiser" . ,(const emacs-geiser-latest))))
+   emacs-geiser-guile))
+
+(define-public emacs-geiser-eros-latest
+  ((package-input-rewriting/spec
+    `(("emacs-geiser" . ,(const emacs-geiser-latest))))
+   emacs-geiser-eros))
+
+(define-public emacs-gider-latest
+  ((package-input-rewriting/spec
+    `(("emacs-geiser" . ,(const emacs-geiser-latest))
+      ("emacs-geiser-guile" . ,(const emacs-geiser-guile-latest))))
+   emacs-gider))
+
+(define-public emacs-guix-latest
+  ((package-input-rewriting/spec
+    `(("emacs-geiser" . ,(const emacs-geiser-latest))))
+   emacs-guix))
+
 (define-public emacs-telega-server-latest emacs-telega-server)
 
 (define-public emacs-telega-latest emacs-telega)
