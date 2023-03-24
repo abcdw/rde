@@ -2873,10 +2873,10 @@ Almost all other operations are covered by magit."
 
 (define* (feature-emacs-geiser
           #:key
-          (emacs-geiser emacs-geiser)
-          (emacs-gider emacs-gider)
-          (emacs-geiser-guile emacs-geiser-guile)
-          (emacs-geiser-eros emacs-geiser-eros))
+          (emacs-geiser emacs-geiser-latest)
+          (emacs-gider emacs-gider-latest)
+          (emacs-geiser-guile emacs-geiser-guile-latest)
+          (emacs-geiser-eros emacs-geiser-eros-latest))
   "Configure geiser for emacs."
   (ensure-pred file-like? emacs-geiser)
   (ensure-pred file-like? emacs-gider)
@@ -2930,7 +2930,7 @@ Geiser is configured for the Guile scheme implementation.")))
 
 (define* (feature-emacs-guix
           #:key
-          (emacs-guix emacs-guix)
+          (emacs-guix emacs-guix-latest)
           (guix-key "s-G")
           (guix-directory "~/work/gnu/guix"))
   "Configure emacs for guix usage and development."
