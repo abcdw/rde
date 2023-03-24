@@ -175,6 +175,24 @@ sending Git patches via Email, without leaving Emacs."))))
    (description "This package provides transient interface for git-gutter function
 to manipulate and navigate hunks.")))
 
+(define-public emacs-gider
+  (package
+    (name "emacs-gider")
+    (version "0.1.0")
+    (source
+     (local-file "../../../files/emacs/gider" #:recursive? #t))
+    (arguments
+     (list
+      #:exclude #~(list "^\\.dir-locals\\.el$" "^test/")
+      #:include #~(cons "^src/" %default-include)))
+    (build-system emacs-build-system)
+    (propagated-inputs
+     (list emacs-geiser emacs-geiser-guile))
+    (license license:gpl3+)
+    (home-page "https://sr.ht/~abcdw/rde")
+    (synopsis "Guile Interactive Development Enviroment")
+    (description "Right now it's just a few helpers on top of geiser.")))
+
 (define-public emacs-telega-server-latest emacs-telega-server)
 
 (define-public emacs-telega-latest emacs-telega)
