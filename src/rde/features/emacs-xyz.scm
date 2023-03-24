@@ -140,6 +140,10 @@
 ;; removed and done by extending imenu with feature category information.
 (define --UI--)
 
+;; TODO: Take a look at nano-emacs and maybe incorporate some ideas from it
+;; https://github.com/rougier/nano-emacs
+;; MAYBE: Use doom-nano-modeline
+;; https://github.com/ronisbr/doom-nano-modeline
 (define* (feature-emacs-appearance
           #:key
           (margin 8)
@@ -2401,6 +2405,8 @@ adjustments."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+;; TODO: Migrate to beframe
+;; <https://git.sr.ht/~protesilaos/beframe/tree/main/item/beframe.el>
 (define* (feature-emacs-perspective
           #:key
           (emacs-perspective emacs-perspective)
