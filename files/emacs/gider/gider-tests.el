@@ -1,4 +1,4 @@
-;;; rde-tests.el --- Tools for running rde tests -*- lexical-binding:t; coding:utf-8 -*-
+;;; gider-tests.el --- Tools for running rde tests -*- lexical-binding:t; coding:utf-8 -*-
 
 ;; Copyright © 2023 Andrew Tropin <andrew@trop.in>
 
@@ -41,15 +41,6 @@
 (defvar gider-scheme-dir
   (expand-file-name "src" (file-name-directory load-file-name))
   "Directory where the scheme gider modules are installed.")
-
-;;;###autoload
-(define-minor-mode gider-mode
-  "Enable gider things."
-  :global t
-  :group 'geiser
-  (if gider-mode
-      (add-to-list 'geiser-guile-load-path gider-scheme-dir)
-    (delete gider-scheme-dir geiser-guile-load-path)))
 
 (defun gider--summary-to-string (summary)
   (let ((pair-to-string (lambda (x) (format "%s: %s" (car x) (cdr x)))))
@@ -243,9 +234,23 @@ With a prefix, revert the effect of `geiser-mode-eval-last-sexp-to-buffer' "
     (define-key map (kbd "C-f") 'gider-test-rerun-failed-tests)
     map))
 
-(define-key geiser-mode-map (kbd "C-c C-t") gider-test-commands-map)
 
-;; TODO: Reimplement it by changing result print function.
-(define-key geiser-mode-map (kbd "C-c C-p") 'gider-eval-print-last-sexp)
+;;;###autoload
+(define-minor-mode gider-mode
+  "Enable gider things."
+  :global t
+  :group 'geiser
+  (if gider-mode
+      (progn
+        (add-to-list 'geiser-guile-load-path gider-scheme-dir)
+        (define-key geiser-mode-map (kbd "C-c C-t") gider-test-commands-map)
+        ;; TODO: Reimplement it by changing result print function.
+        (define-key geiser-mode-map (kbd "C-c C-p") 'gider-eval-print-last-sexp))
+    (progn
+      (delete gider-scheme-dir geiser-guile-load-path)
+      ;; (keymap-unset (kbd "C-c C-t") geiser-mode-map 'remove)
+      ;; (keymap-unset (kbd "C-c C-p") geiser-mode-map 'remove)
+      (define-key geiser-mode-map (kbd "C-c C-t") nil)
+      (define-key geiser-mode-map (kbd "C-c C-p") nil))))
 
 (provide 'gider-tests)
