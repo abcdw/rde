@@ -1029,7 +1029,8 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
              (t (funcall command)))))
 
         ,@(if (get-value 'emacs-consult-initial-narrowing? config)
-              '((with-eval-after-load 'tramp
+              '((autoload 'tramp-list-remote-buffers "tramp-cmd")
+                (with-eval-after-load 'tramp
                   (defvar rde-tramp-buffer-source
                     `(:name "Tramp"
                       :narrow ?r
