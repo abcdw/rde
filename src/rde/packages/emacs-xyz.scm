@@ -293,3 +293,32 @@ to manipulate and navigate hunks.")))
 clojure-ts-mode is an Emacs major mode that provides font-lock (syntax
 highlighting), indentation, and navigation support for the Clojure(Script)
 programming language, powered by the tree-sitter-clojure tree-sitter grammar."))))
+
+(define-public emacs-combobulate
+  (let ((commit "2e11f429349a4ac1f211dd612d8686081bc7c320")
+        (revision "0"))
+    (package
+      (name "emacs-combobulate")
+      (version (git-version "0.1.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/mickeynp/combobulate.git")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1ggrpv5j23m65cm3fjkr3irb9aypxf2hz0jjc5sbvsnfc3iwv601"))))
+      (build-system emacs-build-system)
+      (arguments (list #:emacs emacs-next-pgtk))
+      (license license:gpl3+)
+      (home-page "https://github.com/mickeynp/combobulate.git")
+      (synopsis "Structured Editing and Navigation in Emacs")
+      (description "Combobulate is a package that adds structured editing and movement to a wide
+range of programming languages. Unlike most programming major modes that use
+error-prone imperative code and regular expressions to determine what's what
+in your code, Combobulate uses Emacs 29's tree-sitter library. Tree-sitter
+maintains a concrete syntax tree of your code; it gives Combobulate absolute
+clarity of all aspects of your code, enabling more correct movement and
+editing than you would otherwise have."))))
