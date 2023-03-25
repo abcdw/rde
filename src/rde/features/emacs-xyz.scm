@@ -4532,8 +4532,6 @@ retrieve information about tracks via EMMS-INFO-METHOD."
            (define-key map "a" 'rde-emms-seek-to-beginning))
 
          (with-eval-after-load 'emms
-           (eval-when-compile
-            (require 'emms-browser))
            (require 'emms-setup)
            (require 'xdg)
            (require ',emms-info-method)
@@ -4546,11 +4544,6 @@ retrieve information about tracks via EMMS-INFO-METHOD."
                    (add-to-list 'emms-player-mpv-parameters
                                 "--force-window=no"))
                  '())
-
-           (emms-browser-make-filter
-            "all-files" (emms-browser-filter-only-type 'file))
-           (emms-browser-make-filter
-            "last-week" (emms-browser-filter-only-recent 7))
 
            (let ((mp3-function (assoc "mp3"
                                       emms-tag-editor-tagfile-functions)))
@@ -4583,6 +4576,12 @@ retrieve information about tracks via EMMS-INFO-METHOD."
            (setq emms-mode-line-icon-enabled-p nil)
 
            (with-eval-after-load 'emms-browser
+             (eval-when-compile
+              (require 'emms-browser))
+             (emms-browser-make-filter
+              "all-files" (emms-browser-filter-only-type 'file))
+             (emms-browser-make-filter
+              "last-week" (emms-browser-filter-only-recent 7))
              (setq emms-browser-covers 'emms-browser-cache-thumbnail-async)
              (setq emms-browser-switch-to-playlist-on-add t)
              (setq emms-browser-thumbnail-small-size 64)
