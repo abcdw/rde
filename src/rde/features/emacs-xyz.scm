@@ -4603,11 +4603,13 @@ System."))))
           #:key
           (emacs-pulseaudio-control emacs-pulseaudio-control)
           (volume-step "5%")
-          (display-volume? #f))
+          (display-volume? #f)
+          (pulseaudio-key "v"))
   "Configure pulseaudio-control for PulseAudio integration in Emacs."
   (ensure-pred file-like? emacs-pulseaudio-control)
   (ensure-pred string? volume-step)
   (ensure-pred boolean? display-volume?)
+  (ensure-pred string? pulseaudio-key)
 
   (define emacs-f-name 'pulseaudio-control)
   (define f-name (symbol-append 'emacs emacs-f-name))
@@ -4625,9 +4627,11 @@ System."))))
        (rde-elisp-configuration-service
         emacs-f-name
         config
-        `((autoload 'pulseaudio-control-default-keybindings
-                    "pulseaudio-control")
-          (pulseaudio-control-default-keybindings)
+        `((with-eval-after-load 'rde-keymaps
+            (define-key rde-app-map (kbd ,pulseaudio-key) 'pulseaudio-control-map))
+          ,@(if display-volume?
+                '((add-hook 'after-init-hook 'pulseaudio-control-display-mode))
+                '())
           (with-eval-after-load 'pulseaudio-control
             (define-key pulseaudio-control-map "L"
               'pulseaudio-control-toggle-sink-input-mute-by-index)
@@ -4657,10 +4661,7 @@ System."))))
             (setq pulseaudio-control-volume-step ,volume-step)
             (setq pulseaudio-control-volume-verbose nil)
             (pulseaudio-control-default-sink-mode)
-            (pulseaudio-control-default-source-mode)
-            ,@(if display-volume?
-                  '((pulseaudio-control-display-mode))
-                  '())))
+            (pulseaudio-control-default-source-mode)))
         #:elisp-packages (append (list emacs-pulseaudio-control)
                                  (or (and=> emacs-all-the-icons list) '()))))))
 
