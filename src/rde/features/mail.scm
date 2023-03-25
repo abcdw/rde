@@ -623,13 +623,6 @@ topics with your preferred hierarchy."
                         '()
                         (map (lambda (mail-acc)
                                `(,(symbol->string (mail-account-id mail-acc))
-                                 (name ,(get-value 'full-name config))
-                                 (signature
-                                  ,(match (get-value 'message-signature config)
-                                     ((? procedure? e) (e config))
-                                     ((? string? e) e)
-                                     (#f 'nil)
-                                     (_ 't)))
                                  ("X-Message-SMTP-Method"
                                   ,(format
                                     #f "smtp ~a ~a ~a"
