@@ -4484,26 +4484,28 @@ retrieve information about tracks via EMMS-INFO-METHOD."
          ,@(if emacs-ytdl
              '((eval-when-compile
                  (require 'ytdl))
-               (defun rde-emms-download-track ()
-                 "Download EMMS track at point using `ytdl'."
-                 (interactive)
-                 (emms-playlist-ensure-playlist-buffer)
-                 (with-current-emms-playlist
-                   (let* ((dl-type (ytdl--get-download-type))
-                          (track (emms-playlist-track-at))
-                          (title (emms-track-get track 'info-title))
-                          (source (emms-track-get track 'name)))
-                     (if (equal (emms-track-get track 'type) 'url)
-                         (ytdl--download-async
-                          source
-                          (expand-file-name
-                           title (ytdl--eval-field (nth 1 dl-type)))
-                          (ytdl--eval-list (ytdl--eval-field (nth 2 dl-type)))
-                          'ignore
-                          (car dl-type))
-                       (error "Track `%s' is not a remote track to download"
-                              title)))))
-               (with-eval-after-load 'emms
+
+               (with-eval-after-load 'emms-playlist-mode
+                 (defun rde-emms-download-track ()
+                   "Download EMMS track at point using `ytdl'."
+                   (interactive)
+                   (emms-playlist-ensure-playlist-buffer)
+                   (with-current-emms-playlist
+                     (let* ((dl-type (ytdl--get-download-type))
+                            (track (emms-playlist-track-at))
+                            (title (emms-track-get track 'info-title))
+                            (source (emms-track-get track 'name)))
+                       (if (equal (emms-track-get track 'type) 'url)
+                           (ytdl--download-async
+                            source
+                            (expand-file-name
+                             title (ytdl--eval-field (nth 1 dl-type)))
+                            (ytdl--eval-list
+                             (ytdl--eval-field (nth 2 dl-type)))
+                            'ignore
+                            (car dl-type))
+                         (error "Track `%s' is not a remote track to download"
+                                title)))))
                  (define-key emms-playlist-mode-map "m"
                    'rde-emms-download-track)))
              '())
@@ -4546,23 +4548,24 @@ retrieve information about tracks via EMMS-INFO-METHOD."
                                 "--force-window=no"))
                  '())
 
-           (let ((mp3-function (assoc "mp3"
-                                      emms-tag-editor-tagfile-functions)))
+           (with-eval-after-load 'emms-tag-editor
+             (let ((mp3-function (assoc "mp3"
+                                        emms-tag-editor-tagfile-functions)))
+               (add-to-list
+                'emms-tag-editor-tagfile-functions
+                `("aac" ,(cadr mp3-function) ,(caddr mp3-function))))
              (add-to-list
               'emms-tag-editor-tagfile-functions
-              `("aac" ,(cadr mp3-function) ,(caddr mp3-function))))
-           (add-to-list
-            'emms-tag-editor-tagfile-functions
-            '("m4a" ,atomicparsley-bin
-              ((info-artist . "--artist")
-               (info-title . "--title")
-               (info-album . "--album")
-               (info-tracknumber . "--tracknum")
-               (info-year . "--year")
-               (info-genre . "--genre")
-               (info-note . "--comment")
-               (info-albumartist . "--albumArtist")
-               (info-composer . "--composer"))))
+              '("m4a" ,atomicparsley-bin
+                ((info-artist . "--artist")
+                 (info-title . "--title")
+                 (info-album . "--album")
+                 (info-tracknumber . "--tracknum")
+                 (info-year . "--year")
+                 (info-genre . "--genre")
+                 (info-note . "--comment")
+                 (info-albumartist . "--albumArtist")
+                 (info-composer . "--composer")))))
 
            (setq emms-playlist-buffer-name "*EMMS Playlist*")
            (setq emms-playlist-mode-center-when-go t)
