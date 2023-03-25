@@ -329,11 +329,12 @@ and various other sites."
       `((with-eval-after-load 'rde-keymaps
           (define-key rde-app-map (kbd ,ytdl-key) 'ytdl-show-list))
         (with-eval-after-load 'ytdl
+          (require 'env)
           (define-key ytdl--dl-list-mode-map "a" 'ytdl-download)
           (setq ytdl-command ,youtube-dl-command)
-          (setq ytdl-download-folder ,download-dir)
-          (setq ytdl-music-folder ,music-dir)
-          (setq ytdl-video-folder ,video-dir)
+          (setq ytdl-download-folder (substitute-env-vars ,download-dir))
+          (setq ytdl-music-folder (substitute-env-vars ,music-dir))
+          (setq ytdl-video-folder (substitute-env-vars ,video-dir))
           (setq ytdl-mode-line nil)
           (setq ytdl-music-extra-args
                 (list ,@music-dl-args "--ffmpeg-location" ,ffmpeg-bin))
