@@ -4534,6 +4534,7 @@ retrieve information about tracks via EMMS-INFO-METHOD."
          (with-eval-after-load 'emms
            (require 'emms-setup)
            (require 'xdg)
+           (require 'env)
            (require ',emms-info-method)
 
            ,@(if (get-value 'mpv config)
@@ -4569,7 +4570,8 @@ retrieve information about tracks via EMMS-INFO-METHOD."
                  (expand-file-name "emacs/emms-history"
                                    (or (xdg-cache-home) "~/.cache")))
            (setq emms-seek-seconds 15)
-           (setq emms-source-file-default-directory ,music-dir)
+           (setq emms-source-file-default-directory
+                 (substitute-env-vars ,music-dir))
            (setq emms-repeat-playlist t)
            (setq emms-info-functions '(,emms-info-method))
            (setq emms-mode-line-format "%s")
