@@ -82,26 +82,6 @@
       "This package implements links to notmuch messages and searches. A search is a query to be performed by notmuch; it is the equivalent to folders in other mail clients. Similarly, mails are referred to by a query, so both a link can refer to several mails.")
      (license license:gpl3+))))
 
-
-(define-public emacs-cyrillic-dvorak-im
-  (package
-    (name "emacs-cyrillic-dvorak-im")
-    (version "0.1.0")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/xFA25E/cyrillic-dvorak-im")
-             (commit version)))
-       (sha256
-        (base32 "12adszd4p9i9glx2chasgq68i6cnxcrwbf5c268jjb5dw4q7ci0n"))
-       (file-name (git-file-name name version))))
-    (build-system emacs-build-system)
-    (home-page "https://github.com/xFA25E/cyrillic-dvorak-im")
-    (synopsis "Cyrillic input method for dvorak layout")
-    (description "Cyrillic input method for dvorak layout.")
-    (license license:gpl3+)))
-
 (define-public emacs-hide-header-line
   (package
     (inherit emacs-hide-mode-line)
