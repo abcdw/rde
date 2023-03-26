@@ -73,6 +73,7 @@
             waybar-idle-inhibitor
             waybar-clock
             waybar-battery
+            waybar-custom
 
             feature-swaynotificationcenter
             feature-swayidle
@@ -802,6 +803,29 @@ By default, NAME is root, PATH is /, and DISK-ICON is ."
        (format . ,(string-append disk-icon " {percentage_used}%"))
        (path . ,path))
      #:bar-id bar-id)))
+
+(define* (waybar-custom
+          #:key
+          (bar-id 'main)
+          (name 'main)
+          (exec #f)
+          (return-type "json")
+          (icon #f)
+          (placement 'modules-right))
+  "Executes a custom script EXEC. The script is expected
+to return a valid json object."
+  (lambda (config)
+    (waybar-module
+     (symbol-append 'custom/ name)
+     `((interval . 2)
+       (exec . ,exec)
+       (return-type . ,return-type)
+       (tooltip . "{tooltip}")
+       (format . ,(if icon
+                       (string-append icon " {}")
+                       "{}")))
+     #:bar-id bar-id
+     #:placement placement)))
 
 (define* (feature-waybar
           #:key
