@@ -101,6 +101,7 @@ You can specify whether to PLAY the file as AUDIO, if you want to be
 prompted for FORMATS or use FORMAT, to REPEAT the file, manually SELECT what to
 do with the file, and whether to add the file to the current PLAYLIST."
                          (interactive "sURI: ")
+                         (require 'mpv)
                          (let* ((sel-format
                                  (or format (and formats
                                                  (ytdl-select-format url))))
@@ -124,6 +125,7 @@ do with the file, and whether to add the file to the current PLAYLIST."
                        (defun rde-mpv-download ()
                          "Download current mpv playback via `ytdl'."
                          (interactive)
+                         (require 'ytdl)
                          (if-let* ((dl-type (ytdl--get-download-type))
                                    (track (mpv-get-property "path"))
                                    (title (mpv-get-property "media-title")))
