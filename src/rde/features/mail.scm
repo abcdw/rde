@@ -619,23 +619,31 @@ topics with your preferred hierarchy."
                 '())
           (setq gnus-update-message-archive-method t)
           (setq gnus-posting-styles
-                '(,@(if (get-value 'msmtp config)
-                        '()
-                        (map (lambda (mail-acc)
-                               `(,(symbol->string (mail-account-id mail-acc))
-                                 ("X-Message-SMTP-Method"
-                                  ,(format
-                                    #f "smtp ~a ~a ~a"
-                                    (assoc-ref
-                                     (assoc-ref %default-msmtp-provider-settings
-                                                (mail-account-type mail-acc))
-                                     'host)
-                                    (assoc-ref
-                                     (assoc-ref %default-msmtp-provider-settings
-                                                (mail-account-type mail-acc))
-                                     'port)
-                                    (mail-account-fqda mail-acc)))))
-                             mail-accounts))
+                '(,@(map (lambda (mail-acc)
+                           `(,(symbol->string (mail-account-id mail-acc))
+                             (address ,(mail-account-fqda mail-acc))
+                             ("Gcc" ,(string-append
+                                      "nnmaildir+"
+                                      (symbol->string
+                                       (mail-account-id mail-acc))
+                                      ":sent"))
+                             ,@(if (get-value 'msmtp config)
+                                   '()
+                                   `(("X-Message-SMTP-Method"
+                                      ,(format
+                                        #f "smtp ~a ~a ~a"
+                                        (assoc-ref
+                                         (assoc-ref
+                                          %default-msmtp-provider-settings
+                                          (mail-account-type mail-acc))
+                                         'host)
+                                        (assoc-ref
+                                         (assoc-ref
+                                          %default-msmtp-provider-settings
+                                          (mail-account-type mail-acc))
+                                         'port)
+                                        (mail-account-fqda mail-acc)))))))
+                         mail-accounts)
                   ,@posting-styles))
           (setq gnus-select-method '(nnnil))
           (setq gnus-secondary-select-methods
