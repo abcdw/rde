@@ -3261,14 +3261,14 @@ built-in help that provides much more contextual information."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((let ((map help-map))
+      `((let ((map global-map))
           (define-key map (vector 'remap 'describe-function) 'helpful-callable)
           (define-key map (vector 'remap 'describe-variable) 'helpful-variable)
           (define-key map (vector 'remap 'describe-key) 'helpful-key)
           (define-key map (vector 'remap 'describe-command) 'helpful-command)
           (define-key map (vector 'Info-goto-emacs-command-node)
-            'helpful-function)
-          (define-key map "o" 'helpful-at-point))
+            'helpful-function))
+        (define-key help-map "o" 'helpful-at-point)
         ,@(if (get-value 'emacs-embark config)
               '((with-eval-after-load 'embark
                   (define-key embark-symbol-map (vector 'remap 'describe-symbol)
