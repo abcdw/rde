@@ -855,8 +855,6 @@ to offset block quotes."
         (with-eval-after-load 'org
           (define-key org-mode-map (kbd "C-c M-o")
             'org-mime-org-buffer-htmlize))
-        (add-hook 'message-send-hook
-                  'org-mime-confirm-when-no-multipart)
         (with-eval-after-load 'message
           (let ((map message-mode-map))
             (define-key map (kbd "C-c M-z") 'org-mime-htmlize)
