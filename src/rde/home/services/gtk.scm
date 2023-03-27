@@ -34,39 +34,59 @@
 ;;; gtk3
 ;;;
 
+(define-maybe/no-serialization string)
+
 (define-configuration/no-serialization home-gtk3-configuration
-  (settings
+  (settings-ini
    (ini-config '())
    "Alist of pairs that set GTK global settings in @file{settings.ini}.
 See @uref{https://docs.gtk.org/gtk3/class.Settings.html} for the
 available settings.")
-  (theme
+  (gtk-css
    (css-config '())
    "List of CSS rules which set the GTK theme.
 For more information on the serialization, consult the documentation
-for @code{serialize-css} or the @code{(rde serializers css)} module."))
+for @code{serialize-css} or the @code{(rde serializers css)} module.")
+  (default-cursor
+   maybe-string
+   "Name of the default cursor theme to use."))
 
 (define (home-gtk3-files-service config)
-  (list
-   `("gtk-3.0/settings.ini"
-     ,(apply mixed-text-file
-             "settings.ini"
-             (serialize-ini-config
-              (home-gtk3-configuration-settings config))))
-   `("gtk-3.0/gtk.css"
-     ,(apply mixed-text-file
-             "gtk.css"
-             (serialize-css-config
-              (home-gtk3-configuration-theme config))))))
+  (append
+   (if (home-gtk3-configuration-default-cursor config)
+       (list
+        `(".icons/default/index.theme"
+          ,(apply
+            mixed-text-file
+            "index.theme"
+            (serialize-ini-config
+             `((#{Icon Theme}#
+                (,(cons 'Inherits
+                        #~(format
+                           #f "~a"
+                           #$(home-gtk3-configuration-default-cursor
+                              config))))))))))
+       '())
+   (list
+    `(".config/gtk-3.0/gtk.css"
+      ,(apply mixed-text-file
+              "gtk.css"
+              (serialize-css-config
+               (home-gtk3-configuration-gtk-css config))))
+    `(".config/gtk-3.0/settings.ini"
+      ,(apply mixed-text-file
+              "settings.ini"
+              (serialize-ini-config
+               (home-gtk3-configuration-settings-ini
+                config)))))))
 
 (define home-gtk3-service-type
   (service-type
    (name 'home-gtk3)
    (extensions
     (list
-     (service-extension
-      home-xdg-configuration-files-service-type
-      home-gtk3-files-service)))
+     (service-extension home-files-service-type
+                        home-gtk3-files-service)))
    (description "Configure GTK3 global settings and theme.")
    (default-value (home-gtk3-configuration))))
 
