@@ -67,6 +67,7 @@
             feature-emacs-help
             feature-emacs-shell
             feature-emacs-browse-url
+            feature-emacs-tab-bar
 
             ;; Completion
             feature-emacs-completion
@@ -1594,6 +1595,156 @@ If ALT is non-nil, URL is assumed to be an alternative so the logic is reversed.
         (advice-add 'browse-url-xdg-open :around 'rde-browse-url-add-scheme)
         (with-eval-after-load 'browse-url
           (setq browse-url-browser-function 'browse-url-xdg-open))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-tab-bar
+          #:key
+          (modules-left '())
+          (modules-center '())
+          (modules-right '())
+          (tab-bar-format '(rde-tab-bar-format-left
+                            rde-tab-bar-format-center
+                            rde-tab-bar-format-right)))
+  "Configure the Emacs Tab Bar.  Add the appropriate formatters via
+TAB-BAR-FORMAT.  The default ones allow you to place \"modules\" (i.e. menu
+items constructed by the helper @code{make-rde-tab-bar-module}) arbitrarily
+on each side of the bar, but you can also include built-in formatters such as
+@code{tab-bar-format-tabs}.
+
+The examples below show different types of modules:
+
+@lisp
+(make-rde-tab-bar-module
+ :id 'text
+ :label \"My arbitrary text\")
+(make-rde-tab-bar-module
+ :id 'battery
+ :label 'battery-mode-line-string)
+(make-rde-tab-bar-module
+ :id 'notifications
+ :label '(:eval (rde-ednc--notify)))
+@end lisp"
+  (ensure-pred elisp-config? modules-left)
+  (ensure-pred elisp-config? modules-center)
+  (ensure-pred elisp-config? modules-right)
+  (ensure-pred list? tab-bar-format)
+
+  (define emacs-f-name 'tab-bar)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to the Emacs Tab Bar."
+    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config))
+
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile
+         (require 'cl-lib))
+        (defgroup rde-tab-bar nil
+          "Configure the tab bar via menu items."
+          :group 'rde)
+        (cl-defstruct rde-tab-bar-module id label help action)
+        (defcustom rde-tab-bar-modules-left '()
+          "List of modules on the left-hand side of the tab bar."
+          :type '(repeat rde-tab-bar-module)
+          :group 'rde-tab-bar)
+
+        (defcustom rde-tab-bar-modules-center '()
+          "List of modules in the center of the tab bar."
+          :type '(repeat rde-tab-bar-module)
+          :group 'rde-tab-bar)
+
+        (defcustom rde-tab-bar-modules-right '()
+          "List of modules on the right-hand side of the tab bar."
+          :type '(repeat rde-tab-bar-module)
+          :group 'rde-tab-bar)
+
+        (defun rde-tab-bar-build-formatter (modules)
+          "Build a tab bar formatter with MODULES."
+          (mapcar (lambda (item)
+                    (if (rde-tab-bar-module-p item)
+                        (let ((label (rde-tab-bar-module-label item)))
+                          `(,(rde-tab-bar-module-id item) menu-item
+                            ,(cond
+                              ((symbolp label)
+                               `(when (boundp ',label)
+                                  ,label))
+                              ((and (listp label) (equal (car label) :eval))
+                               `(format-mode-line ',label))
+                              (t label))
+                            ,(or (rde-tab-bar-module-action item) 'nil)
+                            ,@(when (rde-tab-bar-module-help item)
+                                `(:help ,(rde-tab-bar-module-help item)))))
+                      item))
+                  modules))
+
+        (defun rde-tab-bar-format-left ()
+          "Return modules for the left-hand side of the tab bar."
+          (rde-tab-bar-build-formatter rde-tab-bar-modules-left))
+
+        (defun rde-tab-bar-format-center ()
+          "Return modules for the center of the tab bar."
+          (let* ((modules (mapconcat
+                           (lambda (module)
+                             (let ((label (rde-tab-bar-module-label module)))
+                               (if (symbolp label)
+                                   (symbol-value label)
+                                 label)))
+                           rde-tab-bar-modules-center ""))
+                 (str (concat (propertize
+                               " " 'display
+                               `(space :align-to
+                                       (- center
+                                          ,(/ (length modules) 2.0)))))))
+            (cons
+             `(align-center menu-item ,str nil)
+             (rde-tab-bar-build-formatter rde-tab-bar-modules-center))))
+
+        (defun rde-tab-bar-format-right ()
+          "Return modules for the right-hand side of the tab bar."
+          (let* ((labels (mapconcat
+                          (lambda (module)
+                            (let ((label (rde-tab-bar-module-label module)))
+                              (if (symbolp label)
+                                  (symbol-value label)
+                                label)))
+                          rde-tab-bar-modules-right ""))
+                 (n-icons (cl-loop with nprops = 1
+                                   for i from 0 to (- (length labels) 1)
+                                   when (get-text-property
+                                         i 'rear-nonsticky labels)
+                                   do (cl-incf nprops)
+                                   finally (cl-return nprops)))
+                 (hpos (+ (length labels) n-icons))
+                 (str (propertize " " 'display
+                                  `(space :align-to (- right ,hpos)))))
+            (cons
+             `(align-right menu-item ,str nil)
+             (rde-tab-bar-build-formatter rde-tab-bar-modules-right))))
+
+        (tab-bar-mode)
+        ,@(if emacs-all-the-icons
+              `((eval-when-compile
+                 (require 'all-the-icons))
+                (setq rde-tab-bar-modules-left (list ,@modules-left))
+                (setq rde-tab-bar-modules-center (list ,@modules-center))
+                (setq rde-tab-bar-modules-right (list ,@modules-right)))
+              '())
+        (with-eval-after-load 'tab-bar
+          (setq tab-bar-format ',tab-bar-format)
+          (setq tab-bar-border nil)
+          (setq tab-bar-close-button-show nil)
+          (setq tab-bar-show t)))
+      #:elisp-packages (or (and=> emacs-all-the-icons list) '())
+      #:summary "Extensions to Emacs's Tab Bar"
+      #:commentary "Provide extensions to the Emacs Tab Bar, allowing you to \
+supply custom menu items in the form of modules.")))
 
   (feature
    (name f-name)
