@@ -66,6 +66,7 @@
             feature-emacs-comint
             feature-emacs-help
             feature-emacs-shell
+            feature-emacs-browse-url
 
             ;; Completion
             feature-emacs-completion
@@ -1441,6 +1442,158 @@ process-in-a-buffer derived packages like shell, REPLs, etc."
                   (add-to-list 'project-switch-commands
                                '(project-shell "Start an inferior shell"))))
               '())))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-browse-url
+          #:key
+          (extra-url-mappings '()))
+  "Configure and extend the browse-url library to enhance the handling of URLs
+to browsers in Emacs.  You can set URL mappings to rewrite URLs in Emacs
+buffers, open sites with cookies, make sure URLs use HTTPS, among other."
+  (ensure-pred elisp-config? extra-url-mappings)
+
+  (define emacs-f-name 'browse-url)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile
+         (require 'cl-lib))
+        (defgroup rde-browse-url nil
+          "Generic utilities to enhance `browse-url'."
+          :group 'rde)
+        (defcustom rde-browse-url-mappings '()
+          "URL mapping alist.
+It has the form (SERVICE . ALT) where SERVICE is the original hostname of
+the service and ALT is the alternative service host to rewrite urls to, and
+viceversa."
+          :type 'list
+          :group 'rde-browse-url)
+
+        (cl-defun rde-browse-url--transform-url (url &key (alt t))
+          "Transform URL to its alternative in `rde-browse-url-mappings'.
+If ALT is non-nil, URL is assumed to be an alternative so the logic is reversed."
+          (string-match (rx (group (+ any) "://" (* (not "/"))) (* any)) url)
+          (if-let* ((service-url (match-string 1 url))
+                    (mapping (if alt
+                                 (cl-rassoc service-url rde-browse-url-mappings
+                                            :test 'string=)
+                               (assoc-string service-url
+                                             rde-browse-url-mappings))))
+              (if alt
+                  (replace-regexp-in-string
+                   service-url
+                   (car mapping)
+                   url)
+                (replace-regexp-in-string
+                 service-url
+                 (cdr mapping)
+                 url))
+            url))
+
+        (defun rde-browse-url-bookmark-make-record (url title)
+          "Create a bookmark record from a browser buffer with URL and TITLE."
+          (let* ((defaults (delq nil (list title url)))
+                 (bookmark
+                  `(,title
+                    ,@(bookmark-make-record-default 'no-file)
+                    ,(cons 'browser-url url)
+                    ,(cons 'filename url)
+                    ,(cons 'handler 'rde-browse-url-bookmark-jump)
+                    ,(cons 'defaults defaults))))
+            bookmark))
+
+        (defun rde-browse-url-bookmark-jump (bookmark)
+          "Jump to BOOKMARK in the default browser."
+          (let ((location (bookmark-prop-get bookmark 'browser-url)))
+            (browse-url-default-browser location)))
+
+        (defun rde-browse-url-alt-bookmark-jump (bookmark)
+          "Jump to BOOKMARK in an alternative browser."
+          (cl-letf (((symbol-function 'browse-url-can-use-xdg-open) 'ignore))
+            (rde-browse-url-bookmark-jump bookmark)))
+
+        ,@(if (get-value 'emacs-embark config)
+              '((defun rde-browse-url-open-with-cookies (cookies &optional url)
+                  "Open URL with COOKIES in corresponding external application."
+                  (interactive "\nsURL: ")
+                  (let ((url-request-extra-headers
+                         `(("Cookie"
+                            ,(cl-loop for (field cookie) in cookies
+                                      collect (format " %s=%s;" field cookie)
+                                      into headers
+                                      finally (return (string-join headers))))))
+                        (filename (concat temporary-file-directory
+                                          (car (last (split-string url "/"))))))
+                    (unless (file-exists-p filename)
+                      (with-current-buffer
+                          (url-retrieve-synchronously url t)
+                        (goto-char (point-min))
+                        (re-search-forward "^$")
+                        (forward-line 1)
+                        (delete-region (point) (point-min))
+                        (write-region (point-min) (point-max) filename)))
+                    (embark-open-externally filename)))
+
+                (with-eval-after-load 'embark
+                  (define-key embark-bookmark-map "c"
+                              'rde-browse-url-alt-bookmark-jump)))
+              '())
+
+        (defun rde-browse-url-add-scheme (fun url &rest args)
+          "Add https scheme to URL if missing and invoke FUN and ARGS with it."
+          (let ((link (if (string-match (rx bol (+ (in (?A . ?Z))) ":") url)
+                          url
+                        (concat "https:" url))))
+            (apply fun link args)))
+
+        (defun rde-browse-url-trace-url (fun url &rest args)
+          "Transform URL to its original form and invoke FUN and ARGS with it."
+          (let ((link (rde-browse-url--transform-url url)))
+            (apply fun link args)))
+
+        (setq rde-browse-url-mappings
+              (append
+               (list
+                ,@(if (get-value 'youtube-frontend config)
+                      `((cons "https://www.youtube.com"
+                              ,(get-value 'youtube-frontend config)))
+                      '())
+                ,@(if (get-value 'reddit-frontend config)
+                      `((cons "https://www.reddit.com"
+                              ,(get-value 'reddit-frontend config)))
+                      '())
+                ,@(if (get-value 'quora-frontend config)
+                      `((cons "https://quora.com"
+                              ,(get-value 'quora-frontend config)))
+                      '())
+                ,@(if (get-value 'twitter-frontend config)
+                      `((cons "https://twitter.com"
+                              ,(get-value 'twitter-frontend config)))
+                      '())
+                ,@(if (get-value 'imgur-frontend config)
+                      `((cons "https://imgur.com"
+                              ,(get-value 'imgur-frontend config)))
+                      '())
+                ,@(if (get-value 'google-frontend config)
+                      `((cons "https://www.google.com"
+                              ,(get-value 'google-frontend config)))
+                      '())
+                ,@(if (get-value 'medium-frontend config)
+                      `((cons "https://medium.com"
+                              ,(get-value 'medium-frontend config)))
+                      '()))
+               ',extra-url-mappings))
+        (advice-add 'browse-url-xdg-open :around 'rde-browse-url-add-scheme)
+        (with-eval-after-load 'browse-url
+          (setq browse-url-browser-function 'browse-url-xdg-open))))))
 
   (feature
    (name f-name)
