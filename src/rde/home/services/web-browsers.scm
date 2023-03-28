@@ -38,13 +38,14 @@
 (define file-likes? (list-of file-like?))
 (define serialize-packages empty-serializer)
 (define serialize-file-likes empty-serializer)
+(define serialize-list empty-serializer)
 
 (define-configuration home-nyxt-configuration
   (nyxt
    (file-like nyxt)
    "The nyxt package to use.")
   (lisp-packages
-   (file-likes '())
+   (list '())
    "List of Lisp packages to install alongside the configuration.")
   (config-lisp
    (lisp-config '())
@@ -80,7 +81,7 @@ more information on how to write these rules."))
 
 (define-configuration home-nyxt-extension
   (lisp-packages
-   (file-likes '())
+   (list '())
    "List of additional Lisp packages to install alongside the service
 extension.")
   (config-lisp
@@ -178,7 +179,7 @@ extension.")
    "List of Lisp expressions.  See
 @code{home-nyxt-service-type} for more information.")
   (lisp-packages
-   (file-likes '())
+   (list '())
    "List of additional Lisp packages to install alongside the configuration
 package.")
   (auto-rules
@@ -192,7 +193,7 @@ package.")
    "List of expressions.  See
 @code{home-nyxt-service-type} for more information.")
   (lisp-packages
-   (file-likes '())
+   (list '())
    "List of additional Lisp packages.")
   (auto-rules
    (lisp-config '())
