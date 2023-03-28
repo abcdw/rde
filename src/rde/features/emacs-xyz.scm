@@ -3984,7 +3984,7 @@ the node, relative to `org-roam-directory'."
          (org-roam-db-autosync-enable)
 
          ,@(if org-roam-capture-templates
-               `((setq org-roam-capture-templates org-roam-capture-templates))
+               `((setq org-roam-capture-templates ',org-roam-capture-templates))
                '())
 
          ,@(if org-roam-dailies-directory
