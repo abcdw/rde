@@ -357,7 +357,7 @@ subject:/home:/) and tag:new}\"'")
      '(:name "Guix Home Inbox" :key "H" :query "tag:guix-home and tag:unread")
      '(:name "RDE Inbox"       :key "R"
              :query "(to:/rde/ or cc:/rde/) and tag:unread")
-
+     '(:name "New TODO" :query "tag:todo or (tag:inbox and not tag:unread)" :key "T")
      ;; '(:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "tw")
      %rde-notmuch-saved-searches))
 
