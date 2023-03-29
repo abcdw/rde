@@ -457,7 +457,6 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
    (append
     (strings->packages
      "icecat"
-     "ungoogled-chromium-wayland" "ublock-origin-chromium"
      "imv" "wev"
      "make"
      "adwaita-icon-theme" "gnome-themes-extra"
