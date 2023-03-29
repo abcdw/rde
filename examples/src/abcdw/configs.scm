@@ -30,6 +30,7 @@
 
   #:use-module (gnu packages)
   #:use-module (rde packages)
+  #:use-module (rde packages aspell) ; needed for strings->packages
 
   #:use-module (guix gexp)
   #:use-module (guix inferior)
