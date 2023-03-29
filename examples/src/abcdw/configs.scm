@@ -66,6 +66,18 @@
    'emacs-extra-packages
    home-emacs-service-type
    (home-emacs-extension
+    (init-el
+     `((with-eval-after-load 'org
+         (define-key org-mode-map (kbd "M-o")
+           (lambda ()
+             (interactive)
+             (org-end-of-meta-data t))))
+       (with-eval-after-load 'simple
+         (setq-default display-fill-column-indicator-column 80)
+         (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+       (setq copyright-names-regexp
+             (format "%s <%s>" user-full-name user-mail-address))
+       (add-hook 'after-save-hook (lambda () (copyright-update nil nil)))))
     (elisp-packages
      (append
       (strings->packages
