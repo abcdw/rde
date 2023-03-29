@@ -1,0 +1,39 @@
+#+TITLE: Tests and TDD
+#+Date: 2023-03-29
+
+* Status
+RFC by 2023-04-05.
+
+* Context
+Right now rde feels quite stable because almost everything is tested extensively
+(but manually), because of reproducibility and because most of the updates adds
+functionality and doesn't modify existing one, but in fact it's relatively
+fragile to refactorings and changes and doesn't scale up well with a bigger
+number of comming patches.  We don't have an automated tools for testing that
+functionality still works as expected after introducing changes and that new
+functionality in contributed patches behaves according to specification.  All
+the testing happens manually and should be repeated from time to time.
+
+With recent introduction of [[https://git.sr.ht/~abcdw/rde/commit/b704365][gider]] and [[https://git.sr.ht/~abcdw/rde/tree/498dec881904b307a5a5e2c954a10d2b2fb8b3e3/tests/rde/tests.scm#L1][(rde tests)]] it became much easier to write
+tests and execute them often in the running repl and see the testing summary in
+emacs echo area and extensive test results in the report buffer.
+
+* Decision
+We will use gider, (rde tests) and TDD for making new modules. We will cover
+existing modules with tests, when touch them during cleanups, refactorings or
+other modification occasions.
+
+* Consequences
+We will need more code to implement the same functionality.
+
+We will raise learning curve, which can make it a little harder to develop
+modules for newcommers.
+
+We will get a better test coverage, which allows to make automated quality
+assurance.  Automated QA reduces the need of manual testing and reduces the
+maintanance burden.
+
+We will get an example of usage written down for public API, which in addition
+to automated QA, allows to review contributions easier, make sure the
+impementation behaves according to the examples and also serves the documenting
+purpose.
