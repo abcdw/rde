@@ -139,7 +139,8 @@ optionally ending with context, but provided expression is:\n ~a")
     (e
      (raise (formatted-message
              (G_ "Nginx context should be a list of expressions, \
-where each expression is also a list or gexp, but provided value is:\n ~a") e))) ))
+where each expression is also a list or gexp, but provided value is:\n ~a")
+             e)))))
 
 (define (serialize-nginx-config f c)
   #~(apply string-append
