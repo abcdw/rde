@@ -346,7 +346,7 @@ HiDPI friendly."
       'xcursors-environment-variables-ubuntu-fix
       home-environment-variables-service-type
       `(("XCURSOR_PATH" .
-         "/usr/share/icons${XCURSORS_PATH:+:}$XCURSOR_PATH")))))
+         "/usr/share/icons${XCURSOR_PATH:+:}$XCURSOR_PATH")))))
 
   (feature
    (name 'foreign-distro)
