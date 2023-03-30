@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -323,3 +323,28 @@ HiDPI friendly."
   (feature
    (name 'hidpi)
    (values (make-feature-values scaling-factor console-font))))
+
+(define* (feature-foreign-distro
+          #:key
+          (glibc-locales glibc-locales))
+  "Provides missing packages and other fixes for rde usage on foreign distro."
+  (ensure-pred file-like? glibc-locales)
+
+  (define (get-home-services _)
+    (list
+     ;; On ubuntu 20.04 default Guix Home environment fails with
+     ;; guile: warning: failed to install locale
+     (service home-profile-service-type (list glibc-locales))
+
+     ;; The fix for ubuntu, as it doesn't set XCURSOR_PATH, but expects it
+     ;; contains a /usr/share/icons if it set.
+     (simple-service
+      'xcursors-environment-variables-ubuntu-fix
+      home-environment-variables-service-type
+      `(("XCURSOR_PATH" .
+         "/usr/share/icons${XCURSORS_PATH:+:}$XCURSOR_PATH")))))
+
+  (feature
+   (name 'foreign-distro)
+   (home-services-getter get-home-services)
+   (values `((foreign-distro . #t)))))
