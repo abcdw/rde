@@ -211,14 +211,22 @@ functionalities."
                  '()
                  `((define-key *rde-keymap* ,@extra-bindings)))
            ,@(if temporary-history?
-                 '((defmethod files:resolve ((profile nyxt-profile)
-                                             (file nyxt:history-file))
+                 '((define-class tmp-profile (nyxt-profile)
+                     ((files:name :initform "nyxt-tmp"))
+                     (:documentation "Temporary profile."))
+                   (defmethod files:resolve ((profile tmp-profile)
+                                             (file history-file))
                      "Store history in a temporary directory."
                      (sera:path-join
-                      (nfiles:expand
+                      (files:expand
                        (make-instance 'nyxt-temporary-directory))
                       (uiop:relativize-pathname-directory
-                       (call-next-method)))))
+                       (call-next-method))))
+                   (define-configuration web-buffer
+                     ((profile (make-instance
+                                (or (find-profile-class
+                                     (getf *options* :profile))
+                                    'tmp-profile))))))
                  '())
            (define-mode rde-keymap-mode ()
              "Dummy mode to apply key bindings in `*rde-keymap*.'"
