@@ -192,7 +192,9 @@ location / {
       '((a ((b c)))
         (d ((e f)))
         (g ((h i))))
-      (nginx-merge '((a ((b c)))) '((d ((e f)))) `((g ((h i))))))
+      (nginx-merge '((a ((b c))))
+                   '((d ((e f))))
+                   '((g ((h i))))))
 
     ;; Right now nginx-merge doesn't actually merge, it just concatenates.
     ;; Fix the implementation and remove test-expect-fail.
@@ -201,7 +203,9 @@ location / {
       '((a ((b c)
             (e f)
             (h i))))
-      (nginx-merge '((a ((b c)))) '((a ((e f)))) `((a ((h i))))))
+      (nginx-merge '((a ((b c))))
+                   '((a ((e f))))
+                   '((a ((h i))))))
 
     (test-expect-fail 1)
     (test-equal "deep merge"
@@ -223,7 +227,7 @@ location / {
     ;; Current implementation doesn't traverse the data structure and doesn't
     ;; check elements of nginx expression.
     (test-expect-fail 1)
-    (test-assert "not valid: two subcontext"
+    (test-assert "not valid: two subcontexts"
       (not (nginx-config? '((a ((e f)) ((b c)))))))
 
     ;; Current implementation doesn't traverse the data structure and checks
