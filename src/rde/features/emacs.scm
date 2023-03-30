@@ -348,8 +348,9 @@ environment outside of Guix Home."
                 (home-emacs-feature-loader-configuration
                  ;; (autoloads? #t)
                  (add-to-init-el? #t)))
+
        (rde-elisp-configuration-service
-        'rde-emacs
+        'emacs
         config
         `((defgroup rde nil
             "Base customization group for rde."
