@@ -327,9 +327,10 @@
    (feature-emacs-time)
    (feature-emacs-spelling
     #:spelling-program (@ (gnu packages hunspell) hunspell)
-    #:spelling-dictionaries (strings->packages
-                             "hunspell-dict-en"
-                             "hunspell-dict-ru"))
+    #:spelling-dictionaries
+    (list
+     (@ (gnu packages hunspell) hunspell-dict-en)
+     (@ (rde packages aspell) hunspell-dict-ru)))
    (feature-emacs-git
     #:project-directory "~/work")
    (feature-emacs-org
