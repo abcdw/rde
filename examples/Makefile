@@ -24,6 +24,10 @@ ixy/home/reconfigure: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
 	reconfigure ${CONFIGS}
 
+ixy/system/build: guix
+	RDE_TARGET=ixy-system ${GUIX} system \
+	build ${CONFIGS}
+
 ixy/system/reconfigure: guix
 	RDE_TARGET=ixy-system ${GUIX} system \
 	reconfigure ${CONFIGS}
