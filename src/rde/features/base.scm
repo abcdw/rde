@@ -59,6 +59,7 @@
             feature-desktop-services
             feature-hidpi
             feature-generic
+            feature-foreign-distro
 
             %rde-default-substitute-urls
             %rde-default-authorized-guix-keys))
