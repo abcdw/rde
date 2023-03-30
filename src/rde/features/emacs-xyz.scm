@@ -3797,6 +3797,7 @@ Start an unlimited search at `point-min' otherwise."
                  (add-hook 'org-mode-hook 'org-make-toc-mode))
                '())
 
+         ;; TODO: Move to feature notmuch
          (with-eval-after-load 'notmuch (require 'ol-notmuch))
 
          (add-hook 'org-mode-hook 'org-appear-mode)
