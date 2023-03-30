@@ -335,7 +335,10 @@ HiDPI friendly."
     (list
      ;; On ubuntu 20.04 default Guix Home environment fails with
      ;; guile: warning: failed to install locale
-     (service home-profile-service-type (list glibc-locales))
+     (simple-service
+      'foreign-distro-glibc-locales
+      home-profile-service-type
+      (list glibc-locales))
 
      ;; The fix for ubuntu, as it doesn't set XCURSOR_PATH, but expects it
      ;; contains a /usr/share/icons if it set.
