@@ -68,6 +68,7 @@
    (home-emacs-extension
     (init-el
      `((with-eval-after-load 'org
+         (setq org-use-speed-commands t)
          (define-key org-mode-map (kbd "M-o")
            (lambda ()
              (interactive)
