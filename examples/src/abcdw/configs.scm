@@ -111,7 +111,7 @@
 
      "utox" "qtox" "jami"
 
-     "alsa-utils" "yt-dlp" "imv" "cozy"
+     "alsa-utils" "yt-dlp" "cozy"
      "pavucontrol" "wev"
      "imagemagick"
      "obs" "obs-wlrobs"
