@@ -31,11 +31,12 @@
     (stop #~(make-kill-destructor)))))
 
 (define (add-transmission-configuration config)
-  `(("transmission-daemon/settings.json"
-     ,(apply mixed-text-file "settings.json"
-             (serialize-json-config
-              (home-transmission-configuration-settings config))))))
-
+  (if (not (null? (home-transmission-configuration-settings config)))
+      `(("transmission-daemon/settings.json"
+         ,(apply mixed-text-file "settings.json"
+                 (serialize-json-config
+                  (home-transmission-configuration-settings config)))))
+      '()))
 
 (define home-transmission-service-type
   (service-type
