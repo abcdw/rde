@@ -4843,6 +4843,7 @@ retrieve information about tracks via EMMS-INFO-METHOD."
            (require 'xdg)
            (require 'env)
            (require ',emms-info-method)
+           (emms-all)
 
            ,@(if (get-value 'mpv config)
                  '((defun rde-emms-mpv-kill ()
