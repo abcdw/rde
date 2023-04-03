@@ -1,5 +1,6 @@
 (define-module (rde system install)
   #:use-module (gnu)
+  #:use-module (gnu packages linux)
   #:use-module (gnu system)
   #:use-module (gnu system install)
   #:use-module (rde features)
