@@ -8,8 +8,11 @@
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module (rde serializers json)
+  #:use-module (ice-9 match)
   #:export (home-transmission-configuration
             home-transmission-service-type))
+
+(define-maybe/no-serialization string)
 
 (define-configuration/no-serialization home-transmission-configuration
   (transmission
@@ -17,18 +20,26 @@
    "The transmission package to use.")
   (settings
    (json-config '())
-   "Transmission configuration."))
+   "Transmission configuration.")
+  (download-dir
+   maybe-string
+   "Where to download torrent data to."))
 
-(define (home-transmission-shepherd-service config)
-  (list
-   (shepherd-service
-    (provision '(transmission))
-    (start #~(make-forkexec-constructor
-              (list #$(file-append
-                       (home-transmission-configuration-transmission config)
-                       "/bin/transmission-daemon")
-                    "--foreground")))
-    (stop #~(make-kill-destructor)))))
+(define home-transmission-shepherd-service
+  (match-lambda
+    (($ <home-transmission-configuration> transmission _ download-dir)
+     (list
+      (shepherd-service
+       (provision '(transmission))
+       (auto-start? #t)
+       (start #~(make-forkexec-constructor
+                 (list
+                  #$(file-append transmission "/bin/transmission-daemon")
+                  "--foreground" "--no-incomplete-dir"
+                  #$@(if download-dir
+                         (list "--download-dir" download-dir)
+                         '()))))
+       (stop #~(make-kill-destructor)))))))
 
 (define (add-transmission-configuration config)
   (if (not (null? (home-transmission-configuration-settings config)))
