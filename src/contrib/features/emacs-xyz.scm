@@ -42,7 +42,8 @@
           (emacs-evil-collection emacs-evil-collection)
           (emacs-evil-org emacs-evil-org)
           (emacs-undo-fu emacs-undo-fu))
-  "Configure evil-mode for emacs."
+  "Configure evil-mode for emacs. The feature is in contrib because the
+recommended RDE experience is to rely on Emacs default keybindings."
   (ensure-pred file-like? emacs-evil)
   (ensure-pred file-like? emacs-evil-collection)
   (ensure-pred file-like? emacs-evil-org)

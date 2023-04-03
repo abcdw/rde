@@ -33,7 +33,9 @@
           (age-ssh-key "~/.ssh/id_ed25519"))
   "This feature sets up age for encryption tasks. It uses the SSH key
 given in the location age-ssh-key to encrypt and decrypt files in the
-password-store."
+password-store. The feature is in contrib because it currently has limited
+functionality compared to GnuPG, which is the recommended privacy tool for
+RDE."
   (ensure-pred file-like? age)
   (ensure-pred string? age-ssh-key)
 
