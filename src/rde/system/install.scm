@@ -41,22 +41,23 @@
           (custom-system-services '())
           (supplementary-system-packages '())
           (supplementary-features '())) ;; user-preferences
-  (rde-config
-   (initial-os installation-os)
-   (features
-    (append
-     supplementary-features
-     (list
-      (feature-file-systems
-       #:file-systems live-file-systems)
-      (feature-kernel
-       #:kernel kernel
-       #:firmware kernel-firmware)
-      (feature-base-packages
-       #:system-packages supplementary-system-packages)
-      (feature-custom-services
-       #:feature-name-prefix 'live
-       #:system-services custom-system-services)
-      (feature-base-services
-       #:guix-substitute-urls guix-substitute-urls
-       #:guix-authorized-keys guix-authorized-keys))))))
+  (rde-config-operating-system
+   (rde-config
+    (initial-os installation-os)
+    (features
+     (append
+      supplementary-features
+      (list
+       (feature-file-systems
+        #:file-systems live-file-systems)
+       (feature-kernel
+        #:kernel kernel
+        #:firmware kernel-firmware)
+       (feature-base-packages
+        #:system-packages supplementary-system-packages)
+       (feature-custom-services
+        #:feature-name-prefix 'live
+        #:system-services custom-system-services)
+       (feature-base-services
+        #:guix-substitute-urls guix-substitute-urls
+        #:guix-authorized-keys guix-authorized-keys)))))))
