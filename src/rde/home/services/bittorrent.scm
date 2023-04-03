@@ -36,17 +36,12 @@
              (serialize-json-config
               (home-transmission-configuration-settings config))))))
 
-(define (home-transmission-profile-service config)
-  (list (home-transmission-configuration-transmission config)))
 
 (define home-transmission-service-type
   (service-type
    (name 'home-transmission)
    (extensions
     (list
-     (service-extension
-      home-profile-service-type
-      home-transmission-profile-service)
      (service-extension
       home-xdg-configuration-files-service-type
       add-transmission-configuration)
