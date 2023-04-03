@@ -54,11 +54,9 @@
    (name 'home-transmission)
    (extensions
     (list
-     (service-extension
-      home-xdg-configuration-files-service-type
-      add-transmission-configuration)
-     (service-extension
-      home-shepherd-service-type
-      home-transmission-shepherd-service)))
+     (service-extension home-xdg-configuration-files-service-type
+                        add-transmission-configuration)
+     (service-extension home-shepherd-service-type
+                        home-transmission-shepherd-service)))
    (description "Launch a transmission daemon from the user space.")
    (default-value (home-transmission-configuration))))
