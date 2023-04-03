@@ -416,7 +416,8 @@ to config one more time."
                  (list (service sudoers-service-type))
                  (if user-name
                      (list (service rde-account-service-type user))
-                     '()))))))
+                     '())))
+      (sudoers-file #f))))
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)
