@@ -2,7 +2,6 @@
   #:use-module (rde features)
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
-  #:use-module (rde home services bittorrent)
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
@@ -16,8 +15,7 @@
 (define* (feature-transmission
           #:key
           (package transmission)
-          (download-dir #f)
-          (extra-transmission-settings '()))
+          (auto-start? #t))
   "Setup and configure Transmission and transmission.el"
 
   (define (transmission-home-services config)
@@ -57,11 +55,18 @@ links and torrent files."
  (revert-buffer))"))
         #:default-for '(x-scheme-handler/magnet application/x-bittorrent)))
 
-     (service home-transmission-service-type
-              (home-transmission-configuration
-               (transmission package)
-               (download-dir download-dir)
-               (settings extra-transmission-settings)))))
+     (simple-service
+      'transmission-add-shepherd-daemon
+      home-shepherd-service-type
+      (list
+       ;; TODO: Make home-transmission service for Guix Home
+       (shepherd-service
+        (provision '(transmission))
+        (auto-start? auto-start?)
+        (start #~(make-forkexec-constructor
+                  (list #$(file-append package "/bin/transmission-daemon")
+                        "--foreground")))
+        (stop  #~(make-kill-destructor)))))))
 
   (feature
    (name 'transmission)
