@@ -1049,7 +1049,7 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
 `consult-buffer-sources'.")
                   (with-eval-after-load 'consult
                     (add-to-list 'consult-buffer-sources
-                                 rde-tramp-buffer-source))))
+                                 rde-tramp-buffer-source 'append))))
               '())
 
         (defun rde-tramp-shell (&optional arg)
@@ -1398,7 +1398,7 @@ process-in-a-buffer derived packages like shell, REPLs, etc."
 `consult-buffer-sources'.")
                 (with-eval-after-load 'consult
                   (add-to-list 'consult-buffer-sources
-                               rde-comint-buffer-source))
+                               rde-comint-buffer-source 'append))
                 (with-eval-after-load 'rde-completion
                   (add-to-list 'rde-completion-initial-narrow-alist
                                '(comint-mode . ?c))))
@@ -4363,7 +4363,7 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
 `consult-buffer-sources'.")
                 (with-eval-after-load 'consult
                   (add-to-list 'consult-buffer-sources
-                               rde-telega-buffer-source))
+                               rde-telega-buffer-source 'append))
                 (with-eval-after-load 'rde-completion
                   (add-to-list 'rde-completion-initial-narrow-alist
                                '(telega-root-mode . ?t))

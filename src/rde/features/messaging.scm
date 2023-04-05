@@ -126,7 +126,7 @@ the RDE manual) correctly."
 `consult-buffer-sources'.")
                 (with-eval-after-load 'consult
                   (add-to-list 'consult-buffer-sources
-                               rde-slack-buffer-source))
+                               rde-slack-buffer-source 'append))
                 (with-eval-after-load 'rde-completion
                   (add-to-list 'rde-completion-initial-narrow-alist
                                '(slack-message-buffer-mode . ?s))

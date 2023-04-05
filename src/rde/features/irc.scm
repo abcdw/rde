@@ -139,7 +139,8 @@ is a list of message types to ignore."
                   "Source for ERC buffers to be set in
  `consult-buffer-sources'.")
                 (with-eval-after-load 'consult
-                  (add-to-list 'consult-buffer-sources rde-erc-buffer-source))
+                  (add-to-list 'consult-buffer-sources rde-erc-buffer-source
+                               'append))
                 (with-eval-after-load 'rde-completion
                     (add-to-list 'rde-completion-initial-narrow-alist
                                  '(erc-mode . ?i))))
