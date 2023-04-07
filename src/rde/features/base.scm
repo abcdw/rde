@@ -327,18 +327,21 @@ HiDPI friendly."
 
 (define* (feature-foreign-distro
           #:key
-          (glibc-locales glibc-locales))
+          (glibc-locales glibc-locales)
+          (nss-certs nss-certs))
   "Provides missing packages and other fixes for rde usage on foreign distro."
   (ensure-pred file-like? glibc-locales)
+  (ensure-pred file-like? nss-certs)
 
   (define (get-home-services _)
     (list
      ;; On ubuntu 20.04 default Guix Home environment fails with
      ;; guile: warning: failed to install locale
+     ;; also, some commands fails without nss-certs
      (simple-service
-      'foreign-distro-glibc-locales
+      'foreign-distro-base-packages
       home-profile-service-type
-      (list glibc-locales))
+      (list glibc-locales nss-certs))
 
      ;; The fix for ubuntu, as it doesn't set XCURSOR_PATH, but expects it
      ;; contains a /usr/share/icons if it set.
@@ -351,4 +354,6 @@ HiDPI friendly."
   (feature
    (name 'foreign-distro)
    (home-services-getter get-home-services)
-   (values `((foreign-distro . #t)))))
+   (values `((foreign-distro . #t)
+             (glibc-locales . ,glibc-locales)
+             (nss-certs . ,nss-certs)))))
