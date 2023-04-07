@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -34,7 +34,9 @@
 (define* (feature-xdg
           #:key
           (xdg-base-directories-configuration
-           (home-xdg-base-directories-configuration))
+           (home-xdg-base-directories-configuration
+            (state-home "$HOME/.local/var/lib")
+            (log-home "$HOME/.local/var/log")))
           (xdg-user-directories-configuration
            (home-xdg-user-directories-configuration)))
   "Set XDG base (with a few extensions) and user directories.
