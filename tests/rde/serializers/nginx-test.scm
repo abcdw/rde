@@ -188,26 +188,33 @@ location / {
 
 (define-test nginx-config-merge
   (test-group "nginx config merge"
-    (test-equal "naive merge"
-      '((a ((b c)))
+
+    (define gexp-l #~"l")
+    (define gexp-m #~"m")
+    (test-equal "simple merge"
+      `((a ((b c)))
+        (j k)
+        ,gexp-l
+        (,gexp-m)
         (d ((e f)))
         (g ((h i))))
-      (nginx-merge '((a ((b c))))
+      (nginx-merge `((a ((b c)))
+                     (j k)
+                     ,gexp-l
+                     (,gexp-m))
                    '((d ((e f))))
                    '((g ((h i))))))
 
     ;; Right now nginx-merge doesn't actually merge, it just concatenates.
     ;; Fix the implementation and remove test-expect-fail.
-    (test-expect-fail 1)
     (test-equal "advanced merge"
-      '((a ((b c)
-            (e f)
-            (h i))))
-      (nginx-merge '((a ((b c))))
-                   '((a ((e f))))
-                   '((a ((h i))))))
+      '((a b ((b c)
+              (e f)
+              (h i))))
+      (nginx-merge '((a b ((b c))))
+                   '((a b ((e f))))
+                   '((a b ((h i))))))
 
-    (test-expect-fail 1)
     (test-equal "deep merge"
       '((a ((b ((c d)
                 (e f)
@@ -215,6 +222,18 @@ location / {
             (i j))))
       (nginx-merge '((a ((b ((c d))))))
                    '((a ((b ((e f))))))
+                   '((a ((b ((g h)))
+                         (i j))))))
+
+    (test-equal "deep merge + gexps"
+      `((a ((b ((c d)
+                (,gexp-l) ;; Check that equality compared correctly
+                ,gexp-m
+                (g h)))
+            (i j))))
+      (nginx-merge '((a ((b ((c d))))))
+                   `((a ((b ((,gexp-l)
+                             ,gexp-m)))))
                    '((a ((b ((g h)))
                          (i j))))))))
 

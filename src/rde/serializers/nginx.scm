@@ -149,9 +149,64 @@ where each expression is also a list or gexp, but provided value is:\n ~a")
 (define (nginx-serialize config)
   (serialize-nginx-config #f config))
 
-(define (nginx-merge config1 config2 . rest)
-  "Naive implementation, without actual merging logic."
-  (apply append config1 config2 rest))
+(define (has-nested-context? l)
+  (and (list? l)
+       (nginx-context? (last l))))
+
+(define (context-args l)
+  (drop-right l 1))
+
+(define (context-body l)
+  (last l))
+
+(define (nginx-merge-contexts c1 c2)
+  "Recursively merge two nginx contexts."
+  (define c2-nested-contexts (make-hash-table))
+  (define merged-contexts (make-hash-table))
+  (define (mark-merged key)
+    (hash-set! merged-contexts key #t))
+
+  (for-each
+   (lambda (x)
+     (when (has-nested-context? x)
+       (hash-set! c2-nested-contexts (context-args x) (context-body x))))
+   c2)
+
+  (define c1-with-merged
+    (map
+     (lambda (x)
+       (let ((c2-context-body
+              (if (has-nested-context? x)
+                  (hash-ref c2-nested-contexts (context-args x))
+                  #f)))
+         (if (and (has-nested-context? x) c2-context-body)
+             (begin
+               (mark-merged (context-args x))
+               (append
+                (context-args x)
+                (list
+                 (nginx-merge-contexts (context-body x)
+                                       c2-context-body))))
+             x)))
+     c1))
+
+  (define c2-without-merged
+    (remove
+     (lambda (x)
+       (if (list? x)
+           (hash-ref merged-contexts (context-args x))
+           #f))
+     c2))
+
+  (append c1-with-merged c2-without-merged))
+
+(define (nginx-merge . rest)
+  "Merge nginx context recursively."
+  ((@ (rde features) throw-message)
+   (< (length rest) 2)
+   "The number of arguments to nginx-merge should be more than 1.")
+
+  (reduce-right nginx-merge-contexts '() rest))
 
 (define (nginx-config? config)
   "Naive implementation, without traversing nested structures."

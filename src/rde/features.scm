@@ -159,7 +159,6 @@ of services.  Service can be either @code{service?} or
    (default
      (get-operating-system this-rde-config))))
 
-
 (define-syntax ensure-pred
   (syntax-rules ()
     ((ensure-pred pred field)
@@ -173,6 +172,7 @@ of services.  Service can be either @code{service?} or
                   (procedure-name pred)
                   field)))))))))
 
+;; TODO: Move it to approprate module
 (define-syntax throw-message
   (syntax-rules ()
     ((throw-message pred msg)
