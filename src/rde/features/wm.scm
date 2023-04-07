@@ -949,19 +949,11 @@ for the main bar."
 
   (define (get-system-services _)
     (list
-     (screen-locker-service swaylock "swaylock")
-     ;; (simple-service
-     ;;  'setuid-chkpwd
-     ;;  setuid-program-service-type
-     ;;  (list (file-like->setuid-program
-     ;;         (file-append linux-pam "/sbin/unix_chkpwd"))))
-
-     ;; (simple-service
-     ;;  'sway-add-swaylock-pam
-     ;;  pam-root-service-type
-     ;;  (list
-     ;;   (unix-pam-service "swaylock")))
-     ))
+     ;; TODO: Remove once chkpwd patch merged (it's in core-updates rn)
+     (service
+      screen-locker-service-type
+      (screen-locker-configuration
+       "swaylock" (file-append swaylock "/bin/swaylock") #f))))
 
   (feature
    (name 'swaylock)

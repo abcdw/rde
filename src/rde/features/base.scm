@@ -277,14 +277,14 @@ be a symbol, which will be used to construct feature name."
    (service accountsservice-service-type)
    (service cups-pk-helper-service-type)
    (service colord-service-type)
-   (geoclue-service)
+   (service geoclue-service-type)
    ;; (service polkit-service-type)
    (service elogind-service-type)
    (service dbus-root-service-type)
 
    (service ntp-service-type)
 
-   x11-socket-directory-service))
+   (service x11-socket-directory-service-type)))
 
 (define %rde-desktop-home-services
   (list (service home-dbus-service-type)))
