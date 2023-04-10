@@ -79,6 +79,7 @@ recommended RDE experience is to rely on Emacs default keybindings."
         (setq evil-want-integration t)
         (setq evil-want-C-u-scroll t)
         (setq evil-want-C-i-jump nil)
+        (setq evil-want-minibuffer t)
         (setq evil-respect-visual-line-mode t)
         (setq evil-undo-system 'undo-fu)
 
