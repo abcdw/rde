@@ -5,12 +5,12 @@
 
 # Store items doesn't have useful mtime, so we rely on guix.lock to prevent
 # unecessary rebuilds
-guix: target/profiles/guix-time-marker
+guix: target/guix-time-marker
 
 target/profiles:
 	mkdir -p target/profiles
 
-target/profiles/guix-time-marker: rde/channels-lock.scm
+target/guix-time-marker: rde/channels-lock.scm
 	make target/profiles/guix
 	touch $@
 
