@@ -18,10 +18,12 @@ For each serializer module we will provide:
 
 - FORMAT-serialize :: a public function returning a g-expression, which
   produce a string being written to configuration file.
-- FORMAT-merge :: a public function taking two or more configurations and
+- FORMAT-merge :: a public function taking any number of configurations and
   merging them into one with respect to underlying format.
 - FORMAT-config? :: a public function for checking if provided data looks
   suitable for this format.
 
 * Consequences
 We get unified API across serializers modules.
+
+Serialization code depends on guix gexps.
