@@ -20,7 +20,11 @@
 (define-module (rde tests)
   #:use-module (srfi srfi-64)
   #:export (define-test test?)
-  #:re-export (test-equal test-error test-group))
+  #:re-export (test-error
+               test-equal
+               test-group
+               test-assert
+               test-expect-fail))
 
 (define-syntax define-test
   (syntax-rules ()
