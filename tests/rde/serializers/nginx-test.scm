@@ -72,6 +72,13 @@
           "" "}\n") #t)
         (_ #f)))
 
+    (test-assert "empty subcontext"
+      (match (serialize-nginx-context
+              `((a b ())))
+        (("" "a" " " "b" " {\n"
+          "" "}\n") #t)
+        (_ #f)))
+
     (test-assert "double nested config"
       (match (serialize-nginx-context
               `((a ((b ((c d)))))))
@@ -203,6 +210,11 @@ location / {
                      (,gexp-m))
                    '((d ((e f))))
                    '((g ((h i))))))
+
+    (test-equal "empty context merge"
+      '((a b ((e f))))
+      (nginx-merge '((a b ()))
+                   '((a b ((e f))))))
 
     (test-equal "advanced merge"
       '((a b ((b c)
