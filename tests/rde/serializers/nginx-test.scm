@@ -22,8 +22,7 @@
   #:use-module (rde serializers nginx)
   #:use-module (rde tests)
   #:use-module (rde tests store)
-  #:use-module (ice-9 match)
-  #:use-module (srfi srfi-64))
+  #:use-module (ice-9 match))
 
 (define (serialize-config config)
   (eval-with-store (nginx-serialize config)))
@@ -205,8 +204,6 @@ location / {
                    '((d ((e f))))
                    '((g ((h i))))))
 
-    ;; Right now nginx-merge doesn't actually merge, it just concatenates.
-    ;; Fix the implementation and remove test-expect-fail.
     (test-equal "advanced merge"
       '((a b ((b c)
               (e f)

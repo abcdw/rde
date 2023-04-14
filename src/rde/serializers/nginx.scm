@@ -202,10 +202,6 @@ where each expression is also a list or gexp, but provided value is:\n ~a")
 
 (define (nginx-merge . rest)
   "Merge nginx context recursively."
-  ((@ (rde features) throw-message)
-   (< (length rest) 2)
-   "The number of arguments to nginx-merge should be more than 1.")
-
   (reduce-right nginx-merge-contexts '() rest))
 
 (define (nginx-config? config)
