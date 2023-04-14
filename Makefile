@@ -12,7 +12,7 @@ install:
 	@echo some installation will happen here
 
 check:
-	./pre-inst-env guile -L ./tests -c \
+	./pre-inst-env guile -L ./tests -L ./files/emacs/gider/src -c \
 	'((@ (rde test-runners) run-project-tests-cli))'
 
 repl:
