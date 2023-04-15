@@ -28,6 +28,7 @@
   #:use-module (rde system services web)
   #:use-module (rde tests)
   #:use-module (rde tests store)
+  #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (ice-9 regex))
 
@@ -57,8 +58,19 @@
                      (append base-services services))
                     #:target-type nginx-service-type)))))
 
-(define (drop-first-line s)
-  (string-join (cdr (string-split s #\newline)) "\n"))
+(define (drop-nth-line s n)
+  (let ((lines (string-split s #\newline)))
+    (when (not (<= 0 n (1- (length lines))))
+      (raise-exception
+       (make-exception
+        (make-assertion-failure)
+        (make-exception-with-message
+         (format #f "n should be in a range [~a, ~a]" 0 (1- (length lines)))))))
+    (string-join
+     (append
+      (take lines n)
+      (take-right lines (- (length lines) n 1)))
+     "\n")))
 
 (define-test nginx-basic-config
   (define services
@@ -97,6 +109,9 @@
 
   (define pattern
     "\
+user nginx nginx;
+pid /var/run/nginx/pid;
+
 load_module /gnu/store/19apmplkgpmnvn963cfydgjhhnvpf9fs-nginx-rtmp-module-1.2.2/etc/nginx/modules/ngx_rtmp_module.so;
 
 events {
@@ -137,5 +152,5 @@ rtmp {
   (test-group "nginx basic service config"
     ;; Should start failing once configuration check implemented
     (test-equal "service, simple-service http+rtmp contexts"
-      (drop-first-line pattern)
-      (drop-first-line (services->config-string services)))))
+      (drop-nth-line pattern 3)
+      (drop-nth-line (services->config-string services) 3))))

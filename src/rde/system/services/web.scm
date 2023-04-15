@@ -50,6 +50,12 @@
   (run-directory
    (string "/var/run/nginx")
    "Nginx run directory")
+  (initial-conf
+   (nginx-config
+    `((user nginx nginx)
+      (pid /var/run/nginx/pid)
+      ,#~""))
+   "Initial Nginx configuration.")
   (nginx-conf
    (nginx-config '())
    "Nginx configuration."))
@@ -81,6 +87,7 @@
      (nginx-conf
       (apply
        nginx-merge
+       (nginx-configuration-initial-conf original-config)
        (nginx-configuration-nginx-conf original-config)
        (map nginx-extension-nginx-conf extensions))))))
 
