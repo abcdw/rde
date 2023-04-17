@@ -21,20 +21,17 @@
   (settings
    (json-config '())
    "Transmission configuration.")
-  (auto-start?
-   (boolean #f)
-   "Whether to autostart the transmission daemon.")
   (download-dir
    maybe-string
    "Where to download torrent data to."))
 
 (define home-transmission-shepherd-service
   (match-lambda
-    (($ <home-transmission-configuration> transmission _ auto-start? download-dir)
+    (($ <home-transmission-configuration> transmission _ download-dir)
      (list
       (shepherd-service
        (provision '(transmission))
-       (auto-start? auto-start?)
+       (auto-start? #t)
        (start #~(make-forkexec-constructor
                  (list
                   #$(file-append transmission "/bin/transmission-daemon")
