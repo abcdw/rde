@@ -161,9 +161,12 @@ is a list of message types to ignore."
                                           string pred)))))
                           rde-erc-users :key 'rde-erc-user-id)))
           (require 'erc)
-          (let ((network (rde-erc-user-network user))
-                (nick (rde-erc-user-nick user))
-                (original-erc-email-userid erc-email-userid))
+          (let* ((network (rde-erc-user-network user))
+                 (nick (rde-erc-user-nick user))
+                 (original-erc-email-userid erc-email-userid)
+                 (password (auth-source-pick-first-password
+                            :host network
+                            :user nick)))
             (when (rde-erc-user-bouncer-p user)
               (let* ((irc-network (completing-read
                                    "Network: "
@@ -182,14 +185,13 @@ is a list of message types to ignore."
                                         (cl-find irc-network rde-erc-users
                                                  :key 'rde-erc-user-network
                                                  :test 'string=))))
-                (setq erc-email-userid (format "%s/%s" irc-network-nick irc-network))))
+                (setq erc-email-userid (format "%s/%s" nick irc-network))
+                (setq nick irc-network-nick)))
             (erc-tls
              :server network
              :port 6697
              :nick nick
-             :password (auth-source-pick-first-password
-                        :host network
-                        :user nick))
+             :password password)
             ;; Restore original value of erc-email-userid
             (setq erc-email-userid original-erc-email-userid)))
 
