@@ -39,7 +39,7 @@
                  (list
                   #$(file-append transmission "/bin/transmission-daemon")
                   "--foreground" "--no-incomplete-dir"
-                  #$@(if download-dir
+                  #$@(if (maybe-value-set? download-dir)
                          (list "--download-dir" download-dir)
                          '()))))
        (stop #~(make-kill-destructor)))))))
