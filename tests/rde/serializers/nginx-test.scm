@@ -224,6 +224,37 @@ location / {
                    '((a b ((e f))))
                    '((a b ((h i))))))
 
+    ;; It will require some parametrization of merge function.
+    ;; For example providing a list of keys to override.
+    (test-expect-fail 1)
+    (test-equal "merge with override"
+      '((user c d)
+        (a ((b ((c f))))))
+      (nginx-merge '((user a b)
+                     (a ((b ((c d))))))
+                   '((user c d)
+                     (a ((b ((c f))))))))
+
+    ;; It will require some parametrization of merge function as well.  Maybe
+    ;; a list of nested keys to use for equal comparison or maybe some
+    ;; hardcoded merge logic.
+
+    ;; There is a potential problem with gexp-generated content, as it won't
+    ;; be equal to plain strings/symbols.
+    (test-expect-fail 1)
+    (test-equal "merge a few server blocks"
+      '((http ((server ((listen 80)
+                        (server_name a)
+                        (listen 443 ssl)))
+               (server ((listen 80)
+                        (server_name b))))))
+      (nginx-merge '((http ((server ((listen 80)
+                                     (server_name a))))))
+                   '((http ((server ((listen 443 ssl)
+                                     (server_name a))))))
+                   '((http ((server ((listen 80)
+                                     (server_name b))))))))
+
     (test-equal "deep merge"
       '((a ((b ((c d)
                 (e f)
