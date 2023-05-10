@@ -247,8 +247,8 @@ functionalities."
                     `((default-new-buffer-url
                        (quri:uri ,default-new-buffer-url)))
                     '())))
-           (define-configuration nyxt/hint-mode:hint-mode
-             ((nyxt/hint-mode:hints-alphabet ,(match keyboard-variant
+           (define-configuration nyxt/mode/hint:hint-mode
+             ((nyxt/mode/hint:hints-alphabet ,(match keyboard-variant
                                                 ("dvorak" "aoeuidhtns")
                                                 (_ "asdfghjklqwertyuiop")))))
            ,@(if autostart-slynk?
