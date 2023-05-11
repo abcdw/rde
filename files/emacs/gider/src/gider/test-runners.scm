@@ -1,4 +1,7 @@
 (define-module (gider test-runners)
+  ;; Needed for fold-module-public-variables
+  ;; TODO: later remove this dependency
+  #:use-module (guix discovery)
   #:use-module (srfi srfi-64)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 ftw)
