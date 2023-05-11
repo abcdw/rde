@@ -14,6 +14,10 @@
 
             test-runner-summary))
 
+(define (test? proc)
+  "Checks if PROC is a test."
+  (and (procedure? proc) (procedure-property proc 'srfi-64-test?)))
+
 (define (string-repeat s n)
   "Returns string S repeated N times."
   (fold

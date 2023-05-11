@@ -19,7 +19,7 @@
 
 (define-module (rde tests)
   #:use-module (srfi srfi-64)
-  #:export (define-test test?)
+  #:export (define-test)
   #:re-export (test-error
                test-equal
                test-group
@@ -32,7 +32,3 @@
      (begin
        (define-public (test-name) e ...)
        (set-procedure-property! test-name 'srfi-64-test? #t)))))
-
-(define (test? proc)
-  "Checks if PROC is a test."
-  (and (procedure? proc) (procedure-property proc 'srfi-64-test?)))
