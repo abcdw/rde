@@ -24,7 +24,7 @@ See also emacs-multitran
 ** TODO Configure icecat profiles
 ** TODO Implement home service ungoogled-chromium
 - Browser extension
-** TODO Implement home service nyxt
+** DONE Implement home service nyxt
 - Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
 *
 * Archive                                                           :ARCHIVE:
