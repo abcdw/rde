@@ -5,6 +5,7 @@
 
   #:export (%previous-runner
             get-test-module
+            get-module-tests
 
             rerun-tests
             run-test
@@ -252,23 +253,11 @@ given string in an ANSI escape code."
         (map (lambda (t) (run-test t #:runner runner)) module-tests))))
   runner)
 
-(define (get-test-modules)
-  (define this-module-file
-    (canonicalize-path
-     (search-path %load-path "rde/test-runners.scm")))
-
-  (define tests-root-dir
-    (dirname (dirname this-module-file)))
-  ;; TODO: Reimplement or migrate to (geiser module) (a different from guix
-  ;; discovery, so it doesn't find nested modules)
-
-  ;; ((@@ (gesier modules) all-child-modules) (resolve-module '(rde)))
-  (all-modules (list tests-root-dir)))
-
 ;; (test-runner-current #f)
 (define* (run-project-tests
-          #:key (runner (test-runner-create)))
-  (define test-modules (get-test-modules))
+          #:key
+          (runner (test-runner-create))
+          (test-modules '()))
   (test-with-runner runner
     (test-group "PROJECT TEST"
       (map (lambda (m)
