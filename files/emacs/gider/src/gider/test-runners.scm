@@ -198,9 +198,6 @@ given string in an ANSI escape code."
 
 (test-runner-factory test-runner-default)
 
-(use-modules (guix discovery)
-             (rde tests))
-
 (define (test-runner-summary runner)
   "Return alist of helpful statistics for the test-runner RUNNER."
   `((pass . ,(test-runner-pass-count runner))
