@@ -1484,22 +1484,23 @@ viceversa."
           "Transform URL to its alternative in `rde-browse-url-mappings'.
 If ALT is non-nil, URL is assumed to be an alternative so the logic is reversed."
           (string-match (rx (group (+ any) "://" (* (not "/"))) (* any)) url)
-          (if-let* ((service-url (match-string 1 url))
-                    (mapping (if alt
-                                 (cl-rassoc service-url rde-browse-url-mappings
-                                            :test 'string=)
-                               (assoc-string service-url
-                                             rde-browse-url-mappings))))
-              (if alt
-                  (replace-regexp-in-string
-                   service-url
-                   (car mapping)
-                   url)
-                (replace-regexp-in-string
-                 service-url
-                 (cdr mapping)
-                 url))
-            url))
+          (let* ((service-url (match-string 1 url))
+                 (mapping (if alt
+                              (cl-rassoc service-url rde-browse-url-mappings
+                                         :test 'string=)
+                              (assoc-string service-url
+                                            rde-browse-url-mappings))))
+            (if mapping
+                (if alt
+                    (replace-regexp-in-string
+                     service-url
+                     (car mapping)
+                     url)
+                    (replace-regexp-in-string
+                     service-url
+                     (cdr mapping)
+                     url))
+                url)))
 
         (defun rde-browse-url-bookmark-make-record (url title)
           "Create a bookmark record from a browser buffer with URL and TITLE."
