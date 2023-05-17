@@ -172,13 +172,15 @@ do with the file, and whether to add the file to the current PLAYLIST."
                      `((with-eval-after-load 'embark
                          (defvar rde-mpv-chapter-embark-actions
                            (let ((map (make-sparse-keymap)))
-                             (define-key map "r" 'mpv-set-chapter-ab-loop)))
+                             (define-key map "r" 'mpv-set-chapter-ab-loop)
+                             map))
                          (add-to-list 'embark-keymap-alist
                                       (cons 'mpv-chapter
                                             'rde-mpv-chapter-embark-actions))
                          (defvar rde-mpv-file-embark-actions
                            (let ((map (make-sparse-keymap)))
-                             (define-key map "d" 'mpv-remove-playlist-entry)))
+                             (define-key map "d" 'mpv-remove-playlist-entry)
+                             map))
                          (add-to-list 'embark-keymap-alist
                                       (cons 'mpv-file
                                             'rde-mpv-file-embark-actions))))
