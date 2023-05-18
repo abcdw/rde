@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
@@ -98,14 +98,12 @@ and provides GPG-PRIMARY-KEY value for other features."
         (home-gpg-agent-configuration
          (shepherd? #f)
          (extra-config
-          ;; TTL for security-tokens doesn't make sense
-          `(,@(if (not (get-value 'security-token config))
-                  `((default-cache-ttl . ,default-ttl)
-                    (default-cache-ttl-ssh . ,default-ttl)
-                    (max-cache-ttl . ,default-ttl)
-                    (max-cache-ttl-ssh . ,default-ttl))
-                  '())
-            ,@gpg-agent-extra-config))
+          ;; TTL for security-token's keys doesn't make sense, but even if
+          ;; security-token is enabled, some keys can be stored locally.
+          `((default-cache-ttl . ,default-ttl)
+            (default-cache-ttl-ssh . ,default-ttl)
+            (max-cache-ttl . ,default-ttl)
+            (max-cache-ttl-ssh . ,default-ttl)))
          (ssh-agent? gpg-ssh-agent?)
          (ssh-keys ssh-keys)
          (pinentry-flavor pinentry-flavor)))))))
