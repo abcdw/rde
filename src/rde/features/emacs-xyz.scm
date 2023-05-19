@@ -3927,6 +3927,81 @@ olivetti package."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define (org-roam-todo config)
+  "Configure Org Roam for non-hierarchical task management."
+  `((defun rde-org-roam-get-filetags ()
+      "Return the top-level tags for the current org-roam node."
+      (split-string
+       (or (cadr (assoc "FILETAGS"
+                        (org-collect-keywords '("filetags"))))
+           "")
+       ":" 'omit-nulls))
+
+    (defun rde-org-roam-todo-p ()
+      "Return non-nil if the current buffer has any to-do entry."
+      (org-element-map
+          (org-element-parse-buffer 'headline)
+          'headline
+        (lambda (h)
+          ,@(if (get-value 'emacs-org-recur config)
+                '((eval-when-compile
+                   (require 'org-recur))
+                  (or (eq (org-element-property :todo-type h) 'todo)
+                      (when (stringp (org-element-property :raw-value h))
+                        (string-match org-recur--regexp (org-element-property
+                                                         :raw-value h)))))
+              '((eq (org-element-property :todo-type h) 'todo))))
+        nil 'first-match))
+
+    (defun rde-org-roam-update-todo-tag ()
+      "Update the \"todo\" tag in the current buffer."
+      (when (and (not (active-minibuffer-window))
+                 (org-roam-file-p))
+        (org-with-point-at 1
+          (let* ((tags (rde-org-roam-get-filetags))
+                 (is-todo (rde-org-roam-todo-p)))
+            (cond ((and is-todo (not (member "todo" tags)))
+                   (org-roam-tag-add '("todo")))
+                  ((and (not is-todo) (member "todo" tags))
+                   (org-roam-tag-remove '("todo"))))))))
+
+    (defun rde-org-roam-list-todo-files ()
+      "Return a list of org-roam files containing the \"todo\" tag."
+      (org-roam-db-sync)
+      (let ((todo-nodes (cl-remove-if-not
+                         (lambda (n)
+                           (member "todo" (org-roam-node-tags n)))
+                         (org-roam-node-list))))
+        (delete-dups (mapcar 'org-roam-node-file todo-nodes))))
+
+    (defun rde-org-roam-update-todo-files (&rest _)
+      "Update the value of `org-agenda-files'."
+      (setq org-agenda-files (rde-org-roam-list-todo-files)))
+
+    (defun rde-org-roam-ref-add (ref node)
+      "Add REF to NODE.
+If NODE doesn't exist, create a new org-roam node with REF."
+      (interactive
+       (list
+        (read-string "Ref: ")
+        (org-roam-node-read)))
+      (if-let ((file (org-roam-node-file node)))
+          (with-current-buffer (or (find-buffer-visiting file)
+                                   (find-file-noselect file))
+            (org-roam-property-add "ROAM_REFS" ref)
+            (save-buffer)
+            (kill-current-buffer))
+        (org-roam-capture-
+         :keys "r"
+         :node node
+         :info `(:ref ,ref)
+         :templates org-roam-capture-templates
+         :props '(:finalize find-file))))
+
+    (add-hook 'org-roam-find-file-hook 'rde-org-roam-update-todo-tag)
+    (add-hook 'before-save-hook 'rde-org-roam-update-todo-tag)
+    (advice-add 'org-agenda :before 'rde-org-roam-update-todo-files)))
+
 ;; TODO: rewrite to states
 (define* (feature-emacs-org-roam
           #:key
@@ -3934,6 +4009,7 @@ olivetti package."
           (org-roam-directory #f)
           (org-roam-dailies-directory #f)
           (org-roam-capture-templates #f)
+          (org-roam-todo? #t)
           (use-node-types? #t))
   "Configure org-roam for GNU Emacs."
   (ensure-pred file-like? emacs-org-roam)
@@ -3942,6 +4018,7 @@ olivetti package."
   (ensure-pred maybe-path? org-roam-dailies-directory)
   (ensure-pred maybe-list? org-roam-capture-templates)
   (ensure-pred boolean? use-node-types?)
+  (ensure-pred boolean? org-roam-todo?)
 
   (define emacs-f-name 'org-roam)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -3989,6 +4066,9 @@ the node, relative to `org-roam-directory'."
          ,@(if org-roam-dailies-directory
                `((setq org-roam-dailies-directory ,org-roam-dailies-directory))
                '()))
+        ,@(if org-roam-todo?
+              (org-roam-todo config)
+              '())
 
         (let ((map mode-specific-map))
           (define-key map (kbd "n t") 'org-roam-dailies-goto-today)
@@ -4003,11 +4083,16 @@ Knowlede base, note-taking set up and ready"
 Set roam directory, basic keybindings, reasonable defaults and adjust
 marginalia annotations."
       #:keywords '(convenience org-mode roam knowledgebase)
-      #:elisp-packages (list emacs-org-roam))))
+      #:elisp-packages (append
+                        (list emacs-org-roam)
+                        (or (and=> (get-value 'emacs-org-recur config)
+                                   list)
+                            '())))))
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((,f-name . #t)
+             (org-roam-todo? . ,org-roam-todo?)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-citar
