@@ -4123,10 +4123,18 @@ the node, relative to `org-roam-directory'."
 
         (let ((map mode-specific-map))
           (define-key map (kbd "n t") 'org-roam-dailies-goto-today)
+          (define-key map (kbd "n y") 'org-roam-dailies-goto-yesterday)
+          (define-key map (kbd "n m") 'org-roam-dailies-goto-tomorrow)
           (define-key map (kbd "n d") 'org-roam-dailies-goto-date)
+          (define-key map (kbd "n c t") 'org-roam-dailies-capture-today)
+          (define-key map (kbd "n c y") 'org-roam-dailies-capture-yesterday)
+          (define-key map (kbd "n c m") 'org-roam-dailies-capture-tomorrow)
+          (define-key map (kbd "n c d") 'org-roam-dailies-capture-date)
           (define-key map (kbd "n n") 'org-roam-buffer-toggle)
           (define-key map (kbd "n f") 'org-roam-node-find)
-          (define-key map (kbd "n i") 'org-roam-node-insert)))
+          (define-key map (kbd "n i") 'org-roam-node-insert)
+          (define-key map (kbd "n r") 'org-roam-ref-find)
+          (define-key map (kbd "n C") 'org-roam-capture)))
 
       #:summary "\
 Knowlede base, note-taking set up and ready"
