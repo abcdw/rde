@@ -25,6 +25,7 @@
   #:use-module (gnu home services fontutils)
   #:use-module (gnu services)
   #:use-module (gnu packages fonts)
+  #:use-module (guix records)
   #:use-module (rde packages fonts)
   #:use-module (srfi srfi-9)
 
@@ -34,25 +35,17 @@
             font-size
             font-name
             font-weight
-            font-specification))
+            font-specification
+            make-font
+            font?))
 
-(define %rde-default-font-packages
-  (list font-iosevka
-        font-iosevka-aile
-        font-iosevka-etoile
-        font-liberation ;; Substitute for Arial, Times New Roman, Courier New
-        font-noto-emoji
-        font-gnu-unifont))
-
-(define-record-type <font>
-  (%font name size weight)
+(define-record-type* <font> font
+  make-font
   font?
   (name font-name)
   (size font-size)
-  (weight font-weight))
-
-(define* (font name #:key size weight)
-  (%font name size weight))
+  (weight font-weight (default 'regular))
+  (package font-package))
 
 (define (font-specification font)
   "Convert <font> record to string."
@@ -65,42 +58,72 @@
 (define* (feature-fonts
           #:key
           (default-font-size 11)
-          (font-monospace (font "Iosevka"
-                                #:size default-font-size #:weight 'regular))
-          (font-sans      (font "Iosevka Aile"
-                                #:size default-font-size #:weight 'regular))
-          (font-serif     (font "Iosevka Etoile"
-                                #:size default-font-size #:weight 'regular))
-          (font-unicode   (font "Unifont"))
-          (font-packages  '())
-          (base-font-packages  %rde-default-font-packages))
+          (font-monospace
+           (font
+            (name "Iosevka")
+            (size default-font-size)
+            (package font-iosevka)))
+          (font-serif
+           (font
+            (name "Iosevka Aile")
+            (size default-font-size)
+            (package font-iosevka-aile)))
+          (font-sans
+           (font
+            (name "Iosevka Etoile")
+            (size default-font-size)
+            (package font-iosevka-etoile)))
+          (font-unicode
+           (font
+            (name "Unifont")
+            (size default-font-size)
+            (package font-gnu-unifont)))
+          (extra-font-packages '()))
   "Configure fonts.  DEFAULT-FONT-SIZE will be used for making
 font-monospace default value, and it will be ignored if
 #:font-monospace argument is specified."
 
   (ensure-pred integer? default-font-size)
   (ensure-pred font? font-monospace)
-  (ensure-pred font? font-sans)
   (ensure-pred font? font-serif)
-  (ensure-pred list-of-packages? font-packages)
-  (ensure-pred list-of-packages? base-font-packages)
+  (ensure-pred font? font-sans)
+  (ensure-pred font? font-unicode)
+  (ensure-pred list-of-file-likes? extra-font-packages)
 
-  ;; TODO: Make it configure fonts via fontconfig home service
-  ;; (requires adding extending capabilities to service)
-  (define (fonts-home-services config)
-    "Returns home services related to fonts."
+  (define f-name 'fonts)
+
+  (define (get-home-services config)
+    "Return home services related to fonts."
     (list
      (simple-service
-      'font-packages
+      'add-extra-fonts
       home-profile-service-type
       (append
-       font-packages
-       base-font-packages))))
+       (map font-package
+            (list font-sans font-serif font-monospace font-unicode))
+       extra-font-packages))
+     (simple-service
+      'add-fontconfig-font-families
+      home-fontconfig-service-type
+      (list
+       `(alias
+         (family "sans-serif")
+         (prefer
+          (family ,(font-name font-sans))))
+       `(alias
+         (family "serif")
+         (prefer
+          (family ,(font-name font-serif))))
+       `(alias
+         (family "monospace")
+         (prefer
+          (family ,(font-name font-monospace))))))))
 
   (feature
-   (name 'fonts)
+   (name f-name)
    (values
     (append
-     `((fonts . #t))
-     (make-feature-values font-monospace font-sans font-serif font-unicode)))
-   (home-services-getter fonts-home-services)))
+     `((,f-name . #t))
+     (make-feature-values font-sans font-monospace
+                          font-serif font-unicode)))
+   (home-services-getter get-home-services)))
