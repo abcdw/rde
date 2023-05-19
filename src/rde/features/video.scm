@@ -62,8 +62,6 @@
         (bindings extra-bindings)
         (default-options
          `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
-           (keep-open . #t)
-           (save-position-on-quit . #t)
            (osd-font . ,font-sans-serif)
            (sub-font . ,font-sans-serif)
            ,@extra-mpv-conf))))
