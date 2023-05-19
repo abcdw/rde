@@ -4085,6 +4085,21 @@ the node, relative to `org-roam-directory'."
                 node-ref
               (error "No roam refs in this node"))))
 
+        (with-eval-after-load 'org
+          (let ((map org-mode-map))
+            (define-key map (kbd "C-TAB") 'completion-at-point)
+            (define-key map (kbd "C-c r r") 'org-roam-ref-add)
+            (define-key map (kbd "C-c r R") 'org-roam-ref-remove)
+            (define-key map (kbd "C-c r f") 'org-roam-ref-find)
+            (define-key map (kbd "C-c r t") 'org-roam-tag-add)
+            (define-key map (kbd "C-c r T") 'org-roam-tag-remove)
+            (define-key map (kbd "C-c r a") 'org-roam-alias-add)
+            (define-key map (kbd "C-c r A") 'org-roam-alias-remove)
+            (define-key map (kbd "C-c r O") 'rde-org-roam-open-ref)
+            (define-key map (kbd "C-c n N") 'org-roam-dailies-goto-next-note)
+            (define-key map (kbd "C-c n P")
+              'org-roam-dailies-goto-previous-note)))
+
          ,@(if org-roam-capture-templates
                `((setq org-roam-capture-templates ',org-roam-capture-templates))
                '())
