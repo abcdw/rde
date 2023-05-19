@@ -4110,6 +4110,24 @@ the node, relative to `org-roam-directory'."
         ,@(if org-roam-todo?
               (org-roam-todo config)
               '())
+          ,@(if (get-value 'emacs-embark config)
+                 `((with-eval-after-load 'embark
+                     (defvar-keymap embark-roam-ref-map
+                       :doc "Keymap for actions on org-roam refs."
+                       :parent embark-url-map
+                       ,@(if (get-value 'mpv config)
+                             '("v" 'rde-mpv-play-url)
+                             '())
+                       "RET" 'browse-url-generic
+                       "c" 'browse-url-chromium
+                       "r" 'org-roam-ref-remove)
+                     (add-to-list 'embark-keymap-alist
+                                  '(org-roam-ref . embark-roam-ref-map))
+                     ,@(if (get-value 'emacs-browse-url config)
+                           '((advice-add 'org-roam-ref-add
+                                         :around 'rde-browse-url-trace-url))
+                           '())))
+                 '())
 
         (with-eval-after-load 'org-roam-dailies
           ,@(if org-roam-dailies-capture-templates
@@ -4144,6 +4162,8 @@ marginalia annotations."
       #:keywords '(convenience org-mode roam knowledgebase)
       #:elisp-packages (append
                         (list emacs-org-roam)
+                        (or (and=> (get-value 'emacs-embark config) list)
+                            '())
                         (or (and=> (get-value 'emacs-org-recur config)
                                    list)
                             '())))))
