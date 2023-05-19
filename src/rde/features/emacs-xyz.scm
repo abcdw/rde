@@ -4009,6 +4009,7 @@ If NODE doesn't exist, create a new org-roam node with REF."
           (org-roam-directory #f)
           (org-roam-dailies-directory #f)
           (org-roam-capture-templates #f)
+          (org-roam-dailies-capture-templates #f)
           (org-roam-todo? #t)
           (use-node-types? #t))
   "Configure org-roam for GNU Emacs."
@@ -4018,6 +4019,7 @@ If NODE doesn't exist, create a new org-roam node with REF."
   (ensure-pred maybe-path? org-roam-dailies-directory)
   (ensure-pred maybe-list? org-roam-capture-templates)
   (ensure-pred boolean? use-node-types?)
+  (ensure-pred maybe-list? org-roam-dailies-capture-templates)
   (ensure-pred boolean? org-roam-todo?)
 
   (define emacs-f-name 'org-roam)
@@ -4069,6 +4071,16 @@ the node, relative to `org-roam-directory'."
         ,@(if org-roam-todo?
               (org-roam-todo config)
               '())
+
+        (with-eval-after-load 'org-roam-dailies
+          ,@(if org-roam-dailies-capture-templates
+                `((setq org-roam-dailies-capture-templates
+                        ',org-roam-dailies-capture-templates))
+                '())
+          ,@(if org-roam-dailies-directory
+                `((setq org-roam-dailies-directory
+                        ,org-roam-dailies-directory))
+                '()))
 
         (let ((map mode-specific-map))
           (define-key map (kbd "n t") 'org-roam-dailies-goto-today)
