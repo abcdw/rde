@@ -4060,6 +4060,30 @@ the node, relative to `org-roam-directory'."
                org-roam-node-annotation-function
                (lambda (node) (marginalia--time (org-roam-node-file-mtime node))))
          (org-roam-db-autosync-enable)
+        (defun rde-org-roam-open-ref ()
+          "Prompt you for a list of all ROAM_REFS in the current buffer."
+          (interactive)
+          (when (derived-mode-p 'org-mode)
+            (if-let* ((refs (org-property-values "ROAM_REFS"))
+                      (choices (mapcar
+                                (lambda (x)
+                                  (org-unbracket-string "[[" "]]" x))
+                                (split-string
+                                 (car (org-property-values "ROAM_REFS"))
+                                 " ")))
+                      (node-ref (completing-read
+                                 "Refs: "
+                                 (lambda (string pred action)
+                                   (if (eq action 'metadata)
+                                       `(metadata
+                                         (category . org-roam-ref)
+                                         ,(cons 'display-sort-function
+                                                'identity))
+                                     (complete-with-action
+                                      action choices string pred)))
+                                 nil 'require-match)))
+                node-ref
+              (error "No roam refs in this node"))))
 
          ,@(if org-roam-capture-templates
                `((setq org-roam-capture-templates ',org-roam-capture-templates))
