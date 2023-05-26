@@ -77,13 +77,13 @@
 (define (services-getter? fn)
   (procedure? fn))
 
-(define-configuration feature
+(define-configuration/no-serialization feature
   (name
    (symbol)
    "Name for feature to identify it in debug messages.")
   (values
    (alist '())
-   "List of pairs avaliable to share across services.")
+   "List of pairs available to share across services.")
   (home-services-getter
    (services-getter (const '()))
    "Function taking one argument (@code{values}) and returning a list
@@ -93,8 +93,7 @@ of services.  Service can be either @code{service?} or
    (services-getter (const '()))
    "Function taking one argument (@code{values}) and returning a list
 of services.  Service can be either @code{service?} or
-@code{#f}. Resulting list will be appended to operating system.")
-  (no-serialization))
+@code{#f}. Resulting list will be appended to operating system."))
 
 (define-record-type* <rde-config> rde-config
   make-rde-config
