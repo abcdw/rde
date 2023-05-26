@@ -1109,10 +1109,12 @@ path /sudo:HOST:/path if the user in sudoers.")))
           (emacs-all-the-icons-dired emacs-all-the-icons-dired)
           (emacs-dired-rsync emacs-dired-rsync)
           (kill-when-opening-new-buffer? #f)
-          (group-directories-first? #f))
+          (group-directories-first? #f)
+          (default-switches "-l -h"))
   (ensure-pred boolean? kill-when-opening-new-buffer?)
   (ensure-pred boolean? group-directories-first?)
   (ensure-pred file-like? emacs-dired-rsync)
+  (ensure-pred string? default-switches)
 
   (define emacs-f-name 'dired)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1128,7 +1130,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
           "(dired \"" (car (cdr (command-line))) "\")")))
     (define dired-listing-switches
       (string-join
-       (list "-l -h"
+       (list default-switches
              (if (get-value 'emacs-advanced-user? config)
                  "-A --time-style=long-iso"
                  "-a")
