@@ -90,6 +90,7 @@ recommended RDE experience is to rely on Emacs default keybindings."
         (setq evil-want-minibuffer t)
         (setq evil-respect-visual-line-mode t)
         (setq evil-undo-system 'undo-fu)
+        (setq evil-want-fine-undo t)
 
         ;; Since =evil-mode= take over =C-u= for buffer scrolling,
         ;; the =universal-argument= command needs to be rebind to another key
@@ -123,6 +124,9 @@ recommended RDE experience is to rely on Emacs default keybindings."
           (define-key evil-motion-state-map (kbd "k") 'evil-previous-visual-line)
           (define-key evil-operator-state-map (kbd "j") 'evil-next-line)
           (define-key evil-operator-state-map (kbd "k") 'evil-previous-line)
+          ;; undo and redo
+          (define-key evil-normal-state-map (kbd "u") 'undo-fu-only-undo)
+          (define-key evil-normal-state-map (kbd "C-r") 'undo-fu-only-redo)
 
           (evil-define-key '(normal insert visual)
                            org-mode-map (kbd "C-j") 'org-next-visible-heading)
