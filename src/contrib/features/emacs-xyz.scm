@@ -119,8 +119,10 @@ recommended RDE experience is to rely on Emacs default keybindings."
             (kbd "C-h") 'evil-delete-backward-char-and-join)
 
           ;; Use visual line motions even outside of visual-line-mode buffers
-          (evil-global-set-key 'motion "j" 'evil-next-visual-line)
-          (evil-global-set-key 'motion "k" 'evil-previous-visual-line)
+          (define-key evil-motion-state-map (kbd "j") 'evil-next-visual-line)
+          (define-key evil-motion-state-map (kbd "k") 'evil-previous-visual-line)
+          (define-key evil-operator-state-map (kbd "j") 'evil-next-line)
+          (define-key evil-operator-state-map (kbd "k") 'evil-previous-line)
 
           (evil-define-key '(normal insert visual)
                            org-mode-map (kbd "C-j") 'org-next-visible-heading)
