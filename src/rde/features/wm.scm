@@ -26,7 +26,6 @@
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
   #:use-module (rde packages)
-  #:use-module (rde packages wm)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages image)
   #:use-module (gnu packages web)
@@ -764,7 +763,7 @@ By default, NAME is root, PATH is /, and DISK-ICON is ."
 
 (define* (feature-waybar
           #:key
-          (waybar waybar-stable)
+          (waybar waybar)
           (waybar-modules
            (list
             (waybar-sway-workspaces)
