@@ -43,7 +43,8 @@
           (emacs-evil-commentary emacs-evil-commentary)
           (emacs-evil-surround emacs-evil-surround)
           (emacs-evil-org emacs-evil-org)
-          (emacs-undo-fu emacs-undo-fu))
+          (emacs-undo-fu emacs-undo-fu)
+          (hide-state-message? #f))
   "Configure evil-mode for emacs. The feature is in contrib because the
 recommended RDE experience is to rely on Emacs default keybindings."
   (ensure-pred file-like? emacs-evil)
@@ -52,6 +53,7 @@ recommended RDE experience is to rely on Emacs default keybindings."
   (ensure-pred file-like? emacs-evil-surround)
   (ensure-pred file-like? emacs-evil-org)
   (ensure-pred file-like? emacs-undo-fu)
+  (ensure-pred boolean? hide-state-message?)
 
   (define emacs-f-name 'evil)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -111,6 +113,12 @@ recommended RDE experience is to rely on Emacs default keybindings."
           (define-key map (kbd "C-j") 'next-line-or-history-element)
           (define-key map (kbd "C-k") 'previous-line-or-history-element)
           (define-key map (kbd "C-r") 'consult-history))
+
+        ,@(if hide-state-message?
+              `(;; Hide state messages, rely on "<N>", "<I>" and "<V>" in modeline
+                (setq evil-insert-state-message nil)
+                (setq evil-visual-state-message nil))
+              '())
 
         (with-eval-after-load
             'evil
