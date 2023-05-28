@@ -40,12 +40,16 @@
           #:key
           (emacs-evil emacs-evil)
           (emacs-evil-collection emacs-evil-collection)
+          (emacs-evil-commentary emacs-evil-commentary)
+          (emacs-evil-surround emacs-evil-surround)
           (emacs-evil-org emacs-evil-org)
           (emacs-undo-fu emacs-undo-fu))
   "Configure evil-mode for emacs. The feature is in contrib because the
 recommended RDE experience is to rely on Emacs default keybindings."
   (ensure-pred file-like? emacs-evil)
   (ensure-pred file-like? emacs-evil-collection)
+  (ensure-pred file-like? emacs-evil-commentary)
+  (ensure-pred file-like? emacs-evil-surround)
   (ensure-pred file-like? emacs-evil-org)
   (ensure-pred file-like? emacs-undo-fu)
 
@@ -66,7 +70,9 @@ recommended RDE experience is to rely on Emacs default keybindings."
 
         (eval-when-compile
          (require 'evil)
-         (require 'evil-collection))
+         (require 'evil-collection)
+         (require 'evil-commentary)
+         (require 'evil-surround))
 
         (setq evil-want-keybinding nil)
 
@@ -74,7 +80,9 @@ recommended RDE experience is to rely on Emacs default keybindings."
           (evil-collection-init))
 
         (with-eval-after-load 'evil-autoloads
-          (evil-mode 1))
+          (evil-mode 1)
+          (evil-commentary-mode)
+          (global-evil-surround-mode 1))
 
         (setq evil-want-integration t)
         (setq evil-want-C-u-scroll t)
@@ -155,6 +163,7 @@ recommended RDE experience is to rely on Emacs default keybindings."
             (require 'evil-org-agenda)
             (evil-org-agenda-set-keys))))
       #:elisp-packages (list emacs-evil emacs-evil-collection emacs-evil-org
+                             emacs-evil-commentary emacs-evil-surround
                              emacs-undo-fu)
       #:authors '("Nicolas Graves <ngraves@ngraves.fr>")
       #:summary "\
