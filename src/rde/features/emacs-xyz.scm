@@ -4012,7 +4012,7 @@ If NODE doesn't exist, create a new org-roam node with REF."
           (org-roam-dailies-directory #f)
           (org-roam-capture-templates #f)
           (org-roam-dailies-capture-templates #f)
-          (org-roam-todo? #t)
+          (org-roam-todo? #f)
           (use-node-types? #t))
   "Configure org-roam for GNU Emacs."
   (ensure-pred file-like? emacs-org-roam)
