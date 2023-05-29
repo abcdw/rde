@@ -3485,6 +3485,7 @@ application/epub+zip mime-type will be openned with emacs client."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+;; TODO: Add https://github.com/karthink/elfeed-tube
 (define* (feature-emacs-elfeed
           #:key
           (emacs-elfeed emacs-elfeed)
