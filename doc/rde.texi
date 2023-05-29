@@ -279,7 +279,7 @@ The most frequent actions are usually binded to combinations using
 @kbd{s-} modifier, where @kbd{s} is super key (@pxref{Modifier
 Keys,,,Emacs}).  @kbd{s-@key{RET}} to launch emacsclient,
 @kbd{s-@key{TAB}} switch back and forth between workspaces, inside Emacs
-@kbd{s-e} for toggle eshell, @kbd{s-b} for switch buffer, @kbd{s-b} for
+@kbd{s-e} for toggle eshell, @kbd{s-b} for switch buffer, @kbd{s-r} for
 recompile.
 
 @quotation Note
