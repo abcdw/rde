@@ -3904,6 +3904,38 @@ Indentation and refile configurations, visual adjustment."
       config
       `((eval-when-compile
          (require 'org-agenda))
+        (defgroup rde-org-agenda nil
+          "Custom enhancements to the Org Agenda."
+          :group 'rde)
+        (defvar rde-org-agenda-appt-timer nil
+          "Timer to update `appt-time-msg-list' from Agenda entries.")
+
+        (defun rde-org-agenda-to-appt ()
+          "Reset the `appt-mode' list and initialize it from Agenda entries."
+          (interactive)
+          (setq appt-time-msg-list nil)
+          (org-agenda-to-appt))
+
+        (defun rde-org-agenda-appt-reset ()
+          "Initialize the `appt-mode' list for today and reset the timer."
+          (interactive)
+          (rde-org-agenda-to-appt)
+          (setq rde-org-agenda-appt-timer
+                (run-at-time "24:01" nil 'rde-org-agenda-appt-reset)))
+
+        (define-minor-mode rde-org-agenda-appt-mode
+          "Set up `appt-mode' integration for Agenda items."
+          :global t :group 'rde-org-agenda
+          (if rde-org-agenda-appt-mode
+              (progn
+                (setq rde-org-agenda-appt-timer
+                      (rde-org-agenda-appt-reset))
+                (add-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt))
+            (progn
+              (remove-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt)
+              (cancel-timer rde-org-agenda-appt-timer))))
+
+        (rde-org-agenda-appt-mode)
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
         (with-eval-after-load
          'org-agenda
@@ -3917,7 +3949,9 @@ Indentation and refile configurations, visual adjustment."
                ;; TODO: Name this value better
                ,(- (get-value 'olivetti-body-width config 85)))
          (setq org-agenda-window-setup 'current-window)
-         (setq org-agenda-files ',org-agenda-files)))
+         (setq org-agenda-files ',org-agenda-files))
+        (advice-add 'org-redo :after 'rde-org-agenda-to-appt)
+        (add-hook 'org-capture-after-finalize-hook 'rde-org-agenda-to-appt))
       #:summary "\
 Preconfigured agenda views"
       #:commentary "\
