@@ -3890,10 +3890,12 @@ Indentation and refile configurations, visual adjustment."
 
 (define* (feature-emacs-org-agenda
           #:key
-          (org-agenda-files 'nil)
+          (org-agenda-files #f)
           (org-agenda-custom-commands %rde-org-agenda-custom-commands)
           (org-agenda-prefix-format '()))
   "Configure org-agenda for GNU Emacs."
+  (ensure-pred maybe-list? org-agenda-files)
+  (ensure-pred list? org-agenda-custom-commands)
   (ensure-pred maybe-list? org-agenda-prefix-format)
 
   (define emacs-f-name 'org-agenda)
@@ -3975,28 +3977,51 @@ result is longer than LEN."
 
         (rde-org-agenda-appt-mode)
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
-        (with-eval-after-load
-         'org-agenda
-         ;; Impressive agenda examples
-         ;; https://github.com/fniessen/emacs-leuven/blob/master/org-leuven-agenda-views.txt
-         ;; Clean agenda view
-         ;; https://gist.github.com/rougier/ddb84c16c28f7cd75e27e50d4c3c43da
-         ;; https://d12frosted.io/posts/2020-06-23-task-management-with-roam-vol1.html
-         (setq org-agenda-custom-commands ,org-agenda-custom-commands)
-         (setq org-agenda-tags-column
-               ;; TODO: Name this value better
-               ,(- (get-value 'olivetti-body-width config 85)))
-         (setq org-agenda-window-setup 'current-window)
-         (setq org-agenda-files ',org-agenda-files)
-         ,@(if org-agenda-prefix-format
-               (if (get-value 'org-roam-todo? config)
-                   `((setq org-agenda-prefix-format
-                           '((agenda . " %i %(rde-org-agenda-category 12)%?-12t% s")
-                             (todo . " %i %(rde-org-agenda-category 12) ")
-                             (tags . " %i %(rde-org-agenda-category 12) ")
-                             (search . " %i %(rde-org-agenda-category 12) "))))
-                   `((setq org-agenda-prefix-format ',org-agenda-prefix-format)))
-               '()))
+        (add-hook 'org-agenda-mode-hook
+                  'hack-dir-local-variables-non-file-buffer)
+        (with-eval-after-load 'org-agenda
+          ;; Impressive agenda examples
+          ;; https://github.com/fniessen/emacs-leuven/blob/master/org-leuven-agenda-views.txt
+          ;; Clean agenda view
+          ;; https://gist.github.com/rougier/ddb84c16c28f7cd75e27e50d4c3c43da
+          (setq org-agenda-custom-commands ,org-agenda-custom-commands)
+          (setq org-agenda-tags-column
+                ;; TODO: Name this value better
+                ,(- (get-value 'olivetti-body-width config 85)))
+          (setq org-agenda-window-setup 'current-window)
+          ,@(if org-agenda-files
+                `((setq org-agenda-files ',org-agenda-files))
+                '())
+          (setq org-agenda-sticky t)
+          (setq org-agenda-block-separator ?-)
+          (setq org-agenda-time-grid '((daily today require-timed)
+                                       (800 1000 1200 1400 1600 1800 2000)
+                                       " ┄┄┄┄┄ " "┄┄┄┄┄┄┄┄┄┄┄┄┄┄┄"))
+          (setq org-agenda-current-time-string
+                "⭠ now ─────────────────────────────────────────────────")
+          (setq org-agenda-start-with-log-mode t)
+          (setq org-agenda-todo-ignore-scheduled t)
+          (setq org-agenda-todo-ignore-deadlines t)
+          (setq org-agenda-todo-ignore-timestamp t)
+          (setq org-agenda-window-setup 'current-window)
+          (setq org-agenda-dim-blocked-tasks t)
+          (setq org-agenda-skip-scheduled-if-done t)
+          (setq org-agenda-skip-deadline-if-done t)
+          (setq org-agenda-compact-blocks nil)
+          (setq org-agenda-include-diary t)
+          (setq org-agenda-custom-commands ,org-agenda-custom-commands)
+          (setq org-agenda-bulk-custom-functions
+                '((?P (lambda nil
+                        (org-agenda-priority 'set)))))
+          ,@(if org-agenda-prefix-format
+                (if (get-value 'org-roam-todo? config)
+                    `((setq org-agenda-prefix-format
+                            '((agenda . " %i %(rde-org-agenda-category 12)%?-12t% s")
+                              (todo . " %i %(rde-org-agenda-category 12) ")
+                              (tags . " %i %(rde-org-agenda-category 12) ")
+                              (search . " %i %(rde-org-agenda-category 12) "))))
+                    `((setq org-agenda-prefix-format ',org-agenda-prefix-format)))
+                '()))
         (advice-add 'org-redo :after 'rde-org-agenda-to-appt)
         (add-hook 'org-capture-after-finalize-hook 'rde-org-agenda-to-appt))
       #:summary "\
