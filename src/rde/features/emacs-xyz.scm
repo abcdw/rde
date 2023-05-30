@@ -3923,6 +3923,41 @@ Indentation and refile configurations, visual adjustment."
           (setq rde-org-agenda-appt-timer
                 (run-at-time "24:01" nil 'rde-org-agenda-appt-reset)))
 
+        (defun rde-org-agenda-category (&optional len)
+          "Get category of the Org Agenda item at point.
+The category is defined by one of the following:
+- CATEGORY property
+- TITLE keyword
+- TITLE property
+- filename without directory and extension
+When LEN is a number, the resulting string is right-padded with
+white space and then truncated with an ellipsis on the right if the
+result is longer than LEN."
+          (let* ((filename (when buffer-file-name
+                             (file-name-sans-extension
+                              (file-name-nondirectory buffer-file-name))))
+                 (title (cadr (assoc "TITLE"
+                                     (org-collect-keywords '("title")))))
+                 (project-title (if (and title (string-match
+                                                (rx (group (+ any))
+                                                    ":" (+ any))
+                                                title))
+                                    (match-string 1 title)
+                                  title))
+                 (category (org-get-category))
+                 (agenda-category (if (and title (string= category filename))
+                                      project-title
+                                    category))
+                 (result
+                  (or (if (numberp len)
+                          (s-truncate
+                           len (s-pad-right len " " agenda-category))
+                        agenda-category)
+                      "")))
+            (if (and (not project-title) (numberp len))
+                (s-truncate len (s-pad-right len " " result))
+                result)))
+
         (define-minor-mode rde-org-agenda-appt-mode
           "Set up `appt-mode' integration for Agenda items."
           :global t :group 'rde-org-agenda
