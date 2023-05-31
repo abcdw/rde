@@ -1110,11 +1110,11 @@ path /sudo:HOST:/path if the user in sudoers.")))
           (emacs-dired-rsync emacs-dired-rsync)
           (kill-when-opening-new-buffer? #f)
           (group-directories-first? #f)
-          (default-switches "-l -h"))
+          (extra-switches "-h"))
   (ensure-pred boolean? kill-when-opening-new-buffer?)
   (ensure-pred boolean? group-directories-first?)
   (ensure-pred file-like? emacs-dired-rsync)
-  (ensure-pred string? default-switches)
+  (ensure-pred maybe-string? extra-switches)
 
   (define emacs-f-name 'dired)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -1130,13 +1130,18 @@ path /sudo:HOST:/path if the user in sudoers.")))
           "(dired \"" (car (cdr (command-line))) "\")")))
     (define dired-listing-switches
       (string-join
-       (list default-switches
+       (append
+        (list "-l"
+              (if group-directories-first?
+                  "--group-directories-first"
+                  ""))
+        (if extra-switches
+            (append
+             (list extra-switches)
              (if (get-value 'emacs-advanced-user? config)
-                 "-A --time-style=long-iso"
-                 "-a")
-             (if group-directories-first?
-                 "--group-directories-first"
-                 ""))
+                 (list "-A --time-style=long-iso")
+                 (list "-a")))
+            '()))
        " "))
     (define zip (get-value 'zip config (@ (gnu packages compression) zip)))
     (define rsync (get-value 'rsync config (@ (gnu packages rsync) rsync)))
