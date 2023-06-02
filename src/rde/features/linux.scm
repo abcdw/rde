@@ -52,7 +52,7 @@
       shepherd-root-service-type
       (list (shepherd-service
              (provision '(startup-brightness))
-             (requirement '(virtual-terminal))
+             (requirement '(term-tty1))
              (start
               #~(lambda ()
                   (invoke #$(file-append brightnessctl "/bin/brightnessctl")
