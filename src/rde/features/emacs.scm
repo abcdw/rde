@@ -237,7 +237,7 @@ environment outside of Guix Home."
      (rde-elisp-configuration-service
       'rde-emacs-portable
       config
-      `((setq native-comp-deferred-compilation nil)
+      `((setq native-comp-jit-compilation nil)
         ,@(if full-name `((setq user-full-name ,full-name)) '())
         ,@(if email `((setq user-mail-address ,email)) '())
 
@@ -358,7 +358,7 @@ environment outside of Guix Home."
             :prefix 'rde-)
           (require 'rde-keymaps)
 
-          (setq native-comp-deferred-compilation nil)
+          (setq native-comp-jit-compilation nil)
 
           (setq user-full-name ,full-name)
           (setq user-mail-address ,email)
