@@ -901,7 +901,7 @@ for the main bar."
        (swayidle swayidle)
        (config
         `(,@(if lock-cmd
-                (let ((lock-cmd-quoted (format #f "'~a'" lock-cmd)))
+                (let ((lock-cmd-quoted #~(format #f "'~a'" #$lock-cmd)))
                   `((lock ,lock-cmd-quoted)
                     (before-sleep ,lock-cmd-quoted)
                     (timeout ,lock-timeout ,lock-cmd-quoted)))
