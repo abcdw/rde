@@ -44,7 +44,10 @@
    (feature-ledger)
    (feature-imv)
    (feature-mpv
-    #:extra-mpv-conf '((speed . 1.61)))))
+    #:extra-mpv-conf
+    '((keep-open . #t)
+      (save-position-on-quit . #t)
+      (speed . 1.61)))))
 
 (define-public %mail-features
   (list
