@@ -948,7 +948,7 @@ for the main bar."
 
   (define (get-system-services _)
     (list
-     ;; TODO: Remove once chkpwd patch merged (it's in core-updates rn)
+     ;; TODO: set suid? to #f, when https://issues.guix.gnu.org/63652 merged
      (service
       screen-locker-service-type
       (screen-locker-configuration
@@ -956,12 +956,11 @@ for the main bar."
 
   (feature
    (name 'swaylock)
-   (values `((swaylock . ,swaylock)
-             ,@(if default-screen-locker?
-                   ;; TODO: Change it to path in the store, once
-                   ;; https://issues.guix.gnu.org/53468 is resolved
-                   `((default-screen-locker . "/run/setuid-programs/swaylock"))
-                   '())))
+   (values
+    `((swaylock . ,swaylock)
+      ,@(if default-screen-locker?
+            `((default-screen-locker . ,(file-append swaylock "/bin/swaylock")))
+            '())))
    (home-services-getter get-home-services)
    (system-services-getter get-system-services)))
 
