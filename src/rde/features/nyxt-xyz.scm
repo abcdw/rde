@@ -19,14 +19,142 @@
 
 (define-module (rde features nyxt-xyz)
   #:use-module (rde features)
+  #:use-module (rde features predicates)
   #:use-module (rde features web-browsers)
   #:use-module (rde home services web-browsers)
   #:use-module (rde serializers lisp)
   #:use-module (gnu home services)
-  #:export (feature-nyxt-userscript))
+  #:export (feature-nyxt-nx-search-engines
+            feature-nyxt-userscript))
 
 (define (maybe-lisp-config? x)
   (or (lisp-config? x) (not x)))
+
+(define (%rde-nx-search-engines config)
+  `((engines:wordnet
+     :shortcut "wn"
+     :show-examples t
+     :show-word-frequencies t
+     :show-sense-numbers t)
+    (engines:github
+     :shortcut "gh"
+     :object :advanced)
+    (engines:startpage
+     :shortcut "sp")
+    (engines:sourcehut
+     :shortcut "sh")
+    (engines:libgen
+     :shortcut "lg"
+     :covers t
+     :results 100
+     :object :files
+     :fallback-url (quri:uri "http://libgen.gs")
+     :base-search-url "https://libgen.gs/index.php?req=~a")
+    (engines:lemmy
+     :shortcut "le")
+    (engines:discourse
+     :shortcut "ae")
+    (engines:meetup
+     :shortcut "me")
+    (engines:gitea
+     :shortcut "gi")
+    (engines:gitea-users
+     :shortcut "giu")
+    (engines:hacker-news
+     :shortcut "hn"
+     :fallback-url (quri:uri "https://news.ycombinator.com")
+     :search-type :all)
+    (engines:lobsters
+     :shortcut "lo")
+    (engines:google
+     :shortcut "go"
+     :safe-search nil
+     :lang-ui :english
+     :results-number 50
+     :new-window t)
+    (engines:reddit
+     :shortcut "re")
+    (engines:teddit
+     :shortcut "re")
+    (engines:whoogle
+     :shortcut "who"
+     :theme :system
+     :alternatives nil
+     :lang-results :english
+     :lang-ui :english
+     :view-image t
+     :no-javascript t
+     :new-tab t)))
+
+(define* (feature-nyxt-nx-search-engines
+          #:key
+          (engines %rde-nx-search-engines)
+          (default-engine-shortcut #f)
+          (extra-engines #f)
+          (auto-complete? #f)
+          (auto-complete-non-prefix? #f))
+  "Configure nx-search-engines, a collection of easy-to-setup
+search engines for Nyxt.
+
+You can pass additional search engines via EXTRA-ENGINES, a
+single argument procedure that takes the current rde configuration
+and returns Lisp configuration containing the engines."
+  (ensure-pred maybe-procedure? engines)
+  (ensure-pred maybe-string? default-engine-shortcut)
+  (ensure-pred maybe-procedure? extra-engines)
+  (ensure-pred boolean? auto-complete?)
+  (ensure-pred boolean? auto-complete-non-prefix?)
+
+  (define nyxt-f-name 'nx-search-engines)
+  (define f-name (symbol-append 'nyxt- nyxt-f-name))
+  (define nyxt-config-name (symbol-append 'rde- nyxt-f-name))
+  (define nyxt-service-type-name (symbol-append 'nyxt- nyxt-config-name))
+
+  (define nyxt-rde-nx-search-engines-service-type
+    (make-nyxt-service-type nyxt-service-type-name))
+
+  (define (get-home-services config)
+    "Return home services related to nx-search-engines."
+    (list
+     (service
+      nyxt-rde-nx-search-engines-service-type
+      (home-nyxt-lisp-configuration
+       (name nyxt-config-name)
+       (config
+        `((define-configuration context-buffer
+            ((search-auto-complete-p ,(if auto-complete? 't 'nil))
+             (search-always-auto-complete-p
+              ,(if auto-complete-non-prefix? 't 'nil))
+             (search-engines
+              (append
+               %slot-value%
+               ,(if extra-engines
+                    `(list ,@(extra-engines config))
+                    '())
+               ,@(if default-engine-shortcut
+                     `((remove ,default-engine-shortcut
+                               (list ,@(engines config)
+                                     ,@(if extra-engines
+                                          (extra-engines config)
+                                          '()))
+                               :key 'shortcut :test 'string=)
+                       (list
+                        (find ,default-engine-shortcut
+                              (list ,@(if extra-engines
+                                          (extra-engines config)
+                                          '())
+                                    ,@(engines config))
+                              :key 'shortcut :test 'string=)))
+                     `(list ,@(engines config)))))))))
+       (lisp-packages '(nx-search-engines))))))
+
+  (feature
+   (name f-name)
+   (values
+    `((,f-name . #t)
+      (nyxt-rde-nx-search-engines-service-type
+       . ,nyxt-rde-nx-search-engines-service-type)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-nyxt-userscript
           #:key
