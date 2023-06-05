@@ -10,3 +10,7 @@ tasks:
   - build-minimal-example-home: |
       cd rde/examples
       make minimal/home/build
+triggers:
+  - action: email
+    condition: failure
+    to: ~abcdw/rde-devel@lists.sr.ht
