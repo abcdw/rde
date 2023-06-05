@@ -121,7 +121,6 @@
     #:default-application-launcher? #t)
 
    (feature-emacs-appearance)
-   (feature-emacs-faces)
    (feature-emacs-modus-themes)
 
    (feature-emacs-completion
