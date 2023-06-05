@@ -24,8 +24,49 @@
   #:use-module (rde home services web-browsers)
   #:use-module (rde serializers lisp)
   #:use-module (gnu home services)
-  #:export (feature-nyxt-nx-search-engines
+  #:export (feature-nyxt-blocker
+            feature-nyxt-nx-search-engines
             feature-nyxt-userscript))
+
+(define* (feature-nyxt-blocker
+          #:key
+          (blocked-hosts '()))
+  "Configure Nyxt's blocker mode."
+  (ensure-pred list-of-strings? blocked-hosts)
+
+  (define nyxt-f-name 'blocker)
+  (define f-name (symbol-append 'nyxt- nyxt-f-name))
+  (define nyxt-config-name (symbol-append 'rde- nyxt-f-name))
+  (define nyxt-service-type-name (symbol-append 'nyxt- nyxt-config-name))
+
+  (define nyxt-rde-blocker-service-type
+    (make-nyxt-service-type nyxt-service-type-name))
+
+  (define (get-home-services config)
+    "Return home services related to blocker-mode."
+    (list
+     (service
+      nyxt-rde-blocker-service-type
+      (home-nyxt-lisp-configuration
+       (name nyxt-config-name)
+       (config
+        `((define-configuration web-buffer
+            ((default-modes `(nyxt/blocker-mode:blocker-mode
+                              ,@%slot-value%))))
+          (define-configuration nyxt/blocker-mode:blocker-mode
+            ((nyxt/blocker-mode:hostlists
+              (append
+               (list
+                (nyxt/blocker-mode:make-hostlist
+                 :hosts ',blocked-hosts))
+               (list %slot-default%)))))))))))
+
+  (feature
+   (name f-name)
+   (values
+    `((,f-name . #t)
+      (nyxt-rde-blocker-service-type . ,nyxt-rde-blocker-service-type)))
+   (home-services-getter get-home-services)))
 
 (define (maybe-lisp-config? x)
   (or (lisp-config? x) (not x)))
