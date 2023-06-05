@@ -3732,6 +3732,21 @@ built-in help that provides much more contextual information."
          (require 'org-modern))
 
         (define-key mode-specific-map (kbd "c") 'org-capture)
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+              '((autoload 'org-buffer-list "org")
+                (defvar rde-org-buffer-source
+                  `(:name "Org"
+                          :narrow ?o
+                          :category buffer
+                          :state ,'consult--buffer-state
+                          :items ,(lambda ()
+                                    (mapcar 'buffer-name (org-buffer-list))))
+                  "Source for Org buffers to be set in \
+`consult-buffer-sources'.")
+                (with-eval-after-load 'consult
+                  (add-to-list 'consult-buffer-sources rde-org-buffer-source
+                               'append)))
+              '())
 
         (with-eval-after-load 'org-crypt
           (setq org-crypt-key user-mail-address))
