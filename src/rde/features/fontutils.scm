@@ -176,7 +176,9 @@ font-monospace default value, and it will be ignored if
               '((t
                  :default-family ,(font-name font-monospace)
                  :default-height ,(inexact->exact
-                                   (* (font-size font-monospace) 10))
+                                   ;; -5 is a random hacky adjustment to
+                                   ;; make it work the same as in rde-faces
+                                   (- (* (font-size font-monospace) 10) 5))
                  :fixed-pitch-family ,(font-name font-monospace)
                  :fixed-pitch-height 1.0
                  :variable-pitch-family ,(font-name font-sans)
