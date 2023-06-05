@@ -3682,6 +3682,8 @@ built-in help that provides much more contextual information."
           (org-directory "~/org")
           (org-capture-templates #f)
           (org-todo-keywords #f)
+          (org-todo-keyword-faces #f)
+          (org-priority-faces #f)
           (org-tag-alist #f)
           (org-rename-buffer-to-title? #t)
           (org-indent? #t)
@@ -3691,6 +3693,8 @@ built-in help that provides much more contextual information."
   (ensure-pred path? org-directory)
   (ensure-pred maybe-list? org-capture-templates)
   (ensure-pred maybe-list? org-todo-keywords)
+  (ensure-pred maybe-list? org-todo-keyword-faces)
+  (ensure-pred maybe-list? org-priority-faces)
   (ensure-pred maybe-list? org-tag-alist)
   (ensure-pred boolean? org-rename-buffer-to-title?)
   (ensure-pred boolean? org-indent?)
@@ -3793,6 +3797,14 @@ built-in help that provides much more contextual information."
 
          ,@(if org-tag-alist
                `((setq org-tag-alist ',org-tag-alist))
+               '())
+
+         ,@(if org-todo-keyword-faces
+               `((setq org-todo-keyword-faces ',org-todo-keyword-faces))
+               '())
+
+         ,@(if org-priority-faces
+               `((setq org-priority-faces ',org-priority-faces))
                '())
 
          ;; <https://emacs.stackexchange.com/questions/54809/rename-org-buffers-to-orgs-title-instead-of-filename>
