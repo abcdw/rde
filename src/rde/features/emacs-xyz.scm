@@ -3770,7 +3770,7 @@ built-in help that provides much more contextual information."
                '())
 
          ;; <https://emacs.stackexchange.com/questions/54809/rename-org-buffers-to-orgs-title-instead-of-filename>
-         (defun rde-buffer-name-to-title (&optional end)
+         (defun rde-org-rename-buffer-to-title (&optional end)
            "Rename buffer to value of #+TITLE:.
 If END is non-nil search for #+TITLE: at `point' and
 delimit it to END.
@@ -3790,12 +3790,12 @@ Start an unlimited search at `point-min' otherwise."
                 (rename-buffer (match-string 1)))))
            nil)
 
-         (defun rde-buffer-name-to-title-config ()
+         (defun rde-org-rename-buffer-to-title-config ()
            "Configure Org to rename buffer to value of #+TITLE:."
-           (font-lock-add-keywords nil '(rde-buffer-name-to-title)))
+           (font-lock-add-keywords nil '(rde-org-rename-buffer-to-title)))
 
          ,@(if org-rename-buffer-to-title?
-               '((add-hook 'org-mode-hook 'rde-buffer-name-to-title-config))
+               '((add-hook 'org-mode-hook 'rde-org-rename-buffer-to-title-config))
                '())
 
          ,@(if auto-update-toc?
