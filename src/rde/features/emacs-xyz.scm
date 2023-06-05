@@ -2018,7 +2018,7 @@ relative line numbers, when narrowing is active."
         (let ((map search-map))
           (define-key map (kbd "f") 'consult-find)
           (define-key map (kbd "g") 'consult-ripgrep)
-          (define-key map (kbd "e") 'consult-isearch)
+          (define-key map (kbd "e") 'consult-isearch-history)
           (define-key map (kbd "l") 'consult-line))
         ;; (define-key global-map (kbd "C-S-s") 'consult-line)
 
