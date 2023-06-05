@@ -3735,11 +3735,22 @@ built-in help that provides much more contextual information."
 
         (with-eval-after-load 'org-crypt
           (setq org-crypt-key user-mail-address))
+        (defun rde-org-timer-reset ()
+          "Set `org-timer-mode-line-string' to nil."
+          (interactive)
+          (setq org-timer-mode-line-string nil))
 
         (with-eval-after-load 'org
          (setq org-adapt-indentation nil)
          (setq org-edit-src-content-indentation 0)
          (setq org-startup-indented ,(if org-indent? 't 'nil))
+        (defun rde-org-timer-update-mode-line ()
+          "Update the timer in the mode line without surrounding brackets."
+          (if org-timer-pause-time
+              nil
+            (setq org-timer-mode-line-string
+                  (substring (org-timer-value-string) 0 -1))
+            (force-mode-line-update)))
 
          (setq org-outline-path-complete-in-steps nil)
          (setq org-refile-use-outline-path 'full-file-path)
@@ -3821,6 +3832,30 @@ Start an unlimited search at `point-min' otherwise."
           ;; the same color as bg and keep them accessible/editable.
           (setq org-hide-leading-stars t))
 
+         (advice-add 'org-timer-update-mode-line
+                     :override 'rde-org-timer-update-mode-line)
+         (add-hook 'org-timer-stop-hook 'rde-org-timer-reset)
+         (defvar rde-org-timer-map nil
+           "Map to bind org-timer commands under.")
+         (define-prefix-command 'rde-org-timer-map)
+         (with-eval-after-load 'rde-keymaps
+           (define-key rde-app-map (kbd "o") 'rde-org-timer-map))
+         (let ((map rde-org-timer-map))
+           (define-key map (kbd "s") 'org-timer-start)
+           (define-key map (kbd "q") 'org-timer-stop)
+           (define-key map (kbd "p") 'org-timer-pause-or-continue)
+           (define-key map (kbd "t") 'org-timer-set-timer))
+         (with-eval-after-load 'org-timer
+           ,@(if (get-value 'emacs-all-the-icons config)
+                 '((eval-when-compile
+                    (require 'all-the-icons))
+                   (with-eval-after-load 'all-the-icons
+                     (setq org-timer-format
+                           (concat
+                            (all-the-icons-material "timer" :v-adjust -0.1)
+                            " %s  "))))
+                 '()))
+
          (autoload 'global-org-modern-mode "org-modern")
          ,@(if org-modern?
                `((if after-init-time
@@ -3837,6 +3872,7 @@ Indentation and refile configurations, visual adjustment."
        (list emacs-org emacs-org-contrib
              (get-value 'emacs-olivetti config emacs-olivetti)
              emacs-org-appear emacs-org-modern)
+       (or (and=> (get-value 'emacs-all-the-icons config) list) '())
        (if auto-update-toc? (list emacs-org-make-toc) '())))))
 
   (feature
