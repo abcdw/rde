@@ -126,8 +126,7 @@ See @url{/man/pantalaimon.5,,Pantalaimon} for the list of available options."
    (values `((pantalaimon . ,pantalaimon)
              (pantalaimon-port . ,port)
              (get-pantalaimon-uri . ,get-pantalaimon-uri)))
-   (home-services-getter get-home-services)
-   (system-services-getter get-system-services)))
+   (home-services-getter get-home-services)))
 
 
 ;;;
