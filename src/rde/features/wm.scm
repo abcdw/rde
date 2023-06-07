@@ -948,11 +948,13 @@ for the main bar."
 
   (define (get-system-services _)
     (list
-     ;; TODO: set suid? to #f, when https://issues.guix.gnu.org/63652 merged
      (service
       screen-locker-service-type
       (screen-locker-configuration
-       "swaylock" (file-append swaylock "/bin/swaylock") #f))))
+       (name "swaylock")
+       (program (file-append swaylock "/bin/swaylock"))
+       (using-setuid? #f)
+       (using-pam? #t)))))
 
   (feature
    (name 'swaylock)
