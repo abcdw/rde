@@ -83,6 +83,7 @@
             (size default-font-size)
             (package font-gnu-unifont)))
           (emacs-fontaine emacs-fontaine)
+          (use-serif-for-variable-pitch? #t)
           (extra-fontaine-presets '())
           (extra-font-packages '()))
   "Configure fonts.  DEFAULT-FONT-SIZE will be used for making
@@ -96,12 +97,16 @@ font-monospace default value, and it will be ignored if
   (ensure-pred font? font-unicode)
   (ensure-pred file-like? emacs-fontaine)
   (ensure-pred elisp-config? extra-fontaine-presets)
+  (ensure-pred boolean? use-serif-for-variable-pitch?)
   (ensure-pred list-of-file-likes? extra-font-packages)
 
   (define f-name 'fonts)
 
   (define (get-home-services config)
     "Return home services related to fonts."
+    (define font-variable (if use-serif-for-variable-pitch?
+                              font-serif
+                              font-sans))
     (list
      (simple-service
       'add-extra-fonts
@@ -110,6 +115,7 @@ font-monospace default value, and it will be ignored if
        (map font-package
             (list font-sans font-serif font-monospace font-unicode))
        extra-font-packages))
+
      (simple-service
       'add-fontconfig-font-families
       home-fontconfig-service-type
@@ -126,6 +132,7 @@ font-monospace default value, and it will be ignored if
          (family "monospace")
          (prefer
           (family ,(font-name font-monospace))))))
+
      (rde-elisp-configuration-service
       f-name
       config
@@ -181,9 +188,9 @@ font-monospace default value, and it will be ignored if
                                    (- (* (font-size font-monospace) 10) 5))
                  :fixed-pitch-family ,(font-name font-monospace)
                  :fixed-pitch-height 1.0
-                 :variable-pitch-family ,(font-name font-sans)
+                 :variable-pitch-family ,(font-name font-variable)
                  :variable-pitch-height 1.0
-                 :variable-pitch-weight ,(font-weight font-sans))
+                 :variable-pitch-weight ,(font-weight font-variable))
                 ,@extra-fontaine-presets))
         (require 'xdg)
         (setq fontaine-latest-state-file
