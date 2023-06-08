@@ -69,14 +69,14 @@
             (package font-iosevka)))
           (font-serif
            (font
-            (name "Iosevka Aile")
-            (size default-font-size)
-            (package font-iosevka-aile)))
-          (font-sans
-           (font
             (name "Iosevka Etoile")
             (size default-font-size)
             (package font-iosevka-etoile)))
+          (font-sans
+           (font
+            (name "Iosevka Aile")
+            (size default-font-size)
+            (package font-iosevka-aile)))
           (font-unicode
            (font
             (name "Unifont")
