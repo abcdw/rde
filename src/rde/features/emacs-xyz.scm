@@ -1408,10 +1408,7 @@ process-in-a-buffer derived packages like shell, REPLs, etc."
 `consult-buffer-sources'.")
                 (with-eval-after-load 'consult
                   (add-to-list 'consult-buffer-sources
-                               rde-comint-buffer-source 'append))
-                (with-eval-after-load 'rde-completion
-                  (add-to-list 'rde-completion-initial-narrow-alist
-                               '(comint-mode . ?c))))
+                               rde-comint-buffer-source 'append)))
               '())
         (add-hook 'comint-preoutput-filter-functions 'ansi-color-apply nil t)))))
 
