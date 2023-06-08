@@ -4,7 +4,7 @@
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022, 2023 Nicolas Graves <ngraves@ngraves.fr>
-;;; Copyright © 2022, 2023 conses <contact@conses.eu>
+;;; Copyright © 2022, 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;; Copyright © 2023 Benoit Joly <benoit@benoitj.ca>
 ;;;
 ;;; This file is part of rde.
@@ -119,6 +119,7 @@
             ;; Multimedia
             feature-emacs-dashboard
             feature-emacs-emms
+            feature-emacs-nyxt
             feature-emacs-pulseaudio-control
             feature-emacs-webpaste
             feature-emacs-display-wttr))
@@ -5428,6 +5429,56 @@ System."))))
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-emms)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-nyxt
+          #:key
+          (emacs-nyxt emacs-nyxt)
+          (autostart-delay 0)
+          (nyxt-key "x"))
+  "Configure the nyxt.el package to interact with Nyxt from Emacs."
+  (ensure-pred file-like? emacs-nyxt)
+  (ensure-pred integer? autostart-delay)
+
+  (define emacs-f-name 'nyxt)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to emacs-nyxt."
+    (define startup-flags (get-value 'nyxt-startup-flags config))
+
+    (if (get-value 'nyxt config)
+        (list
+         (rde-elisp-configuration-service
+          emacs-f-name
+          config
+          `((with-eval-after-load 'rde-keymaps
+              (define-key rde-app-map (kbd ,nyxt-key) 'nyxt-map))
+            ,@(if (get-value 'emacs-modus-themes config)
+                  `((defun rde-nyxt-load-theme (&optional theme)
+                      "Load Nyxt theme according to current theme or THEME."
+                      (interactive)
+                      (require 'nyxt)
+                      (when nyxt-process
+                        (if (or (and theme (rde-modus-themes--dark-theme-p theme))
+                                (rde-modus-themes--dark-theme-p))
+                            (nyxt-load-theme ',(get-value 'emacs-dark-theme config))
+                          (nyxt-load-theme ',(get-value 'emacs-light-theme config)))))
+                    (add-hook 'rde-modus-themes-after-enable-theme-hook
+                              'rde-nyxt-load-theme))
+                '())
+            (with-eval-after-load 'nyxt
+              ,@(if (null? startup-flags)
+                    '()
+                    `((setq nyxt-startup-flags ',startup-flags)))
+              (setq nyxt-path ,(file-append (get-value 'nyxt config) "/bin/nyxt"))
+              (setq nyxt-autostart-delay ,autostart-delay)))
+          #:elisp-packages (list emacs-nyxt)))
+        '()))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-nyxt)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-pulseaudio-control
