@@ -42,6 +42,8 @@
   #:use-module (guix gexp)
   #:use-module (rde gexp)
   #:use-module (guix packages)
+  #:use-module (guix diagnostics)
+  #:use-module (guix i18n)
 
   #:use-module (ice-9 match)
 
@@ -522,8 +524,7 @@ based on the time of the day."
    (values `((,f-name . ,emacs-circadian)))
    (home-services-getter get-home-services)))
 
-;; TODO: Can be useful to have different presets for different
-;; environments.  For easier and faster switching.
+;; TODO: Deprecated, remove the feature
 (define* (feature-emacs-faces
           #:key
           ;; Serif vs Sans-Serif
@@ -532,6 +533,10 @@ based on the time of the day."
           ;; too outstanding.
           (use-sans-for-variable-pitch? #t))
   "Configure faces for GNU Emacs."
+
+  (warning (G_ "\
+feature-emacs-faces is deprecated, feature-fonts now covers emacs related \
+functionality.\n"))
 
   (define emacs-f-name 'faces)
   (define f-name (symbol-append 'emacs- emacs-f-name))

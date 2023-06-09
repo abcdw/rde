@@ -209,7 +209,8 @@ font-monospace default value, and it will be ignored if
    (values
     (append
      `((,f-name . #t)
-       (emacs-fontaine . ,emacs-fontaine))
+       (emacs-fontaine . ,emacs-fontaine)
+       (emacs-faces . #t))
      (make-feature-values font-sans font-monospace
                           font-serif font-unicode)))
    (home-services-getter get-home-services)))
