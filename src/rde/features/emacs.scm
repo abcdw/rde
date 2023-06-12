@@ -446,6 +446,7 @@ C-h C-a to open About Emacs buffer."
 
           ,#~""
           ;; TODO: Move it to feature-isearch
+          (setq isearch-lazy-count t)
           (setq search-whitespace-regexp ".*?")
 
           ,#~""
