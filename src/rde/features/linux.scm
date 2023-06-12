@@ -126,6 +126,14 @@ ctl_type.pipewire {
 ")))))
 
      (simple-service
+      'pipewire-prevent-pulseaudio-autostart
+      home-xdg-configuration-files-service-type
+      `(("pulse/client.conf"
+         ,(mixed-text-file
+           "pulse-client.conf"
+           "autospawn = no"))))
+
+     (simple-service
       'pipewire-add-shepherd-daemons
       home-shepherd-service-type
       (list
