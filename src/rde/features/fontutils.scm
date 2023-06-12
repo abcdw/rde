@@ -1,7 +1,8 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
+;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -196,8 +197,14 @@ font-monospace default value, and it will be ignored if
         (setq fontaine-latest-state-file
               (expand-file-name "emacs/fontaine-latest.state.eld"
                                 (or (xdg-cache-home) "~/.cache")))
-        (when (display-graphic-p)
+
+        (defun rde-font--set-default-fonts ()
           (fontaine-set-preset t))
+
+        (if after-init-time
+            (when (display-graphic-p) (rde-font--set-default-fonts))
+            (add-hook 'after-init-hook 'rde-font--set-default-fonts))
+
         ,@(if (get-value 'emacs-modus-themes config)
               '((add-hook 'rde-modus-themes-after-enable-theme-hook
                           'fontaine-apply-current-preset))
