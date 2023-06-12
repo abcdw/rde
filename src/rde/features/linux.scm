@@ -113,16 +113,17 @@
               ">\n"
               "
 pcm_type.pipewire {
-  lib " #$(file-append pipewire "/lib/alsa-lib/libasound_module_pcm_pipewire.so")
+  lib " #$(file-append
+           pipewire "/lib/alsa-lib/libasound_module_pcm_pipewire.so")
   "
 }
 
 ctl_type.pipewire {
-  lib " #$(file-append pipewire "/lib/alsa-lib/libasound_module_ctl_pipewire.so")
+  lib " #$(file-append
+           pipewire "/lib/alsa-lib/libasound_module_ctl_pipewire.so")
   "
 }
 ")))))
-
 
      (simple-service
       'pipewire-add-shepherd-daemons
