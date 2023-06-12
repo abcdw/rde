@@ -14,13 +14,13 @@
   #:use-module (guix gexp)
 
   #:export (feature-backlight
-	    feature-pipewire))
+            feature-pipewire))
 
 (define* (feature-backlight
-	  #:key
-	  (default-brightness 100)
-	  (step 10)
-	  (brightnessctl brightnessctl))
+          #:key
+          (default-brightness 100)
+          (step 10)
+          (brightnessctl brightnessctl))
   "Setup and configure brightness for various devices."
   (ensure-pred brightness? default-brightness)
   (ensure-pred any-package? brightnessctl)
@@ -39,11 +39,11 @@
         'backlight-add-brightness-control-to-sway
         home-sway-service-type
         `((bindsym --locked XF86MonBrightnessUp exec
-		   ,(file-append brightnessctl "/bin/brightnessctl")
-		   set ,(step->symbol '+))
-	  (bindsym --locked XF86MonBrightnessDown exec
-		   ,(file-append brightnessctl "/bin/brightnessctl")
-		   set ,(step->symbol '-)))))))
+                   ,(file-append brightnessctl "/bin/brightnessctl")
+                   set ,(step->symbol '+))
+          (bindsym --locked XF86MonBrightnessDown exec
+                   ,(file-append brightnessctl "/bin/brightnessctl")
+                   set ,(step->symbol '-)))))))
 
   (define (backlight-system-services config)
     (list
@@ -56,8 +56,8 @@
              (start
               #~(lambda ()
                   (invoke #$(file-append brightnessctl "/bin/brightnessctl")
-			  "set" (string-append
-				 (number->string #$default-brightness) "%"))))
+                          "set" (string-append
+                                 (number->string #$default-brightness) "%"))))
              (one-shot? #t))))
      (udev-rules-service 'backlight brightnessctl)))
 
@@ -85,10 +85,10 @@
            "asoundrc"
            #~(string-append
               "<"
-	      #$(file-append
+              #$(file-append
                  pipewire "/share/alsa/alsa.conf.d/50-pipewire.conf")
-	      ">\n<"
-	      #$(file-append
+              ">\n<"
+              #$(file-append
                  pipewire "/share/alsa/alsa.conf.d/99-pipewire-default.conf")
               ">\n"
               "
