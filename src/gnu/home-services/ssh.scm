@@ -151,11 +151,11 @@ as the @code{default-options} field in @code{home-ssh-configuration}."))
   (default-host
    (string "*")
    "The name of the default host."
-   (lambda (field-name val) (serialize-field 'host val)))
+   (serializer (lambda (field-name val) (serialize-field 'host val))))
   (user-known-hosts-file
    (list-of-strings '("~/.ssh/known_hosts"))
    "One or more files to use for the user host key database."
-   serialize-list)
+   (serializer serialize-list))
   (forward-agent
    (boolean #f)
    "Whether the connection to the authentication agent will be forwarded
@@ -197,8 +197,8 @@ would this:
 @example
 Include /some/path/to/file
 @end example"
-   (lambda (field-name val)
-     (serialize-alist field-name val #:toplevel? #t)))
+   (serializer (lambda (field-name val)
+                 (serialize-alist field-name val #:toplevel? #t))))
   (extra-config
    (list-of-ssh-host-or-ssh-match '())
    "List of configurations for other hosts.  Something like this:
@@ -233,8 +233,8 @@ Match exec \"grep key secret.txt\"
   (toplevel-options
    (alist '())
    ""
-   (lambda (field-name val)
-     (serialize-alist field-name val #:toplevel? #t)))
+   (serializer (lambda (field-name val)
+                 (serialize-alist field-name val #:toplevel? #t))))
   (extra-config
    (list-of-ssh-host-or-ssh-match '())
    ""))

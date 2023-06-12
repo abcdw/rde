@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;;
 ;;; This file is part of rde.
@@ -135,7 +135,7 @@ Shell startup process will continue with
   (environment-variables
    (alist '())
    "Association list of environment variables to set for the Zsh session."
-   serialize-posix-env-vars)
+   (serializer serialize-posix-env-vars))
   (zshenv
    (gexp-text-config '())
    "List of strings or gexps, which will be added to @file{.zshenv}.
@@ -321,7 +321,7 @@ for @code{ls} provided by guix to @file{.bashrc}.")
   (environment-variables
    (alist '())
    "Association list of environment variables to set for the Bash session."
-   serialize-posix-env-vars)
+   (serializer serialize-posix-env-vars))
   (bash-profile
    (gexp-text-config '())
    "List of strings or gexps, which will be added to @file{.bash_profile}.

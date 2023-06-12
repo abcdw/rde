@@ -53,7 +53,7 @@
   (name
    (string)
    "The name of the mpv profile."
-   serialize-name)
+   (serializer serialize-name))
   (options
    (alist '())
    "An association list of options to set in the mpv profile.  The format
@@ -88,7 +88,7 @@ is the same as the @code{options} field in
   (bindings
    (alist '())
    "An association list of keybindings to set for mpv."
-   serialize-bindings))
+   (serializer serialize-bindings)))
 
 (define (mpv-files-service config)
   `(("mpv/mpv.conf"
