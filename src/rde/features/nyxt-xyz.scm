@@ -19,14 +19,118 @@
 
 (define-module (rde features nyxt-xyz)
   #:use-module (rde features)
+  #:use-module (rde features fontutils)
   #:use-module (rde features predicates)
   #:use-module (rde features web-browsers)
   #:use-module (rde home services web-browsers)
   #:use-module (rde serializers lisp)
   #:use-module (gnu home services)
-  #:export (feature-nyxt-blocker
+  #:use-module (guix records)
+  #:export (feature-nyxt-appearance
+            feature-nyxt-blocker
             feature-nyxt-nx-search-engines
             feature-nyxt-userscript))
+
+(define-record-type* <nyxt-theme> nyxt-theme
+  make-nyxt-theme
+  nyxt-theme?
+  (name nyxt-theme-name)
+  (palette nyxt-theme-palette))
+
+(define (%rde-nyxt-light-theme config)
+  (nyxt-theme
+   (name 'modus-operandi)
+   (palette
+    `(:background-color "white"
+      :on-background-color "black"
+      :primary-color "#f0f0f0"
+      :on-primary-color "black"
+      :secondary-color "#005a5f"
+      :on-secondary-color "black"
+      :accent-color "#0000c0"
+      :on-accent-color "white"
+      :font-family ,(font-name (get-value 'font-monospace config))))))
+
+(define (%rde-nyxt-dark-theme config)
+  (nyxt-theme
+   (name 'modus-vivendi)
+   (palette
+    `(:dark-p t
+      :background-color "black"
+      :on-background-color "white"
+      :primary-color "#212121"
+      :on-primary-color "#a8a8a8"
+      :secondary-color "#100f10"
+      :on-secondary-color "#6ae4b9"
+      :accent-color "#00bcff"
+      :on-accent-color "black"
+      :font-family ,(font-name (get-value 'font-monospace config))))))
+
+(define* (feature-nyxt-appearance
+          #:key
+          (status-buffer-height 26)
+          (mode-glyphs? #t)
+          (status-buffer-position ':top)
+          (dark? #f)
+          (light-theme %rde-nyxt-light-theme)
+          (dark-theme %rde-nyxt-dark-theme))
+  "Set a more visually appealing Nyxt UI."
+  (ensure-pred integer? status-buffer-height)
+  (ensure-pred boolean? mode-glyphs?)
+  (ensure-pred symbol? status-buffer-position)
+  (ensure-pred boolean? dark?)
+  (ensure-pred maybe-procedure? light-theme)
+  (ensure-pred maybe-procedure? dark-theme)
+
+  (define nyxt-f-name 'appearance)
+  (define f-name (symbol-append 'nyxt- nyxt-f-name))
+
+  (define nyxt-rde-appearance-service-type
+    (make-nyxt-service-type f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Nyxt's appearance."
+    (define theme
+      (if dark?
+          (and dark-theme (dark-theme config))
+          (and light-theme (light-theme config))))
+    (list
+     (service
+      nyxt-rde-appearance-service-type
+      (home-nyxt-lisp-configuration
+       (name f-name)
+       (config
+        `((define-configuration status-buffer
+            ((glyph-mode-presentation-p ,(if mode-glyphs? 't 'nil))
+             (height ,status-buffer-height)))
+
+          (define-configuration window
+            ((status-buffer-position ,status-buffer-position)))
+
+          ,@(if mode-glyphs?
+                '((define-configuration nyxt/blocker-mode:blocker-mode
+                    ((glyph "⨂")))
+                  (define-configuration
+                    nyxt/user-script-mode:user-script-mode
+                    ((glyph "★"))))
+                '())
+
+          (define-configuration browser
+            ((theme ,@(if theme
+                          `((make-instance 'theme:theme
+                                           ,@(nyxt-theme-palette theme)))
+                          (if dark?
+                              '(theme:+dark-theme+)
+                              '(theme:+light-theme+))))))))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)
+             (nyxt-rde-appearance-service-type
+              . ,nyxt-rde-appearance-service-type)
+             (nyxt-light-theme . ,light-theme)
+             (nyxt-dark-theme . ,dark-theme)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-nyxt-blocker
           #:key
