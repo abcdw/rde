@@ -96,7 +96,9 @@
   ""
   (define (home-pipewire-services config)
     (list
-     ;; TODO: Make home-alsa-service-type
+     ;; TODO: Tune the performance settings
+     ;; https://gitlab.freedesktop.org/pipewire/pipewire/-/wikis/Performance-tuning#rlimits
+
      (simple-service
       'pipewire-add-asoundrc
       home-xdg-configuration-files-service-type
