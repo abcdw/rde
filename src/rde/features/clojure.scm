@@ -1,7 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
-;;; Copyright © 2023 conses <contact@conses.eu>
+;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
 ;;; This file is part of rde.
 ;;;

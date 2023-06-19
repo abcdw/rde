@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022 conses <contact@conses.eu>
+;;; Copyright © 2022 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
@@ -335,7 +335,7 @@ is a list of message types to ignore."
       #:summary "Reasonable defaults and extensions for ERC"
       #:commentary "Provide a distraction-free IRC experience with highlighting of nicks,
 image support, content alignment, and more."
-      #:authors '("conses <contact@conses.eu>"))))
+      #:authors '("Miguel Ángel Moreno <me@mianmoreno.com>"))))
 
   (feature
    (name f-name)

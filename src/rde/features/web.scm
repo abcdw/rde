@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2023 Miguel Moreno <mmoreno@mmoreno.eu>
+;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
 ;;; This file is part of rde.
 ;;;

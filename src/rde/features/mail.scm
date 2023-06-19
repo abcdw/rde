@@ -3,7 +3,7 @@
 ;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
-;;; Copyright © 2023 conses <contact@conses.eu>
+;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
 ;;; This file is part of rde.
 ;;;
