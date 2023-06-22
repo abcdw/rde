@@ -87,6 +87,12 @@
            (lambda ()
              (interactive)
              (org-end-of-meta-data t))))
+       (with-eval-after-load 'geiser-mode
+         (defun abcdw-geiser-connect ()
+           (interactive)
+           (geiser-connect 'guile "localhost" "37146"))
+
+         (define-key geiser-mode-map (kbd "C-c M-j") 'abcdw-geiser-connect))
        (with-eval-after-load 'simple
          (setq-default display-fill-column-indicator-column 80)
          (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
