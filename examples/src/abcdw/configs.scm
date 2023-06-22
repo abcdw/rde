@@ -245,6 +245,16 @@
      '((host-key-algorithms . "+ssh-rsa")
        (pubkey-accepted-key-types . "+ssh-rsa"))))))
 
+(define (feature-additional-services)
+  (feature-custom-services
+   #:feature-name-prefix 'abcdw
+   #:home-services
+   (list
+    emacs-extra-packages-service
+    home-extra-packages-service
+    sway-extra-config-service
+    ssh-extra-config-service
+    i2pd-add-ilita-irc-service)))
 
 ;;; User-specific features with personal preferences
 
@@ -253,6 +263,7 @@
 
 (define %abcdw-features
   (list
+   (feature-additional-services)
    (feature-user-info
     #:user-name "bob"
     #:full-name "Andrew Tropin"
@@ -297,16 +308,6 @@
                      (id 'oftc)
                      (network "irc.oftc.net")
                      (nick "abcdw"))))
-
-   (feature-custom-services
-    #:feature-name-prefix 'abcdw
-    #:home-services
-    (list
-     emacs-extra-packages-service
-     home-extra-packages-service
-     sway-extra-config-service
-     ssh-extra-config-service
-     i2pd-add-ilita-irc-service))
 
    (feature-ssh-proxy #:host "pinky-ygg" #:auto-start? #f)
    (feature-ssh-proxy #:host "pinky-ygg" #:name "hundredrps"
