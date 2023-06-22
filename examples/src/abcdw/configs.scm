@@ -370,10 +370,10 @@
     #:org-capture-templates
     ;; https://libreddit.tiekoetter.com/r/orgmode/comments/gc76l3/org_capture_inside_notmuch/
     `(("r" "Reply" entry (file+headline "" "Tasks")
-       "* TODO Reply %:subject %?\nSCHEDULED: %t\n%U\n%a\n"
+       "* TODO %:subject %?\nSCHEDULED: %t\n%U\n%a\n"
        :immediate-finish t)
       ("t" "Todo" entry (file+headline "" "Tasks") ;; org-default-notes-file
-       "* TODO %?\nSCHEDULED: %t\n%a\n" :clock-in t :clock-resume t)))
+       "* TODO %?\nSCHEDULED: %t\n%a\n")))
    (feature-emacs-org-roam
     ;; TODO: Rewrite to states
     #:org-roam-directory "~/work/abcdw/notes/notes")
