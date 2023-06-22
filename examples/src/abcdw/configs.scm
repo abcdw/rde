@@ -586,4 +586,23 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
       ("live-system" live-os)
       (_ ixy-he))))
 
+;; (pretty-print-rde-config ixy-config)
+;; (use-modules (gnu services)
+;;           (gnu services base))
+;; (display
+;;  (filter (lambda (x)
+;;         (eq? (service-kind x) console-font-service-type))
+;;       (rde-config-system-services ixy-config)))
+
+;; (use-modules (rde features))
+;; ((@ (ice-9 pretty-print) pretty-print)
+;;  (map feature-name (rde-config-features ixy-config)))
+
+;; ((@ (ice-9 pretty-print) pretty-print)
+;;  (rde-config-home-services ixy-config))
+
+;; (define br ((@ (rde tests store) build-with-store) ixy-he))
 (dispatcher)
+
+
+;;; TODO: Call reconfigure from scheme file.
