@@ -3068,6 +3068,7 @@ language for GNU Emacs."
    (home-services-getter get-home-services)))
 
 ;; MAYBE: Merge it with feature-git
+;; TODO: Add https://github.com/magit/magit-tbdiff
 (define* (feature-emacs-git
           #:key
           (git-gutter-transient-key "s-g")
