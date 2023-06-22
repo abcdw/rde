@@ -207,3 +207,7 @@ where each expression is also a list or gexp, but provided value is:\n ~a")
 (define (nginx-config? config)
   "Naive implementation, without traversing nested structures."
   (nginx-context? config))
+
+;; TODO: Think about order of things, which defined above contexts, which are
+;; get merged (for example load_module if defined in extension can appear
+;; after http context).
