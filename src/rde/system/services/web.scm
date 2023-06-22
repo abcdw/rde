@@ -165,3 +165,5 @@ renewed TLS certificates, or @code{include}d files.")
                 (extend nginx-extensions)
                 (default-value (nginx-configuration))
                 (description "Run the nginx Web server.")))
+
+;; https://othacehe.org/hosting-a-blog-using-only-scheme.html :: certbot example
