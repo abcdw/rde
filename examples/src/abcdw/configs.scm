@@ -388,8 +388,6 @@
 
    ;; TODO: move feature to general, move extra configuration to service.
    (feature-notmuch
-    ;; TODO: Add integration with mail-lists
-    ;; `notmuch-show-stash-mlarchive-link-alist'
     #:extra-tag-updates-post
     '("notmuch tag +guix-home +inbox -- 'thread:\"\
 {((subject:guix and subject:home) or (subject:service and subject:home) or \
