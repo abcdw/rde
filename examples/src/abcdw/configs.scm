@@ -278,7 +278,8 @@
     ;; it's not recommended to use it.
     #:emacs-advanced-user? #t)
    (feature-gnupg
-    #:gpg-primary-key "74830A276C328EC2")
+    #:gpg-primary-key "74830A276C328EC2"
+    #:ssh-keys '(("58AAE5966479124A357F7D6B9D710EBA1C24E10E")))
    (feature-security-token)
    (feature-password-store
     #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
