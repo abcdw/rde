@@ -305,6 +305,11 @@
      (publicshare "$HOME")
      (templates "$HOME")))
 
+   ((@ (rde features terminals) feature-alacritty)
+    #:config-file (local-file "./files/config/alacritty/alacritty.yml")
+    #:default-terminal? #f
+    #:backup-terminal? #t
+    #:software-rendering? #f)
    (feature-yggdrasil)
    (feature-i2pd
     #:outproxy 'http://acetone.i2p:3128
