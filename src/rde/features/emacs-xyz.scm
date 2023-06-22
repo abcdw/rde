@@ -5116,7 +5116,7 @@ You can truncate paths whose character length is greater than PATH-MAX-LENGTH."
           ,@(if (and (get-value 'emacs-org-agenda config)
                      dashboard-agenda-weekly?)
                 '((setq dashboard-week-agenda t))
-                '())
+                '((setq dashboard-week-agenda nil)))
           (setq dashboard-agenda-release-buffers t)
           ,@(if dashboard-agenda-prefix-format
                 `((setq dashboard-agenda-prefix-format
