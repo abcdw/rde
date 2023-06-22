@@ -137,11 +137,12 @@
      "pavucontrol" "wev"
      "imagemagick"
      "obs" "obs-wlrobs"
-     "recutils" "binutils" "make"
+     "recutils" "binutils" "make" "gdb"
      "fheroes2"
 
      "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-extra"
-     "papirus-icon-theme" "arc-theme"
+     ;; "papirus-icon-theme" ; 85k files
+     "arc-theme"
      "thunar" "fd"
      ;; "glib:bin"
 
