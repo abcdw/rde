@@ -67,7 +67,21 @@
    home-emacs-service-type
    (home-emacs-extension
     (init-el
-     `((with-eval-after-load 'org
+     `((with-eval-after-load 'piem
+         (setq piem-inboxes
+               '(("guix-devel"
+                  :url "https://yhetil.org/guile-devel/"
+                  :address "guile-devel@gnu.org"
+                  :coderepo "~/work/gnu/guile/")
+                 ("guix-patches"
+                  :url "https://yhetil.org/guix-patches/"
+                  :address "guix-patches@gnu.org"
+                  :coderepo "~/work/gnu/guix/")
+                 ("rde-devel"
+                  :url "https://lists.sr.ht/~abcdw/rde-devel"
+                  :address "~abcdw/rde-devel@lists.sr.ht"
+                  :coderepo "~/work/abcdw/rde/"))))
+       (with-eval-after-load 'org
          (setq org-use-speed-commands t)
          (define-key org-mode-map (kbd "M-o")
            (lambda ()
@@ -83,6 +97,7 @@
      (append
       (strings->packages
        ;; "emacs-dirvish"
+       "emacs-piem"
        "emacs-rainbow-mode"
        "emacs-hl-todo"
        "emacs-yasnippet"
