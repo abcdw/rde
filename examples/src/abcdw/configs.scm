@@ -101,14 +101,20 @@
        (add-hook 'after-save-hook (lambda () (copyright-update nil nil)))))
     (elisp-packages
      (append
+      (list
+       (@ (rde packages emacs-xyz) emacs-clojure-ts-mode)
+       (@ (rde packages emacs-xyz) emacs-combobulate))
       (strings->packages
        ;; "emacs-dirvish"
        "emacs-piem"
+       ;; "emacs-company"
+       "emacs-ox-haunt"
+       "emacs-haskell-mode"
        "emacs-rainbow-mode"
        "emacs-hl-todo"
        "emacs-yasnippet"
        ;; "emacs-company"
-       "emacs-consult-dir"
+       ;; "emacs-consult-dir"
        ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
        "emacs-kind-icon"
        "emacs-nginx-mode" "emacs-yaml-mode"
@@ -125,6 +131,9 @@
    'home-profile-extra-packages
    home-profile-service-type
    (append
+    (list
+     (@ (gnu packages tree-sitter) tree-sitter-clojure)
+     (@ (gnu packages tree-sitter) tree-sitter-html))
     (strings->packages
      "figlet" ;; TODO: Move to emacs-artist-mode
      "calibre"
@@ -504,6 +513,7 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
      "icecat"
      "imv" "wev"
      "make"
+     ;; "nroff" ;; man doesn't work according to report
      "adwaita-icon-theme" "gnome-themes-extra"
      "hicolor-icon-theme" ;; needed for nm icons
 
@@ -606,3 +616,5 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
 
 
 ;;; TODO: Call reconfigure from scheme file.
+;;; TODO: Rename configs.scm to main.scm?
+;;; TODO: Move all files from abcdw/ to rde-config/ ?
