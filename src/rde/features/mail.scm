@@ -1606,4 +1606,7 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-;; Think about delayed email sending
+
+;;; Mail subsystem refactoring:
+
+;; TODO: Add piem for apply emails and stuff
