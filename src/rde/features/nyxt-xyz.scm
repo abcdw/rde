@@ -28,6 +28,7 @@
   #:use-module (guix records)
   #:export (feature-nyxt-appearance
             feature-nyxt-blocker
+            feature-nyxt-nx-router
             feature-nyxt-nx-search-engines
             feature-nyxt-userscript))
 
@@ -170,6 +171,63 @@
    (values
     `((,f-name . #t)
       (nyxt-rde-blocker-service-type . ,nyxt-rde-blocker-service-type)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-nyxt-nx-router
+          #:key
+          (routers #f)
+          (show-block-banner? #t))
+  "Configure nx-router, a URL routing extension for Nyxt."
+  (ensure-pred maybe-procedure? routers)
+  (ensure-pred boolean? show-block-banner?)
+
+  (define nyxt-f-name 'nx-router)
+  (define f-name (symbol-append 'nyxt- nyxt-f-name))
+  (define nyxt-config-name (symbol-append 'rde- nyxt-f-name))
+  (define nyxt-service-type-name (symbol-append 'nyxt- nyxt-config-name))
+
+  (define nyxt-rde-nx-router-service-type
+    (make-nyxt-service-type nyxt-service-type-name))
+
+  (define (get-home-services config)
+    "Return home services related to nx-router."
+    (list
+     (service
+      nyxt-rde-nx-router-service-type
+      (home-nyxt-lisp-configuration
+       (name nyxt-config-name)
+       (config
+        `((define-configuration router:opener
+            ((router:toplevel-p nil)))
+
+          (define-configuration router:blocker
+            ((router:block-banner-p ,(if show-block-banner? 't 'nil))))
+
+          (define-configuration router:router-mode
+            ((router:routers
+              (list
+               ,@(if routers
+                     (routers config)
+                     '())))))
+
+          (defmethod nyxt:on-signal-load-finished
+            :around ((mode nyxt/history-mode:history-mode) url)
+            (call-next-method mode (router:trace-url url)))
+
+          (defmethod nyxt/bookmark-mode:bookmark-current-url
+            :around (&optional (buffer (current-buffer)))
+            (setf (url buffer) (router:trace-url (url buffer)))
+            (call-next-method buffer))
+
+          (define-configuration web-buffer
+            ((default-modes `(router:router-mode ,@%slot-value%))))))
+       (lisp-packages '(nx-router))))))
+
+  (feature
+   (name f-name)
+   (values
+    `((,f-name . #t)
+      (nyxt-rde-nx-router-service-type . ,nyxt-rde-nx-router-service-type)))
    (home-services-getter get-home-services)))
 
 (define (maybe-lisp-config? x)
