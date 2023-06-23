@@ -26,10 +26,12 @@
   #:use-module (rde serializers lisp)
   #:use-module (gnu home services)
   #:use-module (guix records)
+  #:use-module (ice-9 match)
   #:export (feature-nyxt-appearance
             feature-nyxt-blocker
             feature-nyxt-nx-router
             feature-nyxt-nx-search-engines
+            feature-nyxt-nx-tailor
             feature-nyxt-userscript))
 
 (define-record-type* <nyxt-theme> nyxt-theme
@@ -357,6 +359,61 @@ and returns Lisp configuration containing the engines."
     `((,f-name . #t)
       (nyxt-rde-nx-search-engines-service-type
        . ,nyxt-rde-nx-search-engines-service-type)))
+   (home-services-getter get-home-services)))
+
+(define (symbol-or-boolean? x)
+  (or (symbol? x) (boolean? x)))
+
+(define* (feature-nyxt-nx-tailor
+          #:key
+          (auto? #t))
+  "Configure nx-tailor, a Nyxt theme manager."
+  (ensure-pred symbol-or-boolean? auto?)
+
+  (define nyxt-f-name 'nx-tailor)
+  (define f-name (symbol-append 'nyxt- nyxt-f-name))
+  (define nyxt-config-name (symbol-append 'rde- nyxt-f-name))
+  (define nyxt-service-type-name (symbol-append 'nyxt- nyxt-config-name))
+
+  (define nyxt-rde-nx-tailor-service-type
+    (make-nyxt-service-type nyxt-service-type-name))
+
+  (define (get-home-services config)
+    "Return home services related to nx-tailor."
+    (require-value 'nyxt-light-theme config)
+    (require-value 'nyxt-dark-theme config)
+    (define light-theme ((get-value 'nyxt-light-theme config) config))
+    (define dark-theme ((get-value 'nyxt-dark-theme config) config))
+
+    (list
+     (service
+      nyxt-rde-nx-tailor-service-type
+      (home-nyxt-lisp-configuration
+       (name nyxt-config-name)
+       (config
+        `((define-configuration web-buffer
+            ((default-modes `(tailor:tailor-mode ,@%slot-value%))))
+
+          (define-configuration tailor:tailor-mode
+            ((tailor:auto-p ,(match auto?
+                               ((? symbol? e) e)
+                               (#t 't)
+                               (#f 'nil)))
+             (tailor:themes
+              (list
+               (make-instance 'tailor:user-theme
+                              :name ',(nyxt-theme-name light-theme)
+                              ,@(nyxt-theme-palette light-theme))
+               (make-instance 'tailor:user-theme
+                              :name ',(nyxt-theme-name dark-theme)
+                              ,@(nyxt-theme-palette dark-theme))))))))
+       (lisp-packages '(nx-tailor))))))
+
+  (feature
+   (name f-name)
+   (values
+    `((,f-name . #t)
+      (nyxt-rde-nx-tailor-service-type . ,nyxt-rde-nx-tailor-service-type)))
    (home-services-getter get-home-services)))
 
 (define* (feature-nyxt-userscript
