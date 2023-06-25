@@ -506,8 +506,9 @@ based on the time of the day."
                   (cons longitude latitude))))))
 
         (with-eval-after-load 'solar
-          (setq calendar-longitude (car (rde-circadian--get-geolocation)))
-          (setq calendar-latitude (cdr (rde-circadian--get-geolocation))))
+          (let ((coordinates (rde-circadian--get-geolocation)))
+            (setq calendar-longitude (if coordinates (car coordinates) 0))
+            (setq calendar-latitude (if coordinates (cdr coordinates) 0))))
         ,@(if (get-value 'emacs-modus-themes config)
               '((add-hook 'circadian-after-load-theme-hook
                           'rde-modus-themes-set-custom-faces))
