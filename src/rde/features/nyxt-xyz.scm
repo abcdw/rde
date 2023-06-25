@@ -212,10 +212,10 @@
                      '())))))
 
           (defmethod nyxt:on-signal-load-finished
-            :around ((mode nyxt/history-mode:history-mode) url)
+            :around ((mode nyxt/mode/history:history-mode) url)
             (call-next-method mode (router:trace-url url)))
 
-          (defmethod nyxt/bookmark-mode:bookmark-current-url
+          (defmethod nyxt/mode/bookmark:bookmark-current-url
             :around (&optional (buffer (current-buffer)))
             (setf (url buffer) (router:trace-url (url buffer)))
             (call-next-method buffer))
