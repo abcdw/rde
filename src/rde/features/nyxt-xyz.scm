@@ -442,15 +442,15 @@ construct these."
        (name nyxt-config-name)
        (config
         `((define-configuration web-buffer
-            ((default-modes `(nyxt/user-script-mode:user-script-mode
+            ((default-modes `(nyxt/mode/user-script:user-script-mode
                               ,@%slot-value%))))
-          (define-configuration nyxt/user-script-mode:user-script-mode
+          (define-configuration nyxt/mode/user-script:user-script-mode
             (,@(if userstyles
-                   `((nyxt/user-script-mode:user-styles
+                   `((nyxt/mode/user-script:user-styles
                       (list ,@userstyles)))
                    '())
              ,@(if userscripts
-                   `((nyxt/user-script-mode:user-scripts
+                   `((nyxt/mode/user-script:user-scripts
                       (list ,@userscripts)))
                    '())))))))))
 
