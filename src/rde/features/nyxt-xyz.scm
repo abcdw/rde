@@ -58,8 +58,7 @@
   (nyxt-theme
    (name 'modus-vivendi)
    (palette
-    `(:dark-p t
-      :background-color "black"
+    `(:background-color "black"
       :on-background-color "white"
       :primary-color "#212121"
       :on-primary-color "#a8a8a8"
@@ -111,10 +110,10 @@
             ((status-buffer-position ,status-buffer-position)))
 
           ,@(if mode-glyphs?
-                '((define-configuration nyxt/blocker-mode:blocker-mode
+                '((define-configuration nyxt/mode/blocker:blocker-mode
                     ((glyph "⨂")))
                   (define-configuration
-                    nyxt/user-script-mode:user-script-mode
+                    nyxt/mode/user-script:user-script-mode
                     ((glyph "★"))))
                 '())
 
