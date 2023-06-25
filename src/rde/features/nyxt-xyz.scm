@@ -157,13 +157,13 @@
        (name nyxt-config-name)
        (config
         `((define-configuration web-buffer
-            ((default-modes `(nyxt/blocker-mode:blocker-mode
+            ((default-modes `(nyxt/mode/blocker:blocker-mode
                               ,@%slot-value%))))
-          (define-configuration nyxt/blocker-mode:blocker-mode
-            ((nyxt/blocker-mode:hostlists
+          (define-configuration nyxt/mode/blocker:blocker-mode
+            ((nyxt/mode/blocker:hostlists
               (append
                (list
-                (nyxt/blocker-mode:make-hostlist
+                (nyxt/mode/blocker:make-hostlist
                  :hosts ',blocked-hosts))
                (list %slot-default%)))))))))))
 
