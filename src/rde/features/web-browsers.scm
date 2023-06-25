@@ -28,6 +28,7 @@
   #:use-module (gnu home services xdg)
   #:use-module (gnu packages browser-extensions)
   #:use-module (gnu packages chromium)
+  #:use-module (gnu packages web-browsers)
   #:use-module (gnu services)
   #:use-module (gnu system keyboard)
   #:use-module (guix gexp)
@@ -115,7 +116,7 @@
 
 (define* (feature-nyxt
           #:key
-          (nyxt nyxt-next)
+          (nyxt nyxt)
           (default-browser? #f)
           (startup-flags '())
           (default-cookie-policy ':no-third-party)
