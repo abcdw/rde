@@ -15,6 +15,9 @@ ROOT_MOUNT_POINT=/mnt
 
 VERSION=latest
 
+repl:
+	${GUIX} repl -L ../tests \
+	-L ../files/emacs/gider/src --listen=tcp:37146
 
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
