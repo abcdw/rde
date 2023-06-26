@@ -47,5 +47,6 @@
     ;; ls `guix build tzdata`/share/zoneinfo
     #:timezone  "Europe/Kiev")
    live-extra-services
+   (feature-hidpi)
    (feature-file-systems
     #:file-systems live-file-systems)))
