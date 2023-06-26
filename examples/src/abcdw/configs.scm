@@ -1,20 +1,43 @@
 (define-module (abcdw configs)
-  #:use-module (abcdw hosts ixy)
-  #:use-module (abcdw hosts live)
-  #:use-module (abcdw users abcdw)
-  #:use-module (abcdw users guest)
   #:use-module (rde features)
   #:use-module (gnu services)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match))
 
-;; TODO: Load user and hosts modules without explicit import
-;; (canonicalize-path
-;;  (search-path %load-path "abcdw/users/abcdw.scm"))
+(define* (use-nested-configuration-modules
+          #:key
+          (users-subdirectory "/users")
+          (hosts-subdirectory "/hosts"))
+  (use-modules (guix discovery)
+               (guix modules))
 
-;; (getcwd)
-;; (format #t "path: ~a\n" (canonicalize-path "./users/"))
-;; (source-properties ixy-config)
+  (define current-module-file
+    (search-path %load-path
+                 (module-name->file-name (module-name (current-module)))))
+
+  (define current-module-directory
+    (dirname (and=> current-module-file canonicalize-path)))
+
+  (define src-directory
+    (dirname current-module-directory))
+
+  (define current-module-subdirectory
+    (string-drop current-module-directory (1+ (string-length src-directory))))
+
+  (define users-modules
+    (scheme-modules
+     src-directory
+     (string-append current-module-subdirectory users-subdirectory)))
+
+  (define hosts-modules
+    (scheme-modules
+     src-directory
+     (string-append current-module-subdirectory hosts-subdirectory)))
+
+  (map (lambda (x) (module-use! (current-module) x)) hosts-modules)
+  (map (lambda (x) (module-use! (current-module) x)) users-modules))
+
+(use-nested-configuration-modules)
 
 
 ;;; Some TODOs
