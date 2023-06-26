@@ -1,5 +1,4 @@
 (define-module (abcdw configs)
-  #:use-module (abcdw feature-lists)
   #:use-module (abcdw hosts ixy)
   #:use-module (abcdw hosts live)
   #:use-module (abcdw users abcdw)
