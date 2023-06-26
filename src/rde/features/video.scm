@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -28,23 +28,21 @@
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu home services xdg)
-  #:use-module (gnu home-services video)
+  #:use-module (rde home services video)
   #:use-module (guix gexp)
   #:export (feature-mpv
             feature-youtube-dl))
 
+;; Nice mpv configs
+;; https://libreddit.tiekoetter.com/r/mpv/comments/1149cpm/recommended_profiles/
 (define* (feature-mpv
           #:key
           (mpv mpv)
           (emacs-mpv emacs-mpv)
-          (mpv-key "m")
-          (extra-bindings '())
-          (extra-mpv-conf '()))
+          (mpv-key "m"))
   "Setup and configure the mpv command-line player."
   (ensure-pred file-like? mpv)
   (ensure-pred file-like? emacs-mpv)
-  (ensure-pred alist? extra-mpv-conf)
-  (ensure-pred alist? extra-bindings)
   (ensure-pred string? mpv-key)
 
   (define f-name 'mpv)
@@ -58,13 +56,11 @@
       (service
        home-mpv-service-type
        (home-mpv-configuration
-        (package mpv)
-        (bindings extra-bindings)
-        (default-options
-         `((script . ,(file-append mpv-mpris "/lib/mpris.so"))
-           (osd-font . ,font-sans-serif)
-           (sub-font . ,font-sans-serif)
-           ,@extra-mpv-conf))))
+        (mpv mpv)
+        (mpv-conf
+         `((global ((script . ,(file-append mpv-mpris "/lib/mpris.so"))
+                    (osd-font . ,font-sans-serif)
+                    (sub-font . ,font-sans-serif)))))))
       (simple-service
        'add-mpv-mime-entries
        home-xdg-mime-applications-service-type
