@@ -31,6 +31,7 @@
   #:use-module (rde home services emacs)
   #:use-module (rde home services i2p)
   #:use-module (rde home services wm)
+  #:use-module (rde home services video)
   #:use-module (rde packages aspell)
   #:use-module (rde packages))
 
@@ -206,6 +207,19 @@
      ;; (xwayland disable)
      (bindsym $mod+Shift+Return exec emacs))))
 
+(define mpv-add-user-settings-service
+  (simple-service
+   'mpv-add-user-settings-irc
+   home-mpv-service-type
+   (home-mpv-extension
+    (mpv-conf
+     `((global
+        ((keep-open . #t)
+         (ytdl-format . "bestvideo[height<=?720][fps<=?30][vcodec!=?vp9]+bestaudio/best
+")
+         (save-position-on-quit . #t)
+         (speed . 1.61))))))))
+
 (define i2pd-add-ilita-irc-service
   (simple-service
    'i2pd-add-ilita-irc
@@ -262,7 +276,8 @@
     home-extra-packages-service
     sway-extra-config-service
     ssh-extra-config-service
-    i2pd-add-ilita-irc-service)))
+    i2pd-add-ilita-irc-service
+    mpv-add-user-settings-service)))
 
 ;;; User-specific features with personal preferences
 
