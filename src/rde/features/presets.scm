@@ -62,11 +62,7 @@
                      (effect-blur . 7x5)
                      (clock)))
    (feature-imv)
-   (feature-mpv
-    #:extra-mpv-conf
-    '((keep-open . #t)
-      (save-position-on-quit . #t)
-      (speed . 1.61)))
+   (feature-mpv)
    (feature-ungoogled-chromium
     #:default-browser? #t)
   (feature-transmission #:auto-start? #f)
