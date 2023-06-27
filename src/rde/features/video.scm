@@ -25,6 +25,7 @@
   #:use-module (rde features fontutils)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages video)
+  #:use-module (rde packages video)
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu home services xdg)
@@ -38,10 +39,14 @@
 (define* (feature-mpv
           #:key
           (mpv mpv)
+          (uosc? #t)
           (emacs-mpv emacs-mpv)
           (mpv-key "m"))
-  "Setup and configure the mpv command-line player."
+  "Setup and configure the mpv command-line player.  UOSC? enables minimalist,
+but feature-rich proximity based UI and in addition to that thumbfast for
+on-the-fly thumbnail generation for progress bar."
   (ensure-pred file-like? mpv)
+  (ensure-pred boolean? uosc?)
   (ensure-pred file-like? emacs-mpv)
   (ensure-pred string? mpv-key)
 
@@ -52,6 +57,40 @@
     (define font-sans-serif (font-name (get-value 'font-sans config)))
 
     (append
+     (if uosc?
+         (list
+          ;; Reach out rde-devel mailing list if you don't know how to extend
+          ;; the configuration.
+          (simple-service
+           'mpv-disable-builtin-ui
+           home-mpv-service-type
+           (home-mpv-extension
+            (input-conf
+             `("tab script-binding uosc/toggle-ui"
+               "menu script-binding uosc/menu"))
+            (mpv-conf
+             `((global ((osc . no)
+                        (osd-bar . no)
+                        (border . no)))))))
+          ;; This approach is kinda hacky and hard to extend, but was the
+          ;; simplest one at the moment to get everything up and running.  It
+          ;; could be a separate service shared via rde values for future
+          ;; extensibility.  Also, instead of creating files in xdg config
+          ;; home options could be passed as command line arguments inside
+          ;; wrapper or something like that.
+          (simple-service
+           'mpv-add-uosc
+           home-xdg-configuration-files-service-type
+           `(("mpv/fonts" ,(file-append mpv-uosc "/share/mpv/fonts"))
+             ("mpv/scripts/thumbfast.lua"
+              ,(file-append mpv-thumbfast "/share/mpv/scripts/thumbfast.lua"))
+             ("mpv/script-opts/thumbfast.conf"
+              ,(mixed-text-file "thumbfast.conf" "network=yes"))
+             ("mpv/scripts/uosc.lua"
+              ,(file-append mpv-uosc "/share/mpv/scripts/uosc.lua"))
+             ("mpv/scripts/uosc_shared"
+              ,(file-append mpv-uosc "/share/mpv/scripts/uosc_shared")))))
+         '())
      (list
       (service
        home-mpv-service-type
