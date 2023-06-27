@@ -58,11 +58,12 @@
 
 (define-configuration/no-serialization home-mpv-extension
   (mpv-conf
+   ;; TODO: Serialize #t to yes?
    (ini-config '())
    "Configuration that will be added to mpv-conf field of original
 configuration.")
   (input-conf
-   (ini-config '())
+   (list '())
    "Configuration that will be added to input-conf field of original
 configuration."))
 
@@ -76,7 +77,8 @@ configuration."))
      ,(apply
        mixed-text-file
        "mpv-input.conf"
-       (serialize-ini-config (home-mpv-configuration-input-conf config))))))
+       (interpose
+        (home-mpv-configuration-input-conf config) "\n")))))
 
 (define (mpv-extensions original-config extensions)
   (let ((extensions (reverse extensions)))
@@ -84,12 +86,12 @@ configuration."))
      (inherit original-config)
      (mpv-conf
       (fold
-       ini-merge
+       (lambda (x acc) (ini-merge acc x))
        (home-mpv-configuration-mpv-conf original-config)
        (map home-mpv-extension-mpv-conf extensions)))
      (input-conf
       (fold
-       ini-merge
+       (lambda (x acc) (append acc x))
        (home-mpv-configuration-input-conf original-config)
        (map home-mpv-extension-input-conf extensions))))))
 
