@@ -1,18 +1,29 @@
-# -*- mode: org; org-archive-reversed-order: t -*-
+# -*- mode: org -*-
 
 * TODO Questions
-- Do we want to use ~!~ in commit messages?
 - What is a better format for new feature commit message?
 - Add links to the info/websites?
 - How to split long list of changelog items into more manageable pieces?
 - Check out https://gitlab.com/spritely/goblins/-/blob/master/CHANGELOG.org
 
 * Notes
-Items starting with ~!~ means BREAKING CHANGES.  It's not a dump of commit log,
-it's carefully crafted list of items, which usually takes some of commit
-messages as a foundation.
+It's not a dump of commit log, it's carefully crafted list of items, which
+usually takes some of commit messages as a foundation.
 
-* Unreleased
+* Releases
+** Unreleased
+
+** TODO 0.4.0 (2022-06-30)
+*** Breaking Changes
+- rde: mpv: Removed extra-mpv-conf arguments.
+- rde: faces: Deprecated in favor of feature-fonts.
+- rde: Move [[https://protesilaos.com/emacs/modus-themes][modus-theme]] related stuff to feature-emacs-modus-themes.
+
+*** Updates
+- rde: pipewire: Prevent pulseaudio autostart.
+- system: nginx: Add service-type.
+- serializers: nginx: Add serialize and merge functions.
+- contrib: emacs-evil: Add feature.
 - rde: emacs-org-recur: Add feature.
 - rde: emacs-smartparens: Add paredit bindings support, introduce a more flexible approach to its normal and strict mode hooks, and refine paren highlighting.
 - rde: emacs-calendar: Add feature.
@@ -27,8 +38,6 @@ messages as a foundation.
 - rde: completion: Reuse original ripgrep options. Now it can search in
   compressed files, including el source code bundled with Emacs and so on.
 - rde: emacs: Add tree-sitter support.
-
-- !rde: Move [[https://protesilaos.com/emacs/modus-themes][modus-theme]] related stuff to feature-emacs-modus-themes.
 - rde: emacs-modus-themes: Add feature.
 - rde: emacs-circadian: Add feature.
 - rde: emacs-ebdb: Add feature.
@@ -39,5 +48,5 @@ messages as a foundation.
 - doc: Add Decision Log.  Important decision are now will be captured with the
   context and recorded.
 
-* TODO 0.3.0 (2022-12-31)
+** 0.3.0 (2022-12-31)
 - Write some information here.
