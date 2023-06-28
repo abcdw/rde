@@ -17,7 +17,6 @@
   (append
    rde-base
    rde-desktop
-   rde-mail
    rde-cli
    rde-emacs))
 
