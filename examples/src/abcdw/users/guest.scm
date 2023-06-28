@@ -48,6 +48,8 @@
      "adwaita-icon-theme" "gnome-themes-extra"
      "hicolor-icon-theme" ;; needed for nm icons
 
+     "cryptsetup" "dosfstools" "btrfs-progs"
+
      "ripgrep" "curl"))))
 
 (define example-configs-service
