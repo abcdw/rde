@@ -16,7 +16,10 @@
            (he (cdr x)))
        (shepherd-service
         (documentation "Activate Guix Home.")
-        (requirement '(user-homes))
+        ;; Originally requirement was user-homes, but for recently it stopped
+        ;; working, seems like it was executed too early and didn't work, so
+        ;; we switched to term-tty1.
+        (requirement '(term-tty1))
         (provision (list (symbol-append 'guix-home- (string->symbol user))))
         (one-shot? #t)
         (auto-start? #t)
