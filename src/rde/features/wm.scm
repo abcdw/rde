@@ -303,7 +303,7 @@ chooser_type=simple"
 (define* (feature-sway-run-on-tty
           #:key
           (sway-tty-number 2)
-          (launch-arguments "2> ${XDG_LOG_HOME}/sway.log"))
+          (launch-arguments "2> ${XDG_STATE_HOME}/sway.log"))
   "Launch Sway on specified tty upon user login.  Also,
 automatically switch to SWAY-TTY-NUMBER on boot."
   (ensure-pred tty-number? sway-tty-number)
