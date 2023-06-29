@@ -82,6 +82,7 @@
                 ;; MAYBE: take this value from rde-config
                 (system* #$(file-append (@ (gnu packages shellutils) direnv)
                                         "/bin/direnv") "allow" output))))))
+     (auto-start? #t)
      (one-shot? #t)))))
 
 (define (feature-additional-services)
