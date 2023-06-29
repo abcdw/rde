@@ -148,9 +148,11 @@
         `((,#~"\n\n# Launch shepherd:")
           (exec ,(program-file
                   "launch-shepherd"
-                  #~(let ((log-dir (or (getenv "XDG_LOG_HOME")
-                                       (format #f "~a/.local/var/log"
-                                               (getenv "HOME")))))
+                  #~(let* ((state-dir (or (getenv "XDG_STATE_HOME")
+                                          (format #f "~a/.local/state"
+                                                  (getenv "HOME"))))
+                           (log-dir (string-append state-dir "/log")))
+                      ((@ (guix build utils) mkdir-p) log-dir)
                       (system*
                        #$(file-append shepherd "/bin/shepherd")
                        "--logfile"
