@@ -349,7 +349,7 @@ automatically switch to SWAY-TTY-NUMBER on boot."
       shepherd-root-service-type
       (list (shepherd-service
              (provision '(switch-to-sway-tty))
-             (requirement '(virtual-terminal))
+             (requirement '(term-tty1))
              (start #~(lambda ()
                         (invoke #$(file-append kbd "/bin/chvt")
                                 #$(format #f "~a" sway-tty-number))))
