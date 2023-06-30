@@ -78,16 +78,16 @@
 (define-public rde
   (package
     (name "rde")
-    (version "0.3.0")
+    (version "0.4.0")
     (home-page "https://trop.in/rde")
     (source
      (origin
       (method git-fetch)
       (uri (git-reference (url "https://git.sr.ht/~abcdw/rde")
-                          (commit "bb580995a3ace2ecf4e3ef33d200d5b8faad751e")))
+                          (commit "5da32fb8507d27fe6b05badae8a70541aa25d47e")))
       (sha256
        (base32
-        "16xs407jhf93m4nn6ysbyfbfnxf2g7g9c5sbiblngckdhiwkjll9"))
+        "0vqgabkpnv8iirwdmngq7l72w8wc2nzka3hmw8qip9yv34m38ry3"))
       (file-name (string-append "rde-" version "-checkout"))))
     (build-system gnu-build-system)
     (native-inputs
