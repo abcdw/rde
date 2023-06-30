@@ -13,13 +13,16 @@ usually takes some of commit messages as a foundation.
 * Releases
 ** Unreleased
 
-** TODO 0.4.0 (2022-06-30)
+** 0.4.0 (2022-06-30)
 *** Breaking Changes
-- rde: mpv: Removed extra-mpv-conf arguments.
-- rde: faces: Deprecated in favor of feature-fonts.
+- rde: mpv: Remove extra-mpv-conf arguments.
+- rde: faces: Deprecate in favor of feature-fonts.
 - rde: Move [[https://protesilaos.com/emacs/modus-themes][modus-theme]] related stuff to feature-emacs-modus-themes.
+- examples: Move abcdw to rde-configs root module.
 
 *** Updates
+- rde: emacs-xyz: Services are shared in rde values and available for
+  extension.
 - rde: pipewire: Prevent pulseaudio autostart.
 - system: nginx: Add service-type.
 - serializers: nginx: Add serialize and merge functions.
