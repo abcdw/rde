@@ -240,7 +240,7 @@ Emacs metaservice.  Can be used to restart all emacs servers.")
       (cut string-append
         (if xdg-flavor?
             "emacs/"
-            "emacs.d/")
+            ".emacs.d/")
         <>))
 
     (define (filter-fields field)
