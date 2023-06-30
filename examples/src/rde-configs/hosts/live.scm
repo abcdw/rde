@@ -1,4 +1,4 @@
-(define-module (abcdw hosts live)
+(define-module (rde-configs hosts live)
   #:use-module (rde features base)
   #:use-module (rde features system)
 

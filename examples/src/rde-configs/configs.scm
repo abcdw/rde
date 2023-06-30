@@ -1,4 +1,4 @@
-(define-module (abcdw configs)
+(define-module (rde-configs configs)
   #:use-module (rde features)
   #:use-module (gnu services)
   #:use-module (srfi srfi-1)

@@ -1,4 +1,4 @@
-(define-module (abcdw users guest)
+(define-module (rde-configs users guest)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu home services)
   #:use-module (gnu services)
@@ -58,19 +58,22 @@
    home-shepherd-service-type
    (list
     (shepherd-service
-     (documentation "Create ~/rde-configs.")
+     (documentation "Create ~/example-rde-configs.")
      (requirement '())
      (provision '(rde-configs))
      (start
       (with-imported-modules '((guix build utils))
         #~(lambda ()
-            (let ((rde-configs #$(local-file
-                                  "../../.." "rde-configs"
-                                  #:recursive? #t
-                                  #:select?
-                                  (lambda (file _)
-                                    (not (string=? (basename file) "target")))))
-                  (output (string-append (getenv "HOME") "/rde-configs")))
+            (let ((rde-configs
+                   #$(local-file
+                      "../../.." "example-rde-configs"
+                      #:recursive? #t
+                      #:select?
+                      (lambda (file _)
+                        (not (string=? (basename file) "target")))))
+
+                  (output
+                   (string-append (getenv "HOME") "/example-rde-configs")))
               (when (not (file-exists? output))
                 (mkdir-p output)
                 (copy-recursively

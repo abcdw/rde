@@ -1,4 +1,4 @@
-(define-module (abcdw minimal)
+(define-module (rde-configs ci)
   #:use-module (rde features)
   #:use-module (rde features base)
   #:use-module (rde features shells))

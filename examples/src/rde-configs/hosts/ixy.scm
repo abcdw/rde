@@ -1,4 +1,4 @@
-(define-module (abcdw hosts ixy)
+(define-module (rde-configs hosts ixy)
   #:use-module (rde features base)
   #:use-module (rde features system)
   #:use-module (rde features wm)

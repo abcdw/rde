@@ -1,4 +1,4 @@
-(define-module (abcdw users abcdw)
+(define-module (rde-configs users abcdw)
   #:use-module (contrib features javascript)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu home services xdg)

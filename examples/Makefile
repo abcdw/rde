@@ -7,7 +7,7 @@ GUIX_PROFILE=target/profiles/guix
 GUIX=./pre-inst-env ${GUIX_PROFILE}/bin/guix
 
 SRC_DIR=./src
-CONFIGS=${SRC_DIR}/abcdw/configs.scm
+CONFIGS=${SRC_DIR}/rde-configs/configs.scm
 PULL_EXTRA_OPTIONS=
 # --allow-downgrades
 

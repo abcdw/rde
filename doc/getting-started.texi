@@ -117,8 +117,9 @@ more details will be added.
 
 @subsection Writing Config
 The simpliest way is to take example configuration, explore it and edit
-according to your needs.  Live image contains @file{~/rde-configs},
-which is a real-world full-blown rde configuration.
+according to your needs.  Live image contains
+@file{~/example-rde-configs}, which is a real-world full-blown rde
+configuration.
 
 The other option is to craft the configuration from scratch, take
 rde-config record declaration from example configuration and remove all
