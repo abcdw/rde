@@ -1,7 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2022 Aleksandr Vityazev <avityazev@posteo.org>
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -63,10 +63,7 @@
                 (list #$(file-append i2pd "/bin/i2pd"))
                 #:pid-file (string-append (getenv "HOME") "/.i2pd/i2pd.pid")
                 #:log-file (string-append
-                            (or (getenv "XDG_LOG_HOME")
-                                (string-append
-                                 (getenv "HOME")
-                                 "/.local/var/log"))
+                            (getenv "XDG_STATE_HOME") "/log"
                             "/i2pd.log")))
       ;; TODO: Add graceful shutdown.
       (stop #~(make-kill-destructor))

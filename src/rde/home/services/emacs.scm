@@ -198,9 +198,7 @@ inputs."
                       (home-emacs-configuration-package config)
                       "/bin/emacs") #$(format #f "--fg-daemon=~a" name))
              #:log-file (string-append
-                         (or (getenv "XDG_LOG_HOME")
-                             (format #f "~a/.local/var/log"
-                                     (getenv "HOME")))
+                         (getenv "XDG_STATE_HOME") "/log"
                          "/emacs-" #$(symbol->string name) ".log")))
    (stop #~(make-kill-destructor))))
 

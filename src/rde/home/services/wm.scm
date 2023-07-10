@@ -380,10 +380,7 @@ The example configuration:
       (start #~(make-forkexec-constructor
                 (list #$(file-append kanshi "/bin/kanshi"))
                 #:log-file (string-append
-                            (or (getenv "XDG_LOG_HOME")
-                                (string-append
-                                 (getenv "HOME")
-                                 "/.local/var/log"))
+                            (getenv "XDG_STATE_HOME") "/log"
                             "/kanshi.log")))
       (stop #~(make-kill-destructor))
       (documentation "Run Kanshi")))))

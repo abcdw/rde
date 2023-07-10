@@ -146,9 +146,7 @@ ctl_type.pipewire {
         (start #~(make-forkexec-constructor
                   (list #$(file-append pipewire "/bin/pipewire"))
                   #:log-file (string-append
-                              (or (getenv "XDG_LOG_HOME")
-                                  (format #f "~a/.local/var/log"
-                                          (getenv "HOME")))
+                              (getenv "XDG_STATE_HOME") "/log"
                               "/pipewire.log")
                   #:environment-variables
                   (append (list "DISABLE_RTKIT=1")
@@ -160,9 +158,7 @@ ctl_type.pipewire {
         (start #~(make-forkexec-constructor
                   (list #$(file-append wireplumber "/bin/wireplumber"))
                   #:log-file (string-append
-                              (or (getenv "XDG_LOG_HOME")
-                                  (format #f "~a/.local/var/log"
-                                          (getenv "HOME")))
+                              (getenv "XDG_STATE_HOME") "/log"
                               "/wireplumber.log")
                   #:environment-variables
                   (append (list "DISABLE_RTKIT=1")
@@ -174,9 +170,7 @@ ctl_type.pipewire {
         (start #~(make-forkexec-constructor
                   (list #$(file-append pipewire "/bin/pipewire-pulse"))
                   #:log-file (string-append
-                              (or (getenv "XDG_LOG_HOME")
-                                  (format #f "~a/.local/var/log"
-                                          (getenv "HOME")))
+                              (getenv "XDG_STATE_HOME") "/log"
                               "/pipewire-pulse.log")
                   #:environment-variables
                   (append (list "DISABLE_RTKIT=1")

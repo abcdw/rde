@@ -68,9 +68,7 @@
                          "-d" "-a"
                          (string-append (getenv "XDG_RUNTIME_DIR") "/" #$sock))
                    #:log-file (string-append
-                               (or (getenv "XDG_LOG_HOME")
-                                   (format #f "~a/.local/var/log"
-                                           (getenv "HOME")))
+                               (getenv "XDG_STATE_HOME") "/log"
                                "/ssh-agent.log")))
                (stop #~(make-kill-destructor)))))
             (simple-service

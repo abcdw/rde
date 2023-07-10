@@ -53,9 +53,7 @@ bus has been activated.")
                        (home-pantalaimon-configuration-pantalaimon config)
                        "/bin/pantalaimon"))
               #:log-file (string-append
-                          (or (getenv "XDG_LOG_HOME")
-                              (format #f "~a/.local/var/log"
-                                      (getenv "HOME")))
+                          (getenv "XDG_STATE_HOME") "/log"
                           "/pantalaimon.log")))
     (stop #~(make-kill-destructor)))))
 

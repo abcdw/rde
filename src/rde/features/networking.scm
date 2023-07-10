@@ -231,9 +231,7 @@ feature-ssh."
                   (list #$(file-append network-manager-applet "/bin/nm-applet")
                         "--indicator")
                   #:log-file (string-append
-                              (or (getenv "XDG_LOG_HOME")
-                                  (format #f "~a/.local/var/log"
-                                          (getenv "HOME")))
+                              (getenv "XDG_STATE_HOME") "/log"
                               "/nm-applet.log"))))))))
 
   (define (get-system-services config)

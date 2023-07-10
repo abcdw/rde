@@ -379,10 +379,7 @@ a particular public-inbox repository."))
                 (start #~(make-forkexec-constructor
                           (list #$(file-append package "/bin/l2md"))
                           #:log-file (string-append
-                                      (or (getenv "XDG_LOG_HOME")
-                                          (string-append
-                                           (getenv "HOME")
-                                           "/.local/var/log"))
+                                      (getenv "XDG_STATE_HOME") "/log"
                                       "/l2md.log")))
                 (stop #~(make-kill-destructor))))
          '()))))
