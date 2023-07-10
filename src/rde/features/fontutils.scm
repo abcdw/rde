@@ -60,6 +60,7 @@
                 (number->string (font-size font)))
                " "))
 
+;; Fonts by its classification: https://modernfontstacks.com/
 (define* (feature-fonts
           #:key
           (default-font-size 11)
