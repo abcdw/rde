@@ -40,8 +40,7 @@
 
 (define-public rde-desktop
   (list
-   (feature-fonts
-    #:extra-font-packages (list (@ (rde packages fonts) font-noto-emoji)))
+   (feature-fonts)
 
    ;; https://sr.ht/~tsdh/swayr/
    ;; https://github.com/ErikReider/SwayNotificationCenter

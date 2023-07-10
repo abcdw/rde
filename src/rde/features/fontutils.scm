@@ -24,6 +24,7 @@
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
   #:use-module (rde serializers elisp)
+  #:use-module (rde packages fonts)
   #:use-module (gnu home services)
   #:use-module (gnu home services fontutils)
   #:use-module (gnu services)
@@ -81,9 +82,9 @@
             (package font-iosevka-aile)))
           (font-unicode
            (font
-            (name "Unifont")
+            (name "Noto Emoji")
             (size default-font-size)
-            (package font-gnu-unifont)))
+            (package font-noto-emoji)))
           (emacs-fontaine emacs-fontaine)
           (use-serif-for-variable-pitch? #t)
           (extra-fontaine-presets '())
