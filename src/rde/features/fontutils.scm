@@ -133,7 +133,11 @@ font-monospace default value, and it will be ignored if
        `(alias
          (family "monospace")
          (prefer
-          (family ,(font-name font-monospace))))))
+          (family ,(font-name font-monospace))))
+       `(alias
+         (family "emoji")
+         (prefer
+          (family ,(font-name font-unicode))))))
 
      (rde-elisp-configuration-service
       f-name
