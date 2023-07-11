@@ -10,6 +10,7 @@
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 pretty-print)
 
+  #:use-module (guix deprecation)
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix utils)
@@ -275,7 +276,8 @@ connect to it.")
                home-emacs-extension-early-init-el extensions))))))
 
 
-(define home-emacs-service-type
+(define-deprecated home-emacs-service-type
+  (@ (rde home service emacs) home-emacs-service-type)
   (service-type (name 'home-emacs)
                 (extensions
                  (list (service-extension
