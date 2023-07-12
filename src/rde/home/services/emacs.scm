@@ -450,9 +450,13 @@ details can be changed later.")
                            `(,#~";;;###autoload"
                              (defun ,loader-feature-name ()
                                (interactive)
-                               (message "Everything should be loaded now."))))
+                               (message "Everything should be loaded now.")))
+                           (if autoloads?
+                               `(,#~";;;###autoload"
+                                 (,loader-feature-name))
+                               '()))
                           #:elisp-packages (append-map cdr feature-entries)
-                          #:autoloads? autoloads?
+                          #:autoloads? #f
                           #:summary "Just loads all necessary features."
                           #:commentary "\
 Depending on configuration it either loads features, when required or do it
