@@ -491,14 +491,16 @@ It can contain settings not yet moved to separate features."
         #:elisp-packages
         (append (list (get-value 'emacs-configure-rde-keymaps config)
                       emacs-expand-region)
-                (if auto-clean-space? (list emacs-ws-butler) '())
-                (if default-application-launcher? (list emacs-app-launcher) '())))
+                (if auto-clean-space? (list emacs-ws-butler) '())))
 
        (service
         home-emacs-service-type
         (home-emacs-configuration
          (package emacs)
-         (elisp-packages additional-elisp-packages)
+         (elisp-packages
+          (append
+           additional-elisp-packages
+           (if default-application-launcher? (list emacs-app-launcher) '())))
          (emacs-servers (if emacs-server-mode? '(server) '()))
          (xdg-flavor? #t)
          (early-init-el
