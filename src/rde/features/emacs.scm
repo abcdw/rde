@@ -236,12 +236,16 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
 (define* (feature-emacs
           #:key
           (emacs %default-emacs-package)
-          (additional-elisp-packages '())
           (disable-warnings? #t)
           (auto-update-buffers? #t)
           (auto-clean-space? #t)
+
+          ;; TODO: Deprecate (can be added via home services)
+          (additional-elisp-packages '())
           (extra-init-el '())
           (extra-early-init-el '())
+          ;;=======================
+
           (emacs-server-mode? #t)
           (default-terminal? #t)
           (default-application-launcher? #t)
