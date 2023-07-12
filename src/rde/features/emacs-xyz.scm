@@ -184,10 +184,9 @@ Move the mode line to the top by setting HEADER-LINE-AS-MODE-LINE? to #t."
         (setq-default cursor-in-non-selected-windows nil)
         (setq bookmark-set-fringe-mark nil)
 
-        (with-eval-after-load 'minions-autoloads
-          (minions-mode))
         (with-eval-after-load 'minions
           (setq minions-mode-line-lighter ";"))
+        (add-hook 'after-init-hook 'minions-mode)
 
         (setq mode-line-compact 'long)
 
@@ -249,7 +248,10 @@ This function is needed for various modes to set up the mode-line late."
                 (setq inhibit-startup-message t)
                 (setq initial-scratch-message nil))
               '()))
-      #:elisp-packages (list emacs-minions)
+      #:elisp-packages (list
+                        (if header-line-as-mode-line?
+                            emacs-header-minions
+                            emacs-minions))
       #:keywords '(appearance mode-line faces accessibility)
       #:summary "Set more visually appealing defaults"
       #:commentary "\
