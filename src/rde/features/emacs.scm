@@ -350,7 +350,7 @@ environment outside of Guix Home."
                  (add-to-init-el? #t)))
 
        (rde-elisp-configuration-service
-        'emacs
+        'emacs-base
         config
         `((defgroup rde nil
             "Base customization group for rde."
