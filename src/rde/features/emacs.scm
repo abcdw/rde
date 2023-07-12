@@ -300,8 +300,8 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
 
        (service home-emacs-feature-loader-service-type
                 (home-emacs-feature-loader-configuration
-                 ;; (autoloads? #t)
-                 (add-to-init-el? #t)))
+                 (autoloads? #t)
+                 (add-to-init-el? #f)))
 
        (rde-elisp-configuration-service
         'emacs-base
