@@ -202,56 +202,6 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
      (define-prefix-command 'rde-toggle-map nil))
    #:summary "Keymaps inteded for reuse among configure-* packages"))
 
-;; "#f0d3ff" ;; magenta
-;; "#c0efff" ;; cyan
-;; "#b5d0ff" ;; blue
-;; "#aecf90" ;; green
-;; "#f2b0a2" ;; red
-
-(define* (feature-emacs-portable
-          #:key
-          (emacs %default-emacs-package)
-          (status-line-bg-color "#b5d0ff")
-          (additional-elisp-packages '()))
-  (ensure-pred maybe-string? status-line-bg-color)
-  (ensure-pred list-of-elisp-packages? additional-elisp-packages)
-  (ensure-pred file-like? emacs)
-
-  (define (emacs-home-services config)
-    "Returns home services related to GNU Emacs, which usually used in development
-environment outside of Guix Home."
-    (define full-name (get-value 'full-name config))
-    (define email (get-value 'email config))
-    (list
-     (service home-emacs-feature-loader-service-type
-              (home-emacs-feature-loader-configuration
-               (loader-feature-name 'feature-loader-portable)))
-     (service
-      home-emacs-service-type
-      (home-emacs-configuration
-       (package emacs)
-       (elisp-packages additional-elisp-packages)
-       ;;; TODO: Rebuilding packages with emacs will be useful for
-       ;;; native-comp, but some packages fails to build, need to fix them.
-       (rebuild-elisp-packages? #f)))
-     (rde-elisp-configuration-service
-      'rde-emacs-portable
-      config
-      `((setq native-comp-jit-compilation nil)
-        ,@(if full-name `((setq user-full-name ,full-name)) '())
-        ,@(if email `((setq user-mail-address ,email)) '())
-
-        ,@(if status-line-bg-color
-              `((with-eval-after-load
-                 'configure-appearance
-                 (setq rde-status-line-bg-color ,status-line-bg-color)))
-              '())))))
-  (feature
-   (name 'emacs)
-   (values (append (make-feature-values emacs emacs-configure-rde-keymaps)
-                   `((emacs-portable? . #t))))
-   (home-services-getter emacs-home-services)))
-
 (define (wayland-clipboard-fix config)
   (let* ((wl-cb (get-value 'wl-clipboard config wl-clipboard))
          (wl-copy (file-append wl-cb "/bin/wl-copy"))
@@ -607,6 +557,56 @@ It can contain settings not yet moved to separate features."
             (if default-application-launcher?
                    `((default-application-launcher . ,emacs-application-launcher))
                    '())))
+   (home-services-getter emacs-home-services)))
+
+;; "#f0d3ff" ;; magenta
+;; "#c0efff" ;; cyan
+;; "#b5d0ff" ;; blue
+;; "#aecf90" ;; green
+;; "#f2b0a2" ;; red
+
+(define* (feature-emacs-portable
+          #:key
+          (emacs %default-emacs-package)
+          (status-line-bg-color "#b5d0ff")
+          (additional-elisp-packages '()))
+  (ensure-pred maybe-string? status-line-bg-color)
+  (ensure-pred list-of-elisp-packages? additional-elisp-packages)
+  (ensure-pred file-like? emacs)
+
+  (define (emacs-home-services config)
+    "Returns home services related to GNU Emacs, which usually used in development
+environment outside of Guix Home."
+    (define full-name (get-value 'full-name config))
+    (define email (get-value 'email config))
+    (list
+     (service home-emacs-feature-loader-service-type
+              (home-emacs-feature-loader-configuration
+               (loader-feature-name 'feature-loader-portable)))
+     (service
+      home-emacs-service-type
+      (home-emacs-configuration
+       (package emacs)
+       (elisp-packages additional-elisp-packages)
+       ;;; TODO: Rebuilding packages with emacs will be useful for
+       ;;; native-comp, but some packages fails to build, need to fix them.
+       (rebuild-elisp-packages? #f)))
+     (rde-elisp-configuration-service
+      'rde-emacs-portable
+      config
+      `((setq native-comp-jit-compilation nil)
+        ,@(if full-name `((setq user-full-name ,full-name)) '())
+        ,@(if email `((setq user-mail-address ,email)) '())
+
+        ,@(if status-line-bg-color
+              `((with-eval-after-load
+                 'configure-appearance
+                 (setq rde-status-line-bg-color ,status-line-bg-color)))
+              '())))))
+  (feature
+   (name 'emacs)
+   (values (append (make-feature-values emacs emacs-configure-rde-keymaps)
+                   `((emacs-portable? . #t))))
    (home-services-getter emacs-home-services)))
 
 ;; TODO: https://www.reddit.com/r/emacs/comments/xb6qdm/super_fast_emacs_start_up/
