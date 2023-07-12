@@ -251,7 +251,7 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
           (default-application-launcher? #t)
           (standalone-minibuffer-height 100))
   "Setup and configure GNU Emacs."
-  (ensure-pred any-package? emacs)
+  (ensure-pred file-like? emacs)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
   (ensure-pred boolean? disable-warnings?)
   (ensure-pred boolean? auto-update-buffers?)
