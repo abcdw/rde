@@ -233,6 +233,206 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
       (setq interprogram-cut-function 'wl-copy)
       (setq interprogram-paste-function 'wl-paste))))
 
+(define (rde-emacs-base config)
+  (let* ((full-name (get-value 'full-name config))
+         (email     (get-value 'email config)))
+    (require-value 'full-name config)
+    (require-value 'email config)
+    (rde-elisp-configuration-service
+     'emacs-base
+     config
+     `((defgroup rde nil
+         "Base customization group for rde."
+         :group 'external
+         :prefix 'rde-)
+       (require 'rde-keymaps)
+
+       (setq native-comp-jit-compilation nil)
+
+       (setq user-full-name ,full-name)
+       (setq user-mail-address ,email)
+
+       ,#~"\n;; Disable messages, when minibuffer is active"
+       (setq minibuffer-message-timeout 0)
+
+       ,#~""
+       (setq custom-file
+             (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                     "/emacs/custom.el"))
+       (load custom-file t)
+
+       (setq
+        backup-directory-alist
+        `(,(cons "." (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                             "/emacs/backup"))))
+
+       (setq
+        recentf-save-file
+        (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                "/emacs/recentf"))
+
+       ;; (add-hook 'after-init 'recentf-mode)
+       (recentf-mode 1)
+       (run-with-idle-timer 30 t 'recentf-save-list)
+
+       ;; (customize-set-variable 'history-length 10000)
+       (setq
+        savehist-file
+        (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                "/emacs/history"))
+
+       (savehist-mode 1)
+       (run-with-idle-timer 30 t 'savehist-save)
+
+       (setq
+        bookmark-default-file
+        (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                "/emacs/bookmarks"))
+
+       ,#~""
+       (column-number-mode 1)
+       (save-place-mode 1)
+       ;; MAYBE: Make it buffer local?
+       (show-paren-mode 1)
+       ,#~";; Treat camelCased parts as separate words."
+       (subword-mode 1)
+       ;; (add-hook 'prog-mode-hook 'subword-mode)
+
+       (setq-default indent-tabs-mode nil)
+       (setq save-interprogram-paste-before-kill t)
+       (setq mouse-yank-at-point t)
+       (setq require-final-newline t)
+
+       (defun rde-whitespace-mode ()
+         "Equivalent of `whitespace-mode', but highlights only tabs."
+         (interactive)
+         (if (and (featurep 'whitespace) whitespace-mode)
+             (whitespace-mode 0)
+             (progn
+              (defvar whitespace-style) ; dynamically bind
+              (let ((whitespace-style '(face tabs)))
+                (whitespace-mode 1)))))
+       (add-hook 'prog-mode-hook
+                 (lambda ()
+                   (rde-whitespace-mode)
+                   (setq show-trailing-whitespace t)))
+
+       ;; Highlight zero-width whitespaces and other glypless characters.
+       (set-face-background 'glyphless-char "red")
+       ,#~""
+       (define-key global-map (kbd "C-=") 'er/expand-region)
+
+       ,#~""
+       (defun rde-display-load-time ()
+         (interactive)
+         (message "\
+rde emacs loaded in %s, C-h r i for search in emacs manual by topic. \
+C-h C-a to open About Emacs buffer."
+                  (emacs-init-time)))
+
+       (defun display-startup-echo-area-message ()
+         (rde-display-load-time))
+
+       ,#~""
+       ;; TODO: Move it to feature-isearch
+       (setq isearch-lazy-count t)
+       (setq search-whitespace-regexp ".*?")
+
+       ,#~""
+
+       (dolist (mode-hook '(prog-mode-hook))
+               (add-hook mode-hook (lambda () (setq truncate-lines t))))
+
+       ,#~""
+       (define-key global-map (kbd "s-b") 'switch-to-buffer)
+       (define-key global-map (kbd "s-w") 'kill-current-buffer)
+       (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
+       (define-key global-map (kbd "s-o") 'other-window)
+       (define-key global-map (kbd "C-z") nil)
+
+       ,#~""
+       ,@(if (get-value 'emacs-advanced-user? config)
+             '((put 'narrow-to-page   'disabled nil)
+               (put 'narrow-to-region 'disabled nil))
+             '())
+
+       ,#~""
+
+       ;; TODO: Move to feature-sane-bindings
+       (let ((map goto-map))
+         (define-key map "L" 'find-library)
+         (define-key map "F" 'find-function)
+         (define-key map "K" 'find-function-on-key)
+         (define-key map "V" 'find-variable))
+
+       (defun rde-kill-region-dwim (&optional count)
+         "The function kills region if mark is active, otherwise kills a word.
+Prefix argument can be used to kill a few words."
+         (interactive "p")
+         (if (use-region-p)
+             (kill-region (region-beginning) (region-end) 'region)
+             (backward-kill-word count)))
+
+       ;; (define-key global-map (kbd "C-h") 'backward-delete-char-untabify)
+       (define-key global-map (kbd "M-K") 'kill-whole-line)
+       (define-key global-map (kbd "M-c") 'capitalize-dwim)
+       (define-key global-map (kbd "M-l") 'downcase-dwim)
+       (define-key global-map (kbd "M-u") 'upcase-dwim)
+       (define-key global-map (kbd "C-w") 'rde-kill-region-dwim)
+
+       (define-key mode-specific-map (kbd "a")
+         '("rde applications" . rde-app-map))
+       (define-key mode-specific-map (kbd "t")
+         '("rde toggles" . rde-toggle-map))
+
+       ,#~""
+       ,@(if (or (get-value 'emacs-disable-warnings? config)
+                 (get-value 'emacs-advanced-user? config))
+             `(;; Don't warn for large files
+               (setq large-file-warning-threshold nil)
+               ;; Don't warn for followed symlinked files
+               (setq vc-follow-symlinks t)
+               ;; Don't warn when advice is added for functions
+               (setq ad-redefinition-action 'accept))
+             '())
+
+       ,#~""
+       ,@(if (get-value 'emacs-auto-update-buffers? config)
+             `(;; Revert Dired and other buffers
+               (setq global-auto-revert-non-file-buffers t)
+               ;; Revert buffers when the underlying file has changed
+               (global-auto-revert-mode 1))
+             '())
+
+       ,#~""
+       ,@(if (get-value 'emacs-auto-clean-space? config)
+             `((eval-when-compile (require 'ws-butler))
+               (add-hook 'text-mode-hook 'ws-butler-mode)
+               (add-hook 'prog-mode-hook 'ws-butler-mode))
+             '())
+
+       ,#~""
+       ;; Specifying default action for display-buffer.
+       ;; (setq display-buffer-base-action
+       ;;       '(display-buffer-reuse-mode-window
+       ;;         display-buffer-reuse-window
+       ;;         display-buffer-same-window))
+       ;; If a popup does happen, don't resize windows to be equal-sized
+       (setq even-window-sizes nil)
+       ;; Configure ediff for window manager.
+       (setq ediff-diff-options "-w"
+             ediff-split-window-function 'split-window-horizontally
+             ediff-window-setup-function 'ediff-setup-windows-plain))
+     #:summary "General settings, better defaults"
+     #:commentary "\
+It can contain settings not yet moved to separate features."
+     #:keywords '(convenience)
+     #:elisp-packages
+     (append (list (get-value 'emacs-configure-rde-keymaps config)
+                   emacs-expand-region)
+             (if (get-value 'emacs-auto-clean-space? config)
+                 (list emacs-ws-butler) '())))))
+
 (define* (feature-emacs
           #:key
           (emacs %default-emacs-package)
@@ -299,204 +499,7 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
                (autoloads? #t)
                (add-to-init-el? #f)))
 
-     (let* ((full-name (get-value 'full-name config))
-            (email     (get-value 'email config)))
-       (require-value 'full-name config)
-       (require-value 'email config)
-       (rde-elisp-configuration-service
-        'emacs-base
-        config
-        `((defgroup rde nil
-            "Base customization group for rde."
-            :group 'external
-            :prefix 'rde-)
-          (require 'rde-keymaps)
-
-          (setq native-comp-jit-compilation nil)
-
-          (setq user-full-name ,full-name)
-          (setq user-mail-address ,email)
-
-          ,#~"\n;; Disable messages, when minibuffer is active"
-          (setq minibuffer-message-timeout 0)
-
-          ,#~""
-          (setq custom-file
-                (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                        "/emacs/custom.el"))
-          (load custom-file t)
-
-          (setq
-           backup-directory-alist
-           `(,(cons "." (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                                "/emacs/backup"))))
-
-          (setq
-           recentf-save-file
-           (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                   "/emacs/recentf"))
-
-          ;; (add-hook 'after-init 'recentf-mode)
-          (recentf-mode 1)
-          (run-with-idle-timer 30 t 'recentf-save-list)
-
-          ;; (customize-set-variable 'history-length 10000)
-          (setq
-           savehist-file
-           (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                   "/emacs/history"))
-
-          (savehist-mode 1)
-          (run-with-idle-timer 30 t 'savehist-save)
-
-          (setq
-           bookmark-default-file
-           (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
-                   "/emacs/bookmarks"))
-
-          ,#~""
-          (column-number-mode 1)
-          (save-place-mode 1)
-          ;; MAYBE: Make it buffer local?
-          (show-paren-mode 1)
-          ,#~";; Treat camelCased parts as separate words."
-          (subword-mode 1)
-          ;; (add-hook 'prog-mode-hook 'subword-mode)
-
-          (setq-default indent-tabs-mode nil)
-          (setq save-interprogram-paste-before-kill t)
-          (setq mouse-yank-at-point t)
-          (setq require-final-newline t)
-
-          (defun rde-whitespace-mode ()
-            "Equivalent of `whitespace-mode', but highlights only tabs."
-            (interactive)
-            (if (and (featurep 'whitespace) whitespace-mode)
-                (whitespace-mode 0)
-                (progn
-                 (defvar whitespace-style) ; dynamically bind
-                 (let ((whitespace-style '(face tabs)))
-                   (whitespace-mode 1)))))
-          (add-hook 'prog-mode-hook
-                    (lambda ()
-                      (rde-whitespace-mode)
-                      (setq show-trailing-whitespace t)))
-
-          ;; Highlight zero-width whitespaces and other glypless characters.
-          (set-face-background 'glyphless-char "red")
-          ,#~""
-          (define-key global-map (kbd "C-=") 'er/expand-region)
-
-          ,#~""
-          (defun rde-display-load-time ()
-            (interactive)
-            (message "\
-rde emacs loaded in %s, C-h r i for search in emacs manual by topic. \
-C-h C-a to open About Emacs buffer."
-                     (emacs-init-time)))
-
-          (defun display-startup-echo-area-message ()
-            (rde-display-load-time))
-
-          ,#~""
-          ;; TODO: Move it to feature-isearch
-          (setq isearch-lazy-count t)
-          (setq search-whitespace-regexp ".*?")
-
-          ,#~""
-
-          (dolist (mode-hook '(prog-mode-hook))
-                  (add-hook mode-hook (lambda () (setq truncate-lines t))))
-
-          ,#~""
-          (define-key global-map (kbd "s-b") 'switch-to-buffer)
-          (define-key global-map (kbd "s-w") 'kill-current-buffer)
-          (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
-          (define-key global-map (kbd "s-o") 'other-window)
-          (define-key global-map (kbd "C-z") nil)
-
-          ,#~""
-          ,@(if (get-value 'emacs-advanced-user? config)
-                '((put 'narrow-to-page   'disabled nil)
-                  (put 'narrow-to-region 'disabled nil))
-                '())
-
-          ,#~""
-
-          ;; TODO: Move to feature-sane-bindings
-          (let ((map goto-map))
-            (define-key map "L" 'find-library)
-            (define-key map "F" 'find-function)
-            (define-key map "K" 'find-function-on-key)
-            (define-key map "V" 'find-variable))
-
-          (defun rde-kill-region-dwim (&optional count)
-            "The function kills region if mark is active, otherwise kills a word.
-Prefix argument can be used to kill a few words."
-            (interactive "p")
-            (if (use-region-p)
-                (kill-region (region-beginning) (region-end) 'region)
-                (backward-kill-word count)))
-
-          ;; (define-key global-map (kbd "C-h") 'backward-delete-char-untabify)
-          (define-key global-map (kbd "M-K") 'kill-whole-line)
-          (define-key global-map (kbd "M-c") 'capitalize-dwim)
-          (define-key global-map (kbd "M-l") 'downcase-dwim)
-          (define-key global-map (kbd "M-u") 'upcase-dwim)
-          (define-key global-map (kbd "C-w") 'rde-kill-region-dwim)
-
-          (define-key mode-specific-map (kbd "a")
-            '("rde applications" . rde-app-map))
-          (define-key mode-specific-map (kbd "t")
-            '("rde toggles" . rde-toggle-map))
-
-          ,#~""
-          ,@(if (or (get-value 'emacs-disable-warnings? config)
-                    (get-value 'emacs-advanced-user? config))
-                `(;; Don't warn for large files
-                  (setq large-file-warning-threshold nil)
-                  ;; Don't warn for followed symlinked files
-                  (setq vc-follow-symlinks t)
-                  ;; Don't warn when advice is added for functions
-                  (setq ad-redefinition-action 'accept))
-                '())
-
-          ,#~""
-          ,@(if (get-value 'emacs-auto-update-buffers? config)
-                `(;; Revert Dired and other buffers
-                  (setq global-auto-revert-non-file-buffers t)
-                  ;; Revert buffers when the underlying file has changed
-                  (global-auto-revert-mode 1))
-                '())
-
-          ,#~""
-          ,@(if (get-value 'emacs-auto-clean-space? config)
-                `((eval-when-compile (require 'ws-butler))
-                  (add-hook 'text-mode-hook 'ws-butler-mode)
-                  (add-hook 'prog-mode-hook 'ws-butler-mode))
-                '())
-
-          ,#~""
-          ;; Specifying default action for display-buffer.
-          ;; (setq display-buffer-base-action
-          ;;       '(display-buffer-reuse-mode-window
-          ;;         display-buffer-reuse-window
-          ;;         display-buffer-same-window))
-          ;; If a popup does happen, don't resize windows to be equal-sized
-          (setq even-window-sizes nil)
-          ;; Configure ediff for window manager.
-          (setq ediff-diff-options "-w"
-                ediff-split-window-function 'split-window-horizontally
-                ediff-window-setup-function 'ediff-setup-windows-plain))
-        #:summary "General settings, better defaults"
-        #:commentary "\
-It can contain settings not yet moved to separate features."
-        #:keywords '(convenience)
-        #:elisp-packages
-        (append (list (get-value 'emacs-configure-rde-keymaps config)
-                      emacs-expand-region)
-                (if (get-value 'emacs-auto-clean-space? config)
-                    (list emacs-ws-butler) '()))))
+     (rde-emacs-base config)
 
      (service
       home-emacs-service-type
