@@ -592,14 +592,15 @@ It can contain settings not yet moved to separate features."
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs, which usually used in development
 environment outside of Guix Home."
-    (define full-name (get-value 'full-name config))
-    (define email (get-value 'email config))
     (list
      (service home-emacs-feature-loader-service-type
               (home-emacs-feature-loader-configuration
                (loader-feature-name 'feature-loader-portable)
                (autoloads? autoloads?)
                (add-to-init-el? #f)))
+
+     (rde-emacs-base config)
+
      (service
       home-emacs-service-type
       (home-emacs-configuration
@@ -608,14 +609,11 @@ environment outside of Guix Home."
        ;;; TODO: Rebuilding packages with emacs will be useful for
        ;;; native-comp, but some packages fails to build, need to fix them.
        (rebuild-elisp-packages? #f)))
+
      (rde-elisp-configuration-service
       'rde-emacs-portable
       config
-      `((setq native-comp-jit-compilation nil)
-        ,@(if full-name `((setq user-full-name ,full-name)) '())
-        ,@(if email `((setq user-mail-address ,email)) '())
-
-        ,@(if status-line-bg-color
+      `(,@(if status-line-bg-color
               `((with-eval-after-load
                  'configure-appearance
                  (setq rde-status-line-bg-color ,status-line-bg-color)))
@@ -623,7 +621,10 @@ environment outside of Guix Home."
   (feature
    (name 'emacs)
    (values (append (make-feature-values emacs emacs-configure-rde-keymaps)
-                   `((emacs-portable? . #t))))
+                   `((emacs-disable-warnings? . #t)
+                     (emacs-auto-update-buffers? . #t)
+                     (emacs-auto-clean-space? . #t)
+                     (emacs-portable? . #t))))
    (home-services-getter emacs-home-services)))
 
 ;; TODO: https://www.reddit.com/r/emacs/comments/xb6qdm/super_fast_emacs_start_up/
