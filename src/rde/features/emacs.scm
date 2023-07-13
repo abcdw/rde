@@ -451,7 +451,7 @@ Prefix argument can be used to kill a few words."
             '("rde toggles" . rde-toggle-map))
 
           ,#~""
-          ,@(if (or disable-warnings?
+          ,@(if (or (get-value 'emacs-disable-warnings? config)
                     (get-value 'emacs-advanced-user? config))
                 `(;; Don't warn for large files
                   (setq large-file-warning-threshold nil)
@@ -462,19 +462,19 @@ Prefix argument can be used to kill a few words."
                 '())
 
           ,#~""
-          ,@(if auto-update-buffers?
-              `(;; Revert Dired and other buffers
-                (setq global-auto-revert-non-file-buffers t)
-                ;; Revert buffers when the underlying file has changed
-                (global-auto-revert-mode 1))
-              '())
+          ,@(if (get-value 'emacs-auto-update-buffers? config)
+                `(;; Revert Dired and other buffers
+                  (setq global-auto-revert-non-file-buffers t)
+                  ;; Revert buffers when the underlying file has changed
+                  (global-auto-revert-mode 1))
+                '())
 
           ,#~""
-          ,@(if auto-clean-space?
-              `((eval-when-compile (require 'ws-butler))
-                (add-hook 'text-mode-hook 'ws-butler-mode)
-                (add-hook 'prog-mode-hook 'ws-butler-mode))
-              '())
+          ,@(if (get-value 'emacs-auto-clean-space? config)
+                `((eval-when-compile (require 'ws-butler))
+                  (add-hook 'text-mode-hook 'ws-butler-mode)
+                  (add-hook 'prog-mode-hook 'ws-butler-mode))
+                '())
 
           ,#~""
           ;; Specifying default action for display-buffer.
@@ -495,7 +495,8 @@ It can contain settings not yet moved to separate features."
         #:elisp-packages
         (append (list (get-value 'emacs-configure-rde-keymaps config)
                       emacs-expand-region)
-                (if auto-clean-space? (list emacs-ws-butler) '())))
+                (if (get-value 'emacs-auto-clean-space? config)
+                    (list emacs-ws-butler) '())))
 
        (service
         home-emacs-service-type
@@ -557,12 +558,15 @@ It can contain settings not yet moved to separate features."
              emacs-client-no-wait
              emacs-configure-rde-keymaps
              emacs-server-mode?)
+            `((emacs-disable-warnings? . ,disable-warnings?)
+              (emacs-auto-update-buffers? . ,auto-update-buffers?)
+              (emacs-auto-clean-space? . ,auto-clean-space?))
             (if default-terminal?
                 `((default-terminal . ,emacs-client-create-frame))
                 '())
             (if default-application-launcher?
-                   `((default-application-launcher . ,emacs-application-launcher))
-                   '())))
+                `((default-application-launcher . ,emacs-application-launcher))
+                '())))
    (home-services-getter emacs-home-services)))
 
 ;; "#f0d3ff" ;; magenta
