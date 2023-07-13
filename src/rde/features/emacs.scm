@@ -582,10 +582,12 @@ It can contain settings not yet moved to separate features."
           #:key
           (emacs %default-emacs-package)
           (status-line-bg-color "#b5d0ff")
+          (autoloads? #t)
           (additional-elisp-packages '()))
-  (ensure-pred maybe-string? status-line-bg-color)
-  (ensure-pred list-of-elisp-packages? additional-elisp-packages)
   (ensure-pred file-like? emacs)
+  (ensure-pred maybe-string? status-line-bg-color)
+  (ensure-pred boolean? autoloads?)
+  (ensure-pred list-of-elisp-packages? additional-elisp-packages)
 
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs, which usually used in development
@@ -595,7 +597,9 @@ environment outside of Guix Home."
     (list
      (service home-emacs-feature-loader-service-type
               (home-emacs-feature-loader-configuration
-               (loader-feature-name 'feature-loader-portable)))
+               (loader-feature-name 'feature-loader-portable)
+               (autoloads? autoloads?)
+               (add-to-init-el? #f)))
      (service
       home-emacs-service-type
       (home-emacs-configuration
