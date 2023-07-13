@@ -288,21 +288,21 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
 
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs."
-    (require-value 'full-name config)
-    (require-value 'email config)
-    (let* ((full-name (get-value 'full-name config))
-           (email     (get-value 'email config)))
-      (list
-       (emacs-xdg-service 'emacs-q "Emacs (No init: -q)"
-                          #~(system* "emacs" "-q"))
-       (emacs-xdg-service 'emacs-Q "Emacs (No init, no site-lisp: -Q)"
-                          #~(system* "emacs" "-Q"))
+    (list
+     (emacs-xdg-service 'emacs-q "Emacs (No init: -q)"
+                        #~(system* "emacs" "-q"))
+     (emacs-xdg-service 'emacs-Q "Emacs (No init, no site-lisp: -Q)"
+                        #~(system* "emacs" "-Q"))
 
-       (service home-emacs-feature-loader-service-type
-                (home-emacs-feature-loader-configuration
-                 (autoloads? #t)
-                 (add-to-init-el? #f)))
+     (service home-emacs-feature-loader-service-type
+              (home-emacs-feature-loader-configuration
+               (autoloads? #t)
+               (add-to-init-el? #f)))
 
+     (let* ((full-name (get-value 'full-name config))
+            (email     (get-value 'email config)))
+       (require-value 'full-name config)
+       (require-value 'email config)
        (rde-elisp-configuration-service
         'emacs-base
         config
@@ -496,56 +496,56 @@ It can contain settings not yet moved to separate features."
         (append (list (get-value 'emacs-configure-rde-keymaps config)
                       emacs-expand-region)
                 (if (get-value 'emacs-auto-clean-space? config)
-                    (list emacs-ws-butler) '())))
+                    (list emacs-ws-butler) '()))))
 
-       (service
-        home-emacs-service-type
-        (home-emacs-configuration
-         (package emacs)
-         (elisp-packages
-          (append
-           additional-elisp-packages
-           (if default-application-launcher? (list emacs-app-launcher) '())))
-         (emacs-servers (if emacs-server-mode? '(server) '()))
-         (xdg-flavor? #t)
-         (early-init-el
-          `(,(slurp-file-like (local-file "./emacs/early-init.el"))
-            ,#~""
-            ;; FIXME: Move it back to the configure-rde-emacs package, when it
-            ;; will be built with emacs-29
-            (pixel-scroll-precision-mode 1)
+     (service
+      home-emacs-service-type
+      (home-emacs-configuration
+       (package emacs)
+       (elisp-packages
+        (append
+         additional-elisp-packages
+         (if default-application-launcher? (list emacs-app-launcher) '())))
+       (emacs-servers (if emacs-server-mode? '(server) '()))
+       (xdg-flavor? #t)
+       (early-init-el
+        `(,(slurp-file-like (local-file "./emacs/early-init.el"))
+          ,#~""
+          ;; FIXME: Move it back to the configure-rde-emacs package, when it
+          ;; will be built with emacs-29
+          (pixel-scroll-precision-mode 1)
 
-            ,@(if (get-value 'wayland config)
-                  (wayland-clipboard-fix config)
-                  '())))
+          ,@(if (get-value 'wayland config)
+                (wayland-clipboard-fix config)
+                '())))
          ;;; TODO: Rebuilding packages with emacs will be useful for
          ;;; native-comp, but some packages fails to build, need to fix them.
-         (rebuild-elisp-packages? #f)))
+       (rebuild-elisp-packages? #f)))
 
+     (simple-service
+      'emacs-add-to-init-el
+      home-emacs-service-type
+      (home-emacs-extension
+       (init-el extra-init-el)
+       (early-init-el extra-early-init-el)))
+
+     (simple-service 'emacs-set-default-editor
+                     home-environment-variables-service-type
+                     `(("ALTERNATE_EDITOR" . ,emacs-editor)
+                       ("VISUAL" . ,emacs-client-no-wait)))
+     (when (get-value 'sway config)
        (simple-service
-        'emacs-add-to-init-el
-        home-emacs-service-type
-        (home-emacs-extension
-         (init-el extra-init-el)
-         (early-init-el extra-early-init-el)))
+        'emacs-update-environment-variables-on-sway-start
+        home-sway-service-type
+        `((,#~"")
+          ;; (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
+          ;;              ,(update-emacs-server-env-variables emacs-client))
 
-       (simple-service 'emacs-set-default-editor
-                       home-environment-variables-service-type
-                       `(("ALTERNATE_EDITOR" . ,emacs-editor)
-                         ("VISUAL" . ,emacs-client-no-wait)))
-       (when (get-value 'sway config)
-         (simple-service
-          'emacs-update-environment-variables-on-sway-start
-          home-sway-service-type
-          `((,#~"")
-            ;; (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
-            ;;              ,(update-emacs-server-env-variables emacs-client))
-
-            ;; TODO: Return back when sway bug is fixed
-            ;; <https://github.com/swaywm/sway/issues/6950>
-            ;; (for_window "[title=\".* - Emacs Client\"]"
-            ;;             floating enable)
-            ))))))
+          ;; TODO: Return back when sway bug is fixed
+          ;; <https://github.com/swaywm/sway/issues/6950>
+          ;; (for_window "[title=\".* - Emacs Client\"]"
+          ;;             floating enable)
+          )))))
 
   (feature
    (name 'emacs)
