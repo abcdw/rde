@@ -3963,6 +3963,59 @@ Indentation and refile configurations, visual adjustment."
          (org-agenda-skip-function '(or (org-agenda-skip-if nil '(scheduled))))
          (org-agenda-overriding-header "\nBacklog\n")))))))
 
+(define* (feature-emacs-org-agenda-appt)
+  (define emacs-f-name 'org-agenda-appt)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (require-value 'emacs-org config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `(
+        (defvar rde-org-agenda-appt-timer nil
+          "Timer to update `appt-time-msg-list' from Agenda entries.")
+
+        (defun rde-org-agenda-to-appt ()
+          "Reset the `appt-mode' list and initialize it from Agenda entries."
+          (interactive)
+          (setq appt-time-msg-list nil)
+          (org-agenda-to-appt))
+
+        (defun rde-org-agenda-appt-reset ()
+          "Initialize the `appt-mode' list for today and reset the timer."
+          (interactive)
+          (rde-org-agenda-to-appt)
+          (setq rde-org-agenda-appt-timer
+                (run-at-time "24:01" nil 'rde-org-agenda-appt-reset)))
+
+        (define-minor-mode rde-org-agenda-appt-mode
+          "Set up `appt-mode' integration for Agenda items."
+          :global t :group 'rde-org-agenda
+          (if rde-org-agenda-appt-mode
+              (progn
+               (setq rde-org-agenda-appt-timer
+                     (rde-org-agenda-appt-reset))
+               (add-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt))
+              (progn
+               (remove-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt)
+               (cancel-timer rde-org-agenda-appt-timer))))
+
+        (rde-org-agenda-appt-mode)
+        (advice-add 'org-redo :after 'rde-org-agenda-to-appt)
+        (add-hook 'org-capture-after-finalize-hook 'rde-org-agenda-to-appt))
+      #:summary "\
+Add appointments from agenda items"
+      #:commentary "\
+A system of reminders, derived from org-agenda-files."
+      #:keywords '(convenience))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 (define* (feature-emacs-org-agenda
           #:key
           (org-agenda-files #f)
@@ -3987,21 +4040,7 @@ Indentation and refile configurations, visual adjustment."
         (defgroup rde-org-agenda nil
           "Custom enhancements to the Org Agenda."
           :group 'rde)
-        (defvar rde-org-agenda-appt-timer nil
-          "Timer to update `appt-time-msg-list' from Agenda entries.")
 
-        (defun rde-org-agenda-to-appt ()
-          "Reset the `appt-mode' list and initialize it from Agenda entries."
-          (interactive)
-          (setq appt-time-msg-list nil)
-          (org-agenda-to-appt))
-
-        (defun rde-org-agenda-appt-reset ()
-          "Initialize the `appt-mode' list for today and reset the timer."
-          (interactive)
-          (rde-org-agenda-to-appt)
-          (setq rde-org-agenda-appt-timer
-                (run-at-time "24:01" nil 'rde-org-agenda-appt-reset)))
 
         (defun rde-org-agenda-category (&optional len)
           "Get category of the Org Agenda item at point.
@@ -4038,19 +4077,6 @@ result is longer than LEN."
                 (s-truncate len (s-pad-right len " " result))
                 result)))
 
-        (define-minor-mode rde-org-agenda-appt-mode
-          "Set up `appt-mode' integration for Agenda items."
-          :global t :group 'rde-org-agenda
-          (if rde-org-agenda-appt-mode
-              (progn
-                (setq rde-org-agenda-appt-timer
-                      (rde-org-agenda-appt-reset))
-                (add-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt))
-            (progn
-              (remove-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt)
-              (cancel-timer rde-org-agenda-appt-timer))))
-
-        (rde-org-agenda-appt-mode)
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
         (add-hook 'org-agenda-mode-hook
                   'hack-dir-local-variables-non-file-buffer)
@@ -4096,9 +4122,7 @@ result is longer than LEN."
                               (tags . " %i %(rde-org-agenda-category 12) ")
                               (search . " %i %(rde-org-agenda-category 12) "))))
                     `((setq org-agenda-prefix-format ',org-agenda-prefix-format)))
-                '()))
-        (advice-add 'org-redo :after 'rde-org-agenda-to-appt)
-        (add-hook 'org-capture-after-finalize-hook 'rde-org-agenda-to-appt))
+                '())))
       #:summary "\
 Preconfigured agenda views"
       #:commentary "\
