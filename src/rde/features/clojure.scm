@@ -39,7 +39,7 @@
           #:key
           (clojure-tools clojure-tools)
           (clojure-lsp #f)
-          (eglot-stay-out-of '())
+          (eglot-stay-out-of '(flymake eldoc))
           (jdk (list openjdk17 "jdk"))
           (clj-deps-new-key "J")
           (leiningen #f))
