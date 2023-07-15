@@ -172,7 +172,9 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
                 (advice-add 'cider-complete-at-point
                             :override 'rde--cider-complete-at-point)
 
-                (setq cider-use-xref nil) ;; eglot will handle it
+                `(if (get-value 'clojure-lsp config)
+                     `((setq cider-use-xref nil))  ;; eglot will handle it
+                     '())
                 (setq cider-auto-select-error-buffer nil)
                 (setq cider-inspector-auto-select-buffer nil)
                 (setq cider-auto-select-test-report-buffer nil)
@@ -219,5 +221,6 @@ Configure eglot, imenu, CIDER, flymake and other packages.
 
   (feature
    (name 'clojure)
-   (values `((clojure . #t)))
+   (values `((clojure . #t)
+             (clojure-lsp . ,clojure-lsp)))
    (home-services-getter get-home-services)))
