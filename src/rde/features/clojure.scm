@@ -139,8 +139,7 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
               (add-hook 'after-init-hook 'jarchive-setup)
 
               (with-eval-after-load 'cider
-                (setq cider-allow-jack-in-without-project t)
-                (setq cider-words-of-inspiration '("")))
+                (setq cider-allow-jack-in-without-project t))
 
               (with-eval-after-load 'cider-mode
                 ;; Make cider-completion work together with orderless and eglot
