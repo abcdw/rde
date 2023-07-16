@@ -26,7 +26,7 @@
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu services)
   #:use-module (gnu home services)
-  #:use-module (gnu home services shells)
+  #:use-module (rde home services shells)
   #:use-module (gnu services configuration)
   #:use-module (guix gexp)
   #:export (feature-ocaml))
@@ -53,7 +53,7 @@
      (if (and opam? (get-value 'zsh config))
          (list
           (simple-service
-           'set-opam-env-bash
+           'set-opam-env-zsh
            home-zsh-service-type
            (home-zsh-extension
             (zshrc
@@ -64,7 +64,7 @@
      (if (and opam? (get-value 'bash config))
          (list
           (simple-service
-           'set-opam-env-zsh
+           'set-opam-env-bash
            home-bash-service-type
            (home-bash-extension
             (bashrc
