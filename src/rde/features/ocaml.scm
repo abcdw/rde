@@ -22,6 +22,9 @@
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
   #:use-module (rde home services ocaml)
+  #:use-module (gnu packages base)
+  #:use-module (gnu packages compression)
+  #:use-module (gnu packages gcc)
   #:use-module (gnu packages ocaml)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu services)
@@ -84,7 +87,7 @@
        'add-ocaml-home-packages
        home-profile-service-type
        (if opam?
-           (list opam)
+           (list opam unzip glibc gcc)
            (append
             (list
              ocaml-core
