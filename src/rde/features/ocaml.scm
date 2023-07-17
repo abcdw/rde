@@ -159,7 +159,7 @@
              (with-eval-after-load 'merlin
                (setq merlin-command
                      ,(if opam?
-                          'opam
+                          ''opam
                           (file-append ocaml-merlin "/bin/ocamlmerlin")))
                (setq merlin-report-warnings nil)
                (setq merlin-error-in-fringe nil)
