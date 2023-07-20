@@ -15,9 +15,12 @@ check:
 	./pre-inst-env guile -L ./tests -L ./files/emacs/gider/src -c \
 	'((@ (rde test-runners) run-project-tests-cli))'
 
-repl:
+guix:
+	make -C examples guix
+
+repl: guix
 	./pre-inst-env examples/target/profiles/guix/bin/guix repl -L ./tests \
-	--listen=tcp:37146
+	-L ./files/emacs/gider/src --listen=tcp:37146
 
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure
