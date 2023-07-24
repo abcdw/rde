@@ -37,7 +37,9 @@
 (define* (feature-compile
           #:key
           (make gnu-make)
-          (recompile-key "s-r"))
+          (recompile-key "s-r")
+          (notify-on-finish? #t)
+          (buffers-to-ignore '("*grep*")))
   "Configure compilation tooling."
   (ensure-pred file-like? make)
   (ensure-pred string? recompile-key)
@@ -54,7 +56,17 @@
      (rde-elisp-configuration-service
       f-name
       config
-      `((defun rde-compile-ansi-color-apply ()
+      `((defgroup rde-compile nil
+          "Customizations for `compile'."
+          :group 'rde)
+
+        (defvar rde-compile-notify-on-finish-p ,(if notify-on-finish? 't 'nil)
+          "Wether to send notification on compilation finish or not.")
+
+        (defvar rde-compile-buffers-to-ignore ',buffers-to-ignore
+          "A list of buffers to not send notifications from.")
+
+        (defun rde-compile-ansi-color-apply ()
           "Translate control sequences into text properties in compile buffer."
           (interactive)
           (ansi-color-apply-on-region (point-min) (point-max)))
@@ -64,6 +76,29 @@
 
         (add-hook 'compilation-mode-hook 'toggle-truncate-lines)
         (add-hook 'compilation-filter-hook 'rde-compile-ansi-color-apply)
+
+        (defun rde-compile--on-action (id key)
+          (message "Message %d, key \"%s\" pressed" id key))
+
+        (defun rde-compile--on-close (id reason)
+          (message "Message %d, closed due to \"%s\"" id reason))
+
+        (defun rde-compile-notify-on-finish (buffer desc)
+          ;; TODO: Don't send notification on interrupt
+          (when (and rde-compile-notify-on-finish-p
+                     (not (string= desc "interrupt\n")) ; it is in user focus rn
+                     (not (member buffer rde-compile-buffers-to-ignore)))
+            (require 'notifications)
+            (notifications-notify
+             :title "Compilation Finished"
+             :body (format "%s: %s" buffer desc)
+             :app-icon nil
+             ;; :actions '("restart" "Restart" "celebrate" "Celebrate")
+             :on-action 'rde-compile--on-action
+             :on-close 'rde-compile--on-close)))
+
+        (add-hook 'compilation-finish-functions 'rde-compile-notify-on-finish)
+
         (with-eval-after-load 'compile
           (setq compilation-scroll-output 'first-error)
           (setq compilation-ask-about-save nil))))))
