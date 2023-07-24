@@ -88,7 +88,7 @@
           (emacs-fontaine emacs-fontaine)
           (use-serif-for-variable-pitch? #t)
           (extra-fontaine-presets '())
-          (extra-font-packages '()))
+          (extra-font-packages (list font-gnu-unifont)))
   "Configure fonts.  DEFAULT-FONT-SIZE will be used for making
 font-monospace default value, and it will be ignored if
 #:font-monospace argument is specified."
