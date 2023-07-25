@@ -53,6 +53,7 @@
    (feature-sway-screenshot)
    ;; (feature-sway-statusbar
    ;;  #:use-global-fonts? #f)
+   (feature-swaynotificationcenter)
    (feature-waybar)
    (feature-swayidle)
    (feature-swaylock
