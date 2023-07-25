@@ -71,6 +71,7 @@
             waybar-clock
             waybar-battery
 
+            feature-swaynotificationcenter
             feature-swayidle
             feature-swaylock
             feature-kanshi))
@@ -875,6 +876,69 @@ for the main bar."
 
 
 ;;;
+;;; swaync.
+;;;
+
+(define* (feature-swaynotificationcenter
+          #:key
+          (swaynotificationcenter swaynotificationcenter))
+  "Configure Sway Notification Center."
+
+  (ensure-pred file-like? swaynotificationcenter)
+  (define f-name 'swaynotificationcenter)
+
+  (define (get-home-services config)
+    (define (swaync-client args)
+      #~(format #f "\"~a/bin/swaync-client ~a\""
+                ;; "hi"
+                #$(get-value 'swaynotificationcenter config)
+                #$args))
+    (append
+     (list
+      (simple-service
+       'swaynotificationcenter-add-package
+       home-profile-service-type
+       (list swaynotificationcenter))
+      (waybar-module
+       'custom/notification
+       `((tooltip . #f)
+         (format . "{icon}")
+         (format-icons
+          .
+          ((none . "🔔")
+           (notification . "🔔")
+           (inhibited-none . "🔔")
+           (inhibited-notification . "🔔")
+           (dnd-none . "🔕")
+           (dnd-notification . "🔕")
+           (dnd-inhibited-none . "🔕")
+           (dnd-inhibited-notification . "🔕")))
+         (return-type . "json")
+         (exec . ,(swaync-client "-swb"))
+         (on-click . ,(swaync-client "-t -sw"))
+         (on-click-right . ,(swaync-client "-d -sw"))
+         (on-click-middle . ,(swaync-client "-C -sw"))
+         (escape . #t))
+       `((#((#{#custom-notification.notification}#)
+            (#{#custom-notification.dnd-notification}#)
+            (#{#custom-notification.dnd-inhibited-notification}#))
+          ((color . @base07)
+           (background . @base02))))))
+
+      (list
+       (when (get-value 'sway config)
+         (simple-service
+          'sway-swaync
+          home-sway-service-type
+          `((exec ,(file-append swaynotificationcenter "/bin/swaync"))))))))
+
+  (feature
+   (name f-name)
+   (values `((swaynotificationcenter . ,swaynotificationcenter)))
+   (home-services-getter get-home-services)))
+
+
+;;;
 ;;; swayidle.
 ;;;
 
@@ -999,7 +1063,7 @@ for the main bar."
 
 ;; [ ] feature-wayland-appearance (sway, gtk, qt themes)
 ;; [X] feature-wayland-statusbar
-;; [ ] feature-wayland-notifications
+;; [X] feature-wayland-notifications
 ;; [ ] feature-wayland-clipboard
 
 

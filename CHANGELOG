@@ -12,6 +12,10 @@ usually takes some of commit messages as a foundation.
 
 * Releases
 ** Unreleased
+*** New
+- rde: wm: Add feature-swaynotificationcenter.
+*** Updates
+- rde: compilation: Add notification on finish.
 
 ** 0.4.0 (2022-06-30)
 *** Breaking Changes
