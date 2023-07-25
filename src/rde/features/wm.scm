@@ -854,11 +854,6 @@ for the main bar."
 
       (list
        (simple-service
-        'waybar-add-font-package
-        home-profile-service-type
-        (list font-awesome))
-
-       (simple-service
         'waybar-reload-config-on-change
         home-run-on-change-service-type
         `(("files/.config/waybar/style.css"
