@@ -277,7 +277,7 @@ connect to it.")
 
 
 (define-deprecated home-emacs-service-type
-  (@ (rde home service emacs) home-emacs-service-type)
+  (@ (rde home services emacs) home-emacs-service-type)
   (service-type (name 'home-emacs)
                 (extensions
                  (list (service-extension
