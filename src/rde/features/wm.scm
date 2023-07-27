@@ -930,7 +930,8 @@ for the main bar."
          (simple-service
           'sway-swaync
           home-sway-service-type
-          `((exec ,(file-append swaynotificationcenter "/bin/swaync"))))))))
+          `((bindsym --to-code $mod+Shift+n exec ,(swaync-client "-t -sw"))
+            (exec ,(file-append swaynotificationcenter "/bin/swaync"))))))))
 
   (feature
    (name f-name)
