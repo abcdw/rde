@@ -78,6 +78,7 @@
         (add-hook 'compilation-filter-hook 'rde-compile-ansi-color-apply)
 
         (defun rde-compile--on-action (id key)
+          (select-frame-set-input-focus (selected-frame))
           (message "Message %d, key \"%s\" pressed" id key))
 
         (defun rde-compile--on-close (id reason)
@@ -90,10 +91,10 @@
                      (not (member buffer rde-compile-buffers-to-ignore)))
             (require 'notifications)
             (notifications-notify
-             :title "Compilation Finished"
-             :body (format "%s: %s" buffer desc)
-             :app-icon nil
-             ;; :actions '("restart" "Restart" "celebrate" "Celebrate")
+             :title "Compilation"
+             :body (format "%s\nBuffer: %s" desc buffer)
+             ;; :app-icon nil
+             :actions '("focus" "Focus Frame")
              :on-action 'rde-compile--on-action
              :on-close 'rde-compile--on-close)))
 
