@@ -309,7 +309,10 @@
    %dev-features
    %general-features))
 
+;; In fact, kernel customization fits hosts/ submodule better, but it's ok to
+;; have it here for demonstration purpose.
 (define example-firmware (@ (gnu packages firmware) ath9k-htc-firmware))
+
 ;; To override default features obtained from (rde presets) just remove them
 ;; from the list and add them back with customizations needed.
 (define all-features-with-custom-kernel-and-substitutes
