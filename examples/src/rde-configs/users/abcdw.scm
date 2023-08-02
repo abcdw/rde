@@ -286,16 +286,16 @@
 ;; Initial user's password hash will be available in store, so use this
 ;; feature with care (display (crypt "hi" "$6$abc"))
 
-(define %dev-features
+(define dev-features
   (list
    (feature-markdown)))
 
-(define %virtualization-features
+(define virtualization-features
   (list
    (feature-docker)
    (feature-qemu)))
 
-(define %general-features
+(define general-features
   (append
    rde-base
    rde-desktop
@@ -305,9 +305,9 @@
 
 (define %all-features
   (append
-   %virtualization-features
-   %dev-features
-   %general-features))
+   virtualization-features
+   dev-features
+   general-features))
 
 ;; In fact, kernel customization fits hosts/ submodule better, but it's ok to
 ;; have it here for demonstration purpose.
