@@ -26,6 +26,7 @@
   #:use-module (rde features markup)
   #:use-module (rde features docker)
   #:use-module (rde features virtualization)
+  #:use-module (rde features ocaml)
   #:use-module (rde features presets)
   #:use-module (rde features)
   #:use-module (rde home services emacs)
@@ -453,6 +454,7 @@
      #:elfeed-org-files '("~/work/abcdw/private/rss.org"))
 
     (feature-javascript)
+    (feature-ocaml #:opam? #t)
 
     ;; TODO: move feature to general, move extra configuration to service.
     (feature-notmuch
