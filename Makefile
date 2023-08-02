@@ -20,7 +20,7 @@ guix:
 
 repl: guix
 	./pre-inst-env examples/target/profiles/guix/bin/guix repl -L ./tests \
-	-L ./files/emacs/gider/src --listen=tcp:37146
+	-L ./files/emacs/gider/src -L ./examples/src --listen=tcp:37146
 
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure
