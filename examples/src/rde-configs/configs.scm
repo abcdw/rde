@@ -117,4 +117,3 @@
 
 ;;; TODO: Call reconfigure from scheme file.
 ;;; TODO: Rename configs.scm to main.scm?
-;;; TODO: Move all files from abcdw/ to rde-config/ ?
