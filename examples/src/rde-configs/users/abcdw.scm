@@ -33,7 +33,8 @@
   #:use-module (rde home services wm)
   #:use-module (rde home services video)
   #:use-module (rde packages aspell)
-  #:use-module (rde packages))
+  #:use-module (rde packages)
+  #:use-module (srfi srfi-1))
 
 
 ;;; Helpers
@@ -307,9 +308,29 @@
    %dev-features
    %general-features))
 
+(define example-firmware (@ (gnu packages firmware) ath9k-htc-firmware))
+;; To override default features obtained from (rde presets) just remove them
+;; from the list and add them back with customizations needed.
+(define all-features-with-custom-kernel-and-substitutes
+  (append
+   ;; "C-h S" (info-lookup-symbol), "C-c C-d C-i" (geiser-doc-look-up-manual)
+   ;; to see the info manual for a particular function.
+
+   ;; Here we basically remove all the features which has feature name equal
+   ;; to either 'base-services or 'kernel.
+   (remove (lambda (f) (member (feature-name f) '(base-services kernel)))
+           %all-features)
+   (list
+    (feature-kernel
+     #:kernel-arguments '("snd_hda_intel.dmic_detect=0")
+     #:firmware (list example-firmware))
+    (feature-base-services
+     #:default-substitute-urls (list "https://bordeaux.guix.gnu.org"
+                                     "https://ci.guix.gnu.org")))))
+
 (define-public %abcdw-features
   (append
-   %all-features
+   all-features-with-custom-kernel-and-substitutes
    (list
     (feature-additional-services)
     (feature-user-info
