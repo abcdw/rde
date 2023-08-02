@@ -15,7 +15,7 @@
           (git git)
           (sign-commits? #t)
           (git-gpg-sign-key #f)
-          (git-send-email? #f)
+          (git-send-email? #t)
           (extra-config '()))
   "Setup and configure Git."
   (ensure-pred any-package? git)
