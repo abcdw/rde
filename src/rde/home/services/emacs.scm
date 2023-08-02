@@ -490,7 +490,7 @@ time."))))
                 (compose identity)
                 (extend home-emacs-feature-loader-extensions)
                 (default-value (home-emacs-feature-loader-configuration))
-                (description "Extends emacs with feauter-loader elisp package,
+                (description "Extends emacs with feature-loader elisp package,
 which have specified packages as propagated inputs, loads specified emacs
 feaures and optionally adds a require of itself to init-el.")))
 
