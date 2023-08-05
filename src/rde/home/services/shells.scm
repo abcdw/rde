@@ -19,7 +19,8 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (rde home services shells)
-  #:use-module (rde serializers utils)
+  #:use-module ((rde serializers utils) #:select (gexp-text-config?
+                                                  serialize-gexp-text-config))
   #:use-module (gnu services configuration)
   #:use-module (gnu home services)
   #:use-module (gnu home services utils)
