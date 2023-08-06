@@ -205,6 +205,15 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
      (define-prefix-command 'rde-toggle-map nil))
    #:summary "Keymaps inteded for reuse among configure-* packages"))
 
+(define emacs-configure-rde-startup
+  (rde-emacs-configuration-package
+   'startup
+   `((when (file-exists-p "~/.emacs.d")
+       (display-warning 'rde-startup "\
+~/.emacs.d exists, emacs may load the wrong init.el")))
+   #:autoloads? #t
+   #:summary "Additional autoloaded rde startup configuration."))
+
 (define (wayland-clipboard-fix config)
   (let* ((wl-cb (get-value 'wl-clipboard config wl-clipboard))
          (wl-copy (file-append wl-cb "/bin/wl-copy"))
@@ -437,6 +446,7 @@ It can contain settings not yet moved to separate features."
      #:keywords '(convenience)
      #:elisp-packages
      (append (list (get-value 'emacs-configure-rde-keymaps config)
+                   (get-value 'emacs-configure-rde-startup config)
                    emacs-expand-region)
              (if (get-value 'emacs-auto-clean-space? config)
                  (list emacs-ws-butler) '())))))
@@ -564,6 +574,7 @@ It can contain settings not yet moved to separate features."
              emacs-client-create-frame
              emacs-client-no-wait
              emacs-configure-rde-keymaps
+             emacs-configure-rde-startup
              emacs-server-mode?)
             `((emacs-disable-warnings? . ,disable-warnings?)
               (emacs-auto-update-buffers? . ,auto-update-buffers?)
@@ -624,7 +635,8 @@ environment outside of Guix Home."
               '())))))
   (feature
    (name 'emacs)
-   (values (append (make-feature-values emacs emacs-configure-rde-keymaps)
+   (values (append (make-feature-values emacs emacs-configure-rde-keymaps
+                                        emacs-configure-rde-startup)
                    `((emacs-disable-warnings? . #t)
                      (emacs-auto-update-buffers? . #t)
                      (emacs-auto-clean-space? . #t)
