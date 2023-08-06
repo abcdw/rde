@@ -163,27 +163,29 @@ emacs servers' environment variables to same values."
          (format #f "~s" vars))
        ")"))))
 
-;; MAYBE: Make a separate emacs server instance for some
-;; standalone-minibuffer-programs.
+;; This doesn't use the emacs-client-create-frame program because
+;; it executes by default the after-make-frame-functions, which
+;; can mess up with other buffers or frames.
 (define* (emacs-minibuffer-program
-          emacs-client-create-frame file-name-suffix title command
+          emacs-client file-name-suffix title command
           #:key (height 10))
   (program-file
    (string-append "emacs-" file-name-suffix)
-   #~(system* #$emacs-client-create-frame
+   #~(system* #$emacs-client
               "--eval"
               #$(format
                  #f "\
-(let ((current-frame (selected-frame))
-      (vertico-count ~a)) \
-  (unwind-protect \
-      (command-execute '~a) \
-    (delete-frame current-frame)))" height command)
-              "-F"
-              #$(format
-                 #f "\
-((name . \"~a - Emacs Client\") (minibuffer . only) (width . 120) (height . ~a))"
-                 title (1+ height)))))
+(let* ((vertico-count ~a) \
+       (after-make-frame-functions '()) \
+       (minibuffer-frame (make-frame
+                          `((name . \"~a - Emacs Client\") \
+                            (minibuffer . only) \
+                            (width . 120) \
+                            (height . ~a))))) \
+   (unwind-protect \
+       (with-selected-frame minibuffer-frame (command-execute '~a)) \
+     (delete-frame minibuffer-frame)))"
+                 height title (1+ height) command))))
 
 
 ;;;
@@ -483,7 +485,7 @@ It can contain settings not yet moved to separate features."
 
   (define emacs-application-launcher
     (emacs-minibuffer-program
-     emacs-client-create-frame "application-launcher" "Application Launcher"
+     emacs-client "application-launcher" "Application Launcher"
      'app-launcher-run-app #:height standalone-minibuffer-height))
 
   (define (emacs-home-services config)
