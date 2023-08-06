@@ -173,17 +173,17 @@ emacs servers' environment variables to same values."
    #~(system* #$emacs-client-create-frame
               "--eval"
               #$(format
-                 #f "(progn \
-(set-frame-name \"~a - Emacs Client\") \
+                 #f "\
 (let ((current-frame (selected-frame))
       (vertico-count ~a)) \
   (unwind-protect \
       (command-execute '~a) \
-    (delete-frame current-frame))))" title height command)
+    (delete-frame current-frame)))" height command)
               "-F"
               #$(format
-                 #f "((minibuffer . only) (width . 120) (height . ~a))"
-                 (1+ height)))))
+                 #f "\
+((name . \"~a - Emacs Client\") (minibuffer . only) (width . 120) (height . ~a))"
+                 title (1+ height)))))
 
 
 ;;;
