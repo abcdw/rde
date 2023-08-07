@@ -935,7 +935,8 @@ for the main bar."
 
   (feature
    (name f-name)
-   (values `((swaynotificationcenter . ,swaynotificationcenter)))
+   (values `((desktop-notifications . #t)
+             (swaynotificationcenter . ,swaynotificationcenter)))
    (home-services-getter get-home-services)))
 
 
