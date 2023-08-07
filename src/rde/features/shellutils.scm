@@ -77,14 +77,10 @@
         (add-hook 'compilation-mode-hook 'toggle-truncate-lines)
         (add-hook 'compilation-filter-hook 'rde-compile-ansi-color-apply)
 
-        (defun rde-compile--on-action (id key)
-          (select-frame-set-input-focus (selected-frame))
-          (message "Message %d, key \"%s\" pressed" id key))
+        (defun rde-compile--notification-on-action (id key)
+          (select-frame-set-input-focus (selected-frame)))
 
-        (defun rde-compile--on-close (id reason)
-          (message "Message %d, closed due to \"%s\"" id reason))
-
-        (defun rde-compile-notify-on-finish (buffer desc)
+        (defun rde-compile--notify-on-finish (buffer desc)
           ;; TODO: Don't send notification on interrupt
           (when (and rde-compile-notify-on-finish-p
                      (not (string= desc "interrupt\n")) ; it is in user focus rn
@@ -95,10 +91,9 @@
              :body (format "%s\nBuffer: %s" desc buffer)
              ;; :app-icon nil
              :actions '("focus" "Focus Frame")
-             :on-action 'rde-compile--on-action
-             :on-close 'rde-compile--on-close)))
+             :on-action 'rde-compile--notification-on-action)))
 
-        (add-hook 'compilation-finish-functions 'rde-compile-notify-on-finish)
+        (add-hook 'compilation-finish-functions 'rde-compile--notify-on-finish)
 
         (with-eval-after-load 'compile
           (setq compilation-scroll-output 'first-error)
