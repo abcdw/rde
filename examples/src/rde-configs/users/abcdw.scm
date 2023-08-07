@@ -256,8 +256,14 @@
         (options
          '((host-name . "200:554d:3eb1:5bc5:6d7b:42f4:8792:efb8")
            (port . 50621)
-           (control-master . "auto")
-           (control-path . "~/.ssh/master-%r@%h:%p")
+           ;; (control-master . "auto")
+           ;; (control-path . "~/.ssh/master-%r@%h:%p")
+           (compression . #t))))
+       (ssh-host
+        (host "pinky-wg")
+        (options
+         '((host-name . "10.0.0.1")
+           (port . 50621)
            (compression . #t))))
        (ssh-host
         (host "pinky")
