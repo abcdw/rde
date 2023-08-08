@@ -1,0 +1,53 @@
+#+TITLE: rde Flavored Guix Services
+#+Date: 2023-08-08
+
+* Status
+RFC by 2023-08-22
+
+* Context
+By default in nginx-configuration it's not possible to define something
+outside of http context, but one could want to define others contexts, for
+example rtmp or any other.
+
+The configuration can have thousands of objects (contexts for nginx example),
+which are defined in plugins or somewhere else and if we use closed world
+assumption and represent them using scheme records, it will make it almost
+impossible to maintain all of them (because we need to keep it in sync not
+only with nginx itself, but also with all its plugings).  If we don't cover
+everything with records, the configuration becomes a mix of raw strings and
+scheme code, which makes it harder to maintain the configuration and almost
+impossible to extend it programmatically.
+
+There are two escape hatches in nginx-configuration, which are limited, ~file~
+escape hatch allows to use already existing configuration, but prevents all
+the scheme extension of it. ~extra-content~ works only for http context (with
+very hacky work around it can work for other contexts).  Also, there are
+nested escape hatches in nested records, but they are inconsistent with
+outermost escape hatches and also forces to mix manual string generation with
+scheme code.
+
+Extensions are very limited, you can only add server blocks to http context
+and nothing else, no server blocks for stream or rtmp context, no upstream
+blocks for http or others contexts and so on.
+
+The examples demonstrated using nginx service, but it applies to many other
+guix services for highly extensible software.
+
+* Decision
+We will make rde Flavored Guix Services :)
+
+To make it possible to disable all defaults and start with clean
+configuration, which can be constructed from ground up.
+
+* Consequences
+Configuration will become much more flexible and easier (and possible) to
+extend programmatically.
+
+It will be incompatible with Guix proper services style and thus hard to
+upstream.
+
+We can lose some of type checks and autocompletion due to usage of alists
+vectors and other data structures without well-defined structure (however
+basic structure will be checked during serialization and in future it possible
+to cover those needs with something like scheme-flavored clojure.spec or
+malli).
