@@ -451,7 +451,7 @@ It can contain settings not yet moved to separate features."
           (emacs-server-mode? #t)
           (default-terminal? #t)
           (default-application-launcher? #t)
-          (standalone-minibuffer-height 100))
+          (standalone-minibuffer-height 10))
   "Setup and configure GNU Emacs."
   (ensure-pred file-like? emacs)
   (ensure-pred list-of-elisp-packages? additional-elisp-packages)
@@ -546,11 +546,7 @@ It can contain settings not yet moved to separate features."
           ;; (exec_always "sleep 2s && " ;; Need to wait until emacs daemon loaded.
           ;;              ,(update-emacs-server-env-variables emacs-client))
 
-          ;; TODO: Return back when sway bug is fixed
-          ;; <https://github.com/swaywm/sway/issues/6950>
-          ;; (for_window "[title=\".* - Emacs Client\"]"
-          ;;             floating enable)
-          )))))
+          (for_window "[title=\".* - Emacs Client\"]" floating enable))))))
 
   (feature
    (name 'emacs)
