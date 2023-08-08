@@ -178,7 +178,8 @@ emacs servers' environment variables to same values."
 (let* ((vertico-count ~a) \
        (after-make-frame-functions '()) \
        (minibuffer-frame (make-frame
-                          `((name . \"~a - Emacs Client\") \
+                          `((display . ,x-display-name) \
+                            (name . \"~a - Emacs Client\") \
                             (minibuffer . only) \
                             (width . 120) \
                             (height . ~a))))) \
