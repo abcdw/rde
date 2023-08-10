@@ -22,6 +22,7 @@
 (define-module (rde features wm)
   #:use-module (rde features)
   #:use-module (rde features predicates)
+  #:use-module (rde features emacs)
   #:use-module (rde features fontutils)
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
@@ -32,6 +33,7 @@
   #:use-module (gnu packages qt)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages xdisorg)
+  #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages terminals)
   #:use-module (gnu packages rust-apps)
@@ -286,7 +288,29 @@ chooser_type=simple"
              '() (list foot))
          (if (get-value 'default-application-launcher config) '() (list bemenu))
          (list qtwayland-5 swayhide
-               xdg-desktop-portal xdg-desktop-portal-wlr))))))
+               xdg-desktop-portal xdg-desktop-portal-wlr)))
+
+       (when (get-value 'emacs config)
+         (rde-elisp-configuration-service
+          'sway
+          config
+          `((eval-when-compile (require 'sway))
+            (autoload 'sway--x-focus-frame "sway")
+            (defalias 'x-focus-frame 'sway--x-focus-frame)
+            (setq frame-title-format
+                  '(multiple-frames "%b"
+                                    ("" "%b — GNU Emacs at " system-name
+                                     " [" (:eval (frame-parameter (selected-frame) 'window-id)) "]"))))
+          #:summary "\
+Emacs configuration to play nice with sway."
+          #:commentary "\
+Currently this is a workaround because pgtk doesn't support the function
+x-focus-frame (which is used in emacs-mini-frame for instance). Using sway.el
+properly with pgtk also requires a unique name for each frame, hence the
+frame-title-format."
+          #:keywords '(convenience)
+          #:elisp-packages
+          (list emacs-sway))))))
 
   (feature
    (name 'sway)
