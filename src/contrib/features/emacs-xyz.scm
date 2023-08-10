@@ -78,12 +78,13 @@ recommended RDE experience is to rely on Emacs default keybindings."
 
         (setq evil-want-keybinding nil)
 
+        (with-eval-after-load 'evil-autoloads
+          (evil-mode 1))
         (with-eval-after-load 'evil-collection-autoloads
           (evil-collection-init))
-
-        (with-eval-after-load 'evil-autoloads
-          (evil-mode 1)
-          (evil-commentary-mode)
+        (with-eval-after-load 'evil-commentary-autoloads
+          (evil-commentary-mode))
+        (with-eval-after-load 'evil-surround-autoloads
           (global-evil-surround-mode 1))
 
         (setq evil-want-integration t)
