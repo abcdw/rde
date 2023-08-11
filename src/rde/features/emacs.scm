@@ -415,6 +415,11 @@ Prefix argument can be used to kill a few words."
              '())
 
        ,#~""
+       ,@(if (get-value 'desktop-notifications config)
+             `((with-eval-after-load 'alert
+                 (setq alert-default-style 'notifications)))
+             '())
+       ,#~""
        ;; Specifying default action for display-buffer.
        ;; (setq display-buffer-base-action
        ;;       '(display-buffer-reuse-mode-window
