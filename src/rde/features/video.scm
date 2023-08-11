@@ -107,6 +107,7 @@ on-the-fly thumbnail generation for progress bar."
         (default
          '((video/mp4 . mpv.desktop)
            (video/mkv . mpv.desktop)
+           (video/webm . mpv.desktop)
            (audio/mpeg . mpv.desktop))))))
      (if (get-value 'emacs config)
          (let ((emacs-embark (get-value 'emacs-embark config)))
