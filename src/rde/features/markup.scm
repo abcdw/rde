@@ -89,12 +89,12 @@ tex-listings package that typesets source code."
        'add-tex-home-packages
        home-profile-service-type
        (append
-        (list texlive-base)
+        (list texlive-scheme-basic)
         (if listings?
             (list texlive-listings)
             '())
         (if biblatex?
-            (list texlive-biblatex biber)
+            (list texlive-biblatex texlive-biber)
             '())
         extra-tex-packages))
       (simple-service
