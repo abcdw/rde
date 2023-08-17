@@ -2374,6 +2374,7 @@ This configuration packages is not actively maintained right now."
          'corfu
          (setq corfu-min-width 60)
          (setq corfu-cycle t)
+         (setq corfu-quit-no-match t)
 
          (setq corfu-auto ,(if corfu-auto 't 'nil))
          ;; '((define-key corfu-map (kbd "SPC") 'corfu-insert-separator))
