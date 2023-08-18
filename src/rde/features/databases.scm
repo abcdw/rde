@@ -23,11 +23,13 @@
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
   #:use-module (gnu packages databases)
+  #:use-module (gnu packages sqlite)
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu services databases)
   #:use-module (srfi srfi-1)
-  #:export (feature-postgresql))
+  #:export (feature-postgresql
+            feature-sqlite))
 
 (define-public (list-of-postgresql-roles? lst)
   (and (list? lst) (every postgresql-role? lst)))
@@ -85,4 +87,29 @@
    (name f-name)
    (values `((,f-name . ,postgresql)))
    (system-services-getter get-system-services)
+   (home-services-getter get-home-services)))
+
+(define* (feature-sqlite
+          #:key
+          (sqlite sqlite))
+  "Configure the SQLite relational database."
+  (ensure-pred file-like? sqlite)
+
+  (define f-name 'sqlite)
+
+  (define (get-home-services config)
+    "Return home services related to SQLite."
+    (list
+     (simple-service
+      'add-sqlite-home-package
+      home-profile-service-type
+      (list sqlite))
+     (simple-service
+      'sqlite-xdg-base-dirs-specification
+      home-environment-variables-service-type
+      '(("SQLITE_HISTORY" . "$XDG_CACHE_HOME/sqlite_history")))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,sqlite)))
    (home-services-getter get-home-services)))
