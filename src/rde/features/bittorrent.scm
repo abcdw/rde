@@ -24,7 +24,7 @@
 
   (define (transmission-home-services config)
     (define emacs-f-name 'transmission)
-    (define emacs-cmd (get-value 'emacs-client-create-frame config))
+    (define emacs-cmd (get-value 'emacs-client config))
 
     (list
      (when (get-value 'emacs config)
@@ -51,12 +51,20 @@ links and torrent files."
         #~(system*
            #$emacs-cmd "--eval"
 	   (string-append "\
-(progn
- (set-frame-name \"Transmission - Emacs Client\")
- (transmission)
- (delete-other-windows)
- (transmission-add \"" (cadr (command-line)) "\")
- (revert-buffer))"))
+(let* ((torrent \"" (cadr (command-line)) "\"))
+ (require 'notifications)
+ (condition-case nil
+     (progn
+       (transmission-add torrent)
+       (notifications-notify
+        :title \"Transmission\"
+        :body (format \"Torrent probably added: %s\" torrent)
+        :timeout 2000))
+   (error
+    (notifications-notify
+     :title \"Transmission\"
+     :body \"Something went wrong, check if transmission daemon is running.\")
+    nil)))"))
         #:default-for '(x-scheme-handler/magnet application/x-bittorrent)))
 
      (service home-transmission-service-type
