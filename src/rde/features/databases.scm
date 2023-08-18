@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
+;;; Copyright © 2023 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -23,6 +24,7 @@
   #:use-module (rde features predicates)
   #:use-module (gnu packages databases)
   #:use-module (gnu services)
+  #:use-module (gnu home services)
   #:use-module (gnu services databases)
   #:use-module (srfi srfi-1)
   #:export (feature-postgresql))
@@ -59,19 +61,25 @@
 
   (define (get-home-services config)
     "Return home services related to PostgreSQL."
-    (if (get-value 'emacs config)
-        (list
-         (rde-elisp-configuration-service
-          f-name
-          config
-          `(,@(if (get-value 'emacs-org config)
-                  '((with-eval-after-load 'ob-core
-                      (require 'ob-sql))
-                    (with-eval-after-load 'ob-sql
-                      (setq org-babel-default-header-args:sql
-                            '((:engine . "postgresql")))))
-                  '()))))
-        '()))
+    (append
+     (list
+      (simple-service
+       'postgresql-xdg-base-dirs-specification
+       home-environment-variables-service-type
+       '(("PSQL_HISTORY" . "$XDG_STATE_HOME/psql_history"))))
+     (if (get-value 'emacs config)
+         (list
+          (rde-elisp-configuration-service
+           f-name
+           config
+           `(,@(if (get-value 'emacs-org config)
+                   '((with-eval-after-load 'ob-core
+                       (require 'ob-sql))
+                     (with-eval-after-load 'ob-sql
+                       (setq org-babel-default-header-args:sql
+                             '((:engine . "postgresql")))))
+                   '()))))
+         '())))
 
   (feature
    (name f-name)
