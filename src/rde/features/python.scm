@@ -28,6 +28,46 @@
   #:use-module (guix gexp)
   #:export (feature-python))
 
+;; This is the current recommended way to go by
+;; https://github.com/b3nj5m1n/xdg-ninja, where it's specified that this won't
+;; work if python is invoked with the -i flag. But it does work with `run-python'
+;; emacs command, which is the recommended way to use the python repl in RDE.
+;; The official PR seems to be here : https://github.com/python/cpython/pull/26377
+(define python-startup-file
+  (plain-file "pythonrc"
+              "\
+import os
+import atexit
+import readline
+from pathlib import Path
+
+if readline.get_current_history_length() == 0:
+
+    state_home = os.environ.get(\"XDG_STATE_HOME\")
+    if state_home is None:
+        state_home = Path.home() / \".local\" / \"state\"
+    else:
+        state_home = Path(state_home)
+
+    history_path = state_home / \"python_history\"
+    if history_path.is_dir():
+        raise OSError(f\"'{history_path}' cannot be a directory\")
+
+    history = str(history_path)
+
+    try:
+        readline.read_history_file(history)
+    except OSError: # Non existent
+        pass
+
+    def write_history():
+        try:
+            readline.write_history_file(history)
+        except OSError:
+            pass
+
+    atexit.register(write_history)"))
+
 (define* (feature-python
           #:key
           (python python-wrapper)
@@ -48,6 +88,11 @@ python files."
       'add-python-home-package
       home-profile-service-type
       (list python))
+     (simple-service
+      'python-xdg-base-dirs-specification
+      home-environment-variables-service-type
+      `(("IPYTHONDIR" . "$XDG_CONFIG_HOME/ipython")
+        ("PYTHONSTARTUP" . ,python-startup-file)))
      (rde-elisp-configuration-service
       f-name
       config
