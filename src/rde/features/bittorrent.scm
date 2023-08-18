@@ -28,6 +28,10 @@
 
     (list
      (when (get-value 'emacs config)
+       ;; Without desktop notifications it will be unclear what is happening.
+       ;; It could be a fallback to old approach (where frame is created), but
+       ;; it would require future maintanance.
+       (require-value 'desktop-notifications config)
        (rde-elisp-configuration-service
         emacs-f-name
         config
