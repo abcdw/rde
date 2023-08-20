@@ -82,6 +82,18 @@ To propose new features, fixes or ideas send emails, optionally with inline
 patches to rde-devel mailing list.  As usual more info is available in
 [[https://trop.in/rde/manual#Contributing][Contributing]] section of the [[https://trop.in/rde/manual][manual]].
 
+** People's rde configurations
+These repositories serve as real-world examples of people's rde configurations, which you can inspect to get familiar with its concepts.  If you think other users might learn from your configuration and you'd like to share it publicly, let us know via the [[* Community][community channels]].  For Guix Home example configurations, see [[* People's Guix Home configurations][People's Guix Home configurations]].
+
+- https://github.com/abcdw/nonrde
+- https://github.com/nicolas-graves/dotfiles
+- https://github.com/engstrand-config/guix-dotfiles
+- https://github.com/minikN/dots
+- https://github.com/migalmoreno/guix-config
+- https://git.sr.ht/~benoit/dotfiles/tree/rde/item/src/benoitj
+- https://git.sr.ht/~whereiseveryone/confetti
+- https://git.sr.ht/~elevenkb/dotfiles
+
 ** Guix Home
 ~Guix Home~ is a part of GNU Guix now, no additional installation steps are
 required anymore.
