@@ -1282,6 +1282,13 @@ Small tweaks, xdg entry for openning directories in emacs client."
         (define-key global-map (kbd "s-e") 'eshell)
         (add-hook 'eshell-mode-hook 'rde-eshell-mode-setup)
         (with-eval-after-load 'eshell
+          (let ((eshell-cache (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                                      "/emacs/eshell/")))
+            (setq eshell-aliases-file (concat eshell-cache "alias"))
+            (setq eshell-history-file-name (concat eshell-cache "history"))
+            (setq eshell-last-dir-ring-file-name
+                  (concat eshell-cache "lastdir")))
+
           (setq eshell-banner-message "")
           (autoload 'eshell-syntax-highlighting-global-mode
                     "eshell-syntax-highlighting")
