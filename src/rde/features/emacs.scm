@@ -309,6 +309,10 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
        ,#~""
        (column-number-mode 1)
        (save-place-mode 1)
+       (setq
+        save-place-file
+        (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                "/emacs/places"))
        ;; MAYBE: Make it buffer local?
        (show-paren-mode 1)
        ,#~";; Treat camelCased parts as separate words."
