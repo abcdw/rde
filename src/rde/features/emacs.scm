@@ -301,6 +301,11 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
         (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                 "/emacs/bookmarks"))
 
+       (setq
+        auto-save-list-file-prefix
+        (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                "/emacs/auto-save-list"))
+
        ,#~""
        (column-number-mode 1)
        (save-place-mode 1)
