@@ -4276,6 +4276,11 @@ If NODE doesn't exist, create a new org-roam node with REF."
         (with-eval-after-load
          'org-roam
 
+         (setq
+          org-roam-db-location
+          (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                  "/emacs/org-roam.db"))
+
          (cl-defmethod
           org-roam-node-type ((node org-roam-node))
           "Return the TYPE of NODE, where the TYPE is a directory of
