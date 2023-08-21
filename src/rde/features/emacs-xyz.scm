@@ -3124,6 +3124,12 @@ git-link, git-timemachine."
           'git-gutter-transient)
 
         (with-eval-after-load
+         'transient
+          (setq transient-history-file
+                (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                        "/emacs/transient/history.el")))
+
+        (with-eval-after-load
          'git-gutter-transient
          (transient-insert-suffix
           'git-gutter-transient "Q"
