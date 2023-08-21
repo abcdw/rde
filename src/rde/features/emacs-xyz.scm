@@ -3786,6 +3786,12 @@ built-in help that provides much more contextual information."
           (interactive)
           (setq org-timer-mode-line-string nil))
 
+        (with-eval-after-load 'org-id
+          (setq
+           org-id-locations
+           (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                   "/emacs/org-id-locations")))
+
         (with-eval-after-load 'org
          (setq org-adapt-indentation nil)
          (setq org-edit-src-content-indentation 0)
