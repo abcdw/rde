@@ -5647,7 +5647,12 @@ be used in descending order of priority."
           (define-key map "p" 'webpaste-paste-buffer-or-region))
         (with-eval-after-load 'webpaste
           (setq webpaste-provider-priority ',webpaste-providers)
-          (setq webpaste-paste-confirmation t)))
+          (setq webpaste-paste-confirmation t))
+        (with-eval-after-load 'request
+          (setq
+           request-storage-directory
+           (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
+                   "/emacs/request"))))
       #:elisp-packages (list emacs-webpaste))))
 
   (feature
