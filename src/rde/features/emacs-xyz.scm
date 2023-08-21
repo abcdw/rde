@@ -2853,7 +2853,8 @@ Provide basic adjustments and integration with project.el."
 
   (feature
    (name f-name)
-   (values `((,f-name . ,emacs-ednc)))
+   (values `((,f-name . ,emacs-ednc)
+             (desktop-notifications . #t)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-ace-window
