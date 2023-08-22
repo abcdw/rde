@@ -2,7 +2,7 @@
 #+OPTIONS: toc:nil
 
 * rde
-Developers and power user friendly GNU/Linux distribution based on [[https://guix.gnu.org/][GNU Guix]]
+Developer and power user friendly GNU/Linux distribution based on [[https://guix.gnu.org/][GNU Guix]]
 package manager.
 
 More info is available at [[https://trop.in/rde][trop.in/rde]].
@@ -83,16 +83,23 @@ patches to rde-devel mailing list.  As usual more info is available in
 [[https://trop.in/rde/manual#Contributing][Contributing]] section of the [[https://trop.in/rde/manual][manual]].
 
 ** People's rde configurations
-These repositories serve as real-world examples of people's rde configurations, which you can inspect to get familiar with its concepts.  If you think other users might learn from your configuration and you'd like to share it publicly, let us know via the [[* Community][community channels]].  For Guix Home example configurations, see [[* People's Guix Home configurations][People's Guix Home configurations]].
+Those repositories are not affilated with rde or Guix, they are provided as
+real-world examples of people's rde configurations, which you can inspect to
+get familiar with its concepts, but be careful and thoughtful, remember that
+blindly copying snippets of code from the internet can have a huge security
+implications on your setup.  If you think other users might learn from your
+configuration and you'd like to share it publicly, let us know via the [[*
+Community][community channels]].  For Guix Home example configurations, see [[* People's Guix Home
+configurations][People's Guix Home configurations]].
 
-- https://github.com/abcdw/nonrde
-- https://github.com/nicolas-graves/dotfiles
-- https://github.com/engstrand-config/guix-dotfiles
-- https://github.com/minikN/dots
-- https://github.com/migalmoreno/guix-config
-- https://git.sr.ht/~benoit/dotfiles/tree/rde/item/src/benoitj
-- https://git.sr.ht/~whereiseveryone/confetti
-- https://git.sr.ht/~elevenkb/dotfiles
+- Andrew Tropin's configuration [[https://git.sr.ht/~abcdw/rde/tree/master/item/examples][part 1]], [[https://github.com/abcdw/nonrde][part 2]].
+- Nicolas Graves' [[https://github.com/nicolas-graves/dotfiles][dotfiles]].
+- The GNU/Linux+Engstrand system [[https://github.com/engstrand-config/guix-dotfiles][guix-dotfiles]].
+- Demis Balbach's [[https://github.com/minikN/dots][dots]].
+- Miguel Ángel Moreno's [[https://github.com/migalmoreno/guix-config][guix-config]]
+- Benoit J's [[https://git.sr.ht/~benoit/dotfiles/tree/rde/item/src/benoitj][dotfiles]].
+- jgart's [[https://git.sr.ht/~whereiseveryone/confetti][confetti]].
+- Kabelo M'sobomvu Moiloa's [[https://git.sr.ht/~elevenkb/dotfiles][dotfiles]].
 
 ** Guix Home
 ~Guix Home~ is a part of GNU Guix now, no additional installation steps are
