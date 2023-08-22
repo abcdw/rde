@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -34,7 +34,8 @@
   #:use-module (guix gexp)
 
   #:export (feature-alacritty
-            feature-vterm))
+            feature-vterm
+            feature-foot))
 
 (define (font-weight->style weight)
   "Transform kebab-cased symbols to capitalized strings without dashes."
@@ -168,4 +169,44 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
    (values
     `((vterm . #t)
       (emacs-vterm . ,emacs-vterm)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-foot
+          #:key
+          (foot foot)
+          (default-terminal? #f)
+          (backup-terminal? #t))
+  "Configure foot terminal."
+  (ensure-pred file-like? foot)
+
+  (define (get-home-services config)
+    (define font-mono (get-value 'font-monospace config))
+    (list
+     (simple-service
+      'foot-package
+      home-profile-service-type
+      (list foot))
+     ;; TODO: Migrate to home service to make it extandable
+     (simple-service
+      'foot-package
+      home-xdg-configuration-files-service-type
+      `(("foot/foot.ini"
+         ,(mixed-text-file
+           "foot.ini"
+           "pad = 10x5\n"
+           "font=monospace:size=" (number->string (font-size font-mono)) "\n"
+           ;; "dpi-aware = yes\n" ; use dpi instead of output scaling factor
+           "[main]
+include = " (file-append foot "/share/foot/themes/modus-operandi") "\n"))))))
+
+  (feature
+   (name 'foot)
+   (values
+    `((foot . ,foot)
+      ,@(if default-terminal?
+            `((default-terminal . ,(file-append foot "/bin/foot")))
+            '())
+      ,@(if backup-terminal?
+            `((backup-terminal . ,(file-append foot "/bin/foot")))
+            '())))
    (home-services-getter get-home-services)))
