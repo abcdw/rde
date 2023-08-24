@@ -85,6 +85,7 @@
    (feature-bash)
    (feature-direnv)
    (feature-git)
+   (feature-guile)
    (feature-ssh)))
 
 (define-public rde-emacs
