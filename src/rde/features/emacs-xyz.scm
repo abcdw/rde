@@ -3688,6 +3688,7 @@ built-in help that provides much more contextual information."
           (emacs-org-modern emacs-org-modern)
           (emacs-org-appear emacs-org-appear)
           (emacs-org-make-toc emacs-org-make-toc)
+          (emacs-ox-html-stable-ids emacs-ox-html-stable-ids)
           (org-directory "~/org")
           (org-capture-templates #f)
           (org-todo-keywords #f)
@@ -3712,6 +3713,7 @@ built-in help that provides much more contextual information."
   (ensure-pred file-like? emacs-org-modern)
   (ensure-pred file-like? emacs-org-appear)
   (ensure-pred file-like? emacs-org-make-toc)
+  (ensure-pred file-like? emacs-ox-html-stable-ids)
 
   (define emacs-f-name 'org)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -3744,6 +3746,9 @@ built-in help that provides much more contextual information."
          (require 'org-refile)
          (require 'org-modern))
 
+        (with-eval-after-load 'ox-html
+          (require 'ox-html-stable-ids)
+          (org-html-stable-ids-add))
         (define-key mode-specific-map (kbd "c") 'org-capture)
         ,@(if (get-value 'emacs-consult-initial-narrowing? config)
               '((autoload 'org-buffer-list "org")
@@ -3906,6 +3911,7 @@ Indentation and refile configurations, visual adjustment."
       #:elisp-packages
       (append
        (list emacs-org emacs-org-contrib
+             emacs-ox-html-stable-ids
              (get-value 'emacs-olivetti config emacs-olivetti)
              emacs-org-appear emacs-org-modern)
        (or (and=> (get-value 'emacs-all-the-icons config) list) '())
