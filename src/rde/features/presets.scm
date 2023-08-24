@@ -121,6 +121,7 @@
     #:erc-autojoin-channels-alist '((Libera.Chat "#rde")))
    (feature-emacs-telega)
    (feature-emacs-elpher)
+   (feature-emacs-webpaste)
 
    (feature-emacs-pdf-tools)
    (feature-emacs-nov-el)
