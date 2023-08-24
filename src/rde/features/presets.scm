@@ -108,7 +108,6 @@
    (feature-emacs-tramp)
    (feature-emacs-project)
    (feature-compile)
-   (feature-emacs-perspective)
    (feature-emacs-input-methods)
    (feature-emacs-which-key)
    (feature-emacs-dired)
