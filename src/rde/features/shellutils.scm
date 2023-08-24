@@ -91,6 +91,7 @@
              :body (format "%s\nBuffer: %s" desc buffer)
              ;; :app-icon nil
              :actions '("focus" "Focus Frame")
+             :timeout 2000
              :on-action 'rde-compile--notification-on-action)))
 
         (add-hook 'compilation-finish-functions 'rde-compile--notify-on-finish)
