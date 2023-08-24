@@ -3,6 +3,7 @@
   #:use-module (rde features bittorrent)
   #:use-module (rde features docker)
   #:use-module (rde features emacs)
+  #:use-module (rde features guile)
   #:use-module (rde features emacs-xyz)
   #:use-module (rde features finance)
   #:use-module (rde features fontutils)
