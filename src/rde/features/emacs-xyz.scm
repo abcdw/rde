@@ -3990,68 +3990,50 @@ Indentation and refile configurations, visual adjustment."
          (org-agenda-skip-function '(or (org-agenda-skip-if nil '(scheduled))))
          (org-agenda-overriding-header "\nBacklog\n")))))))
 
-(define* (feature-emacs-org-agenda-appt)
-  (define emacs-f-name 'org-agenda-appt)
-  (define f-name (symbol-append 'emacs- emacs-f-name))
+(define (org-agenda-appt _)
+  `((defvar rde-org-agenda-appt-timer nil
+      "Timer to update `appt-time-msg-list' from Agenda entries.")
 
-  (define (get-home-services config)
-    (require-value 'emacs-org config)
-    (list
-     (rde-elisp-configuration-service
-      emacs-f-name
-      config
-      `(
-        (defvar rde-org-agenda-appt-timer nil
-          "Timer to update `appt-time-msg-list' from Agenda entries.")
+    (defun rde-org-agenda-to-appt ()
+      "Reset the `appt-mode' list and initialize it from Agenda entries."
+      (interactive)
+      (setq appt-time-msg-list nil)
+      (org-agenda-to-appt))
 
-        (defun rde-org-agenda-to-appt ()
-          "Reset the `appt-mode' list and initialize it from Agenda entries."
-          (interactive)
-          (setq appt-time-msg-list nil)
-          (org-agenda-to-appt))
+    (defun rde-org-agenda-appt-reset ()
+      "Initialize the `appt-mode' list for today and reset the timer."
+      (interactive)
+      (rde-org-agenda-to-appt)
+      (setq rde-org-agenda-appt-timer
+            (run-at-time "24:01" nil 'rde-org-agenda-appt-reset)))
 
-        (defun rde-org-agenda-appt-reset ()
-          "Initialize the `appt-mode' list for today and reset the timer."
-          (interactive)
-          (rde-org-agenda-to-appt)
-          (setq rde-org-agenda-appt-timer
-                (run-at-time "24:01" nil 'rde-org-agenda-appt-reset)))
+    (define-minor-mode rde-org-agenda-appt-mode
+      "Set up `appt-mode' integration for Agenda items."
+      :global t :group 'rde-org-agenda
+      (if rde-org-agenda-appt-mode
+          (progn
+           (setq rde-org-agenda-appt-timer
+                 (rde-org-agenda-appt-reset))
+           (add-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt))
+          (progn
+           (remove-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt)
+           (cancel-timer rde-org-agenda-appt-timer))))
 
-        (define-minor-mode rde-org-agenda-appt-mode
-          "Set up `appt-mode' integration for Agenda items."
-          :global t :group 'rde-org-agenda
-          (if rde-org-agenda-appt-mode
-              (progn
-               (setq rde-org-agenda-appt-timer
-                     (rde-org-agenda-appt-reset))
-               (add-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt))
-              (progn
-               (remove-hook 'org-agenda-finalize-hook 'rde-org-agenda-to-appt)
-               (cancel-timer rde-org-agenda-appt-timer))))
-
-        (rde-org-agenda-appt-mode)
-        (advice-add 'org-redo :after 'rde-org-agenda-to-appt)
-        (add-hook 'org-capture-after-finalize-hook 'rde-org-agenda-to-appt))
-      #:summary "\
-Add appointments from agenda items"
-      #:commentary "\
-A system of reminders, derived from org-agenda-files."
-      #:keywords '(convenience))))
-
-  (feature
-   (name f-name)
-   (values `((,f-name . #t)))
-   (home-services-getter get-home-services)))
+    (rde-org-agenda-appt-mode)
+    (advice-add 'org-redo :after 'rde-org-agenda-to-appt)
+    (add-hook 'org-capture-after-finalize-hook 'rde-org-agenda-to-appt)))
 
 (define* (feature-emacs-org-agenda
           #:key
           (org-agenda-files #f)
           (org-agenda-custom-commands %rde-org-agenda-custom-commands)
-          (org-agenda-prefix-format '()))
+          (org-agenda-prefix-format '())
+          (org-agenda-appt? #f))
   "Configure org-agenda for GNU Emacs."
   (ensure-pred maybe-list? org-agenda-files)
   (ensure-pred list? org-agenda-custom-commands)
   (ensure-pred maybe-list? org-agenda-prefix-format)
+  (ensure-pred boolean? org-agenda-appt?)
 
   (define emacs-f-name 'org-agenda)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -4072,7 +4054,9 @@ A system of reminders, derived from org-agenda-files."
           "Custom enhancements to the Org Agenda."
           :group 'rde)
 
-
+        ,@(if org-agenda-appt?
+              (org-agenda-appt config)
+              '())
         (defun rde-org-agenda-category (&optional len)
           "Get category of the Org Agenda item at point.
 The category is defined by one of the following:
