@@ -4058,6 +4058,10 @@ A system of reminders, derived from org-agenda-files."
 
   (define (get-home-services config)
     (require-value 'emacs-org config)
+    (when (and (get-value 'org-roam-todo? config) org-agenda-files)
+      (raise
+       (formatted-message
+        (G_ "You cannot set org-agenda-files if org-roam-todo? is true"))))
     (list
      (rde-elisp-configuration-service
       emacs-f-name
