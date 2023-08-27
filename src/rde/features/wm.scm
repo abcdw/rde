@@ -328,10 +328,13 @@ frame-title-format."
 (define* (feature-sway-run-on-tty
           #:key
           (sway-tty-number 2)
-          (launch-arguments "2> ${XDG_STATE_HOME}/sway.log"))
-  "Launch Sway on specified tty upon user login.  Also,
-automatically switch to SWAY-TTY-NUMBER on boot."
+          (logfile "${XDG_STATE_HOME}/log/sway.log")
+          (launch-arguments ""))
+  "Launch Sway on specified tty upon user login.  Also, automatically switch
+to SWAY-TTY-NUMBER on boot.  Log errors into LOGFILE. Sway is launched with
+additional LAUNCH-ARGUMENTS."
   (ensure-pred tty-number? sway-tty-number)
+  (ensure-pred string? logfile)
   (ensure-pred string? launch-arguments)
 
   (define (sway-run-on-tty-home-services config)
@@ -363,11 +366,13 @@ automatically switch to SWAY-TTY-NUMBER on boot."
       'sway-run-sway-on-login-to-sway-tty
       home-shell-profile-service-type
       (list
-       #~(format #f "[ $(tty) = /dev/tty~a ] && exec ~a~a~a"
-                 #$sway-tty-number
-                 #$sway-with-env-vars
-                 #$(if (positive? (string-length launch-arguments)) " " "")
-                 #$launch-arguments)))))
+       #~(format
+          #f
+          "[ $(tty) = /dev/tty~a ] && mkdir -p \"$(dirname ~a)\" && exec ~a ~a"
+          #$sway-tty-number
+          #$logfile
+          #$sway-with-env-vars
+          #$(string-join (list launch-arguments "2>" logfile) " "))))))
 
   (define (sway-run-on-tty-system-services _)
     (list
