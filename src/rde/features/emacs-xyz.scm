@@ -5605,7 +5605,8 @@ System."))))
 (define* (feature-emacs-webpaste
           #:key
           (emacs-webpaste emacs-webpaste)
-          (webpaste-providers '("bpa.st" "paste.mozilla.org" "ix.io"))
+          (webpaste-providers '("paste.rs" "bpa.st" "ix.io"
+                                "paste.mozilla.org"))
           (webpaste-key "P"))
   "Configure Webpaste.el, a mode to paste whole buffers or
 parts of buffers to pastebin-like services.
