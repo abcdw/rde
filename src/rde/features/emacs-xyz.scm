@@ -71,6 +71,7 @@
             feature-emacs-shell
             feature-emacs-browse-url
             feature-emacs-tab-bar
+            feature-emacs-power-menu
 
             ;; Completion
             feature-emacs-completion
@@ -1772,6 +1773,129 @@ supply custom menu items in the form of modules.")))
   (feature
    (name f-name)
    (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-power-menu)
+  "Configure a simple power menu for emacs."
+
+  (define emacs-f-name 'power-menu)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (emacs-power-menu config)
+    (require-value 'emacs config)
+    (emacs-minibuffer-program
+     (get-value 'emacs-client config)
+     "power-menu" "power-menu" 'rde-power-menu #:height 7))
+
+  (define (get-home-services config)
+    (require-value 'elogind config)
+    (list
+     (when (get-value 'emacs config)
+       (emacs-xdg-service
+        'power-menu
+        "Emacs (Client) [power-menu]"
+        (emacs-power-menu config)))
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      (let ((candidates-def
+             `((setq
+                rde-power-menu-candidates
+                (append
+                 ,@(if (get-value 'sway config)
+                       `((list
+                          (cons
+                           ,@(if (get-value 'emacs-all-the-icons config)
+                                 '((concat (all-the-icons-faicon "undo")
+                                           " reload sway"))
+                                 '("reload sway"))
+                           (cons
+                            ,(file-append (get-value 'sway config)
+                                          "/bin/swaymsg")
+                            "reload"))
+                          (cons
+                           ,@(if (get-value 'emacs-all-the-icons config)
+                                 '((concat (all-the-icons-faicon "times")
+                                           " exit sway"))
+                                 '("exit sway"))
+                           (cons
+                            ,(file-append (get-value 'sway config)
+                                          "/bin/swaymsg")
+                            "exit"))))
+                       '())
+                 ,@(let ((loginctl (file-append (get-value 'elogind config)
+                                                "/bin/loginctl")))
+                     `((list
+                        (cons
+                         ,@(if (get-value 'emacs-all-the-icons config)
+                               '((concat (all-the-icons-faicon "lock")
+                                         " lock"))
+                               '("lock"))
+                         (cons ,loginctl "lock-session"))
+                        (cons
+                         ,@(if (get-value 'emacs-all-the-icons config)
+                               '((concat (all-the-icons-faicon "pause")
+                                         " suspend"))
+                               '("suspend"))
+                         (cons ,loginctl "suspend"))
+                        (cons
+                         ,@(if (get-value 'emacs-all-the-icons config)
+                               '((concat (all-the-icons-faicon "stop")
+                                         " hibernate"))
+                               '("hibernate"))
+                         (cons ,loginctl "suspend-then-hibernate"))
+                        (cons
+                         ,@(if (get-value 'emacs-all-the-icons config)
+                               '((concat (all-the-icons-faicon "power-off")
+                                         " shutdown"))
+                               '("shutdown"))
+                         (cons ,loginctl "poweroff"))
+                        (cons
+                         ,@(if (get-value 'emacs-all-the-icons config)
+                               '((concat (all-the-icons-faicon "refresh")
+                                         " reboot"))
+                               '("reboot"))
+                         (cons ,loginctl "reboot"))))))))))
+        `(,@(if (get-value 'emacs-all-the-icons config)
+                `((with-eval-after-load
+                      'all-the-icons
+                    ,@candidates-def))
+                `(,@candidates-def))
+          (defun rde-power-menu ()
+            "Prompt for an action on the power-menu, and make this action."
+            (interactive)
+            ,@(if (get-value 'emacs-all-the-icons config)
+                  ,((require 'all-the-icons)) '())
+            (let* ((selected
+                    (completing-read
+                     "power-menu command:"
+                     (lambda (string predicate action)
+                       (if (eq action 'metadata)
+                           `(metadata (display-sort-function . identity))
+                           (complete-with-action action
+                                                 rde-power-menu-candidates
+                                                 string
+                                                 predicate)))))
+                   (command-list (cdr
+                                  (assoc selected rde-power-menu-candidates))))
+              (async-start-process "power-menu"
+                                   (car command-list)
+                                   nil
+                                   (cdr command-list))))))
+      #:summary "Simple power-menu for RDE"
+      #:commentary "\
+Provides the command rde-power-menu, bind to s-Q by default, with the
+following commands:
+lock, suspend, hibernate, shutdown, reboot.
+
+Adds sway-related commands and emacs icons when the feature sway and
+emacs-all-the-icons is in the list of features, respectively."
+      #:authors '("Nicolas Graves <ngraves@ngraves.fr>"))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)
+             (default-power-menu-fn . ,emacs-power-menu)))
    (home-services-getter get-home-services)))
 
 

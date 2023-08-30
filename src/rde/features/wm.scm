@@ -189,6 +189,11 @@
                     (bindsym --to-code $mod+Shift+p exec $pass))
                   '())
 
+            ,@(if (get-value 'default-power-menu-fn config)
+                  `((set $power-menu ,(get-value-eval 'default-power-menu-fn config))
+                    (bindsym --to-code $mod+Shift+q exec $power-menu))
+                  '())
+
             (bindsym $mod+Control+Shift+Return exec $backup-term)
             (bindsym $mod+Return exec $term)
 
