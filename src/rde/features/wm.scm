@@ -27,6 +27,7 @@
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
   #:use-module (rde packages)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages image)
   #:use-module (gnu packages web)
@@ -368,8 +369,12 @@ additional LAUNCH-ARGUMENTS."
       (list
        #~(format
           #f
-          "[ $(tty) = /dev/tty~a ] && mkdir -p \"$(dirname ~a)\" && exec ~a ~a"
+          "[ $(tty) = /dev/tty~a ] && \\
+~a -p \"$(~a ~a)\" && \\
+exec ~a ~a"
           #$sway-tty-number
+          #$(file-append (get-value 'coreutils config coreutils) "/bin/mkdir")
+          #$(file-append (get-value 'coreutils config coreutils) "/bin/dirname")
           #$logfile
           #$sway-with-env-vars
           #$(string-join (list launch-arguments "2>" logfile) " "))))))
