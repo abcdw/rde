@@ -23,3 +23,5 @@
 ;; they are installed and site files are compiled when gccemacs is installed.
 ;; (setq comp-deferred-compilation nil)
 (setq native-comp-jit-compilation nil)
+(startup-redirect-eln-cache
+ (concat (or (getenv "XDG_CACHE_HOME") "~/.cache") "/emacs"))
