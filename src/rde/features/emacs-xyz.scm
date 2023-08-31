@@ -3912,7 +3912,7 @@ built-in help that provides much more contextual information."
 
         (with-eval-after-load 'org-id
           (setq
-           org-id-locations
+           org-id-locations-file
            (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                    "/emacs/org-id-locations")))
 
