@@ -1865,7 +1865,7 @@ supply custom menu items in the form of modules.")))
             "Prompt for an action on the power-menu, and make this action."
             (interactive)
             ,@(if (get-value 'emacs-all-the-icons config)
-                  ,((require 'all-the-icons)) '())
+                  '((require 'all-the-icons)) '())
             (let* ((selected
                     (completing-read
                      "power-menu command:"
