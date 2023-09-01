@@ -28,25 +28,77 @@
   #:use-module (gnu home services xdg)
   #:use-module (gnu packages browser-extensions)
   #:use-module (gnu packages chromium)
+  #:use-module ((gnu packages base) #:select (glibc-utf8-locales))
+  #:use-module (gnu packages bash)
   #:use-module (gnu packages web-browsers)
   #:use-module (gnu services)
   #:use-module (gnu system keyboard)
+  #:use-module (guix build-system trivial)
   #:use-module (guix gexp)
+  #:use-module (guix packages)
   #:use-module (ice-9 match)
   #:export (feature-ungoogled-chromium
             feature-nyxt))
+
+;; The issue with Chromium is that like Libreoffice, all user data is
+;; managed in a single directory in ~/.config by default. The content of this
+;; single directory better matches XDG_STATE_HOME for the most part, but like
+;; most non-XDG compliant big apps, we put it in XDG_DATA_HOME until they are.
 
 (define* (feature-ungoogled-chromium
           #:key
           (ungoogled-chromium ungoogled-chromium/wayland)
           (default-browser? #f)
-          (startup-flags '()))
+          (default-startup-flags '("--user-data-dir=$XDG_DATA_HOME/chromium"))
+          (desktop-startup-flags '("")))
   "Configure the Chromium browser."
   (ensure-pred any-package? ungoogled-chromium)
   (ensure-pred boolean? default-browser?)
-  (ensure-pred list? startup-flags)
+  (ensure-pred list-of-strings? default-startup-flags)
+  (ensure-pred list-of-strings? desktop-startup-flags)
 
   (define f-name 'ungoogled-chromium)
+
+  (define rde-ungoogled-chromium
+    (package
+      (inherit ungoogled-chromium)
+      (inputs
+       (list bash-minimal glibc-utf8-locales ungoogled-chromium))
+      (build-system trivial-build-system)
+      (arguments
+       (list
+        #:modules '((guix build utils))
+        #:builder
+        #~(begin
+            (use-modules (guix build utils))
+            (let* ((bash #$(this-package-input "bash-minimal"))
+                   (chromium #$(this-package-input "ungoogled-chromium-wayland"))
+                   (locales #$(this-package-input "glibc-utf8-locales"))
+                   (exe (string-append #$output "/bin/chromium")))
+
+              ;; Use a Unicode locale so we can substitute the file below.
+              (setenv "GUIX_LOCPATH" (string-append locales "/lib/locale"))
+              (setlocale LC_ALL "en_US.utf8")
+
+              (mkdir-p (dirname exe))
+              (symlink (string-append chromium "/bin/chromedriver")
+                       (string-append #$output "/bin/chromedriver"))
+
+              (call-with-output-file exe
+                (lambda (port)
+                  (format port "#!~a
+exec ~a ~a $@"
+                          (string-append bash "/bin/bash")
+                          (string-append chromium "/bin/chromium")
+                          (string-join '#$default-startup-flags " "))))
+              (chmod exe #o555)
+
+              ;; Provide the manual and .desktop file.
+              (copy-recursively (string-append chromium "/share")
+                                (string-append #$output "/share"))
+              (substitute* (string-append
+                            #$output "/share/applications/chromium.desktop")
+                ((chromium) #$output))))))))
 
   (define (get-home-services config)
     "Return home services related to Ungoogled Chromium."
@@ -56,7 +108,8 @@
           (simple-service
            'set-chromium-as-default-browser
            home-environment-variables-service-type
-           `(("BROWSER" . ,(file-append ungoogled-chromium "/bin/chromium"))))
+           `(("BROWSER" .
+              ,(file-append rde-ungoogled-chromium "/bin/chromium"))))
           (simple-service
            'chromium-xdg-defaults
            home-xdg-mime-applications-service-type
@@ -73,7 +126,7 @@
            f-name
            config
            `((with-eval-after-load 'browse-url
-               (setq browse-url-chromium-arguments ',startup-flags))
+               (setq browse-url-chromium-arguments ',desktop-startup-flags))
              ,@(if (get-value 'emacs-embark config)
                    `((with-eval-after-load 'embark
                        (define-key embark-url-map "c" 'browse-url-chromium)))
@@ -84,7 +137,7 @@
        'add-chromium-packages
        home-profile-service-type
        (list
-        ungoogled-chromium
+        rde-ungoogled-chromium
         ublock-origin/chromium))
       (simple-service
        'add-chromium-xdg-desktop-entry
@@ -99,8 +152,8 @@
            (config
             `((exec . ,#~(string-join
                           (list
-                           #$(file-append ungoogled-chromium "/bin/chromium")
-                           #$@startup-flags "%U")))
+                           #$(file-append rde-ungoogled-chromium "/bin/chromium")
+                           #$@desktop-startup-flags "%U")))
               (terminal . #f)
               (comment . "Access the Internet")))))))))))
 
