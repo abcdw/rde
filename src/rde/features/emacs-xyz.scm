@@ -3649,7 +3649,7 @@ client."
                  (save-excursion
                   (goto-char (point-min))
                   (while (not (eobp))
-                    (when (not (looking-at "^[[:space:]]*$"))
+                    (when (not (looking-at "^[[:space:]-]*$"))
                       (goto-char (line-end-position))
                       (when (> (shr-pixel-column) max-width)
                         (goto-char (line-beginning-position))
