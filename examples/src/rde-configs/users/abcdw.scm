@@ -460,12 +460,16 @@
         "* TODO %:subject %?\nSCHEDULED: %t\n%U\n%a\n"
         :immediate-finish t)
        ("t" "Todo" entry (file+headline "" "Tasks") ;; org-default-notes-file
+        "* TODO %?\nSCHEDULED: %t\n%a\n")
+       ("p" "PhD Todo" entry
+        (file+headline "~/work/abcdw/private/phd.org" "Tasks")
         "* TODO %?\nSCHEDULED: %t\n%a\n")))
     (feature-emacs-org-roam
      ;; TODO: Rewrite to states
      #:org-roam-directory "~/work/abcdw/notes/notes")
     (feature-emacs-org-agenda
      #:org-agenda-files '("~/work/abcdw/private/todo.org"
+                          "~/work/abcdw/private/phd.org"
                           "~/work/abcdw/rde/TODO"))
     (feature-emacs-elfeed
      #:elfeed-org-files '("~/work/abcdw/private/rss.org"))
