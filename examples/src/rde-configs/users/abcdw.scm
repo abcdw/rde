@@ -449,6 +449,8 @@
       (@ (rde packages aspell) hunspell-dict-ru)))
     (feature-emacs-git
      #:project-directory "~/work")
+    ;; https://plaindrops.de/blog/2020/GTDorgmode/
+    ;; https://www.labri.fr/perso/nrougier/GTD/index.html#org2d62325
     (feature-emacs-org
      #:org-directory "~/work/abcdw/private"
      #:org-indent? #f
