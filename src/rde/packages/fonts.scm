@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -73,4 +73,22 @@
     (home-page "https://fonts.google.com/noto/specimen/Noto+Emoji")
     (synopsis "Noto Emoji fonts")
     (description "Monochrome version of Noto Color Emoji fonts.")
+    (license license:silofl1.1)))
+
+(define-public font-iosevka-nerd
+  (package
+    (name "font-iosevka-nerd")
+    (version "3.0.2")
+    (source
+     (origin
+       (method url-fetch/zipbomb)
+       (uri (string-append
+             "https://github.com/ryanoasis/nerd-fonts/releases/download/v"
+             version "/Iosevka.zip"))
+       (sha256
+        (base32 "09zmfksn1qyhc0pql5cvr0nmd8i8swjlipjfhwgf4zs6mdgac3fv"))))
+    (build-system font-build-system)
+    (home-page "https://github.com/ryanoasis/nerd-fonts")
+    (synopsis "Iosevka Nerd Font")
+    (description "Iosevka font with nerd icons.")
     (license license:silofl1.1)))
