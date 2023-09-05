@@ -137,7 +137,6 @@
      "figlet" ;; TODO: Move to emacs-artist-mode
      "calibre"
      "icecat" "nyxt"
-     "ungoogled-chromium-wayland" "ublock-origin-chromium"
 
      "utox" "qtox" "jami"
 
