@@ -427,6 +427,13 @@
      `(fundamental-mode
        ,#~""
        (t (format-time-string "%Y-%m-%d"))
+       (todo
+        (if (derived-mode-p 'lisp-data-mode 'clojure-mode 'scheme-mode)
+            ";;"
+            comment-start)
+        (if (string-suffix-p " " comment-start) "" " ")
+        "TODO"  ": [" user-full-name ", "
+        (format-time-string "%Y-%m-%d") "] ")
        ;; TODO: Move to feature-guix
        ;; ,((@ (rde gexp) slurp-file-like)
        ;;   (file-append ((@ (guix packages) package-source)
