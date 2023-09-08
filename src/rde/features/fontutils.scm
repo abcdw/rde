@@ -88,7 +88,10 @@
           (emacs-fontaine emacs-fontaine)
           (use-serif-for-variable-pitch? #t)
           (extra-fontaine-presets '())
-          (extra-font-packages (list font-gnu-unifont)))
+          ;; font-liberation needed for proper rendering of sites/pdfs using
+          ;; Times, Helvetica, Nimbus.  Use pdffonts from poppler package to
+          ;; check what fonts are needed for pdf.
+          (extra-font-packages (list font-gnu-unifont font-liberation)))
   "Configure fonts.  DEFAULT-FONT-SIZE will be used for making
 font-monospace default value, and it will be ignored if
 #:font-monospace argument is specified."
