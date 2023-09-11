@@ -39,7 +39,7 @@
           (make gnu-make)
           (recompile-key "s-r")
           (notify-on-finish? #t)
-          (buffers-to-ignore '("*grep*")))
+          (buffers-to-ignore '()))
   "Configure compilation tooling."
   (ensure-pred file-like? make)
   (ensure-pred string? recompile-key)
