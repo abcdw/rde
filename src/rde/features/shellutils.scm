@@ -84,6 +84,12 @@
           ;; TODO: Don't send notification on interrupt
           (when (and rde-compile-notify-on-finish-p
                      (not (string= desc "interrupt\n")) ; it is in user focus rn
+                     ;; frame in the focus and buffer is visible
+                     (not
+                      ;; comparing to t make sense because return value can be
+                      ;; not only nil, but also 'unknown
+                      (and (equal t (frame-focus-state (selected-frame)))
+                           (get-buffer-window buffer)))
                      (not (member buffer rde-compile-buffers-to-ignore)))
             (require 'notifications)
             (notifications-notify
