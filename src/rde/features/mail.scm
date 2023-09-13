@@ -340,6 +340,8 @@ Citation line format, message signature, gpg and msmtp configurations. "
                 (port . 587)))
     (hosteurope-de . ((host . "smtp.hosteurope.de")
                       (port . 587)))
+    (posteo . ((host . "posteo.de")
+                       (port . 587)))
     (generic . #f)))
 
 (define %default-msmtp-settings
