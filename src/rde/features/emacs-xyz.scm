@@ -3637,6 +3637,8 @@ application/epub+zip mime-type will be openned with emacs client."
    (home-services-getter get-home-services)))
 
 ;; TODO: Add https://github.com/karthink/elfeed-tube
+;; TODO: [Andrew Tropin 2023-09-05] Add bookmarks intergration for saved searches
+;; TODO: [Andrew Tropin 2023-09-05] Add ratings, faces and other tweaks
 (define* (feature-emacs-elfeed
           #:key
           (emacs-elfeed emacs-elfeed)
@@ -5729,6 +5731,8 @@ System."))))
 (define* (feature-emacs-webpaste
           #:key
           (emacs-webpaste emacs-webpaste)
+          ;; bpa.st has line numbers anchors and huge list of supported langs
+          ;; paste.rs is minimalistic, fast and gives a raw paste by default
           (webpaste-providers '("paste.rs" "bpa.st" "ix.io"
                                 "paste.mozilla.org"))
           (webpaste-key "P"))
