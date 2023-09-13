@@ -182,7 +182,7 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
 
               (with-eval-after-load 'cider-repl
                 (define-key cider-repl-mode-map (kbd "C-M-q") 'indent-sexp)
-                (setq cider-repl-pop-to-buffer-on-connect nil)
+                (setq cider-repl-pop-to-buffer-on-connect 'display-only)
                 ,@(if (get-value 'emacs-advanced-user? config)
                       '((setq cider-repl-display-help-banner nil))
                       '()))
