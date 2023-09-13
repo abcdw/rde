@@ -1089,6 +1089,9 @@ control whether to NOTIFY? when new emails arrive."
 (define hosteurope-de-isync-settings
   (generate-isync-serializer "imap.hosteurope.de" hosteurope-de-folder-mapping))
 
+(define posteo-isync-settings
+  (generate-isync-serializer "posteo.de" gandi-folder-mapping))
+
 (define* (get-ovh-pro-isync-settings
           #:key
           (folder-mapping #f)
@@ -1119,6 +1122,7 @@ control whether to NOTIFY? when new emails arrive."
     (ovh-pro2-fr . ,ovh-pro2-fr-isync-settings)
     (mailbox . ,mailbox-isync-settings)
     (hosteurope-de . ,hosteurope-de-isync-settings)
+    (posteo . ,posteo-isync-settings)
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
