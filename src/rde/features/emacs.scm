@@ -477,6 +477,49 @@ It can contain settings not yet moved to separate features."
                            "--no-splash"
                            (cdr (command-line)))))
 
+  ;; Emacs and emacsclient don't handle stdin properly, in the case they
+  ;; should be used as dmenu. This tiny guile+emacs script behaves like dmenu.
+  (define emacs-dmenu
+    (program-file
+     "emacs-dmenu"
+     #~(begin
+         (use-modules (ice-9 textual-ports) (ice-9 popen))
+         (let* ((raw-input (get-string-all (current-input-port)))
+                (len (string-length raw-input))
+                (clean-input
+                 (if (and (> len 0)
+                          (char=? (string-ref raw-input (- len 1)) #\newline))
+                     (string-drop-right raw-input 1)
+                     raw-input))
+                (count (string-count clean-input #\newline))
+                ;; Always setting display to WAYLAND_DISPLAY can be
+                ;; problematic on non-wayland systems
+                (port (open-input-pipe
+                       (format #f "~a --eval \"\
+(let* ((vertico-count ~a)\
+       (after-make-frame-functions '())\
+       (minibuffer-frame\
+         (make-frame (list (cons 'display (getenv \\\"WAYLAND_DISPLAY\\\"))\
+                           '(name . \\\"dynamic menu - Emacs Client\\\")\
+                           '(minibuffer . only)\
+                           '(width . 120)\
+                           '(height . ~a)))))\
+     (unwind-protect\
+        (with-selected-frame minibuffer-frame\
+          (completing-read \\\"Select: \\\"\
+                          (split-string \\\"~a\\\" \\\"\n\\\")))\
+      (delete-frame minibuffer-frame)))\""
+                               #$emacs-client
+                               (+ 1 count)
+                               (+ 2 count)
+                               clean-input)))
+                ;; Drop surrounding quotes and newline.
+                (selected (string-drop
+                           (string-drop-right (get-string-all port) 2)
+                           1)))
+           (close-port port)
+           (format #t "~a\n" selected)))))
+
   (define emacs-application-launcher
     (emacs-minibuffer-program
      emacs-client "application-launcher" "Application Launcher"
@@ -527,7 +570,8 @@ It can contain settings not yet moved to separate features."
      (simple-service 'emacs-set-default-editor
                      home-environment-variables-service-type
                      `(("ALTERNATE_EDITOR" . ,emacs-editor)
-                       ("VISUAL" . ,emacs-client-no-wait)))
+                       ("VISUAL" . ,emacs-client-no-wait)
+                       ("MENU" . ,emacs-dmenu)))
      (when (get-value 'sway config)
        (simple-service
         'emacs-update-environment-variables-on-sway-start
@@ -544,7 +588,7 @@ It can contain settings not yet moved to separate features."
             (make-feature-values
              standalone-minibuffer-height
              emacs
-             emacs-editor emacs-client
+             emacs-editor emacs-client emacs-dmenu
              emacs-client-create-frame
              emacs-client-no-wait
              emacs-configure-rde-keymaps
