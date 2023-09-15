@@ -4534,6 +4534,7 @@ marginalia annotations."
           #:key
           (emacs-citar emacs-citar)
           (emacs-citar-org-roam emacs-citar-org-roam)
+          (emacs-zotra emacs-zotra)
           (bibtex-dialect 'biblatex)
           (citar-library-paths (list "~/docs/library"))
           (citar-notes-paths (list "~/docs/bib/notes"))
@@ -4544,6 +4545,7 @@ citation management for GNU Emacs."
     (member x '(bibtex biblatex)))
   (ensure-pred file-like? emacs-citar)
   (ensure-pred file-like? emacs-citar-org-roam)
+  (ensure-pred file-like? emacs-zotra)
   (ensure-pred list? citar-library-paths)
   (ensure-pred list? citar-notes-paths)
   (ensure-pred list? global-bibliography)
@@ -4566,6 +4568,18 @@ citation management for GNU Emacs."
 
         (with-eval-after-load 'bibtex
           (setq bibtex-dialect ',bibtex-dialect))
+        (autoload 'zotra-add-entry-from-url "zotra" "" t)
+        (autoload 'zotra-add-entry-from-search "zotra" "" t)
+        (with-eval-after-load 'zotra
+          ;;  This is not a self-contained solution.
+
+          ;; TODO: [Andrew Tropin, 2023-09-14] Need to package
+          ;; translation-server and zotra-cli
+          (setq zotra-url-retrieve-timeout 10)
+          (setq zotra-backend 'curl_translation-server)
+          (setq zotra-default-entry-format ,(symbol->string bibtex-dialect))
+          (setq zotra-default-bibliography ,(car global-bibliography)))
+
         (with-eval-after-load 'oc
           (require 'oc-csl)
           (setq org-cite-global-bibliography (list ,@global-bibliography))
@@ -4629,7 +4643,7 @@ defaults."
       (append
        (if (get-value 'emacs-org-roam config) (list emacs-citar-org-roam) '())
        (or (and=> emacs-all-the-icons list) '())
-       (list emacs-citar)))))
+       (list emacs-citar emacs-zotra)))))
 
   (feature
    (name f-name)
