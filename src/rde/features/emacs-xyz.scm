@@ -40,6 +40,7 @@
   #:use-module (rde serializers elisp)
 
   #:use-module (guix gexp)
+  #:use-module (guix deprecation)
   #:use-module (rde gexp)
   #:use-module (guix packages)
   #:use-module (guix diagnostics)
@@ -107,6 +108,7 @@
             feature-emacs-org
             feature-emacs-org-roam
             feature-emacs-org-agenda
+            feature-emacs-citation
             feature-emacs-citar
             feature-emacs-org-protocol
             feature-emacs-spelling
@@ -4528,7 +4530,7 @@ marginalia annotations."
              (org-roam-todo? . ,org-roam-todo?)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-citar
+(define* (feature-emacs-citation
           #:key
           (emacs-citar emacs-citar)
           (emacs-citar-org-roam emacs-citar-org-roam)
@@ -4536,7 +4538,8 @@ marginalia annotations."
           (citar-library-paths (list "~/docs/library"))
           (citar-notes-paths (list "~/docs/bib/notes"))
           (global-bibliography (list "~/docs/bib/biblio.bib")))
-  "Configure org-cite and citar for GNU Emacs."
+  "Configure org-cite, citar, and other packages related to bibliography and
+citation management for GNU Emacs."
   (define (bibtex-dialect? x)
     (member x '(bibtex biblatex)))
   (ensure-pred file-like? emacs-citar)
@@ -4546,7 +4549,7 @@ marginalia annotations."
   (ensure-pred list? global-bibliography)
   (ensure-pred bibtex-dialect? bibtex-dialect)
 
-  (define emacs-f-name 'citar)
+  (define emacs-f-name 'citation)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
@@ -4616,7 +4619,7 @@ marginalia annotations."
           (define-key map (kbd "b") 'org-cite-insert)
           (define-key map (kbd "n b") 'rde-find-main-bibliography)))
       #:summary "\
-Reference management with emacs and citar"
+Reference and bibliography management with emacs"
       #:commentary "\
 Set org-cite processors and citar configuration, basic keybindings, reasonable
 defaults."
@@ -4630,8 +4633,10 @@ defaults."
 
   (feature
    (name f-name)
-   (values `((,f-name . ,emacs-citar)))
+   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
+
+(define-deprecated/alias feature-emacs-citar feature-emacs-citation)
 
 (define* (feature-emacs-org-protocol)
   "Setup and configure Org-Protocol for Emacs."
