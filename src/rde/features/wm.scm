@@ -46,6 +46,7 @@
   #:use-module (gnu services shepherd)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
+  #:use-module (gnu home services pm)
   #:use-module (rde home services wm)
   #:use-module (rde home services shells)
 
@@ -78,7 +79,8 @@
             feature-swaynotificationcenter
             feature-swayidle
             feature-swaylock
-            feature-kanshi))
+            feature-kanshi
+            feature-batsignal))
 
 
 ;;;
@@ -1116,6 +1118,35 @@ for the main bar."
   (feature
    (name 'kanshi)
    (values `((kanshi . ,kanshi)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; batsignal.
+;;;
+
+(define* (feature-batsignal
+          #:key
+          (warning-level 15)
+          (critical-level 10)
+          (danger-level 5))
+  "Configure desktop notifications for battery status levels."
+  (ensure-pred integer? warning-level)
+  (ensure-pred integer? critical-level)
+  (ensure-pred integer? danger-level)
+
+  (define (get-home-services config)
+    (list
+     (service
+      home-batsignal-service-type
+      (home-batsignal-configuration
+       (warning-level warning-level)
+       (critical-level critical-level)
+       (danger-level danger-level)))))
+
+  (feature
+   (name 'batsignal)
+   (values `((batsignal . #t)))
    (home-services-getter get-home-services)))
 
 ;; [X] feature-sway-run-on-tty
