@@ -4537,7 +4537,7 @@ marginalia annotations."
           (emacs-zotra emacs-zotra)
           (bibtex-dialect 'biblatex)
           (citar-library-paths (list "~/docs/library"))
-          (citar-notes-paths (list "~/docs/bib/notes"))
+          (citar-notes-paths #f)
           (global-bibliography (list "~/docs/bib/biblio.bib")))
   "Configure org-cite, citar, and other packages related to bibliography and
 citation management for GNU Emacs."
@@ -4547,7 +4547,7 @@ citation management for GNU Emacs."
   (ensure-pred file-like? emacs-citar-org-roam)
   (ensure-pred file-like? emacs-zotra)
   (ensure-pred list? citar-library-paths)
-  (ensure-pred list? citar-notes-paths)
+  (ensure-pred maybe-list? citar-notes-paths)
   (ensure-pred list? global-bibliography)
   (ensure-pred bibtex-dialect? bibtex-dialect)
 
@@ -4609,7 +4609,8 @@ citation management for GNU Emacs."
                                   :v-adjust 0.01) . " "))))
                 '())
           (setq citar-library-paths (list ,@citar-library-paths))
-          (setq citar-notes-paths (list ,@citar-notes-paths))
+          (setq citar-notes-paths
+                ,(if citar-notes-paths `(list ,@citar-notes-paths) 'nil))
           (setq citar-bibliography org-cite-global-bibliography))
 
         (autoload 'citar-embark-mode "citar-embark")
