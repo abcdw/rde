@@ -29,7 +29,8 @@
   #:use-module (gnu services databases)
   #:use-module (srfi srfi-1)
   #:export (feature-postgresql
-            feature-sqlite))
+            feature-sqlite)
+  #:re-export (postgresql-role))
 
 (define-public (list-of-postgresql-roles? lst)
   (and (list? lst) (every postgresql-role? lst)))
