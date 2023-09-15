@@ -316,3 +316,29 @@ editing than you would otherwise have."))))
      "Ox-html-stable-ids is an Org export extension package that generates
  HTML with stable ID attributes instead of the random IDs Org's exporter uses
 by default.")))
+
+(define-public emacs-zotra
+  (let ((commit "c63e274950b5975c7d74f5d0df4b1a1e07f9b5f5")
+        (revision "0"))
+    (package
+      (name "emacs-zotra")
+      (version (git-version "1.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/mpedramfar/zotra")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1jy4a8fhfdvk2i9ac18mka3b2hk3x3r8kmvxkhip1ks50s2m71cg"))))
+      (build-system emacs-build-system)
+      (license license:gpl3)
+      (home-page "https://github.com/mpedramfar/zotra")
+      (synopsis "Get bibliographic information from a url")
+      (description
+       "This emacs library provides functions to get bibliographic information
+ from a url and save it into a bibtex file. It also provides a way to obtain a
+ list of attachments (e.g. PDF files) associated with a url. This is done
+ using Zotero translators, but without using the Zotero client."))))
