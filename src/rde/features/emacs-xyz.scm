@@ -4591,12 +4591,15 @@ marginalia annotations."
 
         (autoload 'citar-embark-mode "citar-embark")
         ,@(if (get-value 'emacs-embark config)
-              `((with-eval-after-load 'embark (citar-embark-mode 1)))
+              `((with-eval-after-load 'citar (citar-embark-mode 1)))
               '())
 
         (autoload 'citar-org-roam-mode "citar-org-roam")
         ,@(if (get-value 'emacs-org-roam config)
-              `((with-eval-after-load 'org-roam (citar-org-roam-mode 1)))
+              `((with-eval-after-load 'citar
+                  (setq citar-org-roam-note-title-template
+                        "${title} :: ${author editor}")
+                  (citar-org-roam-mode 1)))
               '())
 
         (defun rde-find-main-bibliography ()
