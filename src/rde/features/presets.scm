@@ -84,6 +84,7 @@
     ;;                  (effect-blur . 7x5)
     ;;                  (clock))
     )
+   (feature-batsignal)
    (feature-imv)
    (feature-mpv)
    (feature-ungoogled-chromium
