@@ -4532,15 +4532,19 @@ marginalia annotations."
           #:key
           (emacs-citar emacs-citar)
           (emacs-citar-org-roam emacs-citar-org-roam)
+          (bibtex-dialect 'biblatex)
           (citar-library-paths (list "~/docs/library"))
           (citar-notes-paths (list "~/docs/bib/notes"))
           (global-bibliography (list "~/docs/bib/biblio.bib")))
   "Configure org-cite and citar for GNU Emacs."
+  (define (bibtex-dialect? x)
+    (member x '(bibtex biblatex)))
   (ensure-pred file-like? emacs-citar)
   (ensure-pred file-like? emacs-citar-org-roam)
   (ensure-pred list? citar-library-paths)
   (ensure-pred list? citar-notes-paths)
   (ensure-pred list? global-bibliography)
+  (ensure-pred bibtex-dialect? bibtex-dialect)
 
   (define emacs-f-name 'citar)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -4557,6 +4561,8 @@ marginalia annotations."
          (require 'oc-biblatex)
          (require 'oc-csl))
 
+        (with-eval-after-load 'bibtex
+          (setq bibtex-dialect ',bibtex-dialect))
         (with-eval-after-load 'oc
           (require 'oc-csl)
           (setq org-cite-global-bibliography (list ,@global-bibliography))
