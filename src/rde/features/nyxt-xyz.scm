@@ -161,11 +161,10 @@
                               ,@%slot-value%))))
           (define-configuration nyxt/mode/blocker:blocker-mode
             ((nyxt/mode/blocker:hostlists
-              (append
-               (list
-                (nyxt/mode/blocker:make-hostlist
-                 :hosts ',blocked-hosts))
-               (list %slot-default%)))))))))))
+              (cons
+               (nyxt/mode/blocker:make-hostlist
+                :hosts ',blocked-hosts)
+               %slot-default%))))))))))
 
   (feature
    (name f-name)
