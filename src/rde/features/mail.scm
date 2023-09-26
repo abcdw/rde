@@ -1069,6 +1069,14 @@ control whether to NOTIFY? when new emails arrive."
     ("spam"    . "Spam")
     ("archive" . "All")))
 
+(define fastmail-folder-mapping
+  '(("inbox"   . "INBOX")
+    ("sent"    . "Sent")
+    ("drafts"  . "Drafts")
+    ("trash"   . "Trash")
+    ("spam"    . "Spam")
+    ("archive" . "Archive")))
+
 (define gmx-fr-isync-settings
   (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
 
@@ -1091,6 +1099,9 @@ control whether to NOTIFY? when new emails arrive."
 
 (define posteo-isync-settings
   (generate-isync-serializer "posteo.de" gandi-folder-mapping))
+
+(define fastmail-isync-settings
+  (generate-isync-serializer "imap.fastmail.com" fastmail-folder-mapping))
 
 (define* (get-ovh-pro-isync-settings
           #:key
@@ -1123,6 +1134,7 @@ control whether to NOTIFY? when new emails arrive."
     (mailbox . ,mailbox-isync-settings)
     (hosteurope-de . ,hosteurope-de-isync-settings)
     (posteo . ,posteo-isync-settings)
+    (fastmail . ,fastmail-isync-settings)
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
