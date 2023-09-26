@@ -342,6 +342,9 @@ Citation line format, message signature, gpg and msmtp configurations. "
                       (port . 587)))
     (posteo . ((host . "posteo.de")
                        (port . 587)))
+    (fastmail . ((host . "smtp.fastmail.com")
+                 (port . 465)
+                 (tls_starttls . off)))
     (generic . #f)))
 
 (define %default-msmtp-settings
