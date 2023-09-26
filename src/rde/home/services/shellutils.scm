@@ -28,8 +28,7 @@
   #:use-module (srfi srfi-26)
 
   #:export (home-zsh-plugin-manager-service-type
-            home-zsh-autosuggestions-service-type
-            home-zsh-direnv-service-type))
+            home-zsh-autosuggestions-service-type))
 
 (define (add-zsh-plugins-load-command packages)
   (home-zsh-extension
