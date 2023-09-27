@@ -1378,6 +1378,7 @@ not appear in the pop-up buffer."
 
 ;; TODO: revisit this package
 ;; https://github.com/larkery/emacs/blob/master/site-lisp/notmuch-attachment-list.el
+;; https://michal.sapka.me/2023/notmuch/
 (define* (feature-notmuch
           #:key
           (get-notmuch-configuration default-get-notmuch-configuration)
