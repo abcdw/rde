@@ -444,12 +444,12 @@ details can be changed later.")
          (loader-package (elisp-configuration-package
                           (symbol->string loader-feature-name)
                           (append
-                           (map (lambda (x)
-                                  `(require ',(car x)))
-                                feature-entries)
                            `(,#~";;;###autoload"
                              (defun ,loader-feature-name ()
                                (interactive)
+                               ,@(map (lambda (x)
+                                        `(require ',(car x)))
+                                      feature-entries)
                                (message "Everything should be loaded now.")))
                            (if autoloads?
                                `(,#~";;;###autoload"
