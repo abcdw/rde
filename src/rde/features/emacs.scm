@@ -435,6 +435,7 @@ It can contain settings not yet moved to separate features."
           (disable-warnings? #t)
           (auto-update-buffers? #t)
           (auto-clean-space? #t)
+          (native-comp? #f)
 
           ;; TODO: Deprecate (can be added via home services)
           (additional-elisp-packages '())
@@ -452,6 +453,7 @@ It can contain settings not yet moved to separate features."
   (ensure-pred boolean? disable-warnings?)
   (ensure-pred boolean? auto-update-buffers?)
   (ensure-pred boolean? auto-clean-space?)
+  (ensure-pred boolean? native-comp?)
   (ensure-pred boolean? emacs-server-mode?)
   (ensure-pred boolean? default-terminal?)
   (ensure-pred boolean? default-application-launcher?)
@@ -558,7 +560,7 @@ It can contain settings not yet moved to separate features."
           (pixel-scroll-precision-mode 1)))
          ;;; TODO: Rebuilding packages with emacs will be useful for
          ;;; native-comp, but some packages fails to build, need to fix them.
-       (native-comp? #f)))
+       (native-comp? native-comp?)))
 
      (simple-service
       'emacs-add-to-init-el
