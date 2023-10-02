@@ -48,15 +48,15 @@
             home-elisp-extension
             make-home-elisp-service-type))
 
-(define file-likes? (list-of file-like?))
+(define list-of-file-likes? (list-of file-like?))
 (define list-of-symbols? (list-of symbol?))
 
 (define (maybe-string? x)
   (or (string? x) (not x)))
 
-(define serialize-file-likes empty-serializer)
 (define serialize-boolean empty-serializer)
 (define serialize-list empty-serializer)
+(define serialize-list-of-file-likes empty-serializer)
 
 ;; TODO: Implement native compilation
 ;; https://git.sr.ht/~whereiseveryone/guixrus/tree/master/item/guixrus/home/services/emacs.scm#L1
@@ -65,7 +65,7 @@
    (package emacs)
    "Emacs package to use.")
   (elisp-packages
-   (file-likes '())
+   (list-of-file-likes '())
    "List of Emacs Lisp packages to install.")
   (rebuild-elisp-packages?
    (boolean #f)
@@ -280,7 +280,7 @@ Emacs metaservice.  Can be used to restart all emacs servers.")
 
 (define-configuration home-emacs-extension
   (elisp-packages
-   (file-likes '())
+   (list-of-file-likes '())
    "List of additional Emacs Lisp packages.")
   (emacs-servers
    (list '())
@@ -512,7 +512,7 @@ feaures and optionally adds a require of itself to init-el.")))
    "List of expressions.  See
 @code{home-emacs-service-type} for more information.")
   (elisp-packages
-   (file-likes '())
+   (list-of-file-likes '())
    "List of additional Emacs Lisp packages.")
   (autoloads?
    (boolean #f)
@@ -540,7 +540,7 @@ feature-loader take care of it.")
    "List of expressions.  See
 @code{home-emacs-service-type} for more information.")
   (elisp-packages
-   (file-likes '())
+   (list-of-file-likes '())
    "List of additional Emacs Lisp packages."))
 
 (define (home-elisp-feature config)
