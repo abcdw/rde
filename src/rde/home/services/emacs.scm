@@ -61,8 +61,8 @@
 ;; TODO: Implement native compilation
 ;; https://git.sr.ht/~whereiseveryone/guixrus/tree/master/item/guixrus/home/services/emacs.scm#L1
 (define-configuration home-emacs-configuration
-  (package
-   (package emacs)
+  (emacs
+   (file-like emacs)
    "Emacs package to use.")
   (elisp-packages
    (list-of-file-likes '())
@@ -70,7 +70,7 @@
   (rebuild-elisp-packages?
    (boolean #f)
    "Rebuild Emacs Lisp packages with version of Emacs specified in
-PACKAGE field.")
+EMACS field.")
   (emacs-servers
    (list '(server))
    "List of emacs named servers.  Use can use @command{emacsclient -s
@@ -168,7 +168,7 @@ inputs."
                    (lambda (p) #f)))
 
 (define (updated-elisp-packages config)
-  (let* ((emacs-package  (home-emacs-configuration-package config))
+  (let* ((emacs-package  (home-emacs-configuration-emacs config))
          (elisp-packages (home-emacs-configuration-elisp-packages config))
 
          (updated-elisp-packages
@@ -182,7 +182,7 @@ inputs."
   (append (updated-elisp-packages config)
           ;; It's important for packages to go first to override
           ;; built-in emacs packages in case of collisions
-          (list (home-emacs-configuration-package config))))
+          (list (home-emacs-configuration-emacs config))))
 
 (define (emacs-shepherd-service config name)
   (shepherd-service
@@ -195,7 +195,7 @@ inputs."
    (requirement '(emacs))
    (start #~(make-forkexec-constructor
              (list #$(file-append
-                      (home-emacs-configuration-package config)
+                      (home-emacs-configuration-emacs config)
                       "/bin/emacs") #$(format #f "--fg-daemon=~a" name))
              #:log-file (string-append
                          (getenv "XDG_STATE_HOME") "/log"

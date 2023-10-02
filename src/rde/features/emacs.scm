@@ -543,7 +543,7 @@ It can contain settings not yet moved to separate features."
      (service
       home-emacs-service-type
       (home-emacs-configuration
-       (package emacs)
+       (emacs emacs)
        (elisp-packages
         (append
          additional-elisp-packages
@@ -637,7 +637,7 @@ environment outside of Guix Home."
      (service
       home-emacs-service-type
       (home-emacs-configuration
-       (package emacs)
+       (emacs emacs)
        (elisp-packages additional-elisp-packages)
        ;;; TODO: Rebuilding packages with emacs will be useful for
        ;;; native-comp, but some packages fails to build, need to fix them.
