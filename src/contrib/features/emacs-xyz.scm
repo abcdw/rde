@@ -23,7 +23,6 @@
   #:use-module (rde features predicates)
   #:use-module (rde home services emacs-xyz)
   #:use-module (gnu home services)
-  #:use-module (gnu home-services emacs)
   #:use-module (gnu services)
   #:use-module (guix gexp)
 
