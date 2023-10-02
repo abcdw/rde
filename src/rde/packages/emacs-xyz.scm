@@ -278,7 +278,6 @@ programming language, powered by the tree-sitter-clojure tree-sitter grammar."))
           (base32
            "1ggrpv5j23m65cm3fjkr3irb9aypxf2hz0jjc5sbvsnfc3iwv601"))))
       (build-system emacs-build-system)
-      (arguments (list #:emacs emacs-next-pgtk))
       (license license:gpl3+)
       (home-page "https://github.com/mickeynp/combobulate.git")
       (synopsis "Structured Editing and Navigation in Emacs")
