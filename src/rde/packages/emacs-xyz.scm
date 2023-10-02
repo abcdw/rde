@@ -239,30 +239,27 @@ to manipulate and navigate hunks.")))
          (delete "emacs-docker-tramp"))))))
 
 (define-public emacs-clojure-ts-mode
-  (let ((commit "c9f1ed357d1cc9b73dfa53ef239a846a7ef17bd2")
-        (revision "0"))
-    (package
-      (name "emacs-clojure-ts-mode")
-      (version (git-version "0.0.1" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://github.com/clojure-emacs/clojure-ts-mode.git")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32
-           "1nm4g9pxami5liib0y1apngarphpggf7fvq4hi661vlcfpqg22kq"))))
-      (build-system emacs-build-system)
-      (arguments (list #:emacs emacs-next-pgtk))
-      (license license:gpl3+)
-      (home-page "https://github.com/clojure-emacs/clojure-ts-mode.git")
-      (synopsis "Major mode for Clojure code backed up by Tree-sitter")
-      (description "\
+  (package
+    (name "emacs-clojure-ts-mode")
+    (version "0.2.0")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/clojure-emacs/clojure-ts-mode.git")
+             (commit (string-append "v" version))))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "101c1xwrmkb9rq713jij105117y2d0ffiplxsnb3z1h2pgcil0p8"))))
+    (build-system emacs-build-system)
+    (license license:gpl3+)
+    (home-page "https://github.com/clojure-emacs/clojure-ts-mode.git")
+    (synopsis "Major mode for Clojure code backed up by Tree-sitter")
+    (description "\
 clojure-ts-mode is an Emacs major mode that provides font-lock (syntax
 highlighting), indentation, and navigation support for the Clojure(Script)
-programming language, powered by the tree-sitter-clojure tree-sitter grammar."))))
+programming language, powered by the tree-sitter-clojure tree-sitter grammar.")))
 
 (define-public emacs-combobulate
   (let ((commit "2e11f429349a4ac1f211dd612d8686081bc7c320")
