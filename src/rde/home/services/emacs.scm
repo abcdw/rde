@@ -54,6 +54,7 @@
 (define (maybe-string? x)
   (or (string? x) (not x)))
 
+(define serialize-alist empty-serializer)
 (define serialize-boolean empty-serializer)
 (define serialize-list empty-serializer)
 (define serialize-list-of-file-likes empty-serializer)
@@ -67,6 +68,12 @@
   (elisp-packages
    (list-of-file-likes '())
    "List of Emacs Lisp packages to install.")
+  (elisp-packages-rewrites
+   (alist '())
+   "Alist of package-input-rewrite/spec specification that will be applied to
+all ELISP-PACKAGES.  This can be used to replace any package in all packages
+definitions, and is particularly useful to exclude some packages from
+native-compilation.")
   (native-comp?
    (boolean #f)
    "Rebuild Emacs Lisp packages with version of Emacs specified in
@@ -147,9 +154,10 @@ Same as @code{init-el}, but result will go to @file{early-init.el}."))
 
 (define (updated-elisp-packages config)
   (map (if (home-emacs-configuration-native-comp? config)
-           (package-input-rewriting
-            `((,emacs-minimal
-               . ,(home-emacs-configuration-emacs config))))
+           (package-input-rewriting/spec
+            (append
+             `(("emacs" . ,(const (home-emacs-configuration-emacs config))))
+             (home-emacs-configuration-elisp-packages-rewrites config)))
            identity)
        (let ((elisp-packages (home-emacs-configuration-elisp-packages config)))
          (concatenate
