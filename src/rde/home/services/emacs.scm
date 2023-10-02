@@ -67,7 +67,7 @@
   (elisp-packages
    (list-of-file-likes '())
    "List of Emacs Lisp packages to install.")
-  (rebuild-elisp-packages?
+  (native-comp?
    (boolean #f)
    "Rebuild Emacs Lisp packages with version of Emacs specified in
 EMACS field.")
@@ -172,7 +172,7 @@ inputs."
          (elisp-packages (home-emacs-configuration-elisp-packages config))
 
          (updated-elisp-packages
-          (if (home-emacs-configuration-rebuild-elisp-packages? config)
+          (if (home-emacs-configuration-native-comp? config)
               (map (emacs-argument-updater emacs-package)
                    elisp-packages)
               elisp-packages)))

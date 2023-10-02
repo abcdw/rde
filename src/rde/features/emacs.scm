@@ -558,7 +558,7 @@ It can contain settings not yet moved to separate features."
           (pixel-scroll-precision-mode 1)))
          ;;; TODO: Rebuilding packages with emacs will be useful for
          ;;; native-comp, but some packages fails to build, need to fix them.
-       (rebuild-elisp-packages? #f)))
+       (native-comp? #f)))
 
      (simple-service
       'emacs-add-to-init-el
@@ -641,7 +641,7 @@ environment outside of Guix Home."
        (elisp-packages additional-elisp-packages)
        ;;; TODO: Rebuilding packages with emacs will be useful for
        ;;; native-comp, but some packages fails to build, need to fix them.
-       (rebuild-elisp-packages? #f)))
+       (native-comp? #f)))
 
      (rde-elisp-configuration-service
       'rde-emacs-portable
