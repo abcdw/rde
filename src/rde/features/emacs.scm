@@ -437,7 +437,7 @@ It can contain settings not yet moved to separate features."
           (disable-warnings? #t)
           (auto-update-buffers? #t)
           (auto-clean-space? #t)
-          (native-comp? #f)
+          (native-comp? #t)
 
           ;; TODO: Deprecate (can be added via home services)
           (additional-elisp-packages '())
@@ -560,8 +560,6 @@ It can contain settings not yet moved to separate features."
           ;; FIXME: Move it back to the configure-rde-emacs package, when it
           ;; will be built with emacs-29
           (pixel-scroll-precision-mode 1)))
-         ;;; TODO: Rebuilding packages with emacs will be useful for
-         ;;; native-comp, but some packages fails to build, need to fix them.
        (native-comp? native-comp?)))
 
      (simple-service

@@ -59,8 +59,6 @@
 (define serialize-list empty-serializer)
 (define serialize-list-of-file-likes empty-serializer)
 
-;; TODO: Implement native compilation
-;; https://git.sr.ht/~whereiseveryone/guixrus/tree/master/item/guixrus/home/services/emacs.scm#L1
 (define-configuration home-emacs-configuration
   (emacs
    (file-like emacs)
