@@ -4622,7 +4622,7 @@ citation management for GNU Emacs."
         ,@(if (get-value 'emacs-org-roam config)
               `((with-eval-after-load 'citar
                   (setq citar-org-roam-note-title-template
-                        "${title} :: ${author editor}")
+                        "${title} - ${author editor}")
                   (citar-org-roam-mode 1)))
               '())
 
