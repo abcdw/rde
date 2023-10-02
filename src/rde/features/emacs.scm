@@ -86,7 +86,8 @@ dependency for other packages."
           #:key
           summary authors url keywords commentary
           (early-init '())
-          (elisp-packages '()))
+          (elisp-packages '())
+          (elisp-packages-rewrites '()))
   "Adds a configure-NAME package to the profile and emacs load path and if
 emacs-portable? rde value is present adds autoloads cookies to each expression
 of it, otherwise adds a require to @file{init.el}."
@@ -98,6 +99,7 @@ of it, otherwise adds a require to @file{init.el}."
     (config elisp-expressions)
     (early-init early-init)
     (elisp-packages elisp-packages)
+    (elisp-packages-rewrites elisp-packages-rewrites)
     (authors (or authors '("Andrew Tropin <andrew@trop.in>")))
     (url (or url "https://trop.in/rde"))
     (summary summary)
