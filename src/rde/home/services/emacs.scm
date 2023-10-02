@@ -338,6 +338,7 @@ extensible, self-documenting editor.")))
           #:key
           summary authors maintainers url keywords commentary
           (elisp-packages '())
+          (elisp-packages-rewrites '())
           (autoloads? #f))
   "Takes a list of Elisp expressions, creates emacs-NAME package.
 When autoloads? is @code{#t} adds @code{#~\";;;###autoload\"} before each
@@ -502,6 +503,11 @@ feaures and optionally adds a require of itself to init-el.")))
   (elisp-packages
    (list-of-file-likes '())
    "List of additional Emacs Lisp packages.")
+  (elisp-packages-rewrites
+   (alist '())
+   "Alist of additional package-input-rewrite/spec specification that will be
+applied to all @code{elisp-packages}.  This can be used to replace any package
+in all packages definitions.")
   (autoloads?
    (boolean #f)
    "Add autoload cookies to all items in config.  Usually not needed as
@@ -540,6 +546,8 @@ feature-loader take care of it.")
        (symbol->string name)
        (home-elisp-configuration-config config)
        #:elisp-packages (home-elisp-configuration-elisp-packages config)
+       #:elisp-packages-rewrites
+       (home-elisp-configuration-elisp-packages-rewrites config)
        #:autoloads? (home-elisp-configuration-autoloads? config)
        #:summary (home-elisp-configuration-summary config)
        #:commentary (home-elisp-configuration-commentary config)
