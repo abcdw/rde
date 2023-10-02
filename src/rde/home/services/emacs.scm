@@ -145,38 +145,18 @@ would yield something like:
    "List of expressions, each expression can be a Sexp or Gexp.
 Same as @code{init-el}, but result will go to @file{early-init.el}."))
 
-
-(define ((update-emacs-argument-for-package target-emacs) p)
-  "Set @code{#:emacs} to EMACS-PACKAGE for package P.  To build elisp
-packages with proper GNU Emacs version."
-  (if (equal?
-       (package-build-system p)
-       emacs-build-system)
-      (package
-        (inherit p)
-        (arguments
-         (substitute-keyword-arguments (package-arguments p)
-           ((#:emacs e #f) target-emacs))))
-      p))
-
-(define (emacs-argument-updater target-emacs)
-  "Recursively updates @code{#:emacs} argument for package and all the
-inputs."
-  ;; Alternative solution compilation with other emacs version
-  ;; https://yhetil.org/20221021192458.4956-1-paren@disroot.org
-  (package-mapping (update-emacs-argument-for-package target-emacs)
-                   (lambda (p) #f)))
-
 (define (updated-elisp-packages config)
-  (let* ((emacs-package  (home-emacs-configuration-emacs config))
-         (elisp-packages (home-emacs-configuration-elisp-packages config))
-
-         (updated-elisp-packages
-          (if (home-emacs-configuration-native-comp? config)
-              (map (emacs-argument-updater emacs-package)
-                   elisp-packages)
-              elisp-packages)))
-    updated-elisp-packages))
+  (map (if (home-emacs-configuration-native-comp? config)
+           (package-input-rewriting
+            `((,emacs-minimal
+               . ,(home-emacs-configuration-emacs config))))
+           identity)
+       (let ((elisp-packages (home-emacs-configuration-elisp-packages config)))
+         (concatenate
+          (cons elisp-packages
+                (map (compose (cute map second <>)
+                              package-transitive-propagated-inputs)
+                     elisp-packages))))))
 
 (define (add-emacs-packages config)
   (append (updated-elisp-packages config)
