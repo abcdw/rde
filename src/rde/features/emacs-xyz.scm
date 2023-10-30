@@ -2482,12 +2482,15 @@ This configuration packages is not actively maintained right now."
           #:key
           (emacs-corfu emacs-corfu)
           (emacs-corfu-doc emacs-corfu-doc)
+          (emacs-corfu-candidate-overlay emacs-corfu-candidate-overlay)
           (turn-on? #t)
+          (corfu-candidate-overlay #f)
           (corfu-auto #t)
           (corfu-doc-auto #f))
   "Configure corfu completion UI for GNU Emacs."
   (ensure-pred file-like? emacs-corfu)
   (ensure-pred file-like? emacs-corfu-doc)
+  (ensure-pred file-like? emacs-corfu-candidate-overlay)
   (ensure-pred boolean? turn-on?)
   (ensure-pred boolean? corfu-auto)
   (ensure-pred boolean? corfu-doc-auto)
@@ -2501,7 +2504,8 @@ This configuration packages is not actively maintained right now."
       emacs-f-name
       config
       `((eval-when-compile
-         (require 'corfu))
+         (require 'corfu)
+         (require 'corfu-candidate-overlay))
 
         (with-eval-after-load
          'corfu
@@ -2509,7 +2513,8 @@ This configuration packages is not actively maintained right now."
          (setq corfu-cycle t)
          (setq corfu-quit-no-match t)
 
-         (setq corfu-auto ,(if corfu-auto 't 'nil))
+         (setq corfu-auto ,(if (and corfu-auto (not corfu-candidate-overlay))
+                               't 'nil))
          ;; '((define-key corfu-map (kbd "SPC") 'corfu-insert-separator))
 
          ;; (define-key corfu-map (kbd "C-e") 'corfu-insert)
@@ -2536,11 +2541,21 @@ This configuration packages is not actively maintained right now."
          (add-hook 'corfu-mode-hook 'corfu-doc-mode))
 
         (autoload 'global-corfu-mode "corfu")
+        (autoload 'corfu-candidate-overlay-mode "corfu-candidate-overlay")
         ;; FIXME: Fix override of vertico completion in region.
         ,@(if turn-on?
-              '((if after-init-time
-                    (global-corfu-mode 1)
-                    (add-hook 'after-init-hook 'global-corfu-mode)))
+              `((if after-init-time
+                    (progn
+                     ,@(if corfu-candidate-overlay
+                          `((corfu-candidate-overlay-mode 1))
+                          '())
+                     (global-corfu-mode 1))
+                    (progn
+                     ,@(if corfu-candidate-overlay
+                           `((add-hook 'after-init-hook
+                                       'corfu-candidate-overlay-mode))
+                           '())
+                     (add-hook 'after-init-hook 'global-corfu-mode))))
               '()))
       #:summary "\
 Flexible in-buffer (overlay) completion interface"
@@ -2548,6 +2563,7 @@ Flexible in-buffer (overlay) completion interface"
 It shows `completion-at-point' candidates in overlay frame."
       #:keywords '(convenience completion)
       #:elisp-packages (list (get-value 'emacs-consult config emacs-consult)
+                             emacs-corfu-candidate-overlay
                              emacs-corfu emacs-corfu-doc))))
 
   (feature
