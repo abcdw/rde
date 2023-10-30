@@ -4244,7 +4244,6 @@ result is longer than LEN."
           (setq org-agenda-current-time-string
                 "⭠ now ─────────────────────────────────────────────────")
           (setq org-agenda-start-with-log-mode t)
-          (setq org-agenda-window-setup 'current-window)
           (setq org-agenda-dim-blocked-tasks t)
           (setq org-agenda-skip-scheduled-if-done nil)
           (setq org-agenda-skip-deadline-if-done nil)
