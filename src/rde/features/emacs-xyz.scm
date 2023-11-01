@@ -97,6 +97,7 @@
             feature-emacs-geiser
             feature-emacs-guix
             feature-emacs-xref
+            feature-emacs-treebundel
 
             ;; Reading
             feature-emacs-pdf-tools
@@ -3492,6 +3493,29 @@ and references in your programs."
                 '((setq xref-show-xrefs-function 'consult-xref)
                   (setq xref-show-definitions-function 'consult-xref))
                 '()))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-treebundel
+          #:key
+          (emacs-treebundel emacs-treebundel)
+          (treebundel-workspace-root "~/workspaces"))
+  "Configure treebundel for GNU Emacs."
+  (ensure-pred file-like? emacs-treebundel)
+
+  (define emacs-f-name 'treebundel)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((setq treebundel-workspace-root ,treebundel-workspace-root))
+      #:elisp-packages (list emacs-treebundel))))
 
   (feature
    (name f-name)
