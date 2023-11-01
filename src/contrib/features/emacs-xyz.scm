@@ -32,7 +32,8 @@
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages emacs-xyz)
 
-  #:export (feature-emacs-evil))
+  #:export (feature-emacs-evil
+            feature-emacs-undo-fu-session))
 
 
 (define* (feature-emacs-evil
@@ -209,6 +210,42 @@ modus-vivendi-tinted.")))
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-evil)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-undo-fu-session
+          #:key
+          (emacs-undo-fu-session emacs-undo-fu-session))
+  "Save & recover undo steps between Emacs sessions."
+  (ensure-pred file-like? emacs-undo-fu-session)
+
+  (define emacs-f-name 'undo-fu-session)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (require-value 'xdg-base-directories-configuration config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((eval-when-compile (require 'undo-fu-session))
+        (autoload 'undo-fu-session-global-mode "undo-fu-session")
+        ;; This hack is necessary for the rde-package to be built. The call to
+        ;; the global mode tries to ensure existence of a directory, which
+        ;; breaks the build with /homeless-shelter. But we can't set the
+        ;; undo-fu-session-directory to /tmp permanently either.
+        (setq undo-fu-session-directory
+              (if (getenv "XDG_CACHE_HOME")
+                  (concat (getenv "XDG_CACHE_HOME") "/emacs/undo-fu-session")
+                  "/tmp"))
+        (setq undo-fu-session-file-limit 1000)
+        (undo-fu-session-global-mode 1))
+      #:elisp-packages (list emacs-undo-fu-session)
+      #:summary "Save & recover undo steps between Emacs sessions."
+      #:authors '("Nicolas Graves <ngraves@ngraves.fr>"))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
 ;;; emacs-xyz.scm end here
