@@ -2107,7 +2107,11 @@ parses its input."
                         '(read-from-minibuffer
                           read-key-sequence
                           save-some-buffers yes-or-no-p))
-                  (setq mini-frame-ignore-commands '()))
+                  (setq mini-frame-ignore-commands
+                        '(consult-line consult-line-multi consult-outline
+                          consult-imenu consult-imenu-multi consult-history
+                          consult-git-grep consult-ripgrep consult-grep
+                          embark-bindings)))
 
                  (autoload 'mini-frame-mode "mini-frame")
                  (if after-init-time
