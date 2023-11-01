@@ -201,23 +201,6 @@ Emacs metaservice.  Can be used to restart all emacs servers.")
             (home-emacs-configuration-emacs-servers config)))
       '()))
 
-;; (define* (mixed-text-file name #:rest text)
-;;   "Return an object representing store file NAME containing TEXT.  TEXT is a
-;; sequence of strings and file-like objects, as in:
-
-;;   (mixed-text-file \"profile\"
-;;                    \"export PATH=\" coreutils \"/bin:\" grep \"/bin\")
-
-;; This is the declarative counterpart of 'text-file*'."
-;;   (define build
-;;     (gexp (call-with-output-file (ungexp output "out")
-;;             (lambda (port)
-;;               ;; TODO: Upstream the fix?
-;;               (set-port-encoding! port "UTF-8")
-;;               (display (string-append (ungexp-splicing text)) port)))))
-
-;;   (computed-file name build))
-
 (define (get-emacs-configuration-files config)
   (let* ((xdg-flavor? (home-emacs-configuration-xdg-flavor? config)))
     (define prefix-file
