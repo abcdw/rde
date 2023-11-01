@@ -2232,7 +2232,8 @@ Annotations for completion candidates using marginalia."
              (emacs-cape . ,emacs-cape)
              (emacs-embark . ,emacs-embark)
              (emacs-consult . ,emacs-consult)
-             (emacs-consult-initial-narrowing? . ,consult-initial-narrowing?)))
+             (emacs-consult-initial-narrowing? . ,consult-initial-narrowing?)
+             (emacs-mini-frame? . ,mini-frame?)))
    (home-services-getter get-home-services)))
 
 

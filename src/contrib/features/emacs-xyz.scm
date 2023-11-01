@@ -175,7 +175,26 @@ recommended RDE experience is to rely on Emacs default keybindings."
           (with-eval-after-load
               'evil-org
             (require 'evil-org-agenda)
-            (evil-org-agenda-set-keys))))
+            (evil-org-agenda-set-keys))
+          ,@(if (get-value 'emacs-mini-frame? config)
+                `((with-eval-after-load
+                      'mini-frame
+                    (dolist (element
+                                '(evil-change
+                                  evil-delete
+                                  evil-org-delete
+                                  evil-yank
+                                  evil-find-char
+                                  evil-find-char-backward
+                                  evil-record-macro
+                                  evil-replace
+                                  evil-org-replace
+                                  evil-indent
+                                  evil-fill
+                                  evil-fill-and-move
+                                  evil-use-register))
+                            (push element mini-frame-ignore-commands))))
+                '())))
       #:elisp-packages (list emacs-evil emacs-evil-collection emacs-evil-org
                              emacs-evil-commentary emacs-evil-surround
                              emacs-undo-fu)
