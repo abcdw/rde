@@ -431,6 +431,7 @@ It can contain settings not yet moved to separate features."
              (if (get-value 'emacs-auto-clean-space? config)
                  (list emacs-ws-butler) '())))))
 
+;; https://idiomdrottning.org/bad-emacs-defaults
 (define* (feature-emacs
           #:key
           (emacs %default-emacs-package)

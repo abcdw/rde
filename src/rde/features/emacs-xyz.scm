@@ -3840,6 +3840,7 @@ built-in help that provides much more contextual information."
 
 (define --Notetaking--)
 
+;; https://cmdln.org/2023/03/25/how-i-org-in-2023/
 (define* (feature-emacs-org
           #:key
           (emacs-org-modern emacs-org-modern)
