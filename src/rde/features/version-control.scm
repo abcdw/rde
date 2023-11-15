@@ -32,6 +32,8 @@
     (let ((gpg-sign-key (or git-gpg-sign-key
                             (get-value 'gpg-primary-key config))))
       (when sign-commits?
+        ;; TODO: Make a more detailed exception, which tells that user either
+        ;; need to provide a correct key or set sign-commits? to #f
         (ensure-pred string? gpg-sign-key))
       (list
        (when git-send-email?
