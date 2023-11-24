@@ -4553,7 +4553,7 @@ the node, relative to `org-roam-directory'."
           (define-key map (kbd "n C") 'org-roam-capture)))
 
       #:summary "\
-Knowlede base, note-taking set up and ready"
+Knowledge base, note-taking set up and ready"
       #:commentary "\
 Set roam directory, basic keybindings, reasonable defaults and adjust
 marginalia annotations."
