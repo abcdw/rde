@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -219,6 +219,8 @@ feature-ssh."
      (simple-service 'network-manager-applet-package
                      home-profile-service-type
                      (list network-manager-applet))
+     ;; TODO: Disable nm-applet notification by default
+     ;; gsettings set org.gnome.nm-applet disable-connected-notifications true
      (simple-service
       'networking-nm-applet-shepherd-service
       home-shepherd-service-type
