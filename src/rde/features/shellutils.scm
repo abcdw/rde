@@ -74,7 +74,6 @@
         (autoload 'recompile "compile")
         (define-key global-map (kbd ,recompile-key) 'recompile)
 
-        (add-hook 'compilation-start-hook 'toggle-truncate-lines)
         (add-hook 'compilation-filter-hook 'rde-compile-ansi-color-apply)
 
         (defun rde-compile--notification-on-action (id key)
