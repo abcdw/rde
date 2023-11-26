@@ -2838,8 +2838,8 @@ on the current project."
             (call-interactively 'compile nil (and comint (vector (list 4))))))
 
         (setq rde-project-dominating-files ',project-extra-dominating-files)
-        (add-hook 'project-find-functions 'project-try-vc)
         (add-hook 'project-find-functions 'rde-project-custom-root)
+        (add-hook 'project-find-functions 'project-try-vc)
         (advice-add 'project-compile :override 'rde-project-compile)
 
         (define-key global-map (kbd "s-p") project-prefix-map)
