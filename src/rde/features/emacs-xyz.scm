@@ -2865,6 +2865,7 @@ on the current project."
           (setq project-list-file
                 (expand-file-name "emacs/projects"
                                   (or (xdg-cache-home) "~/.cache")))
+          (setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
           (add-to-list 'project-switch-commands '(project-compile "Compile") t)))
       #:summary "\
 Enchancements for project management with project.el"
