@@ -4392,8 +4392,9 @@ If NODE doesn't exist, create a new org-roam node with REF."
          :templates org-roam-capture-templates
          :props '(:finalize find-file))))
 
-    (add-hook 'org-roam-find-file-hook 'rde-org-roam-update-todo-tag)
-    (add-hook 'before-save-hook 'rde-org-roam-update-todo-tag)
+    (with-eval-after-load 'org-roam
+      (add-hook 'org-roam-find-file-hook 'rde-org-roam-update-todo-tag)
+      (add-hook 'before-save-hook 'rde-org-roam-update-todo-tag))
     (advice-add 'org-agenda :before 'rde-org-roam-update-todo-files)))
 
 ;; TODO: rewrite to states
