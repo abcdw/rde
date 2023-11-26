@@ -53,9 +53,7 @@ on-the-fly thumbnail generation for progress bar."
   (define f-name 'mpv)
 
   (define (get-home-services config)
-    (require-value 'fonts config)
-    (define font-sans-serif (font-name (get-value 'font-sans config)))
-
+    (define font-sans-serif (and=> (get-value 'font-sans config) font-name))
     (append
      (if uosc?
          (list
@@ -98,8 +96,10 @@ on-the-fly thumbnail generation for progress bar."
         (mpv mpv)
         (mpv-conf
          `((global ((script . ,(file-append mpv-mpris "/lib/mpris.so"))
-                    (osd-font . ,font-sans-serif)
-                    (sub-font . ,font-sans-serif)))))))
+                    ,@(if font-sans-serif
+                          `((osd-font . ,font-sans-serif)
+                            (sub-font . ,font-sans-serif))
+                          '())))))))
       (simple-service
        'add-mpv-mime-entries
        home-xdg-mime-applications-service-type
