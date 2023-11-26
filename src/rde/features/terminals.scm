@@ -194,7 +194,10 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
          ,(mixed-text-file
            "foot.ini"
            "pad = 10x5\n"
-           "font=monospace:size=" (number->string (font-size font-mono)) "\n"
+           (if font-mono
+               (string-append "font=monospace:size="
+                              (number->string (font-size font-mono)) "\n")
+               "")
            ;; "dpi-aware = yes\n" ; use dpi instead of output scaling factor
            "[main]
 include = " (file-append foot "/share/foot/themes/modus-operandi") "\n"))))))
