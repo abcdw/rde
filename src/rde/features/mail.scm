@@ -58,6 +58,8 @@
             mail-account-id
             mail-account-type
             mail-account-fqda
+            mail-account-aliases
+            mail-account-get-addresses
             mail-account-user
             mail-account-get-user
             mail-account-synchronizer
@@ -98,6 +100,9 @@ scenarios, during generation of @file{mbsyncrc} for example.")
   (fqda
    (string #f)
    "Email address. @code{\"someone@example.com\"} for example.")
+  (aliases
+   (list-of-strings '())
+   "Aliases for @code{fqda}. @code{'(\"admin@example.com\")} for example.")
   (user
    (maybe-string #f)
    "User name.  Will default to @code{fqda}.")
@@ -119,6 +124,12 @@ field."))
 present."
   (or (mail-account-user account)
       (mail-account-fqda account)))
+
+(define (mail-account-get-addresses account)
+  "Return a list containing fqda and aliases combined together."
+  (cons
+   (mail-account-fqda account)
+   (mail-account-aliases account)))
 
 (define-configuration/no-serialization mailing-list
   (id
@@ -402,15 +413,19 @@ Example:
          mixed-text-file
          "msmtp-config"
          msmtp-settings
-          (map
+          (append-map
            (lambda (acc)
-             (string-append
-              "\n"
-              "account " (symbol->string (mail-account-id acc)) "\n"
-              "from " (mail-account-fqda acc) "\n"
-              "user " (mail-account-get-user acc) "\n"
-              "passwordeval " (mail-account-get-pass-cmd acc) "\n"
-              (msmtp-serializer msmtp-provider-settings acc)))
+             (map
+              (lambda (address)
+                (string-append
+                 "\n"
+                 "account " (symbol->string (mail-account-id acc))
+                 "-" address "\n"
+                 "from " address "\n"
+                 "user " (mail-account-get-user acc) "\n"
+                 "passwordeval " (mail-account-get-pass-cmd acc) "\n"
+                 (msmtp-serializer msmtp-provider-settings acc)))
+              (mail-account-get-addresses acc)))
            mail-accs)))))
 
      (when (get-value 'git-send-email? config)
@@ -1009,6 +1024,7 @@ control whether to NOTIFY? when new emails arrive."
 
   (define (isync-settings mail-directory mail-account)
     (let* ((id       (mail-account-id mail-account))
+           (account  (symbol->string id))
            (user     (mail-account-get-user mail-account))
            (pass-cmd (mail-account-get-pass-cmd mail-account)))
       `(,#~(string-append "# Account '" #$(symbol->string id)
@@ -1029,8 +1045,8 @@ control whether to NOTIFY? when new emails arrive."
         ,#~""
         (MaildirStore ,(symbol-append id '-local))
         (SubFolders ,subfolders)
-        (Path ,(string-append mail-directory "/accounts/" user "/"))
-        (Inbox ,(string-append mail-directory "/accounts/" user "/inbox"))
+        (Path ,(string-append mail-directory "/accounts/" account "/"))
+        (Inbox ,(string-append mail-directory "/accounts/" account "/inbox"))
         ,#~""
         ,@(isync-group-with-channels id folders-mapping))))
   isync-settings)
@@ -1217,7 +1233,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
         #~(map mkdir-p
                '#$(map (lambda (acc)
                          (string-append mail-directory "/accounts/"
-                                        (mail-account-fqda acc)))
+                                        (symbol->string (mail-account-id acc))))
                        mail-accounts)))
        (service
         home-isync-service-type
@@ -1260,7 +1276,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
     (map (lambda (x)
            (format
             #f "notmuch tag +~a -- path:accounts/~a/** and tag:new"
-            (mail-account-id x) (mail-account-fqda x)))
+            (mail-account-id x) (mail-account-id x)))
          mail-accounts))
 
   (define tag-updates-post
@@ -1437,10 +1453,22 @@ not appear in the pop-up buffer."
   (define f-name 'notmuch)
 
   (define (get-home-services config)
-    (define emails (map mail-account-fqda (get-value 'mail-accounts config)))
+    (define emails
+      (append-map
+       mail-account-get-addresses
+       (get-value 'mail-accounts config)))
 
     (define fcc-dirs
-      (map (lambda (x) (cons x (string-append "accounts/" x "/sent"))) emails))
+      (append-map
+       (lambda (account)
+         ;; email address can differ from user name, also it can be a few
+         ;; email addresses attached to on user name.
+         (let ((dir (string-append
+                     "accounts/"
+                     (symbol->string (mail-account-id account)) "/sent")))
+           (map (lambda (x) (cons x dir))
+                (mail-account-get-addresses account))))
+       (get-value 'mail-accounts config)))
 
     (list
      (simple-service
