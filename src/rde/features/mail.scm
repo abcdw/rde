@@ -59,6 +59,7 @@
             mail-account-type
             mail-account-fqda
             mail-account-user
+            mail-account-get-user
             mail-account-synchronizer
             mail-account-get-pass-cmd
 
@@ -113,6 +114,11 @@ field."))
       (mail-account-pass-cmd mail-account)
       (string-append "pass show mail/" (mail-account-fqda mail-account))))
 
+(define (mail-account-get-user account)
+  "Return the value of user field or fqda if a value for user filed is not
+present."
+  (or (mail-account-user account)
+      (mail-account-fqda account)))
 
 (define-configuration/no-serialization mailing-list
   (id
@@ -394,9 +400,7 @@ logfile \"~/.local/var/log/msmtp.log\"\n")
               "\n"
               "account " (symbol->string (mail-account-id acc)) "\n"
               "from " (mail-account-fqda acc) "\n"
-              "user " (or (mail-account-user acc)
-                          (mail-account-fqda acc))
-                       "\n"
+              "user " (mail-account-get-user acc) "\n"
               "passwordeval " (mail-account-get-pass-cmd acc) "\n"
               (msmtp-serializer msmtp-provider-settings acc)))
            mail-accs)))))
@@ -797,8 +801,7 @@ configured."
       `((with-eval-after-load 'smtpmail
           (require 'xdg)
           ,@(if mail-account-id
-                '((setq smtpmail-smtp-user ,(or (mail-account-user mail-acc)
-                                                (mail-account-fqda mail-acc)))
+                '((setq smtpmail-smtp-user ,(mail-account-get-user mail-acc))
                   (setq smtpmail-smtp-service ,smtp-port)
                   (setq smtpmail-smtp-server ,smtp-host)
                   (setq smtpmail-default-smtp-server ,smtp-host))
@@ -998,8 +1001,7 @@ control whether to NOTIFY? when new emails arrive."
 
   (define (isync-settings mail-directory mail-account)
     (let* ((id       (mail-account-id mail-account))
-           (user     (or (mail-account-user mail-account)
-                         (mail-account-fqda mail-account)))
+           (user     (mail-account-get-user mail-account))
            (pass-cmd (mail-account-get-pass-cmd mail-account)))
       `(,#~(string-append "# Account '" #$(symbol->string id)
                           " starts here")
