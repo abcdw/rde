@@ -345,6 +345,8 @@ Citation line format, message signature, gpg and msmtp configurations. "
     (fastmail . ((host . "smtp.fastmail.com")
                  (port . 465)
                  (tls_starttls . off)))
+    (runbox . ((host . "mail.runbox.com")
+               (port . 587)))
     (generic . #f)))
 
 (define %default-msmtp-settings
@@ -1080,6 +1082,14 @@ control whether to NOTIFY? when new emails arrive."
     ("spam"    . "Spam")
     ("archive" . "Archive")))
 
+(define generic-folder-mapping
+  '(("inbox"   . "INBOX")
+    ("sent"    . "Sent")
+    ("drafts"  . "Drafts")
+    ("archive" . "Archive")
+    ("trash"   . "Trash")
+    ("spam"    . "Spam")))
+
 (define gmx-fr-isync-settings
   (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
 
@@ -1105,6 +1115,9 @@ control whether to NOTIFY? when new emails arrive."
 
 (define fastmail-isync-settings
   (generate-isync-serializer "imap.fastmail.com" fastmail-folder-mapping))
+
+(define runbox-isync-settings
+  (generate-isync-serializer "mail.runbox.com" generic-folder-mapping))
 
 (define* (get-ovh-pro-isync-settings
           #:key
@@ -1138,6 +1151,9 @@ control whether to NOTIFY? when new emails arrive."
     (hosteurope-de . ,hosteurope-de-isync-settings)
     (posteo . ,posteo-isync-settings)
     (fastmail . ,fastmail-isync-settings)
+    (runbox . ,runbox-isync-settings)
+    ;; TODO: [Andrew Tropin, 2023-11-26] Fix cryptic error message when type
+    ;; set to the value not listed in isync-serializers (type 'non-existing).
     (generic . ,generic-isync-settings)))
 
 (define default-isync-global-settings
