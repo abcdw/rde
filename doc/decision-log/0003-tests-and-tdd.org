@@ -2,7 +2,7 @@
 #+Date: 2023-03-29
 
 * Status
-RFC by 2023-04-05.
+Accepted.
 
 * Context
 Right now rde feels quite stable because almost everything is tested extensively

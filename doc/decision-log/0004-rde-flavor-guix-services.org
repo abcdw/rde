@@ -2,7 +2,7 @@
 #+Date: 2023-08-08
 
 * Status
-RFC by 2023-08-22
+Accepted.
 
 * Context
 By default in nginx-configuration it's not possible to define something
