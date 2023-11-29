@@ -365,6 +365,11 @@ auth on
 logfile \"~/.local/var/log/msmtp.log\"\n")
 
 (define (default-msmtp-serializer provider-settings mail-account)
+  "Generates a configuration string from key/value pairs found in
+PROVIDER-SETTINGS using type field of MAIL-ACCOUNT.
+
+Example:
+@code{host mail.example.com\nport 587\n}"
   (let* ((account-type (mail-account-type mail-account))
          (settings (assoc-ref provider-settings account-type)))
     (apply
