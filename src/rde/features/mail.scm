@@ -353,6 +353,9 @@ Citation line format, message signature, gpg and msmtp configurations. "
                  (tls_starttls . off)))
     (runbox . ((host . "mail.runbox.com")
                (port . 587)))
+    (migadu . ((host . "smtp.migadu.com")
+               (port . 465)
+               (tls_starttls . off)))
     (generic . #f)))
 
 (define %default-msmtp-settings
@@ -1121,6 +1124,9 @@ control whether to NOTIFY? when new emails arrive."
 (define runbox-isync-settings
   (generate-isync-serializer "mail.runbox.com" generic-folder-mapping))
 
+(define migadu-isync-settings
+  (generate-isync-serializer "imap.migadu.com" generic-folder-mapping))
+
 (define* (get-ovh-pro-isync-settings
           #:key
           (folder-mapping #f)
@@ -1154,6 +1160,7 @@ control whether to NOTIFY? when new emails arrive."
     (posteo . ,posteo-isync-settings)
     (fastmail . ,fastmail-isync-settings)
     (runbox . ,runbox-isync-settings)
+    (migadu . ,migadu-isync-settings)
     ;; TODO: [Andrew Tropin, 2023-11-26] Fix cryptic error message when type
     ;; set to the value not listed in isync-serializers (type 'non-existing).
     (generic . ,generic-isync-settings)))
