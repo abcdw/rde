@@ -289,29 +289,6 @@ maintains a concrete syntax tree of your code; it gives Combobulate absolute
 clarity of all aspects of your code, enabling more correct movement and
 editing than you would otherwise have."))))
 
-;; TODO: Remove after channels-lock.scm updated
-(define-public emacs-ox-html-stable-ids
-  (package
-    (name "emacs-ox-html-stable-ids")
-    (version "0.1.1")
-    (source
-     (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://codeberg.org/jkreeftmeijer/ox-html-stable-ids.el")
-             (commit version)))
-       (file-name (git-file-name name version))
-       (sha256
-        (base32
-         "1slfc1hx6mgx6rb0h0hz7200dmpqr04sz8009r6cy7msp2b91hg7"))))
-    (build-system emacs-build-system)
-    (license license:gpl3)
-    (home-page "https://jeffkreeftmeijer.com/ox-html-stable-ids")
-    (synopsis "Stable IDs for ox-html.el")
-    (description
-     "Ox-html-stable-ids is an Org export extension package that generates
- HTML with stable ID attributes instead of the random IDs Org's exporter uses
-by default.")))
 
 (define-public emacs-zotra
   (let ((commit "c63e274950b5975c7d74f5d0df4b1a1e07f9b5f5")
