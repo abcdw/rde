@@ -1039,7 +1039,8 @@ control whether to NOTIFY? when new emails arrive."
     ("trash"   . "[Gmail]/Trash")
     ("spam"    . "[Gmail]/Spam")))
 
-(define gandi-folder-mapping
+;; https://www.rfc-editor.org/rfc/rfc6154#section-2
+(define generic-folder-mapping
   '(("inbox"   . "INBOX")
     ("sent"    . "Sent")
     ("drafts"  . "Drafts")
@@ -1087,7 +1088,7 @@ control whether to NOTIFY? when new emails arrive."
     ("spam"    . "Spam")
     ("archive" . "Archive")))
 
-(define generic-folder-mapping
+(define runbox-folder-mapping
   '(("inbox"   . "INBOX")
     ("sent"    . "Sent")
     ("drafts"  . "Drafts")
@@ -1099,7 +1100,7 @@ control whether to NOTIFY? when new emails arrive."
   (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
 
 (define ovh-isync-settings
-  (generate-isync-serializer "ssl0.ovh.net" gandi-folder-mapping
+  (generate-isync-serializer "ssl0.ovh.net" generic-folder-mapping
                              #:subfolders 'Legacy
                              #:auth-mechs 'LOGIN))
 
@@ -1107,7 +1108,7 @@ control whether to NOTIFY? when new emails arrive."
   (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
 
 (define gandi-isync-settings
-  (generate-isync-serializer "mail.gandi.net" gandi-folder-mapping))
+  (generate-isync-serializer "mail.gandi.net" generic-folder-mapping))
 
 (define mailbox-isync-settings
   (generate-isync-serializer "imap.mailbox.org" mailbox-folder-mapping))
@@ -1116,13 +1117,13 @@ control whether to NOTIFY? when new emails arrive."
   (generate-isync-serializer "imap.hosteurope.de" hosteurope-de-folder-mapping))
 
 (define posteo-isync-settings
-  (generate-isync-serializer "posteo.de" gandi-folder-mapping))
+  (generate-isync-serializer "posteo.de" generic-folder-mapping))
 
 (define fastmail-isync-settings
   (generate-isync-serializer "imap.fastmail.com" fastmail-folder-mapping))
 
 (define runbox-isync-settings
-  (generate-isync-serializer "mail.runbox.com" generic-folder-mapping))
+  (generate-isync-serializer "mail.runbox.com" runbox-folder-mapping))
 
 (define migadu-isync-settings
   (generate-isync-serializer "imap.migadu.com" generic-folder-mapping))
