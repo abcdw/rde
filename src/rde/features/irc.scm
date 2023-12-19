@@ -314,7 +314,7 @@ is a list of message types to ignore."
                   (setq erc-log-insert-log-on-open t)
                   (setq erc-log-channels-directory
                         (expand-file-name "emacs/erc-logs"
-                                          (or (xdg-cache-home) "~/.cache")))))
+                                          (xdg-cache-home)))))
               '())
         ,@(if erc-align-nicknames?
               '((with-eval-after-load 'erc-fill

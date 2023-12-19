@@ -205,7 +205,7 @@ font-monospace default value, and it will be ignored if
         (require 'xdg)
         (setq fontaine-latest-state-file
               (expand-file-name "emacs/fontaine-latest.state.eld"
-                                (or (xdg-cache-home) "~/.cache")))
+                                (xdg-cache-home)))
 
         (defun rde-font--set-default-fonts ()
           (fontaine-set-preset t))

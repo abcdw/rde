@@ -163,7 +163,7 @@ See @code{sly-mrepl-default-prompt} for its arguments and return value."
             (define-key map (kbd "C-c M-p") 'sly-mrepl-previous-prompt))
           (setq sly-mrepl-history-file-name
                 (expand-file-name "emacs/sly-mrepl-history"
-                                  (or (xdg-cache-home) "~/.cache")))
+                                  (xdg-cache-home)))
           (setq sly-mrepl-prevent-duplicate-history t)
           (setq sly-mrepl-pop-sylvester nil)
           ,@(if sly-custom-prompt

@@ -760,7 +760,7 @@ default severities with which bugs should be filered with DEFAULT-SEVERITIES."
           (require 'xdg)
           (setq debbugs-gnu-persistency-file
                 (expand-file-name "emacs/debbugs"
-                                  (or (xdg-cache-home) "~/.cache")))
+                                  (xdg-cache-home)))
           (setq debbugs-gnu-default-packages (list ,@default-packages))
           (setq debbugs-gnu-default-severities (list ,@default-severities))))
       #:elisp-packages (list emacs-debbugs))))

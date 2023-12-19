@@ -1359,7 +1359,7 @@ it every EXCHANGE-UPDATE-INTERVAL days."
           (require 'xdg)
           (setq calc-currency-exchange-rates-file
                 (expand-file-name "emacs/calc-currency-rates.el"
-                                  (or (xdg-cache-home) "~/.cache")))
+                                  (xdg-cache-home)))
           (setq calc-currency-base-currency ',currency)
           (setq calc-currency-update-interval ,exchange-update-interval)))
       #:elisp-packages (list emacs-calc-currency))))
@@ -2864,7 +2864,7 @@ on the current project."
                 '())
           (setq project-list-file
                 (expand-file-name "emacs/projects"
-                                  (or (xdg-cache-home) "~/.cache")))
+                                  (xdg-cache-home)))
           (setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
           (add-to-list 'project-switch-commands '(project-compile "Compile") t)))
       #:summary "\
@@ -3377,7 +3377,8 @@ Almost all other operations are covered by magit."
           (setq geiser-repl-query-on-kill-p nil)
           (setq geiser-repl-history-filename
                 (expand-file-name "emacs/geiser_history"
-                                  (or (xdg-cache-home) "~/.cache")))
+                                  (xdg-cache-home)
+))
           (setq geiser-repl-add-project-paths nil))
         (with-eval-after-load 'geiser-mode
           (geiser-eros-mode)
@@ -5080,7 +5081,7 @@ stored in directory understood by project.el."
         (with-eval-after-load 'telega
           (require 'xdg)
           (setq telega-directory
-                (expand-file-name "emacs/telega" (or (xdg-cache-home) "~/.cache")))
+                (expand-file-name "emacs/telega" (xdg-cache-home)))
 
          ;; The real telega width will be 81
          (setq telega-chat-fill-column 70)
@@ -5649,7 +5650,7 @@ retrieve information about tracks via EMMS-INFO-METHOD."
            (setq emms-playlist-mode-center-when-go t)
            (setq emms-history-file
                  (expand-file-name "emacs/emms-history"
-                                   (or (xdg-cache-home) "~/.cache")))
+                                   (xdg-cache-home)))
            (setq emms-seek-seconds 15)
            (setq emms-source-file-default-directory
                  (substitute-env-vars ,music-dir))
