@@ -103,6 +103,8 @@
         (add-hook 'compilation-finish-functions 'rde-compile--notify-on-finish)
 
         (with-eval-after-load 'compile
+          ;; Disable collapse of utf progress bar to [...]
+          (setq compilation-max-output-line-length nil)
           (setq compilation-scroll-output 'first-error)
           (setq compilation-ask-about-save nil))))))
 
