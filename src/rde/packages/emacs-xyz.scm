@@ -315,3 +315,30 @@ editing than you would otherwise have."))))
  from a url and save it into a bibtex file. It also provides a way to obtain a
  list of attachments (e.g. PDF files) associated with a url. This is done
  using Zotero translators, but without using the Zotero client."))))
+
+;; [Andrew Tropin, 2023-12-22] Cool idea and implementation of the package,
+;; but it doesn't have a map, where one can bind actions.  I've sent a patch
+;; weeks ago, didn't get a response yet.
+(define-public emacs-corfu-candidate-overlay
+  (package
+    (name "emacs-corfu-candidate-overlay")
+    (version "1.5")
+    (source
+     (origin
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://code.bsdgeek.org/adam/corfu-candidate-overlay")
+             (commit "265438b16155e899d82a869aebca16105665c998")))
+       (file-name (git-file-name name version))
+       (sha256
+        (base32
+         "0i36g2i7435pby32vcapv4ydmp6rqn0r51qm91wqyzan1f3n3qck"))))
+    (build-system emacs-build-system)
+    (propagated-inputs (list emacs-corfu))
+    (license license:gpl3)
+    (home-page "https://code.bsdgeek.org/adam/corfu-candidate-overlay")
+    (synopsis "Show first Corfu's completion candidate in an overlay while
+ typing")
+    (description
+     "Simple corfu as-you-type auto-suggestion candidate overlay with a visual
+ indication of whether there are many or exactly one candidate available.")))
