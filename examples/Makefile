@@ -19,6 +19,10 @@ repl:
 	${GUIX} repl -L ../tests \
 	-L ../files/emacs/gider/src --listen=tcp:37146
 
+ares-rs:
+	${GUIX} shell guile-next guix guile-ares-rs -- guile \
+	-c "((@ (nrepl server) run-nrepl-server) #:port 7888)"
+
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
 	build ${CONFIGS}
