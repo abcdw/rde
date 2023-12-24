@@ -45,8 +45,7 @@
       #:org-agenda-files '("~/work/abcdw/private/todo.org"
                            "~/work/abcdw/rde/TODO"))
      (feature-emacs-appearance)
-     (feature-emacs-modus-themes)
-     (feature-emacs-faces)))))
+     (feature-emacs-modus-themes)))))
 
 (package
  (name "minimal-emacs-env")
