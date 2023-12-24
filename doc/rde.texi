@@ -577,6 +577,11 @@ for details), an entry of the form `nick^cookie@@workspace`.
 
 @section Programming Languages
 @subsection Clojure
+@subsection Common Lisp
+@subsection Go
+@subsection JavaScript
+@subsection OCaml
+@subsection Python
 
 @section Finances
 @ref{,,,ledger3} and @ref{,,,ledger-mode}.
