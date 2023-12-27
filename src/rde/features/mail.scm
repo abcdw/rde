@@ -1663,3 +1663,6 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
 ;;; Mail subsystem refactoring:
 
 ;; TODO: Add piem for apply emails and stuff
+
+;; TODO: [Andrew Tropin, 2023-12-27] Add offline sending of emails
+;; https://jao.io/blog/relaying-mail-to-multiple-smarthosts.html
