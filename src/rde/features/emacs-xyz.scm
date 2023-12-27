@@ -3230,7 +3230,7 @@ language for GNU Emacs."
 
 ;; MAYBE: Merge it with feature-git
 ;; TODO: Add https://github.com/magit/magit-tbdiff
-;; TODO: Add https://jao.io/blog/consulting-hunks.html
+;; TODO: Add consult for hunks https://jao.io/blog/consulting-hunks.html
 (define* (feature-emacs-git
           #:key
           (git-gutter-transient-key "s-g")
