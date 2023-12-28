@@ -12,9 +12,37 @@
 ;; TODO: Switch from UUIDs to partition labels For better
 ;; reproducibilty and easier setup.  Grub doesn't support luks2 yet.
 
-(define ixy-mapped-devices
+(define ixy-original-mapped-devices
   (list (mapped-device
          (source (uuid "0e51ee1e-49ef-45c6-b0c3-6307e9980fa9"))
+         (target "enc")
+         (type luks-device-mapping))))
+
+(define ixy-original-file-systems
+  (append
+   (map (match-lambda
+          ((subvol . mount-point)
+           (file-system
+             (type "btrfs")
+             (device "/dev/mapper/enc")
+             (mount-point mount-point)
+             (options (format #f "subvol=~a" subvol))
+             (dependencies ixy-original-mapped-devices))))
+        '((root . "/")
+          (boot . "/boot")
+          (gnu  . "/gnu")
+          (home . "/home")
+          (data . "/data")
+          (log  . "/var/log")))
+   (list
+    (file-system
+      (mount-point "/boot/efi")
+      (type "vfat")
+      (device (uuid "8C99-0704" 'fat32))))))
+
+(define ixy-mapped-devices
+  (list (mapped-device
+         (source (uuid "6243841f-4171-43dd-8e0b-93bddd56daaa"))
          (target "enc")
          (type luks-device-mapping))))
 
@@ -28,17 +56,18 @@
              (mount-point mount-point)
              (options (format #f "subvol=~a" subvol))
              (dependencies ixy-mapped-devices))))
-        '((root . "/")
-          (boot . "/boot")
-          (gnu  . "/gnu")
-          (home . "/home")
-          (data . "/data")
-          (log  . "/var/log")))
+        '((@ . "/")
+          (@boot . "/boot")
+          (@gnu  . "/gnu")
+          (@home . "/home")
+          (@data . "/data")
+          (@var-log . "/var/log")
+          (@swap . "/swap")))
    (list
     (file-system
       (mount-point "/boot/efi")
       (type "vfat")
-      (device (uuid "8C99-0704" 'fat32))))))
+      (device (uuid "97DB-35DC" 'fat32))))))
 
 (define-public %ixy-features
   (list
