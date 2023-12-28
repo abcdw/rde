@@ -150,6 +150,4 @@
 
    (feature-emacs-smartparens
     #:show-smartparens? #t)
-   (feature-emacs-geiser)
-   (feature-emacs-guix)
    (feature-emacs-eglot)))
