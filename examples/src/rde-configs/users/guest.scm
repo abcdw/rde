@@ -7,6 +7,7 @@
   #:use-module (rde features irc)
   #:use-module (rde features keyboard)
   #:use-module (rde features presets)
+  #:use-module (rde features terminals)
   #:use-module (rde features version-control)
   #:use-module (rde features)
   #:use-module (rde home services wm)
@@ -123,6 +124,7 @@ G9.lc/f.U9QxNW1.2MZdV1KzW6uMJ0t23KKoN/")
       ",dvorak"
       #:options '("grp:shifts_toggle" "ctrl:nocaps")))
     (feature-git #:sign-commits? #f)
+    (feature-foot)
     (feature-irc-settings
      #:irc-accounts (list
                      (irc-account
