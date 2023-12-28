@@ -20,7 +20,6 @@
 (define-module (rde features presets)
   #:use-module (rde features base)
   #:use-module (rde features bittorrent)
-  #:use-module (rde features docker)
   #:use-module (rde features emacs)
   #:use-module (rde features guile)
   #:use-module (rde features emacs-xyz)
