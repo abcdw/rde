@@ -34,7 +34,10 @@
    'sway-output-settings
    home-sway-service-type
    `((output Virtual-1 mode 1920x1080 scale 2)
-     (exec emacs --eval "'(info \"(rde)Getting Started\")'"))))
+     (exec emacs --eval "'(info \"(rde)Getting Started\")'")
+     ;; A hack to make other emacsclient based apps (like app launcher) to
+     ;; work.
+     (exec "sleep 10s && emacsclient -a '' -c --eval '(delete-frame)'"))))
 
 (define home-profile-live-extra-packages-service
   (simple-service
