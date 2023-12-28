@@ -147,8 +147,6 @@
    (feature-emacs-pdf-tools)
    (feature-emacs-nov-el)
    (feature-emacs-org-protocol)
-   ;; TODO: Remove auctex dependency, which interjects in texinfo-mode.
-   ;; (feature-emacs-citar)
 
    (feature-emacs-smartparens
     #:show-smartparens? #t)
