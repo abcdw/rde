@@ -627,12 +627,12 @@ series of patches on rde-devel mailing list.
 There are a few subsystem @code{system:} for system services,
 @code{home:} for home services, @code{packages:} for packages,
 @code{rde:} for rde features, use them and module/object you modify
-without prefix.  Use present simple, add period at the end of the
-subject line.  Elaborate on the reason behind change in the message
-body.  For example:
+(skip prefix like feature- or other to save some space).  Use present
+simple in the subject line.  Elaborate on the reason behind change in
+the message body.  For example:
 
 @example
-rde: emacs: Update %default-emacs-package to emacs-next-stable.
+rde: emacs: Update %default-emacs-package to emacs-next-stable
 
 This prevent clipboard issue from happening.
 @end example
