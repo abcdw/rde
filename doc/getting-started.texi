@@ -15,8 +15,7 @@ To write it to usb stick you can use any software, we provide you with
 
 @example
 # /dev/sdX is your USB stick device, which can be found in sudo dmesg
-sudo dd if=@value{ISO-NAME} of=/dev/sdX status=progress
-sync
+sudo dd if=@value{ISO-NAME} of=/dev/sdX bs=32M status=progress oflag=sync
 @end example
 
 After boot in live system, you can want to adjust a few settings.
