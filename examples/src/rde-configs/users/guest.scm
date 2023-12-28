@@ -50,6 +50,11 @@
      "hicolor-icon-theme" ;; needed for nm icons
 
      "cryptsetup" "dosfstools" "btrfs-progs"
+     "smartmontools" "parted" "gparted"
+
+     "binutils" ;; needed for emacs native-comp stuff
+
+     "emacs-arei" "guile-next" "guile-ares-rs"
 
      "ripgrep" "curl"))))
 
