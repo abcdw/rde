@@ -147,6 +147,7 @@
      (service
       yggdrasil-service-type
       (yggdrasil-configuration
+       (yggdrasil yggdrasil)
        (yggdrasil-conf
         `((peers . ,peers)))))))
 
