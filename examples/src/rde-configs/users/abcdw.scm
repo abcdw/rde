@@ -135,13 +135,16 @@
    (append
     (list
      (@ (gnu packages tree-sitter) tree-sitter-clojure)
-     (@ (gnu packages tree-sitter) tree-sitter-html))
+     (@ (gnu packages tree-sitter) tree-sitter-html)
+     (@ (gnu packages guile) guile-next))
     (strings->packages
      "figlet" ;; TODO: Move to emacs-artist-mode
      "calibre"
      "icecat" "nyxt"
 
-     "utox" "qtox" "jami"
+     "hut"
+     "utox" "qtox"
+     ;; "jami"
 
      "alsa-utils" "yt-dlp" "cozy"
      "pavucontrol" "wev"
