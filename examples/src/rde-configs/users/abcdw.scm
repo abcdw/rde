@@ -498,17 +498,22 @@
      #:extra-tag-updates-post
      '("notmuch tag +guix-home +inbox -- 'thread:\"\
 {((subject:guix and subject:home) or (subject:service and subject:home) or \
-subject:/home:/) and tag:new}\"'")
+subject:/home:/) and tag:new}\"'"
+       "notmuch tag +rde +list -- 'to:.*rde.*@lists.sr.ht and tag:new}'")
      #:notmuch-saved-searches
      (append
-      ;; TODO: Add tag:unread to all inboxes.  Revisit archive workflow.
-      '((:name "To Process" :query "tag:todo or (tag:inbox and not tag:unread)"
+      ;; TODO: [Andrew Tropin, 2024-01-07] Archive replied emails automatically
+      '((:name "To Process"
+         :query "tag:todo or (tag:inbox and not tag:unread and not tag:replied)"
          :key "t")
         (:name "Drafts" :query "tag:draft" :key "d")
         (:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "w")
-        (:name "Work Inbox" :query "tag:work and tag:inbox and tag:unread"
+        (:name "Work Inbox"
+         :query "tag:work and tag:inbox and tag:unread"
          :key "W")
-        (:name "Personal Inbox" :query "tag:personal and tag:inbox" :key "P")
+        (:name "Personal Inbox"
+         :query "tag:personal and tag:inbox and tag:unread"
+         :key "P")
         (:name "Guix Home Inbox" :key "H" :query "tag:guix-home and tag:unread"))
       ;; %rde-notmuch-saved-searches
       '()))
