@@ -101,23 +101,25 @@
     (elisp-packages
      (append
       (list
-       (@ (rde packages emacs-xyz) emacs-clojure-ts-mode)
-       (@ (rde packages emacs-xyz) emacs-combobulate))
+       ;; (@ (rde packages emacs-xyz) emacs-corfu-candidate-overlay)
+       )
       (strings->packages
        ;; "emacs-dirvish"
+       "emacs-company-posframe"
+       "emacs-eat"
+       "emacs-wgrep"
        "emacs-piem"
-       ;; "emacs-company"
+       "emacs-geiser"
        "emacs-ox-haunt"
+       "emacs-org-wild-notifier"
        "emacs-haskell-mode"
        "emacs-rainbow-mode"
        "emacs-hl-todo"
        "emacs-yasnippet"
-       ;; "emacs-company"
        ;; "emacs-consult-dir"
-       ;; "emacs-all-the-icons-completion" "emacs-all-the-icons-dired"
        "emacs-kind-icon"
        "emacs-nginx-mode" "emacs-yaml-mode"
-       ;; "emacs-lispy"
+       "emacs-arei"
        "emacs-ytdl"
        "emacs-multitran"
        "emacs-minimap"
