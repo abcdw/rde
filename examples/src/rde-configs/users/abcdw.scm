@@ -12,6 +12,7 @@
   #:use-module (guix inferior)
   #:use-module (guix packages)
   #:use-module (rde features base)
+  #:use-module (rde features wm)
   #:use-module (rde features clojure)
   #:use-module (rde features emacs-xyz)
   #:use-module (rde features gnupg)
@@ -28,6 +29,8 @@
   #:use-module (rde features virtualization)
   #:use-module (rde features ocaml)
   #:use-module (rde features presets)
+  #:use-module (rde features version-control)
+  #:use-module (rde features video)
   #:use-module (rde features)
   #:use-module (rde home services emacs)
   #:use-module (rde home services i2p)
@@ -333,12 +336,25 @@
 
    ;; Here we basically remove all the features which has feature name equal
    ;; to either 'base-services or 'kernel.
-   (remove (lambda (f) (member (feature-name f) '(base-services kernel)))
+   (remove (lambda (f)
+             (member
+              (feature-name f)
+              '(base-services
+                kernel
+                swaylock
+                git)))
            %all-features)
    (list
+    (feature-git)
     (feature-kernel
      #:kernel-arguments '("snd_hda_intel.dmic_detect=0")
      #:firmware (list example-firmware))
+    (feature-swaylock
+     #:swaylock (@ (gnu packages wm) swaylock-effects)
+     ;; The blur on lock screen is not privacy-friendly.
+     #:extra-config '((screenshots)
+                      (effect-blur . 7x5)
+                      (clock)))
     (feature-base-services
      #:default-substitute-urls (list "https://bordeaux.guix.gnu.org"
                                      "https://ci.guix.gnu.org")))))
