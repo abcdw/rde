@@ -130,7 +130,6 @@
        "emacs-restart-emacs"
        "emacs-org-present"))))))
 
-
 (define home-extra-packages-service
   (simple-service
    'home-profile-extra-packages
@@ -219,7 +218,7 @@
 
 (define mpv-add-user-settings-service
   (simple-service
-   'mpv-add-user-settings-irc
+   'mpv-add-user-settings
    home-mpv-service-type
    (home-mpv-extension
     (mpv-conf
