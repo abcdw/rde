@@ -366,9 +366,11 @@
      #:ssh-keys '(("58AAE5966479124A357F7D6B9D710EBA1C24E10E")))
     (feature-security-token)
     (feature-password-store
+     #:password-store-directory "/data/abcdw/password-store"
      #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
 
     (feature-mail-settings
+     #:mail-directory-fn (const "/data/abcdw/mail")
      #:mail-accounts (list
                       (mail-account
                        (id 'work)
@@ -464,11 +466,11 @@
       (@ (gnu packages hunspell) hunspell-dict-en)
       (@ (rde packages aspell) hunspell-dict-ru)))
     (feature-emacs-git
-     #:project-directory "~/work")
+     #:project-directory "/data/abcdw/work")
     ;; https://plaindrops.de/blog/2020/GTDorgmode/
     ;; https://www.labri.fr/perso/nrougier/GTD/index.html#org2d62325
     (feature-emacs-org
-     #:org-directory "~/work/abcdw/private"
+     #:org-directory "/data/abcdw/work/abcdw/private"
      #:org-indent? #f
      #:org-capture-templates
      ;; https://libreddit.tiekoetter.com/r/orgmode/comments/gc76l3/org_capture_inside_notmuch/
@@ -478,17 +480,17 @@
        ("t" "Todo" entry (file+headline "" "Tasks") ;; org-default-notes-file
         "* TODO %?\nSCHEDULED: %t\n%a\n")
        ("p" "PhD Todo" entry
-        (file+headline "~/work/abcdw/private/phd.org" "Tasks")
+        (file+headline "/data/abcdw/work/abcdw/private/phd.org" "Tasks")
         "* TODO %?\nSCHEDULED: %t\n%a\n")))
     (feature-emacs-org-roam
      ;; TODO: Rewrite to states
-     #:org-roam-directory "~/work/abcdw/notes/notes")
+     #:org-roam-directory "/data/abcdw/work/abcdw/notes/notes")
     (feature-emacs-org-agenda
-     #:org-agenda-files '("~/work/abcdw/private/todo.org"
-                          "~/work/abcdw/private/phd.org"
-                          "~/work/abcdw/rde/TODO"))
+     #:org-agenda-files '("/data/abcdw/work/abcdw/private/todo.org"
+                          "/data/abcdw/work/abcdw/private/phd.org"
+                          "/data/abcdw/work/abcdw/rde/TODO"))
     (feature-emacs-elfeed
-     #:elfeed-org-files '("~/work/abcdw/private/rss.org"))
+     #:elfeed-org-files '("/data/abcdw/work/abcdw/private/rss.org"))
 
     (feature-javascript)
     (feature-ocaml #:opam? #t)
