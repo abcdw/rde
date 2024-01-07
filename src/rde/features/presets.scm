@@ -76,13 +76,7 @@
    (feature-swaynotificationcenter)
    (feature-waybar)
    (feature-swayidle)
-   (feature-swaylock
-    ;; #:swaylock (@ (gnu packages wm) swaylock-effects)
-    ;; ;; The blur on lock screen is not privacy-friendly.
-    ;; #:extra-config '((screenshots)
-    ;;                  (effect-blur . 7x5)
-    ;;                  (clock))
-    )
+   (feature-swaylock)
    (feature-batsignal)
    (feature-imv)
    (feature-mpv)
