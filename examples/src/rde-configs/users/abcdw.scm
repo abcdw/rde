@@ -369,8 +369,18 @@
      #:remote-password-store-url "ssh://abcdw@olorin.lan/~/state/password-store")
 
     (feature-mail-settings
-     #:mail-accounts (list (mail-acc 'work     "andrew@trop.in" 'gandi)
-                           (mail-acc 'personal "bs@trop.in"     'gandi))
+     #:mail-accounts (list
+                      (mail-account
+                       (id 'work)
+                       (type 'migadu)
+                       (fqda "andrew@trop.in")
+                       (aliases '("admin@trop.in" "postmaster@trop.in"))
+                       (pass-cmd "pass show mail/work"))
+                      (mail-account
+                       (id 'personal)
+                       (type 'migadu)
+                       (fqda "mail@trop.in")
+                       (pass-cmd "pass show mail/personal")))
      #:mailing-lists (list (mail-lst 'guile-devel "guile-devel@gnu.org"
                                      '("https://yhetil.org/guile-devel/0"))
                            (mail-lst 'guix-devel "guix-devel@gnu.org"
