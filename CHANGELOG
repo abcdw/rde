@@ -12,10 +12,19 @@ usually takes some of commit messages as a foundation.
 
 * Releases
 ** Unreleased
+*** Breaking Changes
+- rde: mail: Updated directory naming, now accounts/ID is used.
+
+** 0.5.0 (2022-12-30)
 *** New
 - rde: wm: Add feature-swaynotificationcenter.
+- Add feature-foot.
+- examples: live: Add emacs-arei and guile-ares-rs.
 *** Updates
 - rde: compilation: Add notification on finish.
+- rde: presets: Remove emacs-geiser and emacs-guix features.
+There are much more updates, but they are not listed here, please consult ~git
+log~ to get the whole picture.
 
 ** 0.4.0 (2022-06-30)
 *** Breaking Changes
