@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -31,6 +31,7 @@
   #:use-module (gnu home services xdg)
   #:use-module (rde home services video)
   #:use-module (guix gexp)
+  #:use-module (srfi srfi-1)
   #:export (feature-mpv
             feature-youtube-dl))
 
@@ -255,6 +256,10 @@ do with the file, and whether to add the file to the current PLAYLIST."
      (values (make-feature-values mpv emacs-mpv))
      (home-services-getter get-home-services)))
 
+(define rde-yt-dlp-config
+  `(("--format" . "247+251") ; 720p webm
+    ("--output" . "%(title)s [%(id)s].%(ext)s")))
+
 (define* (feature-youtube-dl
           #:key
           (youtube-dl yt-dlp)
@@ -289,6 +294,24 @@ and various other sites."
       (home-xdg-user-directories-configuration-videos user-dirs))
 
     (list
+     (simple-service
+      'yt-dlp-config
+      home-xdg-configuration-files-service-type
+      `(("yt-dlp/config"
+         ,(apply
+           mixed-text-file
+           "yt-dlp.conf"
+           (append-map
+            (lambda (pair)
+              (let ((head (car pair))
+                    (tail (cdr pair)))
+                (append
+                 (list head)
+                 ;; It should be quoted to prevent misstreating it as a few
+                 ;; options
+                 (if tail `(" \"" ,tail "\"") '())
+                 (list "\n"))))
+            rde-yt-dlp-config)))))
      (rde-elisp-configuration-service
       f-name
       config
