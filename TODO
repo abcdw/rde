@@ -24,11 +24,19 @@ See also emacs-multitran
 ** TODO Configure icecat profiles
 ** TODO Implement home service ungoogled-chromium
 - Browser extension
-** DONE Implement home service nyxt
-- Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
-*
 * Archive                                                           :ARCHIVE:
 
+** DONE Implement home service nyxt                                     :rde:
+:PROPERTIES:
+:ARCHIVE_TIME: 2023-08-14 Mon 13:42
+:ARCHIVE_FILE: ~/work/abcdw/rde/TODO
+:ARCHIVE_OLPATH: ~rde~
+:ARCHIVE_CATEGORY: rde
+:ARCHIVE_TODO: DONE
+:ARCHIVE_ITAGS: rde
+:END:
+- Install extensions for Nyxt, see [[https://github.com/atlas-engineer/nyxt/blob/master/documents/EXTENSIONS.org#L1][here]]
+*
 ** DONE Configure orderless                                              :rde:
 SCHEDULED: <2022-07-14 Thu>
 :PROPERTIES:
