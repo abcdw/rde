@@ -32,8 +32,10 @@
   #:use-module (gnu home services xdg)
   #:use-module (rde home services video)
   #:use-module (guix gexp)
+  #:use-module (guix deprecation)
   #:use-module (srfi srfi-1)
   #:export (feature-mpv
+            feature-yt-dlp
             feature-youtube-dl))
 
 ;; Nice mpv configs
@@ -261,27 +263,27 @@ do with the file, and whether to add the file to the current PLAYLIST."
   `(("--format" . "247+251") ; 720p webm
     ("--output" . "%(title)s [%(id)s].%(ext)s")))
 
-(define* (feature-youtube-dl
+(define* (feature-yt-dlp
           #:key
-          (youtube-dl yt-dlp)
-          (youtube-dl-command (file-append youtube-dl "/bin/yt-dlp"))
+          (yt-dlp yt-dlp)
+          (yt-dlp-command (file-append yt-dlp "/bin/yt-dlp"))
           (emacs-ytdl emacs-ytdl)
           (music-dl-args '())
           (video-dl-args '())
           (ytdl-key "y"))
-  "Configure the youtube-dl program to download videos from YouTube
+  "Configure the yt-dlp program to download videos from YouTube
 and various other sites."
-  (ensure-pred any-package? youtube-dl)
-  (ensure-pred file-like? youtube-dl-command)
+  (ensure-pred any-package? yt-dlp)
+  (ensure-pred file-like? yt-dlp-command)
   (ensure-pred file-like? emacs-ytdl)
   (ensure-pred list? music-dl-args)
   (ensure-pred list? video-dl-args)
   (ensure-pred string? ytdl-key)
 
-  (define f-name 'youtube-dl)
+  (define f-name 'yt-dlp)
 
   (define (get-home-services config)
-    "Return home services related to youtube-dl."
+    "Return home services related to yt-dlp."
     (define ffmpeg-bin
       (file-append (get-value 'ffmpeg config ffmpeg) "/bin/ffmpeg"))
 
@@ -321,7 +323,7 @@ and various other sites."
         (with-eval-after-load 'ytdl
           (require 'env)
           (define-key ytdl--dl-list-mode-map "a" 'ytdl-download)
-          (setq ytdl-command ,youtube-dl-command)
+          (setq ytdl-command ,yt-dlp-command)
           (setq ytdl-download-folder (substitute-env-vars ,download-dir))
           (setq ytdl-music-folder (substitute-env-vars ,music-dir))
           (setq ytdl-video-folder (substitute-env-vars ,video-dir))
@@ -334,6 +336,8 @@ and various other sites."
 
   (feature
    (name f-name)
-   (values `((,f-name . ,youtube-dl)
+   (values `((,f-name . ,yt-dlp)
              (emacs-ytdl . ,emacs-ytdl)))
    (home-services-getter get-home-services)))
+
+(define-deprecated/alias feature-youtube-dl feature-yt-dlp)
