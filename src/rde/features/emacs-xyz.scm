@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022, 2023 Nicolas Graves <ngraves@ngraves.fr>
@@ -40,7 +40,6 @@
   #:use-module (rde serializers elisp)
 
   #:use-module (guix gexp)
-  #:use-module (guix deprecation)
   #:use-module (rde gexp)
   #:use-module (guix packages)
   #:use-module (guix diagnostics)
@@ -52,7 +51,6 @@
             feature-emacs-appearance
             feature-emacs-modus-themes
             feature-emacs-circadian
-            feature-emacs-faces
             feature-emacs-which-key
             feature-emacs-keycast
             feature-emacs-all-the-icons
@@ -110,7 +108,6 @@
             feature-emacs-org-roam
             feature-emacs-org-agenda
             feature-emacs-citation
-            feature-emacs-citar
             feature-emacs-org-protocol
             feature-emacs-spelling
             feature-emacs-org-recur
@@ -529,75 +526,6 @@ based on the time of the day."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-circadian)))
-   (home-services-getter get-home-services)))
-
-;; TODO: Deprecated, remove the feature
-(define* (feature-emacs-faces
-          #:key
-          ;; Serif vs Sans-Serif
-          ;; <https://geniusee.com/single-blog/font-readability-research-famous-designers-vs-scientists>
-          ;; Picked Sans by default, as it works good enough and doesn't look
-          ;; too outstanding.
-          (use-sans-for-variable-pitch? #t))
-  "Configure faces for GNU Emacs."
-
-  (warning (G_ "\
-feature-emacs-faces is deprecated, feature-fonts now covers emacs related \
-functionality.\n"))
-
-  (define emacs-f-name 'faces)
-  (define f-name (symbol-append 'emacs- emacs-f-name))
-
-  (define (get-home-services config)
-    (require-value 'fonts config)
-    (define font-monospace (get-value 'font-monospace config))
-    (define font-sans      (get-value 'font-sans      config))
-    (define font-serif     (get-value 'font-serif     config))
-
-    (list
-     (rde-elisp-configuration-service
-      emacs-f-name
-      config
-      `((with-eval-after-load
-         'faces
-         (let* ((mono-fn ,(font-name font-monospace))
-                (sans-fn ,(font-name font-sans))
-                (serif-fn ,(font-name font-serif))
-                (mono (font-spec
-                       :name ,(font-name font-monospace)
-                       ;; For some reason pgtk emacs has much smaller
-                       ;; font than alacritty with the same size value
-                       :size   ,(+ 3 (font-size font-monospace))
-                       :weight ',(or (font-weight font-monospace) 'normal)))
-                ;; For people coming here years later, only
-                ;; face which can contain size or integer
-                ;; height is default, everything else should
-                ;; set only family or relative height
-                ;; (decimal value), the font-spec even
-                ;; without height/size shouldn't be used.
-                ;; Otherwise text-adjust and other stuff can
-                ;; be broken.
-                (faces `((default ((t (:font ,mono))))
-                         (fixed-pitch ((t (:family ,mono-fn))))
-                         (button ((t (:inherit (fixed-pitch)))))
-                         (variable-pitch ((t (:family
-                                              ,,(if use-sans-for-variable-pitch?
-                                                    'sans-fn
-                                                    'serif-fn))))))))
-           (dolist (face faces)
-                   (custom-set-faces face))
-
-           (dolist (face faces)
-                   (put (car face) 'saved-face nil)))))
-      #:summary "\
-Font and face settings"
-      #:commentary "\
-Values are sourced from feature-fonts."
-      #:keywords '(convenience faces))))
-
-  (feature
-   (name f-name)
-   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-which-key
@@ -4696,8 +4624,6 @@ defaults."
    (name f-name)
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
-
-(define-deprecated/alias feature-emacs-citar feature-emacs-citation)
 
 (define* (feature-emacs-org-protocol)
   "Setup and configure Org-Protocol for Emacs."
