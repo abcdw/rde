@@ -86,6 +86,7 @@
              (interactive)
              (org-end-of-meta-data t))))
        (with-eval-after-load 'geiser-mode
+         (setq geiser-mode-auto-p nil)
          (defun abcdw-geiser-connect ()
            (interactive)
            (geiser-connect 'guile "localhost" "37146"))
