@@ -1,0 +1,81 @@
+# -*- mode: org -*-
+#+OPTIONS: toc:nil
+
+* Installation
+** Partitioning
+Note, most of the commands related to partitioning will require root
+priveleges.  Prefix them with ~sudo~ or issue them from priviledged user shell.
+
+Some theory and concepts behind btrfs:
+https://fedoramagazine.org/working-with-btrfs-general-concepts/
+
+1. Enter environment, where all needed tools are available ~guix shell parted
+   cryptsetup btrfs-progs~.
+2. List all devices with ~parted -l~. Find appropriate one, save to variable
+   ~$DISK~, for example ~DISK=/dev/sda~.
+3. Make a partition table, it's very likely you need GPT (aka GUID Partition
+   Table) and not MBR: ~parted $DISK~
+4.
+
+#+begin_src sh
+guix shell parted
+sudo parted -l
+DISK=/dev/sda
+# or
+# DISK=/dev/nvme0n1
+sudo parted $DISK
+# it will open a parted prompt
+mklabel gpt
+# 1GiB is a safe size for EFI partition, but you probably will be fine
+# with much smaller, do your research on this topic
+mkpart "EFI system partition" fat32 0% 1024MiB
+set 1 esp on
+mkpart primary 1024MiB 100%
+
+sudo -s
+mkfs.fat -F32 /dev/sda1
+
+cryptsetup luksFormat --type luks1 /dev/sda2
+# Need to explore and probably fix luks2 support
+# cryptsetup luksFormat --type luks2 --pbkdf pbkdf2 /dev/sda2
+cryptsetup luksDump
+# UUID: 6243841f-4171-43dd-8e0b-93bddd56daaa
+
+cryptsetup luksOpen /dev/sda2 enc
+
+mkfs.btrfs /dev/mapper/enc
+# UUID: 92ce490b-5802-431c-8bc2-2451c3c67d3a
+
+mkdir -p /mnt/ssd
+mount /dev/mapper/enc /mnt/ssd
+
+cd /mnt/ssd
+btrfs subvolume create @
+btrfs subvolume create @boot
+btrfs subvolume create @home
+btrfs subvolume create @gnu
+btrfs subvolume create @data
+btrfs subvolume create @var
+btrfs subvolume create @swap
+
+btrfs subvolume snapshot -r @ blank@
+
+
+# I have 16GB of RAM.
+btrfs filesystem mkswapfile --size 32g --uuid clear @swap/swapfile
+
+# https://wiki.archlinux.org/title/btrfs#Swap_file
+
+mount -o subvol=root /dev/mapper/enc /mnt
+
+mkdir {boot,boot/efi,home,gnu,data,var,swap}
+
+herd start cow-store /mnt
+
+# to write intermediate build results to actual drive
+# instead of r/o or in-memory fs
+export TMPDIR=/mnt/data/rde/tmp
+mkdir -p $TMPDIR
+
+blkid /dev/blablabla
+#+end_src
