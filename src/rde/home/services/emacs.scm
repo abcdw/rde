@@ -2,6 +2,8 @@
 ;;;
 ;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
+;;; Copyright © 2023 Nicolas Graves <ngraves@ngraves.fr>
+;;;
 ;;; This file is part of rde.
 ;;;
 ;;; rde is free software; you can redistribute it and/or modify it
@@ -251,6 +253,12 @@ Emacs metaservice.  Can be used to restart all emacs servers.")
   (elisp-packages
    (list-of-file-likes '())
    "List of additional Emacs Lisp packages.")
+  (elisp-packages-rewrites
+   (alist '())
+   "Alist of package-input-rewrite/spec specification that will be applied to
+all ELISP-PACKAGES.  This can be used to replace any package in all packages
+definitions, and is particularly useful to exclude some packages from
+native-compilation.")
   (emacs-servers
    (list '())
    "List of emacs servers to add to @code{emacs-servers}.  See
@@ -272,6 +280,10 @@ Emacs metaservice.  Can be used to restart all emacs servers.")
       (append (home-emacs-configuration-elisp-packages original-config)
               (append-map
                home-emacs-extension-elisp-packages extensions)))
+     (elisp-packages-rewrites
+      (append (home-emacs-configuration-elisp-packages-rewrites original-config)
+              (append-map
+               home-emacs-extension-elisp-packages-rewrites extensions)))
      (emacs-servers
       (append (home-emacs-configuration-emacs-servers original-config)
               (append-map
@@ -319,7 +331,6 @@ extensible, self-documenting editor.")))
           #:key
           summary authors maintainers url keywords commentary
           (elisp-packages '())
-          (elisp-packages-rewrites '())
           (autoloads? #f))
   "Takes a list of Elisp expressions, creates emacs-NAME package.
 When autoloads? is @code{#t} adds @code{#~\";;;###autoload\"} before each
@@ -527,8 +538,6 @@ feature-loader take care of it.")
        (symbol->string name)
        (home-elisp-configuration-config config)
        #:elisp-packages (home-elisp-configuration-elisp-packages config)
-       #:elisp-packages-rewrites
-       (home-elisp-configuration-elisp-packages-rewrites config)
        #:autoloads? (home-elisp-configuration-autoloads? config)
        #:summary (home-elisp-configuration-summary config)
        #:commentary (home-elisp-configuration-commentary config)
@@ -543,7 +552,9 @@ feature-loader take care of it.")
    ;; we want to overwrite builtin emacs packages.  Propagated
    ;; inputs have lowest priority on collisions, that's why we have
    ;; to list those package here in addition to propagated-inputs.
-   (elisp-packages (home-elisp-configuration-elisp-packages config))))
+   (elisp-packages (home-elisp-configuration-elisp-packages config))
+   (elisp-packages-rewrites
+    (home-elisp-configuration-elisp-packages-rewrites config))))
 
 (define (home-elisp-extensions original-config extensions)
   (let ((extensions (reverse extensions)))
@@ -573,5 +584,5 @@ feature-loader take care of it.")
                 (description (format #f "\
 Creates emacs-~a configuration package, extends emacs and feature-loader to
 make provided configuration available/loaded at startup time.  Can be extended
-with home-elisp-extension."
+with @code{home-elisp-extension}."
                                      name))))
