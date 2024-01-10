@@ -683,12 +683,12 @@ topics with your preferred hierarchy."
           (setq gnus-secondary-select-methods
                 '(,@(if (get-value 'isync config)
                         (map (lambda (mail-acc)
-                               `(nnmaildir
-                                 ,(symbol->string (mail-account-id mail-acc))
-                                 (directory
-                                  ,(string-append
-                                    mail-dir "/accounts/"
-                                    (mail-account-fqda mail-acc)))))
+                               (let ((id (symbol->string
+                                          (mail-account-id mail-acc))))
+                                 `(nnmaildir
+                                   ,id
+                                   (directory
+                                    ,(string-append mail-dir "/accounts/" id)))))
                              mail-accounts)
                       '())
                   (nntp "gwene"
