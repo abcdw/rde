@@ -90,7 +90,6 @@ recommended RDE experience is to rely on Emacs default keybindings."
         (setq evil-want-integration t)
         (setq evil-want-C-u-scroll t)
         (setq evil-want-C-i-jump nil)
-        (setq evil-want-minibuffer t)
         (setq evil-respect-visual-line-mode t)
         (setq evil-undo-system 'undo-fu)
         (setq evil-want-fine-undo t)
@@ -110,6 +109,8 @@ recommended RDE experience is to rely on Emacs default keybindings."
         (setq evil-shift-width tab-width)
 
         ;; use evil in minibuffers with Ctrl key.
+        ;; these provide a lighter and less intrusive minibuffer experience
+        ;; than (setq evil-want-minibuffer t)
         (let ((map minibuffer-mode-map))
           (define-key map (kbd "C-j") 'next-line-or-history-element)
           (define-key map (kbd "C-k") 'previous-line-or-history-element)
