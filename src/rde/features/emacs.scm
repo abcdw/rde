@@ -278,6 +278,7 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
                 "/emacs/auto-save-list"))
 
        ,#~""
+       (pixel-scroll-precision-mode 1)
        (column-number-mode 1)
        (save-place-mode 1)
        (setq
@@ -556,11 +557,7 @@ It can contain settings not yet moved to separate features."
        (emacs-servers (if emacs-server-mode? '(server) '()))
        (xdg-flavor? #t)
        (early-init-el
-        `(,(slurp-file-like (local-file "./emacs/early-init.el"))
-          ,#~""
-          ;; FIXME: Move it back to the configure-rde-emacs package, when it
-          ;; will be built with emacs-29
-          (pixel-scroll-precision-mode 1)))
+        `(,(slurp-file-like (local-file "./emacs/early-init.el"))))
        (native-comp? native-comp?)))
 
      (simple-service
