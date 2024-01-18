@@ -2216,6 +2216,9 @@ Annotations for completion candidates using marginalia."
          (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
          (setq vertico-cycle t)
 
+         ;; TODO: [Andrew Tropin, 2023-12-28]: Re-implement vertico-monocle
+         ;; https://github.com/minad/vertico/issues/189#issuecomment-1870066271
+
          ;; (defvar rde--vertico-monocle-previous-window-configuration nil
          ;;   "Window configuration for restoring on vertico monocle exit.")
 
