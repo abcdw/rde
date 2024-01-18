@@ -4135,7 +4135,7 @@ Indentation and refile configurations, visual adjustment."
           #:key
           (org-agenda-files #f)
           (org-agenda-custom-commands %rde-org-agenda-custom-commands)
-          (org-agenda-prefix-format '())
+          (org-agenda-prefix-format #f)
           (org-agenda-appt? #f))
   "Configure org-agenda for GNU Emacs."
   (ensure-pred maybe-list? org-agenda-files)
@@ -4233,15 +4233,17 @@ result is longer than LEN."
           (setq org-agenda-bulk-custom-functions
                 '((?P (lambda nil
                         (org-agenda-priority 'set)))))
-          ,@(if org-agenda-prefix-format
-                (if (get-value 'org-roam-todo? config)
-                    `((setq org-agenda-prefix-format
-                            '((agenda . " %i %(rde-org-agenda-category 12)%?-12t% s")
-                              (todo . " %i %(rde-org-agenda-category 12) ")
-                              (tags . " %i %(rde-org-agenda-category 12) ")
-                              (search . " %i %(rde-org-agenda-category 12) "))))
-                    `((setq org-agenda-prefix-format ',org-agenda-prefix-format)))
-                '())))
+          (setq org-agenda-prefix-format
+                ,(cond
+                  ((get-value 'org-roam-todo? config)
+                   ''((agenda . " %i %(rde-org-agenda-category 12)%?-12t% s")
+                      (todo . " %i %(rde-org-agenda-category 12) ")
+                      (tags . " %i %(rde-org-agenda-category 12) ")
+                      (search . " %i %(rde-org-agenda-category 12) ")))
+                  (org-agenda-prefix-format
+                   `(quote ,org-agenda-prefix-format))
+                  (else
+                   ''())))))
       #:summary "\
 Preconfigured agenda views"
       #:commentary "\
