@@ -349,11 +349,13 @@
      #:kernel-arguments '("snd_hda_intel.dmic_detect=0")
      #:firmware (list example-firmware))
     (feature-swaylock
-     #:swaylock (@ (gnu packages wm) swaylock-effects)
+     ;; swaylock-effects often crashes with red screen
+     ;; #:swaylock (@ (gnu packages wm) swaylock-effects)
      ;; The blur on lock screen is not privacy-friendly.
-     #:extra-config '((screenshots)
-                      (effect-blur . 7x5)
-                      (clock)))
+     ;; #:extra-config '((screenshots)
+     ;;                  (effect-blur . 7x5)
+     ;;                  (clock))
+     )
     (feature-base-services
      #:default-substitute-urls (list "https://bordeaux.guix.gnu.org"
                                      "https://ci.guix.gnu.org")))))
