@@ -312,7 +312,7 @@ and various other sites."
                  (list head)
                  ;; It should be quoted to prevent misstreating it as a few
                  ;; options
-                 (if tail `(" \"" ,tail "\"") '())
+                 (if (not (null? tail)) `(" \"" ,tail "\"") '())
                  (list "\n"))))
             rde-yt-dlp-config)))))
      (rde-elisp-configuration-service
