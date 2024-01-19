@@ -108,6 +108,7 @@
             feature-emacs-org-roam
             feature-emacs-org-agenda
             feature-emacs-citation
+            feature-emacs-org-dailies
             feature-emacs-org-protocol
             feature-emacs-spelling
             feature-emacs-org-recur
@@ -4350,30 +4351,72 @@ If NODE doesn't exist, create a new org-roam node with REF."
       (add-hook 'before-save-hook 'rde-org-roam-update-todo-tag))
     (advice-add 'org-agenda :before 'rde-org-roam-update-todo-files)))
 
+(define* (feature-emacs-org-dailies
+          #:key
+          (emacs-org-dailies emacs-org-dailies)
+          (org-dailies-directory "daily/")
+          (org-dailies-capture-templates #f))
+  "Configure org-dailies for GNU Emacs."
+  (ensure-pred file-like? emacs-org-dailies)
+  (ensure-pred maybe-path? org-dailies-directory)
+  (ensure-pred maybe-list? org-dailies-capture-templates)
+
+  (define emacs-f-name 'org-dailies)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (when (and (not (get-value 'org-roam-dailies? config))
+               org-dailies-capture-templates)
+      (raise
+       (formatted-message
+        (G_ "org-dailies package does't handle capture templates for now."))))
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `(,@(if (get-value 'org-roam-dailies? config)
+              '()
+              `((require 'org-dailies)
+                (setq org-dailies-directory ,org-dailies-directory))))
+      #:summary "Daily journaling functionality for Emacs"
+      #:commentary "\
+This feature configure daily journaling functionality, either with org-roam-dailies,
+or with a org-roam-less copy of the package."
+      #:keywords '(convenience)
+      #:elisp-packages (if (get-value 'org-roam-dailies? config)
+                           '()
+                           (list emacs-org-dailies)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)
+             (org-dailies-directory . ,org-dailies-directory)
+             (org-dailies-capture-templates . ,org-dailies-capture-templates)))
+   (home-services-getter get-home-services)))
+
 ;; TODO: rewrite to states
 (define* (feature-emacs-org-roam
           #:key
           (emacs-org-roam emacs-org-roam)
           (org-roam-directory #f)
-          (org-roam-dailies-directory #f)
           (org-roam-capture-templates #f)
-          (org-roam-dailies-capture-templates #f)
           (org-roam-todo? #f)
+          (org-roam-dailies? #f)
           (use-node-types? #t))
   "Configure org-roam for GNU Emacs."
   (ensure-pred file-like? emacs-org-roam)
   (define (not-boolean? x) (not (boolean? x)))
   (ensure-pred not-boolean? org-roam-directory)
-  (ensure-pred maybe-path? org-roam-dailies-directory)
   (ensure-pred maybe-list? org-roam-capture-templates)
   (ensure-pred boolean? use-node-types?)
-  (ensure-pred maybe-list? org-roam-dailies-capture-templates)
   (ensure-pred boolean? org-roam-todo?)
+  (ensure-pred boolean? org-roam-dailies?)
 
   (define emacs-f-name 'org-roam)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
+    (if org-roam-dailies? (require-value 'org-dailies-directory config))
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -4520,6 +4563,7 @@ marginalia annotations."
   (feature
    (name f-name)
    (values `((,f-name . #t)
+             (org-roam-dailies? . ,org-roam-dailies?)
              (org-roam-todo? . ,org-roam-todo?)))
    (home-services-getter get-home-services)))
 
