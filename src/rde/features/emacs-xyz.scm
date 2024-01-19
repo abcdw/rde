@@ -4455,10 +4455,6 @@ the node, relative to `org-roam-directory'."
 
          ,@(if org-roam-capture-templates
                `((setq org-roam-capture-templates ',org-roam-capture-templates))
-               '())
-
-         ,@(if org-roam-dailies-directory
-               `((setq org-roam-dailies-directory ,org-roam-dailies-directory))
                '()))
         ,@(if org-roam-todo?
               (org-roam-todo config)
