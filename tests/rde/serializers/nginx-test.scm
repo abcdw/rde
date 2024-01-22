@@ -21,7 +21,7 @@
   #:use-module (guix gexp)
   #:use-module (rde serializers nginx)
   #:use-module (rde tests)
-  #:use-module (rde tests store)
+  #:use-module (rde api store)
   #:use-module (ice-9 match))
 
 (define (serialize-config config)

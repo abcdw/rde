@@ -20,7 +20,7 @@
 (define-module (rde serializers lisp-test)
   #:use-module (srfi srfi-64)
   #:use-module (rde tests)
-  #:use-module (rde tests store)
+  #:use-module (rde api store)
 
   #:use-module (rde serializers lisp)
 

@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -17,7 +17,7 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (rde tests store)
+(define-module (rde api store)
   #:use-module (ice-9 match)
   #:use-module (guix monads)
   #:use-module (guix gexp)
@@ -28,7 +28,7 @@
   #:export (build-with-store
             eval-with-store))
 
-(define %build-verbosity 0)
+(define %build-verbosity 10)
 
 (define* (default-guile-derivation store #:optional (system (%current-system)))
   "Return the derivation of the default "

@@ -21,7 +21,7 @@
   #:use-module (guix gexp)
   #:use-module (rde serializers yaml)
   #:use-module (rde tests)
-  #:use-module (rde tests store)
+  #:use-module (rde api store)
   #:use-module (ice-9 match))
 
 (define (serialize-yaml config)

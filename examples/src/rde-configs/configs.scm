@@ -111,7 +111,7 @@
 ;; ((@ (ice-9 pretty-print) pretty-print)
 ;;  (rde-config-home-services ixy-config))
 
-;; (define br ((@ (rde tests store) build-with-store) ixy-he))
+;; (define br ((@ (rde api store) build-with-store) ixy-he))
 (dispatcher)
 
 

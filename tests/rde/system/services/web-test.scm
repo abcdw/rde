@@ -27,7 +27,7 @@
   #:use-module (rde serializers nginx)
   #:use-module (rde system services web)
   #:use-module (rde tests)
-  #:use-module (rde tests store)
+  #:use-module (rde api store)
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
   #:use-module (ice-9 regex))
