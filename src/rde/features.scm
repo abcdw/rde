@@ -27,6 +27,7 @@
   #:use-module (gnu system file-systems)
   #:use-module (gnu system accounts)
   #:use-module (gnu system shadow)
+  #:use-module (gnu system nss)
   #:use-module (gnu services home)
   #:use-module (rde system services accounts)
   #:use-module (rde system services admin)
@@ -390,7 +391,11 @@ can be later used to extend original service with additional configuration."
                             (operating-system-initrd-modules initial-os)))
          (firmware         (get-value
                             'firmware config
-                            (operating-system-firmware initial-os))))
+                            (operating-system-firmware initial-os)))
+         (name-service-switch
+                           (get-value
+                            'name-service config
+                            %default-nss)))
 
     (when (rde-config-integrate-he-in-os? config)
       (require-value 'user-name config))
@@ -424,7 +429,8 @@ can be later used to extend original service with additional configuration."
                  (if user-name
                      (list (service rde-account-service-type user))
                      '())))
-      (sudoers-file #f))))
+      (sudoers-file #f)
+      (name-service-switch name-service-switch))))
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)

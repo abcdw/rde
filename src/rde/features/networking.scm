@@ -26,6 +26,7 @@
   #:use-module (gnu home services shepherd)
   #:use-module (rde home services i2p)
   #:use-module (gnu services networking)
+  #:use-module (gnu system nss)
   #:use-module (rde system services networking)
   #:use-module (rde system services accounts)
 
@@ -209,7 +210,8 @@ feature-ssh."
 (define* (feature-networking
           #:key
           (iwd-autoconnect? #t)
-          (network-manager-applet network-manager-applet))
+          (network-manager-applet network-manager-applet)
+          mdns?)
   "Configure iwd and everything."
   (ensure-pred file-like? network-manager-applet)
 
@@ -251,6 +253,10 @@ feature-ssh."
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((,f-name . #t)
+             ,@(if mdns?
+                   `((name-service . ,%mdns-host-lookup-nss)
+                     (mdns . #t))
+                   '())))
    (home-services-getter get-home-services)
    (system-services-getter get-system-services)))
