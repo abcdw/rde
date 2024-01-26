@@ -199,7 +199,8 @@ emacs servers' environment variables to same values."
                          (minibuffer-frame
                           (make-frame
                            (list
-                            (cons 'display x-display-name)
+                            (cons 'display (or x-display-name
+                                               (getenv "WAYLAND_DISPLAY")))
                             '(name . ,(string-append title " - Emacs Client"))
                             '(minibuffer . only)
                             '(width . 120)
@@ -517,8 +518,6 @@ It can contain settings not yet moved to separate features."
                      (string-drop-right raw-input 1)
                      raw-input))
                 (count (string-count clean-input #\newline))
-                ;; Always setting display to WAYLAND_DISPLAY can be
-                ;; problematic on non-wayland systems
                 (port (open-input-pipe
                        (format
                         #f "~a --eval '~s'"
@@ -528,7 +527,8 @@ It can contain settings not yet moved to separate features."
                                 (minibuffer-frame
                                  (make-frame
                                   (list
-                                   (cons 'display (getenv "WAYLAND_DISPLAY"))
+                                   (cons 'display (or x-display-name
+                                                      (getenv "WAYLAND_DISPLAY")))
                                    '(name . "dynamic menu - Emacs Client")
                                    '(minibuffer . only)
                                    '(width . 120)
