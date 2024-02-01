@@ -713,6 +713,7 @@ topics with your preferred hierarchy."
         (add-hook 'gnus-group-mode-hook 'gnus-topic-mode)
         (add-hook 'gnus-group-mode-hook 'hl-line-mode)
         (with-eval-after-load 'gnus-sum
+          (setq gnus-summary-goto-unread 'never)
           (setq gnus-thread-hide-subtree t))
         (with-eval-after-load 'nndraft
           (setq nndraft-directory
