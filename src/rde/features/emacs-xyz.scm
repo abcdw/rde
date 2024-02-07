@@ -3191,12 +3191,16 @@ git-link, git-timemachine."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((defun rde-git-link ()
-          "Same as `git-link', but with commit hash specified."
+        (autoload 'git-link--relative-filename "git-link")
+        (defun rde-git-link ()
+          "Same as `git-link', but with commit hash specified.  If used in
+ non-file buffer fallbacks to `git-link-commit'."
           (interactive)
           (defvar git-link-use-commit) ;; dynamically bind
           (let ((git-link-use-commit t))
-            (call-interactively 'git-link)))
+            (if (git-link--relative-filename)
+                (call-interactively 'git-link)
+                (call-interactively 'git-link-commit))))
 
         (with-eval-after-load 'rde-keymaps
           (define-key rde-toggle-map (kbd "g") 'git-gutter-mode)
