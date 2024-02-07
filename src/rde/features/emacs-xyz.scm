@@ -3191,6 +3191,21 @@ git-link, git-timemachine."
      (rde-elisp-configuration-service
       emacs-f-name
       config
+      `((with-eval-after-load 'git-link
+          (advice-add
+           'git-link :around
+           (lambda (f remote start end)
+             "`git-link--last-commit' advice with specific remote."
+             (let ((git-link--last-commit-from-remote
+                    (lambda ()
+                      (car (git-link--exec
+                            "--no-pager" "log" "-n1" "--pretty=format:%H"
+                            (concat remote "/" (git-link--branch)))))))
+               (advice-add 'git-link--last-commit :override
+                           git-link--last-commit-from-remote)
+               (funcall f remote start end)
+               (advice-remove 'git-link--last-commit
+                              git-link--last-commit-from-remote)))))
         (autoload 'git-link--relative-filename "git-link")
         (defun rde-git-link ()
           "Same as `git-link', but with commit hash specified.  If used in
