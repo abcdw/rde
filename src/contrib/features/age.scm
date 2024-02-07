@@ -19,7 +19,7 @@
 
 (define-module (contrib features age)
   #:use-module (rde features)
-  #:use-module (gnu packages golang)
+  #:use-module (gnu packages golang-crypto)
   #:use-module (gnu services)
   #:use-module (gnu services base)
   #:use-module (gnu home services)
