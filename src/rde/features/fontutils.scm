@@ -113,6 +113,11 @@ font-monospace default value, and it will be ignored if
     (define font-variable (if use-serif-for-variable-pitch?
                               font-serif
                               font-sans))
+    (define default-font-height
+      (inexact->exact
+       ;; -5 is a random hacky adjustment to
+       ;; make it work the same as in rde-faces
+       (- (* (font-size font-monospace) 10) 5)))
     (list
      (simple-service
       'add-extra-fonts
@@ -192,15 +197,16 @@ font-monospace default value, and it will be ignored if
         (setq fontaine-presets
               '((t
                  :default-family ,(font-name font-monospace)
-                 :default-height ,(inexact->exact
-                                   ;; -5 is a random hacky adjustment to
-                                   ;; make it work the same as in rde-faces
-                                   (- (* (font-size font-monospace) 10) 5))
+                 :default-height ,default-font-height
                  :fixed-pitch-family ,(font-name font-monospace)
                  :fixed-pitch-height 1.0
                  :variable-pitch-family ,(font-name font-variable)
                  :variable-pitch-height 1.0
                  :variable-pitch-weight ,(font-weight font-variable))
+                (regular)
+                (large :default-weight semilight
+                       :default-height ,(+ default-font-height 40)
+                       :bold-weight extrabold)
                 ,@extra-fontaine-presets))
         (require 'xdg)
         (setq fontaine-latest-state-file
