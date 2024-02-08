@@ -4416,15 +4416,6 @@ or with a org-roam-less copy of the package."
   (define emacs-f-name 'org-roam)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
-  (define emacs-org-roam-package
-    (if org-roam-dailies?
-        emacs-org-roam
-        (package
-          (inherit emacs-org-roam)
-          (source (origin (inherit (package-source emacs-org-roam))
-                          (snippet
-                           '(delete-file "extensions/org-roam-dailies.el")))))))
-
   (define (get-home-services config)
     (if org-roam-dailies?
         (unless (get-value 'org-dailies-directory config)
