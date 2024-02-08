@@ -4355,17 +4355,26 @@ If NODE doesn't exist, create a new org-roam node with REF."
           #:key
           (emacs-org-dailies emacs-org-dailies)
           (org-dailies-directory "daily/")
-          (org-dailies-capture-templates #f))
+          (encrypted? #f)
+          (org-dailies-capture-templates
+           (if encrypted?
+               '(("d" "default" entry "* %?" :target
+                  (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %<%Y-%m-%d>\n")))
+               #f)))
   "Configure org-dailies or org-roam-dailies for GNU Emacs, depending on
-ORG-ROAM-DAILIES? RDE value."
+ORG-ROAM-DAILIES? RDE value.  When ENCRYPTED? is set to true, provide a
+default value for ORG-DAILIES-CAPTURE-TEMPLATES, which has .gpg at the end of
+filename, however its value can be overriden."
   (ensure-pred file-like? emacs-org-dailies)
   (ensure-pred maybe-path? org-dailies-directory)
   (ensure-pred maybe-list? org-dailies-capture-templates)
+  (ensure-pred boolean? encrypted?)
 
   (define emacs-f-name 'org-dailies)
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
+    (if encrypted? (require-value 'rde-emacs-gnupg config))
     (define org-roam? (get-value 'emacs-org-roam config))
     (when (and (not org-roam?)
                org-dailies-capture-templates)
