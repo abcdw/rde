@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -65,6 +65,7 @@
             require-value
             get-value
             get-value-eval
+            service-type->rde-value
 
             ensure-pred
             throw-message
@@ -251,6 +252,12 @@ to config one more time."
     #f "Value ~a is not provided by any feature.\n~a"
     key (or (and=> additional-msg (lambda (x) (string-append x "\n"))) ""))))
 
+(define (service-type->rde-value service-type)
+  "Returns a pair of service name and a value of SERVICE-TYPE.  This rde value
+can be later used to extend original service with additional configuration."
+  `(,(service-type-name service-type) . ,service-type))
+
+;; TODO: [Andrew Tropin, 2024-02-08] Move to module definition
 (use-modules (gnu home services)
              (gnu home services xdg)
              (gnu home services fontutils)
