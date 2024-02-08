@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
@@ -24,6 +24,7 @@
   #:use-module (gnu services)
   #:use-module (gnu home-services gnupg)
   #:use-module (gnu home-services wm)
+  #:use-module (rde home services emacs)
   #:use-module (guix gexp)
 
   #:export (feature-gnupg))
@@ -49,9 +50,25 @@ and provides GPG-PRIMARY-KEY value for other features."
   (ensure-pred ssh-keys-list? ssh-keys)
   (ensure-pred file-like? gnupg)
 
+  (define rde-emacs-service-type
+    (make-home-elisp-service-type 'rde-emacs-gnupg))
+
   (define (home-gnupg-services config)
     "Return a list of home-services, required for gnupg to operate."
     (list
+     (service
+      rde-emacs-service-type
+      (home-elisp-configuration
+       (name 'rde-emacs-gnupg)
+       (config
+        `((with-eval-after-load 'epa-hook
+            (setq-default epa-file-encrypt-to (list user-mail-address))
+            ;; It should be set buffer-local to prevent asking for encryption
+            ;; key setq-default doesn't help here :/ only setq-local works
+            ;; https://superuser.com/questions/1204820/emacs-easypg-asks-what-key-to-use-although-epa-file-encrypt-to-already-specified
+            (setq epa-file-select-keys 1))))
+       (summary "File Encryption, EasyPG and GnuPG")
+       (commentary "Encryption related configurations and settings.")))
      ;; TODO: Move to sway feature
      (when (get-value 'sway config)
        (simple-service
@@ -111,6 +128,7 @@ and provides GPG-PRIMARY-KEY value for other features."
   (feature
    (name 'gnupg)
    (values (append
+            (list (service-type->rde-value rde-emacs-service-type))
             (make-feature-values gpg-primary-key gpg-ssh-agent?)
             (if gpg-ssh-agent?
                 '((ssh-agent? . #t))
