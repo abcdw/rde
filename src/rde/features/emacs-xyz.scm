@@ -4378,8 +4378,16 @@ ORG-ROAM-DAILIES? RDE value."
       emacs-f-name
       config
       `(,@(if org-roam?
-              '()
-              `((require 'org-dailies)
+              `((autoload 'org-roam-dailies-map "org-roam-dailies"
+                          "" nil 'keymap)
+                (define-key mode-specific-map (kbd "d") 'org-roam-dailies-map)
+                (with-eval-after-load 'org-roam-dailies
+                  (setq org-roam-dailies-capture-templates
+                        ',org-dailies-capture-templates)
+                  (setq org-roam-dailies-directory
+                        ,org-dailies-directory)))
+              `((autoload 'org-dailies-map "org-dailies" "" nil 'keymap)
+                (define-key mode-specific-map (kbd "d") 'org-dailies-map)
                 (setq org-dailies-directory ,org-dailies-directory))))
       #:summary "Daily journaling functionality for Emacs"
       #:commentary "\
@@ -4390,9 +4398,7 @@ or with a org-roam-less copy of the package."
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)
-             (org-dailies-directory . ,org-dailies-directory)
-             (org-dailies-capture-templates . ,org-dailies-capture-templates)))
+   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
 ;; TODO: rewrite to states
@@ -4416,8 +4422,6 @@ or with a org-roam-less copy of the package."
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
-    (define org-roam-dailies? (get-value 'emacs-org-dailies config))
-
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -4492,29 +4496,12 @@ the node, relative to `org-roam-directory'."
             (define-key map (kbd "C-c r T") 'org-roam-tag-remove)
             (define-key map (kbd "C-c r a") 'org-roam-alias-add)
             (define-key map (kbd "C-c r A") 'org-roam-alias-remove)
-            (define-key map (kbd "C-c r O") 'rde-org-roam-open-ref)
-            ,@(if org-roam-dailies?
-                  `((define-key map (kbd "C-c n N")
-                      'org-roam-dailies-goto-next-note)
-                    (define-key map (kbd "C-c n P")
-                      'org-roam-dailies-goto-previous-note))
-                  '())))
+            (define-key map (kbd "C-c r O") 'rde-org-roam-open-ref)))
 
          ,@(if org-roam-capture-templates
                `((setq org-roam-capture-templates ',org-roam-capture-templates))
-               '())
-
-         ,@(if org-roam-dailies?
-               `((with-eval-after-load 'org-roam-dailies
-                   ,@(if (get-value 'org-dailies-capture-templates config)
-                         `((setq org-roam-dailies-capture-templates
-                                 ',(get-value
-                                    'org-dailies-capture-templates
-                                    config)))
-                         '())
-                   (setq org-roam-dailies-directory
-                         ,(get-value 'org-dailies-directory config))))
                '()))
+
         ,@(if org-roam-todo?
               (org-roam-todo config)
               '())
@@ -4538,18 +4525,6 @@ the node, relative to `org-roam-directory'."
                  '())
 
         (let ((map mode-specific-map))
-          ,@(if org-roam-dailies?
-                `((define-key map (kbd "n t") 'org-roam-dailies-goto-today)
-                  (define-key map (kbd "n y") 'org-roam-dailies-goto-yesterday)
-                  (define-key map (kbd "n m") 'org-roam-dailies-goto-tomorrow)
-                  (define-key map (kbd "n d") 'org-roam-dailies-goto-date)
-                  (define-key map (kbd "n c t") 'org-roam-dailies-capture-today)
-                  (define-key map (kbd "n c y")
-                    'org-roam-dailies-capture-yesterday)
-                  (define-key map (kbd "n c m")
-                    'org-roam-dailies-capture-tomorrow)
-                  (define-key map (kbd "n c d") 'org-roam-dailies-capture-date))
-                '())
           (define-key map (kbd "n n") 'org-roam-buffer-toggle)
           (define-key map (kbd "n f") 'org-roam-node-find)
           (define-key map (kbd "n i") 'org-roam-node-insert)
