@@ -454,6 +454,13 @@ can be later used to extend original service with additional configuration."
       (append-map
        (lambda (f) ((feature-system-services-getter f) config)) features)))))
 
+(define (features->home-services features)
+  "Get home services out of list of rde features."
+  ;; It's written for demonstration purpose, not intended to be a part of rde
+  ;; features API.
+  (let ((config (rde-config (features features))))
+    (fold-home-services features config)))
+
 ;; (pretty-print-rde-config
 ;;  (rde-config
 ;;   (features my-features)))
