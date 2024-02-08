@@ -4356,7 +4356,8 @@ If NODE doesn't exist, create a new org-roam node with REF."
           (emacs-org-dailies emacs-org-dailies)
           (org-dailies-directory "daily/")
           (org-dailies-capture-templates #f))
-  "Configure org-dailies for GNU Emacs."
+  "Configure org-dailies or org-roam-dailies for GNU Emacs, depending on
+ORG-ROAM-DAILIES? RDE value."
   (ensure-pred file-like? emacs-org-dailies)
   (ensure-pred maybe-path? org-dailies-directory)
   (ensure-pred maybe-list? org-dailies-capture-templates)
@@ -4401,7 +4402,7 @@ or with a org-roam-less copy of the package."
           (org-roam-directory #f)
           (org-roam-capture-templates #f)
           (org-roam-todo? #f)
-          (org-roam-dailies? #f)
+          (org-roam-dailies? #t)
           (use-node-types? #t))
   "Configure org-roam for GNU Emacs."
   (ensure-pred file-like? emacs-org-roam)
@@ -4418,13 +4419,19 @@ or with a org-roam-less copy of the package."
   (define emacs-org-roam-package
     (if org-roam-dailies?
         emacs-org-roam
-        (package/inherit emacs-org-roam
+        (package
+          (inherit emacs-org-roam)
           (source (origin (inherit (package-source emacs-org-roam))
                           (snippet
                            '(delete-file "extensions/org-roam-dailies.el")))))))
 
   (define (get-home-services config)
-    (if org-roam-dailies? (require-value 'org-dailies-directory config))
+    (if org-roam-dailies?
+        (unless (get-value 'org-dailies-directory config)
+          (raise
+           (formatted-message
+            (G_ "`org-dailies-directory' RDE value is not peresnt, \
+enable emacs-org-dailies feature.")))))
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -4513,7 +4520,7 @@ the node, relative to `org-roam-directory'."
 
          ,@(if org-roam-dailies?
                `((with-eval-after-load 'org-roam-dailies
-                   ,@(if org-dailies-capture-templates
+                   ,@(if (get-value 'org-dailies-capture-templates config)
                          `((setq org-roam-dailies-capture-templates
                                  ',(get-value
                                     'org-dailies-capture-templates
