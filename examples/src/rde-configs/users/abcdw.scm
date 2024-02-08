@@ -502,6 +502,9 @@
     (feature-emacs-org-roam
      ;; TODO: Rewrite to states
      #:org-roam-directory "/data/abcdw/work/abcdw/notes/notes")
+    (feature-emacs-org-dailies
+     #:encrypted? #t)
+
     (feature-emacs-org-agenda
      #:org-agenda-files '("/data/abcdw/work/abcdw/private/todo.org"
                           "/data/abcdw/work/abcdw/private/phd.org"
