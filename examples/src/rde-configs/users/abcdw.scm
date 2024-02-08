@@ -506,6 +506,13 @@
      #:encrypted? #t)
 
     (feature-emacs-org-agenda
+     ;; Add efforts to agenda, it's a bit space hungry, so not included in
+     ;; feature by default yet.
+     #:org-agenda-prefix-format
+     '((agenda . " %i %-12:c%?-12t%-6e% s")
+       (todo . " %i %-12:c %-6e")
+       (tags . " %i %-12:c")
+       (search . " %i %-12:c"))
      #:org-agenda-files '("/data/abcdw/work/abcdw/private/todo.org"
                           "/data/abcdw/work/abcdw/private/phd.org"
                           "/data/abcdw/work/abcdw/rde/TODO"))
