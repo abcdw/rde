@@ -3907,8 +3907,6 @@ built-in help that provides much more contextual information."
                                'append)))
               '())
 
-        (with-eval-after-load 'org-crypt
-          (setq org-crypt-key user-mail-address))
         (defun rde-org-timer-reset ()
           "Set `org-timer-mode-line-string' to nil."
           (interactive)
