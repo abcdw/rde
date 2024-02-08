@@ -23,7 +23,7 @@
   #:use-module (gnu packages gnupg)
   #:use-module (gnu services)
   #:use-module (gnu home-services gnupg)
-  #:use-module (gnu home-services wm)
+  #:use-module (rde home services wm)
   #:use-module (rde home services emacs)
   #:use-module (guix gexp)
 
