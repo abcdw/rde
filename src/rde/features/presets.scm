@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -20,6 +20,7 @@
 (define-module (rde features presets)
   #:use-module (rde features base)
   #:use-module (rde features bittorrent)
+  #:use-module (rde features documentation)
   #:use-module (rde features emacs)
   #:use-module (rde features guile)
   #:use-module (rde features emacs-xyz)
@@ -93,6 +94,7 @@
 
 (define-public rde-cli
   (list
+   (feature-manpages)
    (feature-vterm)
    (feature-tmux)
    (feature-zsh
