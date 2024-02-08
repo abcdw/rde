@@ -3199,7 +3199,8 @@ git-link, git-timemachine."
              (let ((git-link--last-commit-from-remote
                     (lambda ()
                       (car (git-link--exec
-                            "--no-pager" "log" "-n1" "--pretty=format:%H"
+                            ;; Use %h for abbreviated commit hash
+                            "--no-pager" "log" "-n1" "--pretty=format:%h"
                             (concat remote "/" (git-link--branch)))))))
                (advice-add 'git-link--last-commit :override
                            git-link--last-commit-from-remote)
