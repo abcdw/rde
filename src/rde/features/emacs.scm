@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
@@ -131,6 +131,23 @@ of it, otherwise adds a require to @file{init.el}."
        (config `((exec . ,file-file)
                  (icon . "emacs")))
        (type 'application)))))))
+
+;; (define* (make-emacs-feature
+;;           #:key
+;;           (name)
+;;           (home-service-getter (lambda (_) '())))
+
+;;   (define rde-emacs-feature-name (symbol-append 'rde-emacs- name))
+;;   (define rde-emacs-feature-service-type-name
+;;     (symbol-append 'rde-emacs- name '-service-type))
+
+;;   (define rde-emacs-feature-service-type
+;;     (make-home-elisp-service-type rde-emacs-feature-name))
+
+;;   (feature
+;;    (name rde-emacs-feature-name)
+;;    (values `((,rde-emacs-feature-name . ,rde-emacs-feature-service-type)))
+;;    (home-services-getter home-service-getter)))
 
 ;; TODO: Add more generic rde-expand function
 (define (expand-extra-elisp elisp config)
