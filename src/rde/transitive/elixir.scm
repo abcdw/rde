@@ -38,12 +38,14 @@
     (name "mixlocktosexp")
     (version "0.1.0")
     (source
-     (local-file (%search-load-path "rde/transitive/elixir/mixlocktosexp.ex")
-                 ;; peserve executable bit
-                 #:recursive? #t))
+     (local-file (%search-load-path "rde/transitive/elixir/mixlocktosexp.ex")))
     (arguments (list
                 #:patch-shebangs? #t
-                #:install-plan #~`(("mixlocktosexp.ex" "bin/mixlocktosexp"))))
+                #:install-plan #~`(("mixlocktosexp.ex" "bin/mixlocktosexp"))
+                #:phases
+                #~(modify-phases %standard-phases
+                    (add-after 'unpack 'add-executable-bit
+                      (lambda _ (chmod "mixlocktosexp.ex" #o555))))))
     (build-system copy-build-system)
     (inputs (list elixir))
     (home-page "https://trop.in/rde")
