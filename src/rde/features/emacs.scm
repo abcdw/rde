@@ -193,19 +193,21 @@ emacs servers' environment variables to same values."
    #~(system* #$emacs-client
               "--eval"
               #$(format
-                 #f "\
-(let* ((vertico-count ~a) \
-       (after-make-frame-functions '()) \
-       (minibuffer-frame (make-frame
-                          `((display . ,x-display-name) \
-                            (name . \"~a - Emacs Client\") \
-                            (minibuffer . only) \
-                            (width . 120) \
-                            (height . ~a))))) \
-   (unwind-protect \
-       (with-selected-frame minibuffer-frame (command-execute '~a)) \
-     (delete-frame minibuffer-frame)))"
-                 height title (1+ height) command))))
+                 #f "~s"
+                 `(let* ((vertico-count ,height)
+                         (after-make-frame-functions '())
+                         (minibuffer-frame
+                          (make-frame
+                           (list
+                            (cons 'display x-display-name)
+                            '(name . ,(string-append title " - Emacs Client"))
+                            '(minibuffer . only)
+                            '(width . 120)
+                            '(height . ,(1+ height))))))
+                    (unwind-protect
+                     (with-selected-frame minibuffer-frame
+                                          (command-execute ',command))
+                     (delete-frame minibuffer-frame)))))))
 
 
 ;;;
