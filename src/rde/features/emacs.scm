@@ -520,24 +520,25 @@ It can contain settings not yet moved to separate features."
                 ;; Always setting display to WAYLAND_DISPLAY can be
                 ;; problematic on non-wayland systems
                 (port (open-input-pipe
-                       (format #f "~a --eval \"\
-(let* ((vertico-count ~a)\
-       (after-make-frame-functions '())\
-       (minibuffer-frame\
-         (make-frame (list (cons 'display (getenv \\\"WAYLAND_DISPLAY\\\"))\
-                           '(name . \\\"dynamic menu - Emacs Client\\\")\
-                           '(minibuffer . only)\
-                           '(width . 120)\
-                           '(height . ~a)))))\
-     (unwind-protect\
-        (with-selected-frame minibuffer-frame\
-          (completing-read \\\"Select: \\\"\
-                          (split-string \\\"~a\\\" \\\"\n\\\")))\
-      (delete-frame minibuffer-frame)))\""
-                               #$emacs-client
-                               (+ 1 count)
-                               (+ 2 count)
-                               clean-input)))
+                       (format
+                        #f "~a --eval '~s'"
+                        #$emacs-client
+                        `(let* ((vertico-count ,(+ 1 count))
+                                (after-make-frame-functions '())
+                                (minibuffer-frame
+                                 (make-frame
+                                  (list
+                                   (cons 'display (getenv "WAYLAND_DISPLAY"))
+                                   '(name . "dynamic menu - Emacs Client")
+                                   '(minibuffer . only)
+                                   '(width . 120)
+                                   '(height . ,(+ 2 count))))))
+                           (unwind-protect
+                            (with-selected-frame
+                             minibuffer-frame
+                             (completing-read "Select: "
+                                              (split-string ,clean-input "\n")))
+                            (delete-frame minibuffer-frame))))))
                 ;; Drop surrounding quotes and newline.
                 (selected (string-drop
                            (string-drop-right (get-string-all port) 2)
