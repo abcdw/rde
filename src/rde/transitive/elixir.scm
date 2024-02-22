@@ -67,6 +67,7 @@
 (define (base16->nix-base32 hash)
   (bytevector->nix-base32-string
    (base16-string->bytevector hash)))
+
 (define* (get-package-sexp
           #:key
           name (hex-name name) version hash build-system (dependencies '())
@@ -136,4 +137,4 @@
       (format port preamble)
       (for-each (lambda (x)
                   (format port "~y\n"
-                          (mix-sexp->package-sexp x))) (reverse pkgs)))))
+                          (mix-sexp->package-sexp x))) pkgs))))
