@@ -4653,6 +4653,9 @@ citation management for GNU Emacs."
               `((with-eval-after-load 'citar
                   (setq citar-org-roam-note-title-template
                         "${title} - ${author editor}")
+                  ,@(if citar-notes-paths
+                        `((setq citar-org-roam-subdir ,(car citar-notes-paths)))
+                        '())
                   (citar-org-roam-mode 1)))
               '())
 
@@ -4667,7 +4670,8 @@ citation management for GNU Emacs."
 Reference and bibliography management with emacs"
       #:commentary "\
 Set org-cite processors and citar configuration, basic keybindings, reasonable
-defaults."
+defaults. The first element of citar-notes-path also defines
+citar-org-roam-subdir if org-roam is enabled."
       #:keywords
       '(convenience org-mode org-cite citar references roam knowledgebase)
       #:elisp-packages
