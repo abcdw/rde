@@ -10,16 +10,25 @@
 
   #:export (feature-git))
 
+(define (ssh:ssh-key? key)
+  (not (null? (filter (lambda (s) (string-prefix? s key))
+                      '("ssh-rsa"
+                        "ssh-dss"
+                        "ecdsa-sha2-nistp256"
+                        "ssh-ed25519"
+                        "sk-ssh-ed25519@openssh.com"
+                        "sk-ecdsa-sha2-nistp256@openssh.com")))))
+
 (define* (feature-git
           #:key
           (git git)
           (sign-commits? #t)
-          (git-gpg-sign-key #f)
+          (git-sign-key #f)
           (git-send-email? #t)
           (extra-config '()))
   "Setup and configure Git."
   (ensure-pred any-package? git)
-  (ensure-pred maybe-string? git-gpg-sign-key)
+  (ensure-pred maybe-string? git-sign-key)
   (ensure-pred boolean? sign-commits?)
   (ensure-pred boolean? git-send-email?)
   (ensure-pred list? extra-config)
@@ -29,12 +38,16 @@
     (require-value 'full-name config)
     (require-value 'email config)
 
-    (let ((gpg-sign-key (or git-gpg-sign-key
-                            (get-value 'gpg-primary-key config))))
+    (let* ((gpg-primary-key (get-value 'gpg-primary-key config))
+           (git-sign-key (or git-sign-key gpg-primary-key))
+           (ssh-key? (ssh:ssh-key? git-sign-key))
+           (sign-key (if ssh-key?
+                         (string-append "key::" git-sign-key)
+                         git-sign-key)))
       (when sign-commits?
         ;; TODO: Make a more detailed exception, which tells that user either
         ;; need to provide a correct key or set sign-commits? to #f
-        (ensure-pred string? gpg-sign-key))
+        (ensure-pred string? sign-key))
       (list
        (when git-send-email?
          (simple-service
@@ -54,7 +67,7 @@
              ((name . ,(get-value 'full-name config))
               (email . ,(get-value 'email config))
               ,@(if sign-commits?
-                    `((signingkey . ,gpg-sign-key))
+                    `((signingkey . ,sign-key))
                     '())))
             (merge
              ;; diff3 makes it easier to solve conflicts with smerge, zdiff3
@@ -70,6 +83,10 @@
                     '())))
             (sendemail
              ((annotate . #t)))
+
+            ,@(if (and sign-commits? ssh-key?)
+                  `((gpg ((format . ssh))))
+                  '())
 
             ,@extra-config)))))))
 
