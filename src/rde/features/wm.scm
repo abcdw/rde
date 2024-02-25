@@ -307,9 +307,9 @@ chooser_type=simple"
             (autoload 'sway--x-focus-frame "sway")
             (defalias 'x-focus-frame 'sway--x-focus-frame)
             (setq frame-title-format
-                  '(multiple-frames "%b"
-                                    ("" "%b — GNU Emacs at " system-name
-                                     " [" (:eval (frame-parameter (selected-frame) 'window-id)) "]"))))
+                  '(multiple-frames ("" "%b — GNU Emacs at " system-name
+                                     " [" (:eval (frame-parameter (selected-frame) 'window-id)) "]")
+                                    "%b")))
           #:summary "\
 Emacs configuration to play nice with sway."
           #:commentary "\
