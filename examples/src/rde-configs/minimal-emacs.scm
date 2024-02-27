@@ -59,3 +59,5 @@
  (synopsis "")
  (description "")
  (license #f))
+
+;; TODO: Construct and source setup-environment somehow
