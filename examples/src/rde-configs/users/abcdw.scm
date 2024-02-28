@@ -31,6 +31,7 @@
   #:use-module (rde features presets)
   #:use-module (rde features version-control)
   #:use-module (rde features video)
+  #:use-module (rde features terminals)
   #:use-module (rde features)
   #:use-module (rde home services emacs)
   #:use-module (rde home services i2p)
@@ -443,11 +444,7 @@
       (publicshare "$HOME")
       (templates "$HOME")))
 
-    ((@ (rde features terminals) feature-alacritty)
-     #:config-file (local-file "../files/config/alacritty/alacritty.yml")
-     #:default-terminal? #f
-     #:backup-terminal? #t
-     #:software-rendering? #f)
+    (feature-foot)
     (feature-yggdrasil)
     (feature-i2pd
      #:outproxy 'http://acetone.i2p:3128
