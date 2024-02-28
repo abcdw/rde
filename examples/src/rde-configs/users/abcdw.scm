@@ -124,7 +124,6 @@
        "emacs-kind-icon"
        "emacs-nginx-mode" "emacs-yaml-mode"
        "emacs-arei"
-       "emacs-ytdl"
        "emacs-multitran"
        "emacs-minimap"
        "emacs-ement"
@@ -149,7 +148,7 @@
      "utox" "qtox"
      ;; "jami"
 
-     "alsa-utils" "yt-dlp" "cozy"
+     "alsa-utils" "cozy"
      "pavucontrol" "wev"
      "imagemagick"
      "obs" "obs-wlrobs"
@@ -543,6 +542,8 @@ subject:/home:/) and tag:new}\"'"
         (:name "Guix Home Inbox" :key "H" :query "tag:guix-home and tag:unread"))
       ;; %rde-notmuch-saved-searches
       '()))
+
+    (feature-yt-dlp)
 
     (feature-keyboard
      ;; To get all available options, layouts and variants run:
