@@ -12,14 +12,14 @@ install:
 	@echo some installation will happen here
 
 check:
-	./pre-inst-env guile -L ./tests -L ./files/emacs/gider/src -c \
+	guile -L ./src -L ./tests -L ./files/emacs/gider/src -c \
 	'((@ (rde test-runners) run-project-tests-cli))'
 
 guix:
 	make -C examples guix
 
 repl: guix
-	./pre-inst-env examples/target/profiles/guix/bin/guix repl -L ./tests \
+	examples/target/profiles/guix/bin/guix repl -L ./src -L ./tests \
 	-L ./files/emacs/gider/src -L ./examples/src --listen=tcp:37146
 
 examples/ixy/home/reconfigure:

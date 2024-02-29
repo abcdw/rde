@@ -1,6 +1,0 @@
-#!/bin/sh
-
-GUILE_LOAD_PATH="./src${GUILE_LOAD_PATH:+:}$GUILE_LOAD_PATH"
-export GUILE_LOAD_PATH
-
-exec "$@"
