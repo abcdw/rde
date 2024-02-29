@@ -4,7 +4,7 @@ include profiles.mk
 
 # Also defined in .envrc to make proper guix version available project-wide
 GUIX_PROFILE=target/profiles/guix
-GUIX=./pre-inst-env ${GUIX_PROFILE}/bin/guix
+GUIX=GUILE_LOAD_PATH="../src:../tests:./src" GUILE_LOAD_COMPILED_PATH="" ${GUIX_PROFILE}/bin/guix
 
 SRC_DIR=./src
 CONFIGS=${SRC_DIR}/rde-configs/configs.scm
@@ -16,11 +16,13 @@ ROOT_MOUNT_POINT=/mnt
 VERSION=latest
 
 repl:
-	${GUIX} repl -L ../tests \
+	${GUIX} repl \
 	-L ../files/emacs/gider/src --listen=tcp:37146
 
 ares-rs:
-	${GUIX} shell guile-next guix guile-ares-rs -- guile \
+	${GUIX} shell guile-next guile-ares-rs \
+	-e '(@ (rde packages package-management) guix-from-channels-lock)' \
+	-- guile \
 	-c "((@ (nrepl server) run-nrepl-server) #:port 7888)"
 
 ixy/home/build: guix
