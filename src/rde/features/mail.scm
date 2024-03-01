@@ -947,7 +947,7 @@ control whether to NOTIFY? when new emails arrive."
                   (tls . #f)
                   (tlsOptions . ((rejectUnauthorized . #t)))
                   (username . ,(mail-account-fqda acc))
-                  (passwordCmd . ,(mail-account-pass-cmd acc))
+                  (passwordCmd . ,(mail-account-get-pass-cmd acc))
                   (xoauth2 . #f)
                   (alias . ,(mail-account-id acc))
                   (trigger . 20)
