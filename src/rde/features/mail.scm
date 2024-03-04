@@ -1,8 +1,8 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
-;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2022, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
 ;;; This file is part of rde.
@@ -446,7 +446,10 @@ Example:
   (feature
    (name 'msmtp)
    (home-services-getter get-home-services)
-   (values `((msmtp . ,msmtp)))))
+   (values `((msmtp . ,msmtp)
+             ;; TODO: [Andrew Tropin, 2024-03-07] Should be provided from
+             ;; feature-mail-settings, not feature-msmtp
+             (smtp-provider-settings . ,msmtp-provider-settings)))))
 
 
 ;;;
@@ -668,12 +671,14 @@ topics with your preferred hierarchy."
                                         #f "smtp ~a ~a ~a"
                                         (assoc-ref
                                          (assoc-ref
-                                          %default-msmtp-provider-settings
+                                          (get-value
+                                           'smtp-provider-settings config)
                                           (mail-account-type mail-acc))
                                          'host)
                                         (assoc-ref
                                          (assoc-ref
-                                          %default-msmtp-provider-settings
+                                          (get-value
+                                           'smtp-provider-settings config)
                                           (mail-account-type mail-acc))
                                          'port)
                                         (mail-account-fqda mail-acc)))))))
@@ -813,7 +818,7 @@ configured."
                   (get-value 'mail-accounts config))
           #f))
     (define smtp-provider
-      (assoc-ref %default-msmtp-provider-settings
+      (assoc-ref (get-value 'smtp-provider-settings config)
                  (and=> mail-acc mail-account-type)))
     (define smtp-host (assoc-ref smtp-provider 'host))
     (define smtp-port (assoc-ref smtp-provider 'port))
@@ -940,9 +945,10 @@ control whether to NOTIFY? when new emails arrive."
         `#(,@(map
               (lambda (acc)
                 `((host . ,(assoc-ref
-                            (assoc-ref %default-msmtp-provider-settings
-                                       (mail-account-type acc))
-                                      'host))
+                            (assoc-ref
+                             (get-value 'smtp-provider-settings config)
+                             (mail-account-type acc))
+                            'host))
                   (port . 143)
                   (tls . #f)
                   (tlsOptions . ((rejectUnauthorized . #t)))
