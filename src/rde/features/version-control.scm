@@ -40,7 +40,7 @@
 
     (let* ((gpg-primary-key (get-value 'gpg-primary-key config))
            (git-sign-key (or git-sign-key gpg-primary-key))
-           (ssh-key? (ssh:ssh-key? git-sign-key))
+           (ssh-key? (and (string? git-sign-key) (ssh:ssh-key? git-sign-key)))
            (sign-key (if ssh-key?
                          (string-append "key::" git-sign-key)
                          git-sign-key)))
