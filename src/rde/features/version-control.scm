@@ -7,6 +7,8 @@
   #:use-module (gnu services)
   #:use-module (gnu packages version-control)
   #:use-module (guix gexp)
+  #:use-module (guix diagnostics)
+  #:use-module (guix ui)
 
   #:export (feature-git))
 
@@ -45,9 +47,11 @@
                          (string-append "key::" git-sign-key)
                          git-sign-key)))
       (when sign-commits?
-        ;; TODO: Make a more detailed exception, which tells that user either
-        ;; need to provide a correct key or set sign-commits? to #f
-        (ensure-pred string? sign-key))
+        (unless (string? sign-key)
+          (raise (formatted-message
+                  (G_ "Ensure that correct `git-sign-key' or `gpg-primary-key' \
+is provided or disable `sign-commits?' Current sign-key value is ~a")
+                  sign-key))))
       (list
        (when git-send-email?
          (simple-service
