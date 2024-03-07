@@ -456,8 +456,12 @@ Example:
 ;;; feature-l2md.
 ;;;
 
-(define* (feature-l2md)
+(define* (feature-l2md
+          #:key
+          (l2md l2md))
   "Configure l2md MDA."
+  (ensure-pred file-like? l2md)
+
   (define (get-home-services config)
     (require-value 'mail-directory-fn config)
     (require-value 'mailing-lists config)
@@ -506,13 +510,14 @@ Example:
      (service
       home-l2md-service-type
       (home-l2md-configuration
+       (l2md l2md)
        (oneshot 1)
        (repos (map get-repo-config mls))))))
 
   (feature
    (name 'l2md)
    (home-services-getter get-home-services)
-   (values `((l2md . #t)))))
+   (values `((l2md . ,l2md)))))
 
 
 ;;;
