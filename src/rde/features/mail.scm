@@ -1450,11 +1450,19 @@ not appear in the pop-up buffer."
 ;; https://michal.sapka.me/2023/notmuch/
 (define* (feature-notmuch
           #:key
+          (notmuch notmuch)
+          (emacs-notmuch emacs-notmuch)
+          (emacs-consult-notmuch emacs-consult-notmuch)
+          (emacs-ol-notmuch emacs-ol-notmuch)
           (get-notmuch-configuration default-get-notmuch-configuration)
           (notmuch-saved-searches %rde-notmuch-saved-searches)
           (notmuch-search-oldest-first #t)
           (extra-tag-updates-post '()))
   "Configure notmuch and Emacs UI for it if emacs enabled."
+  (ensure-pred file-like? notmuch)
+  (ensure-pred file-like? emacs-notmuch)
+  (ensure-pred file-like? emacs-ol-notmuch)
+  (ensure-pred file-like? emacs-consult-notmuch)
   (ensure-pred procedure? get-notmuch-configuration)
 
   (define f-name 'notmuch)
@@ -1478,6 +1486,10 @@ not appear in the pop-up buffer."
        (get-value 'mail-accounts config)))
 
     (list
+     (service
+      home-notmuch-service-type
+      (home-notmuch-configuration
+       (notmuch notmuch)))
      (simple-service
       'notmuch-service
       home-notmuch-service-type
