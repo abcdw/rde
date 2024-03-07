@@ -1469,6 +1469,9 @@ not appear in the pop-up buffer."
   (ensure-pred file-like? emacs-ol-notmuch)
   (ensure-pred file-like? emacs-consult-notmuch)
   (ensure-pred procedure? get-notmuch-configuration)
+  (ensure-pred list? %rde-notmuch-saved-searches)
+  (ensure-pred boolean? notmuch-search-oldest-first)
+  (ensure-pred list? extra-tag-updates-post)
 
   (define f-name 'notmuch)
 
