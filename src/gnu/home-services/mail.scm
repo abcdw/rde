@@ -290,9 +290,9 @@ the messages.")
 (define list-of-l2md-repos? (list-of l2md-repo?))
 
 (define-configuration/no-serialization home-l2md-configuration
-  (package
-    (package l2md)
-    "The L2md package to use.")
+  (l2md
+   (file-like l2md)
+   "The L2md package to use.")
   (autostart?
    (boolean #f)
    "Whether to autostart L2md on login.")
@@ -346,7 +346,7 @@ a particular public-inbox repository."))
                  (sync-enabled . ,sync-enabled?)))))))
 
   (match config
-    (($ <home-l2md-configuration> package autostart? period oneshot maildir pipe base repos _)
+    (($ <home-l2md-configuration> l2md autostart? period oneshot maildir pipe base repos _)
      (begin
        (generic-serialize-git-ini-config
         #:combine-ini (compose flatten list)
@@ -370,14 +370,14 @@ a particular public-inbox repository."))
 
 (define l2md-shepherd-service
   (match-lambda
-    (($ <home-l2md-configuration> package autostart? _)
+    (($ <home-l2md-configuration> l2md autostart? _)
      (if autostart?
          (list (shepherd-service
                 (documentation
                  "L2md service for downloading public-inbox archives.")
                 (provision '(l2md))
                 (start #~(make-forkexec-constructor
-                          (list #$(file-append package "/bin/l2md"))
+                          (list #$(file-append l2md "/bin/l2md"))
                           #:log-file (string-append
                                       (getenv "XDG_STATE_HOME") "/log"
                                       "/l2md.log")))
@@ -385,7 +385,7 @@ a particular public-inbox repository."))
          '()))))
 
 (define (l2md-profile-service config)
-  (list (home-l2md-configuration-package config)))
+  (list (home-l2md-configuration-l2md config)))
 
 (define home-l2md-service-type
   (service-type (name 'home-l2md)
