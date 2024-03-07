@@ -146,8 +146,8 @@ binary.")
 ;;;
 
 (define-configuration/no-serialization home-notmuch-configuration
-  (package
-   (package notmuch)
+  (notmuch
+   (file-like notmuch)
    "notmuch package to use.")
   (config
    (ini-config '())
@@ -183,7 +183,7 @@ notmuch-hooks} for more information.")
 notmuch-hooks} for more information."))
 
 (define (add-notmuch-package config)
-  (list (home-notmuch-configuration-package config)))
+  (list (home-notmuch-configuration-notmuch config)))
 
 (define (add-notmuch-configuration config)
   (define (serialize-field key val)
