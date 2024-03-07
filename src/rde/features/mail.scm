@@ -1703,7 +1703,7 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((notmuch . ,notmuch)))
    (home-services-getter get-home-services)))
 
 
