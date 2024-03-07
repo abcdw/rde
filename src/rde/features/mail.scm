@@ -1217,6 +1217,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
   (ensure-pred maybe-list? mail-account-ids)
   (ensure-pred list? isync-serializers)
   (ensure-pred list? isync-global-settings)
+  (ensure-pred boolean? isync-verbose)
 
   ;; Sync mail deletion
   ;; https://notmuchmail.org/pipermail/notmuch/2016/023112.html
