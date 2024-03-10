@@ -1207,6 +1207,7 @@ control whether to NOTIFY? when new emails arrive."
 
 (define* (feature-isync
           #:key
+          (isync isync)
           (mail-account-ids #f)
           (isync-global-settings default-isync-global-settings)
           (isync-serializers %default-isync-serializers)
@@ -1214,6 +1215,7 @@ control whether to NOTIFY? when new emails arrive."
   "Setup and configure isync.  If MAIL-ACCOUNT-IDS not provided use all
 mail accounts.  ISYNC-VERBOSE controls output verboseness of
 @file{mbsync}."
+  (ensure-pred file-like? isync)
   (ensure-pred maybe-list? mail-account-ids)
   (ensure-pred list? isync-serializers)
   (ensure-pred list? isync-global-settings)
@@ -1251,6 +1253,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
        (service
         home-isync-service-type
         (home-isync-configuration
+         (isync isync)
          (config
           (append
            isync-global-settings
