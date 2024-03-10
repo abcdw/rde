@@ -58,8 +58,8 @@
   #~(string-append #$@(interpose (map serialize-item val) "\n" 'suffix)))
 
 (define-configuration/no-serialization home-isync-configuration
-  (package
-   (package isync)
+  (isync
+   (file-like isync)
    "isync package to use.")
   (xdg-flavor?
    (boolean #t)
@@ -75,7 +75,7 @@ binary.")
     #~(system
        (string-join
         (cons
-         #$(file-append (home-isync-configuration-package config)
+         #$(file-append (home-isync-configuration-isync config)
                         "/bin/mbsync")
          (if (or (member "-c" (command-line))
                  (member "--config" (command-line)))
@@ -87,9 +87,9 @@ binary.")
   (list
    (if (home-isync-configuration-xdg-flavor? config)
        (wrap-package
-        (home-isync-configuration-package config)
+        (home-isync-configuration-isync config)
         "mbsync" wrapper-gexp)
-       (home-isync-configuration-package config))))
+       (home-isync-configuration-isync config))))
 
 (define (get-isync-configuration config)
   `((,(if (home-isync-configuration-xdg-flavor? config)
