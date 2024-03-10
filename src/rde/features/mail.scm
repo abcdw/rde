@@ -962,42 +962,43 @@ control whether to NOTIFY? when new emails arrive."
                   (xoauth2 . #f)
                   (alias . ,(mail-account-id acc))
                   (trigger . 20)
-                  (boxes .
-                         #(((mailbox . "Inbox")
-                            ,@(if (get-value 'isync config)
-                                  (list
-                                   (cons
-                                    'onNewMail
-                                    #~(format
-                                       #f "~s"
-                                       (string-join
-                                        (list #$(get-value-eval 'mbsync config)
-                                              #$@((get-value
-                                                   'mail-acc->isync-args config)
-                                                  acc))
-                                        " "))))
-                                  '())
-                            ,@(if notify?
-                                  (cond
-                                   ((get-value 'emacs-ednc config)
-                                    (list
-                                     (cons 'onNewMailPost
-                                           #~(format
-                                              #f "~s"
-                                              (string-join
-                                               (list
-                                                #$(file-append
-                                                   (get-value 'emacs config)
-                                                   "/bin/emacsclient")
-                                                "-e"
-                                                (format
-                                                 #f "'~s'"
-                                                 '(notifications-notify
-                                                   :app-name "goimapnotify"
-                                                   :title "New email received"
-                                                   :timeout 5000))))))))
-                                   (else '()))
-                                  '()))))))
+                  (boxes
+                   .
+                   #(((mailbox . "Inbox")
+                      ,@(if (get-value 'isync config)
+                            (list
+                             (cons
+                              'onNewMail
+                              #~(format
+                                 #f "~s"
+                                 (string-join
+                                  (list #$(get-value-eval 'mbsync config)
+                                        #$@((get-value
+                                             'mail-acc->isync-args config)
+                                            acc))
+                                  " "))))
+                            '())
+                      ,@(if notify?
+                            (cond
+                             ((get-value 'emacs-ednc config)
+                              (list
+                               (cons 'onNewMailPost
+                                     #~(format
+                                        #f "~s"
+                                        (string-join
+                                         (list
+                                          #$(file-append
+                                             (get-value 'emacs config)
+                                             "/bin/emacsclient")
+                                          "-e"
+                                          (format
+                                           #f "'~s'"
+                                           '(notifications-notify
+                                             :app-name "goimapnotify"
+                                             :title "New email received"
+                                             :timeout 5000))))))))
+                             (else '()))
+                            '()))))))
               mail-accounts)))))))
 
   (feature
