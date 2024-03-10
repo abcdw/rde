@@ -966,10 +966,16 @@ control whether to NOTIFY? when new emails arrive."
                          #(((mailbox . "Inbox")
                             ,@(if (get-value 'isync config)
                                   (list
-                                   (cons 'onNewMail
-                                         ((get-value
-                                           'isync-synchronize-cmd-fn config)
-                                          acc)))
+                                   (cons
+                                    'onNewMail
+                                    #~(format
+                                       #f "~s"
+                                       (string-join
+                                        (list #$(get-value-eval 'mbsync config)
+                                              #$@((get-value
+                                                   'mail-acc->isync-args config)
+                                                  acc))
+                                        " "))))
                                   '())
                             ,@(if notify?
                                   (cond
@@ -1259,17 +1265,29 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
            isync-global-settings
            (append-map serialize-mail-acc mail-accounts))))))))
 
-  ;; MAYBE: Wrap it in a program-file to make it possible to call it
-  ;; with system*
-  (define (isync-synchronize-cmd-fn mail-acc)
-    (string-append "mbsync "
-                   (if isync-verbose "-V " "")
-                   (symbol->string (mail-account-id mail-acc))))
+  ;; Necessary to go get this package for proper mbsync configuration.
+  ;; That's because home-isync-service-type wraps the isync binary,
+  ;; and we need this wrapper for isync to read the right config.
+  (define (mbsync config)
+    (file-append
+     (car
+      (service-value
+       (fold-services
+        (instantiate-missing-services
+         (cons* (service home-profile-service-type '())
+                (get-home-services config)))
+        #:target-type home-profile-service-type)))
+     "/bin/mbsync"))
+
+  (define (mail-acc->isync-args mail-acc)
+    (list (if isync-verbose "-V" "")
+          (symbol->string (mail-account-id mail-acc))))
 
   (feature
    (name 'isync)
    (values `((isync . #t)
-             (isync-synchronize-cmd-fn . ,isync-synchronize-cmd-fn)))
+             (mbsync . ,mbsync)
+             (mail-acc->isync-args . ,mail-acc->isync-args)))
    (home-services-getter get-home-services)))
 
 
