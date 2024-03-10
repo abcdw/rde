@@ -6,7 +6,7 @@
 (define-public go-gitlab.com-shackra-goimapnotify-next
   (package
     (inherit go-gitlab.com-shackra-goimapnotify)
-    (version "2.4-rc3")
+    (version "2.4-rc4")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -17,4 +17,4 @@
                 (package-name go-gitlab.com-shackra-goimapnotify) version))
               (sha256
                (base32
-                "0dk12x0x5zan86fdi5wi5zv545vmccs15cdrc2ica9afy189zvdn"))))))
+                "11vfvjdpwxf5zx23xais836v3n9bq8vawgcfb4bx8fdd6gww157q"))))))
