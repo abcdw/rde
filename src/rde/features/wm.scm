@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
@@ -813,13 +813,14 @@ By default, NAME is root, PATH is /, and DISK-ICON is ."
           (exec #f)
           (return-type "json")
           (icon #f)
+          (interval 60)
           (placement 'modules-right))
   "Executes a custom script EXEC. The script is expected
 to return a valid json object."
   (lambda (config)
     (waybar-module
      (symbol-append 'custom/ name)
-     `((interval . 2)
+     `((interval . ,interval)
        (exec . ,exec)
        (return-type . ,return-type)
        (tooltip . "{tooltip}")
