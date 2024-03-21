@@ -19,7 +19,7 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (rde services cloud-init)
+(define-module (rde system services cloud-init)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages guile-xyz)
   #:use-module ((gnu packages linux) #:select (e2fsprogs))
