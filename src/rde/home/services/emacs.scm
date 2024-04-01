@@ -156,7 +156,11 @@ Same as @code{init-el}, but result will go to @file{early-init.el}."))
   (map (if (home-emacs-configuration-native-comp? config)
            (package-input-rewriting/spec
             (append
-             `(("emacs" . ,(const (home-emacs-configuration-emacs config))))
+             `(("emacs-minimal" . ,(const (home-emacs-configuration-emacs config)))
+               ("emacs" . ,(const (home-emacs-configuration-emacs config)))
+               ("emacs-no-x" . ,(const (home-emacs-configuration-emacs config)))
+               ("emacs-no-x-toolkit" . ,(const (home-emacs-configuration-emacs config)))
+               ("emacs-wide-int" . ,(const (home-emacs-configuration-emacs config))))
              (home-emacs-configuration-elisp-packages-rewrites config)))
            identity)
        (let ((elisp-packages (home-emacs-configuration-elisp-packages config)))
