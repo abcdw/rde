@@ -67,6 +67,10 @@ Integration with pandoc, better code blocks rendering."
 
 (define* (feature-tex
           #:key
+          (texlive-scheme-basic texlive-scheme-basic)
+          (texlive-listings texlive-listings)
+          (texlive-biber texlive-biber)
+          (texlive-biblatex texlive-biblatex)
           (extra-tex-packages '())
           (biblatex? #t)
           (listings? #t)
@@ -74,6 +78,10 @@ Integration with pandoc, better code blocks rendering."
   "Configure the TeX typesetting system.
 LISTINGS-OPTIONS is an association list of key-value pairs for the
 tex-listings package that typesets source code."
+  (ensure-pred file-like? texlive-scheme-basic)
+  (ensure-pred file-like? texlive-listings)
+  (ensure-pred file-like? texlive-biber)
+  (ensure-pred file-like? texlive-biblatex)
   (ensure-pred list-of-file-likes? extra-tex-packages)
   (ensure-pred boolean? biblatex?)
   (ensure-pred boolean? listings?)
