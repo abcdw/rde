@@ -29,10 +29,12 @@
 
 (define* (feature-bluetooth
           #:key
+          (bluez bluez)
           (emacs-bluetooth emacs-bluetooth)
           (auto-enable? #t)
           (bluetooth-key "B"))
   "Configure and set up Bluetooth."
+  (ensure-pred file-like? bluez)
   (ensure-pred file-like? emacs-bluetooth)
   (ensure-pred boolean? auto-enable?)
   (ensure-pred string? bluetooth-key)
@@ -57,6 +59,7 @@
     (list
      (service bluetooth-service-type
               (bluetooth-configuration
+               (bluez bluez)
                (auto-enable? auto-enable?)))))
 
   (feature
