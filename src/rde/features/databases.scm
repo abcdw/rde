@@ -27,6 +27,7 @@
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu services databases)
+  #:use-module (guix gexp)
   #:use-module (srfi srfi-1)
   #:export (feature-postgresql
             feature-sqlite)
