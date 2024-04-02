@@ -36,11 +36,15 @@
 (define* (feature-transmission
           #:key
           (transmission transmission)
+          (emacs-transmission emacs-transmission)
           (auto-start? #t)
           (download-dir %unset-value)
           (extra-transmission-settings '()))
   "Setup and configure Transmission and transmission.el"
   (ensure-pred file-like? transmission)
+  (ensure-pred file-like? emacs-transmission)
+  (ensure-pred boolean? auto-start?)
+  (ensure-pred list? extra-transmission-settings)
 
   (define (transmission-home-services config)
     (define emacs-f-name 'transmission)
