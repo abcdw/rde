@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -25,13 +25,13 @@
   #:use-module (guix utils)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
+  #:use-module (guix deprecation)
   #:use-module (guix build-system trivial)
-  #:use-module ((guix licenses) #:prefix license:))
+  #:use-module ((guix licenses) #:prefix license:)
+  #:export (emacs-next-pgtk-stable emacs-next-pgtk-latest))
 
-(define-public emacs-next-pgtk-stable
-  emacs-next-pgtk)
-
-(define-public emacs-next-pgtk-latest emacs-next-pgtk-stable)
+(define-deprecated/alias emacs-next-pgtk-stable emacs-pgtk)
+(define-deprecated/alias emacs-next-pgtk-latest emacs-pgtk)
 
 (define-public emacs-consumer
   (package
