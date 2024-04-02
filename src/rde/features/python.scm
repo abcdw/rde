@@ -93,26 +93,28 @@ python files."
       home-environment-variables-service-type
       `(("IPYTHONDIR" . "$XDG_CONFIG_HOME/ipython")
         ("PYTHONSTARTUP" . ,python-startup-file)))
-     (rde-elisp-configuration-service
-      f-name
-      config
-      `(,@(if black?
-              '((eval-when-compile (require 'python-black))
-                (add-hook 'python-mode 'python-black-on-save-mode-enable-dwim))
-              '())
+     (when (get-value 'emacs config)
+       (rde-elisp-configuration-service
+        f-name
+        config
+        `(,@(if black?
+                '((eval-when-compile (require 'python-black))
+                  (add-hook 'python-mode
+                            'python-black-on-save-mode-enable-dwim))
+                '())
 
-        ,@(if (get-value 'emacs-org config)
-              `((with-eval-after-load 'org
-                  (add-to-list 'org-structure-template-alist
-                               '("py" . "src python")))
-                (with-eval-after-load 'ob-core
-                  (require 'ob-python))
-                (with-eval-after-load 'ob-python
-                  (setq org-babel-python-command
-                        ,(file-append python "/bin/python"))))
-              '()))
-      #:elisp-packages
-      (if black? (list emacs-python-black) '()))))
+          ,@(if (get-value 'emacs-org config)
+                `((with-eval-after-load 'org
+                    (add-to-list 'org-structure-template-alist
+                                 '("py" . "src python")))
+                  (with-eval-after-load 'ob-core
+                    (require 'ob-python))
+                  (with-eval-after-load 'ob-python
+                    (setq org-babel-python-command
+                          ,(file-append python "/bin/python"))))
+                '()))
+        #:elisp-packages
+        (if black? (list emacs-python-black) '())))))
 
   (feature
    (name f-name)
