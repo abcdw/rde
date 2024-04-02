@@ -37,12 +37,24 @@
 (define* (feature-ocaml
           #:key
           (ocaml ocaml)
+          (ocaml-core ocaml-core)
+          (ocaml-findlib ocaml-findlib)
+          (dune dune)
+          (ocaml-ocp-indent ocaml-ocp-indent)
+          (ocaml-merlin ocaml-merlin)
+          (ocamlbuild ocamlbuild)
           (emacs-tuareg emacs-tuareg)
           (extra-init-ml '())
           (extra-ocaml-packages '())
           (opam? #f))
   "Configure tooling and environment for OCaml."
   (ensure-pred any-package? ocaml)
+  (ensure-pred file-like? ocaml-core)
+  (ensure-pred file-like? ocaml-findlib)
+  (ensure-pred file-like? dune)
+  (ensure-pred file-like? ocaml-ocp-indent)
+  (ensure-pred file-like? ocaml-merlin)
+  (ensure-pred file-like? ocamlbuild)
   (ensure-pred file-like? emacs-tuareg)
   (ensure-pred list-of-strings? extra-init-ml)
   (ensure-pred list-of-file-likes? extra-ocaml-packages)
@@ -99,6 +111,7 @@
             extra-ocaml-packages)))
       (service home-ocaml-service-type
                (home-ocaml-configuration
+                (ocaml ocaml)
                 (config extra-init-ml))))
      (if (get-value 'emacs config)
          (list
