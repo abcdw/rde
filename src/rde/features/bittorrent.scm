@@ -35,11 +35,12 @@
 
 (define* (feature-transmission
           #:key
-          (package transmission)
+          (transmission transmission)
           (auto-start? #t)
           (download-dir %unset-value)
           (extra-transmission-settings '()))
   "Setup and configure Transmission and transmission.el"
+  (ensure-pred file-like? transmission)
 
   (define (transmission-home-services config)
     (define emacs-f-name 'transmission)
@@ -92,7 +93,7 @@ links and torrent files."
 
      (service home-transmission-service-type
               (home-transmission-configuration
-               (transmission package)
+               (transmission transmission)
                (auto-start? auto-start?)
                (download-dir download-dir)
                (settings extra-transmission-settings)))))
