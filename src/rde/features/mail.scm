@@ -299,6 +299,7 @@ is among `rde-notmuch-patch-control-codes'."
 
          ,@(if gpg-primary-key
              `((setq mml-secure-openpgp-signers '(,gpg-primary-key))
+               (setq mml-secure-openpgp-encrypt-to-self t)
                ;; (setq mml-secure-openpgp-sign-with-sender t)
                (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime))
              '())
