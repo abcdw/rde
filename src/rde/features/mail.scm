@@ -292,9 +292,8 @@ is among `rde-notmuch-patch-control-codes'."
             (list (completing-read "Select control code: "
                                    rde-message-patch-control-codes nil t)))
            (if (member control-code rde-message-patch-control-codes)
-               (unless (message-fetch-field "X-Sourcehut-Patchset-Update")
-                 (message-add-header (format "X-Sourcehut-Patchset-Update: %s"
-                                             control-code)))
+               (message-replace-header
+                "X-Sourcehut-Patchset-Update" control-code)
                (user-error "%s is not specified in
 `rde-notmuch-patch-control-codes'" control-code)))
 
