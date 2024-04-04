@@ -459,7 +459,9 @@ It can contain settings not yet moved to separate features."
           (disable-warnings? #t)
           (auto-update-buffers? #t)
           (auto-clean-space? #t)
-          (native-comp? #t)
+          ;; TODO: [Andrew Tropin, 2024-04-04] Enable back, when substitute
+          ;; server for RDE is deployed.
+          (native-comp? #f)
 
           ;; TODO: Deprecate (can be added via home services)
           (additional-elisp-packages '())
