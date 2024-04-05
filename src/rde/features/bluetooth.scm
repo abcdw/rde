@@ -22,6 +22,7 @@
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages linux)
   #:use-module (gnu services)
   #:use-module (gnu services desktop)
   #:use-module (guix gexp)
