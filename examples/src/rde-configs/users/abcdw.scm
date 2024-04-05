@@ -26,6 +26,7 @@
   #:use-module (rde features xdg)
   #:use-module (rde features markup)
   #:use-module (rde features docker)
+  #:use-module (rde features libreoffice)
   #:use-module (rde features virtualization)
   #:use-module (rde features ocaml)
   #:use-module (rde features presets)
@@ -544,6 +545,13 @@ subject:/home:/) and tag:new}\"'"
       '()))
 
     (feature-yt-dlp)
+
+    (feature-libreoffice)
+
+    ;; TODO: Remove auctex dependency, which interjects in texinfo-mode.
+    (feature-emacs-citation
+     #:global-bibliography
+     (list "/data/abcdw/work/abcdw/notes/bibliography.bib"))
 
     (feature-keyboard
      ;; To get all available options, layouts and variants run:
