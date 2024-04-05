@@ -298,6 +298,10 @@ and various other sites."
 
     (list
      (simple-service
+      'yt-dlp-package
+      home-profile-service-type
+      (list yt-dlp))
+     (simple-service
       'yt-dlp-config
       home-xdg-configuration-files-service-type
       `(("yt-dlp/config"
