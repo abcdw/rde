@@ -188,11 +188,14 @@ Same as @code{init-el}, but result will go to @file{early-init.el}."))
    (start #~(make-forkexec-constructor
              (list #$(file-append
                       (home-emacs-configuration-emacs config)
-                      "/bin/emacs") #$(format #f "--fg-daemon=~a" name))
+                      "/bin/emacs") #$(format #f "--daemon=~a" name))
              #:log-file (string-append
                          (getenv "XDG_STATE_HOME") "/log"
-                         "/emacs-" #$(symbol->string name) ".log")))
-   (stop #~(make-kill-destructor))))
+                         "/emacs-" #$(symbol->string name) ".log")
+             #:pid-file (string-append (getenv "XDG_RUNTIME_DIR") "/emacs/"
+                                       #$(symbol->string name) ".pid")))
+   (stop #~(make-kill-destructor))
+   (respawn? #f)))
 
 (define (add-emacs-shepherd-service config)
   (if (not (null? (home-emacs-configuration-emacs-servers config)))

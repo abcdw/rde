@@ -440,7 +440,47 @@ Prefix argument can be used to kill a few words."
        ;; Configure ediff for window manager.
        (setq ediff-diff-options "-w"
              ediff-split-window-function 'split-window-horizontally
-             ediff-window-setup-function 'ediff-setup-windows-plain))
+             ediff-window-setup-function 'ediff-setup-windows-plain)
+
+       ;; Configure emacs background server.
+       ,@(if (get-value 'emacs-server-mode? config)
+             `((add-hook
+                'emacs-startup-hook
+                (lambda ()
+                  (when server-mode
+                    (advice-add
+                     'kill-emacs :override
+                     (lambda (&optional arg restart)
+                       "\
+Make GNU Shepherd kill the Emacs server.
+
+If RESTART is non-nil, instead of just exiting at the end, herd will restart
+an Emacs server. ARG is ignored.
+
+Note: This is added through RDE. Redefining a primitive is not advised in
+Emacs, but this one is high-level (present in few other functions), and
+tested."
+                       (interactive)
+                       (if restart
+                           (call-process-shell-command
+                            (concat "herd restart emacs-" server-name)
+                            nil 0)
+                           (call-process-shell-command
+                            (concat "herd stop emacs-" server-name)
+                            nil 0))))
+                    ;; Tell shepherd that emacs is started through pid-file.
+                    (with-temp-file (concat (getenv "XDG_RUNTIME_DIR")
+                                            "/emacs/" server-name ".pid")
+                                    (insert (number-to-string (emacs-pid)))))))
+               (add-hook
+                'kill-emacs-hook
+                (lambda ()
+                  (when server-mode
+                    (let ((pidfile (concat (getenv "XDG_RUNTIME_DIR")
+                                           "/emacs/" server-name ".pid")))
+                      (when (file-exists-p pidfile)
+                        (delete-file pidfile)))))))
+             '()))
      #:summary "General settings, better defaults"
      #:commentary "\
 It can contain settings not yet moved to separate features."
