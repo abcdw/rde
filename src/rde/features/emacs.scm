@@ -49,8 +49,7 @@
 
             rde-elisp-configuration-service
             emacs-xdg-service
-            expand-extra-elisp
-            emacs-minibuffer-program))
+            expand-extra-elisp))
 
 
 ;;;
@@ -205,44 +204,6 @@ emacs servers' environment variables to same values."
                      "--icon=emacs"))
            (_  ; run the serverless fallback
             (apply system* #$fallback (cdr (command-line)))))))))
-
-;; This doesn't use the emacs-client-create-frame program because
-;; it executes by default the after-make-frame-functions, which
-;; can mess up with other buffers or frames.
-(define* (emacs-minibuffer-program
-          emacs-client file-name-suffix title command
-          #:key (height 10))
-  (program-file
-   (string-append "emacs-" file-name-suffix)
-   #~(system* #$emacs-client
-              (string-append
-               "--alternate-editor="
-               #$(emacs-client-alternate-editor
-                  (program-file
-                   "emacs-client-alternate-fail"
-                   #~(system*
-                      #$(file-append libnotify "/bin/notify-send")
-                      "Emacs error"
-                      "Minibuffer programs require a running server."
-                      "--icon=emacs"))))
-              "--eval"
-              #$(format
-                 #f "~s"
-                 `(let* ((vertico-count ,height)
-                         (after-make-frame-functions '())
-                         (minibuffer-frame
-                          (make-frame
-                           (list
-                            (cons 'display (or x-display-name
-                                               (getenv "WAYLAND_DISPLAY")))
-                            '(name . ,(string-append title " - Emacs Client"))
-                            '(minibuffer . only)
-                            '(width . 120)
-                            '(height . ,(1+ height))))))
-                    (unwind-protect
-                     (with-selected-frame minibuffer-frame
-                                          (command-execute ',command))
-                     (delete-frame minibuffer-frame)))))))
 
 
 ;;;
@@ -626,9 +587,47 @@ It can contain settings not yet moved to separate features."
            (close-port port)
            (format #t "~a\n" selected)))))
 
+  ;; This doesn't use the emacs-client-create-frame program because
+  ;; it executes by default the after-make-frame-functions, which
+  ;; can mess up with other buffers or frames.
+  (define* (emacs-minibuffer-program
+            file-name-suffix title command
+            #:key (height 10) (client emacs-client))
+    (program-file
+     (string-append "emacs-" file-name-suffix)
+     #~(system* #$client
+                (string-append
+                 "--alternate-editor="
+                 #$(emacs-client-alternate-editor
+                    (program-file
+                     "emacs-client-alternate-fail"
+                     #~(system*
+                        #$(file-append libnotify "/bin/notify-send")
+                        "Emacs error"
+                        "Minibuffer programs require a running server."
+                        "--icon=emacs"))))
+                "--eval"
+                #$(format
+                   #f "~s"
+                   `(let* ((vertico-count ,height)
+                           (after-make-frame-functions '())
+                           (minibuffer-frame
+                            (make-frame
+                             (list
+                              (cons 'display (or x-display-name
+                                                 (getenv "WAYLAND_DISPLAY")))
+                              '(name . ,(string-append title " - Emacs Client"))
+                              '(minibuffer . only)
+                              '(width . 120)
+                              '(height . ,(1+ height))))))
+                      (unwind-protect
+                       (with-selected-frame minibuffer-frame
+                                            (command-execute ',command))
+                       (delete-frame minibuffer-frame)))))))
+
   (define emacs-application-launcher
     (emacs-minibuffer-program
-     emacs-client "application-launcher" "Application Launcher"
+     "application-launcher" "Application Launcher"
      'app-launcher-run-app #:height standalone-minibuffer-height))
 
   (define (emacs-home-services config)
@@ -694,6 +693,7 @@ It can contain settings not yet moved to separate features."
              emacs-editor emacs-client emacs-dmenu
              emacs-client-create-frame
              emacs-client-no-wait
+             emacs-minibuffer-program
              emacs-configure-rde-keymaps
              emacs-configure-rde-startup
              emacs-server-mode?)

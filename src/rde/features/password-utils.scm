@@ -56,8 +56,7 @@
 
   (define (emacs-pass-prompt config)
     (require-value 'emacs config)
-    (emacs-minibuffer-program
-     (get-value 'emacs-client config)
+    ((get-value 'emacs-minibuffer-program config)
      "pass-prompt" "pass" 'rde-consult-pass
      #:height (get-value 'standalone-minibuffer-height config 10)))
 

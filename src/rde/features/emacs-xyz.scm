@@ -1715,9 +1715,9 @@ supply custom menu items in the form of modules.")))
 
   (define (emacs-power-menu config)
     (require-value 'emacs config)
-    (emacs-minibuffer-program
-     (get-value 'emacs-client config)
-     "power-menu" "power-menu" 'rde-power-menu #:height 7))
+    ((get-value 'emacs-minibuffer-program config)
+     "power-menu" "power-menu" 'rde-power-menu
+     #:height 7))
 
   (define (get-home-services config)
     (require-value 'elogind config)
