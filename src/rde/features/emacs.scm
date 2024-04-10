@@ -497,10 +497,14 @@ tested."
                        (interactive)
                        (if restart
                            (call-process-shell-command
-                            (concat "herd restart emacs-" server-name)
+                            (concat ,(file-append (get-value 'shepherd config)
+                                                  "/bin/herd")
+                                    " restart emacs-" server-name)
                             nil 0)
                            (call-process-shell-command
-                            (concat "herd stop emacs-" server-name)
+                            (concat ,(file-append (get-value 'shepherd config)
+                                                  "/bin/herd")
+                                    " stop emacs-" server-name)
                             nil 0))))
                     ;; Tell shepherd that emacs is started through pid-file.
                     (with-temp-file (concat (getenv "XDG_RUNTIME_DIR")
