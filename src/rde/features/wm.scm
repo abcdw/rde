@@ -33,6 +33,7 @@
   #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages glib)
+  #:use-module (gnu packages gnome)
   #:use-module (gnu packages image)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages pulseaudio)
@@ -951,6 +952,7 @@ for the main bar."
 
 (define* (feature-swaynotificationcenter
           #:key
+          (libnotify libnotify)
           (swaynotificationcenter swaynotificationcenter))
   "Configure Sway Notification Center."
 
@@ -1006,6 +1008,7 @@ for the main bar."
   (feature
    (name f-name)
    (values `((desktop-notifications . #t)
+             (libnotify . ,libnotify)
              (swaynotificationcenter . ,swaynotificationcenter)))
    (home-services-getter get-home-services)))
 
