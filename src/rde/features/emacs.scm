@@ -35,6 +35,7 @@
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages mail)
+  #:use-module (gnu packages gnome)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu packages base)
 
@@ -181,6 +182,29 @@ emacs servers' environment variables to same values."
          (close-port port)
          (format #f "~s" vars))
        ")"))))
+
+;; libnotify is propagated from a lot of packages, but is not currently
+;; a value provided by a feature. Assume it's present for now, but FIXME.
+(define (emacs-client-alternate-editor fallback)
+  (program-file
+   "emacs-client-alternate-editor"
+   #~(begin
+       (use-modules (ice-9 textual-ports) (ice-9 popen) (ice-9 match))
+       (let* ((port
+               (open-input-pipe
+                (format
+                 #f "herd eval root ~s"
+                 "(and=> (lookup-service 'emacs-server) service-status)")))
+              (status (cadr (string-split (get-string-all port) #\newline))))
+         (close-port port)
+         (match status
+           ((or "running" "stopping" "starting")
+            (system* #$(file-append libnotify "/bin/notify-send")
+                     "Emacs error"
+                     (string-append "An emacs server is currently " status ".")
+                     "--icon=emacs"))
+           (_  ; run the serverless fallback
+            (apply system* #$fallback (cdr (command-line)))))))))
 
 ;; This doesn't use the emacs-client-create-frame program because
 ;; it executes by default the after-make-frame-functions, which
@@ -629,11 +653,14 @@ It can contain settings not yet moved to separate features."
        (init-el extra-init-el)
        (early-init-el extra-early-init-el)))
 
-     (simple-service 'emacs-set-default-editor
-                     home-environment-variables-service-type
-                     `(("ALTERNATE_EDITOR" . ,emacs-editor)
-                       ("VISUAL" . ,emacs-client-no-wait)
-                       ("MENU" . ,emacs-dmenu)))
+     (simple-service
+      'emacs-set-default-editor
+      home-environment-variables-service-type
+      `(("ALTERNATE_EDITOR" . ,(if emacs-server-mode?
+                                   (emacs-client-alternate-editor emacs-editor)
+                                   emacs-editor))
+        ("VISUAL" . ,emacs-client-no-wait)
+        ("MENU" . ,emacs-dmenu)))
      (when (get-value 'sway config)
        (simple-service
         'emacs-update-environment-variables-on-sway-start
