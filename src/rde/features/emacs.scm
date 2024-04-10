@@ -591,42 +591,49 @@ It can contain settings not yet moved to separate features."
   ;; it executes by default the after-make-frame-functions, which
   ;; can mess up with other buffers or frames.
   (define* (emacs-minibuffer-program
-            file-name-suffix title command
-            #:key (height 10) (client emacs-client))
-    (program-file
-     (string-append "emacs-" file-name-suffix)
-     #~(system* #$client
-                (string-append
-                 "--alternate-editor="
-                 #$(emacs-client-alternate-editor
-                    (program-file
-                     "emacs-client-alternate-fail"
-                     #~(system*
-                        #$(file-append libnotify "/bin/notify-send")
-                        "Emacs error"
-                        "Minibuffer programs require a running server."
-                        "--icon=emacs"))))
-                "--eval"
-                #$(format
-                   #f "~s"
-                   `(let* ((vertico-count ,height)
-                           (after-make-frame-functions '())
-                           (minibuffer-frame
-                            (make-frame
-                             (list
-                              (cons 'display (or x-display-name
-                                                 (getenv "WAYLAND_DISPLAY")))
-                              '(name . ,(string-append title " - Emacs Client"))
-                              '(minibuffer . only)
-                              '(width . 120)
-                              '(height . ,(1+ height))))))
-                      (unwind-protect
-                       (with-selected-frame minibuffer-frame
-                                            (command-execute ',command))
-                       (delete-frame minibuffer-frame)))))))
+            config #:key
+            (alternate
+             (begin
+               (require-value 'libnotify config)
+               (emacs-client-alternate-editor
+                (program-file
+                 "emacs-client-alternate-fail"
+                 #~(system*
+                    #$(file-append (get-value 'libnotify config)
+                                   "/bin/notify-send")
+                    "Emacs error"
+                    "Minibuffer programs require a running server."
+                    "--icon=emacs"))))))
+    (lambda* (file-name-suffix title command
+                               #:key (client emacs-client)
+                               (height 10))
+      (program-file
+       (string-append "emacs-" file-name-suffix)
+       #~(system* #$client
+                  #$@(if alternate
+                         #~((string-append "--alternate-editor=" #$alternate))
+                         #~())
+                  "--eval"
+                  #$(format
+                     #f "~s"
+                     `(let* ((vertico-count ,height)
+                             (after-make-frame-functions '())
+                             (minibuffer-frame
+                              (make-frame
+                               (list
+                                (cons 'display (or x-display-name
+                                                   (getenv "WAYLAND_DISPLAY")))
+                                '(name . ,(string-append title " - Emacs Client"))
+                                '(minibuffer . only)
+                                '(width . 120)
+                                '(height . ,(1+ height))))))
+                        (unwind-protect
+                         (with-selected-frame minibuffer-frame
+                                              (command-execute ',command))
+                         (delete-frame minibuffer-frame))))))))
 
-  (define emacs-application-launcher
-    (emacs-minibuffer-program
+  (define (emacs-application-launcher config)
+    ((emacs-minibuffer-program config)
      "application-launcher" "Application Launcher"
      'app-launcher-run-app #:height standalone-minibuffer-height))
 
@@ -704,7 +711,7 @@ It can contain settings not yet moved to separate features."
                 `((default-terminal . ,emacs-client-create-frame))
                 '())
             (if default-application-launcher?
-                `((default-application-launcher . ,emacs-application-launcher))
+                `((default-application-launcher-fn . ,emacs-application-launcher))
                 '())))
    (home-services-getter emacs-home-services)))
 

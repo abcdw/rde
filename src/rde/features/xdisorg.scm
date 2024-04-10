@@ -60,8 +60,8 @@
    (name 'rofi)
    (values `((rofi . ,rofi)
              ,@(if default-application-launcher?
-                   `((default-application-launcher .
-                       ,(file-append rofi "/bin/rofi -show drun")))
+                   `((default-application-launcher-fn .
+                       ,(const (file-append rofi "/bin/rofi -show drun"))))
                    '())))
    (home-services-getter get-home-services)))
 

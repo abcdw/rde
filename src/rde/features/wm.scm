@@ -144,8 +144,8 @@
              (get-value 'backup-terminal config
                         (file-append foot "/bin/foot")))
            (default-application-launcher
-             (get-value 'default-application-launcher config
-                        (file-append bemenu "/bin/bemenu-run -l 20 -p run:")))
+             (get-value-eval 'default-application-launcher-fn config
+                             (file-append bemenu "/bin/bemenu-run -l 20 -p run:")))
 
            (shepherd-configuration (home-shepherd-configuration
                                     (shepherd shepherd)
@@ -299,7 +299,8 @@ chooser_type=simple"
          (if (and (get-value 'default-terminal config)
                   (get-value 'backup-terminal config))
              '() (list foot))
-         (if (get-value 'default-application-launcher config) '() (list bemenu))
+         (if (get-value 'default-application-launcher-fn config)
+             '() (list bemenu))
          (list qtwayland-5 swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
 

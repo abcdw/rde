@@ -1715,7 +1715,7 @@ supply custom menu items in the form of modules.")))
 
   (define (emacs-power-menu config)
     (require-value 'emacs config)
-    ((get-value 'emacs-minibuffer-program config)
+    ((get-value-eval 'emacs-minibuffer-program config)
      "power-menu" "power-menu" 'rde-power-menu
      #:height 7))
 
