@@ -215,6 +215,16 @@ emacs servers' environment variables to same values."
   (program-file
    (string-append "emacs-" file-name-suffix)
    #~(system* #$emacs-client
+              (string-append
+               "--alternate-editor="
+               #$(emacs-client-alternate-editor
+                  (program-file
+                   "emacs-client-alternate-fail"
+                   #~(system*
+                      #$(file-append libnotify "/bin/notify-send")
+                      "Emacs error"
+                      "Minibuffer programs require a running server."
+                      "--icon=emacs"))))
               "--eval"
               #$(format
                  #f "~s"
