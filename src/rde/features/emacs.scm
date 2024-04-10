@@ -182,9 +182,7 @@ emacs servers' environment variables to same values."
          (format #f "~s" vars))
        ")"))))
 
-;; libnotify is propagated from a lot of packages, but is not currently
-;; a value provided by a feature. Assume it's present for now, but FIXME.
-(define (emacs-client-alternate-editor fallback)
+(define* (emacs-client-alternate-editor fallback shepherd libnotify)
   (program-file
    "emacs-client-alternate-editor"
    #~(begin
@@ -192,7 +190,8 @@ emacs servers' environment variables to same values."
        (let* ((port
                (open-input-pipe
                 (format
-                 #f "herd eval root ~s"
+                 #f "~a/bin/herd eval root ~s"
+                 #$shepherd
                  "(and=> (lookup-service 'emacs-server) service-status)")))
               (status (cadr (string-split (get-string-all port) #\newline))))
          (close-port port)
@@ -603,7 +602,9 @@ It can contain settings not yet moved to separate features."
                                    "/bin/notify-send")
                     "Emacs error"
                     "Minibuffer programs require a running server."
-                    "--icon=emacs"))))))
+                    "--icon=emacs"))
+                (get-value 'shepherd config)
+                (get-value 'libnotify config)))))
     (lambda* (file-name-suffix title command
                                #:key (client emacs-client)
                                (height 10))
@@ -677,7 +678,10 @@ It can contain settings not yet moved to separate features."
       'emacs-set-default-editor
       home-environment-variables-service-type
       `(("ALTERNATE_EDITOR" . ,(if emacs-server-mode?
-                                   (emacs-client-alternate-editor emacs-editor)
+                                   (emacs-client-alternate-editor
+                                    emacs-editor
+                                    (get-value 'shepherd config)
+                                    (get-value 'libnotify config))
                                    emacs-editor))
         ("VISUAL" . ,emacs-client-no-wait)
         ("MENU" . ,emacs-dmenu)))
