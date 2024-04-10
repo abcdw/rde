@@ -2,7 +2,7 @@
 ;;;
 ;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
-;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2022, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -27,6 +27,7 @@
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
   #:use-module (rde packages)
+  #:use-module (gnu packages admin)
   #:use-module (gnu packages base)
   #:use-module (gnu packages wm)
   #:use-module (gnu packages image)
@@ -107,6 +108,7 @@
           (sway sway)
           (foot foot)
           (bemenu bemenu)
+          (shepherd shepherd-0.10)  ; TODO Keep up to date with upstream.
           (xdg-desktop-portal xdg-desktop-portal)
           (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
           ;; Logo key. Use Mod1 for Alt.
@@ -120,6 +122,7 @@
   (ensure-pred any-package? sway)
   (ensure-pred any-package? foot)
   (ensure-pred any-package? bemenu)
+  (ensure-pred file-like? shepherd)
   (ensure-pred any-package? xdg-desktop-portal)
   (ensure-pred any-package? xdg-desktop-portal-wlr)
 
@@ -144,9 +147,9 @@
                         (file-append bemenu "/bin/bemenu-run -l 20 -p run:")))
 
            (shepherd-configuration (home-shepherd-configuration
+                                    (shepherd shepherd)
                                     (auto-start? #f)
-                                    (daemonize? #f)))
-           (shepherd (home-shepherd-configuration-shepherd shepherd-configuration)))
+                                    (daemonize? #f))))
       (list
        (service home-shepherd-service-type shepherd-configuration)
        (simple-service
@@ -324,6 +327,7 @@ frame-title-format."
   (feature
    (name 'sway)
    (values `((sway . ,sway)
+             (shepherd . ,shepherd)
              (wl-clipboard . ,wl-clipboard)
              (wayland . #t)
              (xwayland? . ,xwayland?)))
