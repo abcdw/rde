@@ -438,14 +438,27 @@ Prefix argument can be used to kill a few words."
 
        ;; Configure emacs background server.
        ,@(if (get-value 'emacs-server-mode? config)
-             `((add-hook
-                'emacs-startup-hook
-                (lambda ()
-                  (when server-mode
-                    (advice-add
-                     'kill-emacs :override
-                     (lambda (&optional arg restart)
-                       "\
+             `((defun rde-create-pid-file ()
+                 "Create a pid-file for `server-name'.
+
+This function is designed to be called in the `emacs-startup-hook' and
+tells shepherd that emacs has been started."
+                 (when server-mode
+                   (with-temp-file (concat (getenv "XDG_RUNTIME_DIR")
+                                           "/emacs/" server-name ".pid")
+                                   (insert (number-to-string (emacs-pid))))))
+               (defun rde-delete-pid-file ()
+                 "Delete the pid-file for `server-name'.
+
+This function is designed to be called in the `kill-emacs-hook'."
+                 (when server-mode
+                   (let ((pidfile (concat (getenv "XDG_RUNTIME_DIR")
+                                          "/emacs/" server-name ".pid")))
+                     (when (file-exists-p pidfile)
+                       (delete-file pidfile)))))
+
+               (defun rde-kill-emacs (&optional arg restart)
+                 "\
 Make GNU Shepherd kill the Emacs server.
 
 If RESTART is non-nil, instead of just exiting at the end, herd will restart
@@ -454,24 +467,20 @@ an Emacs server. ARG is ignored.
 Note: This is added through RDE. Redefining a primitive is not advised in
 Emacs, but this one is high-level (present in few other functions), and
 tested."
-                       (interactive)
-                       (call-process
-                        ,(file-append
-                          (get-value 'shepherd config) "/bin/herd")
-                        nil 0 nil (if restart "restart" "stop")
-                        (concat "emacs-" server-name))))
-                    ;; Tell shepherd that emacs is started through pid-file.
-                    (with-temp-file (concat (getenv "XDG_RUNTIME_DIR")
-                                            "/emacs/" server-name ".pid")
-                                    (insert (number-to-string (emacs-pid)))))))
+                 (interactive)
+                 (call-process
+                  ,(file-append
+                    (get-value 'shepherd config) "/bin/herd")
+                  nil 0 nil (if restart "restart" "stop")
+                  (concat "emacs-" server-name)))
+
                (add-hook
-                'kill-emacs-hook
+                'emacs-startup-hook
                 (lambda ()
                   (when server-mode
-                    (let ((pidfile (concat (getenv "XDG_RUNTIME_DIR")
-                                           "/emacs/" server-name ".pid")))
-                      (when (file-exists-p pidfile)
-                        (delete-file pidfile)))))))
+                    (advice-add 'kill-emacs :override 'rde-kill-emacs))))
+               (add-hook 'emacs-startup-hook 'rde-create-pid-file)
+               (add-hook 'kill-emacs-hook 'rde-delete-pid-file))
              '()))
      #:summary "General settings, better defaults"
      #:commentary "\
