@@ -1741,7 +1741,7 @@ supply custom menu items in the form of modules.")))
                                  '((concat (all-the-icons-faicon "undo")
                                            " reload sway"))
                                  '("reload sway"))
-                           (cons
+                           (list
                             ,(file-append (get-value 'sway config)
                                           "/bin/swaymsg")
                             "reload"))
@@ -1750,7 +1750,7 @@ supply custom menu items in the form of modules.")))
                                  '((concat (all-the-icons-faicon "times")
                                            " exit sway"))
                                  '("exit sway"))
-                           (cons
+                           (list
                             ,(file-append (get-value 'sway config)
                                           "/bin/swaymsg")
                             "exit"))))
@@ -1763,31 +1763,31 @@ supply custom menu items in the form of modules.")))
                                '((concat (all-the-icons-faicon "lock")
                                          " lock"))
                                '("lock"))
-                         (cons ,loginctl "lock-session"))
+                         (list ,loginctl "lock-session"))
                         (cons
                          ,@(if (get-value 'emacs-all-the-icons config)
                                '((concat (all-the-icons-faicon "pause")
                                          " suspend"))
                                '("suspend"))
-                         (cons ,loginctl "suspend"))
+                         (list ,loginctl "suspend"))
                         (cons
                          ,@(if (get-value 'emacs-all-the-icons config)
                                '((concat (all-the-icons-faicon "stop")
                                          " hibernate"))
                                '("hibernate"))
-                         (cons ,loginctl "suspend-then-hibernate"))
+                         (list ,loginctl "suspend-then-hibernate"))
                         (cons
                          ,@(if (get-value 'emacs-all-the-icons config)
                                '((concat (all-the-icons-faicon "power-off")
                                          " shutdown"))
                                '("shutdown"))
-                         (cons ,loginctl "poweroff"))
+                         (list ,loginctl "poweroff"))
                         (cons
                          ,@(if (get-value 'emacs-all-the-icons config)
                                '((concat (all-the-icons-faicon "refresh")
                                          " reboot"))
                                '("reboot"))
-                         (cons ,loginctl "reboot"))))))))))
+                         (list ,loginctl "reboot"))))))))))
         `(,@(if (get-value 'emacs-all-the-icons config)
                 `((with-eval-after-load
                       'all-the-icons
@@ -1810,10 +1810,11 @@ supply custom menu items in the form of modules.")))
                                                  predicate)))))
                    (command-list (cdr
                                   (assoc selected rde-power-menu-candidates))))
-              (async-start-process "power-menu"
-                                   (car command-list)
-                                   nil
-                                   (cdr command-list))))))
+              (apply 'async-start-process
+                     "power-menu"
+                     (car command-list)
+                     nil
+                     (cdr command-list))))))
       #:summary "Simple power-menu for RDE"
       #:commentary "\
 Provides the command rde-power-menu, bind to s-Q by default, with the
