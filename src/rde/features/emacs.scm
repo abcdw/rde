@@ -455,17 +455,11 @@ Note: This is added through RDE. Redefining a primitive is not advised in
 Emacs, but this one is high-level (present in few other functions), and
 tested."
                        (interactive)
-                       (if restart
-                           (call-process-shell-command
-                            (concat ,(file-append (get-value 'shepherd config)
-                                                  "/bin/herd")
-                                    " restart emacs-" server-name)
-                            nil 0)
-                           (call-process-shell-command
-                            (concat ,(file-append (get-value 'shepherd config)
-                                                  "/bin/herd")
-                                    " stop emacs-" server-name)
-                            nil 0))))
+                       (call-process
+                        ,(file-append
+                          (get-value 'shepherd config) "/bin/herd")
+                        nil 0 nil (if restart "restart" "stop")
+                        (concat "emacs-" server-name))))
                     ;; Tell shepherd that emacs is started through pid-file.
                     (with-temp-file (concat (getenv "XDG_RUNTIME_DIR")
                                             "/emacs/" server-name ".pid")
