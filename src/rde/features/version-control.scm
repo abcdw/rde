@@ -67,7 +67,13 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
             "*.\\#\\*"
             "*.\\#*\\#"))
          (config
-          `((user
+          `((core
+             (,@(if (get-value 'emacs-client config)
+                    `((editor . ,(file-append
+                                  (get-value 'emacs-client config)
+                                  " --reuse-frame")))
+                    '())))
+            (user
              ((name . ,(get-value 'full-name config))
               (email . ,(get-value 'email config))
               ,@(if sign-commits?
