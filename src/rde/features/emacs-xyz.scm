@@ -1717,7 +1717,7 @@ supply custom menu items in the form of modules.")))
     (require-value 'emacs config)
     ((get-value-eval 'emacs-minibuffer-program config)
      "power-menu" "power-menu" 'rde-power-menu
-     #:height 7))
+     #:height 8))
 
   (define (get-home-services config)
     (require-value 'elogind config)
@@ -1764,6 +1764,12 @@ supply custom menu items in the form of modules.")))
                                          " lock"))
                                '("lock"))
                          (list ,loginctl "lock-session"))
+                        (cons
+                         ,@(if (get-value 'emacs-all-the-icons config)
+                               '((concat (all-the-icons-material "exit_to_app")
+                                         " logout"))
+                               '("logout"))
+                         (list ,loginctl "terminate-session" (getenv "XDG_SESSION_ID")))
                         (cons
                          ,@(if (get-value 'emacs-all-the-icons config)
                                '((concat (all-the-icons-faicon "pause")
@@ -2799,7 +2805,9 @@ on the current project."
                 (expand-file-name "emacs/projects"
                                   (xdg-cache-home)))
           (setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
-          ;; (add-to-list 'project-switch-commands '(project-compile "Compile") t)
+          ;; Project compile and some other things will not work on project
+          ;; switch anyway, because default-directory is not yet set.  Also,
+          ;; it's one more additional step, which is quite inconvinient.
           (setq project-switch-commands 'project-dired)))
       #:summary "\
 Enchancements for project management with project.el"
