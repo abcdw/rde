@@ -2798,7 +2798,8 @@ on the current project."
                 (expand-file-name "emacs/projects"
                                   (xdg-cache-home)))
           (setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
-          (add-to-list 'project-switch-commands '(project-compile "Compile") t)))
+          ;; (add-to-list 'project-switch-commands '(project-compile "Compile") t)
+          (setq project-switch-commands 'project-dired)))
       #:summary "\
 Enchancements for project management with project.el"
       #:commentary "\
