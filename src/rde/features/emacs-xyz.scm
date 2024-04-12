@@ -2804,7 +2804,19 @@ on the current project."
           (setq project-list-file
                 (expand-file-name "emacs/projects"
                                   (xdg-cache-home)))
-          (setq project-compilation-buffer-name-function 'project-prefixed-buffer-name)
+
+          (defun rde-compilation-buffer-name (mode)
+            "Returns the result of `project-prefixed-buffer-name' if inside
+project and `compilation--default-buffer-name' if not."
+            (if (project-current)
+                (project-prefixed-buffer-name mode)
+                (compilation--default-buffer-name mode)))
+
+          (setq compilation-buffer-name-function
+                'rde-compilation-buffer-name)
+          (setq project-compilation-buffer-name-function
+                'rde-compilation-buffer-name)
+
           ;; Project compile and some other things will not work on project
           ;; switch anyway, because default-directory is not yet set.  Also,
           ;; it's one more additional step, which is quite inconvinient.
