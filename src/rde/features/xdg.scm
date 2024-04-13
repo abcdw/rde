@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -25,6 +26,7 @@
   #:use-module (gnu home services)
   #:use-module (gnu home services xdg)
   #:use-module (gnu packages freedesktop)
+  #:use-module (guix gexp)
   #:use-module (guix ui)
 
   #:export (feature-xdg)
@@ -70,7 +72,11 @@ home-xdg-base-directories-configuration-state-home.")))
       xdg-base-directories-configuration)
      (service
       home-xdg-user-directories-service-type
-      xdg-user-directories-configuration)))
+      xdg-user-directories-configuration)
+     (simple-service
+      'ensure-log-dir-exists
+      home-activation-service-type
+      #~(mkdir-p (string-append (getenv "XDG_STATE_HOME") "/log")))))
 
   (feature
    (name 'xdg)
