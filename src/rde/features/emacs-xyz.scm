@@ -2792,10 +2792,6 @@ on the current project."
                   (with-eval-after-load 'consult
                     (define-key project-prefix-map "F" 'consult-find)
                     (define-key project-prefix-map "R" 'consult-ripgrep)
-                    (add-to-list 'project-switch-commands
-                                 '(consult-find "Find file consult"))
-                    (add-to-list 'project-switch-commands
-                                 '(consult-ripgrep "Search for regexp with rg"))
                     (setq consult-project-root-function
                           (lambda ()
                             (when-let (project (project-current))
