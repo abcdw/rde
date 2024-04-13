@@ -21,9 +21,11 @@
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (gnu services)
+  #:use-module ((gnu services configuration) #:select (maybe-value-set?))
   #:use-module (gnu home services)
   #:use-module (gnu home services xdg)
   #:use-module (gnu packages freedesktop)
+  #:use-module (guix ui)
 
   #:export (feature-xdg)
 
@@ -35,8 +37,7 @@
           #:key
           (xdg-base-directories-configuration
            (home-xdg-base-directories-configuration
-            (state-home "$HOME/.local/var/lib")
-            (log-home "$HOME/.local/var/log")))
+            (state-home "$HOME/.local/var/lib")))
           (xdg-user-directories-configuration
            (home-xdg-user-directories-configuration)))
   "Set XDG base (with a few extensions) and user directories.
@@ -47,6 +48,13 @@ it.  No other environment variables allowed in user directories."
                xdg-base-directories-configuration)
   (ensure-pred home-xdg-user-directories-configuration?
                xdg-user-directories-configuration)
+  (when (maybe-value-set?
+         (home-xdg-base-directories-configuration-log-home
+          xdg-base-directories-configuration))
+    (raise
+     (G_ "Use of home-xdg-base-directories-configuration-log-home is \
+deprecated.  Please put you log files in the \"log\" subdirectory of \
+home-xdg-base-directories-configuration-state-home.")))
 
   (define (xdg-home-services config)
     (list
