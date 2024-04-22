@@ -98,7 +98,7 @@ will end up in @file{init.el}.
 
       ,#~\"\\n;;; Section with gexps results:\"
 
-      ,(slurp-file-gexp (local-file \"./emacs/test-init.el\"))
+      ,(slurp-file-like (local-file \"./emacs/test-init.el\"))
       ,#~(string-append \"(princ \" \"'hello)\")
       ,#~\"\\n\"
       ,#~\";; Another comment\"))))

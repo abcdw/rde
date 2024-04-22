@@ -48,7 +48,7 @@
 ;;; 	      ((program . ,(file-append gnupg "/bin/gpg"))))
 ;;; 	     (sendmail
 ;;; 	      ((annotate . #t))))
-;;; 	   (config-extra-content (slurp-file-gexp
+;;; 	   (config-extra-content (slurp-file-like
 ;;;                                (local-file "./gitconfig")))))
 ;;;
 ;;; (simple-service

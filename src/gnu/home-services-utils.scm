@@ -1,6 +1,6 @@
 ;;; GNU Guix --- Functional package management for GNU
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
-;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of GNU Guix.
 ;;;
@@ -54,9 +54,7 @@
                object->snake-case-string
                object->camel-case-string)
 
-  #:export (slurp-file-gexp
-
-            alist-entry->mixed-text
+  #:export (alist-entry->mixed-text
             boolean->yes-or-no
             boolean->true-or-false
             list->human-readable-list
@@ -82,24 +80,6 @@
             define-enum
             enum-name
             enum-value))
-
-
-;;;
-;;; User's utils.
-;;;
-
-(define* (slurp-file-gexp file #:key (encoding "UTF-8"))
-  "Returns a gexp, which reads all the content of the FILE and returns
-it as a string.  FILE must be a file-like object."
-  (when (not (file-like? file))
-    (raise (formatted-message
-            (G_ "~a is not a file-like object.")
-            file)))
-  #~(call-with-input-file #$file
-      (@ (ice-9 textual-ports) get-string-all)
-      #:encoding #$encoding))
-
-(define-deprecated/alias slurp-file-gexp slurp-file-like)
 
 
 ;;;

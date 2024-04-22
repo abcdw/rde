@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;; Copyright © 2023 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
@@ -120,7 +120,7 @@ will end up in @file{init.el}.
 
       ,#~\"\\n;;; Section with gexps results:\"
 
-      ,(slurp-file-gexp (local-file \"./emacs/test-init.el\"))
+      ,(slurp-file-like (local-file \"./emacs/test-init.el\"))
       ,#~(string-append \"(princ \" \"'hello)\")
       ,#~\"\\n\"
       ,#~\";; Another comment\"))))
