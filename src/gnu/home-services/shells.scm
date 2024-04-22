@@ -1,5 +1,5 @@
 ;;; GNU Guix --- Functional package management for GNU
-;;; Copyright © 2021, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;;
 ;;; This file is part of GNU Guix.
@@ -19,7 +19,6 @@
 
 (define-module (gnu home-services shells)
   #:use-module (gnu services configuration)
-  #:use-module (rde home services shells)
   #:use-module (gnu home services utils)
   #:use-module (gnu home services)
   #:use-module (gnu home-services-utils)
@@ -27,30 +26,50 @@
   #:use-module (gnu packages bash)
   #:use-module (guix gexp)
   #:use-module (guix packages)
+  #:use-module (guix deprecation)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
 
-  #:export (home-fish-service-type
+  #:export (home-shell-profile-service-type
+            home-shell-profile-configuration
+
+            home-bash-service-type
+            home-bash-configuration
+            home-bash-extension
+
+            home-zsh-service-type
+            home-zsh-configuration
+            home-zsh-extension
+
+            home-fish-service-type
             home-fish-configuration
-            home-fish-extension)
-
-  #:re-export (home-shell-profile-service-type
-               home-shell-profile-configuration
-
-               home-bash-service-type
-               home-bash-configuration
-               home-bash-extension
-
-               home-zsh-service-type
-               home-zsh-configuration
-               home-zsh-extension))
+            home-fish-extension))
 
 ;;; Commentary:
 ;;;
 ;;; This module contains shell related services like Zsh.
 ;;;
 ;;; Code:
+
+(define-deprecated/alias home-shell-profile-service-type
+  (@ (rde home services shells) home-shell-profile-service-type))
+(define-deprecated/alias home-shell-profile-configuration
+  (@ (rde home services shells) home-shell-profile-configuration))
+
+(define-deprecated/alias home-bash-service-type
+  (@ (rde home services shells) home-bash-service-type))
+(define-deprecated/alias home-bash-configuration
+  (@ (rde home services shells) home-bash-configuration))
+(define-deprecated/alias home-bash-extension
+  (@ (rde home services shells) home-bash-extension))
+
+(define-deprecated/alias home-zsh-service-type
+  (@ (rde home services shells) home-zsh-service-type))
+(define-deprecated/alias home-zsh-configuration
+  (@ (rde home services shells) home-zsh-configuration))
+(define-deprecated/alias home-zsh-extension
+  (@ (rde home services shells) home-zsh-extension))
 
 
 ;;;
