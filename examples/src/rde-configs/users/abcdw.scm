@@ -86,6 +86,7 @@
                   :coderepo "~/work/abcdw/rde/"))))
        (with-eval-after-load 'org
          (setq org-use-speed-commands t)
+         (setq org-log-reschedule 'time)
          (define-key org-mode-map (kbd "M-o")
            (lambda ()
              (interactive)
