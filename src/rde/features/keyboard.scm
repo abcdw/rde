@@ -21,7 +21,7 @@
   #:use-module (rde features)
   #:use-module (gnu system keyboard)
   #:use-module (gnu services)
-  #:use-module (gnu home-services keyboard)
+  #:use-module (rde home services keyboard)
 
   #:export (feature-keyboard
             %dvorak-layout
