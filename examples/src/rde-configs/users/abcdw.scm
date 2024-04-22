@@ -538,10 +538,10 @@ subject:/home:/) and tag:new}\"'"
         (:name "Drafts" :query "tag:draft" :key "d")
         (:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "w")
         (:name "Work Inbox"
-         :query "tag:work and tag:inbox and tag:unread"
+         :query "tag:work and tag:inbox"
          :key "W")
         (:name "Personal Inbox"
-         :query "tag:personal and tag:inbox and tag:unread"
+         :query "tag:personal and tag:inbox"
          :key "P")
         (:name "Guix Home Inbox" :key "H" :query "tag:guix-home and tag:unread"))
       ;; %rde-notmuch-saved-searches
