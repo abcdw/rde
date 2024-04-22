@@ -5,6 +5,7 @@
   #:use-module (gnu services configuration)
   #:use-module (guix gexp)
   #:use-module (guix packages)
+  #:use-module (guix deprecation)
   #:use-module (ice-9 match)
   #:export (mpv-profile
             home-mpv-configuration
