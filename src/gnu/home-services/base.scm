@@ -1,6 +1,7 @@
 (define-module (gnu home-services base)
   #:use-module (gnu home services)
   #:use-module (gnu services)
+  #:use-module (guix deprecation)
   #:use-module (ice-9 match)
 
   #:export (home-generic-service)
@@ -39,3 +40,5 @@ home-files with FILES.  EXTENSIONS is an alist of pairs @code{(target
 			       (list profile-extension
 				     files-extension))))))
     (service type #f)))
+
+(define-deprecated/alias home-generic-service #f)
