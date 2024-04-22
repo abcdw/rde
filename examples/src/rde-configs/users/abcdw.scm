@@ -110,6 +110,7 @@
        )
       (strings->packages
        ;; "emacs-dirvish"
+       "emacs-elixir-mode"
        "emacs-company-posframe"
        "emacs-eat"
        "emacs-wgrep"
@@ -143,9 +144,11 @@
     (strings->packages
      "figlet" ;; TODO: Move to emacs-artist-mode
      "calibre"
-     "icecat" "nyxt"
+     ;; "nyxt"
+     "librewolf"
 
      "hut"
+     "libnotify"
      "utox" "qtox"
      ;; "jami"
 
@@ -154,7 +157,7 @@
      "imagemagick"
      "obs" "obs-wlrobs"
      "recutils" "binutils" "make" "gdb"
-     "fheroes2"
+     "fheroes2" "sdlpop"
 
      "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-extra"
      ;; "papirus-icon-theme" ; 85k files
@@ -162,7 +165,6 @@
      "thunar" "fd"
      ;; "glib:bin"
 
-     "libreoffice"
      "ffmpeg"
      "ripgrep" "curl"))))
 
