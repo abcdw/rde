@@ -30,7 +30,7 @@
   #:use-module (gnu services shepherd)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
-  #:use-module (gnu home-services wm)
+  #:use-module (rde home services wm)
   #:use-module (guix gexp)
 
   #:export (feature-backlight

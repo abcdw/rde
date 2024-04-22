@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -22,11 +22,9 @@
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
   #:use-module (rde features fontutils)
+  #:use-module (rde home services shells)
   #:use-module (gnu home services)
-  #:use-module (gnu home-services base)
   #:use-module (gnu home-services terminals)
-  #:use-module (gnu home-services shells)
-  #:use-module (gnu home-services wm)
   #:use-module (gnu services)
   #:use-module (rde packages)
   #:use-module (gnu packages emacs-xyz)
