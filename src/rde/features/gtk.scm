@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
+;;; Copyright © 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -48,15 +49,12 @@
 (define* (feature-gtk3
           #:key
           (gtk-dark-theme? #f)
-          (gtk-theme (make-theme
-                      "Numix"
-                      numix-gtk-theme))
-          (icon-theme (make-theme
-                       "Papirus-Dark"
-                       papirus-icon-theme))
-          (cursor-theme (make-theme
-                         "Bibata-Modern-Classic"
-                         bibata-cursor-theme))
+          (gtk-theme
+           (make-theme "Adwaita" gnome-themes-extra))
+          (icon-theme
+           (make-theme "Adwaita" adwaita-icon-theme))
+          (cursor-theme
+           (make-theme "Bibata-Original-Classic" bibata-cursor-theme))
           (extra-gtk-css #f)
           (extra-gtk-settings '()))
   "Configure the GTK3 toolkit.
@@ -96,21 +94,20 @@ to be ingested by @code{serialize-css-config}."
        (settings-ini
         `((Settings
            (,@(if gtk-theme
-                  `(,(cons 'gtk-theme-name
-                           #~(format #f "~a" #$(theme-name gtk-theme))))
+                  `((gtk-theme-name . ,#~#$(theme-name gtk-theme)))
                   '())
             ,@(if icon-theme
-                  `(,(cons 'gtk-icon-theme-name
-                           #~(format #f "~a" #$(theme-name icon-theme))))
+                  `((gtk-icon-theme-name . ,#~#$(theme-name icon-theme)))
                   '())
             ,@(if cursor-theme
-                  `(,(cons 'gtk-cursor-theme-name
-                           #~(format #f "~a" #$(theme-name cursor-theme))))
+                  `((gtk-cursor-theme-name . ,#~#$(theme-name cursor-theme)))
                   '())
-            (gtk-font-name . ,#~(format #f "~a"
-                                        #$(font-specification
-                                           (get-value 'font-monospace config))))
+            (gtk-font-name . ,#~#$(font-specification
+                                   (get-value 'font-monospace config)))
             (gtk-application-prefer-dark-theme . ,gtk-dark-theme?)
+            ;; Doesn't work, seems GTK doesn't respect settings.ini much
+            ;; https://github.com/swaywm/sway/wiki/GTK-3-settings-on-Wayland/
+            ;; (gtk-key-theme-name . Emacs)
             ,@extra-gtk-settings))))
        (gtk-css (if extra-gtk-css
                     (extra-gtk-css config)
