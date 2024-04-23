@@ -569,9 +569,9 @@ module will be added to the BAR-ID."
           (all-outputs? #f)
           (format-icons '(("1" . )
                           ("2" . )
-                          ("3" . )
+                          ("3" . )
                           ("4" . )
-                          ("5" . )
+                          ("5" . )
                           ("6" . )  ; 
                           ("7" . )  ; 
                           ("8" . )
