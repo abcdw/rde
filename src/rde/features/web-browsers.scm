@@ -31,6 +31,7 @@
   #:use-module ((gnu packages base) #:select (glibc-utf8-locales))
   #:use-module (gnu packages bash)
   #:use-module (gnu packages web-browsers)
+  #:use-module (gnu packages librewolf)
   #:use-module (gnu services)
   #:use-module (gnu system keyboard)
   #:use-module (guix build-system trivial)
@@ -38,6 +39,7 @@
   #:use-module (guix packages)
   #:use-module (ice-9 match)
   #:export (feature-ungoogled-chromium
+            feature-librewolf
             feature-nyxt))
 
 ;; The issue with Chromium is that like Libreoffice, all user data is
@@ -164,6 +166,69 @@ exec ~a ~a $@"
    (values `((,f-name . ,ungoogled-chromium)
              ,@(if default-browser?
                    `((default-browser . ,chromium-binary))
+                   '())))
+   (home-services-getter get-home-services)))
+
+(define* (feature-librewolf
+          #:key
+          (librewolf librewolf)
+          (default-browser? #t)
+          (desktop-startup-flags '("")))
+  "Configure the LibreWolf browser."
+  (ensure-pred file-like? librewolf)
+  (ensure-pred boolean? default-browser?)
+  (ensure-pred list-of-strings? desktop-startup-flags)
+
+  (define f-name 'librewolf)
+
+  (define librewolf-binary (file-append librewolf "/bin/librewolf"))
+  (define (get-home-services config)
+    "Return home services related to LibreWolf."
+    (append
+     (if default-browser?
+         (list
+          (simple-service
+           'set-librewolf-as-default-browser
+           home-environment-variables-service-type
+           `(("BROWSER" . ,librewolf-binary)))
+          (simple-service
+           'librewolf-xdg-defaults
+           home-xdg-mime-applications-service-type
+           (home-xdg-mime-applications-configuration
+            (default
+              '((x-scheme-handler/http . librewolf.desktop)
+                (x-scheme-handler/https . librewolf.desktop)
+                (x-scheme-handler/about . librewolf.desktop)
+                (text/html . librewolf.desktop))))))
+         '())
+     (list
+      (simple-service
+       'add-chromium-packages
+       home-profile-service-type
+       (list librewolf))
+      (simple-service
+       'add-librewolf-xdg-desktop-entry
+       home-xdg-mime-applications-service-type
+       (home-xdg-mime-applications-configuration
+        (desktop-entries
+         (list
+          (xdg-desktop-entry
+           (file "librewolf")
+           (name "LibreWolf")
+           (type 'application)
+           (config
+            `((exec . ,#~(string-join
+                          (list
+                           #$librewolf-binary
+                           #$@desktop-startup-flags "%U")))
+              (terminal . #f)
+              (comment . "Access the Internet")))))))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,librewolf)
+             ,@(if default-browser?
+                   `((default-browser . ,librewolf-binary))
                    '())))
    (home-services-getter get-home-services)))
 
