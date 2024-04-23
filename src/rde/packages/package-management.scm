@@ -29,7 +29,7 @@
   #:export (guix-from-channels-lock))
 
 (define-public guix-from-channels-lock
-  (let ((commit "8c0282cf543fe205a5b89201cd7bb8889121a07c"))
+  (let ((commit "02df0a8a7d4712398d90f8635d4004e76bbc9f51"))
     (package
       (inherit guix)
       (version (string-append "1.4.0-" (string-take commit 7)))
@@ -42,7 +42,7 @@
                       (commit commit)))
                 (sha256
                  (base32
-                  "03z38k828ismsbfwvpwiqr557vlhdg0vg7dpvyqbvyhfy8l6c27w"))
+                  "0jdwmf9pkp35xzdpb1sin293wpj6lm8a1ngbc1f4377777n584wv"))
                 (file-name (string-append "guix-" version "-checkout"))))
       (arguments (list #:tests? #f))
       (inputs (modify-inputs (package-inputs guix)

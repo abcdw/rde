@@ -15,14 +15,15 @@ ROOT_MOUNT_POINT=/mnt
 
 VERSION=latest
 
-repl:
-	${GUIX} repl \
-	-L ../files/emacs/gider/src --listen=tcp:37146
+repl: ares-rs
 
 ares-rs:
 	${GUIX} shell guile-next guile-ares-rs \
 	-e '(@ (rde packages package-management) guix-from-channels-lock)' \
 	-- guile \
+	-L ../src \
+	-L ./src \
+	-L /data/abcdw/work/abcdw/guile-ares-rs/src \
 	-c "((@ (nrepl server) run-nrepl-server) #:port 7888)"
 
 ixy/home/build: guix
