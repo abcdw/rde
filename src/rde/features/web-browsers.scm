@@ -100,6 +100,9 @@ exec ~a ~a $@"
                             #$output "/share/applications/chromium.desktop")
                 ((chromium) #$output))))))))
 
+  (define chromium-binary
+    (file-append rde-ungoogled-chromium "/bin/chromium"))
+
   (define (get-home-services config)
     "Return home services related to Ungoogled Chromium."
     (append
@@ -108,8 +111,7 @@ exec ~a ~a $@"
           (simple-service
            'set-chromium-as-default-browser
            home-environment-variables-service-type
-           `(("BROWSER" .
-              ,(file-append rde-ungoogled-chromium "/bin/chromium"))))
+           `(("BROWSER" . ,chromium-binary)))
           (simple-service
            'chromium-xdg-defaults
            home-xdg-mime-applications-service-type
@@ -152,14 +154,17 @@ exec ~a ~a $@"
            (config
             `((exec . ,#~(string-join
                           (list
-                           #$(file-append rde-ungoogled-chromium "/bin/chromium")
+                           #$chromium-binary
                            #$@desktop-startup-flags "%U")))
               (terminal . #f)
               (comment . "Access the Internet")))))))))))
 
   (feature
    (name f-name)
-   (values `((,f-name . ,ungoogled-chromium)))
+   (values `((,f-name . ,ungoogled-chromium)
+             ,@(if default-browser?
+                   `((default-browser . ,chromium-binary))
+                   '())))
    (home-services-getter get-home-services)))
 
 
