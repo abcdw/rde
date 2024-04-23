@@ -81,8 +81,8 @@
    (feature-batsignal)
    (feature-imv)
    (feature-mpv)
-   (feature-ungoogled-chromium
-    #:default-browser? #t)
+   (feature-librewolf)
+   (feature-ungoogled-chromium)
   (feature-transmission #:auto-start? #f)
   (feature-ledger)))
 
