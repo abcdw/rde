@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -43,6 +43,9 @@
 
 ;; There is no default value to force user specify some keyboard
 ;; layout in case they use this feature
+
+;; TODO: [Andrew Tropin, 2024-04-28] Add an ability to add custom layouts
+;; https://todo.sr.ht/~abcdw/tickets/8
 (define* (feature-keyboard #:key keyboard-layout)
   "Sets keyboard layout.  Affects bootloader, and XKB_* variables for
 the user."
