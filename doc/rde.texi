@@ -621,7 +621,23 @@ even more.
 @section Sending Patches
 The process is similiar to many FLOSS projects, just send patch or
 series of patches on rde-devel mailing list.
-@c TODO: Elaborate more on that?
+@uref{https://git-send-email.io/}
+
+Use cover letter if you send patch series, use subject prefix with a
+project name to trigger CI build.  The final Subject should look like:
+@code{[PATCH rde] packages: Add some fancy package} for single ptach or
+@code{[PATCH guile-ares-rs 0/3] Adding support of multiple return
+values} for a patch series with cover letter.
+
+To avoid manually specifying command line arguments you can use this
+example @file{.git/config} for the repo:
+@exmaple
+...
+[format]
+        to = ~abcdw/rde-devel@lists.sr.ht
+        subjectPrefix = PATCH guile-ares-rs
+        coverLetter = auto
+@end example
 
 @section Commit Messages
 There are a few subsystem @code{system:} for system services,
