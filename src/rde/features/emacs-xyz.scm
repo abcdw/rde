@@ -4409,13 +4409,19 @@ filename, however its value can be overriden."
                           "" nil 'keymap)
                 (define-key mode-specific-map (kbd "d") 'org-roam-dailies-map)
                 (with-eval-after-load 'org-roam-dailies
-                  (setq org-roam-dailies-capture-templates
-                        ',org-dailies-capture-templates)
-                  (setq org-roam-dailies-directory
-                        ,org-dailies-directory)))
+                  ,@(if org-dailies-capture-templates
+                        `((setq org-roam-dailies-capture-templates
+                                ',org-dailies-capture-templates))
+                        '())
+                  ,@(if org-dailies-capture-templates
+                        `((setq org-roam-dailies-directory
+                                ,org-dailies-directory))
+                        '())))
               `((autoload 'org-dailies-map "org-dailies" "" nil 'keymap)
                 (define-key mode-specific-map (kbd "d") 'org-dailies-map)
-                (setq org-dailies-directory ,org-dailies-directory))))
+                ,@(if org-dailies-capture-templates
+                      `((setq org-dailies-directory ,org-dailies-directory))
+                      '()))))
       #:summary "Daily journaling functionality for Emacs"
       #:commentary "\
 This feature configure daily journaling functionality, either with org-roam-dailies,
