@@ -24,8 +24,6 @@
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu packages android)
-  #:use-module (gnu packages check)
-  #:use-module (gnu packages emacs-xyz)
   #:use-module (guix gexp)
   #:export (feature-android))
 
@@ -49,7 +47,7 @@
      (simple-service
       'add-android-tools
       home-profile-service-type
-      (list adb fastboot payload-dumper))
+      (list adb fastboot))
      (simple-service
       'add-android-envs
       home-environment-variables-service-type
