@@ -625,7 +625,7 @@ series of patches on rde-devel mailing list.
 
 Use cover letter if you send patch series, use subject prefix with a
 project name to trigger CI build.  The final Subject should look like:
-@code{[PATCH rde] packages: Add some fancy package} for single ptach or
+@code{[PATCH rde] packages: Add some fancy package} for single patch or
 @code{[PATCH guile-ares-rs 0/3] Adding support of multiple return
 values} for a patch series with cover letter.
 
