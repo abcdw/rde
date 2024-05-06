@@ -33,6 +33,7 @@
   #:use-module (rde features version-control)
   #:use-module (rde features video)
   #:use-module (rde features terminals)
+  #:use-module (rde features gtk)
   #:use-module (rde features sourcehut)
   #:use-module (rde features)
   #:use-module (rde home services emacs)
@@ -360,6 +361,7 @@
      ;;                  (effect-blur . 7x5)
      ;;                  (clock))
      )
+    (feature-gtk3)
     (feature-base-services
      #:default-substitute-urls (list "https://bordeaux.guix.gnu.org"
                                      "https://ci.guix.gnu.org")))))
