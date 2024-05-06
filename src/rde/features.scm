@@ -232,9 +232,14 @@ to each system-services-getter function."
   (fold-some-services features config feature-system-services-getter))
 
 
-(define* (get-value key config #:optional default-value)
-  "Get KEY from rde-config-values."
+(define* (get-value key config #:optional default-value
+                    #:key
+                    (required? #f))
+  "Get KEY from CONFIG.  If REQUIRED? is #t, call REQUIRE-VALUE to make sure
+ that KEY is present in the CONFIG."
   (let ((handle (hash-get-handle (rde-config-values config) key)))
+    (when required?
+      (require-value key config))
     (if handle
         (cdr handle)
         default-value)))
