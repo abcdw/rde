@@ -28,7 +28,7 @@
   #:use-module (gnu system accounts)
   #:use-module (gnu system shadow)
   #:use-module (gnu system nss)
-  #:use-module (gnu services home)
+  #:use-module (gnu services guix)
   #:use-module (rde system services accounts)
   #:use-module (rde system services admin)
 
