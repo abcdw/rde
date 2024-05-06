@@ -33,6 +33,7 @@
   #:use-module (rde features version-control)
   #:use-module (rde features video)
   #:use-module (rde features terminals)
+  #:use-module (rde features sourcehut)
   #:use-module (rde features)
   #:use-module (rde home services emacs)
   #:use-module (rde home services i2p)
@@ -148,7 +149,6 @@
      ;; "nyxt"
      "librewolf"
 
-     "hut"
      "libnotify"
      "utox" "qtox"
      ;; "jami"
@@ -547,6 +547,8 @@ subject:/home:/) and tag:new}\"'"
       ;; %rde-notmuch-saved-searches
       '()))
 
+    (feature-sourcehut
+     #:user-name-fn (const "abcdw"))
     (feature-yt-dlp)
 
     (feature-libreoffice)
