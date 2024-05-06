@@ -21,6 +21,9 @@
                         "sk-ssh-ed25519@openssh.com"
                         "sk-ecdsa-sha2-nistp256@openssh.com")))))
 
+;; This comment can be more related to states:
+;; per-project configurations can be included with includeIf
+;; directive. (inside global config? or during repo initialization?)
 (define* (feature-git
           #:key
           (git git)
@@ -84,6 +87,17 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
              ;; should make a conflict scope smaller, but guile-git fails if
              ;; this option is set.
              ((conflictStyle . diff3)))
+            ;; TODO: [Andrew Tropin, 2024-05-06] Add better defaults for
+            ;; rebase workflow
+
+            ;; TODO: [Andrew Tropin, 2024-05-06] Update manual related to git
+            ;; feature
+
+            ;; https://youtu.be/Md44rcw13k4?t=1081
+            ;; rebase.updateRefs true
+            ;; https://andrewlock.net/working-with-stacked-branches-in-git-is-easier-with-update-refs/
+
+            ;; (rebase)
             (diff
              ;; histogram should be smarter about diff generation.
              ((algorithm . histogram)))
