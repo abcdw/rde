@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2024 Demis Balbach <db@minikn.xyz>
 ;;;
@@ -202,6 +202,23 @@ to manipulate and navigate hunks.")))
          (file-name (git-file-name name version))
          (sha256
           (base32 "16qi3vk1yps4f5v98ipdl5kq0jq5qlnlpx8c598csj9yk86p1hsw")))))))
+
+(define-public emacs-srht-latest
+  (let ((commit "d9a8f6a43671d67a86622507136d4195c2dcd149")
+        (revision "1"))
+    (package
+      (inherit emacs-srht)
+      (name "emacs-srht")
+      (version (git-version "0.4" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://git.sr.ht/~akagi/srht.el")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32
+                  "08ysidwlz4z6baih2810fpr1679217lnsb0jhwyvvj05g25ysy5b")))))))
 
 (define-public emacs-geiser-guile-latest
   ((package-input-rewriting/spec
