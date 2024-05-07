@@ -1475,7 +1475,11 @@ not appear in the pop-up buffer."
 
 ;; TODO: revisit this package
 ;; https://github.com/larkery/emacs/blob/master/site-lisp/notmuch-attachment-list.el
-;; https://michal.sapka.me/2023/notmuch/
+;; https://michal.sapka.me/2023/notmuch
+
+;; TODO: [Andrew Tropin, 2024-05-07] Add bug-reference support, similiar to
+;; bug-reference-setup-from-mail-alist, extandable from feature-sourcehut,
+;; feature-guix and others
 (define* (feature-notmuch
           #:key
           (notmuch notmuch)
