@@ -169,6 +169,7 @@ exec ~a ~a $@"
                    '())))
    (home-services-getter get-home-services)))
 
+;; TODO: [Andrew Tropin, 2024-04-24] Use DNS over HTTPS by default
 (define* (feature-librewolf
           #:key
           (librewolf librewolf)
