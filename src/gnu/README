@@ -1,8 +1,8 @@
 -*- mode: org -*-
 
-The project is under active development! Explore and try it on your
-own risk.
+The leftovers from original Guix Home implementation and services for it.
 
-Check out [[https://guix-home.trop.in/Home-Configuration.html][Home Configuration]] and the documentation at the root of rde
-project.
+All the things from here should be properly migrated to ~(rde home services)~.
 
+Proper migration means implementation of serializer and extensions according
+to ~doc/decision-log/0004-rde-flavor-guix-services.org~.
