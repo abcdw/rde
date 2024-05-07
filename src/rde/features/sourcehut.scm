@@ -27,6 +27,10 @@
   #:use-module (guix gexp)
   #:export (feature-sourcehut))
 
+;; https://lists.sr.ht/~abcdw/rde-devel/%3Ccover.1678315998.git.contact%40conses.eu%3E#%3C86bkgz24q5.fsf@migalmoreno.com%3E
+;; https://www.gnu.org/software/emacs/manual/html_node/emacs/Bug-Reference.html
+;; TODO: [Andrew Tropin, 2024-05-06] Move
+;; rde-message-srht-add-email-control-code from feature-emacs-message
 (define* (feature-sourcehut
           #:key
           (hut hut)
@@ -63,5 +67,3 @@ Configures srht.el package and adds couple helpers."
    (name f-name)
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
-
-;; https://lists.sr.ht/~abcdw/rde-devel/%3Ccover.1678315998.git.contact%40conses.eu%3E#%3C86bkgz24q5.fsf@migalmoreno.com%3E
