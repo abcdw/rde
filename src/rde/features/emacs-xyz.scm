@@ -4176,7 +4176,9 @@ Indentation and refile configurations, visual adjustment."
           (org-agenda-prefix-format #f)
           (org-agenda-appt? #f))
   "Configure org-agenda for GNU Emacs."
-  (ensure-pred maybe-list? org-agenda-files)
+  (define (maybe-path-or-list? elt)
+    (or (maybe-path? elt) (maybe-list? elt)))
+  (ensure-pred maybe-path-or-list? org-agenda-files)
   (ensure-pred list? org-agenda-custom-commands)
   (ensure-pred maybe-list? org-agenda-prefix-format)
   (ensure-pred boolean? org-agenda-appt?)
