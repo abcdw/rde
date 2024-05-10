@@ -4394,11 +4394,6 @@ filename, however its value can be overriden."
   (define (get-home-services config)
     (if encrypted? (require-value 'rde-emacs-gnupg config))
     (define org-roam? (get-value 'emacs-org-roam config))
-    (when (and (not org-roam?)
-               org-dailies-capture-templates)
-      (raise
-       (formatted-message
-        (G_ "org-dailies package does't handle capture templates for now."))))
 
     (list
      (rde-elisp-configuration-service
@@ -4442,7 +4437,7 @@ or with a org-roam-less copy of the package."
           (org-roam-capture-templates #f)
           (org-roam-todo? #f)
           (use-node-types? #t))
-  "Configure org-roam for GNU Emacs.  If org-roam-dailies need, enable
+  "Configure org-roam for GNU Emacs.  If you need org-roam-dailies, enable
 `emacs-org-dailies' feature."
   (ensure-pred file-like? emacs-org-roam)
   (define (not-boolean? x) (not (boolean? x)))
