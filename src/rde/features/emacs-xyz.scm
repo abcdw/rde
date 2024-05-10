@@ -4470,9 +4470,11 @@ package is unconfigured but it plays along with emacs-org-agenda-files-track."
 
 (define* (feature-emacs-org-agenda-files-track
           #:key
-          (emacs-org-agenda-files-track emacs-org-agenda-files-track))
+          (emacs-org-agenda-files-track emacs-org-agenda-files-track)
+          (emacs-org-agenda-files-track-ql emacs-org-agenda-files-track-ql))
   "Configure org-agenda-files-track for GNU Emacs."
   (ensure-pred file-like? emacs-org-agenda-files-track)
+  (ensure-pred file-like? emacs-org-agenda-files-track-ql)
 
   (define emacs-f-name 'org-agenda-files-track)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -4482,12 +4484,19 @@ package is unconfigured but it plays along with emacs-org-agenda-files-track."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((require 'org-agenda-files-track))
+      `(,@(if (get-value 'emacs-org-ql config)
+              '((require 'org-agenda-files-track-ql)
+                (setq org-agenda-include-diary nil))
+              '((require 'org-agenda-files-track))))
       #:summary "\
 Org dynamic agenda"
-      #:commentary ""
+      #:commentary "\
+This hook records files that should be saved as agenda-files, making the refreshing
+and loading of org-agenda faster (and even faster with org-ql cache)."
       #:keywords '(convenience)
-      #:elisp-packages (list emacs-org-agenda-files-track))))
+      #:elisp-packages (list (if (get-value 'emacs-org-ql config)
+                                 emacs-org-agenda-files-track-ql
+                                 emacs-org-agenda-files-track)))))
 
   (feature
    (name f-name)
