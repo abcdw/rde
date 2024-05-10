@@ -4373,6 +4373,7 @@ If NODE doesn't exist, create a new org-roam node with REF."
           #:key
           (emacs-org-dailies emacs-org-dailies)
           (org-dailies-directory "daily/")
+          (org-roam-dailies? #t)
           (encrypted? #f)
           (org-dailies-capture-templates
            (if encrypted?
@@ -4380,12 +4381,15 @@ If NODE doesn't exist, create a new org-roam node with REF."
                   (file+head "%<%Y-%m-%d>.org.gpg" "#+title: %<%Y-%m-%d>\n")))
                #f)))
   "Configure org-dailies or org-roam-dailies for GNU Emacs, depending on
-ORG-ROAM-DAILIES? RDE value.  When ENCRYPTED? is set to true, provide a
-default value for ORG-DAILIES-CAPTURE-TEMPLATES, which has .gpg at the end of
-filename, however its value can be overriden."
+ORG-ROAM-DAILIES? option and EMACS-ORG-ROAM feature.  You might want to use
+the ORG-ROAM-DAILIES? option to switch to non-roam org-dailies to store
+dailies in a directory outside of org-roam's directory.  When ENCRYPTED? is
+set to true, provide a default value for ORG-DAILIES-CAPTURE-TEMPLATES, which
+has .gpg at the end of filename, however its value can be overriden."
   (ensure-pred file-like? emacs-org-dailies)
   (ensure-pred maybe-path? org-dailies-directory)
   (ensure-pred maybe-list? org-dailies-capture-templates)
+  (ensure-pred boolean? org-roam-dailies?)
   (ensure-pred boolean? encrypted?)
 
   (define emacs-f-name 'org-dailies)
@@ -4399,7 +4403,7 @@ filename, however its value can be overriden."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(,@(if org-roam?
+      `(,@(if (and org-roam? org-roam-dailies?)
               `((autoload 'org-roam-dailies-map "org-roam-dailies"
                           "" nil 'keymap)
                 (define-key mode-specific-map (kbd "d") 'org-roam-dailies-map)
@@ -4422,7 +4426,9 @@ filename, however its value can be overriden."
 This feature configure daily journaling functionality, either with org-roam-dailies,
 or with a org-roam-less copy of the package."
       #:keywords '(convenience)
-      #:elisp-packages (if org-roam? '() (list emacs-org-dailies)))))
+      #:elisp-packages (if (and org-roam? org-roam-dailies?)
+                           '()
+                           (list emacs-org-dailies)))))
 
   (feature
    (name f-name)
