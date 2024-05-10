@@ -111,6 +111,7 @@
             feature-emacs-citation
             feature-emacs-org-dailies
             feature-emacs-org-protocol
+            feature-emacs-org-ql
             feature-emacs-spelling
             feature-emacs-org-recur
             feature-emacs-graphviz
@@ -4432,6 +4433,35 @@ or with a org-roam-less copy of the package."
       #:elisp-packages (if (and org-roam? org-roam-dailies?)
                            '()
                            (list emacs-org-dailies)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-org-ql
+          #:key
+          (emacs-org-ql emacs-org-ql))
+  "Configure org-ql for GNU Emacs."
+  (ensure-pred file-like? emacs-org-ql)
+
+  (define emacs-f-name 'org-ql)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `()
+      #:summary "\
+An Org-mode query language, including search commands and saved views"
+      #:commentary "\
+This package provides a query language for Org files. It offers two syntax
+styles: Lisp-like sexps and search engine-like keywords. Currently this
+package is unconfigured but it plays along with emacs-org-agenda-files-track."
+      #:keywords '(convenience)
+      #:elisp-packages (list emacs-org-ql))))
 
   (feature
    (name f-name)
