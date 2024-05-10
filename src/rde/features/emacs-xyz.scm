@@ -107,6 +107,7 @@
             feature-emacs-org
             feature-emacs-org-roam
             feature-emacs-org-agenda
+            feature-emacs-org-agenda-files-track
             feature-emacs-citation
             feature-emacs-org-dailies
             feature-emacs-org-protocol
@@ -4429,6 +4430,32 @@ or with a org-roam-less copy of the package."
       #:elisp-packages (if (and org-roam? org-roam-dailies?)
                            '()
                            (list emacs-org-dailies)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-org-agenda-files-track
+          #:key
+          (emacs-org-agenda-files-track emacs-org-agenda-files-track))
+  "Configure org-agenda-files-track for GNU Emacs."
+  (ensure-pred file-like? emacs-org-agenda-files-track)
+
+  (define emacs-f-name 'org-agenda-files-track)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((require 'org-agenda-files-track))
+      #:summary "\
+Org dynamic agenda"
+      #:commentary ""
+      #:keywords '(convenience)
+      #:elisp-packages (list emacs-org-agenda-files-track))))
 
   (feature
    (name f-name)
