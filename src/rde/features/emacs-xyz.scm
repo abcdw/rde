@@ -4416,13 +4416,13 @@ has .gpg at the end of filename, however its value can be overriden."
                         `((setq org-roam-dailies-capture-templates
                                 ',org-dailies-capture-templates))
                         '())
-                  ,@(if org-dailies-capture-templates
+                  ,@(if org-dailies-directory
                         `((setq org-roam-dailies-directory
                                 ,org-dailies-directory))
                         '())))
               `((autoload 'org-dailies-map "org-dailies" "" nil 'keymap)
                 (define-key mode-specific-map (kbd "d") 'org-dailies-map)
-                ,@(if org-dailies-capture-templates
+                ,@(if org-dailies-directory
                       `((setq org-dailies-directory ,org-dailies-directory))
                       '()))))
       #:summary "Daily journaling functionality for Emacs"
