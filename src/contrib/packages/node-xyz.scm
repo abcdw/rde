@@ -32,17 +32,17 @@
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages))
 
-(define-public node-typescript-4.7.3
+(define-public node-typescript-5.4.4
   (package
     (name "node-typescript")
-    (version "4.7.3")
+    (version "5.4.4")
     (source
       (origin
         (method url-fetch)
-        (uri "https://registry.npmjs.org/typescript/-/typescript-4.7.3.tgz")
+        (uri "https://registry.npmjs.org/typescript/-/typescript-5.4.4.tgz")
         (sha256
           (base32
-            "1d0wxv9rzgjn11wkiscalw878kj08mmn3q1a5ifcicxml2bg9v0m"))))
+            "0j2c8m1w77dcz4bfmnzwsfjc2f9wpf5pfcblg7pnx4smy203nnqa"))))
     (build-system node-build-system)
     (arguments
       `(#:tests?
@@ -59,7 +59,7 @@
       "TypeScript is a language for application scale JavaScript development")
     (license license:asl2.0)))
 
-(define-public node-typescript node-typescript-4.7.3)
+(define-public node-typescript node-typescript-5.4.4)
 
 (define-public node-commander-9.3.0
   (package
@@ -2095,17 +2095,17 @@
     (description "Callback wrapping utility")
     (license license:isc)))
 
-(define-public node-typescript-language-server-0.11.1
+(define-public node-typescript-language-server-4.3.3
   (package
     (name "node-typescript-language-server")
-    (version "0.11.1")
+    (version "4.3.3")
     (source
       (origin
         (method url-fetch)
-        (uri "https://registry.npmjs.org/typescript-language-server/-/typescript-language-server-0.11.1.tgz")
+        (uri "https://registry.npmjs.org/typescript-language-server/-/typescript-language-server-4.3.3.tgz")
         (sha256
           (base32
-            "0pr16c4skl8wg582h7smm5ij792rvvq4zgp67lg7mdfchzjf46vk"))))
+            "1l0l95h69p1p8sfjm8crimqr39ln3a2vy8cjvc3zz675dxciq3ja"))))
     (build-system node-build-system)
     (arguments
       `(#:tests?
@@ -2138,7 +2138,7 @@
       "Language Server Protocol (LSP) implementation for TypeScript using tsserver")
     (license license:asl2.0)))
 
-(define-public node-typescript-language-server node-typescript-language-server-0.11.1)
+(define-public node-typescript-language-server node-typescript-language-server-4.3.3)
 
 (define-public node-core-js-3.23.1
   (package
