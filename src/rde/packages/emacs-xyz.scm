@@ -123,6 +123,28 @@ objects.")
     "This packages provides `eslint-fix', which fixes the current file using ESLint.")
    (license license:gpl3+))))
 
+(define-public emacs-flymake-eslint
+ (let ((commit "6ab909b85a8e97815db9831cdd5f283a7830177f"))
+  (package
+   (name "emacs-flymake-eslint")
+   (version "1.7.0")
+   (home-page "https://github.com/orzechowskid/flymake-eslint")
+   (source
+    (origin
+     (method git-fetch)
+     (uri (git-reference
+           (url home-page)
+           (commit commit)))
+     (file-name (git-file-name name version))
+     (sha256
+      (base32 "19jyim5rrmv8bdskaw8gxb6fch3jj3irqhddi2aaxvgdxn321yxm"))))
+   (build-system emacs-build-system)
+   (synopsis "Flymake backend for Javascript using eslint")
+   (description
+    "A backend for Flymake which uses eslint.  Enable it with M-x
+flymake-eslint-enable RET.")
+   (license license:gpl3+))))
+
 (define-public emacs-json-simple-flymake
  (let ((commit "f3dacf070d1e04d5805323b0a95d58c5b9b7f607"))
   (package
