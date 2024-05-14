@@ -23,11 +23,15 @@
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
 
+  #:use-module (rde packages emacs-xyz)
+
   #:use-module (gnu services)
   #:use-module (gnu home services)
 
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages node)
+  #:use-module (gnu packages tree-sitter)
+
   #:use-module (contrib packages node-xyz)
 
   #:use-module (guix gexp)
@@ -38,14 +42,21 @@
           #:key
           (node node)
           (node-typescript node-typescript)
+          (node-eslint node-eslint-8.17.0)
           (node-typescript-language-server node-typescript-language-server)
-          (eglot-stay-out-of '()))
+          (eglot-stay-out-of '(flymake))
+          (format-buffer-on-save? #f))
   "Setup and configure environment for JavaScript."
   (ensure-pred file-like? node-typescript)
   (ensure-pred file-like? node-typescript-language-server)
+  (ensure-pred file-like? node-eslint)
+  (ensure-pred boolean? format-buffer-on-save?)
+
+  (define emacs-f-name 'javascript)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
-    (define emacs-f-name 'javascript)
+
     (define tsserver-library
       (if (any-package? node-typescript)
           (file-append node-typescript "/lib/node_modules/typescript/lib")
@@ -59,6 +70,10 @@
       (if (any-package? node)
           (file-append node "/bin/node")
           node))
+    (define eslint-executable
+      (if (any-package? node-eslint)
+          (file-append node-eslint "/bin/eslint")
+          node-eslint))
     (list
      (when (get-value 'emacs config)
        (rde-elisp-configuration-service
@@ -74,90 +89,172 @@
                                 '((60 . 62)))) ;; <, >
             (setq-local electric-pair-text-pairs electric-pair-pairs))
 
-          (dolist
-           (hook
-            '(js-mode-hook
-              typescript-mode-hook
-              typescript-tsx-mode-hook))
-           (add-hook hook
-                     (lambda ()
-                       (eglot-ensure)
-                       (rde--javascript-setup-electric-pairs-for-jsx-tsx)
-                       (rde--javascript-disable-eglot-parts)
-                       (js2-minor-mode)
-                       (npm-mode))))
+          (defun rde--javascript-setup-keymaps (mode)
+            (defvar nodejs-repl-mode-command-map
+              (let ((map (make-sparse-keymap)))
+                (define-key map (kbd "e") 'nodejs-repl-send-last-expression)
+                (define-key map (kbd "j") 'nodejs-repl-send-line)
+                (define-key map (kbd "r") 'nodejs-repl-send-region)
+                (define-key map (kbd "C-c") 'nodejs-repl-send-buffer)
+                (define-key map (kbd "C-l") 'nodejs-repl-load-file)
+                (define-key map (kbd "C-z") 'nodejs-repl-switch-to-repl)
+                map))
+            (fset 'nodejs-repl-mode-command-map nodejs-repl-mode-command-map)
+            (define-key
+              (symbol-value (intern (format "%s-map" (car mode))))
+              (kbd "C-c r")
+              '("repl" . nodejs-repl-mode-command-map))
+            (define-key
+              (symbol-value (intern (format "%s-map" (car mode))))
+              (kbd "C-c f")
+              '("Format buffer" . eslint-fix)))
 
-          ;; repl
           (with-eval-after-load
-              'nodejs-repl
-            (setq nodejs-repl-command ,node-executable))
+              'web-mode
+            (setq web-mode-markup-indent-offset 2
+                  web-mode-css-indent-offset 2
+                  web-mode-code-indent-offset 2))
 
-          (add-hook 'js-mode-hook
-                    (lambda ()
-                      (defvar nodejs-repl-mode-command-map
-                        (let ((map (make-sparse-keymap)))
-                          (define-key map (kbd "e") 'nodejs-repl-send-last-expression)
-                          (define-key map (kbd "j") 'nodejs-repl-send-line)
-                          (define-key map (kbd "r") 'nodejs-repl-send-region)
-                          (define-key map (kbd "C-c") 'nodejs-repl-send-buffer)
-                          (define-key map (kbd "C-l") 'nodejs-repl-load-file)
-                          (define-key map (kbd "C-z") 'nodejs-repl-switch-to-repl)
-                          map))
-                      (fset 'nodejs-repl-mode-command-map nodejs-repl-mode-command-map)
-                      (define-key js-mode-map (kbd "C-c r")
-                        '("repl" . nodejs-repl-mode-command-map))))
+          (require 'treesit)
 
-          ;; js2-mode
-          (with-eval-after-load
-           'js2-mode
-           (setq js-chain-indent t
-                 js2-basic-offset 2
-                 js2-skip-preprocessor-directives t
-                 js2-mode-show-parse-errors nil
-                 js2-mode-show-strict-warnings nil
-                 js2-strict-missing-semi-warning nil
-                 js2-highlight-level 3
-                 js2-idle-timer-delay 0.15))
+          ;;; We want to make sure that eglot sends the correct language-ids
+          ;;; to the LSP server for the respective files. In short:
+          ;;; .js -> javascript
+          ;;; .jsx -> javascriptreact
+          ;;; .ts -> typescript
+          ;;; .tsx -> typescriptreact
+          ;;; But due to  the way javascript / typescript major modes are
+          ;;; designed in emacs, this doesn't work with current versions
+          ;;; of emacs 29/30.
+          ;;; See: https://github.com/joaotavora/eglot/issues/1384
+          ;;; However, commit c79a509384d33 in emacs master fixes this. I
+          ;;; locally tested this by building latest emacs. Unfortunately,
+          ;;; this commit is not yet packaged in Guix. However let's leave
+          ;;; the code in place, once the package is updated this should work
+          ;;; ootb. In the meantime, this code doesn't have any negative
+          ;;; effect.
+          (let* ((ts-js? (treesit-ready-p 'javascript))
+                 (ts-ts? (treesit-ready-p 'typescript))
+                 (mode-list (if (and ts-js? ts-ts?)
+                                ;; (mode . language-id)
+                                '((jsx-ts-mode . "javascriptreact")
+                                  (js-ts-mode . "javascript")
+                                  (tsx-ts-mode . "typescriptreact")
+                                  (typescript-ts-mode . "typescript"))
+                                '((js-jsx-mode . "javascriptreact")
+                                  (js-mode . "javascript")
+                                  (typescript-tsx-mode . "typescriptreact")
+                                  (typescript-mode . "typescript")))))
 
-          ;; typescript-mode
-          (with-eval-after-load
-           'typescript-mode
-           (add-hook 'typescript-mode-hook 'npm-mode)
-           (setq typescript-indent-level 2))
+            ;; Javascript setup
+            (cond (ts-js?
+                   ;; for tree-sitter
+                   (add-to-list 'major-mode-remap-alist `(javascript-mode . js-ts-mode))
 
-          ;; typescript-tsx-mode
-          (when (fboundp 'web-mode)
-            (define-derived-mode typescript-tsx-mode web-mode "TypeScript[TSX]")
-            (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-tsx-mode)))
-          (with-eval-after-load
-           'web-mode
-           (setq web-mode-markup-indent-offset 2
-                 web-mode-css-indent-offset 2
-                 web-mode-code-indent-offset 2)
-           (add-hook 'typescript-tsx-mode-hook
-                     (lambda ()
-                       (rde--javascript-setup-electric-pairs-for-jsx-tsx)
-                       (rde--javascript-diable-eglot-parts)
-                       (npm-mode))))
+                   ;; We need to create a derived mode from tsx-ts-mode
+                   (define-derived-mode jsx-ts-mode tsx-ts-mode "JavaScript[JSX]")
 
-          ;; npm-mode
-          (with-eval-after-load
-           'npm-mode
-           (fset 'npm-mode-command-keymap npm-mode-command-keymap)
-           (define-key npm-mode-keymap (kbd "C-c n")
-             '("npm" . npm-mode-command-keymap)))
+                   ;; Manually adding js-ts-mode to the end of the list, so that it doesn't
+                   ;; get added again (to the top) once we invoke it
+                   (add-to-list 'auto-mode-alist '("\\(\\.js[mx]\\|\\.har\\)\\'" . js-ts-mode) t)
+                   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . jsx-ts-mode)))
+                  (t
+                   ;; for non-tree-sitter
+                   (add-to-list 'auto-mode-alist '("\\.jsx\\'" . js-jsx-mode))))
 
-          ;; eglot
-          (with-eval-after-load
-           'eglot
+            ;; Typescript setup
+            (cond (ts-ts?
+                   ;; tree-sitter
+                   (add-to-list 'major-mode-remap-alist `(typescript-mode . typescript-ts-mode))
+                   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . tsx-ts-mode)))
+                  (t
+                   ;; for non-tree-sitter
+                   (define-derived-mode typescript-tsx-mode web-mode "TypeScript[TSX]")
+                   (add-to-list 'auto-mode-alist '("\\.tsx\\'" . typescript-tsx-mode))
+                   (with-eval-after-load 'typescript-mode
+                     (setq typescript-indent-level 2))))
 
-           (add-to-list
-            'eglot-server-programs
-            '((js-mode
-               typescript-mode
-               typescript-tsx-mode) . (,ts-lsp-executable
-                                       "--tsserver-path" ,tsserver-library
-                                       "--stdio")))))
+            ;; Setting up each mode dynamically
+            (dolist (mode mode-list)
+                     (add-hook (intern (format "%s-hook" (car mode)))
+                              (lambda ()
+                                (rde--javascript-disable-eglot-parts)
+
+                                ;; set up flymake
+                                (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)
+	                        (flymake-eslint-enable)
+
+                                ;; Run eslint on save if specified
+                                ,@(if format-buffer-on-save?
+                                      '((add-hook 'after-save-hook 'eslint-fix nil t))
+                                      '())
+
+                                ;; eglot
+                                (eglot-ensure)
+
+                                ;; general stuff
+                                (setq indent-tabs-mode nil)
+                                (rde--javascript-setup-electric-pairs-for-jsx-tsx)
+                                (rde--javascript-setup-keymaps mode)
+                                (js2-minor-mode)
+                                (js2-imenu-extras-mode t)
+                                (npm-mode))))
+
+
+
+            ;; js2-mode
+            (with-eval-after-load
+                'js2-mode
+              (setq js-chain-indent t
+                    js2-basic-offset 2
+                    js2-skip-preprocessor-directives t
+                    js2-mode-show-parse-errors nil
+                    js2-mode-show-strict-warnings nil
+                    js2-strict-missing-semi-warning nil
+                    js2-highlight-level 3
+                    js2-idle-timer-delay 0.15))
+
+            ;;eglot
+            (let ((ts-exec ,ts-lsp-executable)
+                  (ts-lib ,tsserver-library)
+                  (modes (mapcar
+                          (lambda (x) `(,(car x) :language-id ,(cdr x)))
+                          mode-list)))
+              (with-eval-after-load
+                  'eglot
+                (add-to-list
+                 'eglot-server-programs
+                 `(,modes . (,ts-exec "--stdio"
+                                      :initializationOptions
+                                      (:tsserver (:path ,ts-lib))))))
+              (add-hook
+               'eglot-managed-mode-hook
+               (lambda ()
+                 (flymake-mode t)
+		 ;; Add flymake diagnostics to mode bar
+		 (add-to-list 'mode-line-misc-info
+			      `(flymake-mode (" " flymake-mode-line-counters " "))))))
+
+            ;; npm-mode
+            (with-eval-after-load
+                'npm-mode
+              (fset 'npm-mode-command-keymap npm-mode-command-keymap)
+              (define-key npm-mode-keymap (kbd "C-c n")
+                '("npm" . npm-mode-command-keymap)))
+
+            ;; flymake-eslint
+            (with-eval-after-load
+                'flymake-eslint
+              (setq flymake-eslint-executable-name ,eslint-executable))
+
+            (with-eval-after-load
+                'eslint-fix
+              (setq eslint-fix-executable ,eslint-executable))
+
+            ;; repl
+            (with-eval-after-load
+                'nodejs-repl
+              (setq nodejs-repl-command ,node-executable))))
         #:authors
         '("Demis Balbach <db@minikn.xyz>"
           "Andrew Tropin <andrew@trop.in>")
@@ -166,14 +263,20 @@
               emacs-npm-mode
               emacs-typescript-mode
               emacs-web-mode
-              emacs-nodejs-repl)))
+              emacs-nodejs-repl
+              emacs-markdown-mode
+              emacs-flymake-eslint
+              emacs-eslint-fix
+              emacs-jsonrpc-1.0.25
+              emacs-eglot-1.17)))
      (simple-service
       'javascript-add-packages
       home-profile-service-type
       (list
        node
-       node-typescript))))
+       tree-sitter-typescript
+       tree-sitter-javascript))))
   (feature
-   (name 'javascript)
-   (values `((javascript . #t)))
+   (name f-name)
+   (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
