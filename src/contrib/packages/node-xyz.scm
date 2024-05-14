@@ -61,6 +61,33 @@
 
 (define-public node-typescript node-typescript-5.4.4)
 
+(define-public node-typescript-4.7.3
+  (package
+    (name "node-typescript")
+    (version "4.7.3")
+    (source
+      (origin
+        (method url-fetch)
+        (uri "https://registry.npmjs.org/typescript/-/typescript-4.7.3.tgz")
+        (sha256
+          (base32
+            "1d0wxv9rzgjn11wkiscalw878kj08mmn3q1a5ifcicxml2bg9v0m"))))
+    (build-system node-build-system)
+    (arguments
+      `(#:tests?
+        #f
+        #:phases
+        (modify-phases
+          %standard-phases
+          (delete 'configure)
+          (delete 'build))))
+    (home-page "https://www.typescriptlang.org/")
+    (synopsis
+      "TypeScript is a language for application scale JavaScript development")
+    (description
+      "TypeScript is a language for application scale JavaScript development")
+    (license license:asl2.0)))
+
 (define-public node-commander-9.3.0
   (package
     (name "node-commander")
