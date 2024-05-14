@@ -19,6 +19,7 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (contrib packages node-xyz)
+  #:use-module (contrib packages node)
   #:use-module (gnu packages base)
   #:use-module (gnu packages node)
   #:use-module (gnu packages node-xyz)
@@ -4993,6 +4994,8 @@
       "Require hook for automatic V8 compile cache persistence")
     (license license:expat)))
 
+;;; Packaged by migalmoreno
+;;; Source: https://lists.sr.ht/~abcdw/rde-devel/patches/47025
 (define-public node-eslint-8.17.0
   (package
     (name "node-eslint")
