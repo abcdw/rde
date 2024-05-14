@@ -2,6 +2,7 @@
 ;;;
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023 Miguel Ángel Moreno <mail@migalmoreno.com>
 ;;;
 ;;; This file is a part of rde.
 ;;;
@@ -1169,36 +1170,6 @@
       "Returns true if a string has an extglob.")
     (license license:expat)))
 
-(define-public node-is-glob-4.0.3
-  (package
-    (name "node-is-glob")
-    (version "4.0.3")
-    (source
-      (origin
-        (method url-fetch)
-        (uri "https://registry.npmjs.org/is-glob/-/is-glob-4.0.3.tgz")
-        (sha256
-          (base32
-            "1imyq6pjl716cjc1ypmmnn0574rh28av3pq50mpqzd9v37xm7r1z"))))
-    (build-system node-build-system)
-    (arguments
-      `(#:tests?
-        #f
-        #:phases
-        (modify-phases
-          %standard-phases
-          (delete 'configure)
-          (delete 'build))))
-    (inputs
-      `(("node-is-extglob" ,node-is-extglob-2.1.1)))
-    (home-page
-      "https://github.com/micromatch/is-glob")
-    (synopsis
-      "Returns `true` if the given string looks like a glob pattern or an extglob pattern. This makes it easy to create code that only uses external modules like node-glob when necessary, resulting in much faster code execution and initialization time, and a bet")
-    (description
-      "Returns `true` if the given string looks like a glob pattern or an extglob pattern. This makes it easy to create code that only uses external modules like node-glob when necessary, resulting in much faster code execution and initialization time, and a bet")
-    (license license:expat)))
-
 (define-public node-is-path-cwd-2.2.0
   (package
     (name "node-is-path-cwd")
@@ -1409,6 +1380,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -1521,6 +1493,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -1553,6 +1526,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -1594,69 +1568,6 @@
     (description
       "Node.js 0.12 path.isAbsolute() ponyfill")
     (license license:expat)))
-
-(define-public node-glob-7.2.3
-  (package
-    (name "node-glob")
-    (version "7.2.3")
-    (source
-      (origin
-        (method url-fetch)
-        (uri "https://registry.npmjs.org/glob/-/glob-7.2.3.tgz")
-        (sha256
-          (base32
-            "10a336nxv867xkjs3ipgbharwdzp5lnz7wr8viawn1lc66qqx8zh"))))
-    (build-system node-build-system)
-    (arguments
-      `(#:tests?
-        #f
-        #:phases
-        (modify-phases
-          %standard-phases
-          (delete 'configure)
-          (delete 'build))))
-    (inputs
-      `(("node-path-is-absolute"
-         ,node-path-is-absolute-1.0.1)
-        ("node-once" ,node-once-1.4.0)
-        ("node-minimatch" ,node-minimatch-3.1.2)
-        ("node-inherits" ,node-inherits-2.0.4)
-        ("node-inflight" ,node-inflight-1.0.6)
-        ("node-fs-realpath" ,node-fs-realpath-1.0.0)))
-    (home-page
-      "https://github.com/isaacs/node-glob#readme")
-    (synopsis "a little globber")
-    (description "a little globber")
-    (license license:isc)))
-
-(define-public node-rimraf-3.0.2
-  (package
-    (name "node-rimraf")
-    (version "3.0.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri "https://registry.npmjs.org/rimraf/-/rimraf-3.0.2.tgz")
-        (sha256
-          (base32
-            "0lkzjyxjij6ssh5h2l3ncp0zx00ylzhww766dq2vf1s7v07w4xjq"))))
-    (build-system node-build-system)
-    (arguments
-      `(#:tests?
-        #f
-        #:phases
-        (modify-phases
-          %standard-phases
-          (delete 'configure)
-          (delete 'build))))
-    (inputs `(("node-glob" ,node-glob-7.2.3)))
-    (home-page
-      "https://github.com/isaacs/rimraf#readme")
-    (synopsis
-      "A deep deletion module for node (like `rm -rf`)")
-    (description
-      "A deep deletion module for node (like `rm -rf`)")
-    (license license:isc)))
 
 (define-public node-slash-3.0.0
   (package
@@ -2116,6 +2027,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -2145,6 +2057,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -2741,6 +2654,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -2806,6 +2720,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -2921,6 +2836,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -2950,6 +2866,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3011,6 +2928,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3039,6 +2957,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3095,6 +3014,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3125,6 +3045,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3212,6 +3133,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3253,35 +3175,6 @@
       "Minimal module to check if a file is executable.")
     (license license:isc)))
 
-(define-public node-which-2.0.2
-  (package
-    (name "node-which")
-    (version "2.0.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri "https://registry.npmjs.org/which/-/which-2.0.2.tgz")
-        (sha256
-          (base32
-            "1p2fkm4lr36s85gdjxmyr6wh86dizf0iwmffxmarcxpbvmgxyfm1"))))
-    (build-system node-build-system)
-    (arguments
-      `(#:tests?
-        #f
-        #:phases
-        (modify-phases
-          %standard-phases
-          (delete 'configure)
-          (delete 'build))))
-    (inputs `(("node-isexe" ,node-isexe-2.0.0)))
-    (home-page
-      "https://github.com/isaacs/node-which#readme")
-    (synopsis
-      "Like which(1) unix command. Find the first instance of an executable in the PATH.")
-    (description
-      "Like which(1) unix command. Find the first instance of an executable in the PATH.")
-    (license license:isc)))
-
 (define-public node-cross-spawn-7.0.3
   (package
     (name "node-cross-spawn")
@@ -3297,6 +3190,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3356,6 +3250,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3385,6 +3280,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3437,6 +3333,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3465,6 +3362,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3523,6 +3421,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3552,6 +3451,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3577,6 +3477,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3631,6 +3532,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3691,6 +3593,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3814,36 +3717,6 @@
       "Use node's fs.realpath, but fall back to the JS implementation if the native one fails")
     (license license:isc)))
 
-(define-public node-inflight-1.0.6
-  (package
-    (name "node-inflight")
-    (version "1.0.6")
-    (source
-      (origin
-        (method url-fetch)
-        (uri "https://registry.npmjs.org/inflight/-/inflight-1.0.6.tgz")
-        (sha256
-          (base32
-            "16w864087xsh3q7f5gm3754s7bpsb9fq3dhknk9nmbvlk3sxr7ss"))))
-    (build-system node-build-system)
-    (arguments
-      `(#:tests?
-        #f
-        #:phases
-        (modify-phases
-          %standard-phases
-          (delete 'configure)
-          (delete 'build))))
-    (inputs
-      `(("node-wrappy" ,node-wrappy-1.0.2)
-        ("node-once" ,node-once-1.4.0)))
-    (home-page "https://github.com/isaacs/inflight")
-    (synopsis
-      "Add callbacks to requests in flight to avoid async duplication")
-    (description
-      "Add callbacks to requests in flight to avoid async duplication")
-    (license license:isc)))
-
 (define-public node-inherits-2.0.4
   (package
     (name "node-inherits")
@@ -3915,6 +3788,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3949,6 +3823,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -3978,6 +3853,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4009,6 +3885,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4067,6 +3944,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4124,6 +4002,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4210,6 +4089,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4266,6 +4146,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4353,6 +4234,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4411,6 +4293,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4532,67 +4415,6 @@
     (synopsis "concatenative mapdashery")
     (description "concatenative mapdashery")
     (license license:expat)))
-
-(define-public node-brace-expansion-1.1.11
-  (package
-    (name "node-brace-expansion")
-    (version "1.1.11")
-    (source
-      (origin
-        (method url-fetch)
-        (uri "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz")
-        (sha256
-          (base32
-            "1nlmjvlwlp88knblnayns0brr7a9m2fynrlwq425lrpb4mcn9gc4"))))
-    (build-system node-build-system)
-    (arguments
-      `(#:tests?
-        #f
-        #:phases
-        (modify-phases
-          %standard-phases
-          (delete 'configure)
-          (delete 'build))))
-    (inputs
-      `(("node-concat-map" ,node-concat-map-0.0.1)
-        ("node-balanced-match"
-         ,node-balanced-match-1.0.2)))
-    (home-page
-      "https://github.com/juliangruber/brace-expansion")
-    (synopsis
-      "Brace expansion as known from sh/bash")
-    (description
-      "Brace expansion as known from sh/bash")
-    (license license:expat)))
-
-(define-public node-minimatch-3.1.2
-  (package
-    (name "node-minimatch")
-    (version "3.1.2")
-    (source
-      (origin
-        (method url-fetch)
-        (uri "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz")
-        (sha256
-          (base32
-            "0kd3h6q90kvmzzw1v7cc3dr911gjkb9s547cdvfncfqanq84p5hk"))))
-    (build-system node-build-system)
-    (arguments
-      `(#:tests?
-        #f
-        #:phases
-        (modify-phases
-          %standard-phases
-          (delete 'configure)
-          (delete 'build))))
-    (inputs
-      `(("node-brace-expansion"
-         ,node-brace-expansion-1.1.11)))
-    (home-page
-      "https://github.com/isaacs/minimatch#readme")
-    (synopsis "a glob matcher in javascript")
-    (description "a glob matcher in javascript")
-    (license license:isc)))
 
 (define-public node-natural-compare-1.4.0
   (package
@@ -4718,6 +4540,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4747,6 +4570,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4805,6 +4629,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -4895,6 +4720,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
@@ -5011,6 +4837,7 @@
     (arguments
       `(#:tests?
         #f
+        #:node ,node-stable
         #:phases
         (modify-phases
           %standard-phases
