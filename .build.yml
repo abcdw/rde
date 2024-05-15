@@ -9,7 +9,7 @@ tasks:
       make check
   - build-minimal-example-home: |
       cd rde/examples
-      make minimal/home/build
+      make minimal/home/build/ci
 triggers:
   - action: email
     condition: failure
