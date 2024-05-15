@@ -37,6 +37,7 @@
   #:use-module (gnu home-services mail)
   #:use-module (gnu home services mcron)
   #:use-module (gnu home-services version-control)
+  #:use-module (gnu home services xdg)
 
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
@@ -372,8 +373,7 @@ Citation line format, message signature, gpg and msmtp configurations. "
 (define %default-msmtp-settings
   "defaults
 tls on
-auth on
-logfile \"~/.local/var/log/msmtp.log\"\n")
+auth on\n")
 
 (define (default-msmtp-serializer provider-settings mail-account)
   "Generates a configuration string from key/value pairs found in
@@ -397,6 +397,7 @@ Example:
           (msmtp-serializer default-msmtp-serializer))
   "Configure msmtp MTA."
   (define (get-home-services config)
+    (require-value 'xdg-base-directories-configuration config)
     (require-value 'mail-accounts config
                    "feature-msmtp can't operate without mail-accounts.")
 
@@ -408,11 +409,16 @@ Example:
       (list
        (list
         "msmtp/config"
-        ;; TODO: Try $HOME/.local/var/log expansion
         (apply
          mixed-text-file
          "msmtp-config"
          msmtp-settings
+         (format #f "logfile ~a~a/log/msmtp.log\n"
+                 (get-value 'home-directory config)
+                 (string-drop
+                  (home-xdg-base-directories-configuration-state-home
+                   (get-value 'xdg-base-directories-configuration config))
+                  (string-length "$HOME")))
           (append-map
            (lambda (acc)
              (map
