@@ -14,7 +14,13 @@ tasks:
       git switch keyring
       git switch -
       cd examples
-      make minimal/home/build/ci
+
+      # Don't try to authenticate channels, when patches sent to mailing list
+      if [[ "$BUILD_REASON" == "patchset" ]]; then
+        make minimal/home/build/ci-no-auth
+      else
+        make minimal/home/build/ci
+      fi
 triggers:
   - action: email
     condition: failure

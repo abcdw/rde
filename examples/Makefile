@@ -85,6 +85,10 @@ minimal/home/build/ci:
 	guix time-machine -C rde/channels-ci.scm -- \
 	home build ./src/rde-configs/minimal.scm
 
+minimal/home/build/ci-no-auth:
+	guix time-machine -C rde/channels-ci.scm --disable-authentication -- \
+	home build ./src/rde-configs/minimal.scm
+
 clean-target:
 	rm -rf ./target
 
