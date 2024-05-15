@@ -12,7 +12,7 @@ tasks:
       # Create a local keyring branch from origin/keyring to make it possible
       # to authenticate local RDE channel and go back to the current HEAD
       git switch keyring
-      git switch -
+      git switch --detach -
       cd examples
 
       # Don't try to authenticate channels, when patches sent to mailing list
