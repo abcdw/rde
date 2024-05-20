@@ -631,10 +631,10 @@ values} for a patch series with cover letter.
 
 To avoid manually specifying command line arguments you can use this
 example @file{.git/config} for the repo:
-@exmaple
+@example
 ...
 [format]
-        to = ~abcdw/rde-devel@lists.sr.ht
+        to = ~abcdw/rde-devel@@lists.sr.ht
         subjectPrefix = PATCH guile-ares-rs
         coverLetter = auto
 @end example
