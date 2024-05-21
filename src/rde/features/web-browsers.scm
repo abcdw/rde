@@ -332,9 +332,10 @@ functionalities."
            (asdf:ensure-source-registry)
            (use-nyxt-package-nicknames)
            (defvar *rde-keymap* (make-keymap "rde-map"))
-           ,@(if (nil? extra-bindings)
-                 '()
-                 `((define-key *rde-keymap* ,@extra-bindings)))
+           (define-key *rde-keymap*
+             "S-b" 'switch-buffer
+             "S-w" 'delete-current-buffer
+             ,@extra-bindings)
            ,@(if temporary-history?
                  '((define-class tmp-profile (nyxt-profile)
                      ((files:name :initform "nyxt-tmp"))

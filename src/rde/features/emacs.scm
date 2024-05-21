@@ -351,6 +351,7 @@ C-h C-a to open About Emacs buffer."
                (add-hook mode-hook (lambda () (setq truncate-lines t))))
 
        ,#~""
+       ;; XXX: Keep in sync with nyxt *rde-keymap*.
        (define-key global-map (kbd "s-b") 'switch-to-buffer)
        (define-key global-map (kbd "s-w") 'kill-current-buffer)
        (define-key global-map (kbd "s-W") 'kill-buffer-and-window)
