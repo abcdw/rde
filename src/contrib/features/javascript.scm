@@ -44,12 +44,14 @@
           (node-typescript node-typescript)
           (node-eslint node-eslint-8.17.0)
           (node-typescript-language-server node-typescript-language-server)
+          (node-vscode-js-debug node-vscode-js-debug)
           (eglot-stay-out-of '(flymake))
           (format-buffer-on-save? #f))
   "Setup and configure environment for JavaScript."
   (ensure-pred file-like? node-typescript)
   (ensure-pred file-like? node-typescript-language-server)
   (ensure-pred file-like? node-eslint)
+  (ensure-pred file-like? node-vscode-js-debug)
   (ensure-pred boolean? format-buffer-on-save?)
 
   (define emacs-f-name 'javascript)
@@ -74,6 +76,10 @@
       (if (any-package? node-eslint)
           (file-append node-eslint "/bin/eslint")
           node-eslint))
+    (define vscode-js-debug-executable
+      (if (any-package? node-vscode-js-debug)
+          (file-append node-vscode-js-debug "/bin/dapDebugServer")
+          node-vscode-js-debug))
     (list
      (when (get-value 'emacs config)
        (rde-elisp-configuration-service
@@ -176,13 +182,13 @@
 
             ;; Setting up each mode dynamically
             (dolist (mode mode-list)
-                     (add-hook (intern (format "%s-hook" (car mode)))
+                    (add-hook (intern (format "%s-hook" (car mode)))
                               (lambda ()
                                 (rde--javascript-disable-eglot-parts)
 
                                 ;; set up flymake
                                 (add-hook 'flymake-diagnostic-functions 'eglot-flymake-backend nil t)
-	                        (flymake-eslint-enable)
+                                (flymake-eslint-enable)
 
                                 ;; Run eslint on save if specified
                                 ,@(if format-buffer-on-save?
@@ -231,9 +237,9 @@
                'eglot-managed-mode-hook
                (lambda ()
                  (flymake-mode t)
-		 ;; Add flymake diagnostics to mode bar
-		 (add-to-list 'mode-line-misc-info
-			      `(flymake-mode (" " flymake-mode-line-counters " "))))))
+                 ;; Add flymake diagnostics to mode bar
+                 (add-to-list 'mode-line-misc-info
+                              `(flymake-mode (" " flymake-mode-line-counters " "))))))
 
             ;; npm-mode
             (with-eval-after-load
@@ -254,7 +260,62 @@
             ;; repl
             (with-eval-after-load
                 'nodejs-repl
-              (setq nodejs-repl-command ,node-executable))))
+              (setq nodejs-repl-command ,node-executable))
+
+            ;; dape
+            ,@(if (get-value 'emacs-dape config)
+                  `((with-eval-after-load
+                        'dape
+                      (let ((vscode-js-debug ,vscode-js-debug-executable)
+                            (js-target-mode (car (rassoc "javascript" mode-list)))
+                            (ts-target-mode (car (rassoc "typescript" mode-list))))
+                        (setq dape-configs
+                              (append
+                               ;; NOTE [Demis Balbach, 24-05-15] All configurations
+                               ;; apart from `frontend' are untested. I just copied
+                               ;; the default dape config and adapted them to work
+                               ;; with our version of vscode-js-debug
+                               `((backend
+                                  modes (,js-target-mode ,ts-target-mode)
+                                  command ,vscode-js-debug
+                                  port 8123
+                                  :name "Backend"
+                                  :type "pwa-node"
+                                  :cwd dape-cwd
+                                  :program dape-buffer-default
+                                  :console "internalConsole")
+                                 (backend-ts
+                                  modes (,ts-target-mode)
+                                  command ,vscode-js-debug
+                                  port 8123
+                                  :name "Backend (TypeScript)"
+                                  :type "pwa-node"
+                                  :runtimeExecutable "ts-node"
+                                  :cwd dape-cwd
+                                  :program dape-buffer-default
+                                  :console "internalConsole")
+                                 (backend-attach
+                                  modes (,js-target-mode ,ts-target-mode)
+                                  command ,vscode-js-debug
+                                  port 8123
+                                  :name "Backend (Attach)"
+                                  :request "attach"
+                                  :port 9229)
+                                 (frontend
+                                  modes (,js-target-mode ,ts-target-mode)
+                                  command ,vscode-js-debug
+                                  port 8123
+                                  :name "Frontend"
+                                  :type "pwa-chrome"
+                                  :userDataDir nil
+                                  :url ,(lambda () (read-string
+                                                    "Url: "
+                                                    "http://localhost:3000"))
+                                  :webRoot ,(lambda () (read-string
+                                                        "Root: "
+                                                        (funcall dape-cwd-fn)))))
+                               dape-configs)))))
+                  '())))
         #:authors
         '("Demis Balbach <db@minikn.xyz>"
           "Andrew Tropin <andrew@trop.in>")
