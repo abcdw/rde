@@ -60,26 +60,15 @@
   (define (get-home-services config)
 
     (define tsserver-library
-      (if (any-package? node-typescript)
-          (file-append node-typescript "/lib/node_modules/typescript/lib")
-          node-typescript))
+      (file-append node-typescript "/lib/node_modules/typescript/lib"))
     (define ts-lsp-executable
-      (if (any-package? node-typescript-language-server)
-          (file-append node-typescript-language-server
-                       "/bin/typescript-language-server")
-          node-typescript-language-server))
-    (define node-executable
-      (if (any-package? node)
-          (file-append node "/bin/node")
-          node))
-    (define eslint-executable
-      (if (any-package? node-eslint)
-          (file-append node-eslint "/bin/eslint")
-          node-eslint))
+      (file-append node-typescript-language-server
+                   "/bin/typescript-language-server"))
+    (define node-executable (file-append node "/bin/node"))
+    (define eslint-executable (file-append node-eslint "/bin/eslint"))
     (define vscode-js-debug-executable
-      (if (any-package? node-vscode-js-debug)
-          (file-append node-vscode-js-debug "/bin/dapDebugServer")
-          node-vscode-js-debug))
+      (file-append node-vscode-js-debug "/bin/dapDebugServer"))
+
     (list
      (when (get-value 'emacs config)
        (rde-elisp-configuration-service
