@@ -39,6 +39,31 @@
   #:use-module (guix build-system gnu)
   #:use-module ((guix licenses) #:prefix license:))
 
+(define-public emacs-dape
+  (let ((commit "eb6042ab4a4ee7758f5f9408904d2d702f1b0ba8"))
+    (package
+      (name "emacs-dape")
+      (version "0.11.1")
+      (home-page "https://github.com/svaante/dape")
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url home-page)
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "0ssl85gyf4k8yk8snj80gln2z4g8gfp1pfg83s1279wrnlgaz7s3"))))
+      (build-system emacs-build-system)
+      (synopsis "Debug Adapter Protocol for Emacs")
+      (description
+       "Dape is a debug adapter client for Emacs. The debug adapter protocol,
+much like its more well-known counterpart, the language server protocol,
+aims to establish a common API for programming tools. However, instead of
+functionalities such as code completions, it provides a standardized
+interface for debuggers.")
+      (license license:gpl3+))))
+
 ;;; TODO: [Demis Balbach, 2024-05-14] Remove once upstreamed
 (define-public emacs-eglot-1.17
   (package
