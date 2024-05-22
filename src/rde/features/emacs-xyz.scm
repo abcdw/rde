@@ -272,6 +272,7 @@ Almost all visual elements are disabled.")))
              (emacs-mode-line-padding . ,mode-line-padding)
              (emacs-header-line-padding . ,header-line-padding)
              (emacs-tab-bar-padding . ,tab-bar-padding)
+             (emacs-fringes . ,fringes)
              (emacs-margin . ,margin)))
    (home-services-getter get-home-services)))
 
