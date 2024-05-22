@@ -186,7 +186,7 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
       (list foot))
      ;; TODO: Migrate to home service to make it extandable
      (simple-service
-      'foot-package
+      'foot-configuration
       home-xdg-configuration-files-service-type
       `(("foot/foot.ini"
          ,(mixed-text-file
