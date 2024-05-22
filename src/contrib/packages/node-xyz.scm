@@ -24,6 +24,7 @@
   #:use-module (gnu packages base)
   #:use-module (gnu packages node)
   #:use-module (gnu packages node-xyz)
+  #:use-module (guix build-system copy)
   #:use-module (guix build-system node)
   #:use-module (guix download)
   #:use-module (guix git-download)
@@ -31,6 +32,61 @@
   ;; #:use-module (ice-9 textual-ports)
   #:use-module ((guix licenses) #:prefix license:)
   #:use-module (guix packages))
+
+(define-public node-vscode-js-debug-1.86.0
+  (package
+    (name "vscode-js-debug")
+    (version "1.86.0")
+    (source
+     (origin
+       (method url-fetch)
+       (uri (string-append
+             "https://github.com/microsoft/vscode-js-debug/releases/download/v"
+             version
+             "/js-debug-dap-v"
+             version ".tar.gz"))
+       (sha256
+        (base32
+         "1zrrbl27252xm4lzvngqib9y6xsd1klh4dfmz3z5cc0vqpfc5zgz"))))
+    (build-system copy-build-system)
+    (arguments
+     `(#:tests? #f
+       #:phases
+       (modify-phases
+           %standard-phases
+         (delete 'build)
+         (replace 'install
+           (lambda* (#:key outputs inputs #:allow-other-keys)
+             (let* ((out (assoc-ref outputs "out"))
+                    (lib (string-append out "/lib"))
+                    (bin (string-append out "/bin"))
+                    (startup-script (string-append bin "/dapDebugServer"))
+                    (exe (string-append lib "/dapDebugServer.js"))
+                    (node (string-append (assoc-ref inputs "node") "/bin/node")))
+               ;; Creating structure
+               (mkdir-p lib)
+               (mkdir-p bin)
+               (copy-recursively "./src" lib)
+               ;; Create startup script
+               (call-with-output-file startup-script
+                 (lambda (port)
+                   (display
+                    (string-append "\
+#!/bin/bash
+exec -a dapDebugServer " node " " exe " " "$@\n"
+)
+                    port)))
+               (chmod startup-script #o555)))))))
+    (inputs
+     (list node-lts))
+    (home-page "https://github.com/microsoft/vscode-js-debug")
+    (synopsis
+     "A DAP-compatible JavaScript debugger. Used in VS Code, VS, + more")
+    (description
+     "A DAP-compatible JavaScript debugger. Used in VS Code, VS, + more")
+    (license license:expat)))
+
+(define-public node-vscode-js-debug node-vscode-js-debug-1.86.0)
 
 (define-public node-typescript-5.4.4
   (package
