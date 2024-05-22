@@ -260,7 +260,7 @@
             ;; repl
             (with-eval-after-load
                 'nodejs-repl
-              (setq nodejs-repl-command ,node-executable))
+              (setopt nodejs-repl-command ,node-executable))
 
             ;; dape
             ,@(if (get-value 'emacs-dape config)
