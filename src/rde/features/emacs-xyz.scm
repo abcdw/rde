@@ -89,6 +89,7 @@
             ;; Development
             feature-emacs-smartparens
             feature-emacs-eglot
+            feature-emacs-dape
             feature-emacs-flymake
             feature-emacs-elisp
             feature-emacs-git
@@ -3111,6 +3112,64 @@ Mostly workarounds and integratios with other packages."
       #:keywords '(convenience completion lsp editing languages)
       #:elisp-packages (list emacs-consult-eglot))))
 
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-dape
+          #:key
+          (window-arrangement 'right)
+          (stepping-granularity 'line)
+          (hide-info-mode-line? #f)
+          (persist-breakpoints? #t)
+          (startup-buffers '(dape-repl))
+          (breakpoint-buffers '(dape-info))
+          (save-buffers-on-startup? #t))
+  "Setup Emacs to use the dape DAP client."
+
+  (define emacs-f-name 'dape)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((setopt dape-buffer-window-arrangement ',window-arrangement
+                dape-stepping-granularity ',stepping-granularity
+                dape-on-start-hooks ',startup-buffers)
+
+        ,@(if hide-info-mode-line?
+              '((setq dape-hide-info-mode-line t))
+              '((setq dape-hide-info-mode-line nil)))
+
+        (with-eval-after-load
+            'dape
+          ,@(if persist-breakpoints?
+                '((add-hook 'kill-emacs-hook 'dape-breakpoint-save)
+                  (dape-breakpoint-load))
+                '())
+
+          (let ((fringe ,(get-value 'emacs-fringes config)))
+            (when (and (numberp fringe) (>= fringe 1))
+              (dape-breakpoint-global-mode)))
+
+          (dolist (mode ',breakpoint-buffers)
+                  (add-hook 'dape-on-stopped-hooks (intern (format "%s" mode))))
+
+          ,@(if save-buffers-on-startup?
+                '((add-hook 'dape-on-start-hooks
+                            (lambda () (save-some-buffers t t))))
+                '())))
+      #:elisp-packages
+      (list
+       emacs-dape
+       emacs-jsonrpc-1.0.25)
+      #:summary
+      "Setup Emacs to use the dape DAP client."
+      #:authors
+      '("Demis Balbach <db@minikn.xyz>"))))
   (feature
    (name f-name)
    (values `((,f-name . #t)))

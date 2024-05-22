@@ -35,7 +35,6 @@
   #:export (feature-emacs-evil
             feature-emacs-undo-fu-session))
 
-
 (define* (feature-emacs-evil
           #:key
           (emacs-evil emacs-evil)
