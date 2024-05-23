@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
+;;; Copyright © 2023, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -172,64 +173,76 @@ exec ~a ~a $@"
 ;; TODO: [Andrew Tropin, 2024-04-24] Use DNS over HTTPS by default
 (define* (feature-librewolf
           #:key
-          (librewolf librewolf)
+          (browser librewolf)
+          (browser-name (match (package-name browser)
+                          ("librewolf" "LibreWolf")
+                          ("icecat" "IceCat")
+                          ("icecat-minimal" "IceCat")
+                          (name (string-capitalize name))))
+          (bin-name (match (package-name browser)
+                      ("icecat-minimal" "icecat")
+                      (name name)))
           (default-browser? #t)
           (desktop-startup-flags '("")))
-  "Configure the LibreWolf browser."
-  (ensure-pred file-like? librewolf)
+  "Configure a recent Firefox-based browser.  The option browser-name allows
+to prettify the name for xdg-mime.  Defaults to LibreWolf.  Tested with IceCat
+and Firefox."
+  (ensure-pred file-like? browser)
+  (ensure-pred string? browser-name)
+  (ensure-pred string? bin-name)
   (ensure-pred boolean? default-browser?)
   (ensure-pred list-of-strings? desktop-startup-flags)
 
-  (define f-name 'librewolf)
+  (define f-name (string->symbol (package-name browser)))
+  (define binary (file-append browser "/bin/" bin-name))
 
-  (define librewolf-binary (file-append librewolf "/bin/librewolf"))
   (define (get-home-services config)
-    "Return home services related to LibreWolf."
+    (format #f "Return home services related to ~a." browser-name)
     (append
      (if default-browser?
          (list
           (simple-service
-           'set-librewolf-as-default-browser
+           (symbol-append 'set- f-name '-as-default-browser)
            home-environment-variables-service-type
-           `(("BROWSER" . ,librewolf-binary)))
+           `(("BROWSER" . ,binary)))
           (simple-service
-           'librewolf-xdg-defaults
+           (symbol-append f-name '-xdg-defaults)
            home-xdg-mime-applications-service-type
            (home-xdg-mime-applications-configuration
             (default
-              '((x-scheme-handler/http . librewolf.desktop)
-                (x-scheme-handler/https . librewolf.desktop)
-                (x-scheme-handler/about . librewolf.desktop)
-                (text/html . librewolf.desktop))))))
+              `((x-scheme-handler/http . ,(symbol-append f-name '.desktop))
+                (x-scheme-handler/https . ,(symbol-append f-name '.desktop))
+                (x-scheme-handler/about . ,(symbol-append f-name '.desktop))
+                (text/html . ,(symbol-append f-name '.desktop)))))))
          '())
      (list
       (simple-service
-       'add-chromium-packages
+       (symbol-append 'add- f-name)
        home-profile-service-type
-       (list librewolf))
+       (list browser))
       (simple-service
-       'add-librewolf-xdg-desktop-entry
+       (symbol-append 'add- f-name '-xdg-desktop-entry)
        home-xdg-mime-applications-service-type
        (home-xdg-mime-applications-configuration
         (desktop-entries
          (list
           (xdg-desktop-entry
-           (file "librewolf")
-           (name "LibreWolf")
+           (file (package-name browser))
+           (name browser-name)
            (type 'application)
            (config
             `((exec . ,#~(string-join
                           (list
-                           #$librewolf-binary
+                           #$binary
                            #$@desktop-startup-flags "%U")))
               (terminal . #f)
               (comment . "Access the Internet")))))))))))
 
   (feature
    (name f-name)
-   (values `((,f-name . ,librewolf)
+   (values `((,f-name . ,browser)
              ,@(if default-browser?
-                   `((default-browser . ,librewolf-binary))
+                   `((default-browser . ,binary))
                    '())))
    (home-services-getter get-home-services)))
 
