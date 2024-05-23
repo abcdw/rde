@@ -157,7 +157,7 @@ use_guixs() {
       `((eval-when-compile (require 'envrc))
         (add-hook 'after-init-hook 'envrc-global-mode)
         (with-eval-after-load 'envrc
-         (define-key envrc-mode-map (kbd "C-c e") 'envrc-command-map)))
+         (define-key envrc-mode-map (kbd "C-c E") 'envrc-command-map)))
       #:summary "\
 Source environment for the project from envrc"
       #:commentary "\
