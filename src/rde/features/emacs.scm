@@ -182,28 +182,6 @@ emacs servers' environment variables to same values."
          (format #f "~s" vars))
        ")"))))
 
-(define* (emacs-client-alternate-editor fallback shepherd libnotify)
-  (program-file
-   "emacs-client-alternate-editor"
-   #~(begin
-       (use-modules (ice-9 textual-ports) (ice-9 popen) (ice-9 match))
-       (let* ((port
-               (open-input-pipe
-                (format
-                 #f "~a/bin/herd eval root ~s"
-                 #$shepherd
-                 "(and=> (lookup-service 'emacs-server) service-status)")))
-              (status (cadr (string-split (get-string-all port) #\newline))))
-         (close-port port)
-         (match status
-           ((or "running" "stopping" "starting")
-            (system* #$(file-append libnotify "/bin/notify-send")
-                     "Emacs error"
-                     (string-append "An emacs server is currently " status ".")
-                     "--icon=emacs"))
-           (_  ; run the serverless fallback
-            (apply system* #$fallback (cdr (command-line)))))))))
-
 
 ;;;
 ;;; Emacs features.
@@ -438,29 +416,9 @@ Prefix argument can be used to kill a few words."
        (setq ediff-diff-options "-w"
              ediff-split-window-function 'split-window-horizontally
              ediff-window-setup-function 'ediff-setup-windows-plain)
-
        ;; Configure emacs background server.
        ,@(if (get-value 'emacs-server-mode? config)
-             `((defun rde-create-pid-file ()
-                 "Create a pid-file for `server-name'.
-
-This function is designed to be called in the `emacs-startup-hook' and
-tells shepherd that emacs has been started."
-                 (when server-mode
-                   (with-temp-file (concat (getenv "XDG_RUNTIME_DIR")
-                                           "/emacs/" server-name ".pid")
-                                   (insert (number-to-string (emacs-pid))))))
-               (defun rde-delete-pid-file ()
-                 "Delete the pid-file for `server-name'.
-
-This function is designed to be called in the `kill-emacs-hook'."
-                 (when server-mode
-                   (let ((pidfile (concat (getenv "XDG_RUNTIME_DIR")
-                                          "/emacs/" server-name ".pid")))
-                     (when (file-exists-p pidfile)
-                       (delete-file pidfile)))))
-
-               (defun rde-kill-emacs (&optional arg restart)
+             `((defun rde-kill-emacs (&optional arg restart)
                  "\
 Make GNU Shepherd kill the Emacs server.
 
@@ -481,9 +439,7 @@ tested."
                 'emacs-startup-hook
                 (lambda ()
                   (when server-mode
-                    (advice-add 'kill-emacs :override 'rde-kill-emacs))))
-               (add-hook 'emacs-startup-hook 'rde-create-pid-file)
-               (add-hook 'kill-emacs-hook 'rde-delete-pid-file))
+                    (advice-add 'kill-emacs :override 'rde-kill-emacs)))))
              '()))
      #:summary "General settings, better defaults"
      #:commentary "\
@@ -599,19 +555,14 @@ It can contain settings not yet moved to separate features."
   (define* (emacs-minibuffer-program
             config #:key
             (alternate
-             (begin
-               (require-value 'libnotify config)
-               (emacs-client-alternate-editor
-                (program-file
-                 "emacs-client-alternate-fail"
-                 #~(system*
-                    #$(file-append (get-value 'libnotify config)
-                                   "/bin/notify-send")
-                    "Emacs error"
-                    "Minibuffer programs require a running server."
-                    "--icon=emacs"))
-                (get-value 'shepherd config)
-                (get-value 'libnotify config)))))
+             (program-file
+              "emacs-client-alternate-fail"
+              #~(system*
+                 #$(file-append (get-value 'libnotify config)
+                                "/bin/notify-send")
+                 "Emacs error"
+                 "Minibuffer programs require a running server."
+                 "--icon=emacs"))))
     (lambda* (file-name-suffix title command
                                #:key (client emacs-client)
                                (height 10))
@@ -684,12 +635,7 @@ It can contain settings not yet moved to separate features."
      (simple-service
       'emacs-set-default-editor
       home-environment-variables-service-type
-      `(("ALTERNATE_EDITOR" . ,(if emacs-server-mode?
-                                   (emacs-client-alternate-editor
-                                    emacs-editor
-                                    (get-value 'shepherd config)
-                                    (get-value 'libnotify config))
-                                   emacs-editor))
+      `(("ALTERNATE_EDITOR" . ,emacs-editor)
         ("VISUAL" . ,emacs-client-no-wait)
         ("MENU" . ,emacs-dmenu)))
      (when (get-value 'sway config)

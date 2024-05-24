@@ -185,17 +185,23 @@ Same as @code{init-el}, but result will go to @file{early-init.el}."))
                 (format #f "@code{emacsclient -s ~a}" name))))
    (provision `(,(symbol-append 'emacs- name)))
    (requirement '(emacs))
-   (start #~(make-forkexec-constructor
+   (modules '((shepherd support)))  ;for '%user-runtime-dir'
+   (start #~(make-systemd-constructor
              (list #$(file-append
                       (home-emacs-configuration-emacs config)
-                      "/bin/emacs") #$(format #f "--daemon=~a" name))
+                      "/bin/emacs") #$(format #f "--fg-daemon=~a" name))
+             (list (endpoint
+                    (make-socket-address
+                     AF_UNIX
+                     (string-append %user-runtime-dir
+                                    "/emacs/" #$(symbol->string name)))
+                    #:name '#$(format #f "emacs-~a" name)
+                    #:socket-directory-permissions #o700))
+             #:lazy-start? #false
              #:log-file (string-append
                          (getenv "XDG_STATE_HOME") "/log"
-                         "/emacs-" #$(symbol->string name) ".log")
-             #:pid-file (string-append (getenv "XDG_RUNTIME_DIR") "/emacs/"
-                                       #$(symbol->string name) ".pid")))
-   (stop #~(make-kill-destructor))
-   (respawn? #f)))
+                         "/emacs-" #$(symbol->string name) ".log")))
+   (stop #~(make-systemd-destructor))))
 
 (define (add-emacs-shepherd-service config)
   (if (not (null? (home-emacs-configuration-emacs-servers config)))
