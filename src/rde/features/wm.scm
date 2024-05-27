@@ -375,7 +375,8 @@ additional LAUNCH-ARGUMENTS."
            (for-each (lambda (x)
                        (setenv (car x) (cdr x)))
                      '#$env-vars)
-           (system* #$(file-append (get-value 'sway config) "/bin/sway")))))
+           (apply system* #$(file-append (get-value 'sway config) "/bin/sway")
+                  (cdr (command-line))))))
     (list
      (simple-service
       'sway-run-sway-on-login-to-sway-tty
