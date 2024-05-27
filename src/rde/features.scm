@@ -426,7 +426,11 @@ can be later used to extend original service with additional configuration."
                  services
                  (if (rde-config-integrate-he-in-os? config)
                      (list (service guix-home-service-type
-                                    `(,(cons
+                                    ;; TODO: [Andrew Tropin, 2024-05-27]
+                                    ;; Temporary fix, remove it, when
+                                    ;; https://issues.guix.gnu.org/71111 is
+                                    ;; merged
+                                    `(,(list
                                         user-name
                                         (get-home-environment config)))))
                      '())
