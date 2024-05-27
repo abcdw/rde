@@ -392,7 +392,7 @@ exec ~a ~a"
           #$(file-append (get-value 'coreutils config coreutils) "/bin/dirname")
           #$logfile
           #$sway-with-env-vars
-          #$(string-join (list launch-arguments "2>" logfile) " "))))))
+          #$(string-join (list launch-arguments "2>>" logfile) " "))))))
 
   (define (sway-run-on-tty-system-services _)
     (list
