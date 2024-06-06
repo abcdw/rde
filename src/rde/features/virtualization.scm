@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment
 ;;;
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -21,6 +21,7 @@
   #:use-module (rde features)
   #:use-module (gnu packages virtualization)
   #:use-module (gnu services)
+  #:use-module (gnu services virtualization)
   #:use-module (gnu home services)
   #:use-module (rde system services accounts)
 
@@ -28,7 +29,8 @@
 
 (define* (feature-qemu
           #:key
-          (qemu qemu))
+          (qemu qemu)
+          (virt-manager virt-manager))
 
   (define f-name 'qemu)
   (define (get-home-services config)
@@ -36,14 +38,16 @@
      (simple-service
       'qemu-add-qemu-package
       home-profile-service-type
-      (list qemu))))
+      (list qemu virt-manager))))
 
   (define (get-system-services config)
     (list
+     (service libvirt-service-type)
+     (service virtlog-service-type)
      (simple-service
       'qemu-add-kvm-group-to-user
       rde-account-service-type
-      (list "kvm"))))
+      (list "kvm" "libvirt"))))
 
   (feature
    (name f-name)
