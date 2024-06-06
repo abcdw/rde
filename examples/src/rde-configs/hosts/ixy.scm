@@ -46,24 +46,41 @@
          (target "enc")
          (type luks-device-mapping))))
 
+(define btrfs-subvolumes
+  (map (match-lambda
+         ((subvol . mount-point)
+          (file-system
+            (type "btrfs")
+            (device "/dev/mapper/enc")
+            (mount-point mount-point)
+            (options (format #f "subvol=~a" subvol))
+            (dependencies ixy-mapped-devices))))
+       '((@ . "/")
+         (@boot . "/boot")
+         (@gnu  . "/gnu")
+         (@home . "/home")
+         (@data . "/data")
+         (@var-log . "/var/log")
+         (@swap . "/swap"))))
+
+(define data-fs
+  (car
+   (filter
+    (lambda (x) (equal? (file-system-mount-point x) "/data"))
+    btrfs-subvolumes)))
+
 (define ixy-file-systems
   (append
-   (map (match-lambda
-          ((subvol . mount-point)
-           (file-system
-             (type "btrfs")
-             (device "/dev/mapper/enc")
-             (mount-point mount-point)
-             (options (format #f "subvol=~a" subvol))
-             (dependencies ixy-mapped-devices))))
-        '((@ . "/")
-          (@boot . "/boot")
-          (@gnu  . "/gnu")
-          (@home . "/home")
-          (@data . "/data")
-          (@var-log . "/var/log")
-          (@swap . "/swap")))
+   btrfs-subvolumes
    (list
+    ;; persist all system data to data
+    (file-system
+      (device "/data/system/var/lib")
+      (type "none")
+      (mount-point "/var/lib")
+      (flags '(bind-mount))
+      ;; (options "bind")
+      (dependencies (list data-fs)))
     (file-system
       (mount-point "/boot/efi")
       (type "vfat")
