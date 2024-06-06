@@ -93,6 +93,7 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
             ;; TODO: [Andrew Tropin, 2024-05-06] Update manual related to git
             ;; feature
 
+            ;; rebase.autoStash true
             ;; https://youtu.be/Md44rcw13k4?t=1081
             ;; rebase.updateRefs true
             ;; https://andrewlock.net/working-with-stacked-branches-in-git-is-easier-with-update-refs/
