@@ -43,7 +43,7 @@
   (list
    (feature-host-info
     #:host-name "live"
-    #:issue "This is rde.  Welcome.  Login and password - guest and guest.\n"
+    #:issue "This is RDE.  Welcome.  Login and password - guest and guest.\n"
     ;; ls `guix build tzdata`/share/zoneinfo
     #:timezone  "Europe/Kiev")
    live-extra-services

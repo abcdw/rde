@@ -318,7 +318,7 @@ can be later used to extend original service with additional configuration."
    (bootloader (bootloader-configuration
                 (bootloader grub-efi-bootloader)
                 (targets '("/boot/efi"))))
-   (issue "This is rde.  Welcome.\n")
+   (issue "This is RDE.  Welcome.\n")
    (services '())
    (sudoers-file #f)
    (file-systems %base-file-systems)))
