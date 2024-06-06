@@ -245,9 +245,10 @@ IRC is a great tool for a real-time text-based communication.  You
 join the channel when you need or want to and leave any time you
 desire. @c (@pxref{IRC} to learn more).
 
-It's also possible to connect to IRC channel via Matrix bridge using
-#tropin:libera.chat room handle, learn more here:
-@uref{https://libera.chat/guides/faq#can-i-connect-with-matrix}
+@c libera <-> matrix brigdge is disable
+@c It's also possible to connect to IRC channel via Matrix bridge using
+@c #tropin:libera.chat room handle, learn more here:
+@c @uref{https://libera.chat/guides/faq#can-i-connect-with-matrix}
 
 @node Getting Started
 @chapter Getting Started
