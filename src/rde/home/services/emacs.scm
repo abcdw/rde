@@ -435,6 +435,13 @@ details can be changed later.")
                            `(,#~";;;###autoload"
                              (defun ,loader-feature-name ()
                                (interactive)
+                               ;; It's necessary to require 'guix-emacs to
+                               ;; make sure all needed variables are set even
+                               ;; when emacs executed with -Q flag.  We can
+                               ;; move it into separate option in
+                               ;; feature-loader configuration record to make
+                               ;; it more flexible/customizable.
+                               (require 'guix-emacs)
                                ,@(map (lambda (x)
                                         `(require ',(car x)))
                                       feature-entries)
