@@ -2011,7 +2011,7 @@ parses its input."
             rde-orderless-initialism-dispatcher
             rde-orderless-flex-dispatcher))
 
-
+         (require 'orderless)
          (setq completion-styles '(orderless basic))
          ;; (setq completion-category-defaults nil)
          (setq completion-category-overrides
