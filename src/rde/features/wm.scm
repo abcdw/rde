@@ -108,6 +108,7 @@
           (extra-config '())
           (sway sway)
           (foot foot)
+          (dconf dconf)
           (bemenu bemenu)
           (shepherd shepherd-0.10)  ; TODO Keep up to date with upstream.
           (xdg-desktop-portal xdg-desktop-portal)
@@ -296,6 +297,7 @@ chooser_type=simple"
         'packages-for-sway
         home-profile-service-type
         (append
+         (list dconf)
          (if (and (get-value 'default-terminal config)
                   (get-value 'backup-terminal config))
              '() (list foot))
