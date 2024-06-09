@@ -2454,6 +2454,8 @@ This configuration packages is not actively maintained right now."
          (require 'corfu)
          (require 'corfu-candidate-overlay))
 
+        (autoload 'corfu-doc-mode "corfu-doc")
+
         (with-eval-after-load
          'corfu
          (setq corfu-min-width 60)
