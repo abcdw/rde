@@ -3031,6 +3031,10 @@ and pair management."
       config
       `((eval-when-compile
          (require 'smartparens))
+
+        (autoload 'smartparens-mode "smartparens-autoloads")
+        (autoload 'smartparens-strict-mode "smartparens-autoloads")
+
         ,@(if smartparens-hooks
               `((mapcar (lambda (hook)
                           (add-hook hook 'smartparens-mode))
