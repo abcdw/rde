@@ -327,6 +327,7 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
        ;; Highlight zero-width whitespaces and other glypless characters.
        (set-face-background 'glyphless-char "red")
        ,#~""
+       (autoload 'er/expand-region "expand-region")
        (define-key global-map (kbd "C-=") 'er/expand-region)
 
        ,#~""
@@ -415,6 +416,7 @@ Prefix argument can be used to kill a few words."
        ,#~""
        ,@(if (get-value 'emacs-auto-clean-space? config)
              `((eval-when-compile (require 'ws-butler))
+               (autoload 'ws-butler-mode "ws-butler")
                (add-hook 'text-mode-hook 'ws-butler-mode)
                (add-hook 'prog-mode-hook 'ws-butler-mode))
              '())
