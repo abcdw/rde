@@ -52,10 +52,10 @@ prompt_rde_setup() {
   if [[ $UID -eq 0 ]]; then
     user_part='%F{red}>%f'
   else
-    user_part='%F{green}>%f'
+    user_part='%F{blue}>%f'
   fi
   if [ -n "$GUIX_ENVIRONMENT" ]; then
-    genv_part='%F{blue}>%f'
+    genv_part='%F{yellow}>%f'
   fi
   # exit_code_part='%(?..[%?])'
 
