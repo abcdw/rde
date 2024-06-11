@@ -1,6 +1,4 @@
-# Local Variables:
-# mode: sh
-# End:
+# -*- mode: sh; -*-
 
 # Prevent freezing output on ^s, needed for various isearches
 hash stty 2> /dev/null && stty -ixon
