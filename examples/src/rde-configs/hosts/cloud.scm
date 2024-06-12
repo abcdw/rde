@@ -26,11 +26,11 @@
 
 ;; Use virtio in your hypervisor to make root partition appear on /dev/vda1
 (define cloud-file-systems
-  (cons (file-system
-          (mount-point "/")
-          (device "/dev/vda1")
-          (type "ext4"))
-        %base-file-systems))
+  (list
+   (file-system
+     (mount-point "/")
+     (device "/dev/vda1")
+     (type "ext4"))))
 
 (define sudoers-extra-service
   (simple-service
@@ -79,6 +79,8 @@
      (targets '("/dev/vda"))
      (terminal-outputs '(console))))
    (feature-base-services)
+   (feature-file-systems
+    #:file-systems cloud-file-systems)
    cloud-extra-services))
 
 (define cloud-config
