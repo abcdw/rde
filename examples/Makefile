@@ -89,6 +89,9 @@ minimal/home/build/ci-no-auth:
 	guix time-machine -C rde/channels-ci.scm --disable-authentication -- \
 	home build ./src/rde-configs/minimal.scm
 
+cloud-rde: guix
+	${GUIX} system image -e '(@ (rde-configs hosts cloud) cloud-image)'
+
 clean-target:
 	rm -rf ./target
 
