@@ -159,6 +159,7 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
         'emacs-vterm-zsh-configuration
         home-zsh-service-type
         (home-zsh-extension
+         (privileged? #t)
          (zshrc
           (list #~(format #f "source ~a" #$setup-vterm))))))))
 
