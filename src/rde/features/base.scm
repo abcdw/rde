@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -20,6 +20,7 @@
 (define-module (rde features base)
   #:use-module (rde features)
   #:use-module (rde features predicates)
+  #:use-module (rde system services admin)
 
   #:use-module (gnu system)
   #:use-module (gnu system setuid)
@@ -201,39 +202,48 @@ be a symbol, which will be used to construct feature name."
   (ensure-pred list-of-file-likes? udev-rules)
 
   (define (get-base-system-services cfg)
-    (modify-services base-system-services
-      (console-font-service-type
-       config =>
-       (map (lambda (x)
-              (cons
-               (format #f "tty~a" x)
-               (get-value 'console-font cfg "LatGrkCyr-8x16")))
-            (iota (get-value 'number-of-ttys cfg 6) 1)))
-      (guix-service-type
-       config =>
-       (guix-configuration
-        (inherit config)
-        (substitute-urls (append
-                          guix-substitute-urls
-                          default-substitute-urls))
-        (authorized-keys (append
-                          guix-authorized-keys
-                          default-authorized-guix-keys))))
-      (greetd-service-type
-       config =>
-       (greetd-configuration
-        (terminals
-         (map (lambda (x)
-                (greetd-terminal-configuration
-                 (terminal-vt (number->string x))))
-              (iota 6 1)))))
-      (udev-service-type
-       config =>
-       (udev-configuration
-        (inherit config)
-        (rules (append
-                udev-rules
-                (udev-configuration-rules config)))))))
+    (append
+     (modify-services base-system-services
+       (console-font-service-type
+        config =>
+        (map (lambda (x)
+               (cons
+                (format #f "tty~a" x)
+                (get-value 'console-font cfg "LatGrkCyr-8x16")))
+             (iota (get-value 'number-of-ttys cfg 6) 1)))
+       (guix-service-type
+        config =>
+        (guix-configuration
+         (inherit config)
+         (substitute-urls (append
+                           guix-substitute-urls
+                           default-substitute-urls))
+         (authorized-keys (append
+                           guix-authorized-keys
+                           default-authorized-guix-keys))))
+       (greetd-service-type
+        config =>
+        (greetd-configuration
+         (terminals
+          (map (lambda (x)
+                 (greetd-terminal-configuration
+                  (terminal-vt (number->string x))))
+               (iota 6 1)))))
+       (udev-service-type
+        config =>
+        (udev-configuration
+         (inherit config)
+         (rules (append
+                 udev-rules
+                 (udev-configuration-rules config))))))
+     (list
+      (simple-service
+       'base-preserve-terminfo-variable
+       sudoers-service-type
+       (list "
+# Keep terminfo database for root and %wheel.
+Defaults:%wheel env_keep+=TERMINFO_DIRS
+Defaults:%wheel env_keep+=TERMINFO")))))
 
   (feature
    (name 'base-services)
