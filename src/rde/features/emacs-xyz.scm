@@ -4178,6 +4178,7 @@ Indentation and refile configurations, visual adjustment."
 
 (define* (feature-emacs-org-agenda
           #:key
+          (emacs-org-wild-notifier emacs-org-wild-notifier)
           (org-agenda-files #f)
           (org-agenda-custom-commands %rde-org-agenda-custom-commands)
           (org-agenda-prefix-format #f)
@@ -4185,6 +4186,8 @@ Indentation and refile configurations, visual adjustment."
   "Configure org-agenda for GNU Emacs."
   (define (maybe-path-or-list? elt)
     (or (maybe-path? elt) (maybe-list? elt)))
+
+  (ensure-pred file-like? emacs-org-wild-notifier)
   (ensure-pred maybe-path-or-list? org-agenda-files)
   (ensure-pred list? org-agenda-custom-commands)
   (ensure-pred maybe-list? org-agenda-prefix-format)
@@ -4250,6 +4253,17 @@ result is longer than LEN."
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
         (add-hook 'org-agenda-mode-hook
                   'hack-dir-local-variables-non-file-buffer)
+
+        (defun rde-start-org-wild-notifier-for-primary-daemon ()
+          "Run `org-wild-notifier-mode', when emacs is started as daemon and
+`server-name' is \"server\"."
+          ;; Without this require (daemonp) silently hangs daemon ¯\_(ツ)_/¯
+          (require 'server)
+          (when (and (daemonp) (string= server-name "server"))
+            (org-wild-notifier-mode)))
+        (add-hook 'after-init-hook
+                  'rde-start-org-wild-notifier-for-primary-daemon)
+
         (with-eval-after-load 'org-agenda
           ;; Impressive agenda examples
           ;; https://github.com/fniessen/emacs-leuven/blob/master/org-leuven-agenda-views.txt
@@ -4291,6 +4305,7 @@ result is longer than LEN."
                    `(quote ,org-agenda-prefix-format))
                   (else
                    ''())))))
+      #:elisp-packages (list emacs-org-wild-notifier)
       #:summary "\
 Preconfigured agenda views"
       #:commentary "\
