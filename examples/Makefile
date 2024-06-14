@@ -23,7 +23,7 @@ ares-rs:
 	-- guile \
 	-L ../src \
 	-L ./src \
-	-L /data/abcdw/work/abcdw/guile-ares-rs/src \
+	-L /data/abcdw/work/abcdw/guile-ares-rs/src/guile \
 	-c \
 "(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
 ((@ (nrepl server) run-nrepl-server) #:port 7888))"
