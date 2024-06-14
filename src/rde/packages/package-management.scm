@@ -23,27 +23,34 @@
   #:use-module (gnu packages guile)
   #:use-module (guix packages)
   #:use-module (guix gexp)
+  #:use-module (guix git)
   #:use-module (guix utils)
   #:use-module (guix download)
   #:use-module (guix git-download)
   #:export (guix-from-channels-lock))
 
 (define-public guix-from-channels-lock
-  (let ((commit "02df0a8a7d4712398d90f8635d4004e76bbc9f51"))
+  (let ((commit "9cc7fc6e79581becb6213103038c23b02ed0d374"))
     (package
       (inherit guix)
       (version (string-append "1.4.0-" (string-take commit 7)))
-      (source (origin
-                (method git-fetch)
-                (uri (git-reference
-                      (url "https://git.savannah.gnu.org/git/guix.git"
-                       ;; (channel-url pinned-channel-guix)
-                       )
-                      (commit commit)))
-                (sha256
-                 (base32
-                  "0jdwmf9pkp35xzdpb1sin293wpj6lm8a1ngbc1f4377777n584wv"))
-                (file-name (string-append "guix-" version "-checkout"))))
-      (arguments (list #:tests? #f))
+      (source
+       (git-checkout
+        (url "https://git.savannah.gnu.org/git/guix.git")
+        (commit commit)))
+      (arguments
+       (substitute-keyword-arguments (package-arguments guix)
+         ((#:tests? _)
+          #f)
+         ((#:phases phases)
+          #~(modify-phases #$phases (delete 'check)))
+         ((#:configure-flags flags #~'())
+          #~(append
+             #$flags
+             (list
+              ;; "--disable-daemon"
+              ;; "--localstatedir=/var"
+              #$(string-append "--with-channel-commit=" commit))))))
+
       (inputs (modify-inputs (package-inputs guix)
                 (replace "guile" guile-next))))))
