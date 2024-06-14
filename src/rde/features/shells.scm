@@ -23,6 +23,7 @@
   #:use-module (rde features predicates)
   #:use-module (gnu home services)
   #:use-module (rde home services shells)
+  #:use-module (rde system services admin)
   #:use-module (gnu services)
   #:use-module (gnu packages shells)
   #:use-module (gnu packages bash)
@@ -134,10 +135,20 @@ bindkey -e '^Y' rde-yank
        (zshenv zshenv)
        (zlogout zlogout)))))
 
+  (define (get-system-services config)
+    (list
+     (simple-service
+      'zsh-preserve-zdotdir-env
+      sudoers-service-type
+      (list "
+# Load zsh config from custom location
+Defaults:%wheel env_keep+=ZDOTDIR"))))
+
   (feature
    (name 'zsh)
    (values (make-feature-values zsh))
-   (home-services-getter zsh-home-services)))
+   (home-services-getter zsh-home-services)
+   (system-services-getter get-system-services)))
 
 (define* (feature-bash
           #:key
