@@ -636,7 +636,7 @@ It can contain settings not yet moved to separate features."
       'emacs-set-default-editor
       home-environment-variables-service-type
       `(("ALTERNATE_EDITOR" . ,emacs-editor)
-        ("VISUAL" . ,emacs-client-no-wait)
+        ("VISUAL" . ,emacs-client-create-frame)
         ("MENU" . ,emacs-dmenu)))
      (when (get-value 'sway config)
        (simple-service
