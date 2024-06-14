@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Xinglu Chen <public@yoctocell.xyz>
 ;;;
 ;;; This file is part of rde.
@@ -242,6 +242,10 @@ if [ -f ~/.profile ]; then source ~/.profile; fi
   (list (home-zsh-configuration-package config)))
 
 (define-configuration/no-serialization home-zsh-extension
+  (priveleged?
+   (boolean #f)
+   "Evaluate configuartion if priveleges are escalated?  Doesn't affect
+environment-variables field.")
   (environment-variables
    (alist '())
    "Association list of environment variables to set.")
@@ -262,6 +266,29 @@ if [ -f ~/.profile ]; then source ~/.profile; fi
    "List of strings or gexps."))
 
 (define (home-zsh-extensions original-config extension-configs)
+  (define (zsh-wrap-unprivileged field)
+    (define get-field
+      (record-accessor
+       (record-type-descriptor (car extension-configs))
+       field))
+
+    (call-with-values
+        (lambda ()
+          (partition
+           (lambda (e) (home-zsh-extension-priveleged? e))
+           extension-configs))
+      (lambda (privileged unprivileged)
+        `(,@(append-map get-field privileged)
+          ,@(if (null? unprivileged)
+                '()
+                `(
+                  "
+# Next section won't be executed for privileged user
+if [[ $(print -P \"%#\") == '%' ]]; then"
+                  ,@(append-map get-field unprivileged)
+                  "fi
+# end of unpriveleged section"))))))
+
   (home-zsh-configuration
    (inherit original-config)
    (environment-variables
@@ -270,24 +297,19 @@ if [ -f ~/.profile ]; then source ~/.profile; fi
              home-zsh-extension-environment-variables extension-configs)))
    (zshrc
     (append (home-zsh-configuration-zshrc original-config)
-            (append-map
-             home-zsh-extension-zshrc extension-configs)))
+            (zsh-wrap-unprivileged 'zshrc)))
    (zshenv
     (append (home-zsh-configuration-zshenv original-config)
-            (append-map
-             home-zsh-extension-zshenv extension-configs)))
+            (zsh-wrap-unprivileged 'zshenv)))
    (zprofile
     (append (home-zsh-configuration-zprofile original-config)
-            (append-map
-             home-zsh-extension-zprofile extension-configs)))
+            (zsh-wrap-unprivileged 'zprofile)))
    (zlogin
     (append (home-zsh-configuration-zlogin original-config)
-            (append-map
-             home-zsh-extension-zlogin extension-configs)))
+            (zsh-wrap-unprivileged 'zlogin)))
    (zlogout
     (append (home-zsh-configuration-zlogout original-config)
-            (append-map
-             home-zsh-extension-zlogout extension-configs)))))
+            (zsh-wrap-unprivileged 'zlogout)))))
 
 (define home-zsh-service-type
   (service-type (name 'home-zsh)
