@@ -64,6 +64,9 @@
 
   (define (get-home-services config)
     "Return home services related to OCaml."
+    (define init-opam-command
+      #~(format #f "command -v opam > /dev/null && eval \"$(~a env)\""
+                #$(file-append opam "/bin/opam")))
     (append
      (if (and opam? (get-value 'zsh config))
          (list
@@ -72,9 +75,7 @@
            home-zsh-service-type
            (home-zsh-extension
             (zshrc
-             (list
-              #~(format #f "eval \"$(~a env)\""
-                        #$(file-append opam "/bin/opam")))))))
+             (list init-opam-command)))))
          '())
      (if (and opam? (get-value 'bash config))
          (list
@@ -83,9 +84,7 @@
            home-bash-service-type
            (home-bash-extension
             (bashrc
-             (list
-              #~(format #f "eval \"$(~a env)\""
-                        #$(file-append opam "/bin/opam")))))))
+             (list init-opam-command)))))
          '())
      (if opam?
          (list
