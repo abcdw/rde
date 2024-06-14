@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -23,7 +23,6 @@
   #:use-module (rde features predicates)
   #:use-module (gnu home services)
   #:use-module (rde home services shells)
-  #:use-module (rde home services shellutils)
   #:use-module (gnu services)
   #:use-module (gnu packages shells)
   #:use-module (gnu packages bash)
@@ -62,8 +61,21 @@
         `(("SHELL" . ,(file-append zsh "/bin/zsh")))))
 
      (when enable-zsh-autosuggestions?
-       (service home-zsh-autosuggestions-service-type
-                zsh-autosuggestions))
+       (simple-service
+        'zsh-autosuggestions-add-config
+        home-zsh-service-type
+        (home-zsh-extension
+         (priveleged? #t)
+         ;; We set variables in zshrc because we need them only in
+         ;; interactive shell.
+         (zshrc `("# Improve the behavior and perfomance of auto suggestions"
+                  "ZSH_AUTOSUGGEST_MANUAL_REBIND=true"
+                  "ZSH_AUTOSUGGEST_USE_ASYNC=true"
+                  "ZSH_AUTOSUGGEST_STRATEGY=(history completion)"
+                  ,#~(format #f "source ~a/share/zsh/plugins/~a/~a.zsh"
+                             #$zsh-autosuggestions
+                             "zsh-autosuggestions"
+                             "zsh-autosuggestions"))))))
 
      (when (get-value 'wayland config)
        (let* ((wl-clipboard (get-value
