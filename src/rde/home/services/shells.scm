@@ -242,9 +242,9 @@ if [ -f ~/.profile ]; then source ~/.profile; fi
   (list (home-zsh-configuration-package config)))
 
 (define-configuration/no-serialization home-zsh-extension
-  (priveleged?
+  (privileged?
    (boolean #f)
-   "Evaluate configuartion if priveleges are escalated?  Doesn't affect
+   "Evaluate configuartion if privileges are escalated?  Doesn't affect
 environment-variables field.")
   (environment-variables
    (alist '())
@@ -267,6 +267,8 @@ environment-variables field.")
 
 (define (home-zsh-extensions original-config extension-configs)
   (define (zsh-wrap-unprivileged field)
+    "Split extensions to privileged and unprivileged, wrap unprivileged with
+@code{if}, which checks if the user is not privileged."
     (define get-field
       (record-accessor
        (record-type-descriptor (car extension-configs))
@@ -275,7 +277,7 @@ environment-variables field.")
     (call-with-values
         (lambda ()
           (partition
-           (lambda (e) (home-zsh-extension-priveleged? e))
+           (lambda (e) (home-zsh-extension-privileged? e))
            extension-configs))
       (lambda (privileged unprivileged)
         `(,@(append-map get-field privileged)
@@ -287,7 +289,7 @@ environment-variables field.")
 if [[ $(print -P \"%#\") == '%' ]]; then"
                   ,@(append-map get-field unprivileged)
                   "fi
-# end of unpriveleged section"))))))
+# end of unprivileged section"))))))
 
   (home-zsh-configuration
    (inherit original-config)

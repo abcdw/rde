@@ -66,7 +66,7 @@
         'zsh-autosuggestions-add-config
         home-zsh-service-type
         (home-zsh-extension
-         (priveleged? #t)
+         (privileged? #t)
          ;; We set variables in zshrc because we need them only in
          ;; interactive shell.
          (zshrc `("# Improve the behavior and perfomance of auto suggestions"
