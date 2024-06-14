@@ -535,6 +535,7 @@ It can contain settings not yet moved to separate features."
                   #~(apply system*
                            #$(file-append emacs "/bin/emacsclient")
                            "--create-frame"
+                           "--quiet"
                            (cdr (command-line)))))
   (define emacs-client-no-wait
     (program-file "emacs-client-no-wait"
