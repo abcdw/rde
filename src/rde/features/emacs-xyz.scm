@@ -4317,7 +4317,7 @@ result is longer than LEN."
         (defun rde-start-org-wild-notifier-for-primary-daemon ()
           "Run `org-wild-notifier-mode', when emacs is started as daemon and
 `server-name' is \"server\"."
-          ;; Without this require (daemonp) silently hangs daemon ¯\_(ツ)_/¯
+          ;; Without this require server-name silently hangs daemon ¯\_(ツ)_/¯
           (require 'server)
           (when (and (daemonp) (string= server-name "server"))
             (org-wild-notifier-mode)))
