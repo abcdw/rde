@@ -9,21 +9,7 @@
 :PROPERTIES:
 :VISIBILITY: content
 :END:
-** TODO Refactor state service
-:PROPERTIES:
-:Effort:   2:00
-:END:
-- Make a state to be a record
-- Add -fn path support
-- Generate shorter state names
-- Make a bigger state include substates (hierarchy sync)
-- Move notmuch tags and mbsync to state
-** TODO Add feature-emacs-sdcv
-Dictionaries: http://download.huzheng.org/
-See also emacs-multitran
-** TODO Configure icecat profiles
-** TODO Implement home service ungoogled-chromium
-- Browser extension
+Tasks migrated to https://todo.sr.ht/~abcdw/tickets
 * Archive                                                           :ARCHIVE:
 
 ** DONE Implement home service nyxt                                     :rde:
