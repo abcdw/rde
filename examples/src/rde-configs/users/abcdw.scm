@@ -38,8 +38,9 @@
   #:use-module (rde features)
   #:use-module (rde home services emacs)
   #:use-module (rde home services i2p)
-  #:use-module (rde home services wm)
+  #:use-module (rde home services shells)
   #:use-module (rde home services video)
+  #:use-module (rde home services wm)
   #:use-module (rde packages aspell)
   #:use-module (rde packages)
   #:use-module (srfi srfi-1))
@@ -287,6 +288,15 @@
      '((host-key-algorithms . "+ssh-rsa")
        (pubkey-accepted-key-types . "+ssh-rsa"))))))
 
+(define rde-guix-add-to-shell-profile-service
+  (simple-service
+   'rde-guix-add-to-shell-profile
+    home-shell-profile-service-type
+   (list "
+GUIX_PROFILE=/data/abcdw/work/abcdw/rde/examples/target/profiles/guix
+if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
+")))
+
 (define (feature-additional-services)
   (feature-custom-services
    #:feature-name-prefix 'abcdw
@@ -297,7 +307,8 @@
     sway-extra-config-service
     ssh-extra-config-service
     i2pd-add-ilita-irc-service
-    mpv-add-user-settings-service)))
+    mpv-add-user-settings-service
+    rde-guix-add-to-shell-profile-service)))
 
 ;;; User-specific features with personal preferences
 
