@@ -280,16 +280,17 @@ environment-variables field.")
            (lambda (e) (home-zsh-extension-privileged? e))
            extension-configs))
       (lambda (privileged unprivileged)
-        `(,@(append-map get-field privileged)
-          ,@(if (null? unprivileged)
-                '()
-                `(
-                  "
+        (let ((unprivileged-statements (append-map get-field unprivileged)))
+          `(,@(append-map get-field privileged)
+            ,@(if (null? unprivileged-statements)
+                  '()
+                  `(
+                    "
 # Next section won't be executed for privileged user
 if [[ $(print -P \"%#\") == '%' ]]; then"
-                  ,@(append-map get-field unprivileged)
-                  "fi
-# end of unprivileged section"))))))
+                    ,@unprivileged-statements
+                    "fi
+# end of unprivileged section")))))))
 
   (home-zsh-configuration
    (inherit original-config)
