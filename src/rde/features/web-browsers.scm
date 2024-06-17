@@ -171,6 +171,7 @@ exec ~a ~a $@"
    (home-services-getter get-home-services)))
 
 ;; TODO: [Andrew Tropin, 2024-04-24] Use DNS over HTTPS by default
+;; Add https://github.com/woodruffw/ff2mpv to feature-mpv?
 (define* (feature-librewolf
           #:key
           (browser librewolf)
