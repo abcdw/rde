@@ -26,6 +26,6 @@
   ;; %search-load-path function for finding resources.
   (let* ((old-load-extensions %load-extensions))
     (dynamic-wind
-        (const (set! %load-extensions '("")))
-        (const (%search-load-path file))
-        (const (set! %load-extensions old-load-extensions)))))
+        (lambda () (set! %load-extensions '("")))
+        (lambda () (%search-load-path file))
+        (lambda () (set! %load-extensions old-load-extensions)))))
