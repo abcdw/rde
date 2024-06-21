@@ -1761,3 +1761,6 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
 
 ;; TODO: [Andrew Tropin, 2023-12-27] Add offline sending of emails
 ;; https://jao.io/blog/relaying-mail-to-multiple-smarthosts.html
+
+;; observations on mail related features by Benoit Joly
+;; https://lists.sr.ht/~abcdw/rde-devel/<878rh4byyg.fsf@benoitj.ca>
