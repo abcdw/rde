@@ -1314,9 +1314,16 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
   (define mail-directory ((get-value 'mail-directory-fn config) config))
 
   (define make-id-tag
+    ;; It can be tempting to tag only new emails, but there is a case, where
+    ;; it won't work: imagine you obtained email via l2md or personal inbox,
+    ;; reindexed notmuch database and later obtained the same email in you
+    ;; work inbox.  In this case the email won't be tagged with work tag,
+    ;; because it's not new email, but already indexed one and it's quite
+    ;; surpising to accidentially find such email in a different place, when
+    ;; you expected it to be in your work inbox search.
     (map (lambda (x)
            (format
-            #f "notmuch tag +~a -- path:accounts/~a/** and tag:new"
+            #f "notmuch tag +~a -- path:accounts/~a/**"
             (mail-account-id x) (mail-account-id x)))
          mail-accounts))
 
