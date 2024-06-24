@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -19,8 +19,13 @@
 
 (define-module (rde packages wm)
   #:use-module (gnu packages wm)
+  #:use-module (gnu packages freedesktop)
+  #:use-module (gnu packages web)
+  #:use-module (gnu packages pkg-config)
   #:use-module (guix packages)
-  #:use-module (guix git-download))
+  #:use-module (guix git-download)
+  #:use-module (guix build-system meson)
+  #:use-module ((guix licenses) #:prefix license:))
 
 (define-public waybar-stable
   (package
@@ -38,3 +43,29 @@
        (file-name (git-file-name name version))
        (sha256
         (base32 "001m7gl04l71is4zla2219njyry7h3n1lpdfcfjbxhp3b0in254f"))))))
+
+(define-public swaykbdd
+  (let ((commit "55435f32299fc19700e6a37260774d3f40c90f9f")
+        (revision "0"))
+    (package
+      (name "swaykbdd")
+      (version (git-version "1.4" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/artemsen/swaykbdd")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32 "1vjcs9y9r9988zmbx34hhriarkljxdlnxfgy5x7b0c4l2x9vgc3a"))))
+      (build-system meson-build-system)
+      (inputs (list json-c))
+      (native-inputs (list pkg-config))
+      (home-page "https://github.com/artemsen/swaykbdd")
+      (synopsis "Keyboard layout switcher for Sway")
+      (description "The @code{swaykbdd} utility can be used to automatically
+ change the keyboard layout on a per-window or per-tab basis.")
+      (license license:expat))))
+
+;; ((@ (rde api store) build) swaykbdd)
