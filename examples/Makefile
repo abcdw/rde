@@ -26,7 +26,7 @@ ares-rs:
 	-L /data/abcdw/work/abcdw/guile-ares-rs/src/guile \
 	-c \
 "(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
-((@ (nrepl server) run-nrepl-server) #:port 7888))"
+((@ (ares server) run-nrepl-server) #:nrepl-port-path \"../.nrepl-port\"))"
 
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
