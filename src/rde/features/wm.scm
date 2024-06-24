@@ -27,6 +27,7 @@
   #:use-module (gnu system)
   #:use-module (gnu system keyboard)
   #:use-module (rde packages)
+  #:use-module (rde packages wm)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages base)
   #:use-module (gnu packages emacs-xyz)
@@ -81,6 +82,7 @@
             feature-swaynotificationcenter
             feature-swayidle
             feature-swaylock
+            feature-swaykbdd
             feature-kanshi
             feature-batsignal))
 
@@ -1105,6 +1107,49 @@ for the main bar."
             '())))
    (home-services-getter get-home-services)
    (system-services-getter get-system-services)))
+
+
+;;;
+;;; swaykbdd.
+;;;
+
+(define* (feature-swaykbdd
+          #:key
+          (swaykbdd swaykbdd)
+          (tab-applications (list "librewolf-default")))
+  "Sets per-application or per-tab layout.  List app_id in
+@code{tab-applications}, can be obtained with @code{swaymsg -t get_tree}."
+  (ensure-pred file-like? swaykbdd)
+  (ensure-pred list-of-strings? tab-applications)
+
+  (define f-name 'swaykbdd)
+
+  (define (get-home-services config)
+    (require-value 'sway config)
+    (list
+     (simple-service
+      'swaykbdd-package
+      home-profile-service-type
+      (list swaykbdd))
+     (simple-service
+      'swaykbdd-shepherd-service
+      home-shepherd-service-type
+      (list
+       (shepherd-service
+        (provision '(swaykbdd))
+        (stop  #~(make-kill-destructor))
+        (start #~(make-forkexec-constructor
+                  (list #$(file-append swaykbdd "/bin/swaykbdd")
+                        "-a" ;; --tabapps=
+                        #$(string-join tab-applications ","))
+                  #:log-file (string-append
+                              (getenv "XDG_STATE_HOME") "/log"
+                              "/swaykbdd.log"))))))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 
 ;;;
