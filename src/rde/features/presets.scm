@@ -23,6 +23,7 @@
   #:use-module (rde features documentation)
   #:use-module (rde features emacs)
   #:use-module (rde features guile)
+  #:use-module (rde features gtk)
   #:use-module (rde features emacs-xyz)
   #:use-module (rde features finance)
   #:use-module (rde features fontutils)
