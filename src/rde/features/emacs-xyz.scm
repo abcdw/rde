@@ -2021,6 +2021,7 @@ parses its input."
                ;; keep the same values for project-file too.
                '((project-file (styles . (orderless partial-completion basic)))
                  (file (styles . (orderless partial-completion basic)))))
+         (setq completion-category-defaults nil)
          (setq enable-recursive-minibuffers t)
 
          ;; (setq resize-mini-windows nil)
