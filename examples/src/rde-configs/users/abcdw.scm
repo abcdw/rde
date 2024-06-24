@@ -372,7 +372,6 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
      ;;                  (effect-blur . 7x5)
      ;;                  (clock))
      )
-    (feature-gtk3)
     (feature-base-services
      #:default-substitute-urls (list "https://bordeaux.guix.gnu.org"
                                      "https://ci.guix.gnu.org")))))

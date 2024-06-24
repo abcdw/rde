@@ -61,6 +61,7 @@
 (define-public rde-desktop
   (list
    (feature-fonts)
+   (feature-gtk3)
 
    ;; https://sr.ht/~tsdh/swayr/
    ;; https://github.com/ErikReider/SwayNotificationCenter
