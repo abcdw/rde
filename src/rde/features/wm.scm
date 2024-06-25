@@ -178,7 +178,7 @@
          (package sway)
          (config
           `(,@(if xwayland? `((xwayland enable)) '())
-            (,#~"")
+            (,#~"\n\n# Layout configuration")
             ,@layout-config
 
             (,#~"\n\n# General settings:")
