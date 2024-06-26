@@ -194,6 +194,7 @@ font-monospace default value, and it will be ignored if
                             (font-spec :name ,(font-name font-unicode))))
         (setq use-default-font-for-symbols nil)
         (require 'fontaine)
+        (setq fontaine-current-preset t)
         (setq fontaine-presets
               '((t
                  :default-family ,(font-name font-monospace)
