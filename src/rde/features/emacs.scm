@@ -32,12 +32,13 @@
   #:use-module (rde packages)
   #:use-module (rde packages emacs)
   #:use-module (rde packages emacs-xyz)
+  #:use-module (gnu packages admin)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages emacs)
   #:use-module (gnu packages emacs-xyz)
-  #:use-module (gnu packages mail)
   #:use-module (gnu packages gnome)
+  #:use-module (gnu packages mail)
   #:use-module (gnu packages xdisorg)
-  #:use-module (gnu packages base)
 
   #:use-module (guix gexp)
   #:use-module (rde gexp)
@@ -338,7 +339,7 @@ C-h C-a to open About Emacs buffer."
        (define-key global-map (kbd "C-z") nil)
 
        ,#~""
-       ,@(if (get-value 'emacs-advanced-user? config)
+       ,@(if (get-value 'emacs-advanced-user? config #f)
              '((put 'narrow-to-page   'disabled nil)
                (put 'narrow-to-region 'disabled nil))
              '())
@@ -373,8 +374,8 @@ Prefix argument can be used to kill a few words."
          '("rde toggles" . rde-toggle-map))
 
        ,#~""
-       ,@(if (or (get-value 'emacs-disable-warnings? config)
-                 (get-value 'emacs-advanced-user? config))
+       ,@(if (or (get-value 'emacs-disable-warnings? config #f)
+                 (get-value 'emacs-advanced-user? config #f))
              `(;; Don't warn for large files
                (setq large-file-warning-threshold nil)
                ;; Don't warn for followed symlinked files
@@ -384,7 +385,7 @@ Prefix argument can be used to kill a few words."
              '())
 
        ,#~""
-       ,@(if (get-value 'emacs-auto-update-buffers? config)
+       ,@(if (get-value 'emacs-auto-update-buffers? config #f)
              `(;; Revert Dired and other buffers
                (setq global-auto-revert-non-file-buffers t)
                ;; Revert buffers when the underlying file has changed
@@ -392,7 +393,7 @@ Prefix argument can be used to kill a few words."
              '())
 
        ,#~""
-       ,@(if (get-value 'emacs-auto-clean-space? config)
+       ,@(if (get-value 'emacs-auto-clean-space? config #f)
              `((eval-when-compile (require 'ws-butler))
                (autoload 'ws-butler-mode "ws-butler")
                (add-hook 'text-mode-hook 'ws-butler-mode)
@@ -400,7 +401,7 @@ Prefix argument can be used to kill a few words."
              '())
 
        ,#~""
-       ,@(if (get-value 'desktop-notifications config)
+       ,@(if (get-value 'desktop-notifications config #f)
              `((with-eval-after-load 'alert
                  (setq alert-default-style 'notifications)))
              '())
@@ -417,7 +418,7 @@ Prefix argument can be used to kill a few words."
              ediff-split-window-function 'split-window-horizontally
              ediff-window-setup-function 'ediff-setup-windows-plain)
        ;; Configure emacs background server.
-       ,@(if (get-value 'emacs-server-mode? config)
+       ,@(if (get-value 'emacs-server-mode? config #f)
              `((defun rde-kill-emacs (&optional arg restart)
                  "\
 Make GNU Shepherd kill the Emacs server.
@@ -431,7 +432,7 @@ tested."
                  (interactive)
                  (call-process
                   ,(file-append
-                    (get-value 'shepherd config) "/bin/herd")
+                    (get-value 'shepherd config shepherd) "/bin/herd")
                   nil 0 nil (if restart "restart" "stop")
                   (concat "emacs-" server-name)))
 
@@ -449,7 +450,7 @@ It can contain settings not yet moved to separate features."
      (append (list (get-value 'emacs-configure-rde-keymaps config)
                    (get-value 'emacs-configure-rde-startup config)
                    emacs-expand-region)
-             (if (get-value 'emacs-auto-clean-space? config)
+             (if (get-value 'emacs-auto-clean-space? config #f)
                  (list emacs-ws-butler) '())))))
 
 ;; https://idiomdrottning.org/bad-emacs-defaults
@@ -558,7 +559,7 @@ It can contain settings not yet moved to separate features."
              (program-file
               "emacs-client-alternate-fail"
               #~(system*
-                 #$(file-append (get-value 'libnotify config)
+                 #$(file-append (get-value 'libnotify config libnotify)
                                 "/bin/notify-send")
                  "Emacs error"
                  "Minibuffer programs require a running server."
@@ -638,7 +639,7 @@ It can contain settings not yet moved to separate features."
       `(("ALTERNATE_EDITOR" . ,emacs-editor)
         ("VISUAL" . ,emacs-client-create-frame)
         ("MENU" . ,emacs-dmenu)))
-     (when (get-value 'sway config)
+     (when (get-value 'sway config #f)
        (simple-service
         'emacs-update-environment-variables-on-sway-start
         home-sway-service-type
