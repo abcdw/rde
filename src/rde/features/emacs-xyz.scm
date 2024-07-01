@@ -4369,7 +4369,7 @@ result is longer than LEN."
           (setq org-agenda-skip-scheduled-if-done nil)
           (setq org-agenda-skip-deadline-if-done nil)
           (setq org-agenda-compact-blocks nil)
-          (setq org-agenda-include-diary t)
+          (setq org-agenda-log-mode-add-notes nil)
           (setq org-agenda-custom-commands ,org-agenda-custom-commands)
           (setq org-agenda-bulk-custom-functions
                 '((?P (lambda nil
