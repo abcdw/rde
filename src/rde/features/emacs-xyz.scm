@@ -2640,7 +2640,7 @@ just start typing `tempel-trigger-prefix' (default is \"<\") and use
            (let ((olivetti-p (if olivetti-mode 1 0)))
              (apply orig-fun r)
              (olivetti-mode olivetti-p)))
-         (advice-add 'org-agenda-redo-all :around 'ensure-olivetti))
+         (advice-add 'org-agenda-redo :around 'ensure-olivetti))
 
         (with-eval-after-load
          'hide-mode-line
