@@ -3328,6 +3328,9 @@ git-link, git-timemachine."
 
         (with-eval-after-load
          'magit
+         (magit-add-section-hook 'magit-status-sections-hook
+                                 'magit-insert-local-branches
+                                 'magit-insert-stashes)
          (defvar rde-projects-directory ,(or project-directory 'nil)
            "Directory where project repositories are stored.")
 
