@@ -4182,9 +4182,32 @@ Indentation and refile configurations, visual adjustment."
      (,(kbd "C-o") "Overview"
       ;; TODO: Add A priority to the top.
       ((agenda
+        "*"
+        ((org-agenda-scheduled-leaders '("" "Sched. %2dx:"))
+         (org-super-agenda-unmatched-name 'none)
+         (org-super-agenda-unmatched-order 5)
+         (org-super-agenda-header-separator "\n")
+         (org-super-agenda-groups
+          `((:name "Clocked today"
+             :log t
+             :order 100)
+            (:name none
+             :tag "proj"
+             :order 1)
+            (:name none
+             :tag "idea"
+             :order 2)
+            (:name "Done"
+             :todo ,org-done-keywords-for-agenda
+             :order 10)))
+         (org-agenda-block-separator nil)
+         (org-agenda-span 14)
+         (org-agenda-show-future-repeats nil)
+         (org-agenda-skip-deadline-prewarning-if-scheduled t)
+         (org-agenda-overriding-header "\nAgenda\n")))
+       (agenda
         ""
-        ((org-agenda-time-grid nil)
-         (org-agenda-start-on-weekday nil)
+        ((org-agenda-start-on-weekday nil)
          (org-agenda-start-day "+1d")
          (org-agenda-span 14)
          (org-agenda-show-all-dates nil)
@@ -4194,13 +4217,6 @@ Indentation and refile configurations, visual adjustment."
          (org-agenda-entry-types '(:deadline))
          (org-agenda-skip-function '(org-agenda-skip-entry-if 'done))
          (org-agenda-overriding-header "\nUpcoming deadlines (+14d)\n")))
-       (agenda
-        "*"
-        ((org-agenda-block-separator nil)
-         (org-agenda-span 14)
-         (org-agenda-show-future-repeats nil)
-         (org-agenda-skip-deadline-prewarning-if-scheduled t)
-         (org-agenda-overriding-header "\nAgenda\n")))
        (alltodo
         ""
         ((org-agenda-block-separator nil)
@@ -4368,8 +4384,9 @@ result is longer than LEN."
                   (org-agenda-prefix-format
                    `(quote ,org-agenda-prefix-format))
                   (else
-                   ''())))))
-      #:elisp-packages (list emacs-org-wild-notifier)
+                   ''())))
+          (org-super-agenda-mode)))
+      #:elisp-packages (list emacs-org-wild-notifier emacs-org-super-agenda)
       #:summary "\
 Preconfigured agenda views"
       #:commentary "\
