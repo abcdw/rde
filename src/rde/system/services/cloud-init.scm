@@ -42,7 +42,8 @@
   #:use-module (web client)
   #:use-module (web response)
   #:use-module (web uri)
-  #:export (cloud-init-service-type))
+  #:export (cloud-init-service-type
+            cloud-init-config))
 
 ;; TODO: [Nikita Domnitskii, 2024-02-12] think of a better way to
 ;; implement datasources
