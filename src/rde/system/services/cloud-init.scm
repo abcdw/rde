@@ -58,6 +58,8 @@
 (define-record-type* <cloud-init-config>
   cloud-init-config make-cloud-init-config
   cloud-init-config?
+  (primary-drive cloud-init-config-primary-drive
+                 (default "/dev/vda"))
   (metadata-host cloud-init-config-metadata-host
                  (default (metadata-host)))
   (metadata-path cloud-init-config-metadata-path
@@ -101,6 +103,7 @@
                    (throw 'metadata-query-error response)))))))))
 
 (define (resize-partition config)
+  (define primary-drive (cloud-init-config-primary-drive config))
   (program-file
    "resize-partition"
    (with-extensions (list guile-parted guile-bytestructures)
@@ -109,7 +112,7 @@
                       (bytestructures guile)
                       (srfi srfi-71)
                       ((system foreign) #:prefix ffi:))
-         (let* ((device          (get-device "/dev/vda"))
+         (let* ((device          (get-device #$primary-drive))
                 (disk            (disk-new device))
                 (main-part       (disk-get-partition disk 1))
                 (next-part       (partition-next main-part))
@@ -140,7 +143,7 @@
            (unless (zero? errno)
              (disk-commit disk)
              (system* (string-append #$e2fsprogs "/sbin/resize2fs")
-                      "/dev/vda1")))))))
+                      (string-append #$primary-drive "1"))))))))
 
 (define (cloud-init-shepherd-services config)
   (list
