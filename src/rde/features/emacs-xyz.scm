@@ -4390,6 +4390,7 @@ result is longer than LEN."
                    `(quote ,org-agenda-prefix-format))
                   (else
                    ''())))
+          (autoload 'org-super-agenda-mode "org-super-agenda")
           (org-super-agenda-mode)))
       #:elisp-packages (list emacs-org-wild-notifier emacs-org-super-agenda)
       #:summary "\
