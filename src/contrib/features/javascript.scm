@@ -1,7 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is a part of rde.
 ;;;
@@ -316,9 +316,7 @@
               emacs-nodejs-repl
               emacs-markdown-mode
               emacs-flymake-eslint
-              emacs-eslint-fix
-              emacs-jsonrpc-1.0.25
-              emacs-eglot-1.17)))
+              emacs-eslint-fix)))
      (simple-service
       'javascript-add-packages
       home-profile-service-type

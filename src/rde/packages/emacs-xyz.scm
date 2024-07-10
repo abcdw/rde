@@ -64,47 +64,6 @@ functionalities such as code completions, it provides a standardized
 interface for debuggers.")
       (license license:gpl3+))))
 
-;;; TODO: [Demis Balbach, 2024-05-14] Remove once upstreamed
-(define-public emacs-eglot-1.17
-  (package
-    (name "emacs-eglot")
-    (version "1.17")
-    (home-page "https://elpa.gnu.org/packages/eglot.html")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://elpa.gnu.org/packages/eglot-" version ".tar"))
-              (sha256
-               (base32
-                "1cnx522wb49f1dkm80sigz3kvzrblmq5b1lnfyq9wdnh6zdm4l00"))))
-    (build-system emacs-build-system)
-    (synopsis "The Emacs Client for LSP servers")
-    (description
-     "Eglot (\"Emacs Polyglot\") is an Emacs LSP client that stays out of
-your way.")
-    (license license:gpl3+)))
-
-
-;;; TODO: [Demis Balbach, 2024-05-14] Remove once upstreamed
-(define-public emacs-jsonrpc-1.0.25
-  (package
-    (name "emacs-jsonrpc")
-    (version "1.0.25")
-    (home-page "https://elpa.gnu.org/packages/jsonrpc.html")
-    (source (origin
-              (method url-fetch)
-              (uri (string-append "https://elpa.gnu.org/packages/jsonrpc-" version ".tar"))
-              (sha256
-               (base32
-                "18f0g8j1rd2fpa707w6fll6ryj7mg6hbcy2pc3xff2a4ps8zv12b"))))
-    (build-system emacs-build-system)
-    (synopsis "JSON-RPC library")
-    (description
-     "This library implements the JSONRPC 2.0 specification as described
-in https://www.jsonrpc.org/.  As the name suggests, JSONRPC is a
-generic Remote Procedure Call protocol designed around JSON
-objects.")
-    (license license:gpl3+)))
-
 (define-public emacs-justify-kp
  (let ((commit "385e6b8b909ae0f570f30101cec3677e21c9e0a0"))
   (package
