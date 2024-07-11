@@ -3169,9 +3169,7 @@ Mostly workarounds and integratios with other packages."
                             (lambda () (save-some-buffers t t))))
                 '())))
       #:elisp-packages
-      (list
-       emacs-dape
-       emacs-jsonrpc-1.0.25)
+      (list emacs-dape)
       #:summary
       "Setup Emacs to use the dape DAP client."
       #:authors
