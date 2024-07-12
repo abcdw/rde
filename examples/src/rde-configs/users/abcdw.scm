@@ -11,6 +11,7 @@
   #:use-module (guix gexp)
   #:use-module (guix inferior)
   #:use-module (guix packages)
+  #:use-module (rde features android)
   #:use-module (rde features base)
   #:use-module (rde features wm)
   #:use-module (rde features clojure)
@@ -531,6 +532,7 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
     (feature-emacs-elfeed
      #:elfeed-org-files '("/data/abcdw/work/abcdw/private/rss.org"))
 
+    (feature-android)
     (feature-javascript)
     (feature-ocaml #:opam? #t)
 
