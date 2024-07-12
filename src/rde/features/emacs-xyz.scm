@@ -4097,7 +4097,10 @@ Start an unlimited search at `point-min' otherwise."
          ;; TODO: Move to feature notmuch
          (with-eval-after-load 'notmuch (require 'ol-notmuch))
 
-         (add-hook 'org-mode-hook 'org-appear-mode)
+         ;; TODO: [Andrew Tropin, 2024-07-12] Enable it back, when it fixed:
+         ;; https://github.com/awth13/org-appear/issues/58
+
+         ;; (add-hook 'org-mode-hook 'org-appear-mode)
          (add-hook 'org-mode-hook 'olivetti-mode)
 
          (with-eval-after-load
