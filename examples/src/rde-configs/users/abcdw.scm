@@ -147,10 +147,10 @@
      (@ (gnu packages guile) guile-next))
     (strings->packages
      "figlet" ;; TODO: Move to emacs-artist-mode
-     "calibre"
+     ;; "calibre"
      ;; "nyxt"
-     "librewolf"
 
+     "dino"
      "libnotify"
      "utox" "qtox"
      ;; "jami"
