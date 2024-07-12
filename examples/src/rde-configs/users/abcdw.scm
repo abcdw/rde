@@ -522,7 +522,7 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
      ;; Add efforts to agenda, it's a bit space hungry, so not included in
      ;; feature by default yet.
      #:org-agenda-prefix-format
-     '((agenda . " %i %-12:c%?-12t%-6e% s")
+     '((agenda . " %i %-12:c%-6e%?-12t% s")
        (todo . " %i %-12:c %-6e")
        (tags . " %i %-12:c")
        (search . " %i %-12:c"))
