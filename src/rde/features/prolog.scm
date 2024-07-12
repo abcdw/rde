@@ -33,7 +33,7 @@
           #:key
           (prolog trealla)
           (emacs-ediprolog emacs-ediprolog))
-  "Configure prolog for emacs."
+  "Configure Prolog for Emacs."
   (ensure-pred file-like? prolog)
   (ensure-pred file-like? emacs-ediprolog)
 
