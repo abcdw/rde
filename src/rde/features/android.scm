@@ -20,8 +20,10 @@
   #:use-module (rde features)
   #:use-module (rde features emacs)
   #:use-module (rde home services android)
+  #:use-module (rde system services accounts)
   #:use-module (rde serializers json)
   #:use-module (gnu services)
+  #:use-module (gnu services base)
   #:use-module (gnu home services)
   #:use-module (gnu packages android)
   #:use-module (guix gexp)
@@ -72,7 +74,19 @@
           (setq fdroid-sans-device t)))
       #:elisp-packages (list emacs-fdroid))))
 
+  (define (get-system-services config)
+    (list
+     (udev-rules-service
+      'adb
+      android-udev-rules
+      #:groups '("adbusers"))
+     (simple-service
+      'android-add-adbusers-group-to-user
+      rde-account-service-type
+      (list "adbusers"))))
+
   (feature
    (name f-name)
    (values `((,f-name . #t)))
-   (home-services-getter get-home-services)))
+   (home-services-getter get-home-services)
+   (system-services-getter get-system-services)))
