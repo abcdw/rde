@@ -527,8 +527,7 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
        (tags . " %i %-12:c")
        (search . " %i %-12:c"))
      #:org-agenda-files '("/data/abcdw/work/abcdw/private/todo.org"
-                          "/data/abcdw/work/abcdw/private/phd.org"
-                          "/data/abcdw/work/abcdw/rde/TODO"))
+                          "/data/abcdw/work/abcdw/private/phd.org"))
     (feature-emacs-elfeed
      #:elfeed-org-files '("/data/abcdw/work/abcdw/private/rss.org"))
 
