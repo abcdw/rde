@@ -25,8 +25,8 @@
   #:use-module (rde features system)
   #:use-module (rde features xdg)
   #:use-module (rde features markup)
-  #:use-module (rde features docker)
   #:use-module (rde features libreoffice)
+  #:use-module (rde features containers)
   #:use-module (rde features virtualization)
   #:use-module (rde features ocaml)
   #:use-module (rde features presets)
@@ -321,7 +321,8 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
 
 (define virtualization-features
   (list
-   (feature-docker)
+   (feature-podman)
+   (feature-distrobox)
    (feature-qemu)))
 
 (define general-features
