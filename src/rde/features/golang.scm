@@ -33,13 +33,13 @@
        'add-go-envs
        home-environment-variables-service-type
        '(("GOPATH" . "$XDG_DATA_HOME/go"))))
-     (if (get-value 'emacs config)
+     (if (get-value 'emacs config #f)
          (list
           (rde-elisp-configuration-service
            f-name
            config
            `((add-to-list 'auto-mode-alist '("\\.go\\'" . go-mode))
-             ,@(if (get-value 'emacs-org config)
+             ,@(if (get-value 'emacs-org config #f)
                    '((with-eval-after-load 'org
                        (add-to-list 'org-structure-template-alist
                                     '("go" . "src go")))

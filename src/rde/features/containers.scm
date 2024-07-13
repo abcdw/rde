@@ -41,7 +41,7 @@ configuration relies on btrfs."
   (define f-name 'podman)
   (define (get-home-services config)
     (list
-     (when (and (get-value 'zsh config) docker-alias?)
+     (when (and (get-value 'zsh config #f) docker-alias?)
        (simple-service
         'direnv-zsh-hook
         home-zsh-service-type

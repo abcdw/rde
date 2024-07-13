@@ -57,7 +57,8 @@ on-the-fly thumbnail generation for progress bar."
   (define f-name 'mpv)
 
   (define (get-home-services config)
-    (define font-sans-serif (and=> (get-value 'font-sans config) font-name))
+    (define font-sans-serif (and=>
+                             (get-value 'font-sans config #f) font-name))
     (append
      (if uosc?
          (list
@@ -113,7 +114,7 @@ on-the-fly thumbnail generation for progress bar."
            (video/mkv . mpv.desktop)
            (video/webm . mpv.desktop)
            (audio/mpeg . mpv.desktop))))))
-     (if (get-value 'emacs config)
+     (if (get-value 'emacs config #f)
          (let ((emacs-embark (get-value 'emacs-embark config)))
            (list
             (rde-elisp-configuration-service
@@ -125,7 +126,7 @@ on-the-fly thumbnail generation for progress bar."
                  "Map to bind `mpv' commands under.")
                (define-prefix-command 'rde-mpv-map)
 
-               ,@(if (get-value 'emacs-ytdl config)
+               ,@(if (get-value 'emacs-ytdl config #f)
                      `((eval-when-compile
                          (require 'ytdl)
                          (require 'cl-lib))
@@ -249,7 +250,7 @@ do with the file, and whether to add the file to the current PLAYLIST."
                  (setq mpv-seek-step 3)))
              #:elisp-packages (append
                                (or (and=> emacs-embark list) '())
-                               (or (and=> (get-value 'emacs-ytdl config) list)
+                               (or (and=> (get-value 'emacs-ytdl config #f) list)
                                    '())
                                (list emacs-mpv)))))
       '())))

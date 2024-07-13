@@ -45,7 +45,7 @@
       'add-prolog-home-package
       home-profile-service-type
       (list trealla))
-     (when (get-value 'emacs config)
+     (when (get-value 'emacs config #f)
        (rde-elisp-configuration-service
         f-name
         config

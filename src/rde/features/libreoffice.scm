@@ -107,9 +107,9 @@
 
   (define (get-home-services config)
     "Return home services related to LibreOffice."
-    (require-value 'xdg-base-directories-configuration config)
-    (let* ((data-home (home-xdg-base-directories-configuration-data-home
-                       (get-value 'xdg-base-directories-configuration config))))
+    (let* ((data-home
+            (home-xdg-base-directories-configuration-data-home
+             (get-value 'xdg-base-directories-configuration config))))
       (list
        (simple-service
         'add-libreoffice-package

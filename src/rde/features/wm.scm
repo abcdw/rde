@@ -194,12 +194,12 @@
             (set $menu ,default-application-launcher)
             (set $lock ,lock-cmd)
 
-            ,@(if (get-value 'default-pass-prompt-fn config)
+            ,@(if (get-value 'default-pass-prompt-fn config #f)
                   `((set $pass ,(get-value-eval 'default-pass-prompt-fn config))
                     (bindsym --to-code $mod+Shift+p exec $pass))
                   '())
 
-            ,@(if (get-value 'default-power-menu-fn config)
+            ,@(if (get-value 'default-power-menu-fn config #f)
                   `((set $power-menu ,(get-value-eval 'default-power-menu-fn config))
                     (bindsym --to-code $mod+Shift+q exec $power-menu))
                   '())
@@ -251,14 +251,14 @@
             (default_floating_border pixel)
             (gaps inner ,(get-value 'emacs-margin config 8))))))
 
-       (when (get-value 'swayidle-cmd config)
+       (when (get-value 'swayidle-cmd config #f)
          (simple-service
           'sway-enable-swayidle
           home-sway-service-type
           `((,#~"")
             (exec ,(get-value 'swayidle-cmd config)))))
 
-       (when (get-value 'swayidle config)
+       (when (get-value 'swayidle config #f)
          (let* ((swaymsg (file-append sway "/bin/swaymsg"))
                 (swaymsg-cmd (lambda (cmd)
                                #~(format #f "'~a \"~a\"'" #$swaymsg #$cmd)))
@@ -300,15 +300,15 @@ chooser_type=simple"
         home-profile-service-type
         (append
          (list dconf)
-         (if (and (get-value 'default-terminal config)
-                  (get-value 'backup-terminal config))
+         (if (and (get-value 'default-terminal config #f)
+                  (get-value 'backup-terminal config #f))
              '() (list foot))
-         (if (get-value 'default-application-launcher-fn config)
+         (if (get-value 'default-application-launcher-fn config #f)
              '() (list bemenu))
          (list qtwayland-5 swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
 
-       (when (get-value 'emacs config)
+       (when (get-value 'emacs config #f)
          (rde-elisp-configuration-service
           'sway
           config
@@ -876,7 +876,7 @@ for the main bar."
     ;; (when use-global-fonts?
     ;;   (require-value 'font-monospace config))
     (define font-mono
-      (and=> (get-value 'font-monospace config)
+      (and=> (get-value 'font-monospace config #f)
              (compose string->symbol font-name)))
     (append
      (list
@@ -939,7 +939,7 @@ for the main bar."
           ("files/.config/waybar/config"
            ,#~(system* #$(file-append psmisc "/bin/killall") "-SIGUSR2" "waybar"))))
 
-       (when (get-value 'sway config)
+       (when (get-value 'sway config #f)
          (simple-service
           'sway-waybar
           home-sway-service-type
@@ -1004,7 +1004,7 @@ for the main bar."
            (background . @base02))))))
 
       (list
-       (when (get-value 'sway config)
+       (when (get-value 'sway config #f)
          (simple-service
           'sway-swaync
           home-sway-service-type
@@ -1034,7 +1034,7 @@ for the main bar."
   (define swayidle-cmd (file-append swayidle "/bin/swayidle -w"))
 
   (define (get-home-services config)
-    (define lock-cmd (get-value 'default-screen-locker config))
+    (define lock-cmd (get-value 'default-screen-locker config #f))
 
     (list
      (service

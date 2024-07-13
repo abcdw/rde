@@ -32,7 +32,7 @@
 
   (define (get-home-services config)
     (define font
-      (and=> (get-value 'font-monospace config)
+      (and=> (get-value 'font-monospace config #f)
              font-specification))
 
     (list

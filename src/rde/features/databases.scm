@@ -71,12 +71,12 @@
        'postgresql-xdg-base-dirs-specification
        home-environment-variables-service-type
        '(("PSQL_HISTORY" . "$XDG_STATE_HOME/psql_history"))))
-     (if (get-value 'emacs config)
+     (if (get-value 'emacs config #f)
          (list
           (rde-elisp-configuration-service
            f-name
            config
-           `(,@(if (get-value 'emacs-org config)
+           `(,@(if (get-value 'emacs-org config #f)
                    '((with-eval-after-load 'ob-core
                        (require 'ob-sql))
                      (with-eval-after-load 'ob-sql

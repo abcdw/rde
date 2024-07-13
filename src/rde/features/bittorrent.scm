@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;; This file is part of rde.
 ;;;
@@ -48,10 +48,10 @@
 
   (define (transmission-home-services config)
     (define emacs-f-name 'transmission)
-    (define emacs-cmd (get-value 'emacs-client config))
+    (define emacs-cmd (get-value 'emacs-client config #f))
 
     (list
-     (when (get-value 'emacs config)
+     (when (get-value 'emacs config #f)
        ;; Without desktop notifications it will be unclear what is happening.
        ;; It could be a fallback to old approach (where frame is created), but
        ;; it would require future maintanance.

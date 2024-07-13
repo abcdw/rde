@@ -252,7 +252,7 @@
               (setopt nodejs-repl-command ,node-executable))
 
             ;; dape
-            ,@(if (get-value 'emacs-dape config)
+            ,@(if (get-value 'emacs-dape config #f)
                   `((with-eval-after-load
                         'dape
                       (let ((vscode-js-debug ,vscode-js-debug-executable)

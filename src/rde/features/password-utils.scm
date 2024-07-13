@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
@@ -33,7 +33,6 @@
   #:use-module (guix gexp)
 
   #:export (feature-password-store))
-
 
 (define* (feature-password-store
           #:key
@@ -84,15 +83,15 @@
            home-profile-service-type
            (list pass-otp))
 
-          (when (get-value 'emacs config)
+          (when (get-value 'emacs config #f)
             (emacs-xdg-service
              'pass
              "Emacs (Client) [pass]"
              (emacs-pass-prompt config)))
 
-          (when (get-value 'emacs config)
+          (when (get-value 'emacs config #f)
             (let ((emacs-embark (get-value 'emacs-embark config))
-                  (emacs-consult (get-value 'emacs-consult config)))
+                  (emacs-consult (get-value 'emacs-consult config #f)))
               (rde-elisp-configuration-service
                emacs-f-name
                config

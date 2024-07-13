@@ -212,8 +212,6 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
 (define (rde-emacs-base config)
   (let* ((full-name (get-value 'full-name config))
          (email     (get-value 'email config)))
-    (require-value 'full-name config)
-    (require-value 'email config)
     (rde-elisp-configuration-service
      'emacs-base
      config

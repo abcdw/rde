@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
 ;;; This file is part of rde.
@@ -82,7 +82,7 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
             '(("LEIN_HOME" . "$XDG_DATA_HOME/lein"))))
           '())
       ;; https://github.com/DogLooksGood/meomacs/blob/master/programming.org#fix-clojure-syntax-highlighting
-      (if (get-value 'emacs config)
+      (if (get-value 'emacs config #f)
           (list
            (rde-elisp-configuration-service
             emacs-f-name
@@ -171,9 +171,9 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
                 (advice-add 'cider-complete-at-point
                             :override 'rde--cider-complete-at-point)
 
-                `(if (get-value 'clojure-lsp config)
-                     `((setq cider-use-xref nil))  ;; eglot will handle it
-                     '())
+                ,@(if (get-value 'clojure-lsp config #f)
+                      `((setq cider-use-xref nil))  ;; eglot will handle it
+                      '())
                 (setq cider-auto-select-error-buffer nil)
                 (setq cider-inspector-auto-select-buffer nil)
                 (setq cider-auto-select-test-report-buffer nil)
@@ -183,14 +183,14 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
               (with-eval-after-load 'cider-repl
                 (define-key cider-repl-mode-map (kbd "C-M-q") 'indent-sexp)
                 (setq cider-repl-pop-to-buffer-on-connect 'display-only)
-                ,@(if (get-value 'emacs-advanced-user? config)
+                ,@(if (get-value 'emacs-advanced-user? config #f)
                       '((setq cider-repl-display-help-banner nil))
                       '()))
 
               (with-eval-after-load 'rde-keymaps
                 (define-key rde-app-map (kbd ,clj-deps-new-key) 'clj-deps-new))
 
-              ,@(if (get-value 'emacs-org config)
+              ,@(if (get-value 'emacs-org config #f)
                     '((with-eval-after-load 'org
                         (add-to-list 'org-structure-template-alist
                                      '("clj" . "src clojure")))

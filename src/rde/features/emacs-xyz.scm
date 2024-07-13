@@ -248,7 +248,7 @@ This function is needed for various modes to set up the mode-line late."
         (push '(internal-border-width . ,margin) default-frame-alist)
         ;; (setq-default fringes-outside-margins t)
 
-        ,@(if (get-value 'emacs-advanced-user? config)
+        ,@(if (get-value 'emacs-advanced-user? config #f)
               '((setq inhibit-startup-screen t)
                 (setq inhibit-startup-message t)
                 (setq initial-scratch-message nil))
@@ -522,7 +522,7 @@ based on the time of the day."
           (let ((coordinates (rde-circadian--get-geolocation)))
             (setq calendar-longitude (if coordinates (car coordinates) 0))
             (setq calendar-latitude (if coordinates (cdr coordinates) 0))))
-        ,@(if (get-value 'emacs-modus-themes config)
+        ,@(if (get-value 'emacs-modus-themes config #f)
               '((add-hook 'circadian-after-load-theme-hook
                           'rde-modus-themes-set-custom-faces))
               '())
@@ -644,7 +644,7 @@ keybindings and adjust some minor settings."
   (define (get-home-services config)
     "Return home services related to all-the-icons."
     (list
-     (let ((emacs-completion (get-value 'emacs-completion config)))
+     (let ((emacs-completion (get-value 'emacs-completion config #f)))
        (rde-elisp-configuration-service
         emacs-f-name
         config
@@ -751,7 +751,7 @@ by mapping characters to default emacs keybindings."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(,@(if (get-value 'emacs-all-the-icons config)
+      `(,@(if (get-value 'emacs-all-the-icons config #f)
               '((defun rde-battery-add-unicode-indicator (data)
                   "Add a unicode indicator to the battery status."
                   (let* ((bat (car (read-from-string (cdr (assq ?p data)))))
@@ -987,7 +987,7 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
              (args (apply command args))
              (t (funcall command)))))
 
-        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config #f)
               '((autoload 'tramp-list-remote-buffers "tramp-cmds")
                 (with-eval-after-load 'tramp
                   (defvar rde-tramp-buffer-source
@@ -1089,14 +1089,14 @@ path /sudo:HOST:/path if the user in sudoers.")))
         (if extra-switches
             (append
              (list extra-switches)
-             (if (get-value 'emacs-advanced-user? config)
+             (if (get-value 'emacs-advanced-user? config #f)
                  (list "-A --time-style=long-iso")
                  (list "-a")))
             '()))
        " "))
     (define zip (get-value 'zip config (@ (gnu packages compression) zip)))
     (define rsync (get-value 'rsync config (@ (gnu packages rsync) rsync)))
-    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config))
+    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config #f))
 
     (list
      (simple-service
@@ -1108,7 +1108,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
       config
       `((eval-when-compile (require 'dired))
 
-        ,@(if (get-value 'emacs-embark config)
+        ,@(if (get-value 'emacs-embark config #f)
               '((defun rde-dired-open-externally ()
                   "Open marked files in Dired through an external program."
                   (interactive)
@@ -1133,7 +1133,7 @@ path /sudo:HOST:/path if the user in sudoers.")))
          ,@(if kill-when-opening-new-buffer?
                '((setq dired-kill-when-opening-new-dired-buffer t))
                '())
-         ,@(if (get-value 'emacs-advanced-user? config)
+         ,@(if (get-value 'emacs-advanced-user? config #f)
                `((add-hook 'dired-mode-hook 'dired-hide-details-mode))
                '())
 
@@ -1236,7 +1236,7 @@ Small tweaks, xdg entry for openning directories in emacs client."
                     "eshell-syntax-highlighting")
           (eshell-syntax-highlighting-global-mode)
 
-          ,@(if (get-value 'emacs-consult config)
+          ,@(if (get-value 'emacs-consult config #f)
                 '((add-hook
                    'eshell-hist-mode-hook
                    (lambda ()
@@ -1351,7 +1351,7 @@ process-in-a-buffer derived packages like shell, REPLs, etc."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(,@(if (get-value 'emacs-consult-initial-narrowing? config)
+      `(,@(if (get-value 'emacs-consult-initial-narrowing? config #f)
               '((defvar rde-comint-buffer-source
                   `(:name "Comint"
                           :narrow ?c
@@ -1394,14 +1394,14 @@ process-in-a-buffer derived packages like shell, REPLs, etc."
         (add-to-list 'display-buffer-alist
                      `(,(rx "*Async Shell Command" (* any) "*")
                        (display-buffer-no-window)))
-        ,@(if (get-value 'emacs-org config)
+        ,@(if (get-value 'emacs-org config #f)
               '((with-eval-after-load 'org
                   (add-to-list 'org-structure-template-alist
                                '("sh" . "src sh")))
                 (with-eval-after-load 'ob-core
                   (require 'ob-shell)))
               '())
-        ,@(if (get-value 'emacs-project config)
+        ,@(if (get-value 'emacs-project config #f)
               '((with-eval-after-load 'project
                   (define-key project-prefix-map "s" 'project-shell)
                   (add-to-list 'project-switch-commands
@@ -1486,7 +1486,7 @@ If ALT is non-nil, URL is assumed to be an alternative so the logic is reversed.
           (cl-letf (((symbol-function 'browse-url-can-use-xdg-open) 'ignore))
             (rde-browse-url-bookmark-jump bookmark)))
 
-        ,@(if (get-value 'emacs-embark config)
+        ,@(if (get-value 'emacs-embark config #f)
               '((defun rde-browse-url-open-with-cookies (cookies &optional url)
                   "Open URL with COOKIES in corresponding external application."
                   (interactive "\nsURL: ")
@@ -1528,31 +1528,31 @@ If ALT is non-nil, URL is assumed to be an alternative so the logic is reversed.
         (setq rde-browse-url-mappings
               (append
                (list
-                ,@(if (get-value 'youtube-frontend config)
+                ,@(if (get-value 'youtube-frontend config #f)
                       `((cons "https://www.youtube.com"
                               ,(get-value 'youtube-frontend config)))
                       '())
-                ,@(if (get-value 'reddit-frontend config)
+                ,@(if (get-value 'reddit-frontend config #f)
                       `((cons "https://www.reddit.com"
                               ,(get-value 'reddit-frontend config)))
                       '())
-                ,@(if (get-value 'quora-frontend config)
+                ,@(if (get-value 'quora-frontend config #f)
                       `((cons "https://quora.com"
                               ,(get-value 'quora-frontend config)))
                       '())
-                ,@(if (get-value 'twitter-frontend config)
+                ,@(if (get-value 'twitter-frontend config #f)
                       `((cons "https://twitter.com"
                               ,(get-value 'twitter-frontend config)))
                       '())
-                ,@(if (get-value 'imgur-frontend config)
+                ,@(if (get-value 'imgur-frontend config #f)
                       `((cons "https://imgur.com"
                               ,(get-value 'imgur-frontend config)))
                       '())
-                ,@(if (get-value 'google-frontend config)
+                ,@(if (get-value 'google-frontend config #f)
                       `((cons "https://www.google.com"
                               ,(get-value 'google-frontend config)))
                       '())
-                ,@(if (get-value 'medium-frontend config)
+                ,@(if (get-value 'medium-frontend config #f)
                       `((cons "https://medium.com"
                               ,(get-value 'medium-frontend config)))
                       '()))
@@ -1603,7 +1603,7 @@ The examples below show different types of modules:
 
   (define (get-home-services config)
     "Return home services related to the Emacs Tab Bar."
-    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config))
+    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config #f))
 
     (list
      (rde-elisp-configuration-service
@@ -1730,6 +1730,7 @@ supply custom menu items in the form of modules.")))
 
   (define (get-home-services config)
     (require-value 'elogind config)
+    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config #f))
     (list
      (when (get-value 'emacs config)
        (emacs-xdg-service
@@ -1743,10 +1744,10 @@ supply custom menu items in the form of modules.")))
              `((setq
                 rde-power-menu-candidates
                 (append
-                 ,@(if (get-value 'sway config)
+                 ,@(if (get-value 'sway config #f)
                        `((list
                           (cons
-                           ,@(if (get-value 'emacs-all-the-icons config)
+                           ,@(if emacs-all-the-icons
                                  '((concat (all-the-icons-faicon "undo")
                                            " reload sway"))
                                  '("reload sway"))
@@ -1755,7 +1756,7 @@ supply custom menu items in the form of modules.")))
                                           "/bin/swaymsg")
                             "reload"))
                           (cons
-                           ,@(if (get-value 'emacs-all-the-icons config)
+                           ,@(if emacs-all-the-icons
                                  '((concat (all-the-icons-faicon "times")
                                            " exit sway"))
                                  '("exit sway"))
@@ -1768,42 +1769,42 @@ supply custom menu items in the form of modules.")))
                                                 "/bin/loginctl")))
                      `((list
                         (cons
-                         ,@(if (get-value 'emacs-all-the-icons config)
+                         ,@(if emacs-all-the-icons
                                '((concat (all-the-icons-faicon "lock")
                                          " lock"))
                                '("lock"))
                          (list ,loginctl "lock-session"))
                         (cons
-                         ,@(if (get-value 'emacs-all-the-icons config)
+                         ,@(if emacs-all-the-icons
                                '((concat (all-the-icons-material "exit_to_app")
                                          " logout"))
                                '("logout"))
                          (list ,loginctl "terminate-session" (getenv "XDG_SESSION_ID")))
                         (cons
-                         ,@(if (get-value 'emacs-all-the-icons config)
+                         ,@(if emacs-all-the-icons
                                '((concat (all-the-icons-faicon "pause")
                                          " suspend"))
                                '("suspend"))
                          (list ,loginctl "suspend"))
                         (cons
-                         ,@(if (get-value 'emacs-all-the-icons config)
+                         ,@(if emacs-all-the-icons
                                '((concat (all-the-icons-faicon "stop")
                                          " hibernate"))
                                '("hibernate"))
                          (list ,loginctl "suspend-then-hibernate"))
                         (cons
-                         ,@(if (get-value 'emacs-all-the-icons config)
+                         ,@(if emacs-all-the-icons
                                '((concat (all-the-icons-faicon "power-off")
                                          " shutdown"))
                                '("shutdown"))
                          (list ,loginctl "poweroff"))
                         (cons
-                         ,@(if (get-value 'emacs-all-the-icons config)
+                         ,@(if emacs-all-the-icons
                                '((concat (all-the-icons-faicon "refresh")
                                          " reboot"))
                                '("reboot"))
                          (list ,loginctl "reboot"))))))))))
-        `(,@(if (get-value 'emacs-all-the-icons config)
+        `(,@(if emacs-all-the-icons
                 `((with-eval-after-load
                       'all-the-icons
                     ,@candidates-def))
@@ -1811,7 +1812,7 @@ supply custom menu items in the form of modules.")))
           (defun rde-power-menu ()
             "Prompt for an action on the power-menu, and make this action."
             (interactive)
-            ,@(if (get-value 'emacs-all-the-icons config)
+            ,@(if emacs-all-the-icons
                   '((require 'all-the-icons)) '())
             (let* ((selected
                     (completing-read
@@ -2203,7 +2204,7 @@ Annotations for completion candidates using marginalia."
       `((eval-when-compile
          (require 'vertico)
          (require 'vertico-multiform))
-        ,@(if (and (get-value 'emacs-consult config) completion-in-region?)
+        ,@(if (and (get-value 'emacs-consult config #f) completion-in-region?)
               '((with-eval-after-load
                  'minibuffer
                  (setq completion-in-region-function
@@ -2273,7 +2274,7 @@ kill a few words or directories."
                (vertico-directory-delete-word count)))
          (define-key vertico-map (kbd "C-w") 'rde-vertico-kill-region-dwim)
 
-         ,@(if (get-value 'emacs-header-line-as-mode-line? config)
+         ,@(if (get-value 'emacs-header-line-as-mode-line? config #f)
                `((defun rde--vertico-prepare-header-line ()
                    "The same as `rde--move-mode-line-to-header', but also increase
 vertico-count by 1 to show one more candidate, which is hidden
@@ -2407,7 +2408,7 @@ buffer should be displayed in other window use least recent one."
              (mct--live-completions)))
 
          ;; (add-hook 'minibuffer-setup-hook 'rde-mct-show-completions)
-         ,@(if (get-value 'emacs-consult config)
+         ,@(if (get-value 'emacs-consult config #f)
                `((autoload 'consult-preview-at-point-mode "consult")
                  (setq rde-completion-categories-other-window
                        (append
@@ -2798,7 +2799,7 @@ on the current project."
         (with-eval-after-load 'project
           (require 'xdg)
           (setq project-switch-use-entire-map t)
-          ,@(if (get-value 'emacs-consult config)
+          ,@(if (get-value 'emacs-consult config #f)
                 '((eval-when-compile
                    (require 'consult))
                   (with-eval-after-load 'consult
@@ -2869,7 +2870,7 @@ emacsclient feels more like a separate emacs instance."
          (setq persp-show-modestring ,(if persp-show-modestring? 't 'nil))
          (setq persp-modestring-dividers '(" [" "]" "|")))
 
-        ,@(if (get-value 'emacs-project config)
+        ,@(if (get-value 'emacs-project config #f)
               `((defun rde-persp-switch-project (dir)
                    "Switch to a project in its own perspective."
                    (interactive (list (project-prompt-project-dir)))
@@ -3217,7 +3218,7 @@ language for GNU Emacs."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(,@(if (get-value 'emacs-flymake config)
+      `(,@(if (get-value 'emacs-flymake config #f)
               '((add-hook 'emacs-lisp-mode-hook 'flymake-mode))
               '())
         (with-eval-after-load 'elisp-mode
@@ -3226,7 +3227,7 @@ language for GNU Emacs."
             (define-key map (kbd "M-:") 'pp-eval-expression)
             (define-key map (kbd "C-c C-m") 'pp-macroexpand-last-sexp)
             (define-key map (kbd "C-c C-b") 'eval-buffer)
-            ,@(if (get-value 'emacs-embark config)
+            ,@(if (get-value 'emacs-embark config #f)
                   '((autoload 'embark-pp-eval-defun "embark")
                     (define-key map (kbd "C-c C-c") 'embark-pp-eval-defun))
                   '())))
@@ -3235,7 +3236,7 @@ language for GNU Emacs."
         (with-eval-after-load 'ielm
           (setq ielm-header "")
           (setq ielm-noisy nil))
-        ,@(if (get-value 'emacs-org config)
+        ,@(if (get-value 'emacs-org config #f)
               '((with-eval-after-load 'org
                   (add-to-list 'org-structure-template-alist
                                '("el" . "src elisp")))
@@ -3422,8 +3423,7 @@ Almost all other operations are covered by magit."
           (setq geiser-repl-query-on-kill-p nil)
           (setq geiser-repl-history-filename
                 (expand-file-name "emacs/geiser_history"
-                                  (xdg-cache-home)
-))
+                                  (xdg-cache-home)))
           (setq geiser-repl-add-project-paths nil))
         (with-eval-after-load 'geiser-mode
           (geiser-eros-mode)
@@ -3433,7 +3433,7 @@ Almost all other operations are covered by magit."
           (setq geiser-active-implementations '(guile))
           (setq geiser-implementations-alist '(((regexp "\\.scm$") guile))))
 
-        ,@(if (get-value 'emacs-org config)
+        ,@(if (get-value 'emacs-org config #f)
               '((with-eval-after-load 'org
                   (add-to-list 'org-structure-template-alist
                                '("sc" . "src scheme")))
@@ -3537,7 +3537,7 @@ and references in your programs."
           (setq xref-prompt-for-identifier
                 '(not xref-find-definitions-other-window
                       xref-find-definitions-other-frame))
-          ,@(if (get-value 'emacs-consult config)
+          ,@(if (get-value 'emacs-consult config #f)
                 '((setq xref-show-xrefs-function 'consult-xref)
                   (setq xref-show-definitions-function 'consult-xref))
                 '()))))))
@@ -3614,7 +3614,7 @@ and references in your programs."
             (with-current-buffer buffer
               (rde-pdf-tools-mode 1))))
 
-        ,@(if (get-value 'emacs-modus-themes config)
+        ,@(if (get-value 'emacs-modus-themes config #f)
               '((defgroup rde-pdf-tools nil
                   "Custom tweaks for PDF Tools."
                   :group 'rde)
@@ -3629,7 +3629,7 @@ and references in your programs."
                 (add-hook 'pdf-view-mode-hook 'rde-pdf-tools-mode))
             '())
 
-        ,@(if (get-value 'emacs-circadian config)
+        ,@(if (get-value 'emacs-circadian config #f)
               '((add-hook 'circadian-after-load-theme-hook
                           'rde-pdf-tools-update-buffers))
             '())
@@ -3753,45 +3753,44 @@ application/epub+zip mime-type will be openned with emacs client."
 
   (define (get-home-services config)
     (list
-     (when (get-value 'emacs config)
-       (rde-elisp-configuration-service
-        emacs-f-name
-        config
-        `((with-eval-after-load
-           'rde-keymaps
-           (define-key rde-app-map (kbd "e") 'elfeed))
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load
+            'rde-keymaps
+          (define-key rde-app-map (kbd "e") 'elfeed))
 
-          (with-eval-after-load
-           'elfeed-org
-           (setq rmh-elfeed-org-files ',elfeed-org-files))
+        (with-eval-after-load
+            'elfeed-org
+          (setq rmh-elfeed-org-files ',elfeed-org-files))
 
-          (with-eval-after-load
-           'org-capture
-           (add-to-list
-            'org-capture-templates
-            '(,capture-key "Elfeed" entry
-              (file+headline ,(car elfeed-org-files)
-                             "Untagged")
-              "*** %:annotation\n"
-              :immediate-finish t)))
+        (with-eval-after-load
+            'org-capture
+          (add-to-list
+           'org-capture-templates
+           '(,capture-key "Elfeed" entry
+                          (file+headline ,(car elfeed-org-files)
+                                         "Untagged")
+                          "*** %:annotation\n"
+                          :immediate-finish t)))
 
-          (with-eval-after-load
-           'elfeed
-           (setq elfeed-db-directory
-                 (expand-file-name "elfeed" (getenv "XDG_STATE_HOME")))
-           (elfeed-org)))
-        #:summary "\
+        (with-eval-after-load
+            'elfeed
+          (setq elfeed-db-directory
+                (expand-file-name "elfeed" (getenv "XDG_STATE_HOME")))
+          (elfeed-org)))
+      #:summary "\
 Elfeed Emacs interface"
-        #:commentary "\
+      #:commentary "\
 Keybinding in `rde-app-map', xdg entry for adding rss feed.
 Configured with an elfeed-org storage for easier tagging.
 capture-in-browser? needs to set
 \"javascript:location.href='org-protocol://capture?%27 +new
 URLSearchParams({template: %27r%27, url: window.location.href,title:
 document.title, body: window.getSelection()});\" as a web bookmark."
-        #:keywords '(convenience)
-        #:elisp-packages
-        (list emacs-elfeed emacs-elfeed-org)))))
+      #:keywords '(convenience)
+      #:elisp-packages
+      (list emacs-elfeed emacs-elfeed-org))))
 
   (feature
    (name f-name)
@@ -3822,7 +3821,7 @@ built-in help that provides much more contextual information."
           (define-key map (vector 'Info-goto-emacs-command-node)
             'helpful-function))
         (define-key help-map "o" 'helpful-at-point)
-        ,@(if (get-value 'emacs-embark config)
+        ,@(if (get-value 'emacs-embark config #f)
               '((with-eval-after-load 'embark
                   (define-key embark-symbol-map (vector 'remap 'describe-symbol)
                     'helpful-symbol)
@@ -3932,7 +3931,7 @@ built-in help that provides much more contextual information."
           (org-tag-alist #f)
           (org-rename-buffer-to-title? #t)
           (org-indent? #t)
-          (org-modern? #t)
+          (org-modern? #f)
           (auto-update-toc? #f))
   "Configure org-mode for GNU Emacs."
   (ensure-pred path? org-directory)
@@ -3955,7 +3954,7 @@ built-in help that provides much more contextual information."
 
   (define (get-home-services config)
     (list
-     (when (get-value 'emacs-tempel config)
+     (when (get-value 'emacs-tempel config #f)
        (simple-service
         'emacs-org-templates
         home-emacs-tempel-service-type
@@ -3985,7 +3984,7 @@ built-in help that provides much more contextual information."
           (require 'ox-html-stable-ids)
           (org-html-stable-ids-add))
         (define-key mode-specific-map (kbd "c") 'org-capture)
-        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config #f)
               '((autoload 'org-buffer-list "org")
                 (defvar rde-org-buffer-source
                   `(:name "Org"
@@ -4129,7 +4128,7 @@ Start an unlimited search at `point-min' otherwise."
            (define-key map (kbd "p") 'org-timer-pause-or-continue)
            (define-key map (kbd "t") 'org-timer-set-timer))
          (with-eval-after-load 'org-timer
-           ,@(if (get-value 'emacs-all-the-icons config)
+           ,@(if (get-value 'emacs-all-the-icons config #f)
                  '((eval-when-compile
                     (require 'all-the-icons))
                    (with-eval-after-load 'all-the-icons
@@ -4156,7 +4155,7 @@ Indentation and refile configurations, visual adjustment."
              emacs-ox-html-stable-ids
              (get-value 'emacs-olivetti config emacs-olivetti)
              emacs-org-appear emacs-org-modern)
-       (or (and=> (get-value 'emacs-all-the-icons config) list) '())
+       (or (and=> (get-value 'emacs-all-the-icons config #f) list) '())
        (if auto-update-toc? (list emacs-org-make-toc) '())))))
 
   (feature
@@ -4284,7 +4283,7 @@ Indentation and refile configurations, visual adjustment."
 
   (define (get-home-services config)
     (require-value 'emacs-org config)
-    (when (and (get-value 'org-roam-todo? config) org-agenda-files)
+    (when (and (get-value 'org-roam-todo? config #f) org-agenda-files)
       (raise
        (formatted-message
         (G_ "You cannot set org-agenda-files if org-roam-todo? is true"))))
@@ -4382,7 +4381,7 @@ result is longer than LEN."
                         (org-agenda-priority 'set)))))
           (setq org-agenda-prefix-format
                 ,(cond
-                  ((get-value 'org-roam-todo? config)
+                  ((get-value 'org-roam-todo? config #f)
                    ''((agenda . " %i %(rde-org-agenda-category 12)%?-12t% s")
                       (todo . " %i %(rde-org-agenda-category 12) ")
                       (tags . " %i %(rde-org-agenda-category 12) ")
@@ -4422,7 +4421,7 @@ olivetti package."
           (org-element-parse-buffer 'headline)
           'headline
         (lambda (h)
-          ,@(if (get-value 'emacs-org-recur config)
+          ,@(if (get-value 'emacs-org-recur config #f)
                 '((eval-when-compile
                    (require 'org-recur))
                   (or (eq (org-element-property :todo-type h) 'todo)
@@ -4510,7 +4509,7 @@ has .gpg at the end of filename, however its value can be overriden."
 
   (define (get-home-services config)
     (if encrypted? (require-value 'rde-emacs-gnupg config))
-    (define org-roam? (get-value 'emacs-org-roam config))
+    (define org-roam? (get-value 'emacs-org-roam config #f))
 
     (list
      (rde-elisp-configuration-service
@@ -4593,7 +4592,7 @@ package is unconfigured but it plays along with emacs-org-agenda-files-track."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(,@(if (get-value 'emacs-org-ql config)
+      `(,@(if (get-value 'emacs-org-ql config #f)
               '((require 'org-agenda-files-track-ql)
                 (setq org-agenda-include-diary nil))
               '((require 'org-agenda-files-track))))
@@ -4603,7 +4602,7 @@ Org dynamic agenda"
 This hook records files that should be saved as agenda-files, making the refreshing
 and loading of org-agenda faster (and even faster with org-ql cache)."
       #:keywords '(convenience)
-      #:elisp-packages (list (if (get-value 'emacs-org-ql config)
+      #:elisp-packages (list (if (get-value 'emacs-org-ql config #f)
                                  emacs-org-agenda-files-track-ql
                                  emacs-org-agenda-files-track)))))
 
@@ -4716,12 +4715,12 @@ the node, relative to `org-roam-directory'."
         ,@(if org-roam-todo?
               (org-roam-todo config)
               '())
-          ,@(if (get-value 'emacs-embark config)
+          ,@(if (get-value 'emacs-embark config #f)
                  `((with-eval-after-load 'embark
                      (defvar-keymap embark-roam-ref-map
                        :doc "Keymap for actions on org-roam refs."
                        :parent embark-url-map
-                       ,@(if (get-value 'mpv config)
+                       ,@(if (get-value 'mpv config #f)
                              '("v" 'rde-mpv-play-url)
                              '())
                        "RET" 'browse-url-generic
@@ -4729,7 +4728,7 @@ the node, relative to `org-roam-directory'."
                        "r" 'org-roam-ref-remove)
                      (add-to-list 'embark-keymap-alist
                                   '(org-roam-ref . embark-roam-ref-map))
-                     ,@(if (get-value 'emacs-browse-url config)
+                     ,@(if (get-value 'emacs-browse-url config #f)
                            '((advice-add 'org-roam-ref-add
                                          :around 'rde-browse-url-trace-url))
                            '())))
@@ -4750,9 +4749,9 @@ marginalia annotations."
       #:keywords '(convenience org-mode roam knowledgebase)
       #:elisp-packages (append
                         (list emacs-org-roam)
-                        (or (and=> (get-value 'emacs-embark config) list)
+                        (or (and=> (get-value 'emacs-embark config #f) list)
                             '())
-                        (or (and=> (get-value 'emacs-org-recur config)
+                        (or (and=> (get-value 'emacs-org-recur config #f)
                                    list)
                             '())))))
 
@@ -4787,7 +4786,7 @@ citation management for GNU Emacs."
   (define f-name (symbol-append 'emacs- emacs-f-name))
 
   (define (get-home-services config)
-    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config))
+    (define emacs-all-the-icons (get-value 'emacs-all-the-icons config #f))
 
     (list
      (rde-elisp-configuration-service
@@ -4846,12 +4845,12 @@ citation management for GNU Emacs."
           (setq citar-bibliography org-cite-global-bibliography))
 
         (autoload 'citar-embark-mode "citar-embark")
-        ,@(if (get-value 'emacs-embark config)
+        ,@(if (get-value 'emacs-embark config #f)
               `((with-eval-after-load 'citar (citar-embark-mode 1)))
               '())
 
         (autoload 'citar-org-roam-mode "citar-org-roam")
-        ,@(if (get-value 'emacs-org-roam config)
+        ,@(if (get-value 'emacs-org-roam config #f)
               `((with-eval-after-load 'citar
                   (setq citar-org-roam-note-title-template
                         "${title} - ${author editor}")
@@ -4878,7 +4877,8 @@ citar-org-roam-subdir if org-roam is enabled."
       '(convenience org-mode org-cite citar references roam knowledgebase)
       #:elisp-packages
       (append
-       (if (get-value 'emacs-org-roam config) (list emacs-citar-org-roam) '())
+       (if (get-value 'emacs-org-roam config #f)
+           (list emacs-citar-org-roam) '())
        (or (and=> emacs-all-the-icons list) '())
        (list emacs-citar emacs-zotra)))))
 
@@ -5068,7 +5068,7 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
         (add-hook 'org-babel-after-execute-hook
                   'rde-graphviz-fix-inline-images)
         (require 'graphviz-dot-mode)
-        ,@(if (get-value 'emacs-org config)
+        ,@(if (get-value 'emacs-org config #f)
               '((with-eval-after-load 'ob-core
                   (require 'ob-dot))
                 (with-eval-after-load 'ob-dot
@@ -5243,7 +5243,7 @@ stored in directory understood by project.el."
                '((add-hook 'telega-load-hook 'telega-notifications-mode))
                '())
 
-        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config #f)
               '((defvar rde-telega-buffer-source
                         `(:name "Telega"
                           :narrow ?t
@@ -5275,12 +5275,12 @@ stored in directory understood by project.el."
          (setq telega-chat-fill-column 70)
          (define-key telega-chat-mode-map (kbd "s-B") 'telega-chat-with)
          (define-key telega-root-mode-map (kbd "s-B") 'telega-chat-with)
-         ,@(if (get-value 'mpv config)
+         ,@(if (get-value 'mpv config #f)
                `((setq telega-video-player-command
                        ,(file-append (get-value 'mpv config) "/bin/mpv")))
                '())
 
-         ,@(if (get-value 'emacs-embark config)
+         ,@(if (get-value 'emacs-embark config #f)
                '((setq telega-open-file-function 'embark-open-externally))
                '())
          (setq telega-open-message-as-file
@@ -5358,24 +5358,24 @@ with a floating-point value between 0 and 1."
         (with-eval-after-load 'ebdb
           (require 'ebdb-i18n)
           (require 'ebdb-vcard)
-          ,@(if (get-value 'emacs-org config)
+          ,@(if (get-value 'emacs-org config #f)
                 '((require 'ebdb-org))
                 '())
-          ,@(if (get-value 'mail-accounts config)
+          ,@(if (get-value 'mail-accounts config #f)
                 '((require 'ebdb-mua)
                   (with-eval-after-load 'ebdb-mua
                     (setq ebdb-mua-pop-up nil)))
                 '())
-          ,@(if (get-value 'notmuch config)
+          ,@(if (get-value 'notmuch config #f)
                 `((require 'ebdb-notmuch))
                 '())
-          ,@(if (get-value 'emacs-message config)
+          ,@(if (get-value 'emacs-message config #f)
                 `((require 'ebdb-message))
                 '())
-          ,@(if (get-value 'emacs-spelling config)
+          ,@(if (get-value 'emacs-spelling config #f)
                 `((require 'ebdb-ispell))
                 '())
-          ,@(if (get-value 'emacs-gnus config)
+          ,@(if (get-value 'emacs-gnus config #f)
                 '((require 'ebdb-gnus))
                 '())
           (setq ebdb-sources (list ,@ebdb-sources))
@@ -5547,10 +5547,10 @@ You can truncate paths whose character length is greater than PATH-MAX-LENGTH."
           (setq dashboard-banner-logo-title "")
           (setq dashboard-image-banner-max-height ,banner-max-height)
           (setq dashboard-image-banner-max-width ,banner-max-width)
-          ,@(if (get-value 'emacs-advanced-user? config)
+          ,@(if (get-value 'emacs-advanced-user? config #f)
                 '((setq dashboard-show-shortcuts nil))
                 '())
-          ,@(if (and (get-value 'emacs-org-agenda config)
+          ,@(if (and (get-value 'emacs-org-agenda config #f)
                      dashboard-agenda-weekly?)
                 '((setq dashboard-week-agenda t))
                 '((setq dashboard-week-agenda nil)))
@@ -5705,7 +5705,7 @@ retrieve information about tracks via EMMS-INFO-METHOD."
                    'rde-emms-download-track)))
              '())
 
-         ,@(if (get-value 'emacs-dired config)
+         ,@(if (get-value 'emacs-dired config #f)
                '((with-eval-after-load 'dired
                    (define-key dired-mode-map "e" 'emms-play-dired)))
                '())
@@ -5735,7 +5735,7 @@ retrieve information about tracks via EMMS-INFO-METHOD."
            (require ',emms-info-method)
            (emms-all)
 
-           ,@(if (get-value 'mpv config)
+           ,@(if (get-value 'mpv config #f)
                  '((defun rde-emms-mpv-kill ()
                      "Kill mpv process unless it's `emms-player-mpv-proc'."
                      (interactive)
@@ -5885,35 +5885,34 @@ System."))))
   (define (get-home-services config)
     "Return home services related to emacs-nyxt."
     (define startup-flags (get-value 'nyxt-startup-flags config))
-
-    (if (get-value 'nyxt config)
-        (list
-         (rde-elisp-configuration-service
-          emacs-f-name
-          config
-          `((with-eval-after-load 'rde-keymaps
-              (define-key rde-app-map (kbd ,nyxt-key) 'nyxt-map))
-            ,@(if (get-value 'emacs-modus-themes config)
-                  `((defun rde-nyxt-load-theme (&optional theme)
-                      "Load Nyxt theme according to current theme or THEME."
-                      (interactive)
-                      (require 'nyxt)
-                      (when nyxt-process
-                        (if (or (and theme (rde-modus-themes--dark-theme-p theme))
-                                (rde-modus-themes--dark-theme-p))
-                            (nyxt-load-theme ',(get-value 'emacs-dark-theme config))
-                          (nyxt-load-theme ',(get-value 'emacs-light-theme config)))))
-                    (add-hook 'rde-modus-themes-after-enable-theme-hook
-                              'rde-nyxt-load-theme))
-                '())
-            (with-eval-after-load 'nyxt
-              ,@(if (null? startup-flags)
-                    '()
-                    `((setq nyxt-startup-flags ',startup-flags)))
-              (setq nyxt-path ,(file-append (get-value 'nyxt config) "/bin/nyxt"))
-              (setq nyxt-autostart-delay ,autostart-delay)))
-          #:elisp-packages (list emacs-nyxt)))
-        '()))
+    (require-value 'nyxt config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'rde-keymaps
+          (define-key rde-app-map (kbd ,nyxt-key) 'nyxt-map))
+        ,@(if (get-value 'emacs-modus-themes config #f)
+              `((defun rde-nyxt-load-theme (&optional theme)
+                  "Load Nyxt theme according to current theme or THEME."
+                  (interactive)
+                  (require 'nyxt)
+                  (when nyxt-process
+                    (if (or (and theme (rde-modus-themes--dark-theme-p theme))
+                            (rde-modus-themes--dark-theme-p))
+                        (nyxt-load-theme ',(get-value 'emacs-dark-theme config))
+                        (nyxt-load-theme ',(get-value 'emacs-light-theme config)))))
+                (add-hook 'rde-modus-themes-after-enable-theme-hook
+                          'rde-nyxt-load-theme))
+              '())
+        (with-eval-after-load 'nyxt
+          ,@(if (null? startup-flags)
+                '()
+                `((setq nyxt-startup-flags ',startup-flags)))
+          (setq nyxt-path ,(file-append (get-value 'nyxt config) "/bin/nyxt"))
+          (setq nyxt-autostart-delay ,autostart-delay)))
+      #:elisp-packages (list emacs-nyxt)))
+    '())
 
   (feature
    (name f-name)
@@ -5943,7 +5942,7 @@ System."))))
                   (@ (gnu packages pulseaudio) pulseaudio))
        "/bin/pactl"))
 
-    (let ((emacs-all-the-icons (get-value 'emacs-all-the-icons config)))
+    (let ((emacs-all-the-icons (get-value 'emacs-all-the-icons config #f)))
       (list
        (rde-elisp-configuration-service
         emacs-f-name

@@ -78,7 +78,7 @@
                              "zsh-autosuggestions"
                              "zsh-autosuggestions"))))))
 
-     (when (get-value 'wayland config)
+     (when (get-value 'wayland config #f)
        (let* ((wl-clipboard (get-value
                              'wl-clipboard config
                              (@ (gnu packages xdisorg) wl-clipboard)))

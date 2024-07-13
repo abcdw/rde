@@ -1,7 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2022 Miguel Ángel Moreno <me@mianmoreno.com>
-;;; Copyright © 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -128,7 +128,7 @@ is a list of message types to ignore."
           :type '(repeat rde-erc-user)
           :group 'rde-erc)
 
-        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config #f)
               '((autoload 'erc-buffer-list "erc")
                 (defvar rde-erc-buffer-source
                   `(:name "ERC"
@@ -305,7 +305,7 @@ is a list of message types to ignore."
           (add-to-list 'erc-modules 'services)
           (with-eval-after-load 'erc-services
             (setq erc-prompt-for-nickserv-password nil))
-          ,@(if (get-value 'emacs-spelling config)
+          ,@(if (get-value 'emacs-spelling config #f)
                 '((add-to-list 'erc-modules 'spelling))
                 '())
           ,@(if erc-log?

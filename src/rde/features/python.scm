@@ -93,7 +93,7 @@ python files."
       home-environment-variables-service-type
       `(("IPYTHONDIR" . "$XDG_CONFIG_HOME/ipython")
         ("PYTHONSTARTUP" . ,python-startup-file)))
-     (when (get-value 'emacs config)
+     (when (get-value 'emacs config #f)
        (rde-elisp-configuration-service
         f-name
         config
@@ -103,7 +103,7 @@ python files."
                             'python-black-on-save-mode-enable-dwim))
                 '())
 
-          ,@(if (get-value 'emacs-org config)
+          ,@(if (get-value 'emacs-org config #f)
                 `((with-eval-after-load 'org
                     (add-to-list 'org-structure-template-alist
                                  '("py" . "src python")))

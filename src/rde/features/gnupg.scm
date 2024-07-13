@@ -70,7 +70,7 @@ and provides GPG-PRIMARY-KEY value for other features."
        (summary "File Encryption, EasyPG and GnuPG")
        (commentary "Encryption related configurations and settings.")))
      ;; TODO: Move to sway feature
-     (when (get-value 'sway config)
+     (when (get-value 'sway config #f)
        (simple-service
         'gnupg-updatestartuptty-on-sway-launch
         home-sway-service-type

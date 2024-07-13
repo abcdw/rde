@@ -125,14 +125,14 @@ exec ~a ~a $@"
                (x-scheme-handler/about . chromium.desktop)
                (text/html . chromium.desktop))))))
          '())
-     (if (get-value 'emacs config)
+     (if (get-value 'emacs config #f)
          (list
           (rde-elisp-configuration-service
            f-name
            config
            `((with-eval-after-load 'browse-url
                (setq browse-url-chromium-arguments ',desktop-startup-flags))
-             ,@(if (get-value 'emacs-embark config)
+             ,@(if (get-value 'emacs-embark config #f)
                    `((with-eval-after-load 'embark
                        (define-key embark-url-map "c" 'browse-url-chromium)))
                    '()))))
@@ -303,7 +303,6 @@ functionalities."
 
   (define (get-home-services config)
     "Return home services related to Nyxt."
-    (require-value 'keyboard-layout config)
     (define keyboard-variant
       (keyboard-layout-variant (get-value 'keyboard-layout config)))
 

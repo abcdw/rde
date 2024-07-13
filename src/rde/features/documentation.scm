@@ -45,7 +45,7 @@
        'add-pager
        home-environment-variables-service-type
        `(("PAGER" . ,pager))))
-     (if (get-value 'emacs config)
+     (if (get-value 'emacs config #f)
          `(,(rde-elisp-configuration-service
              f-name
              config
@@ -53,7 +53,7 @@
                  (let ((map rde-app-map))
                    (define-key map (kbd ,woman-key) 'woman)
                    (define-key map (kbd ,man-key)
-                     ',(if (get-value 'emacs-consult config)
+                     ',(if (get-value 'emacs-consult config #f)
                            'consult-man
                            'man))))
                (add-hook 'woman-mode-hook 'toggle-truncate-lines))))

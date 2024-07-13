@@ -232,7 +232,7 @@ function, which accepts config with rde values and returns a string."
          (require 'message)
          (require 'sendmail))
 
-        ,@(if (get-value 'emacs-gnus config)
+        ,@(if (get-value 'emacs-gnus config #f)
               '((defun rde-message-add-gcc-header ()
                   "Prompt for a Gcc header from `rde-gnus-topic-alist'.
 This will allow a message to be stored in the right directory
@@ -434,7 +434,7 @@ Example:
               (mail-account-get-addresses acc)))
            mail-accs)))))
 
-     (when (get-value 'git-send-email? config)
+     (when (get-value 'git-send-email? config #f)
        (simple-service
         'msmtp-set-git-send-email-cmd
         home-git-service-type
@@ -635,13 +635,13 @@ topics with your preferred hierarchy."
         (with-eval-after-load 'rde-keymaps
           (define-key rde-app-map (kbd ,gnus-key) 'gnus))
         (setq mail-user-agent 'gnus-user-agent)
-        ,@(if (get-value 'emacs-dired config)
+        ,@(if (get-value 'emacs-dired config #f)
               '((add-hook 'dired-mode-hook 'turn-on-gnus-dired-mode))
               '())
         (with-eval-after-load 'gnus
           (setq gnus-use-full-window nil)
           (setq gnus-use-cache t)
-          ,@(if (get-value 'emacs-advanced-user? config)
+          ,@(if (get-value 'emacs-advanced-user? config #f)
                 `((setq gnus-novice-user nil))
               '())
           (setq gnus-interactive-exit nil)
@@ -675,7 +675,7 @@ topics with your preferred hierarchy."
                                       (symbol->string
                                        (mail-account-id mail-acc))
                                       ":sent"))
-                             ,@(if (get-value 'msmtp config)
+                             ,@(if (get-value 'msmtp config #f)
                                    '()
                                    `(("X-Message-SMTP-Method"
                                       ,(format
@@ -697,7 +697,7 @@ topics with your preferred hierarchy."
                   ,@posting-styles))
           (setq gnus-select-method '(nnnil))
           (setq gnus-secondary-select-methods
-                '(,@(if (get-value 'isync config)
+                '(,@(if (get-value 'isync config #f)
                         (map (lambda (mail-acc)
                                (let ((id (symbol->string
                                           (mail-account-id mail-acc))))
@@ -971,7 +971,7 @@ control whether to NOTIFY? when new emails arrive."
                   (boxes
                    .
                    #(((mailbox . "Inbox")
-                      ,@(if (get-value 'isync config)
+                      ,@(if (get-value 'isync config #f)
                             (list
                              (cons
                               'onNewMail
@@ -1544,7 +1544,7 @@ not appear in the pop-up buffer."
       (get-notmuch-configuration
        config
        #:extra-tag-updates-post extra-tag-updates-post))
-     (when (get-value 'emacs config)
+     (when (get-value 'emacs config #f)
        (rde-elisp-configuration-service
         f-name
         config
@@ -1569,7 +1569,7 @@ not appear in the pop-up buffer."
           (with-eval-after-load 'rde-keymaps
             (define-key rde-app-map (kbd "n") 'notmuch))
 
-          ,@(if (get-value 'emacs-consult config)
+          ,@(if (get-value 'emacs-consult config #f)
                 '((define-key global-map (kbd "M-s n") 'consult-notmuch-tree))
                 '())
 
@@ -1745,7 +1745,7 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
         (append
          (list (get-value 'emacs-cape config emacs-cape)
                emacs-notmuch emacs-ol-notmuch)
-         (if (get-value 'emacs-consult config)
+         (if (get-value 'emacs-consult config #f)
              (list emacs-consult-notmuch)
              '()))))))
 

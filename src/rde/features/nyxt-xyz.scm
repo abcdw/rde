@@ -378,8 +378,6 @@ and returns Lisp configuration containing the engines."
 
   (define (get-home-services config)
     "Return home services related to nx-tailor."
-    (require-value 'nyxt-light-theme config)
-    (require-value 'nyxt-dark-theme config)
     (define light-theme ((get-value 'nyxt-light-theme config) config))
     (define dark-theme ((get-value 'nyxt-dark-theme config) config))
 

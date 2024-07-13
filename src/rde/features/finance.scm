@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -44,7 +44,6 @@
 
   (define (get-home-services config)
     (define emacs-f-name 'ledger)
-    (define emacs-cmd (get-value 'emacs-client-create-frame config))
 
     (list
      (simple-service
@@ -53,7 +52,7 @@
       (list ledger)) ;; Needed for info pages
 
      ;; TODO: Build emacs-ledger with ledger specified in feature argument.
-     (when (get-value 'emacs config)
+     (when (get-value 'emacs config #f)
        (rde-elisp-configuration-service
         emacs-f-name
         config

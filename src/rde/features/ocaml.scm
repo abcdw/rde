@@ -68,7 +68,7 @@
       #~(format #f "command -v opam > /dev/null && eval \"$(~a env)\""
                 #$(file-append opam "/bin/opam")))
     (append
-     (if (and opam? (get-value 'zsh config))
+     (if (and opam? (get-value 'zsh config #f))
          (list
           (simple-service
            'set-opam-env-zsh
@@ -77,7 +77,7 @@
             (zshrc
              (list init-opam-command)))))
          '())
-     (if (and opam? (get-value 'bash config))
+     (if (and opam? (get-value 'bash config #f))
          (list
           (simple-service
            'set-opam-env-bash
@@ -112,7 +112,7 @@
                (home-ocaml-configuration
                 (ocaml ocaml)
                 (config extra-init-ml))))
-     (if (get-value 'emacs config)
+     (if (get-value 'emacs config #f)
          (list
           (rde-elisp-configuration-service
            f-name
@@ -176,7 +176,7 @@
                (setq merlin-report-warnings nil)
                (setq merlin-error-in-fringe nil)
                (setq merlin-error-check-then-move nil))
-             ,@(if (get-value 'emacs-org config)
+             ,@(if (get-value 'emacs-org config #f)
                    `((with-eval-after-load 'org
                        (add-to-list 'org-structure-template-alist
                                     '("ml" . "src ocaml")))

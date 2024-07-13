@@ -111,7 +111,7 @@ the RDE manual) correctly."
           "Map to bind `slack' commands under.")
         (define-prefix-command 'rde-slack-map)
 
-        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config #f)
               '((defvar rde-slack-buffer-source
                   `(:name "Slack"
                     :narrow ?s

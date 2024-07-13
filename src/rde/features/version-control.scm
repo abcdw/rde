@@ -40,10 +40,8 @@
 
   (define (git-home-services config)
     "Returns home services related to Git."
-    (require-value 'full-name config)
-    (require-value 'email config)
 
-    (let* ((gpg-primary-key (get-value 'gpg-primary-key config))
+    (let* ((gpg-primary-key (get-value 'gpg-primary-key config #f))
            (git-sign-key (or git-sign-key gpg-primary-key))
            (ssh-key? (and (string? git-sign-key) (ssh:ssh-key? git-sign-key)))
            (sign-key (if ssh-key?
@@ -71,7 +69,7 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
             "*.\\#*\\#"))
          (config
           `((core
-             (,@(if (get-value 'emacs-client config)
+             (,@(if (get-value 'emacs-client config #f)
                     `((editor . ,(file-append
                                   (get-value 'emacs-client config)
                                   " --reuse-frame")))

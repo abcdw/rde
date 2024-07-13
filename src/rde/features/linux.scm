@@ -54,7 +54,7 @@
       'backlight-add-packages
       home-profile-service-type
       (list brightnessctl))
-     (when (get-value 'sway config)
+     (when (get-value 'sway config #f)
        (simple-service
         'backlight-add-brightness-control-to-sway
         home-sway-service-type
@@ -176,7 +176,7 @@ ctl_type.pipewire {
                   (append (list "DISABLE_RTKIT=1")
                           (default-environment-variables)))))))
 
-     (when (get-value 'sway config)
+     (when (get-value 'sway config #f)
        (simple-service
         'pipewire-add-volume-and-player-bindings-to-sway
         home-sway-service-type

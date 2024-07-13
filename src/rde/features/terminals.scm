@@ -54,7 +54,7 @@
   ;; feature extendable.
   (define (alacritty-home-services config)
     "Returns home services related to Alacritty."
-    (define font-mono (get-value 'font-monospace config))
+    (define font-mono (get-value 'font-monospace config #f))
     (list
      (service
       home-alacritty-service-type
@@ -104,7 +104,7 @@
       'vterm
       config
       `((define-key global-map (kbd "s-t") 'vterm)
-        ,@(if (get-value 'emacs-consult config)
+        ,@(if (get-value 'emacs-consult config #f)
               `((eval-when-compile
                  (require 'cl-macs))
 
@@ -125,7 +125,7 @@
                  (advice-add 'consult-yank-pop :around
                              'vterm-consult-yank-pop-wrapper)))
               '())
-        ,@(if (get-value 'emacs-project config)
+        ,@(if (get-value 'emacs-project config #f)
               `((with-eval-after-load
                  'project
                  (defun project-vterm ()
@@ -150,11 +150,11 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
 `s-t' hotkey."
       #:keywords '(convenience)
       #:elisp-packages `(,emacs-vterm
-                         ,@(if (get-value 'emacs-consult config)
+                         ,@(if (get-value 'emacs-consult config #f)
                                (list (get-value 'emacs-consult config))
                                '())))
 
-     (when (get-value 'zsh config)
+     (when (get-value 'zsh config #f)
        (simple-service
         'emacs-vterm-zsh-configuration
         home-zsh-service-type
@@ -179,7 +179,7 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
   (ensure-pred file-like? foot)
 
   (define (get-home-services config)
-    (define font-mono (get-value 'font-monospace config))
+    (define font-mono (get-value 'font-monospace config #f))
     (list
      (simple-service
       'foot-package

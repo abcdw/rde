@@ -232,14 +232,13 @@ to each system-services-getter function."
   (fold-some-services features config feature-system-services-getter))
 
 
-(define* (get-value key config #:optional default-value
-                    #:key
-                    (required? #f))
-  "Get KEY from CONFIG.  If REQUIRED? is #t, call REQUIRE-VALUE to make sure
- that KEY is present in the CONFIG."
+(define* (get-value key config #:optional (default-value *unspecified*))
+  "Get @code{key} from @code{config.}  If @code{default-value} is not
+ specified,call @code{require-value} to make sure that @code{key} is present
+ in the @code{config}."
+  (when (unspecified? default-value)
+    (require-value key config))
   (let ((handle (hash-get-handle (rde-config-values config) key)))
-    (when required?
-      (require-value key config))
     (if handle
         (cdr handle)
         default-value)))
@@ -357,7 +356,7 @@ can be later used to extend original service with additional configuration."
                             'file-systems config
                             (operating-system-file-systems initial-os)))
 
-         (user-name        (get-value 'user-name config))
+         (user-name        (get-value 'user-name config #f))
          (full-name        (get-value 'full-name config ""))
          (user-groups      (get-value 'user-groups config '()))
          (home-directory   (get-value

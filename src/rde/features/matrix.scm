@@ -167,7 +167,7 @@ See @url{/man/pantalaimon.5,,Pantalaimon} for the list of available options."
           "Map to bind `ement' commands under.")
         (define-prefix-command 'rde-ement-map)
 
-        ,@(if (get-value 'emacs-consult-initial-narrowing? config)
+        ,@(if (get-value 'emacs-consult-initial-narrowing? config #f)
               '((defvar rde-ement-buffer-source
                   `(:name "Ement"
                           :narrow ?e
@@ -210,7 +210,7 @@ See @url{/man/pantalaimon.5,,Pantalaimon} for the list of available options."
             (ement-connect
              :user-id (rde-ement-user-id user)
              :password (auth-source-pick-first-password :host homeserver)
-             :uri-prefix ,(if (get-value 'pantalaimon config)
+             :uri-prefix ,(if (get-value 'pantalaimon config #f)
                               ((get-value 'get-pantalaimon-uri config) config)
                               homeserver))))
 

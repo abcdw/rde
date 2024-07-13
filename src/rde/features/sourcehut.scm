@@ -37,7 +37,7 @@
           (emacs-srht (@ (rde packages emacs-xyz) emacs-srht-latest))
           (user-name-fn (lambda (config)
                           "Get user-name RDE value."
-                          (get-value 'user-name config #:required? #t))))
+                          (get-value 'user-name config))))
   "Configure SourceHut related packages."
   (ensure-pred file-like? hut)
   (ensure-pred file-like? emacs-srht)

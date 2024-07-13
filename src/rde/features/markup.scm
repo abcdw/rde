@@ -111,7 +111,7 @@ tex-listings package that typesets source code."
        '(("TEX_MFHOME" . "$XDG_DATA_HOME/texmf")
          ("TEX_MFVAR" . "$XDG_CACHE_HOME/texlive/texmf-var")
          ("TEX_MFCONFIG" . "$XDG_CONFIG_HOME/texlive/texmf-config"))))
-     (if (get-value 'emacs config)
+     (if (get-value 'emacs config #f)
          (list
           (rde-elisp-configuration-service
            f-name

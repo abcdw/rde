@@ -170,7 +170,7 @@ See @code{sly-mrepl-default-prompt} for its arguments and return value."
                 `((setq sly-mrepl-prompt-formatter
                         ,(sly-custom-prompt config)))
                 '()))
-        ,@(if (get-value 'emacs-org config)
+        ,@(if (get-value 'emacs-org config #f)
               '((with-eval-after-load 'org
                   (require 'ob-lisp)
                   (add-to-list 'org-structure-template-alist '("li" . "src lisp")))

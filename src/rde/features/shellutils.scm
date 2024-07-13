@@ -139,7 +139,7 @@ use_guixs() {
     eval \"$(guix shell \"$@\" --search-paths)\"
   fi
 }"))))
-     (when (get-value 'zsh config)
+     (when (get-value 'zsh config #f)
        (simple-service
         'direnv-zsh-hook
         home-zsh-service-type
