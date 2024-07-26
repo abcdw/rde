@@ -220,7 +220,7 @@ function, which accepts config with rde values and returns a string."
     (require-value 'emacs-client-create-frame config)
     (require-value 'full-name config)
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
-    (define gpg-primary-key (get-value 'gpg-primary-key config))
+    (define gpg-primary-key (get-value 'gpg-primary-key config #f))
     (define msmtp (get-value 'msmtp config))
     (define full-name (get-value 'full-name config))
 
@@ -986,7 +986,7 @@ control whether to NOTIFY? when new emails arrive."
                             '())
                       ,@(if notify?
                             (cond
-                             ((get-value 'emacs-ednc config)
+                             ((get-value 'emacs-ednc config #f)
                               (list
                                (cons 'onNewMailPost
                                      #~(format
