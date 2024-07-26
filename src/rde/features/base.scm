@@ -193,12 +193,15 @@ be a symbol, which will be used to construct feature name."
           (default-authorized-guix-keys %rde-default-authorized-guix-keys)
           (guix-substitute-urls '())
           (guix-authorized-keys '())
+          (guix-daemon-extra-options
+           (list "--gc-keep-derivations=yes" "--gc-keep-outputs=yes"))
           (udev-rules '())
           (base-system-services %rde-base-system-services))
   "Provides base system services."
   (ensure-pred list-of-services? base-system-services)
   (ensure-pred list-of-strings? guix-substitute-urls)
   (ensure-pred list-of-file-likes? guix-authorized-keys)
+  (ensure-pred list-of-strings? guix-daemon-extra-options)
   (ensure-pred list-of-file-likes? udev-rules)
 
   (define (get-base-system-services cfg)
@@ -220,7 +223,8 @@ be a symbol, which will be used to construct feature name."
                            default-substitute-urls))
          (authorized-keys (append
                            guix-authorized-keys
-                           default-authorized-guix-keys))))
+                           default-authorized-guix-keys))
+         (extra-options guix-daemon-extra-options)))
        (greetd-service-type
         config =>
         (greetd-configuration
