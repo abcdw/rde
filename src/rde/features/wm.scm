@@ -1116,9 +1116,16 @@ for the main bar."
 (define* (feature-swaykbdd
           #:key
           (swaykbdd swaykbdd)
-          (tab-applications (list "librewolf-default")))
+          (tab-applications '()))
   "Sets per-application or per-tab layout.  List app_id in
-@code{tab-applications}, can be obtained with @code{swaymsg -t get_tree}."
+@code{tab-applications}, can be obtained with @code{swaymsg -t get_tree}.
+
+We don't set @code{tab-applications}, because it uses window title to
+determine the layout for a tab, which works horrible for sites with dynamic
+titles (for example translators or search engines, which change the title
+depending on the content you input) and for sites with the same title, but
+having different session.  So for consistent experience it's recommended not
+to use this functionality."
   (ensure-pred file-like? swaykbdd)
   (ensure-pred list-of-strings? tab-applications)
 
