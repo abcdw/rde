@@ -4163,15 +4163,36 @@ Indentation and refile configurations, visual adjustment."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define %rde-org-super-agenda-config
+  `((org-super-agenda-unmatched-name 'none)
+    (org-super-agenda-unmatched-order 5)
+    (org-super-agenda-header-separator "\n")
+    (org-super-agenda-groups
+     `((:name "Clocked today"
+        :log t
+        :order 100)
+       (:name none
+        :tag "proj"
+        :order 1)
+       (:name none
+        :tag "idea"
+        :order 2)
+       (:name none
+        :todo ,org-done-keywords-for-agenda
+        :order 10)))))
+
 (define %rde-org-agenda-custom-commands
-  ``((,(kbd "C-d") "Agenda for the day"
-      ((agenda
+  `(list
+    (list
+     (kbd "C-d") "Agenda for the day"
+     '((agenda
         ""
         ((org-agenda-span 1)
          (org-agenda-scheduled-leaders '("" "Sched.%2dx: "))
          (org-agenda-block-separator nil)
          (org-agenda-entry-types '(:scheduled :timestamp :sexp))
          (org-scheduled-past-days 0)
+         ,@%rde-org-super-agenda-config
          ;; We don't need the `org-agenda-date-today'
          ;; highlight because that only has a practical
          ;; utility in multi-day views.
@@ -4184,27 +4205,13 @@ Indentation and refile configurations, visual adjustment."
         "NEXT"
         ((org-agenda-block-separator nil)
          (org-agenda-overriding-header "\nCurrent Tasks\n")))))
-     (,(kbd "C-o") "Overview"
-      ;; TODO: Add A priority to the top.
-      ((agenda
+    (list
+     (kbd "C-o") "Overview"
+     ;; TODO: Add A priority to the top.
+     '((agenda
         "*"
         ((org-agenda-scheduled-leaders '("" "Sched. %2dx:"))
-         (org-super-agenda-unmatched-name 'none)
-         (org-super-agenda-unmatched-order 5)
-         (org-super-agenda-header-separator "\n")
-         (org-super-agenda-groups
-          `((:name "Clocked today"
-             :log t
-             :order 100)
-            (:name none
-             :tag "proj"
-             :order 1)
-            (:name none
-             :tag "idea"
-             :order 2)
-            (:name "Done"
-             :todo ,org-done-keywords-for-agenda
-             :order 10)))
+         ,@%rde-org-super-agenda-config
          (org-agenda-block-separator nil)
          (org-agenda-span 14)
          (org-agenda-show-future-repeats nil)
