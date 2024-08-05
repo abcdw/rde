@@ -2235,33 +2235,54 @@ Annotations for completion candidates using marginalia."
          (add-hook 'minibuffer-setup-hook 'vertico-repeat-save)
          (setq vertico-cycle t)
 
-         ;; TODO: [Andrew Tropin, 2023-12-28]: Re-implement vertico-monocle
-         ;; https://github.com/minad/vertico/issues/189#issuecomment-1870066271
+         (defvar rde--vertico-monocle-initial-configuration nil
+           "Vertico multiform initial configuration.")
 
-         ;; (defvar rde--vertico-monocle-previous-window-configuration nil
-         ;;   "Window configuration for restoring on vertico monocle exit.")
+         (defvar rde--vertico-monocle-full nil
+           "If vertico is fullframe or not.")
 
-         ;; (defun rde-vertico-toggle-monocle ()
-         ;;   "Zoom in/out completion list."
-         ;;   (interactive)
-         ;;   (require 'vertico-buffer)
-         ;;   (if (and rde--vertico-monocle-previous-window-configuration
-         ;;            vertico-buffer--window)
-         ;;       (if rde--vertico-monocle-previous-window-configuration
-         ;;           (let ((cur-buffer (current-buffer)))
-         ;;             (set-window-configuration
-         ;;              rde--vertico-monocle-previous-window-configuration)
-         ;;             (setq rde--vertico-monocle-previous-window-configuration nil)
-         ;;             (switch-to-buffer cur-buffer)))
-         ;;       (unless vertico-buffer--window
-         ;;         (vertico-buffer--setup))
-         ;;       (setq rde--vertico-monocle-previous-window-configuration
-         ;;             (current-window-configuration))
-         ;;       (with-selected-window vertico-buffer--window
-         ;;                             (delete-other-windows))))
+         (defun rde-vertico-toggle-monocle-full ()
+           (when (member '(vertico-buffer-mode)
+                         (cdr rde--vertico-monocle-initial-configuration))
+             ;; if vertico is already in buffer mode, just toggle it to display
+             ;; full-frame or in particular window
+             (vertico-multiform-buffer))
+           (vertico-multiform-buffer)
+           (setq-local header-line-format mode-line-format)
+           (setq-local mode-line-format nil))
 
-         ;; (keymap-set vertico-map "<remap> <rde-toggle-monocle>"
-         ;;             'rde-vertico-toggle-monocle))
+         (defun rde-vertico-toggle-monocle ()
+           (interactive)
+           (unless rde--vertico-monocle-initial-configuration
+             ;; We add 'initial-config to the beginning of the list to make
+             ;; sure this condition is not triggered, when
+             ;; vertico-multiform--stack is '(nil)
+
+             ;; We need to copy-list to prevent modification of the variable
+             ;; value, when vertico-multiform--stack is modified.
+             (setq-local rde--vertico-monocle-initial-configuration
+                         (cons 'initial-config
+                               (cl-copy-list vertico-multiform--stack))))
+
+           (if rde--vertico-monocle-full
+               (progn
+                (setq-local vertico-buffer-display-action
+                            '(display-buffer-reuse-window))
+                (rde-vertico-toggle-monocle-full)
+
+                (set-window-configuration
+                 rde--monocle-previous-window-configuration)
+                (setq-local rde--vertico-monocle-full nil)
+                (setq rde--monocle-previous-window-configuration nil))
+               (progn
+                (setq rde--monocle-previous-window-configuration
+                      (current-window-configuration))
+                (setq-local vertico-buffer-display-action '(display-buffer-full-frame))
+                (setq-local rde--vertico-monocle-full t)
+                (rde-vertico-toggle-monocle-full))))
+
+         (keymap-set vertico-map "<remap> <rde-toggle-monocle>"
+                     'rde-vertico-toggle-monocle)
 
          (require 'vertico-directory)
          (defun rde-vertico-kill-region-dwim (&optional count)
