@@ -4211,7 +4211,6 @@ Indentation and refile configurations, visual adjustment."
         ((org-agenda-span 1)
          (org-agenda-scheduled-leaders '("" "Sched.%2dx: "))
          (org-agenda-block-separator nil)
-         (org-agenda-entry-types '(:scheduled :timestamp :sexp))
          (org-scheduled-past-days 0)
          ,@%rde-org-super-agenda-config
          ;; We don't need the `org-agenda-date-today'
