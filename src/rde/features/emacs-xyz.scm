@@ -4253,6 +4253,7 @@ Indentation and refile configurations, visual adjustment."
         ""
         ((org-agenda-block-separator nil)
          (org-agenda-skip-function '(or (org-agenda-skip-if nil '(scheduled))))
+         ,@%rde-org-super-agenda-config
          (org-agenda-overriding-header "\nBacklog\n")))))))
 
 (define (org-agenda-appt _)
