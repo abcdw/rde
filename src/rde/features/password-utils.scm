@@ -27,6 +27,7 @@
   #:use-module (gnu home-services password-utils)
   #:use-module (gnu home-services state)
   #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages freedesktop)
   #:use-module (gnu packages password-utils)
   #:use-module (gnu services)
 
@@ -91,7 +92,8 @@
 
           (when (get-value 'emacs config #f)
             (let ((emacs-embark (get-value 'emacs-embark config))
-                  (emacs-consult (get-value 'emacs-consult config #f)))
+                  (emacs-consult (get-value 'emacs-consult config #f))
+                  (wtype (get-value 'wtype config wtype)))
               (rde-elisp-configuration-service
                emacs-f-name
                config
@@ -133,9 +135,26 @@
                            'rde-consult-pass))
                        '())
 
+                 (with-eval-after-load 'password-store
+                   (defun rde-password-store-autotype (entry)
+                     "\
+Find `username' and `secret' of particular pass entry and types it with a Tab
+in the middle and Return at the end."
+                     (let* ((wtype-bin ,(file-append wtype "/bin/wtype"))
+                            (entry-alist (password-store-parse-entry entry))
+                            (wtype-args
+                             (list
+                              wtype-bin
+                              "-s" "10"
+                              (alist-get "username" entry-alist nil nil 'equal)
+                              "-k" "Tab"
+                              (alist-get 'secret entry-alist nil nil 'equal)
+                              "-k" "Return")))
+
+                       (async-shell-command
+                        (mapconcat 'shell-quote-argument wtype-args " ")))))
                  ,@(if emacs-embark
-                       `((with-eval-after-load
-                             'password-store
+                       `((with-eval-after-load 'password-store
                            (defvar pass-embark-actions
                              (let ((map (make-sparse-keymap)))
                                (define-key map "f" 'password-store-copy-field)
@@ -145,6 +164,7 @@
                                (define-key map "r" 'password-store-rename)
                                (define-key map "d" 'password-store-remove)
                                (define-key map "i" 'password-store-insert)
+                               (define-key map "a" 'rde-password-store-autotype)
                                map)
                              "Keymap for actions for pass entries."))
 
