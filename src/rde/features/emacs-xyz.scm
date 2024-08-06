@@ -4193,10 +4193,10 @@ Indentation and refile configurations, visual adjustment."
         :log t
         :order 100)
        (:name none
-        :tag "proj"
+        :todo ("IDEA")
         :order 1)
        (:name none
-        :tag "idea"
+        :todo ("PROJ")
         :order 2)
        (:name none
         :todo ,org-done-keywords-for-agenda
