@@ -1172,7 +1172,7 @@ Small tweaks, xdg entry for openning directories in emacs client."
           #:key
           (emacs-eshell-syntax-highlighting
            emacs-eshell-syntax-highlighting)
-          (emacs-eshell-promt-extras emacs-eshell-prompt-extras))
+          (emacs-eshell-prompt-extras emacs-eshell-prompt-extras))
   "Configure Eshell, the Emacs shell."
   (ensure-pred file-like? emacs-eshell-syntax-highlighting)
   (ensure-pred file-like? emacs-eshell-prompt-extras)
