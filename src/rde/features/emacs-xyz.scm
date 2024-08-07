@@ -4032,6 +4032,12 @@ built-in help that provides much more contextual information."
            (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                    "/emacs/org-id-locations")))
 
+        (defun rde-org-find-subtask-location ()
+          "Find the location to store a subtask under the current heading."
+          (when (derived-mode-p 'org-agenda-mode)
+            (org-agenda-goto))
+          (org-back-to-heading t))
+
         (with-eval-after-load 'org
          (setq org-adapt-indentation nil)
          (setq org-edit-src-content-indentation 0)
