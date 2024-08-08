@@ -343,7 +343,9 @@ Citation line format, message signature, gpg and msmtp configurations. "
 ;;;
 
 (define %default-msmtp-provider-settings
-  `((gmail . ((host . "smtp.gmail.com")
+  `((dismail . ((host . "smtp.dismail.de")
+                (port . 587)))
+    (gmail . ((host . "smtp.gmail.com")
               (port . 587)))
     (gandi . ((host . "mail.gandi.net")
               (port . 587)))
@@ -359,7 +361,7 @@ Citation line format, message signature, gpg and msmtp configurations. "
     (hosteurope-de . ((host . "smtp.hosteurope.de")
                       (port . 587)))
     (posteo . ((host . "posteo.de")
-                       (port . 587)))
+               (port . 587)))
     (fastmail . ((host . "smtp.fastmail.com")
                  (port . 465)
                  (tls_starttls . off)))
@@ -1150,6 +1152,9 @@ control whether to NOTIFY? when new emails arrive."
                              #:subfolders 'Legacy
                              #:auth-mechs 'LOGIN))
 
+(define dismail-isync-settings
+  (generate-isync-serializer "imap.dismail.de" generic-folder-mapping))
+
 (define gmail-isync-settings
   (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
 
@@ -1197,7 +1202,8 @@ control whether to NOTIFY? when new emails arrive."
       ,#~"# Try to set another value for mail-account's type field.")))
 
 (define %default-isync-serializers
-  `((gmail . ,gmail-isync-settings)
+  `((dismail . ,dismail-isync-settings)
+    (gmail . ,gmail-isync-settings)
     (gandi . ,gandi-isync-settings)
     (gmx-fr . ,gmx-fr-isync-settings)
     (ovh . ,ovh-isync-settings)
