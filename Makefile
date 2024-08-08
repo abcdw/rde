@@ -5,7 +5,8 @@ QEMU_BASE_ARGS= \
 -vga none -device virtio-gpu-pci
 # -vga qxl
 
-all: doc/rde.info
+
+all: ares
 	@echo default target
 
 install:
@@ -18,9 +19,11 @@ check:
 guix:
 	make -C examples guix
 
-repl: guix
-	examples/target/profiles/guix/bin/guix repl -L ./src -L ./tests \
-	-L ./files/emacs/gider/src -L ./examples/src --listen=tcp:37146
+ares:
+	make -C examples ares
+
+repl: ares-rs
+
 
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure

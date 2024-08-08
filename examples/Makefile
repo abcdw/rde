@@ -15,9 +15,9 @@ ROOT_MOUNT_POINT=/mnt
 
 VERSION=latest
 
-repl: ares-rs
+repl: ares
 
-ares-rs:
+ares:
 	${GUIX} shell guile-next guile-ares-rs \
 	-e '(@ (rde packages package-management) guix-from-channels-lock)' \
 	-- guile \
