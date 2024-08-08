@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
@@ -39,10 +39,12 @@
 (define* (feature-ssh
           #:key
           (ssh openssh)
+          (mosh mosh)
           (ssh-configuration (home-ssh-configuration))
           (ssh-agent? #f))
   "Setup and configure ssh and ssh-agent."
   (ensure-pred file-like? ssh)
+  (ensure-pred file-like? mosh)
   (ensure-pred home-ssh-configuration? ssh-configuration)
   (ensure-pred boolean? ssh-agent?)
 
@@ -76,8 +78,13 @@
              home-environment-variables-service-type
              `(("SSH_AUTH_SOCK" . ,(string-append "$XDG_RUNTIME_DIR/" sock))))))
          '())
-     (list (service home-ssh-service-type
-                    ssh-configuration))))
+     (list
+      (simple-service
+       'ssh-mosh
+       home-profile-service-type
+       (list mosh))
+      (service home-ssh-service-type
+               ssh-configuration))))
 
   (feature
    (name 'ssh)
