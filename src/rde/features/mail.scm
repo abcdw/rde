@@ -386,7 +386,16 @@ Example:
           (msmtp-settings %default-msmtp-settings)
           (msmtp-provider-settings %default-msmtp-provider-settings)
           (msmtp-serializer default-msmtp-serializer))
-  "Configure msmtp MTA."
+  "Configure msmtp MTA.
+
+TLS enabled by default, SMTPS 465 port is used by default.
+
+It is possible to use SMTP+STARTTLS by setting @code{starttls?} to @code{#t},
+but not recommended. For SMTP port 587 will used by default.
+@url{https://serverfault.com/questions/523804/is-starttls-less-safe-than-tls-ssl}
+
+Also, port can be explicitly specified with @code{port} option (it's very
+unlikely you ever need this)."
   (define (get-home-services config)
     (require-value 'xdg-base-directories-configuration config)
     (require-value 'mail-accounts config
