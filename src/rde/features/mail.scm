@@ -22,6 +22,7 @@
 
 (define-module (rde features mail)
   #:use-module (rde packages)
+  #:use-module (rde exceptions)
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (rde features emacs)
@@ -1153,8 +1154,12 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
            (mail-directory    (mail-directory-fn config)))
 
       (define (serialize-mail-acc mail-acc)
-        ((assoc-ref isync-serializers (mail-account-type mail-acc))
-         mail-directory mail-acc))
+        (let* ((provider (mail-account-type mail-acc))
+               (serializer (assoc-ref isync-serializers provider)))
+          (unless (procedure? serializer)
+            (raise-exception
+             (config-exception "Serializer for ~a is missing" (list provider))))
+          (serializer mail-directory mail-acc)))
 
       (list
        (simple-service
