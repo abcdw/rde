@@ -1065,145 +1065,54 @@ control whether to NOTIFY? when new emails arrive."
         ,@(isync-group-with-channels id folders-mapping))))
   isync-settings)
 
-;; Directory names has lowercased spelling to match notmuch tags
-(define gmail-folder-mapping
-  '(("inbox"   . "INBOX")
-    ("sent"    . "[Gmail]/Sent Mail")
-    ("drafts"  . "[Gmail]/Drafts")
-    ("archive" . "[Gmail]/All Mail")
-    ("trash"   . "[Gmail]/Trash")
-    ("spam"    . "[Gmail]/Spam")))
-
-;; https://www.rfc-editor.org/rfc/rfc6154#section-2
-(define generic-folder-mapping
-  '(("inbox"   . "INBOX")
-    ("sent"    . "Sent")
-    ("drafts"  . "Drafts")
-    ("archive" . "Archive")
-    ("trash"   . "Trash")
-    ("spam"    . "Junk")))
-
-(define gmx-fr-folder-mapping
-  '(("inbox"   . "INBOX")
-    ("sent"    . "Envoy&AOk-s")
-    ("drafts"  . "Brouillons")
-    ("archive" . "Archive")
-    ("trash"   . "Corbeille")
-    ("spam"    . "Junk")))
-
-(define outlook-fr-folder-mapping
-  '(("inbox"   . "INBOX")
-    ("sent"    . "&AMk-l&AOk-ments envoy&AOk-s") ;"Éléments envoyés"
-    ("drafts"  . "Brouillons")
-    ("archive" . "Notes")
-    ("trash"   . "&AMk-l&AOk-ments supprim&AOk-s") ;"Éléments supprimés"
-    ("spam"    . "Courrier ind&AOk-sirable"))) ;"Courrier indésirable"
-
-(define mailbox-folder-mapping
-  '(("inbox"   . "INBOX")
-    ("sent"    . "Sent")
-    ("drafts"  . "Drafts")
-    ("trash"   . "Trash")
-    ("junk"    . "Junk")
-    ("archive" . "Archive")))
-
-(define hosteurope-de-folder-mapping
-  '(("inbox"   . "INBOX")
-    ("sent"    . "Sent")
-    ("drafts"  . "Entwurf")
-    ("trash"   . "Trash")
-    ("spam"    . "Spam")
-    ("archive" . "All")))
-
-(define fastmail-folder-mapping
-  '(("inbox"   . "INBOX")
-    ("sent"    . "Sent")
-    ("drafts"  . "Drafts")
-    ("trash"   . "Trash")
-    ("spam"    . "Spam")
-    ("archive" . "Archive")))
-
-(define runbox-folder-mapping
-  '(("inbox"   . "INBOX")
-    ("sent"    . "Sent")
-    ("drafts"  . "Drafts")
-    ("archive" . "Archive")
-    ("trash"   . "Trash")
-    ("spam"    . "Spam")))
-
-(define gmx-fr-isync-settings
-  (generate-isync-serializer "imap.gmx.net" gmx-fr-folder-mapping))
-
-(define ovh-isync-settings
-  (generate-isync-serializer "ssl0.ovh.net" generic-folder-mapping
-                             #:subfolders 'Legacy
-                             #:auth-mechs 'LOGIN))
-
-(define dismail-isync-settings
-  (generate-isync-serializer "imap.dismail.de" generic-folder-mapping))
-
-(define gmail-isync-settings
-  (generate-isync-serializer "imap.gmail.com" gmail-folder-mapping))
-
-(define gandi-isync-settings
-  (generate-isync-serializer "mail.gandi.net" generic-folder-mapping))
-
-(define mailbox-isync-settings
-  (generate-isync-serializer "imap.mailbox.org" mailbox-folder-mapping))
-
-(define hosteurope-de-isync-settings
-  (generate-isync-serializer "imap.hosteurope.de" hosteurope-de-folder-mapping))
-
-(define posteo-isync-settings
-  (generate-isync-serializer "posteo.de" generic-folder-mapping))
-
-(define fastmail-isync-settings
-  (generate-isync-serializer "imap.fastmail.com" fastmail-folder-mapping))
-
-(define runbox-isync-settings
-  (generate-isync-serializer "mail.runbox.com" runbox-folder-mapping))
-
-(define migadu-isync-settings
-  (generate-isync-serializer "imap.migadu.com" generic-folder-mapping))
-
-(define* (get-ovh-pro-isync-settings
-          #:key
-          (folder-mapping #f)
-          (host-number #f))
-  (ensure-pred list? folder-mapping)
-  (generate-isync-serializer
-    (string-append "pro" host-number ".mail.ovh.net")
-    folder-mapping
-    #:auth-mechs 'LOGIN
-    #:subfolders 'Legacy))
-
-(define ovh-pro2-fr-isync-settings
-  (get-ovh-pro-isync-settings
-   #:host-number "2"
-   #:folder-mapping outlook-fr-folder-mapping))
-
-(define (generic-isync-settings mail-directory mail-account)
-  (let* ((user     (mail-account-fqda mail-account)))
-    `(,#~"# Do not know how to serialize generic accounts :("
-      ,#~(format #f "# ~a wasn't configured by rde," #$user)
-      ,#~"# Try to set another value for mail-account's type field.")))
+(define* (%generate-isync-serializer imap-settings)
+  (let ((host (assoc-ref imap-settings 'host))
+        (folder-mapping (or (assoc-ref imap-settings 'folder-mapping)
+                            mail-providers:generic-folder-mapping))
+        (options (assoc-ref imap-settings 'extra-options)))
+    (ensure-pred string? host)
+    (ensure-pred list? folder-mapping)
+    (define (isync-settings mail-directory mail-account)
+      (let* ((id       (mail-account-id mail-account))
+             (account  (symbol->string id))
+             (user     (mail-account-get-user mail-account))
+             (pass-cmd (mail-account-get-pass-cmd mail-account))
+             (subfolders (or (assoc-ref options 'subfolders) 'Verbatim))
+             (auth-mechs (assoc-ref options 'auth-mechs))
+             (cipher-string (assoc-ref options 'cipher-string))
+             (pipeline-depth (assoc-ref options 'pipeline-depth))
+             (port (assoc-ref options 'port)))
+        (ensure-pred symbol? subfolders)
+        `(,#~(string-append "# Account '" #$(symbol->string id)
+                            " starts here")
+          (IMAPAccount ,id)
+          (Host ,host)
+          ,@(if (integer? port) `((Port ,port)) '())
+          (User ,user)
+          (PassCmd ,pass-cmd)
+          ,@(if (symbol? auth-mechs) `((AuthMechs ,auth-mechs)) '())
+          (SSLType IMAPS)
+          (CertificateFile /etc/ssl/certs/ca-certificates.crt)
+          ,@(if (symbol? cipher-string) `((CipherString ,cipher-string)) '())
+          ,@(if (integer? pipeline-depth) `((PipelineDepth ,pipeline-depth)) '())
+          ,#~""
+          (IMAPStore ,(symbol-append id '-remote))
+          (Account ,id)
+          ,#~""
+          (MaildirStore ,(symbol-append id '-local))
+          (SubFolders ,subfolders)
+          (Path ,(string-append mail-directory "/accounts/" account "/"))
+          (Inbox ,(string-append mail-directory "/accounts/" account "/inbox"))
+          ,#~""
+          ,@(isync-group-with-channels id folder-mapping))))
+    isync-settings))
 
 (define %default-isync-serializers
-  `((dismail . ,dismail-isync-settings)
-    (gmail . ,gmail-isync-settings)
-    (gandi . ,gandi-isync-settings)
-    (gmx-fr . ,gmx-fr-isync-settings)
-    (ovh . ,ovh-isync-settings)
-    (ovh-pro2-fr . ,ovh-pro2-fr-isync-settings)
-    (mailbox . ,mailbox-isync-settings)
-    (hosteurope-de . ,hosteurope-de-isync-settings)
-    (posteo . ,posteo-isync-settings)
-    (fastmail . ,fastmail-isync-settings)
-    (runbox . ,runbox-isync-settings)
-    (migadu . ,migadu-isync-settings)
-    ;; TODO: [Andrew Tropin, 2023-11-26] Fix cryptic error message when type
-    ;; set to the value not listed in isync-serializers (type 'non-existing).
-    (generic . ,generic-isync-settings)))
+  (map (lambda (provider-settings)
+         (let ((provider (car provider-settings))
+               (settings (assoc-ref (cdr provider-settings) 'imap)))
+           `(,provider . ,(%generate-isync-serializer settings))))
+       mail-providers:default-providers-settings))
 
 (define default-isync-global-settings
   `((Create Both)
