@@ -92,7 +92,8 @@
    (symbol #f)
    "Something short to identify and distinguish a mail account.
 @code{'work} or @code{'personal} for example.")
-  ;; TODO: Add aliases?
+  ;; TODO: [Andrew Tropin, 2024-08-09] provider is more apropriate name for
+  ;; this field
   (type
    (symbol 'generic)
    "Type of the mail account.  Will be used in different serialization
@@ -1027,6 +1028,7 @@ control whether to NOTIFY? when new emails arrive."
         isync-mapping)
      ,#~"")))
 
+;; TODO: [Andrew Tropin, 2024-08-08] Deprecate this function
 (define* (generate-isync-serializer
           host folders-mapping
           #:key
