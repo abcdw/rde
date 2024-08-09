@@ -25,6 +25,7 @@
   #:use-module (rde features)
   #:use-module (rde features predicates)
   #:use-module (rde features emacs)
+  #:use-module ((rde features mail providers) #:prefix mail-providers:)
   #:use-module (gnu packages mail)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (rde packages emacs-xyz)
@@ -343,34 +344,10 @@ Citation line format, message signature, gpg and msmtp configurations. "
 ;;;
 
 (define %default-msmtp-provider-settings
-  `((dismail . ((host . "smtp.dismail.de")
-                (port . 587)))
-    (gmail . ((host . "smtp.gmail.com")
-              (port . 587)))
-    (gandi . ((host . "mail.gandi.net")
-              (port . 587)))
-    (ovh . ((host . "ssl0.ovh.net")
-            (port . 465)
-            (tls_starttls . off)))
-    (ovh-pro2-fr . ((host . "pro2.mail.ovh.net")
-                    (port . 587)))
-    (gmx-fr . ((host . "mail.gmx.net")
-               (port . 587)))
-    (mailbox . ((host . "smtp.mailbox.org")
-                (port . 587)))
-    (hosteurope-de . ((host . "smtp.hosteurope.de")
-                      (port . 587)))
-    (posteo . ((host . "posteo.de")
-               (port . 587)))
-    (fastmail . ((host . "smtp.fastmail.com")
-                 (port . 465)
-                 (tls_starttls . off)))
-    (runbox . ((host . "mail.runbox.com")
-               (port . 587)))
-    (migadu . ((host . "smtp.migadu.com")
-               (port . 465)
-               (tls_starttls . off)))
-    (generic . #f)))
+  (map (lambda (x)
+         (let ((x (mail-providers:add-default-values-to-provider-settings x)))
+           (cons (car x) (assoc-ref (cdr x) 'smtp))))
+       mail-providers:default-providers-settings))
 
 (define %default-msmtp-settings
   "defaults
@@ -383,8 +360,18 @@ PROVIDER-SETTINGS using type field of MAIL-ACCOUNT.
 
 Example:
 @code{host mail.example.com\nport 587\n}"
+
+  (define (provider-settings->msmtp-settings provider-settings)
+    (map
+     (lambda (x)
+       (match x
+         (('starttls? . v)
+          `(tls_starttls . ,(if v 'on 'off)))
+         (_ x)))
+     provider-settings))
   (let* ((account-type (mail-account-type mail-account))
-         (settings (assoc-ref provider-settings account-type)))
+         (settings (provider-settings->msmtp-settings
+                    (assoc-ref provider-settings account-type))))
     (apply
      string-append
      (map (lambda (p)
