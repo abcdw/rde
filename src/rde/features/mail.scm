@@ -224,7 +224,7 @@ function, which accepts config with rde values and returns a string."
     (require-value 'full-name config)
     (define emacs-cmd (get-value 'emacs-client-create-frame config))
     (define gpg-primary-key (get-value 'gpg-primary-key config #f))
-    (define msmtp (get-value 'msmtp config))
+    (define msmtp (get-value 'msmtp config #f))
     (define full-name (get-value 'full-name config))
 
     (list
@@ -269,15 +269,15 @@ but it won't appear on the right Maildir directory."
                    (#f 'nil)
                    (_ 't)))
           ,@(cond
-             ((get-value 'msmtp config)
+             (msmtp
               `((setq sendmail-program
-                      ,(file-append (get-value 'msmtp config) "/bin/msmtp"))
+                      ,(file-append msmtp "/bin/msmtp"))
                 (setq message-send-mail-function
                       'message-send-mail-with-sendmail)
                 (setq message-sendmail-f-is-evil t)
                 (setq message-sendmail-extra-arguments
                       '("--read-envelope-from"))))
-             ((get-value 'emacs-smtpmail config)
+             ((get-value 'emacs-smtpmail config #f)
               `((setq message-send-mail-function 'smtpmail-send-it)))
              (#t '()))
 
