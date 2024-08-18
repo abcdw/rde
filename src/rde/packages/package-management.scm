@@ -30,7 +30,7 @@
   #:export (guix-from-channels-lock))
 
 (define-public guix-from-channels-lock
-  (let ((commit "5905b4728776d6a6e6e5587f46fc0d633df6907c"))
+  (let ((commit "6c045f2c9eb7b8efe7c8a1002cda990abaa9be1a"))
     (package
       (inherit guix)
       (version (string-append "1.4.0-" (string-take commit 7)))
