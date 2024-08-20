@@ -39,6 +39,25 @@
   #:use-module (guix build-system gnu)
   #:use-module ((guix licenses) #:prefix license:))
 
+(define-public emacs-arei-latest
+  (let* ((commit "c9b892183d9bcad36a4e89dd7a1e8c5debcf58b8")
+         (revision "0"))
+    (package
+      (inherit emacs-arei)
+      (name "emacs-arei")
+      (version (git-version "0.9.5" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://git.sr.ht/~abcdw/emacs-arei")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "0hghbqfmx7m7vs9ld9bw4l7wdwjj86m59y63w7qdjc06wa3kf5gk"))))
+      (build-system emacs-build-system))))
+
 (define-public emacs-dape
   (let ((commit "eb6042ab4a4ee7758f5f9408904d2d702f1b0ba8"))
     (package
