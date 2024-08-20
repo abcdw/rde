@@ -480,6 +480,9 @@ is sway dependent, because it relies on swaymsg."
       `((bindsym ,(symbol-append '$mod+ screenshot-key) exec ,shot-output)
         (bindsym ,(symbol-append '$mod+Alt+ screenshot-key)
                  exec ,swappy-clipboard)
+        ;; Usually Fn+PrtSc
+        (bindsym ,(symbol-append 'XF86SelectiveScreenshot)
+                 exec ,shot-window-or-selection)
         (bindsym ,(symbol-append '$mod+Shift+ screenshot-key)
                  exec ,shot-window-or-selection)))))
 
