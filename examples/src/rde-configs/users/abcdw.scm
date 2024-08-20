@@ -90,11 +90,17 @@
                   :coderepo "~/work/abcdw/rde/"))))
        (with-eval-after-load 'org
          (setq org-use-speed-commands t)
+         (setq org-enforce-todo-dependencies t)
+         ;; (setq org-enforce-todo-checkbox-dependencies t)
          (setq org-log-reschedule 'time)
-         (define-key org-mode-map (kbd "M-o")
-           (lambda ()
-             (interactive)
-             (org-end-of-meta-data t))))
+         (defun rde-org-goto-end-of-heading ()
+           (interactive)
+           (org-end-of-meta-data t)
+           (end-of-line)
+           (unless (bolp)
+             (newline)))
+         (define-key org-mode-map (kbd "M-o") 'rde-org-goto-end-of-heading))
+
        (with-eval-after-load 'geiser-mode
          (setq geiser-mode-auto-p nil)
          (defun abcdw-geiser-connect ()
