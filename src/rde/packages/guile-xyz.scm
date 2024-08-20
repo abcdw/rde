@@ -23,8 +23,8 @@
   #:use-module (guix git-download))
 
 (define-public guile-ares-rs-latest
-  (let* ((commit "0718d8b7ae0fac70607ef45abc8fbcc65ce8fb37")
-         (revision "1"))
+  (let* ((commit "a11f745d631ccc713ea1a97406d0586a65b16a02")
+         (revision "2"))
     (package
       (inherit guile-ares-rs)
       (name "guile-ares-rs")
@@ -38,4 +38,4 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "15bc8myxn283hy2jjx6048sy1sh5fsmh5x0gm33slrd4ql36scls")))))))
+           "12cx97whzlps409kqpn7gvb62r88xj46g4m1na1skcyjvnglfv9f")))))))
