@@ -3147,6 +3147,7 @@ Mostly workarounds and integratios with other packages."
 
 (define* (feature-emacs-dape
           #:key
+          (emacs-dape emacs-dape)
           (window-arrangement 'right)
           (stepping-granularity 'line)
           (hide-info-mode-line? #f)
