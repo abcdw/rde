@@ -1012,6 +1012,8 @@ for the main bar."
           'sway-swaync
           home-sway-service-type
           `((bindsym --to-code $mod+Shift+n exec ,(swaync-client "-t -sw"))
+            (bindsym --to-code XF86NotificationCenter
+                     exec ,(swaync-client "-t -sw"))
             (exec ,(file-append swaynotificationcenter "/bin/swaync"))))))))
 
   (feature
