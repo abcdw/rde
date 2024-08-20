@@ -338,8 +338,13 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
    rde-cli
    rde-emacs))
 
+(define keyboard-features
+  (list
+   (feature-swaykbdd)))
+
 (define %all-features
   (append
+   keyboard-features
    virtualization-features
    dev-features
    general-features))
