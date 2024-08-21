@@ -485,10 +485,15 @@ with references to researches.")))
 
 (define* (feature-emacs-circadian
           #:key
-          (emacs-circadian emacs-circadian))
+          (emacs-circadian emacs-circadian)
+          (geolocate-url #f))
   "Configure the circadian.el Emacs package for theme-switching
-based on the time of the day."
+based on the time of the day.
+
+You can use @url{https://positon.xyz/} or other Mozilla compatible geolocation
+API.  @code{geolocate-url} should point to @code{\"/v1/geolocate\"}."
   (ensure-pred file-like? emacs-circadian)
+  (ensure-pred string? geolocate-url)
 
   (define emacs-f-name 'circadian)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -500,24 +505,24 @@ based on the time of the day."
       emacs-f-name
       config
       `((defun rde-circadian--get-geolocation ()
-          "Get current location coordinates through Mozilla's Geolocation API."
+          "Get current location coordinates through Geolocation API."
           (let ((response
                  (ignore-errors
-                   (url-retrieve-synchronously
-                    "https://location.services.mozilla.com/v1/geolocate?key=geoclue"
-                    t))))
+                  (url-retrieve-synchronously ,geolocate-url t))))
             (when response
               (with-current-buffer response
                 (goto-char (point-min))
                 (re-search-forward (rx bol "\n") nil t)
                 (delete-region (point) (point-min))
-                (let* ((location (car (cdr (json-parse-string
-                                            (buffer-string)
-                                            :object-type 'plist))))
+                (let* ((json-data
+                        (json-parse-string
+                         (buffer-string)
+                         :object-type 'plist))
+                       (location
+                        (plist-get json-data :location))
                        (latitude (plist-get location :lat))
                        (longitude (plist-get location :lng)))
                   (cons longitude latitude))))))
-
         (with-eval-after-load 'solar
           (let ((coordinates (rde-circadian--get-geolocation)))
             (setq calendar-longitude (if coordinates (car coordinates) 0))
