@@ -305,7 +305,7 @@ chooser_type=simple"
              '() (list foot))
          (if (get-value 'default-application-launcher-fn config #f)
              '() (list bemenu))
-         (list qtwayland swayhide
+         (list qtwayland-5 swayhide
                xdg-desktop-portal xdg-desktop-portal-wlr)))
 
        (when (get-value 'emacs config #f)
