@@ -1,0 +1,68 @@
+(defcfg
+ ;; "/dev/input/event3"
+ input (device-file "/dev/input/by-path/platform-i8042-serio-0-event-kbd")
+ output (uinput-sink "kmonad-keyboard")
+ fallthrough true
+ allow-cmd true)
+
+(defsrc
+  esc  f1   f2   f3   f4   f5   f6   f7   f8   f9   f10  f11  f12  home end ins  del
+  zeh  1    2    3    4    5    6    7    8    9    0    -    =    grv  Yen bspc
+  tab  q    w    e    r    t    y    u    i    o    p    [    ]
+  caps a    s    d    f    g    h    j    k    l    ;    '    \    ret
+  lsft z    x    c    v    b    n    m    ,    .    /    Ro        rsft
+  wkup lctl lmet lalt muh  spc  hen  kah  ralt cmps rctl back up   fwd
+                                                         left down rght)
+
+(defalias
+  spl (layer-toggle space-layer)
+  ctl (layer-toggle ctrl-layer)
+  bal (tap-hold 200 bspc lalt)
+  ms  M-s
+  mta M-tab
+  sta S-tab
+  cta C-tab
+  cst C-S-tab
+  cle C-left
+  cri C-right
+  cup C-up
+  cdo C-down
+  ssf (sticky-key 300 lsft))
+
+(deflayer base
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
+  _    _    _    _    _    _    =    6    7    8    9    0    -    _    =   X
+  XX   _    _    _    _    _    ]    y    u    i    o    p    [
+  lctl _    _    _    _    _    \    h    j    k    l    ;    '         ret
+  _    _    _    _    _    _    b    n    m    ,    .    /    rsft
+  _    _    _    lalt bspc @spl @spl spc  _    _    _    _    _    _
+                                                         _    _    _)
+
+(deflayer space-layer
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _
+  @mta _    @ms  @sta tab  _    _    _    @cle @cup @cdo @cri _
+  _    _    _    @cst @cta _    _    _    left up   down rght _         _
+  _    _    _    _    _    _    _    _    ret  _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+                                                         _    _    _)
+
+
+;; Doesn't work well, for example C-g
+(deflayer ctrl-layer
+ C-esc C-f1 C-f2 C-f3 C-f4 C-f5 C-f6 C-f7 C-f8 C-f9 C-f10 C-f11 C-f12 C-home C-end C-ins C-del
+ C-zeh C-1  C-2  C-3  C-4  C-5  C-6  C-7  C-8  C-9  C-0  C--  C-= _ _ _
+  _    C-q  C-w  C-e  C-r  C-t  C-y  C-u  C-i  C-o  C-p  C-[  C-]
+  _    C-a  C-s  C-d  C-f  C-g  C-h  C-j  C-k  C-l  C-;  C-'  C-\         C-ret
+  lsft C-z  C-x  C-c  C-v  C-b  C-n  ret  C-,  C-.  C-/  C-Ro rsft
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+                                                         _    _    _)
+
+;; (deflayer template
+;;   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
+;;   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _
+;;   _    _    _    _    _    _    _    _    _    _    _    _    _
+;;   _    _    _    _    _    _    _    _    _    _    _    _    _         _
+;;   _    _    _    _    _    _    _    _    _    _    _    _    _
+;;   _    _    _    _    _    _    _    _    _    _    _    _    _    _
+;;                                                          _    _    _)
