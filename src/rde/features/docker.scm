@@ -64,11 +64,14 @@ Keybinding and Dockerfile major mode association."
       rde-account-service-type
       (list "docker"))
      (service
+      containerd-service-type
+      (containerd-configuration
+       (containerd containerd)))
+     (service
       docker-service-type
       (docker-configuration
        (docker docker)
-       (docker-cli docker-cli)
-       (containerd containerd)))))
+       (docker-cli docker-cli)))))
 
   (feature
    (name f-name)
