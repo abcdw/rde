@@ -43,10 +43,10 @@
 (deflayer space-layer
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _
-  @mta _    @ms  @sta tab  _    _    _    @cle @cup @cdo @cri _
-  _    _    _    @cst @cta _    _    _    left up   down rght _         _
+  @mta _    _    @sta _    _    _    _    @cle up   @cri _    _
+  _    _    @ms  @cst @cta tab  _    @cde left down rght _    _         _
   _    _    _    _    _    _    _    _    ret  _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    del  _    _    _    _    _    _    _    _
                                                          _    _    _)
 
 
