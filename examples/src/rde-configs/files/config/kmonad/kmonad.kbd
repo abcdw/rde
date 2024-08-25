@@ -11,7 +11,7 @@
   tab  q    w    e    r    t    y    u    i    o    p    [    ]
   caps a    s    d    f    g    h    j    k    l    ;    '    \    ret
   lsft z    x    c    v    b    n    m    ,    .    /    Ro        rsft
-  wkup lctl lmet lalt muh  spc  hen  kah  ralt cmps rctl back up   fwd
+  wkup lctl lmet lalt muh  spc  hen  kah  ralt cmps rctl pgup up   pgdn
                                                          left down rght)
 
 (defalias
