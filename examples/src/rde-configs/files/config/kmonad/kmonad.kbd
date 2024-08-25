@@ -23,20 +23,22 @@
   sta S-tab
   cta C-tab
   cst C-S-tab
+  cde C-del
   cle C-left
   cri C-right
   cup C-up
   cdo C-down
+  lng S-rsft
   ssf (sticky-key 300 lsft))
 
 (deflayer base
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
-  _    _    _    _    _    _    =    6    7    8    9    0    -    _    =   X
-  XX   _    _    _    _    _    ]    y    u    i    o    p    [
+  _    _    _    _    _    _    =    6    7    8    9    0    -    _    =   @lng
+  _    _    _    _    _    _    ]    y    u    i    o    p    [
   lctl _    _    _    _    _    \    h    j    k    l    ;    '         ret
-  _    _    _    _    _    _    b    n    m    ,    .    /    rsft
-  _    _    _    lalt bspc @spl @spl spc  _    _    _    _    _    _
-                                                         _    _    _)
+  XX   _    _    _    _    _    b    n    m    ,    .    /    XX
+  _    _    _    lmet @ssf bspc @spl spc  _    _    _    XX   XX   XX
+                                                         XX   XX   XX)
 
 (deflayer space-layer
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
