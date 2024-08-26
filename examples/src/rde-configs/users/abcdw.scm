@@ -368,6 +368,7 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
               '(base-services
                 kernel
                 swaylock
+                xdg
                 git)))
            %all-features)
    (list
@@ -383,6 +384,19 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
      ;;                  (effect-blur . 7x5)
      ;;                  (clock))
      )
+    (feature-xdg
+     #:xdg-user-directories-configuration
+     (home-xdg-user-directories-configuration
+      (music "$HOME/music")
+      (videos "$HOME/vids")
+      (pictures "$HOME/pics")
+      (documents "$HOME/docs")
+      (download "$HOME/dl")
+      (desktop "$HOME")
+      (publicshare "$HOME")
+      (templates "$HOME")))
+
+
     (feature-base-services
      #:default-substitute-urls (list "https://bordeaux.guix.gnu.org"
                                      "https://ci.guix.gnu.org")))))
@@ -457,18 +471,6 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
                        #:proxy-string "50080:localhost:8080"
                        #:reverse? #t
                        #:auto-start? #f)
-
-    (feature-xdg
-     #:xdg-user-directories-configuration
-     (home-xdg-user-directories-configuration
-      (music "$HOME/music")
-      (videos "$HOME/vids")
-      (pictures "$HOME/pics")
-      (documents "$HOME/docs")
-      (download "$HOME/dl")
-      (desktop "$HOME")
-      (publicshare "$HOME")
-      (templates "$HOME")))
 
     (feature-foot)
     (feature-yggdrasil)

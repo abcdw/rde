@@ -42,7 +42,8 @@
   #:use-module (rde features video)
   #:use-module (rde features virtualization)
   #:use-module (rde features web-browsers)
-  #:use-module (rde features wm))
+  #:use-module (rde features wm)
+  #:use-module (rde features xdg))
 
 ;;;
 ;;; Various lists of features with predefined values.
@@ -54,6 +55,7 @@
    (feature-base-services)
    (feature-base-packages)
    (feature-desktop-services)
+   (feature-xdg)
 
    (feature-pipewire)
    (feature-backlight #:step 10)
