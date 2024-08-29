@@ -24,6 +24,7 @@
   #:use-module (gnu services)
   #:use-module (gnu home-services gnupg)
   #:use-module (rde home services wm)
+  #:use-module (rde home services shells)
   #:use-module (rde home services emacs)
   #:use-module (guix gexp)
 
@@ -80,6 +81,16 @@ and provides GPG-PRIMARY-KEY value for other features."
                 '((for_window "[app_id=\"pinentry-qt\"]" floating enable))
                 '())
           (,#~""))))
+
+     (when (get-value 'zsh config #f)
+       (simple-service
+        'direnv-zsh-hook
+        home-zsh-service-type
+        (home-zsh-extension
+         (zshrc
+          (list
+           "\
+alias gpg-update-smartcard='gpg-connect-agent \"scd serialno\" \"learn --force\" /bye'")))))
 
      ;; <https://github.com/drduh/YubiKey-Guide#harden-configuration>
      ;; <https://raw.githubusercontent.com/drduh/config/master/gpg.conf>
