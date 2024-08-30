@@ -91,10 +91,12 @@ autoload -Uz run-help
 (( ${+aliases[run-help]} )) && unalias run-help
 autoload -Uz run-help-git
 
-# Delete, home, end buttons
+# Delete, home, end buttons, ctrl-arrows
 bindkey  "^[[3~"  delete-char
 bindkey  "^[[H"   beginning-of-line
 bindkey  "^[[F"   end-of-line
+bindkey "^[[1;5C" forward-word
+bindkey "^[[1;5D" backward-word
 
 # Launch $VISUAL or $EDITOR, for emacsclient if there is no server
 # avaliable $ALTERNATE_EDITOR will be used.
