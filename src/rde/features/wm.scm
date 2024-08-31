@@ -114,6 +114,7 @@
           (bemenu bemenu)
           (shepherd shepherd-0.10)  ; TODO Keep up to date with upstream.
           (xdg-desktop-portal xdg-desktop-portal)
+          (xdg-desktop-portal-gtk xdg-desktop-portal-gtk)
           (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
           ;; Logo key. Use Mod1 for Alt.
           (sway-mod 'Mod4)
@@ -127,8 +128,9 @@
   (ensure-pred any-package? foot)
   (ensure-pred any-package? bemenu)
   (ensure-pred file-like? shepherd)
-  (ensure-pred any-package? xdg-desktop-portal)
-  (ensure-pred any-package? xdg-desktop-portal-wlr)
+  (ensure-pred file-like? xdg-desktop-portal)
+  (ensure-pred file-like? xdg-desktop-portal-gtk)
+  (ensure-pred file-like? xdg-desktop-portal-wlr)
 
   (define (sway-home-services config)
     "Returns home services related to sway."
@@ -306,7 +308,9 @@ chooser_type=simple"
          (if (get-value 'default-application-launcher-fn config #f)
              '() (list bemenu))
          (list qtwayland-5 swayhide
-               xdg-desktop-portal xdg-desktop-portal-wlr)))
+               xdg-desktop-portal
+               xdg-desktop-portal-gtk
+               xdg-desktop-portal-wlr)))
 
        (when (get-value 'emacs config #f)
          (rde-elisp-configuration-service
