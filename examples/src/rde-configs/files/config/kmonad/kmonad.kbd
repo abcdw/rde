@@ -16,6 +16,7 @@
 
 (defalias
   spl (layer-toggle space-layer)
+  nml (layer-toggle num-layer)
   ctl (layer-toggle ctrl-layer)
   bal (tap-hold 200 bspc lalt)
   ms  M-s
@@ -29,24 +30,34 @@
   cup C-up
   cdo C-down
   lng S-rsft
-  ssf (sticky-key 300 lsft))
+  ssf (sticky-key 300 lsft)
+  cte (tap-hold-next 200 esc lctl))
 
 (deflayer base
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
   _    _    _    _    _    _    =    6    7    8    9    0    -    _    =   @lng
   _    _    _    _    _    _    ]    y    u    i    o    p    [
-  lctl _    _    _    _    _    \    h    j    k    l    ;    '         ret
-  XX   _    _    _    _    _    b    n    m    ,    .    /    XX
-  _    _    _    lmet @ssf bspc @spl spc  _    _    _    XX   XX   XX
-                                                         XX   XX   XX)
+  @cte _    _    _    _    _    \    h    j    k    l    ;    '         ret
+  @nml _    _    _    _    _    b    n    m    ,    .    /    XX
+  _    _    lmet lalt @ssf bspc @spl spc  lalt _    _    XX   up    XX
+                                                         XX   _    XX)
 
 (deflayer space-layer
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _
-  @mta _    _    @sta _    _    _    _    @cle up   @cri _    _
-  _    _    @ms  @cst @cta tab  _    @cde left down rght _    _         _
+  @mta _    _    pgup _    _    _    _    home up   end  _    _
+  _    _    @cst pgdn @cta tab  _    @cde left down rght _    _         _
   _    _    _    _    _    _    _    _    ret  _    _    _    _
   _    _    _    _    _    del  _    _    _    _    _    _    _    _
+                                                         _    _    _)
+
+(deflayer num-layer
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _
+  _    _    _    _    _    _    _    8    4    5    6    7    _
+  _    _    _    _    _    _    _    9    0    1    2    3    _         _
+  _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
                                                          _    _    _)
 
 
