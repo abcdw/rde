@@ -198,12 +198,14 @@
 
             ,@(if (get-value 'default-pass-prompt-fn config #f)
                   `((set $pass ,(get-value-eval 'default-pass-prompt-fn config))
-                    (bindsym --to-code $mod+Shift+p exec $pass))
+                    (bindsym --to-code $mod+Shift+p exec $pass)
+                    (bindsym --to-code $mod+Control+p exec $pass))
                   '())
 
             ,@(if (get-value 'default-power-menu-fn config #f)
                   `((set $power-menu ,(get-value-eval 'default-power-menu-fn config))
-                    (bindsym --to-code $mod+Shift+q exec $power-menu))
+                    (bindsym --to-code $mod+Shift+q exec $power-menu)
+                    (bindsym --to-code $mod+Control+q exec $power-menu))
                   '())
 
             (bindsym $mod+Control+Shift+Return exec $backup-term)
@@ -211,10 +213,14 @@
 
             (bindsym --to-code $mod+Shift+d exec $menu)
             (bindsym --to-code $mod+Shift+l exec $lock)
+            (bindsym --to-code $mod+Control+d exec $menu)
+            (bindsym --to-code $mod+Control+l exec $lock)
 
             (,#~"\n\n# Manipulating windows:")
             (bindsym --to-code $mod+Shift+c kill)
             (bindsym --to-code $mod+Shift+f fullscreen)
+            (bindsym --to-code $mod+Control+c kill)
+            (bindsym --to-code $mod+Control+f fullscreen)
             (bindsym $mod+Shift+space floating toggle)
             (bindsym $mod+Ctrl+space focus mode_toggle)
 
@@ -1016,6 +1022,7 @@ for the main bar."
           'sway-swaync
           home-sway-service-type
           `((bindsym --to-code $mod+Shift+n exec ,(swaync-client "-t -sw"))
+            (bindsym --to-code $mod+Control+n exec ,(swaync-client "-t -sw"))
             (bindsym --to-code XF86NotificationCenter
                      exec ,(swaync-client "-t -sw"))
             (exec ,(file-append swaynotificationcenter "/bin/swaync"))))))))
