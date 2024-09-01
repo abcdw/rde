@@ -5308,6 +5308,7 @@ stored in directory understood by project.el."
 
         (with-eval-after-load 'telega
           (require 'xdg)
+          (setopt telega-chat-show-deleted-messages-for '(not saved-messages))
           (setq telega-directory
                 (expand-file-name "emacs/telega" (xdg-cache-home)))
 
