@@ -45,7 +45,7 @@ includes the configuration to be able to use the token as a user
       rde-account-service-type
       (list "plugdev"))
      (udev-rules-service
-      'yubikey
+      'security-token-libfido2-udev-rules
       libfido2
       #:groups '("plugdev"))))
 
