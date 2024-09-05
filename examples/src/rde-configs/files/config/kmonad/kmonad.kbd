@@ -15,8 +15,8 @@
                                                          left down rght)
 
 (defalias
-  spl (layer-toggle space-layer)
-  nml (layer-toggle num-layer)
+  nal (layer-toggle space-layer)
+  nul (layer-toggle num-layer)
   ctl (layer-toggle ctrl-layer)
   bal (tap-hold 200 bspc lalt)
   ms  M-s
@@ -31,16 +31,17 @@
   cdo C-down
   lng S-rsft
   ssf (sticky-key 300 lsft)
-  cte (tap-hold-next 200 esc lctl))
+  cte (tap-hold-next 200 esc lctl)
+  tct (tap-hold-next 200 tab @nal))
 
 (deflayer base
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
   _    _    _    _    _    _    =    6    7    8    9    0    -    _    =   @lng
   _    _    _    _    _    _    ]    y    u    i    o    p    [
   @cte _    _    _    _    _    \    h    j    k    l    ;    '         ret
-  @nml _    _    _    _    _    b    n    m    ,    .    /    XX
-  _    _    lmet lalt @ssf bspc @spl spc  lalt _    _    XX   up    XX
-                                                         XX   _    XX)
+  @nul _    _    _    _    _    b    n    m    ,    .    /    _
+  _    _    lmet lalt @ssf bspc @nal spc  lalt _    _    _    up   _
+                                                         _    _    _)
 
 (deflayer space-layer
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
@@ -57,7 +58,7 @@
   _    _    _    _    _    _    _    8    4    5    6    7    _
   _    _    _    _    _    _    _    9    0    1    2    3    _         _
   _    _    _    _    _    _    _    _    _    _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    del  _    _    _    _    _    _    _    _
                                                          _    _    _)
 
 
