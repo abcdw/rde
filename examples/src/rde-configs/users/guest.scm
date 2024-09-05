@@ -54,6 +54,7 @@
 
      "cryptsetup" "dosfstools" "btrfs-progs"
      "smartmontools" "parted" "gparted"
+     "lm-sensors"
 
      "binutils" ;; needed for emacs native-comp stuff
 
