@@ -19,11 +19,15 @@
 
 (define-module (rde features keyboard)
   #:use-module (rde features)
+  #:use-module (rde features emacs)
   #:use-module (gnu system keyboard)
   #:use-module (gnu services)
+  #:use-module (gnu home services)
+  #:use-module (gnu packages emacs-xyz)
   #:use-module (rde home services keyboard)
 
   #:export (feature-keyboard
+            feature-emacs-cua
             %dvorak-layout
             %dvorak-jcuken-layout)
 
@@ -60,3 +64,83 @@ the user."
    (name 'keyboard)
    (values (make-feature-values keyboard-layout))
    (home-services-getter keyboard-services)))
+
+(define* (feature-emacs-cua
+          #:key (emacs-undo-fu emacs-undo-fu))
+  "Provide IBM Common User Acces for Emacs (More usual keybindings like
+Ctrl-C/Ctrl-V for copypaste and so on).  It not only alters some keybindings,
+but also adjust the behavior of some region related operations and undo
+system."
+
+  (define emacs-f-name 'cua)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((setopt cua-prefix-override-inhibit-delay 0.0001)
+        (with-eval-after-load 'smartparens
+          (keymap-set smartparens-mode-map "C-<right>" 'forward-word)
+          (keymap-set smartparens-mode-map "M-<right>" 'sp-forward-symbol)
+          (keymap-set smartparens-mode-map "C-M-<right>" 'sp-forward-sexp)
+
+          (keymap-set smartparens-mode-map "C-<left>" 'backward-word)
+          (keymap-set smartparens-mode-map "M-<left>" 'sp-backward-symbol)
+          (keymap-set smartparens-mode-map "C-M-<left>" 'sp-backward-sexp))
+        (with-eval-after-load 'cua-base
+          (setopt cua-keep-region-after-copy t)
+          ;; it doesn't want to work with cua-global-map, so we go a bit into
+          ;; internals.
+          (defun rde--cua-remap-undo (orig-fun &rest args)
+            "Advice to remap C-z to undo-fu-only-undo in CUA mode."
+            (let ((result (apply orig-fun args)))
+              ;; After the original function runs, modify the keymap
+              (keymap-set cua--cua-keys-keymap "C-z" 'undo-fu-only-undo)
+              result))
+
+          (advice-add 'cua--init-keymaps :around 'rde--cua-remap-undo)
+
+          (keymap-set cua-global-keymap "C-y" 'undo-fu-only-redo)
+
+          (autoload 'save-buffer "files")
+          (keymap-set cua-global-keymap "C-s" 'save-buffer)
+          (keymap-set cua-global-keymap "C-w" 'kill-current-buffer)
+          (keymap-set cua-global-keymap "C-f" 'isearch-forward)
+          (keymap-set isearch-mode-map "C-f" 'isearch-repeat-forward)
+          (defun rde-cua-comment-dwim ()
+            "Comment or uncomment the region and preserve the selection."
+            (interactive)
+            (if (region-active-p)
+                (let ((beg (region-beginning))
+                      (end (region-end))
+                      (deactivate-mark nil))
+
+                  (comment-or-uncomment-region beg end))
+                (save-excursion
+                 (comment-line 1))))
+          (keymap-set cua-global-keymap "C-/" 'rde-cua-comment-dwim)
+          (defun rde-cua-join-lines (&optional arg beg end)
+            "Join current and next line or multiple lines if region selected."
+            (interactive
+             (progn (barf-if-buffer-read-only)
+                    (cons current-prefix-arg
+                          (and (use-region-p)
+                               (list (region-beginning) (region-end))))))
+            (if (not (or arg beg end))
+                (let ((p (point)))
+                  (delete-indentation -1)
+                  (goto-char p))
+                (delete-indentation arg beg end)))
+
+          (keymap-set cua-global-keymap "C-S-j" 'rde-cua-join-lines))
+
+        (if after-init-time
+            (cua-mode)
+            (add-hook 'after-init-hook 'cua-mode)))
+      #:elisp-packages (list emacs-undo-fu))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
