@@ -30,7 +30,7 @@
 
 (define* (feature-imv
           #:key
-          (package imv))
+          (imv imv))
   "Setup and configure the imv command-line image viewer."
   (ensure-pred file-like? imv)
 
