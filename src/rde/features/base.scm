@@ -293,13 +293,9 @@ Defaults:%wheel env_keep+=TERMINFO")))))
 
    (service x11-socket-directory-service-type)))
 
-(define %rde-desktop-home-services
-  (list (service home-dbus-service-type)))
-
 (define* (feature-desktop-services
           #:key
           (default-desktop-system-services %rde-desktop-system-services)
-          (default-desktop-home-services %rde-desktop-home-services)
           (avahi avahi)
           (dbus dbus)
           (elogind elogind)
@@ -315,7 +311,8 @@ Defaults:%wheel env_keep+=TERMINFO")))))
   (ensure-pred file-like? upower)
 
   (define (get-home-services _)
-    default-desktop-home-services)
+    (list (service home-dbus-service-type
+                   (home-dbus-configuration (dbus dbus)))))
 
   (define (get-system-services _)
     (cons*
