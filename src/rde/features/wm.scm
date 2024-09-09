@@ -112,6 +112,7 @@
           (foot foot)
           (dconf dconf)
           (bemenu bemenu)
+          (qtwayland qtwayland-5)
           (shepherd shepherd-0.10)  ; TODO Keep up to date with upstream.
           (xdg-desktop-portal xdg-desktop-portal)
           (xdg-desktop-portal-gtk xdg-desktop-portal-gtk)
@@ -127,6 +128,7 @@
   (ensure-pred any-package? sway)
   (ensure-pred any-package? foot)
   (ensure-pred any-package? bemenu)
+  (ensure-pred file-like? qtwayland)
   (ensure-pred file-like? shepherd)
   (ensure-pred file-like? xdg-desktop-portal)
   (ensure-pred file-like? xdg-desktop-portal-gtk)
@@ -313,7 +315,7 @@ chooser_type=simple"
              '() (list foot))
          (if (get-value 'default-application-launcher-fn config #f)
              '() (list bemenu))
-         (list qtwayland-5 swayhide
+         (list qtwayland swayhide
                xdg-desktop-portal
                xdg-desktop-portal-gtk
                xdg-desktop-portal-wlr)))
