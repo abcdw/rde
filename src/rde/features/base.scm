@@ -38,6 +38,7 @@
   #:use-module (gnu home services desktop)
   #:use-module (gnu home services shepherd)
 
+  #:use-module (gnu packages avahi)
   #:use-module (gnu packages certs)
   #:use-module (gnu packages fonts)
   #:use-module (gnu packages glib)
@@ -284,17 +285,9 @@ Defaults:%wheel env_keep+=TERMINFO")))))
 
 
    ;; The D-Bus clique.
-   (service avahi-service-type)
-   (service udisks-service-type
-           (udisks-configuration (udisks udisks)))
-   (service upower-service-type)
    (service accountsservice-service-type)
    (service cups-pk-helper-service-type)
    (service colord-service-type)
-   (service geoclue-service-type)
-   ;; (service polkit-service-type)
-   (service elogind-service-type)
-   (service dbus-root-service-type)
 
    (service ntp-service-type)
 
@@ -307,13 +300,38 @@ Defaults:%wheel env_keep+=TERMINFO")))))
           #:key
           (default-desktop-system-services %rde-desktop-system-services)
           (default-desktop-home-services %rde-desktop-home-services)
-          (dbus dbus))
+          (avahi avahi)
+          (dbus dbus)
+          (elogind elogind)
+          (geoclue geoclue)
+          (udisks udisks)
+          (upower upower))
   "Provides desktop system services."
+  (ensure-pred file-like? avahi)
+  (ensure-pred file-like? dbus)
+  (ensure-pred file-like? elogind)
+  (ensure-pred file-like? geoclue)
+  (ensure-pred file-like? udisks)
+  (ensure-pred file-like? upower)
+
   (define (get-home-services _)
     default-desktop-home-services)
 
   (define (get-system-services _)
-    default-desktop-system-services)
+    (cons*
+     (service avahi-service-type
+              (avahi-configuration (avahi avahi)))
+     (service dbus-root-service-type
+              (dbus-configuration (dbus dbus)))
+     (service elogind-service-type
+              (elogind-configuration (elogind elogind)))
+     (service geoclue-service-type
+              (geoclue-configuration (geoclue geoclue)))
+     (service udisks-service-type
+              (udisks-configuration (udisks udisks)))
+     (service upower-service-type
+              (upower-configuration (upower upower)))
+     default-desktop-system-services))
 
   (feature
    (name 'desktop-services)
