@@ -210,9 +210,11 @@ feature-ssh."
 (define* (feature-networking
           #:key
           (iwd-autoconnect? #t)
+          (network-manager network-manager)
           (network-manager-applet network-manager-applet)
           mdns?)
   "Configure iwd and everything."
+  (ensure-pred file-like? network-manager)
   (ensure-pred file-like? network-manager-applet)
 
   (define f-name 'networking)
@@ -243,6 +245,7 @@ feature-ssh."
     (list
      (service network-manager-service-type
               (network-manager-configuration
+               (network-manager network-manager)
                (shepherd-requirement '(iwd))))
      (service iwd-service-type
               (iwd-configuration
