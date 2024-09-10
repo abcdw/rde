@@ -43,10 +43,11 @@
    (json-config '())
    "Alist of pairs that make up the @code{goimapnotify} configuration."))
 
-(define (home-goimapnotify-file config)
-  (apply mixed-text-file "imapnotify.conf"
-         (serialize-json-config
-          (home-goimapnotify-configuration-config config))))
+(define (add-home-goimapnotify-file config)
+  `(("goimapnotify/goimapnotify.conf"
+     ,(apply mixed-text-file "goimapnotify.conf"
+             (serialize-json-config
+              (home-goimapnotify-configuration-config config))))))
 
 (define (home-goimapnotify-shepherd-service config)
   (list
@@ -56,9 +57,7 @@
               (list
                #$(file-append
                   (home-goimapnotify-configuration-goimapnotify config)
-                  "/bin/goimapnotify")
-               "-conf"
-               #$(home-goimapnotify-file config))
+                  "/bin/goimapnotify"))
               #:log-file (string-append
                           (getenv "XDG_STATE_HOME") "/log"
                           "/goimapnotify.log")))
@@ -77,7 +76,10 @@
       home-goimapnotify-profile-service)
      (service-extension
       home-shepherd-service-type
-      home-goimapnotify-shepherd-service)))
+      home-goimapnotify-shepherd-service)
+     (service-extension
+      home-xdg-configuration-files-service-type
+      add-home-goimapnotify-file)))
    (default-value (home-goimapnotify-configuration))
    (description "Configures the @code{goimapnotify} IMAP Mailbox notifier.")))
 
