@@ -3,7 +3,7 @@
 ;;; Copyright © 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
-;;; Copyright © 2022, 2023 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2022, 2023, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2022, 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;; Copyright © 2023 Benoit Joly <benoit@benoitj.ca>
 ;;;
@@ -103,6 +103,7 @@
             feature-emacs-nov-el
             feature-emacs-elfeed
             feature-emacs-info
+            feature-emacs-devdocs
 
             ;; Notetaking
             feature-emacs-org
@@ -3934,6 +3935,35 @@ built-in help that provides much more contextual information."
   (feature
    (name f-name)
    (values `((,f-name . ,emacs-info-plus)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-devdocs
+          #:key
+          (emacs-devdocs emacs-devdocs))
+  "Configure Info-like documentation viewer for reading various
+DevDocs documentations."
+  (ensure-pred file-like? emacs-devdocs)
+
+  (define emacs-f-name 'devdocs)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to DevDocs."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((global-set-key (kbd "C-h D") 'devdocs-lookup)
+        (autoload 'devdocs-lookup "devdocs")
+        (with-eval-after-load 'devdocs
+          (setq devdocs-data-dir
+                (concat (getenv "XDG_STATE_HOME")
+                        "/devdocs"))))
+      #:elisp-packages (list emacs-devdocs))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-devdocs)))
    (home-services-getter get-home-services)))
 
 
