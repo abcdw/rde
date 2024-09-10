@@ -3,6 +3,7 @@
 ;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2024 Demis Balbach <db@minikn.xyz>
+;;; Copyright © 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -198,8 +199,8 @@ parser.")
              #t)))))))
 
 (define-public emacs-git-email-latest
-  (let* ((commit "b5ebade3a48dc0ce0c85699f25800808233c73be")
-         (revision "0"))
+  (let* ((commit "406a3fdf4684d7bbb83117170efbbafddfe07732")
+         (revision "1"))
     (package
       (name "emacs-git-email")
       (version (git-version "0.2.0" revision commit))
@@ -207,30 +208,24 @@ parser.")
        (origin
          (method git-fetch)
          (uri (git-reference
-               (url "https://git.sr.ht/~yoctocell/git-email")
+               ;; This is a fork that is more up-to-date.
+               (url "https://codeberg.org/martianh/git-email")
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32
-           "1lk1yds7idgawnair8l3s72rgjmh80qmy4kl5wrnqvpmjrmdgvnx"))))
+          (base32 "19f6rvxb4aj2kn12mz4678wh2ppjg1mqrhr8dird72jkgbddjj13"))))
       (build-system emacs-build-system)
       (arguments
        `(#:phases
          (modify-phases %standard-phases
-           ;; piem is not yet packaged in Guix.
-           (add-after 'unpack 'remove-piem
+           (add-after 'unpack 'remove-mu4e
              (lambda _
-               (delete-file "git-email-piem.el")
-               (delete-file "git-email-gnus.el")
                (delete-file "git-email-mu4e.el")))
            (add-before 'install 'makeinfo
              (lambda _
                (invoke "makeinfo" "doc/git-email.texi"))))))
-      (native-inputs
-       `(("texinfo" ,texinfo)))
-      (inputs
-       `(("emacs-magit" ,emacs-magit)
-         ("notmuch" ,emacs-notmuch)))
+      (native-inputs (list texinfo))
+      (inputs (list emacs-magit emacs-notmuch emacs-piem))
       (license license:gpl3+)
       (home-page "https://sr.ht/~yoctocell/git-email")
       (synopsis "Format and send Git patches in Emacs")
