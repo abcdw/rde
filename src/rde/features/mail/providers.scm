@@ -95,7 +95,7 @@
 
     (gmx-fr
      (smtp (host . "mail.gmx.net")
-           (starttls . #t))
+           (starttls? . #t))
      (imap (host . "imap.gmx.net")
            (folder-mapping . ,gmx-fr-folder-mapping)))
 
