@@ -597,7 +597,7 @@ module will be added to the BAR-ID."
                           ("10" . )
 
                           ("urgent" . )
-                          ("focused" . )
+                          ;; ("focused" . )
                           ("default" . ))))
   "PERSISTENT-WORKSPACES is a list of pairs workspace and vector of outputs."
   (waybar-module
