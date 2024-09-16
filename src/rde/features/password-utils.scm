@@ -155,12 +155,20 @@ in the middle and Return at the end."
                         (mapconcat 'shell-quote-argument wtype-args " ")))))
                  ,@(if emacs-embark
                        `((with-eval-after-load 'password-store
+                           (defun rde-password-store-generate (entry)
+                             "Create and entry and generate a secret.  Warn
+ and do nothing, if the entry with this name already exists."
+                             (interactive "sNew entry: ")
+                             (if (password-store-get entry)
+                                 (message "Warning: Entry '%s' already exists. Not generating." entry)
+                               (password-store-generate entry)))
+
                            (defvar pass-embark-actions
                              (let ((map (make-sparse-keymap)))
                                (define-key map "f" 'password-store-copy-field)
                                (define-key map "b" 'password-store-url)
                                (define-key map "e" 'password-store-edit)
-                               (define-key map "g" 'password-store-generate)
+                               (define-key map "g" 'rde-password-store-generate)
                                (define-key map "r" 'password-store-rename)
                                (define-key map "d" 'password-store-remove)
                                (define-key map "i" 'password-store-insert)
