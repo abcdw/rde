@@ -2,6 +2,8 @@
  (version 0)               ;current file format version
  (("2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"
    (name "abcdw"))
+  ("FF72 877C 4F21 FC4D 467D  20C4 DCCB 5255 2098 B6C1"
+   (name "akagi"))
   ("4956 DAC8 B077 15EA 9F14  E13A EF1F 69BF 5F23 F458"
    (name "conses"))
   ("0158 61E3 2C8A E7E4 84CA  4233 ACF5 0999 A2FB 5C79"
