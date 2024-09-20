@@ -41,8 +41,8 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-arei-latest
-  (let* ((commit "c9b892183d9bcad36a4e89dd7a1e8c5debcf58b8")
-         (revision "0"))
+  (let* ((commit "cec17d88f452f740ac007a07b10de403e76b0ccb")
+         (revision "1"))
     (package
       (inherit emacs-arei)
       (name "emacs-arei")
@@ -56,7 +56,7 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "0hghbqfmx7m7vs9ld9bw4l7wdwjj86m59y63w7qdjc06wa3kf5gk"))))
+           "1k68247p8sx6mzagbic0wn671ilax51hbra3p38g8vq5b4yx54bn"))))
       (build-system emacs-build-system))))
 
 (define-public emacs-dape
