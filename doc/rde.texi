@@ -582,6 +582,7 @@ for details), an entry of the form `nick^cookie@@workspace`.
 @subsection Go
 @subsection JavaScript
 @subsection OCaml
+@subsection Prolog
 @subsection Python
 
 @section Finances
