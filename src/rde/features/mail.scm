@@ -1220,6 +1220,7 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
 ;;; feature-notmuch.
 ;;;
 
+;; Do it in Guile : https://git.oscarnajera.com/dotfiles/tree/bin/tagmail
 (define* (default-get-notmuch-configuration config
            #:key
            (extra-tag-updates-post '()))
@@ -1263,22 +1264,23 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
 
   (define (move-out-untagged-messages tag)
     "If tag was removed -> move out of the related folder."
-    (format #f "for f in $(notmuch search --output=files \
-'path:/.*\\/~a/ and not tag:~a' | grep '/~a/'); \
-do mv -v $f \
-$(echo $f | sed 's;/~a/;/archive/;' | sed 's/,U=[0-9]*:/:/'); done"
+    (format #f "notmuch search --output=files \
+'path:/.*\\/~a/ and not tag:~a' | grep '/~a/' | \
+while IFS= read -r f; do mv -v \"$f\" \
+\"$(echo ${f} | sed 's;/~a/;/archive/;' | sed 's/,U=[0-9]*:/:/')\"; done"
             tag tag tag tag))
 
   (define* (move-in-tagged-messages
             tag
             #:key (exclude-dir "nothing-will-match-this"))
-    (format #f "for f in $(notmuch search --output=files \
-'not path:/.*\\/~a/ and tag:~a' | grep -v \"/~a/\"); \
-do mv -v $f \
-$(echo $f | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/'); done"
+    (format #f "notmuch search --output=files \
+'not path:/.*\\/~a/ and tag:~a' | grep -v \"/~a/\" | \
+while IFS= read -r f; do mv -v \"$f\" \
+\"$(echo ${f} | sed 's;/[[:alnum:]]*/cur/;/~a/cur/;' | sed 's/,U=[0-9]*:/:/')\"; done"
             tag tag exclude-dir tag))
   (define delete-deleted-messages
-    "for f in $(notmuch search --output=files tag:deleted); do rm -v $f; done")
+    "notmuch search --output=files tag:deleted | \
+while IFS= read -r f; do rm -v \"$f\"; done")
 
   (define move-rules
     (append
