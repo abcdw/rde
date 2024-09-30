@@ -38,6 +38,7 @@
             feature-yt-dlp
             feature-youtube-dl))
 
+;; https://github.com/po5/mpv_sponsorblock
 ;; Nice mpv configs
 ;; https://libreddit.tiekoetter.com/r/mpv/comments/1149cpm/recommended_profiles/
 (define* (feature-mpv
@@ -89,10 +90,8 @@ on-the-fly thumbnail generation for progress bar."
               ,(file-append mpv-thumbfast "/share/mpv/scripts/thumbfast.lua"))
              ("mpv/script-opts/thumbfast.conf"
               ,(mixed-text-file "thumbfast.conf" "network=yes"))
-             ("mpv/scripts/uosc.lua"
-              ,(file-append mpv-uosc "/share/mpv/scripts/uosc.lua"))
-             ("mpv/scripts/uosc_shared"
-              ,(file-append mpv-uosc "/share/mpv/scripts/uosc_shared")))))
+             ("mpv/scripts/uosc"
+              ,(file-append mpv-uosc "/share/mpv/scripts/uosc")))))
          '())
      (list
       (service

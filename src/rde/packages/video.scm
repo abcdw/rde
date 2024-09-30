@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -19,38 +19,40 @@
 
 (define-module (rde packages video)
   #:use-module (gnu packages)
+  #:use-module (gnu packages compression)
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
+  #:use-module (guix download)
   #:use-module (guix build-system copy)
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public mpv-uosc
   (package
     (name "mpv-uosc")
-    (version "4.7.0")
+    (version "5.6.0")
     (source
      (origin
-       (method git-fetch)
-       (uri (git-reference
-             (url "https://github.com/tomasklaen/uosc")
-             (commit version)))
-       (file-name (git-file-name name version))
+       (method url-fetch/zipbomb)
+       (uri (string-append
+             "https://github.com/tomasklaen/uosc/releases/download/"
+             version
+             "/uosc.zip"))
        (sha256
-        (base32 "14hpl440m9b3fpf7h344kvmn6rim5ly63ivpx7jnb0hi3j743a96"))))
+        (base32 "13lnnyy9qv7pg3yjvavrjznwvdn9cwj2fzv46ac1cjy57fff3ak1"))))
     (build-system copy-build-system)
     (arguments
-     (list #:install-plan
-           #~'(("scripts" "share/mpv/scripts")
-               ("fonts" "share/mpv/fonts"))))
+     (list
+      #:install-plan
+      #~'(("." "share/mpv/" #:exclude ("scripts/uosc/bin")))))
     (home-page "https://github.com/tomasklaen/uosc")
     (synopsis "Feature-rich minimalist proximity-based UI for MPV player")
     (description "Feature-rich minimalist proximity-based UI for MPV player.")
     (license license:gpl3+)))
 
 (define-public mpv-thumbfast
-  (let ((commit "4241c7daa444d3859b51b65a39d30e922adb87e9")
-        (revision "0"))
+  (let ((commit "f1fdf10b17f394f2d42520d0e9bf22feaa20a9f4")
+        (revision "1"))
     (package
       (name "mpv-thumbfast")
       (version (git-version "0.1" revision commit))
@@ -62,7 +64,7 @@
                (commit commit)))
          (file-name (git-file-name name version))
          (sha256
-          (base32 "0p4mpjmq6vkcfni0rkwnvrly97rsd12cvq8bbibaikn4b0jwajgc"))))
+          (base32 "0wxcbq4ji6qbbml37w5pdhg43k3mixfn6p3hapf7wc0gxmzhna3k"))))
       (build-system copy-build-system)
       (arguments
        (list #:install-plan
