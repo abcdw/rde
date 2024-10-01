@@ -602,6 +602,9 @@ It can contain settings not yet moved to separate features."
                         #~(system* "emacs" "-q"))
      (emacs-xdg-service 'emacs-Q "Emacs (No init, no site-lisp: -Q)"
                         #~(system* "emacs" "-Q"))
+     (emacs-xdg-service 'emacs-org-protocol "Emacs (Client) [Org-protocol]"
+                        emacs-client
+                        #:default-for '(x-scheme-handler/org-protocol))
 
      (service home-emacs-feature-loader-service-type
               (home-emacs-feature-loader-configuration
@@ -630,6 +633,16 @@ It can contain settings not yet moved to separate features."
       (home-emacs-extension
        (init-el extra-init-el)
        (early-init-el extra-early-init-el)))
+
+     (simple-service
+      'emacs-org-protocol
+      home-emacs-service-type
+      (home-emacs-extension
+       (init-el
+        `(if after-init-time
+             (require 'org-protocol)
+             (add-hook 'after-init-hook
+                       (lambda () (require 'org-protocol)))))))
 
      (simple-service
       'emacs-set-default-editor

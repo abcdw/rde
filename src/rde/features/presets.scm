@@ -145,7 +145,6 @@
 
    (feature-emacs-pdf-tools)
    (feature-emacs-nov-el)
-   (feature-emacs-org-protocol)
 
    (feature-emacs-smartparens
     #:show-smartparens? #t)

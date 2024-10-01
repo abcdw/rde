@@ -42,6 +42,7 @@
   #:use-module (guix gexp)
   #:use-module (rde gexp)
   #:use-module (guix packages)
+  #:use-module (guix deprecation)
   #:use-module (guix diagnostics)
   #:use-module (guix i18n)
 
@@ -112,7 +113,7 @@
             feature-emacs-org-agenda-files-track
             feature-emacs-citation
             feature-emacs-org-dailies
-            feature-emacs-org-protocol
+            feature-emacs-org-protocol  ; Deprecated.
             feature-emacs-org-ql
             feature-emacs-spelling
             feature-emacs-org-recur
@@ -4957,41 +4958,10 @@ citar-org-roam-subdir if org-roam is enabled."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-(define* (feature-emacs-org-protocol)
-  "Setup and configure Org-Protocol for Emacs."
-
-  (define emacs-f-name 'org-protocol)
-  (define f-name (symbol-append 'emacs- emacs-f-name))
-
-  (define (get-home-services config)
-    (require-value 'emacs config)
-    (define emacs-cmd (get-value 'emacs-client config))
-
-    (list
-     (rde-elisp-configuration-service
-      emacs-f-name
-      config
-      `((if after-init-time
-            (require 'org-protocol)
-            (add-hook 'after-init-hook (lambda () (require 'org-protocol)))))
-      #:summary "\
-Org Protocol Emacs"
-      #:commentary "\
-Adding xdg-mime-entry and loading org-protocol.
-This integrates well with elfeed for now."
-      #:keywords '(convenience)
-      #:elisp-packages '())
-
-     (emacs-xdg-service
-      emacs-f-name
-      "Emacs (Client) [Org-protocol]"
-      emacs-cmd
-      #:default-for '(x-scheme-handler/org-protocol))))
-
+(define-deprecated/alias feature-emacs-org-protocol
   (feature
-   (name f-name)
-   (values `((,f-name . #t)))
-   (home-services-getter get-home-services)))
+   (name 'org-protocol)
+   (values '((org-protocol . #t)))))
 
 (define* (feature-emacs-spelling
           #:key
