@@ -112,6 +112,7 @@
             feature-emacs-org-agenda
             feature-emacs-org-agenda-files-track
             feature-emacs-citation
+            feature-emacs-zotra
             feature-emacs-org-dailies
             feature-emacs-org-protocol  ; Deprecated.
             feature-emacs-org-ql
@@ -4836,7 +4837,6 @@ marginalia annotations."
           #:key
           (emacs-citar emacs-citar)
           (emacs-citar-org-roam emacs-citar-org-roam)
-          (emacs-zotra emacs-zotra)
           (bibtex-dialect 'biblatex)
           (citar-library-paths (list "~/docs/library"))
           (citar-notes-paths #f)
@@ -4847,7 +4847,6 @@ citation management for GNU Emacs."
     (member x '(bibtex biblatex)))
   (ensure-pred file-like? emacs-citar)
   (ensure-pred file-like? emacs-citar-org-roam)
-  (ensure-pred file-like? emacs-zotra)
   (ensure-pred list? citar-library-paths)
   (ensure-pred maybe-list? citar-notes-paths)
   (ensure-pred list? global-bibliography)
@@ -4870,17 +4869,6 @@ citation management for GNU Emacs."
 
         (with-eval-after-load 'bibtex
           (setq bibtex-dialect ',bibtex-dialect))
-        (autoload 'zotra-add-entry-from-url "zotra" "" t)
-        (autoload 'zotra-add-entry-from-search "zotra" "" t)
-        (with-eval-after-load 'zotra
-          ;;  This is not a self-contained solution.
-
-          ;; TODO: [Andrew Tropin, 2023-09-14] Need to package
-          ;; translation-server and zotra-cli
-          (setq zotra-url-retrieve-timeout 10)
-          (setq zotra-backend 'curl_translation-server)
-          (setq zotra-default-entry-format ,(symbol->string bibtex-dialect))
-          (setq zotra-default-bibliography ,(car global-bibliography)))
 
         (with-eval-after-load 'oc
           (require 'oc-csl)
@@ -4951,7 +4939,47 @@ citar-org-roam-subdir if org-roam is enabled."
        (if (get-value 'emacs-org-roam config #f)
            (list emacs-citar-org-roam) '())
        (or (and=> emacs-all-the-icons list) '())
-       (list emacs-citar emacs-zotra)))))
+       (list emacs-citar)))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)
+             (bibtex-dialect . ,bibtex-dialect)
+             (global-bibliography . ,global-bibliography)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-zotra
+          #:key
+          (emacs-zotra emacs-zotra))
+  "Configure zotra integration in feature emacs-citation for GNU Emacs."
+  (ensure-pred file-like? emacs-zotra)
+
+  (define emacs-f-name 'zotra)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (require-value 'emacs-citation config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((autoload 'zotra-add-entry-from-url "zotra" "" t)
+        (autoload 'zotra-add-entry-from-search "zotra" "" t)
+        (with-eval-after-load 'zotra
+          ;; TODO: [Andrew Tropin, 2023-09-14] Need to package
+          ;; translation-server and zotra-cli
+          (setq zotra-url-retrieve-timeout 10)
+          (setq zotra-backend 'curl_translation-server)
+          (setq zotra-default-entry-format
+                ,(symbol->string (get-value 'bibtex-dialect config)))
+          (setq zotra-default-bibliography
+                ,(car (get-value 'global-bibliography config)))))
+      #:summary "\
+Use Zotero Connectors on any url to create a bibliographic entry."
+      #:commentary "\
+This currently is not a self-contained solution."
+      #:keywords '(convenience references knowledgebase)
+      #:elisp-packages (list emacs-zotra))))
 
   (feature
    (name f-name)
