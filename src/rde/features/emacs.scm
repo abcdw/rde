@@ -301,6 +301,11 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
                    (rde-whitespace-mode)
                    (setq show-trailing-whitespace t)))
 
+       (if after-init-time
+           (require 'org-protocol)
+           (add-hook 'after-init-hook
+                     (lambda () (require 'org-protocol))))
+
        ;; Highlight zero-width whitespaces and other glypless characters.
        (set-face-background 'glyphless-char "red")
        ,#~""
@@ -633,16 +638,6 @@ It can contain settings not yet moved to separate features."
       (home-emacs-extension
        (init-el extra-init-el)
        (early-init-el extra-early-init-el)))
-
-     (simple-service
-      'emacs-org-protocol
-      home-emacs-service-type
-      (home-emacs-extension
-       (init-el
-        `(if after-init-time
-             (require 'org-protocol)
-             (add-hook 'after-init-hook
-                       (lambda () (require 'org-protocol)))))))
 
      (simple-service
       'emacs-set-default-editor
