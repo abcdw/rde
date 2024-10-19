@@ -1,7 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
-;;; Copyright © 2023 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2023, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -22,11 +22,14 @@
   #:use-module (rde features)
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
+  #:use-module (gnu packages admin)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages sqlite)
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu services databases)
+  #:use-module (gnu system accounts)
+  #:use-module (gnu system shadow)
   #:use-module (guix gexp)
   #:use-module (srfi srfi-1)
   #:export (feature-postgresql
@@ -49,6 +52,15 @@
   (ensure-pred list-of-file-likes? extension-packages)
   (ensure-pred maybe-list-of-postgresql-roles? postgresql-roles)
 
+  (define (postgresql-role->user-account role)
+    (user-account
+     (name (postgresql-role-name role))
+     (group "postgres")
+     (system? #t)
+     (comment "PostgreSQL user")
+     (home-directory "/var/empty")
+     (shell (file-append shadow "/sbin/nologin"))))
+
   (define f-name 'postgresql)
 
   (define (get-system-services config)
@@ -63,7 +75,13 @@
          (list
           (service postgresql-role-service-type
                    (postgresql-role-configuration
-                    (roles postgresql-roles))))
+                    (roles postgresql-roles)))
+          ;; Default upstream pg_hba.conf is configured for peer authentication
+          ;; so it is necessary to have dedicated system accounts.
+          (simple-service
+           'postgresql-roles-accounts
+           account-service-type
+           (map postgresql-role->user-account postgresql-roles)))
          '())))
 
   (define (get-home-services config)
