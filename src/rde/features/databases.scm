@@ -42,9 +42,11 @@
 (define* (feature-postgresql
           #:key
           (postgresql postgresql)
+          (extension-packages '())
           (postgresql-roles #f))
   "Configure the PostgreSQL relational database."
-  (ensure-pred any-package? postgresql)
+  (ensure-pred file-like? postgresql)
+  (ensure-pred list-of-file-likes? extension-packages)
   (ensure-pred maybe-list-of-postgresql-roles? postgresql-roles)
 
   (define f-name 'postgresql)
@@ -55,7 +57,8 @@
      (list
       (service postgresql-service-type
                (postgresql-configuration
-                (postgresql postgresql))))
+                (postgresql postgresql)
+                (extension-packages extension-packages))))
      (if postgresql-roles
          (list
           (service postgresql-role-service-type
