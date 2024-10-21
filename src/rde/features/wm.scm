@@ -895,6 +895,10 @@ for the main bar."
              (compose string->symbol font-name)))
     (append
      (list
+      (simple-service
+       'waybar-add-font-awesome
+       home-profile-service-type
+       (list font-awesome))
       (service
         home-waybar-service-type
         (home-waybar-configuration
