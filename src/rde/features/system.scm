@@ -36,7 +36,7 @@
 
 (define %default-bootloader-configuration
   (bootloader-configuration
-   (bootloader grub-efi-bootloader)
+   (bootloader grub-efi-removable-bootloader)
    (targets '("/boot/efi"))))
 
 ;; TODO: Add LUKS2 support https://lists.gnu.org/archive/html/grub-devel/2022-07/msg00037.html
