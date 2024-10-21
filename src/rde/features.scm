@@ -312,7 +312,7 @@ can be later used to extend original service with additional configuration."
 (define bare-bone-os
   (operating-system
    (host-name "antelope")
-   (timezone  "Europe/Paris")
+   (timezone  "Etc/UTC")
    (locale    "en_US.utf8")
    (bootloader (bootloader-configuration
                 (bootloader grub-efi-bootloader)
