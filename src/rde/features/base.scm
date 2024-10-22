@@ -269,12 +269,14 @@ Defaults:%wheel env_keep+=TERMINFO")))))
 
    ;; Allow desktop users to also mount NTFS and NFS file systems
    ;; without root.
-   (simple-service 'mount-setuid-helpers setuid-program-service-type
-                   (map (lambda (program)
-                          (setuid-program
-                           (program program)))
-                        (list (file-append nfs-utils "/sbin/mount.nfs")
-                              (file-append ntfs-3g "/sbin/mount.ntfs-3g"))))
+   (simple-service
+    'mount-setuid-helpers
+    privileged-program-service-type
+    (map (lambda (program)
+           (setuid-program
+            (program program)))
+         (list (file-append nfs-utils "/sbin/mount.nfs")
+               (file-append ntfs-3g "/sbin/mount.ntfs-3g"))))
 
    ;; The global fontconfig cache directory can sometimes contain
    ;; stale entries, possibly referencing fonts that have been GC'd,
