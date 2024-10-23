@@ -75,7 +75,7 @@
     (#f "false")
     ((? symbol? e) (symbol->string e))
     ((? number? e) (number->string e))
-    ((? string? e) e)
+    ((? string? e) (format #f "~s" e))
     ((lst ...)
      (raise (formatted-message
              (G_ "Git term should be a non-list value (string, \
