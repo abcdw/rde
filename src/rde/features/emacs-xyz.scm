@@ -42,7 +42,6 @@
   #:use-module (guix gexp)
   #:use-module (rde gexp)
   #:use-module (guix packages)
-  #:use-module (guix deprecation)
   #:use-module (guix diagnostics)
   #:use-module (guix i18n)
 
@@ -114,7 +113,6 @@
             feature-emacs-citation
             feature-emacs-zotra
             feature-emacs-org-dailies
-            feature-emacs-org-protocol  ; Deprecated.
             feature-emacs-org-ql
             feature-emacs-spelling
             feature-emacs-org-recur
@@ -4985,11 +4983,6 @@ This currently is not a self-contained solution."
    (name f-name)
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
-
-(define-deprecated/alias feature-emacs-org-protocol
-  (feature
-   (name 'org-protocol)
-   (values '((org-protocol . #t)))))
 
 (define* (feature-emacs-spelling
           #:key
