@@ -25,13 +25,8 @@
   #:use-module (guix utils)
   #:use-module (guix gexp)
   #:use-module (guix git-download)
-  #:use-module (guix deprecation)
   #:use-module (guix build-system trivial)
-  #:use-module ((guix licenses) #:prefix license:)
-  #:export (emacs-next-pgtk-stable emacs-next-pgtk-latest))
-
-(define-deprecated/alias emacs-next-pgtk-stable emacs-pgtk)
-(define-deprecated/alias emacs-next-pgtk-latest emacs-pgtk)
+  #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-consumer
   (package
