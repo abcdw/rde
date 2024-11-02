@@ -26,23 +26,11 @@
   #:use-module (gnu packages bash)
   #:use-module (guix gexp)
   #:use-module (guix packages)
-  #:use-module (guix deprecation)
   #:use-module (srfi srfi-1)
   #:use-module (srfi srfi-26)
   #:use-module (ice-9 match)
 
-  #:export (home-shell-profile-service-type
-            home-shell-profile-configuration
-
-            home-bash-service-type
-            home-bash-configuration
-            home-bash-extension
-
-            home-zsh-service-type
-            home-zsh-configuration
-            home-zsh-extension
-
-            home-fish-service-type
+  #:export (home-fish-service-type
             home-fish-configuration
             home-fish-extension))
 
@@ -51,25 +39,6 @@
 ;;; This module contains shell related services like Zsh.
 ;;;
 ;;; Code:
-
-(define-deprecated/alias home-shell-profile-service-type
-  (@ (rde home services shells) home-shell-profile-service-type))
-(define-deprecated/alias home-shell-profile-configuration
-  (@ (rde home services shells) home-shell-profile-configuration))
-
-(define-deprecated/alias home-bash-service-type
-  (@ (rde home services shells) home-bash-service-type))
-(define-deprecated/alias home-bash-configuration
-  (@ (rde home services shells) home-bash-configuration))
-(define-deprecated/alias home-bash-extension
-  (@ (rde home services shells) home-bash-extension))
-
-(define-deprecated/alias home-zsh-service-type
-  (@ (rde home services shells) home-zsh-service-type))
-(define-deprecated/alias home-zsh-configuration
-  (@ (rde home services shells) home-zsh-configuration))
-(define-deprecated/alias home-zsh-extension
-  (@ (rde home services shells) home-zsh-extension))
 
 
 ;;;
