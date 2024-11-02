@@ -8,19 +8,13 @@
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix diagnostics)
-  #:use-module (guix deprecation)
   #:use-module (guix ui)
 
   #:use-module (srfi srfi-1)
   #:use-module (ice-9 match)
 
 
-  #:export (home-sway-service-type
-            home-sway-configuration
-
-            sway-config?
-
-            home-xmonad-service-type
+  #:export (home-xmonad-service-type
             home-xmonad-configuration))
 
 ;;; Commentary:
@@ -28,15 +22,6 @@
 ;;; This module contains services for window managers.
 ;;;
 ;;; Code:
-
-
-(define-deprecated/alias home-sway-service-type
-  (@ (rde home services wm) home-sway-service-type))
-(define-deprecated/alias home-sway-configuration
-  (@ (rde home services wm) home-sway-configuration))
-
-(define-deprecated/alias sway-config?
-  (@ (rde home services wm) sway-config?))
 
 
 ;;;
