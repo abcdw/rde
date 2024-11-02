@@ -28,7 +28,6 @@
   #:use-module (guix profiles)
   #:use-module (guix packages)
   #:use-module (guix build-system trivial)
-  #:use-module (guix deprecation)
 
   #:use-module (ice-9 curried-definitions)
   #:use-module (ice-9 match)
