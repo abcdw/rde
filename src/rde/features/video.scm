@@ -32,11 +32,9 @@
   #:use-module (gnu home services xdg)
   #:use-module (rde home services video)
   #:use-module (guix gexp)
-  #:use-module (guix deprecation)
   #:use-module (srfi srfi-1)
   #:export (feature-mpv
-            feature-yt-dlp
-            feature-youtube-dl))
+            feature-yt-dlp))
 
 ;; https://github.com/po5/mpv_sponsorblock
 ;; Nice mpv configs
@@ -343,5 +341,3 @@ and various other sites."
    (values `((,f-name . ,yt-dlp)
              (emacs-ytdl . ,emacs-ytdl)))
    (home-services-getter get-home-services)))
-
-(define-deprecated/alias feature-youtube-dl feature-yt-dlp)
