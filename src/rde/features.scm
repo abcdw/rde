@@ -29,6 +29,7 @@
   #:use-module (gnu system shadow)
   #:use-module (gnu system nss)
   #:use-module (gnu services guix)
+  #:use-module (rde system bare-bone)
   #:use-module (rde system services accounts)
   #:use-module (rde system services admin)
 
@@ -69,9 +70,7 @@
             service-type->rde-value
 
             ensure-pred
-            throw-message
-
-            bare-bone-os))
+            throw-message))
 
 (define (alist? lst)
   (every pair? lst))
@@ -308,19 +307,6 @@ can be later used to extend original service with additional configuration."
 
 (define (get-home-environment-packages config)
   (home-environment-packages (get-home-environment config)))
-
-(define bare-bone-os
-  (operating-system
-   (host-name "antelope")
-   (timezone  "Etc/UTC")
-   (locale    "en_US.utf8")
-   (bootloader (bootloader-configuration
-                (bootloader grub-efi-bootloader)
-                (targets '("/boot/efi"))))
-   (issue "This is RDE.  Welcome.\n")
-   (services '())
-   (sudoers-file #f)
-   (file-systems %base-file-systems)))
 
 (define (get-operating-system config)
   (let* ((initial-os (rde-config-initial-os config))
