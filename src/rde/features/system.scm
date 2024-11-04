@@ -1,6 +1,7 @@
 (define-module (rde features system)
   #:use-module (rde features)
   #:use-module (rde features predicates)
+  #:use-module (rde system bare-bone)
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)
   #:use-module (gnu packages linux)
@@ -35,9 +36,7 @@
 
 
 (define %default-bootloader-configuration
-  (bootloader-configuration
-   (bootloader grub-efi-removable-bootloader)
-   (targets '("/boot/efi"))))
+  (operating-system-bootloader bare-bone-os))
 
 ;; TODO: Add LUKS2 support https://lists.gnu.org/archive/html/grub-devel/2022-07/msg00037.html
 (define* (feature-bootloader
