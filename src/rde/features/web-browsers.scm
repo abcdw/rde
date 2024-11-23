@@ -170,6 +170,9 @@ exec ~a ~a $@"
                    '())))
    (home-services-getter get-home-services)))
 
+;; TODO: [Andrew Tropin, 2024-08-01] Provide more compact oob theme
+;; https://github.com/black7375/Firefox-UI-Fix
+
 ;; TODO: [Andrew Tropin, 2024-04-24] Use DNS over HTTPS by default
 ;; Add https://github.com/woodruffw/ff2mpv to feature-mpv?
 (define* (feature-librewolf
