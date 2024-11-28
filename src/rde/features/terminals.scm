@@ -174,9 +174,11 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
           #:key
           (foot foot)
           (default-terminal? #f)
-          (backup-terminal? #t))
+          (backup-terminal? #t)
+          (theme "modus-operandi"))
   "Configure foot terminal."
   (ensure-pred file-like? foot)
+  (ensure-pred string? theme)
 
   (define (get-home-services config)
     (define font-mono (get-value 'font-monospace config #f))
@@ -199,7 +201,7 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
                "")
            ;; "dpi-aware = yes\n" ; use dpi instead of output scaling factor
            "[main]
-include = " (file-append foot "/share/foot/themes/modus-operandi") "\n"))))))
+include = " (file-append foot "/share/foot/themes/") theme "\n"))))))
 
   (feature
    (name 'foot)
