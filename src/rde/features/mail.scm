@@ -44,6 +44,7 @@
   #:use-module (ice-9 match)
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
+  #:use-module (guix deprecation)
 
   #:export (feature-mail-settings
             feature-emacs-message
@@ -1037,7 +1038,6 @@ control whether to NOTIFY? when new emails arrive."
         isync-mapping)
      ,#~"")))
 
-;; TODO: [Andrew Tropin, 2024-08-08] Deprecate this function
 (define* (generate-isync-serializer
           host folders-mapping
           #:key
@@ -1048,6 +1048,9 @@ control whether to NOTIFY? when new emails arrive."
           (pipeline-depth #f))
   (ensure-pred symbol? subfolders)
 
+  (warn-about-deprecation generate-isync-serializer
+                          (procedure-properties generate-isync-serializer)
+                          #:replacement %generate-isync-serializer)
   (define (isync-settings mail-directory mail-account)
     (let* ((id       (mail-account-id mail-account))
            (account  (symbol->string id))
