@@ -33,8 +33,8 @@
 (define* (feature-guile
           #:key
           (guile guile-next)
-          (emacs-arei emacs-arei-latest)
           (guile-ares-rs guile-ares-rs))
+          (emacs-arei emacs-arei)
   "Configure tooling and environment for GNU Guile."
 
   (define f-name 'guile)
