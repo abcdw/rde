@@ -25,10 +25,16 @@
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu services configuration)
+  #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages guile-xyz)
   #:use-module (guix gexp)
   #:export (feature-guile))
 
-(define* (feature-guile)
+(define* (feature-guile
+          #:key
+          (guile guile-next)
+          (emacs-arei emacs-arei-latest)
+          (guile-ares-rs guile-ares-rs))
   "Configure tooling and environment for GNU Guile."
 
   (define f-name 'guile)
@@ -37,9 +43,35 @@
     "Return home services related to Guile."
     (list
      (simple-service
+      'add-guile-package
+      home-profile-service-type
+      (list guile guile-ares-rs))
+     (simple-service
       'guile-xdg-base-dirs-specification
       home-environment-variables-service-type
-      '(("GUILE_HISTORY" . "$XDG_STATE_HOME/guile_history")))))
+      '(("GUILE_HISTORY" . "$XDG_STATE_HOME/guile_history")))
+     (rde-elisp-configuration-service
+      f-name
+      config
+      `((with-eval-after-load 'info-look
+         (info-lookup-add-help
+          :mode 'scheme-mode
+          :regexp "[^()`',\"        \n]+"
+          :ignore-case t
+          :doc-spec '(("(r5rs)Index" nil "^[ 	]+-+ [^:]+:[ 	]*" "\\b")
+                      ;; TODO: Check what rest nil arguments do
+                      ("(Guile)Procedure Index" nil nil nil)
+                      ("(Guile)Variable Index" nil nil nil)
+                      ("(Guix)Programming Index" nil nil nil))))
+        (with-eval-after-load 'minions
+          (setopt minions-prominent-modes '(arei-mode)))
+        (require 'arei))
+
+      #:elisp-packages (list emacs-arei)
+      #:keywords '(guile)
+      #:summary "Configure Guile-related packages"
+      #:commentary "\
+Provide interactive and functional programming environment for Guile.")))
 
   (feature
    (name f-name)
