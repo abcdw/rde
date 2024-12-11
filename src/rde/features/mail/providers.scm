@@ -72,6 +72,13 @@
     ("trash"   . "Trash")
     ("junk"    . "Junk")))
 
+(define disroot-folder-mapping
+  '(("inbox"   . "INBOX")
+    ("sent"    . "Sent")
+    ("drafts"  . "Drafts")
+    ("trash"   . "Trash")
+    ("spam"    . "Junk")))
+
 (define default-providers-settings
   ;; Keep alphabet order.
   `((dismail
@@ -136,7 +143,14 @@
      (smtp (host . "mail.runbox.com")
            (starttls? . #t))
      (imap (host . "mail.runbox.com")
-           (folder-mapping . ,generic+spam-folder-mapping)))))
+           (folder-mapping . ,generic+spam-folder-mapping)))
+
+    (disroot
+     (smtp (host . "disroot.org")
+           (starttls? . #t))
+     (imap (host . "disroot.org")
+           (folder-mapping . ,disroot-folder-mapping)
+           (extra-options (auth-mechs . LOGIN))))))
 
 (define (add-default-values-to-provider-settings provider-mail-settings)
   "Add default values to mail-providers-settings.
