@@ -6,6 +6,7 @@
 ;;; Copyright © 2022, 2023, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2022, 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;; Copyright © 2023 Benoit Joly <benoit@benoitj.ca>
+;;; Copyright © 2024 jgart <jgart@dismail.de>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -62,6 +63,7 @@
             feature-emacs-calendar
             feature-emacs-tramp
             feature-emacs-dired
+            feature-emacs-eat
             feature-emacs-eshell
             feature-emacs-calc
             feature-emacs-re-builder
@@ -1173,7 +1175,37 @@ Small tweaks, xdg entry for openning directories in emacs client."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
-;; TODO: Integrate with eat https://codeberg.org/akib/emacs-eat
+(define* (feature-emacs-eat
+          #:key
+          (emacs-eat emacs-eat)
+          (number-of-history-items-to-keep 1024))
+  "Configure Eat, a terminal emulator written in pure Emacs Lisp."
+  (ensure-pred file-like? emacs-eat)
+  (ensure-pred number? number-of-history-items-to-keep)
+
+  (define emacs-f-name 'eat)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'eat
+          (setq eat-line-input-ring-size ,number-of-history-items-to-keep
+                eat-kill-buffer-on-exit t
+                eat-term-scrollback-size nil
+                eat-enable-mouse t)))
+      #:elisp-packages (list emacs-eat)
+      #:summary "Eat configurations and tweaks"
+      #:commentary "Keybindings and tweaks."
+      #:keywords '(convenience eat))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 (define* (feature-emacs-eshell
           #:key
           (emacs-eshell-syntax-highlighting
@@ -1205,19 +1237,24 @@ Small tweaks, xdg entry for openning directories in emacs client."
           :group 'rde-eshell
           (if rde-eshell-mode-setup
               (progn
-                (if (and (boundp 'envrc-global-mode) envrc-global-mode)
-                    (add-hook 'envrc-mode-hook (lambda () (setenv "PAGER" "")))
-                    (setenv "PAGER" ""))
+               (if (and (boundp 'envrc-global-mode) envrc-global-mode)
+                   (add-hook 'envrc-mode-hook (lambda () (setenv "PAGER" "")))
+                   (setenv "PAGER" ""))
 
-                (eshell/alias "e" "find-file $1")
-                (eshell/alias "ee" "find-file-other-window $1")
-                (eshell/alias "d" "dired $1")
-                (with-eval-after-load 'magit
-                  (eshell/alias "gd" "magit-diff-unstaged"))
+               ,@(if (get-value 'emacs-eat config #f)
+                     '((add-hook 'eshell-load-hook 'eat-eshell-mode)
+                       (add-hook 'eshell-load-hook 'eat-eshell-visual-command-mode))
+                     '())
 
-                (define-key eshell-mode-map (kbd "C-c M-o") 'eshell/clear)
-                (define-key eshell-mode-map (kbd "s-e")
-                            'switch-to-prev-buffer-or-eshell))
+               (eshell/alias "e" "find-file $1")
+               (eshell/alias "ee" "find-file-other-window $1")
+               (eshell/alias "d" "dired $1")
+               (with-eval-after-load 'magit
+                 (eshell/alias "gd" "magit-diff-unstaged"))
+
+               (define-key eshell-mode-map (kbd "C-c M-o") 'eshell/clear)
+               (define-key eshell-mode-map (kbd "s-e")
+                 'switch-to-prev-buffer-or-eshell))
               (local-unset-key 'eshell/clear)))
 
         (defun rde-project-eshell-or-eshell (&optional arg)
