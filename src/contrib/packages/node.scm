@@ -254,7 +254,7 @@ source files.")
                                 "deps/llhttp/include/llhttp.h")))))))))
     (native-inputs
      (list ;; Runtime dependencies for binaries used as a bootstrap.
-      c-ares-for-node
+      c-ares
       brotli
       icu4c
       libuv-for-node
@@ -270,7 +270,7 @@ source files.")
     (inputs
      (list bash-minimal
            coreutils
-           c-ares-for-node
+           c-ares
            icu4c
            libuv-for-node
            llhttp-bootstrap-2.1.4
