@@ -2659,6 +2659,7 @@ It shows `completion-at-point' candidates in overlay frame."
 (define* (feature-emacs-tempel
           #:key
           (emacs-tempel emacs-tempel)
+          (emacs-tempel-collection emacs-tempel-collection)
           (tempel-capf-hooks '(prog-mode-hook
                                text-mode-hook
                                conf-mode-hook
@@ -2669,6 +2670,7 @@ It shows `completion-at-point' candidates in overlay frame."
   "Configure TempEL for emacs.  To extend a list of templates from other
 features use `home-emacs-tempel-service-type'."
   (ensure-pred file-like? emacs-tempel)
+  (ensure-pred file-like? emacs-tempel-collection)
   (ensure-pred string? tempel-trigger-prefix)
   (ensure-pred list? tempel-capf-hooks)
 
@@ -2705,6 +2707,7 @@ features use `home-emacs-tempel-service-type'."
       `((eval-when-compile (require 'tempel))
         (with-eval-after-load
          'tempel
+         (require 'tempel-collection)
          (setq tempel-trigger-prefix ,tempel-trigger-prefix)
          (defun rde-tempel-setup-capf ()
            "Prepends `tempel-complete' to `completion-at-point-functions'."
@@ -2723,7 +2726,7 @@ features use `home-emacs-tempel-service-type'."
         (if after-init-time
              (global-tempel-abbrev-mode 1)
              (add-hook 'after-init-hook 'global-tempel-abbrev-mode)))
-      #:elisp-packages (list emacs-tempel)
+      #:elisp-packages (list emacs-tempel emacs-tempel-collection)
       #:summary "\
 Simple templates based on tempo syntax."
       #:commentary "\
