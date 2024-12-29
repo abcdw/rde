@@ -380,7 +380,17 @@ HiDPI friendly."
       'xcursors-environment-variables-ubuntu-fix
       home-environment-variables-service-type
       `(("XCURSOR_PATH" .
-         "/usr/share/icons${XCURSOR_PATH:+:}$XCURSOR_PATH")))))
+         "/usr/share/icons${XCURSOR_PATH:+:}$XCURSOR_PATH")))
+
+     (simple-service
+      'set-nss-certs-path
+      home-environment-variables-service-type
+      `(("SSL_CERT_DIR" . ,(file-append nss-certs "/etc/ssl/certs"))
+        ;; The CA certificate bundle is generated in a profile hook rather
+        ;; than in a package like `NSS-CERTS'. It ends up in the store, but
+        ;; I'm not sure how to access the derivation itself here. It would be
+        ;; nicer for this to be a real G-EXP that references the store.
+        ("SSL_CERT_FILE" . "${GUIX_PROFILE}/etc/ssl/certs/ca-certificates.crt")))))
 
   (feature
    (name 'foreign-distro)
