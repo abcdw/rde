@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2024 jgart <jgart@dismail.de>
+;;; Copyright © 2024-2025 jgart <jgart@dismail.de>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -18,6 +18,7 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (rde features prolog)
+  #:use-module (ice-9 match)
   #:use-module (rde features)
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
@@ -29,13 +30,26 @@
   #:use-module (guix gexp)
   #:export (feature-prolog))
 
+(define (prolog-startup-file name)
+  (plain-file name
+              "\
+:- use_module(library(dcgs)).
+:- use_module(library(debug)).
+:- use_module(library(clpz))."))
+
 (define* (feature-prolog
           #:key
           (prolog trealla)
-          (emacs-ediprolog emacs-ediprolog))
+          (binary-name
+           (match (package-name prolog)
+             ("trealla" "tpl")))
+          (emacs-ediprolog emacs-ediprolog)
+          (dwim-key "C-c C-c"))
   "Configure Prolog for Emacs."
   (ensure-pred file-like? prolog)
+  (ensure-pred string? binary-name)
   (ensure-pred file-like? emacs-ediprolog)
+  (ensure-pred string? dwim-key)
 
   (define f-name 'prolog)
 
@@ -44,13 +58,23 @@
      (simple-service
       'add-prolog-home-package
       home-profile-service-type
-      (list trealla))
+      (list prolog))
+     (simple-service
+      'add-prolog-startup-file
+      home-files-service-type
+      (match (package-name prolog)
+        ("trealla"
+         `((".tplrc" ,(prolog-startup-file "tplrc"))))
+        (_ '())))
      (when (get-value 'emacs config #f)
        (rde-elisp-configuration-service
         f-name
         config
-        `((with-eval-after-load 'ediprolog
-            (setq ediprolog-program ,(file-append trealla "/bin/tpl"))))
+        `((with-eval-after-load 'prolog
+            (define-key prolog-mode-map (kbd ,dwim-key) 'ediprolog-dwim))
+          (with-eval-after-load 'ediprolog
+            (setq ediprolog-program
+                  ,(file-append prolog (string-append "/bin/" binary-name)))))
         #:elisp-packages (list emacs-ediprolog)))))
 
   (feature
