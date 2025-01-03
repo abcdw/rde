@@ -5225,10 +5225,13 @@ SPELLING-DICTIONARIES inside buffers of modes defined in FLYSPELL-HOOKS
               '((setq denote-date-prompt-use-org-read-date t))
               '((setq denote-date-prompt-use-org-read-date nil)))
 
-
-        ,@(if (member denote-file-type '(text markdown-toml markdown-yaml))
-              '((add-hook 'find-file-hook 'denote-link-buttonize-buffer))
-              '())
+        ,@(match denote-file-type
+            ('text
+             '((add-hook 'text-mode-hook 'denote-fontify-links-mode-maybe)))
+            ((and (or 'markdown-toml 'markdown-yaml)
+                  (get-value 'markdown config))
+             '((add-hook 'markdown-mode-hook 'denote-fontify-links-mode-maybe)))
+            (else '()))
 
         (setq denote-dired-directories (list denote-directory))
 
@@ -5286,10 +5289,10 @@ stored in directory understood by project.el."
       #:keywords '(convenience)
       #:elisp-packages (list emacs-denote))))
 
-    (feature
-     (name f-name)
-     (values `((,f-name . ,emacs-denote)))
-     (home-services-getter get-home-services)))
+  (feature
+   (name f-name)
+   (values `((,f-name . ,emacs-denote)))
+   (home-services-getter get-home-services)))
 
 
 ;;;
