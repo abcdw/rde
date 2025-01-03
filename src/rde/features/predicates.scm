@@ -13,7 +13,8 @@
   #:use-module (guix inferior)
   #:use-module (guix gexp)
 
-  #:export (any-package?)
+  #:export (any-package?
+            list-of-packages?)
   #:re-export (file-like?
                package?
                ini-config?))
@@ -63,7 +64,7 @@
 
 (define-deprecated/alias any-package? file-like?)
 
-(define-public list-of-packages? list-of-file-likes?)
+(define-deprecated/alias list-of-packages? list-of-file-likes?)
 
 (define-public list-of-elisp-packages? list-of-file-likes?)
 

@@ -110,9 +110,9 @@
 packages for home-environment, or operating-system, or both.
 Standalone means that packages do not require configuration and not
 installed by system or home services."
-  (ensure-pred list-of-packages? home-packages)
-  (ensure-pred list-of-packages? system-packages)
-  (ensure-pred list-of-packages? base-system-packages)
+  (ensure-pred list-of-file-likes? home-packages)
+  (ensure-pred list-of-file-likes? system-packages)
+  (ensure-pred list-of-file-likes? base-system-packages)
 
   (define (get-home-packages values)
     (list
