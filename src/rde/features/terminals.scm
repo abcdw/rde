@@ -48,7 +48,7 @@
           (software-rendering? #f))
   "Configure Alacritty terminal."
   (ensure-pred maybe-file-like? config-file)
-  (ensure-pred any-package? package)
+  (ensure-pred file-like? package)
 
   ;; TODO: Implement home service and rewrite to it to make this
   ;; feature extendable.

@@ -125,9 +125,9 @@
   (ensure-pred sway-config? extra-config)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
   (ensure-pred boolean? xwayland?)
-  (ensure-pred any-package? sway)
-  (ensure-pred any-package? foot)
-  (ensure-pred any-package? bemenu)
+  (ensure-pred file-like? sway)
+  (ensure-pred file-like? foot)
+  (ensure-pred file-like? bemenu)
   (ensure-pred file-like? qtwayland)
   (ensure-pred file-like? shepherd)
   (ensure-pred file-like? xdg-desktop-portal)
@@ -1075,7 +1075,7 @@ for the main bar."
           (lock-timeout 240)
           (extra-config '()))
   "Configure swayidle."
-  (ensure-pred any-package? swayidle)
+  (ensure-pred file-like? swayidle)
 
   (define swayidle-cmd (file-append swayidle "/bin/swayidle -w"))
 
@@ -1117,7 +1117,7 @@ for the main bar."
           (extra-config '())
           (default-screen-locker? #t))
   "Configure swaylock."
-  (ensure-pred any-package? swaylock)
+  (ensure-pred file-like? swaylock)
 
   (define (get-home-services config)
     (list

@@ -48,7 +48,7 @@
           (extra-ocaml-packages '())
           (opam? #f))
   "Configure tooling and environment for OCaml."
-  (ensure-pred any-package? ocaml)
+  (ensure-pred file-like? ocaml)
   (ensure-pred file-like? ocaml-core)
   (ensure-pred file-like? ocaml-findlib)
   (ensure-pred file-like? dune)

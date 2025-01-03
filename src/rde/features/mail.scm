@@ -939,7 +939,7 @@ to offset block quotes."
 MAIL-ACCOUNT-IDS is not provided, use all the mail accounts.  You can also
 control whether to NOTIFY? when new emails arrive."
   (ensure-pred maybe-list? mail-account-ids)
-  (ensure-pred any-package? goimapnotify)
+  (ensure-pred file-like? goimapnotify)
   (ensure-pred boolean? notify?)
 
   (define (get-home-services config)

@@ -55,7 +55,7 @@
           (default-startup-flags '("--user-data-dir=$XDG_DATA_HOME/chromium"))
           (desktop-startup-flags '("")))
   "Configure the Chromium browser."
-  (ensure-pred any-package? ungoogled-chromium)
+  (ensure-pred file-like? ungoogled-chromium)
   (ensure-pred boolean? default-browser?)
   (ensure-pred list-of-strings? default-startup-flags)
   (ensure-pred list-of-strings? desktop-startup-flags)

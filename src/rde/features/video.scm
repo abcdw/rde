@@ -271,7 +271,7 @@ do with the file, and whether to add the file to the current PLAYLIST."
           (ytdl-key "y"))
   "Configure the yt-dlp program to download videos from YouTube
 and various other sites."
-  (ensure-pred any-package? yt-dlp)
+  (ensure-pred file-like? yt-dlp)
   (ensure-pred file-like? yt-dlp-command)
   (ensure-pred file-like? emacs-ytdl)
   (ensure-pred list? music-dl-args)

@@ -154,7 +154,7 @@ Defaults:%wheel env_keep+=ZDOTDIR"))))
           #:key
           (bash bash))
   "Configure Bash."
-  (ensure-pred any-package? bash)
+  (ensure-pred file-like? bash)
 
   (define (get-home-services config)
     "Returns home services related to Bash."

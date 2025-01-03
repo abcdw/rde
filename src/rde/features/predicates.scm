@@ -8,11 +8,14 @@
   #:use-module (gnu system mapped-devices)
 
   #:use-module (srfi srfi-1)
+  #:use-module (guix deprecation)
   #:use-module (guix packages)
   #:use-module (guix inferior)
   #:use-module (guix gexp)
 
-  #:re-export (package?
+  #:export (any-package?)
+  #:re-export (file-like?
+               package?
                ini-config?))
 
 (define-public (maybe-integer? x)
@@ -58,14 +61,11 @@
 (define-public (list-of-file-likes? lst)
   (and (list? lst) (every file-like? lst)))
 
-(define-public (any-package? x)
-  (or (package? x) (inferior-package? x)))
+(define-deprecated/alias any-package? file-like?)
 
-(define-public (list-of-packages? lst)
-  (and (list? lst) (every any-package? lst)))
+(define-public list-of-packages? list-of-file-likes?)
 
-(define-public (list-of-elisp-packages? lst)
-  (list-of-packages? lst))
+(define-public list-of-elisp-packages? list-of-file-likes?)
 
 (define-public (list-of-services? lst)
   (and (list? lst) (every service? lst)))

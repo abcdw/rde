@@ -55,7 +55,7 @@ If you want Leiningen support, make sure to pass in the LEININGEN package."
   (define (get-home-services config)
     (define emacs-f-name 'clojure)
     (define clojure-lsp-binary
-      (if (any-package? clojure-lsp)
+      (if (file-like? clojure-lsp)
           (file-append clojure-lsp "/bin/clojure-lsp")
           clojure-lsp))
 

@@ -15,7 +15,7 @@
           (emacs-go-mode emacs-go-mode)
           (emacs-ob-go emacs-ob-go))
   "Configure and set up tooling for Golang."
-  (ensure-pred any-package? go)
+  (ensure-pred file-like? go)
   (ensure-pred file-like? emacs-go-mode)
   (ensure-pred file-like? emacs-ob-go)
 

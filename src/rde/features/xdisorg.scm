@@ -27,7 +27,7 @@
           (show-actions? #t)
           (default-application-launcher? #t))
   "Configure rofi."
-  (ensure-pred any-package? rofi)
+  (ensure-pred file-like? rofi)
   (ensure-pred file-like-or-path? theme)
 
   (define (get-home-services config)

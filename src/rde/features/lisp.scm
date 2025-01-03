@@ -72,7 +72,7 @@ that takes the current RDE configuration and should return an Emacs Lisp
 function that represents the custom prompt.  If you'd rather use the
 default sly prompt, simply pass #f to it.
 See @code{sly-mrepl-default-prompt} for its arguments and return value."
-  (ensure-pred any-package? lisp)
+  (ensure-pred file-like? lisp)
   (ensure-pred file-like? emacs-sly)
   (ensure-pred lisp-config? extra-sbclrc-lisp)
   (ensure-pred lisp-config? extra-slynk-lisp)

@@ -32,7 +32,7 @@
           (git-send-email? #t)
           (extra-config '()))
   "Setup and configure Git."
-  (ensure-pred any-package? git)
+  (ensure-pred file-like? git)
   (ensure-pred maybe-string? git-sign-key)
   (ensure-pred boolean? sign-commits?)
   (ensure-pred boolean? git-send-email?)
