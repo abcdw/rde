@@ -59,31 +59,6 @@
            "1k68247p8sx6mzagbic0wn671ilax51hbra3p38g8vq5b4yx54bn"))))
       (build-system emacs-build-system))))
 
-(define-public emacs-dape
-  (let ((commit "eb6042ab4a4ee7758f5f9408904d2d702f1b0ba8"))
-    (package
-      (name "emacs-dape")
-      (version "0.11.1")
-      (home-page "https://github.com/svaante/dape")
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url home-page)
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "0ssl85gyf4k8yk8snj80gln2z4g8gfp1pfg83s1279wrnlgaz7s3"))))
-      (build-system emacs-build-system)
-      (synopsis "Debug Adapter Protocol for Emacs")
-      (description
-       "Dape is a debug adapter client for Emacs. The debug adapter protocol,
-much like its more well-known counterpart, the language server protocol,
-aims to establish a common API for programming tools. However, instead of
-functionalities such as code completions, it provides a standardized
-interface for debuggers.")
-      (license license:gpl3+))))
-
 (define-public emacs-justify-kp
  (let ((commit "385e6b8b909ae0f570f30101cec3677e21c9e0a0"))
   (package
