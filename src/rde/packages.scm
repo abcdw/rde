@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -19,16 +20,16 @@
 
 (define-module (rde packages)
   #:use-module (gnu packages)
-  #:use-module (gnu packages linux)
+  #:use-module (gnu packages base)
   #:use-module (gnu packages freedesktop)
-  #:use-module (gnu packages pkg-config)
-  #:use-module (gnu packages xdisorg)
-  #:use-module (gnu packages texinfo)
+  #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gtk)
   #:use-module (gnu packages image)
-  #:use-module (gnu packages glib)
-  #:use-module (gnu packages base)
+  #:use-module (gnu packages linux)
+  #:use-module (gnu packages pkg-config)
+  #:use-module (gnu packages texinfo)
+  #:use-module (gnu packages xdisorg)
 
   #:use-module (srfi srfi-1)
 
