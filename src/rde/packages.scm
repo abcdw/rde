@@ -94,6 +94,7 @@
         "0rcyi4jj09yxj56hlr0v1z70qb4bidf9g4zzq4y4rxl4wdimh2qr"))
       (file-name (string-append "rde-" version "-checkout"))))
     (build-system guile-build-system)
+    (outputs (list "out" "doc"))
     (native-inputs
      (list gnu-make guile-3.0 texinfo))
     (inputs
@@ -119,7 +120,7 @@
           (replace 'install-documentation
             (lambda _
               (install-file "doc/rde.info"
-                            (string-append #$output "/share/info")))))))
+                            (string-append #$output:doc "/share/info")))))))
     (synopsis "Developers and power user friendly GNU/Linux distribution")
     (description "The GNU/Linux distribution, a set of tools for managing
 development environments, home environments, and operating systems, a set of

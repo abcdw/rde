@@ -105,7 +105,7 @@
           (home-packages '())
           (system-packages '())
           (base-system-packages %rde-base-system-packages)
-          (base-home-packages (list rde)))
+          (base-home-packages (list `(,rde "doc"))))
   "Provides base packages and allows to specify additional standalone
 packages for home-environment, or operating-system, or both.
 Standalone means that packages do not require configuration and not
