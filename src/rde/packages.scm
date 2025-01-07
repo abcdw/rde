@@ -25,8 +25,10 @@
   #:use-module (gnu packages glib)
   #:use-module (gnu packages gnome)
   #:use-module (gnu packages gtk)
+  #:use-module (gnu packages guile)
   #:use-module (gnu packages image)
   #:use-module (gnu packages linux)
+  #:use-module (gnu packages package-management)
   #:use-module (gnu packages pkg-config)
   #:use-module (gnu packages texinfo)
   #:use-module (gnu packages xdisorg)
@@ -42,6 +44,7 @@
   #:use-module (guix git-download)
   #:use-module (guix build-system meson)
   #:use-module (guix build-system gnu)
+  #:use-module (guix build-system guile)
   #:use-module ((guix licenses) #:prefix license:)
   #:export (strings->packages
             strings->inferior-packages
@@ -90,21 +93,33 @@
        (base32
         "0rcyi4jj09yxj56hlr0v1z70qb4bidf9g4zzq4y4rxl4wdimh2qr"))
       (file-name (string-append "rde-" version "-checkout"))))
-    (build-system gnu-build-system)
+    (build-system guile-build-system)
     (native-inputs
-     (list gnu-make texinfo))
+     (list gnu-make guile-3.0 texinfo))
+    (inputs
+     (list guix))
     (arguments
      (list
-      #:make-flags ''("doc/rde.info")
       #:phases
       #~(modify-phases %standard-phases
-          (delete 'configure)
-          (delete 'check)
-          (add-after 'install 'install-info
-            (lambda* (#:key outputs #:allow-other-keys)
-              (let* ((out  (assoc-ref outputs "out"))
-                     (info (string-append out "/share/info")))
-                (install-file "doc/rde.info" info)))))))
+          (add-after 'unpack 'configure
+            (lambda _
+              (setenv "GUILE_LOAD_PATH"
+                      (string-join
+                       (list (string-append (getcwd) "/src")
+                             (getenv "GUILE_LOAD_PATH"))
+                       ":"))))
+          (replace 'build
+            (lambda args
+              (with-directory-excursion "src"
+                (apply (assoc-ref %standard-phases 'build) args))))
+          (add-after 'build 'build-info
+            (lambda _
+              (invoke "make" "doc/rde.info")))
+          (replace 'install-documentation
+            (lambda _
+              (install-file "doc/rde.info"
+                            (string-append #$output "/share/info")))))))
     (synopsis "Developers and power user friendly GNU/Linux distribution")
     (description "The GNU/Linux distribution, a set of tools for managing
 development environments, home environments, and operating systems, a set of
