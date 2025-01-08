@@ -101,19 +101,9 @@
      (list guix))
     (arguments
      (list
+      #:source-directory "src"
       #:phases
       #~(modify-phases %standard-phases
-          (add-after 'unpack 'configure
-            (lambda _
-              (setenv "GUILE_LOAD_PATH"
-                      (string-join
-                       (list (string-append (getcwd) "/src")
-                             (getenv "GUILE_LOAD_PATH"))
-                       ":"))))
-          (replace 'build
-            (lambda args
-              (with-directory-excursion "src"
-                (apply (assoc-ref %standard-phases 'build) args))))
           (add-after 'build 'build-info
             (lambda _
               (invoke "make" "doc/rde.info")))
