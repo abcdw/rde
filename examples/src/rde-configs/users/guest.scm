@@ -58,8 +58,6 @@
 
      "binutils" ;; needed for emacs native-comp stuff
 
-     "emacs-arei" "guile-next" "guile-ares-rs"
-
      "ripgrep" "curl"))))
 
 (define example-configs-service
