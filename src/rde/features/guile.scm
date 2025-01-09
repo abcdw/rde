@@ -25,16 +25,16 @@
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu services configuration)
-  #:use-module (gnu packages emacs-xyz)
-  #:use-module (gnu packages guile-xyz)
+  #:use-module (rde packages emacs-xyz)
+  #:use-module (rde packages guile-xyz)
   #:use-module (guix gexp)
   #:export (feature-guile))
 
 (define* (feature-guile
           #:key
           (guile guile-next)
-          (emacs-arei emacs-arei)
-          (guile-ares-rs guile-ares-rs))
+          (emacs-arei emacs-arei-latest)
+          (guile-ares-rs guile-ares-rs-latest))
   "Configure tooling and environment for GNU Guile."
 
   (define f-name 'guile)
