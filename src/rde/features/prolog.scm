@@ -70,7 +70,8 @@
        (rde-elisp-configuration-service
         f-name
         config
-        `((with-eval-after-load 'prolog
+        `((add-to-list 'auto-mode-alist '("\\.pl\\'" . prolog-mode))
+          (with-eval-after-load 'prolog
             (define-key prolog-mode-map (kbd ,dwim-key) 'ediprolog-dwim))
           (with-eval-after-load 'ediprolog
             (setq ediprolog-program
