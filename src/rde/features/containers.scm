@@ -43,7 +43,7 @@ configuration relies on btrfs."
     (list
      (when (and (get-value 'zsh config #f) docker-alias?)
        (simple-service
-        'direnv-zsh-hook
+        'podman-zsh-alias
         home-zsh-service-type
         (home-zsh-extension
          (zshrc
