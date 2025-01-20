@@ -1,0 +1,7 @@
+@itemize @bullet
+@item [] Remove deprecated API
+@item [] Build iso
+@item [] Sign iso
+@item [] Upload iso to server
+@item [] Make announcement
+@end itemize
