@@ -42,6 +42,8 @@
 ;;; Isync.
 ;;;
 
+;; TODO: [Andrew Tropin, 2024-12-04] Fix serialization of gexp value
+;; It doesn't handle gexp valued entries (Tunnel #~"gexp")
 (define (serialize-isync-config field-name val)
   (define (serialize-term term)
     (match term
