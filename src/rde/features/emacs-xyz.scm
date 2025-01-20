@@ -3,10 +3,10 @@
 ;;; Copyright © 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
-;;; Copyright © 2022, 2023, 2024 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2022-2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2022, 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;; Copyright © 2023 Benoit Joly <benoit@benoitj.ca>
-;;; Copyright © 2024 jgart <jgart@dismail.de>
+;;; Copyright © 2024-2025 jgart <jgart@dismail.de>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -47,6 +47,7 @@
   #:use-module (guix i18n)
 
   #:use-module (ice-9 match)
+  #:use-module (srfi srfi-26)
 
   #:export (;; UI
             feature-emacs-appearance
@@ -66,6 +67,7 @@
             feature-emacs-eat
             feature-emacs-eshell
             feature-emacs-calc
+            feature-emacs-gptel
             feature-emacs-re-builder
             feature-emacs-comint
             feature-emacs-help
@@ -1349,6 +1351,64 @@ it every EXCHANGE-UPDATE-INTERVAL days."
    (name f-name)
    (values `((,f-name . #t)
              (emacs-calc-currency . ,emacs-calc-currency)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-emacs-gptel
+          #:key
+          (emacs-gptel emacs-gptel)
+          (emacs-gptel-quick emacs-gptel-quick)
+          (gptel-api-key (list "pass" "show" "gptel-api-key"))
+          (default-mode 'org-mode))
+  "Configure Gptel, a simple and unintrusive LLM client for Emacs.
+GPTEL-API-KEY is a list of program and arguments that are called by Emacs and
+that returns a string API key (safer defaults than having it as a string
+on-disk).  By default, it tries to load the `gptel-api-key' from the
+password-store."
+  (ensure-pred file-like? emacs-gptel)
+  (ensure-pred file-like? emacs-gptel-quick)
+  (ensure-pred list-of-strings? gptel-api-key)
+  (ensure-pred (cut member <> '(markdown-mode org-mode text-mode))
+               default-mode)
+
+  (define emacs-f-name 'gptel)
+  (define f-name (symbol-append 'emacs emacs-f-name))
+
+  (define (get-home-services config)
+    "Return home services related to Gptel."
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((with-eval-after-load 'gptel
+          (defun rde-gptel-get-api-key ()
+            "Get the API key for gptel."
+            (string-trim-right
+             (with-output-to-string
+               (let ((exit (call-process
+                            ,(if (string-prefix? "pass" (car gptel-api-key))
+                                 (file-append
+                                  (get-value 'password-store config)
+                                  "/bin/" (car gptel-api-key))
+                                 (car gptel-api-key))
+                            nil " *string-output*" nil
+                            ,@(cdr gptel-api-key))))
+                 (or (zerop exit)
+                     (error "Failed to get gptel-api-key with %s"
+                            (with-current-buffer " *string-output*"
+                                                 (buffer-string))))))))
+          (setq gptel-api-key 'rde-gptel-get-api-key)
+          ,@(if (get-value 'emacs-embark config)
+                '((with-eval-after-load 'embark
+                    (keymap-set embark-general-map "?" 'gptel-quick)))
+                '())
+          (setq gptel-default-mode ',default-mode)))
+      #:elisp-packages (list emacs-gptel
+                             emacs-gptel-quick))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)
+             (emacs-gptel . ,emacs-gptel)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-re-builder
