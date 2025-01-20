@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
@@ -434,12 +434,15 @@ exec ~a ~a"
 ;;; sway-screenshot.
 ;;;
 
-;; TODO: Add saving to file https://github.com/jtheoof/swappy
-
 (define* (feature-sway-screenshot
           #:key (screenshot-key 'Print))
   "Configure slurp, grim and other tools for screenshot capabilities.  Feature
-is sway dependent, because it relies on swaymsg."
+is sway dependent, because it relies on swaymsg.
+
+If @code{xdg-user-directories-configuration} value provided, feature uses
+@code{$XDG_PICTURES_DIR/screenshots} directory for saving swappy results (and
+changes filename format by removing swappy- prefix and using ISO date),
+otherwise $HOME directory is used."
 
   (define sway-f-name 'screenshot)
   (define f-name (symbol-append 'sway- sway-f-name))
@@ -476,16 +479,37 @@ is sway dependent, because it relies on swaymsg."
       (shot-script "output" #:output subject-output))
     (define shot-window-or-selection
       (shot-script "window-or-selection" #:geom subject-window-or-selection))
+
+    (define xdg-user-dirs
+      (get-value 'xdg-user-directories-configuration config #f))
+
+    (define ensure-screenshots-dir
+      (if xdg-user-dirs
+          "source ${XDG_CONFIG_HOME:-~/.config}/user-dirs.dirs;
+export XDG_PICTURES_DIR; mkdir -p $XDG_PICTURES_DIR/screenshots;"
+          ""))
+
     (define swappy-clipboard
       (program-file
        "sway-swappy-clipboard"
        #~(system
-          (format #f "~a | ~a -f -"
+          (format #f "~a ~a | ~a -f -"
+                  #$ensure-screenshots-dir
                   #$(file-append (get-value 'wl-clipboard config wl-clipboard)
                                  "/bin/wl-paste")
                   #$(file-append (get-value 'swappy config swappy)
                                  "/bin/swappy")))))
+
     (list
+     (simple-service
+      'sway-screenshot-swappy-config
+      home-xdg-configuration-files-service-type
+      `(("swappy/config"
+         ,(mixed-text-file
+           "swappy.conf"
+           "[Default]\n"
+           (if xdg-user-dirs "save_dir=$XDG_PICTURES_DIR/screenshots\n" "")
+           (if xdg-user-dirs "save_filename_format=%Y-%m-%d-%H%M%S.png" "")))))
      (simple-service
       'sway-screenshot
       home-sway-service-type
