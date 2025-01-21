@@ -105,7 +105,10 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
                     '((gpgsign . #t))
                     '())))
             (sendemail
-             ((annotate . #t)))
+             ((annotate . #t)
+              ,@(if (get-value 'rde-advanced-user? config)
+                    '((confirm . auto))
+                    '())))
 
             ,@(if (and sign-commits? ssh-key?)
                   `((gpg ((format . ssh))))
