@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022-2025 Nicolas Graves <ngraves@ngraves.fr>
@@ -4172,6 +4172,9 @@ DevDocs documentations."
           (org-back-to-heading t))
 
         (with-eval-after-load 'org
+          (setopt org-M-RET-may-split-line '((default . nil)))
+          (setopt org-insert-heading-respect-content t)
+
          (setq org-adapt-indentation nil)
          (setq org-edit-src-content-indentation 0)
          (setq org-startup-indented ,(if org-indent? 't 'nil))
