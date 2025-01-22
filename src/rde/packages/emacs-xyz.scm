@@ -3,7 +3,7 @@
 ;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2024 Demis Balbach <db@minikn.xyz>
-;;; Copyright © 2024 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2024, 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -173,39 +173,22 @@ parser.")
                 "header-line-format"))
              #t)))))))
 
-(define-public emacs-git-email-latest
-  (let* ((commit "406a3fdf4684d7bbb83117170efbbafddfe07732")
-         (revision "1"))
-    (package
-      (name "emacs-git-email")
-      (version (git-version "0.2.0" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               ;; This is a fork that is more up-to-date.
-               (url "https://codeberg.org/martianh/git-email")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "19f6rvxb4aj2kn12mz4678wh2ppjg1mqrhr8dird72jkgbddjj13"))))
-      (build-system emacs-build-system)
-      (arguments
-       `(#:phases
-         (modify-phases %standard-phases
-           (add-after 'unpack 'remove-mu4e
-             (lambda _
-               (delete-file "git-email-mu4e.el")))
-           (add-before 'install 'makeinfo
-             (lambda _
-               (invoke "makeinfo" "doc/git-email.texi"))))))
-      (native-inputs (list texinfo))
-      (inputs (list emacs-magit emacs-notmuch emacs-piem))
-      (license license:gpl3+)
-      (home-page "https://sr.ht/~yoctocell/git-email")
-      (synopsis "Format and send Git patches in Emacs")
-      (description "This package provides utilities for formatting and
-sending Git patches via Email, without leaving Emacs."))))
+(define-public emacs-git-email-sans-mu4e
+  (package
+    (inherit emacs-git-email)
+    (inputs (modify-inputs (package-inputs emacs-git-email)
+              (delete "mu")))
+    (arguments
+     (substitute-keyword-arguments (package-arguments emacs-git-email)
+       ((#:phases phases #~%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'unpack 'remove-mu4e
+              (lambda _
+                (delete-file "git-email-mu4e.el")))))))))
+
+;; Note: There is also a channel with a development version
+;; at https://codeberg.org/suhail/git-email
+(define-public emacs-git-email-latest emacs-git-email-sans-mu4e)
 
 (define-public emacs-transient-latest emacs-transient)
 
