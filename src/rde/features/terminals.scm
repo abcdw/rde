@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -186,8 +186,8 @@ Adds integration with zsh, `consult-yank' and `project-prefix-map', provides
      (simple-service
       'foot-package
       home-profile-service-type
-      (list foot))
-     ;; TODO: Migrate to home service to make it extandable
+      (list (get-value 'foot config)))
+     ;; TODO: Migrate to home service to make it extendable
      (simple-service
       'foot-configuration
       home-xdg-configuration-files-service-type
