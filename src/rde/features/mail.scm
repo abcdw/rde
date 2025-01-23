@@ -174,6 +174,7 @@ present."
           #:key
           (mail-accounts #f)
           (mailing-lists '())
+          (mail-providers-settings mail-providers:default-providers-settings)
           (mail-directory-fn default-mail-directory-fn))
   "Provide mail-accounts and mail-directory-fn for other mail-related
 features."
@@ -195,6 +196,7 @@ features."
    (values `((mail-settings . #t)
              (mail-accounts . ,mail-accounts)
              (mailing-lists . ,mailing-lists)
+             (mail-providers-settings . ,mail-providers-settings)
              (mail-directory-fn . ,mail-directory-fn)))))
 
 
