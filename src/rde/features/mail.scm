@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
@@ -1037,48 +1037,6 @@ control whether to NOTIFY? when new emails arrive."
         (lambda (x) (list 'Channel (prep-str id (car x))))
         isync-mapping)
      ,#~"")))
-
-(define* (generate-isync-serializer
-          host folders-mapping
-          #:key
-          (port #f)
-          (auth-mechs #f)
-          (subfolders 'Verbatim)
-          (cipher-string #f)
-          (pipeline-depth #f))
-  (ensure-pred symbol? subfolders)
-
-  (warn-about-deprecation generate-isync-serializer
-                          (procedure-properties generate-isync-serializer)
-                          #:replacement %generate-isync-serializer)
-  (define (isync-settings mail-directory mail-account)
-    (let* ((id       (mail-account-id mail-account))
-           (account  (symbol->string id))
-           (user     (mail-account-get-user mail-account))
-           (pass-cmd (mail-account-get-pass-cmd mail-account)))
-      `(,#~(string-append "# Account '" #$(symbol->string id)
-                          " starts here")
-        (IMAPAccount ,id)
-        (Host ,host)
-        ,@(if (integer? port) `((Port ,port)) '())
-        (User ,user)
-        (PassCmd ,pass-cmd)
-        ,@(if (symbol? auth-mechs) `((AuthMechs ,auth-mechs)) '())
-        (TLSType IMAPS)
-        (CertificateFile /etc/ssl/certs/ca-certificates.crt)
-        ,@(if (symbol? cipher-string) `((CipherString ,cipher-string)) '())
-        ,@(if (integer? pipeline-depth) `((PipelineDepth ,pipeline-depth)) '())
-        ,#~""
-        (IMAPStore ,(symbol-append id '-remote))
-        (Account ,id)
-        ,#~""
-        (MaildirStore ,(symbol-append id '-local))
-        (SubFolders ,subfolders)
-        (Path ,(string-append mail-directory "/accounts/" account "/"))
-        (Inbox ,(string-append mail-directory "/accounts/" account "/inbox"))
-        ,#~""
-        ,@(isync-group-with-channels id folders-mapping))))
-  isync-settings)
 
 (define* (%generate-isync-serializer imap-settings)
   (let ((host (assoc-ref imap-settings 'host))
