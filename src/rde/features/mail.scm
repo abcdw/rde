@@ -45,6 +45,8 @@
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
   #:use-module (guix deprecation)
+  #:use-module (guix diagnostics)
+  #:use-module (guix i18n)
 
   #:export (feature-mail-settings
             feature-emacs-message
@@ -76,7 +78,6 @@
             mailing-list-config
 
             generate-isync-serializer
-            %default-isync-serializers
             %default-msmtp-provider-settings
             %rde-notmuch-saved-searches)
 
@@ -1082,12 +1083,12 @@ control whether to NOTIFY? when new emails arrive."
           ,@(isync-group-with-channels id folder-mapping))))
     isync-settings))
 
-(define %default-isync-serializers
+(define (%get-isync-serializers mail-providers-settings)
   (map (lambda (provider-settings)
          (let ((provider (car provider-settings))
                (settings (assoc-ref (cdr provider-settings) 'imap)))
            `(,provider . ,(%generate-isync-serializer settings))))
-       mail-providers:default-providers-settings))
+       mail-providers-settings))
 
 (define default-isync-global-settings
   `((Create Both)
@@ -1100,23 +1101,27 @@ control whether to NOTIFY? when new emails arrive."
           (isync isync)
           (mail-account-ids #f)
           (isync-global-settings default-isync-global-settings)
-          (isync-serializers %default-isync-serializers)
+          (isync-serializers #f)
+          (get-isync-serializers %get-isync-serializers)
           (isync-verbose #f))
   "Setup and configure isync.  If MAIL-ACCOUNT-IDS not provided use all
 mail accounts.  ISYNC-VERBOSE controls output verboseness of
 @file{mbsync}."
   (ensure-pred file-like? isync)
   (ensure-pred maybe-list? mail-account-ids)
-  (ensure-pred list? isync-serializers)
   (ensure-pred list? isync-global-settings)
   (ensure-pred boolean? isync-verbose)
+
+  (when isync-serializers
+    (warning
+     (G_ "'~a' in feature-isync is deprecated and ignored, use '~a' instead~%")
+     'isync-serializers 'get-isync-serializers))
 
   ;; Sync mail deletion
   ;; https://notmuchmail.org/pipermail/notmuch/2016/023112.html
   ;; http://tiborsimko.org/mbsync-duplicate-uid.html
 
   ;; https://notmuchmail.org/emacstips/#index25h2
-
   (define (get-home-services config)
     (require-value 'mail-accounts config
                    "feature-isync can't operate without mail-accounts.")
@@ -1125,7 +1130,9 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
             (filter (lambda (x) (eq? (mail-account-synchronizer x) 'isync))
                     (get-value 'mail-accounts config)))
            (mail-directory-fn (get-value 'mail-directory-fn config))
-           (mail-directory    (mail-directory-fn config)))
+           (mail-directory    (mail-directory-fn config))
+           (isync-serializers (get-isync-serializers
+                               (get-value 'mail-providers-settings config))))
 
       (define (serialize-mail-acc mail-acc)
         (let* ((provider (mail-account-type mail-acc))
