@@ -78,7 +78,6 @@
             mailing-list-config
 
             generate-isync-serializer
-            %default-msmtp-provider-settings
             %rde-notmuch-saved-searches)
 
   #:re-export (l2md-repo))
@@ -349,12 +348,6 @@ Citation line format, message signature, gpg and msmtp configurations. "
 ;;; feature-msmtp.
 ;;;
 
-(define %default-msmtp-provider-settings
-  (map (lambda (x)
-         (let ((x (mail-providers:add-default-values-to-provider-settings x)))
-           (cons (car x) (assoc-ref (cdr x) 'smtp))))
-       mail-providers:default-providers-settings))
-
 (define %default-msmtp-settings
   "defaults
 tls on
@@ -388,7 +381,7 @@ Example:
           #:key
           (msmtp msmtp)
           (msmtp-settings %default-msmtp-settings)
-          (msmtp-provider-settings %default-msmtp-provider-settings)
+          (msmtp-provider-settings #f)
           (msmtp-serializer default-msmtp-serializer))
   "Configure msmtp MTA.
 
@@ -400,10 +393,22 @@ but not recommended. For SMTP port 587 will used by default.
 
 Also, port can be explicitly specified with @code{port} option (it's very
 unlikely you ever need this)."
+
+  (when msmtp-provider-settings
+    (warning
+     (G_ "'~a' in feature-msmtp is deprecated and ignored, use '~a' in feature-mail-setting instead~%")
+     'msmtp-provider-setting 'mail-providers-setting))
+
   (define (get-home-services config)
     (require-value 'xdg-base-directories-configuration config)
     (require-value 'mail-accounts config
                    "feature-msmtp can't operate without mail-accounts.")
+
+    (define msmtp-provider-settings
+      (map (lambda (x)
+             (let ((x (mail-providers:add-default-values-to-provider-settings x)))
+               (cons (car x) (assoc-ref (cdr x) 'smtp))))
+           (get-value 'mail-providers-settings config)))
 
     (define mail-accs (get-value 'mail-accounts config))
     (list
@@ -456,10 +461,7 @@ unlikely you ever need this)."
   (feature
    (name 'msmtp)
    (home-services-getter get-home-services)
-   (values `((msmtp . ,msmtp)
-             ;; TODO: [Andrew Tropin, 2024-03-07] Should be provided from
-             ;; feature-mail-settings, not feature-msmtp
-             (smtp-provider-settings . ,msmtp-provider-settings)))))
+   (values `((msmtp . ,msmtp)))))
 
 
 ;;;
