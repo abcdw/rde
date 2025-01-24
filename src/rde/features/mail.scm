@@ -1656,3 +1656,83 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
 
 ;; observations on mail related features by Benoit Joly
 ;; https://lists.sr.ht/~abcdw/rde-devel/<878rh4byyg.fsf@benoitj.ca>
+
+
+;;;
+;;; Example of setting up custom email providers
+;;;
+
+(define (example-custom-provider-configuration)
+  "This is an example configuration with a few helpers for interactive
+exploration of resulting msmtp and isync configuration files produces by RDE's
+email subsystem."
+
+  ;; TODO: [Andrew Tropin, 2025-01-24] Move to (rde features) to make it a
+  ;; public API accessible to more people.
+  (define (get-configs rde-cfg)
+    "Takes rde config and returns a list of configuration files produced by it."
+    (service-value
+     (fold-services
+      ((@ (gnu home) home-environment-services)
+       (rde-config-home-environment rde-cfg))
+      #:target-type home-files-service-type)))
+
+  (define custom-folder-mapping
+    '(("inbox"   . "INBOX")
+      ("sent"    . "Sent")
+      ("drafts"  . "Drafts")
+      ("archive" . "Archive")
+      ("trash"   . "Trash")
+      ("spam"    . "Spam")))
+
+  (define custom-providers-settings
+    `((example
+       (smtp (host . "mail.example.com")
+             (starttls? . #t))
+       (imap (host . "imap.exmaple.com")
+             (folder-mapping . ,custom-folder-mapping)))
+      (example-no-starttls-with-generic-folder-mapping
+       (smtp (host . "mail.example.com"))
+       (imap (host . "imap.exmaple.com")
+             (folder-mapping . ,mail-providers:generic-folder-mapping)))))
+
+  (define tmp-config
+    (rde-config
+     (features (list
+                ((@ (rde features base) feature-user-info)
+                 #:user-name "bob"
+                 #:full-name "Bob Anderson"
+                 #:email "happy@example.com")
+                (feature-mail-settings
+                 #:mail-accounts (list
+                                  (mail-account
+                                   (id   'primary)
+                                   (fqda "test@example.com")
+                                   (type 'example)))
+                 #:mail-providers-settings custom-providers-settings)
+
+                ((@ (rde features xdg) feature-xdg))
+                (feature-msmtp)
+                (feature-isync
+                 #:isync-serializers %default-isync-serializers)))))
+
+  (define previous-config
+    "defaults\ntls on\nauth on\nlogfile /home/bob/.local/var/lib/log/msmtp.log\n\naccount primary-test@example.com\nfrom test@example.com\nuser test@example.com\npasswordeval pass show mail/test@example.com\nhost mail.example.com\ntls_starttls on\n")
+
+  (define msmtp+isync-configs-folder
+    (car
+     ((@ (rde api store) build)
+      (file-union
+       "msmtp+isync"
+       `(("isync-config"
+          ,(car (assoc-ref (get-configs tmp-config) ".config/isync/mbsyncrc")))
+         ("msmtp-config"
+          ,(car (assoc-ref (get-configs tmp-config) ".config/msmtp/config"))))))))
+
+  (call-with-input-file
+      (car
+       ((@ (rde api store) build)
+        (car (assoc-ref (get-configs tmp-config) ".config/msmtp/config"))))
+    (lambda (port)
+      (string=? previous-config
+                ((@ (ice-9 textual-ports) get-string-all) port)))))
