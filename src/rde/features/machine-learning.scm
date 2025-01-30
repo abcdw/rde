@@ -44,24 +44,25 @@
           #:key
           (emacs-gptel emacs-gptel)
           (emacs-gptel-quick emacs-gptel-quick)
-          (gptel-api-key (list "pass" "show" "gptel-api-key"))
-          (default-mode 'org-mode))
+          (emacs-gptel-api-key (list "pass" "show" "gptel-api-key"))
+          (emacs-gptel-default-mode 'org-mode))
   "Configure Gptel, a simple and unintrusive LLM client for Emacs.
-GPTEL-API-KEY is a list of program and arguments that are called by Emacs and
-that returns a string API key (safer defaults than having it as a string
-on-disk).  By default, it tries to load the `gptel-api-key' from the
-password-store."
+EMACS-GPTEL-API-KEY is a list of program and arguments that are called by
+Emacs and that returns a string API key (safer defaults than having it as a
+string on-disk).  By default, it tries to load the `emacs-gptel-api-key' from
+the password-store."
   (ensure-pred file-like? emacs-gptel)
   (ensure-pred file-like? emacs-gptel-quick)
-  (ensure-pred list-of-strings? gptel-api-key)
+  (ensure-pred list-of-strings? emacs-gptel-api-key)
   (ensure-pred (cut member <> '(markdown-mode org-mode text-mode))
-               default-mode)
+               emacs-gptel-default-mode)
 
   (define emacs-f-name 'gptel)
   (define f-name (symbol-append 'emacs emacs-f-name))
 
   (define (get-home-services config)
     "Return home services related to Gptel."
+    (define gptel-api-key (get-value 'emacs-gptel-api-key config))
     (list
      (rde-elisp-configuration-service
       emacs-f-name
@@ -88,12 +89,16 @@ password-store."
                 '((with-eval-after-load 'embark
                     (keymap-set embark-general-map "?" 'gptel-quick)))
                 '())
-          (setopt gptel-default-mode ',default-mode)))
-      #:elisp-packages (list emacs-gptel
-                             emacs-gptel-quick))))
+          (setopt gptel-default-mode
+                  ',(get-value 'emacs-gptel-default-mode config))))
+      #:elisp-packages (list (get-value 'emacs-gptel config)
+                             (get-value 'emacs-gptel-quick config)))))
 
   (feature
    (name f-name)
    (values `((,f-name . #t)
-             (emacs-gptel . ,emacs-gptel)))
+             (emacs-gptel . ,emacs-gptel)
+             (emacs-gptel-quick . ,emacs-gptel-quick)
+             (emacs-gptel-api-key . ,emacs-gptel-api-key)
+             (emacs-gptel-default-mode . ,emacs-gptel-default-mode)))
    (home-services-getter get-home-services)))
