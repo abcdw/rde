@@ -83,12 +83,12 @@ password-store."
                      (error "Failed to get gptel-api-key with %s"
                             (with-current-buffer " *string-output*"
                                                  (buffer-string))))))))
-          (setq gptel-api-key 'rde-gptel-get-api-key)
+          (setopt gptel-api-key 'rde-gptel-get-api-key)
           ,@(if (get-value 'emacs-embark config)
                 '((with-eval-after-load 'embark
                     (keymap-set embark-general-map "?" 'gptel-quick)))
                 '())
-          (setq gptel-default-mode ',default-mode)))
+          (setopt gptel-default-mode ',default-mode)))
       #:elisp-packages (list emacs-gptel
                              emacs-gptel-quick))))
 
