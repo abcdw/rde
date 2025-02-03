@@ -1,5 +1,10 @@
 # pipefail is not POSIX complaint
 
+GUIXTM=guix time-machine -C ./examples/rde/channels-lock.scm
+GUIX=$(GUIXTM) --
+EMACS=$(GUIX) shell emacs emacs-ox-html-stable-ids -- emacs
+HUT=$(GUIX) shell hut -- hut
+
 QEMU_BASE_ARGS= \
 -m 4096 -smp 1 -enable-kvm \
 -vga none -device virtio-gpu-pci
@@ -70,6 +75,14 @@ content=\"width=device-width, initial-scale=1\" />" \
 
 doc/rde.pdf: doc/rde.texi
 	makeinfo --pdf -o doc/rde.pdf doc/rde.texi
+
+README.html: README
+	${EMACS} -Q --batch -l doc/html-export-config.el README \
+	--funcall org-html-export-to-html
+
+deploy-README.html: README.html
+	${HUT} git update --readme README.html \
+	--repo https://git.sr.ht/~abcdw/rde
 
 clean:
 	rm -rf target
