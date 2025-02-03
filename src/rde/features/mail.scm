@@ -59,6 +59,7 @@
             feature-emacs-smtpmail
             feature-emacs-org-mime
             feature-goimapnotify
+            feature-emacs-piem
 
             mail-account
             mail-account-id
@@ -1016,6 +1017,39 @@ control whether to NOTIFY? when new emails arrive."
   (feature
    (name 'goimapnotify)
    (values `((goimapnotify . ,goimapnotify)))
+   (home-services-getter get-home-services)))
+
+
+;;;
+;;; feature-piem
+;;;
+
+(define* (feature-emacs-piem
+          #:key
+          (emacs-piem emacs-piem)
+          (piem-inboxes '()))
+  "The tool for working with public-inbox archives and for applying patches (not
+only from public inbox).  It has integration with notmuch and possibly a few
+other tools (get more info in the documentation of the project:
+@url{https://docs.kyleam.com/piem/})."
+  (ensure-pred file-like? emacs-piem)
+  (ensure-pred list? piem-inboxes)
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      'emacs-piem
+      config
+      `((with-eval-after-load 'piem
+          (setq piem-inboxes ',(get-value 'piem-inboxes config)))
+        (with-eval-after-load 'notmuch
+          (add-hook 'notmuch-show-mode-hook 'piem-notmuch-mode)))
+      #:elisp-packages (list (get-value 'emacs-piem config)))))
+
+  (feature
+   (name 'emacs-piem)
+   (values `((emacs-piem . ,emacs-piem)
+             (piem-inboxes . ,piem-inboxes)))
    (home-services-getter get-home-services)))
 
 
