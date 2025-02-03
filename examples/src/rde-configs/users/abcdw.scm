@@ -144,7 +144,12 @@
      "utox" "qtox"
      ;; "jami"
 
-     "alsa-utils" "cozy"
+     "flatpak"
+
+     "python-yubikey-manager"
+
+     "alsa-utils"
+     ;; "cozy"
      "pavucontrol" "wev"
      "imagemagick"
      "obs" "obs-wlrobs"
@@ -154,7 +159,10 @@
      "hicolor-icon-theme" "adwaita-icon-theme" "gnome-themes-extra"
      ;; "papirus-icon-theme" ; 85k files
      "arc-theme"
-     "thunar" "fd"
+     "fd"
+     "nautilus"
+     "qbittorrent"
+     "kdenlive"
      ;; "glib:bin"
 
      "ffmpeg"
