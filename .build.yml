@@ -30,6 +30,7 @@ tasks:
          [[ "$JOB_URL" =~ ^https://builds.sr.ht/~abcdw/job/.*$ ]]; then
         make deploy-README.html
       fi
+oauth: git.sr.ht/REPOSITORIES:RW git.sr.ht/PROFILE:RO
 triggers:
   - action: email
     condition: failure
