@@ -21,6 +21,15 @@ tasks:
       else
         make minimal/home/build/ci
       fi
+  - readme: |
+      cd rde
+
+      # Deploy readme only when abcdw pushes.  Managing shared secrets
+      # without organizations and teams is too cumbersome.
+      if [[ "$BUILD_SUBMITTER" == "git.sr.ht" ]] && \
+         [[ "$JOB_URL" =~ ^https://builds.sr.ht/~abcdw/job/.*$ ]]; then
+        make deploy-README.html
+      fi
 triggers:
   - action: email
     condition: failure
