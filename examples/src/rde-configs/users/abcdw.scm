@@ -94,9 +94,11 @@
            (geiser-connect 'guile "localhost" "37146"))
 
          (define-key geiser-mode-map (kbd "C-c M-j") 'abcdw-geiser-connect))
+
        (with-eval-after-load 'simple
          (setq-default display-fill-column-indicator-column 80)
          (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+
        (setq copyright-names-regexp
              (format "%s <%s>" user-full-name user-mail-address))
        (add-hook 'after-save-hook (lambda () (copyright-update nil nil)))))
