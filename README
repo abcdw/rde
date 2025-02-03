@@ -58,7 +58,7 @@ other way you want.
 
 ** Just a screenshot
 A picture to catch your eye)
-#+CAPTION: Latest rde screenshot
+#+CAPTION: Not that latest rde screenshot
 #+NAME:   fig:latest-screenshot
 https://cdn.fosstodon.org/media_attachments/files/106/900/674/950/793/851/original/4b17f03528571ca0.png
 
@@ -81,6 +81,13 @@ Check out [[https://trop.in/rde/manual#Community][Community]] section of the [[h
 To propose new features, fixes or ideas send emails, optionally with inline
 patches to rde-devel mailing list.  As usual more info is available in
 [[https://trop.in/rde/manual#Contributing][Contributing]] section of the [[https://trop.in/rde/manual][manual]].
+
+** Financial Support
+You can support project via [[https://opencollective.com/rde][opencollective]].  We gather funding for
+internships, infrastructure costs and to pay maintainers for their hard work.
+Please consider a recurring donation.  It constantly takes a lot of time and
+effort from people to maintain, support and develop this wonderful project and
+we would appreciate any help.
 
 ** People's rde configurations
 Those repositories are not affilated with rde or Guix, they are provided as
