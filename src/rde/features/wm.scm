@@ -112,8 +112,8 @@
           (foot foot)
           (dconf dconf)
           (bemenu bemenu)
-          (shepherd shepherd-0.10)  ; TODO Keep up to date with upstream.
           (qtwayland qtwayland)
+          (shepherd shepherd)
           (xdg-desktop-portal xdg-desktop-portal)
           (xdg-desktop-portal-gtk xdg-desktop-portal-gtk)
           (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
