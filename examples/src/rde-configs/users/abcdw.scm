@@ -119,7 +119,6 @@
        ;; "emacs-consult-dir"
        "emacs-kind-icon"
        "emacs-nginx-mode" "emacs-yaml-mode"
-       "emacs-arei"
        "emacs-multitran"
        "emacs-minimap"
        "emacs-ement"
