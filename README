@@ -1,7 +1,7 @@
 # -*- mode: org; org-html-head-include-scripts: nil; org-html-stable-ids: t; org-html-head-include-default-style: nil; -*-
 #+OPTIONS: toc:nil
 
-* rde
+* RDE
 Developer and power user friendly GNU/Linux distribution based on [[https://guix.gnu.org/][GNU Guix]]
 package manager.
 
