@@ -3401,6 +3401,7 @@ language for GNU Emacs."
           (emacs-magit-todos emacs-magit-todos)
           (emacs-git-timemachine emacs-git-timemachine)
           (emacs-git-link emacs-git-link)
+          (emacs-git-email emacs-git-email-sans-mu4e)
           (emacs-git-gutter-fringe emacs-git-gutter-fringe)
           (emacs-git-gutter-transient emacs-git-gutter-transient))
   "Configure git-related utilities for GNU Emacs, including magit,
@@ -3411,6 +3412,7 @@ git-link, git-timemachine."
   (ensure-pred file-like? emacs-magit-todos)
   (ensure-pred file-like? emacs-git-timemachine)
   (ensure-pred file-like? emacs-git-link)
+  (ensure-pred file-like? emacs-git-email)
   (ensure-pred file-like? emacs-git-gutter-fringe)
   (ensure-pred file-like? emacs-git-gutter-transient)
 
@@ -3477,6 +3479,8 @@ git-link, git-timemachine."
          (defvar rde-projects-directory ,(or project-directory 'nil)
            "Directory where project repositories are stored.")
 
+         (git-email-magit-setup)
+
          (autoload 'git-link--parse-remote "git-link")
          (defun rde-get-local-repo-path-from-url (url)
            "Get directory from repository url and suggest it to
@@ -3529,6 +3533,7 @@ Almost all other operations are covered by magit."
       #:keywords '(convenience faces)
       #:elisp-packages (list emacs-magit emacs-magit-todos
                              emacs-git-link emacs-git-timemachine
+                             emacs-git-email
                              emacs-git-gutter-fringe
                              emacs-git-gutter-transient))))
 
