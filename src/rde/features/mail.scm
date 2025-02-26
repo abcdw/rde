@@ -581,6 +581,11 @@ topics with your preferred hierarchy."
                   (get-value 'mail-accounts config))
           (get-value 'mail-accounts config)))
     (define mail-dir ((get-value 'mail-directory-fn config) config))
+    (define (smtp-settings provider)
+      (assoc-ref
+       (assoc-ref
+        (get-value 'mail-providers-settings config) provider)
+       'smtp))
 
     (list
      (rde-elisp-configuration-service
@@ -675,31 +680,21 @@ topics with your preferred hierarchy."
           (setq gnus-update-message-archive-method t)
           (setq gnus-posting-styles
                 '(,@(map (lambda (mail-acc)
-                           `(,(symbol->string (mail-account-id mail-acc))
-                             (address ,(mail-account-fqda mail-acc))
-                             ("Gcc" ,(string-append
-                                      "nnmaildir+"
-                                      (symbol->string
-                                       (mail-account-id mail-acc))
-                                      ":sent"))
-                             ,@(if (get-value 'msmtp config #f)
-                                   '()
-                                   `(("X-Message-SMTP-Method"
-                                      ,(format
-                                        #f "smtp ~a ~a ~a"
-                                        (assoc-ref
-                                         (assoc-ref
-                                          (get-value
-                                           'smtp-provider-settings config)
-                                          (mail-account-type mail-acc))
-                                         'host)
-                                        (assoc-ref
-                                         (assoc-ref
-                                          (get-value
-                                           'smtp-provider-settings config)
-                                          (mail-account-type mail-acc))
-                                         'port)
-                                        (mail-account-fqda mail-acc)))))))
+                           (let* ((id (symbol->string (mail-account-id mail-acc)))
+                                  (email (mail-account-fqda mail-acc))
+                                  (provider (mail-account-type mail-acc))
+                                  (host (assoc-ref (smtp-settings provider) 'host))
+                                  (port (or (assoc-ref (smtp-settings provider) 'port)
+                                            587)))
+                             `(,id
+                               (address ,email)
+                               ("Gcc" ,(string-append "nnmaildir+" id ":sent"))
+                               ,@(if (get-value 'msmtp config #f)
+                                     '()
+                                     `(("X-Message-SMTP-Method"
+                                        ,(format
+                                          #f "smtp ~a ~a ~a"
+                                          host port email)))))))
                          mail-accounts)
                   ,@posting-styles))
           (setq gnus-select-method '(nnnil))
@@ -964,8 +959,10 @@ control whether to NOTIFY? when new emails arrive."
               (lambda (acc)
                 `((host . ,(assoc-ref
                             (assoc-ref
-                             (get-value 'smtp-provider-settings config)
-                             (mail-account-type acc))
+                             (assoc-ref
+                              (get-value 'mail-providers-settings config)
+                              (mail-account-type acc))
+                             'smtp)
                             'host))
                   (port . 143)
                   (tls . #f)
