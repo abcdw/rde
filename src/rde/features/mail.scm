@@ -811,11 +811,11 @@ default severities with which bugs should be filered with DEFAULT-SEVERITIES."
 
 (define* (feature-emacs-smtpmail
           #:key
-          (mail-account-id #f))
+          (mail-acc-id #f))
   "Configure smtpmail, a simple mail protocol for sending mail from Emacs.
-If no MAIL-ACCOUNT-ID is provided, no account-specific settings will be
+If no MAIL-ACC-ID is provided, no account-specific settings will be
 configured."
-  (ensure-pred maybe-symbol? mail-account-id)
+  (ensure-pred maybe-symbol? mail-acc-id)
 
   (define emacs-f-name 'smtpmail)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -825,16 +825,21 @@ configured."
     (require-value 'mail-accounts config)
 
     (define mail-acc
-      (if mail-account-id
-          (filter (lambda (acc)
-                    (= (mail-account-id acc) mail-account-id))
-                  (get-value 'mail-accounts config))
+      (if mail-acc-id
+          (car (filter (lambda (acc)
+                         (eq? (mail-account-id acc) mail-acc-id))
+                       (get-value 'mail-accounts config)))
           #f))
-    (define smtp-provider
-      (assoc-ref (get-value 'smtp-provider-settings config)
-                 (and=> mail-acc mail-account-type)))
-    (define smtp-host (assoc-ref smtp-provider 'host))
-    (define smtp-port (assoc-ref smtp-provider 'port))
+
+    (define smtp-provider-settings
+      (assoc-ref
+       (assoc-ref (get-value 'mail-providers-settings config)
+                  (and=> mail-acc mail-account-type))
+       'smtp))
+    (define smtp-host
+      (assoc-ref smtp-provider-settings 'host))
+    (define smtp-port
+      (or (assoc-ref smtp-provider-settings 'port) 587))
 
     (list
      (rde-elisp-configuration-service
@@ -842,17 +847,17 @@ configured."
       config
       `((with-eval-after-load 'smtpmail
           (require 'xdg)
-          ,@(if mail-account-id
-                '((setq smtpmail-smtp-user ,(mail-account-get-user mail-acc))
-                  (setq smtpmail-smtp-service ,smtp-port)
-                  (setq smtpmail-smtp-server ,smtp-host)
-                  (setq smtpmail-default-smtp-server ,smtp-host))
+          ,@(if mail-acc-id
+                `((setopt smtpmail-smtp-user ,(mail-account-get-user mail-acc))
+                  (setopt smtpmail-smtp-service ,smtp-port)
+                  (setopt smtpmail-smtp-server ,smtp-host)
+                  (setopt smtpmail-default-smtp-server ,smtp-host))
                 '())
-          (setq smtpmail-stream-type 'starttls)
-          (setq smtpmail-queue-dir
-                (expand-file-name "emacs/smtpmail/queued-mail"
-                                  (xdg-cache-home)))
-          (setq smtpmail-debug-info t))))))
+          (setopt smtpmail-stream-type 'starttls)
+          (setopt smtpmail-queue-dir
+                  (expand-file-name "emacs/smtpmail/queued-mail"
+                                    (xdg-cache-home)))
+          (setopt smtpmail-debug-info t))))))
 
   (feature
    (name f-name)
