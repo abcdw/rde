@@ -25,6 +25,7 @@
   #:use-module (rde serializers ini)
   #:use-module (gnu system)
   #:use-module (gnu services)
+  #:use-module (gnu services configuration)
   #:use-module (gnu home services)
   #:use-module (gnu system file-systems)
   #:use-module (gnu system mapped-devices)
@@ -35,76 +36,57 @@
   #:use-module (guix inferior)
   #:use-module (guix gexp)
 
-  #:export (any-package?
-            list-of-packages?)
   #:re-export (file-like?
-               package?
-               ini-config?))
+               ini-config?
+               list-of
+               list-of-strings?
+               list-of-symbols?
+               package?))
 
-(define-public (maybe-integer? x)
-  (or (integer? x) (not x)))
-
-(define-public (maybe-procedure? x)
-  (or (procedure? x) (not x)))
-
-(define-public (maybe-symbol? x)
-  (or (symbol? x) (not x)))
-
-(define-public (maybe-string? x)
-  (or (string? x) (not x)))
-
-(define-public (maybe-url? x)
-  (maybe-string? x))
-
-(define-public (path? x)
-  (string? x))
-
-(define-public (maybe-path? x)
-  (or (path? x) (not x)))
-
-(define-public (maybe-file-like? x)
-  (or (file-like? x) (not x)))
+;; Predicates
+(define-public (keyboard-shortcut? x) (string? x))
+(define-public (path? x) (string? x))
+(define-public (url? x) (string? x))
 
 (define-public (file-like-or-path? x)
   (or (file-like? x) (path? x)))
+
+(define-public (brightness? x)
+  (and (integer? x) (<= 0 x 100)))
 
 (define-public %number-of-ttys 6)
 (define-public (tty-number? x)
   (and (integer? x) (<= 1 x %number-of-ttys)))
 
-(define-public (brightness? x)
-  (and (integer? x) (<= 0 x 100)))
-
-(define-public (maybe-list? lst)
-  (or (list? lst) (not lst)))
-
-(define-public (list-of-strings? lst)
-  (and (list? lst) (every string? lst)))
-
-(define-public (list-of-file-likes? lst)
-  (and (list? lst) (every file-like? lst)))
-
-(define-deprecated/alias any-package? file-like?)
-
-(define-deprecated/alias list-of-packages? list-of-file-likes?)
-
-(define-public list-of-elisp-packages? list-of-file-likes?)
-
-(define-public (list-of-services? lst)
-  (and (list? lst) (every service? lst)))
-
 (define-public (string-or-gexp? x)
   (or (string? x) (gexp? x)))
-(define-public (list-of-string-or-gexps? lst)
-  (and (list? lst) (every string-or-gexp? lst)))
 
+;; Maybes
+(define-public (maybe pred?)
+  (lambda (x)
+    (or (pred? x) (not x))))
 
-(define-public (list-of-file-systems? lst)
-  (and (list? lst) (every file-system? lst)))
-(define-public (list-of-mapped-devices? lst)
-  (and (list? lst) (every mapped-device? lst)))
-(define-public (list-of-swap-devices? lst)
-  (and (list? lst) (every swap-space? lst)))
+(define-public maybe-file-like? (maybe file-like?))
+(define-public maybe-integer?   (maybe integer?))
+(define-public maybe-list?      (maybe list?))
+(define-public maybe-path?      (maybe path?))
+(define-public maybe-procedure? (maybe procedure?))
+(define-public maybe-string?    (maybe string?))
+(define-public maybe-symbol?    (maybe symbol?))
+(define-public maybe-url?       (maybe url?))
+
+;; Lists
+(define-public list-of-file-likes?      (list-of file-like?))
+(define-public list-of-services?        (list-of service?))
+(define-public list-of-string-or-gexps? (list-of string-or-gexp?))
+(define-public list-of-file-systems?    (list-of file-system?))
+(define-public list-of-mapped-devices?  (list-of mapped-device?))
+(define-public list-of-swap-devices?    (list-of swap-space?))
+(define-public list-of-elisp-packages?  list-of-file-likes?)
+
+;; Aliases
+(define-deprecated/public-alias any-package?      file-like?)
+(define-deprecated/public-alias list-of-packages? list-of-file-likes?)
 
 (define-public (rde-procedure? x)
   "Checks if procedure have exactly one required argument, no optional and no
