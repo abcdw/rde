@@ -24,7 +24,7 @@
   #:use-module (rde packages)
   #:use-module (rde exceptions)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde features emacs)
   #:use-module ((rde features mail providers) #:prefix mail-providers:)
   #:use-module (gnu packages mail)

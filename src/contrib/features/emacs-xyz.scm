@@ -20,7 +20,7 @@
 (define-module (contrib features emacs-xyz)
   #:use-module (rde features)
   #:use-module (rde features emacs)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde home services emacs-xyz)
   #:use-module (gnu home services)
   #:use-module (gnu services)

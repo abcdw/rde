@@ -19,6 +19,7 @@
 
 (define-module (rde features virtualization)
   #:use-module (rde features)
+  #:use-module (rde predicates)
   #:use-module (gnu packages virtualization)
   #:use-module (gnu services)
   #:use-module (gnu services virtualization)

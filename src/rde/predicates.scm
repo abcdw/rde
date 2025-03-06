@@ -20,7 +20,7 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (rde features predicates)
+(define-module (rde predicates)
   #:use-module (rde features)
   #:use-module (rde serializers ini)
   #:use-module (gnu system)

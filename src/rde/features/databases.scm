@@ -21,7 +21,7 @@
 (define-module (rde features databases)
   #:use-module (rde features)
   #:use-module (rde features emacs)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages databases)
   #:use-module (gnu packages sqlite)

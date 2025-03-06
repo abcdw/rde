@@ -25,7 +25,7 @@
    #:use-module (gnu services)
    #:use-module (gnu system pam)
    #:use-module (guix gexp)
-   #:use-module (rde features predicates)
+   #:use-module (rde predicates)
    #:use-module (rde features)
    #:use-module (rde system services accounts)
 

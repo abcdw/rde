@@ -20,7 +20,7 @@
 (define-module (rde features ocaml)
   #:use-module (rde features)
   #:use-module (rde features emacs)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde home services ocaml)
   #:use-module (gnu packages base)
   #:use-module (gnu packages compression)

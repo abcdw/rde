@@ -19,7 +19,7 @@
 
 (define-module (rde features web)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:export (feature-alternative-frontends))
 
 (define* (feature-alternative-frontends

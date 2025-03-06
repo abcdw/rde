@@ -21,7 +21,7 @@
 (define-module (rde features irc)
   #:use-module (rde features)
   #:use-module (rde features emacs)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (gnu services configuration)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (guix gexp)

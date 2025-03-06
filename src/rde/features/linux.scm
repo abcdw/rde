@@ -21,7 +21,7 @@
 (define-module (rde features linux)
   #:use-module (rde packages)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (gnu packages linux)
   #:use-module (gnu packages pulseaudio)
   #:use-module (gnu packages freedesktop)

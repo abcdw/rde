@@ -25,7 +25,7 @@
 
 (define-module (rde features emacs-xyz)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde features emacs)
   #:use-module (rde features fontutils)
 

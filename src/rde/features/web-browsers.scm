@@ -21,7 +21,7 @@
 (define-module (rde features web-browsers)
   #:use-module (rde features)
   #:use-module (rde features emacs)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde home services web-browsers)
   #:use-module (rde packages web-browsers)
   #:use-module (rde serializers lisp)

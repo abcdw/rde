@@ -1,6 +1,6 @@
 (define-module (rde features version-control)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde packages)
   #:use-module (gnu home-services version-control)
   #:use-module (gnu home services)

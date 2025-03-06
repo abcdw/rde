@@ -20,7 +20,7 @@
 (define-module (rde features emacs-meow)
   #:use-module (rde features)
   #:use-module (rde features emacs)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde home services emacs)
   #:use-module (rde serializers elisp)
   #:use-module (gnu packages emacs-xyz)

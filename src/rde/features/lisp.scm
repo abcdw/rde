@@ -20,7 +20,7 @@
 (define-module (rde features lisp)
   #:use-module (rde features)
   #:use-module (rde features emacs)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde home services lisp)
   #:use-module (rde serializers lisp)
   #:use-module (gnu home services)

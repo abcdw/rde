@@ -20,7 +20,7 @@
 
 (define-module (rde features base)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde system services admin)
 
   #:use-module (gnu system)

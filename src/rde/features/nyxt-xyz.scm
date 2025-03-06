@@ -20,7 +20,7 @@
 (define-module (rde features nyxt-xyz)
   #:use-module (rde features)
   #:use-module (rde features fontutils)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde features web-browsers)
   #:use-module (rde home services web-browsers)
   #:use-module (rde serializers lisp)

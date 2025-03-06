@@ -21,7 +21,7 @@
 (define-module (rde features gtk)
   #:use-module (rde features)
   #:use-module (rde features fontutils)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde home services gtk)
   #:use-module (gnu home services)
   #:use-module (gnu packages gnome)

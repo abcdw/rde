@@ -20,7 +20,7 @@
 
 (define-module (rde features system)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde system bare-bone)
   #:use-module (gnu bootloader)
   #:use-module (gnu bootloader grub)

@@ -20,7 +20,7 @@
 (define-module (contrib features wm)
   #:use-module (rde features)
   #:use-module (rde features emacs)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde home services shells)
   #:use-module (rde serializers elisp)
   #:use-module (gnu home services)

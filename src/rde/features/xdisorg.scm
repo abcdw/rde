@@ -1,6 +1,6 @@
 (define-module (rde features xdisorg)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (rde features fontutils)
   #:use-module (rde packages)
   #:use-module (gnu packages xdisorg)

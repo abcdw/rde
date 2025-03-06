@@ -20,7 +20,7 @@
 
 (define-module (rde features xdg)
   #:use-module (rde features)
-  #:use-module (rde features predicates)
+  #:use-module (rde predicates)
   #:use-module (gnu services)
   #:use-module ((gnu services configuration) #:select (maybe-value-set?))
   #:use-module (gnu home services)
