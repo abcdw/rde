@@ -219,12 +219,7 @@ font-monospace default value, and it will be ignored if
 
         (if after-init-time
             (when (display-graphic-p) (rde-font--set-default-fonts))
-            (add-hook 'after-init-hook 'rde-font--set-default-fonts))
-
-        ,@(if (get-value 'emacs-modus-themes config #f)
-              '((add-hook 'rde-modus-themes-after-enable-theme-hook
-                          'fontaine-apply-current-preset))
-              '()))
+            (add-hook 'after-init-hook 'rde-font--set-default-fonts)))
       #:elisp-packages (list emacs-fontaine))))
 
   (feature
