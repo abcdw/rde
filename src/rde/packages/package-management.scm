@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -21,22 +21,32 @@
   #:use-module (gnu packages)
   #:use-module (gnu packages package-management)
   #:use-module (gnu packages guile)
+  #:use-module (guix channels)
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix git)
   #:use-module (guix utils)
   #:use-module (guix download)
   #:use-module (guix git-download)
-  #:export (guix-from-channels-lock))
+  #:use-module (rde lib file)
+  #:export (guix-from-channels-lock)
+  #:declarative? #f)
+
+(define (get-guix-channel channels)
+  (car
+   (filter (lambda (x) (equal? (channel-name x) 'guix)) channels)))
+
+(define my-channels
+  (load (canonicalize-path (find-file-in-load-path "channels-lock.scm"))))
 
 (define-public guix-from-channels-lock
-  (let ((commit "59b2a60d0041882d732e1766e28f0df5a1ef1ac1"))
+  (let ((commit (channel-commit (get-guix-channel my-channels))))
     (package
       (inherit guix)
       (version (string-append "1.4.0-" (string-take commit 7)))
       (source
        (git-checkout
-        (url "https://git.savannah.gnu.org/git/guix.git")
+        (url "https://codeberg.org/guix/guix-mirror")
         (commit commit)))
       (arguments
        (substitute-keyword-arguments (package-arguments guix)
