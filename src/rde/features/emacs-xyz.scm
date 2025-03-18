@@ -6238,4 +6238,29 @@ WTTR-LOCATIONS you will get a weather report based on your IP address."
    (values `((,f-name . ,emacs-display-wttr)))
    (home-services-getter get-home-services)))
 
+(define* (feature-emacs-daemons)
+  "Configure emacs daemons (shepherd)"
+  (define f-name 'emacs-daemons)
+
+  (define ansi-fix
+    `(with-eval-after-load 'daemons
+       (require 'ansi-color)
+       (defun display-ansi-sequences ()
+         (let ((inhibit-read-only t))
+           (ansi-color-apply-on-region (point-min) (point-max))))
+       (setq daemons--shell-command-to-string-fun
+             (lambda (command) (ansi-color-filter-apply
+                           (shell-command-to-string command))))
+       (add-hook 'daemons-output-mode-hook 'display-ansi-sequences)))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service f-name config (list ansi-fix)
+      #:elisp-packages (list emacs-daemons))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
+
 ;;; emacs-xyz.scm end here
