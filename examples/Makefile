@@ -4,7 +4,7 @@ include profiles.mk
 
 # Also defined in .envrc to make proper guix version available project-wide
 GUIX_PROFILE=target/profiles/guix
-GUIX=GUILE_LOAD_PATH="../src:../tests:./src" GUILE_LOAD_COMPILED_PATH="" ${GUIX_PROFILE}/bin/guix
+GUIX=GUILE_LOAD_PATH="../src:../tests:./src:./rde" GUILE_LOAD_COMPILED_PATH="" ${GUIX_PROFILE}/bin/guix
 
 SRC_DIR=./src
 CONFIGS=${SRC_DIR}/rde-configs/configs.scm
@@ -22,6 +22,7 @@ ares:
 	-e '(@ (rde packages package-management) guix-from-channels-lock)' \
 	-- guile \
 	-L ../src \
+	-L ./rde \
 	-L ./src \
 	-L /data/abcdw/work/abcdw/guile-ares-rs/src/guile \
 	-c \
