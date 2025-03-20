@@ -366,7 +366,7 @@ different level headings will have different size."
                  ((,c :background ,bg-dim
                       :box (:line-width ,rde-modus-themes-tab-bar-padding
                             :color ,bg-dim
-                            :style unspecified))))
+                            :style nil))))
                `(mode-line
                  ((,c :box (:line-width ,rde-modus-themes-mode-line-padding
                             :color ,bg-mode-line-active))))
