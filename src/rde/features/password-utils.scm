@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
@@ -145,14 +145,24 @@ in the middle and Return at the end."
                             (wtype-args
                              (list
                               wtype-bin
+                              "-s" "10" "--"
+                              (shell-quote-argument
+                               (alist-get "username" entry-alist nil nil 'equal))
+                              ";"
+                              wtype-bin
                               "-s" "10"
-                              (alist-get "username" entry-alist nil nil 'equal)
                               "-k" "Tab"
-                              (alist-get 'secret entry-alist nil nil 'equal)
+                              "--"
+                              (shell-quote-argument
+                               (alist-get 'secret entry-alist nil nil 'equal))
+                              ";"
+                              wtype-bin
                               "-k" "Return")))
-
+                       ;; the command is split into multiple invocations of
+                       ;; wtype to use -- and prevent interpreting strings
+                       ;; starting with '-' as argument to the programs
                        (async-shell-command
-                        (mapconcat 'shell-quote-argument wtype-args " ")))))
+                        (mapconcat 'identity wtype-args " ")))))
                  ,@(if emacs-embark
                        `((with-eval-after-load 'password-store
                            (defun rde-password-store-generate (entry)
