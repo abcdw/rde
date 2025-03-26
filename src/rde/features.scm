@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -43,6 +44,7 @@
   #:use-module (srfi srfi-35)
 
   #:use-module (ice-9 hash-table)
+  #:use-module (ice-9 match)
   #:use-module (ice-9 pretty-print)
 
   #:export (rde-config
@@ -53,6 +55,7 @@
             rde-config-operating-system
             rde-config-system-services
 
+            override-rde-config-with-values
             pretty-print-rde-config
 
             feature
@@ -440,6 +443,21 @@ can be later used to extend original service with additional configuration."
    (map service-kind
         (rde-config-system-services
          config))))
+
+(define (override-rde-config-with-values config value-pairs)
+  "Override an <rde-config> with a list of value pairs."
+  ;; Updates the values hash table
+  (fold
+   (lambda (x acc)
+     (match x
+       ((name . value) (hash-set! acc name value)))
+     acc)
+   (rde-config-values config)
+   values-pairs)
+  ;; Returns an updated config
+  (rde-config
+     (inherit config)
+     (values values-hash-table)))
 
 (define (merge-features features)
   "Combine a few features into one."
