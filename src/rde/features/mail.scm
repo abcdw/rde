@@ -1316,7 +1316,8 @@ while IFS= read -r f; do rm -v \"$f\"; done")
       (search ((exclude_tags . (trash spam deleted))))
       (new ((tags . new)
             (ignore . (.mbsyncstate .uidvalidity
-                       .mbsyncstate.new .mbsyncstate.journal))))))))
+                                    .mbsyncstate.new .mbsyncstate.journal))))
+      (query ,(get-value 'notmuch-queries config))))))
 
 (define (notmuch-redefined-functions config)
   ;; Remove leading arrows for mails without threads
@@ -1431,8 +1432,11 @@ not appear in the pop-up buffer."
           (get-notmuch-configuration default-get-notmuch-configuration)
           (notmuch-saved-searches %rde-notmuch-saved-searches)
           (notmuch-search-oldest-first #t)
+          (notmuch-queries '())
           (extra-tag-updates-post '()))
-  "Configure notmuch and Emacs UI for it if emacs enabled."
+  "Configure notmuch and Emacs UI for it if emacs enabled.
+@code{notmuch-queries} is a list of pairs of query name and query, it added to
+notmuch config and can be used anywhere in search via @code{query:query-name}."
   (ensure-pred file-like? notmuch)
   (ensure-pred file-like? emacs-notmuch)
   (ensure-pred file-like? emacs-ol-notmuch)
@@ -1440,6 +1444,7 @@ not appear in the pop-up buffer."
   (ensure-pred procedure? get-notmuch-configuration)
   (ensure-pred list? %rde-notmuch-saved-searches)
   (ensure-pred boolean? notmuch-search-oldest-first)
+  (ensure-pred alist? notmuch-queries)
   (ensure-pred list? extra-tag-updates-post)
 
   (define f-name 'notmuch)
@@ -1680,7 +1685,8 @@ Set default MUA, adjust view, add auxiliary functions and keybindings."
 
   (feature
    (name f-name)
-   (values `((notmuch . ,notmuch)))
+   (values `((notmuch . ,notmuch)
+             (notmuch-queries . ,notmuch-queries)))
    (home-services-getter get-home-services)))
 
 
