@@ -1232,8 +1232,6 @@ mail accounts.  ISYNC-VERBOSE controls output verboseness of
 (define* (default-get-notmuch-configuration config
            #:key
            (extra-tag-updates-post '()))
-  (require-value 'mail-settings config)
-  (require-value 'full-name config)
   (define full-name (get-value 'full-name config))
   (define mail-accounts (get-value 'mail-accounts config))
   (define emails (map mail-account-fqda mail-accounts))
