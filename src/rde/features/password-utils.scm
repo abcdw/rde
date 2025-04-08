@@ -161,7 +161,8 @@ in the middle and Return at the end."
                        ;; the command is split into multiple invocations of
                        ;; wtype to use -- and prevent interpreting strings
                        ;; starting with '-' as argument to the programs
-                       (async-shell-command
+                       (start-process-shell-command
+                        "password-store-autotype" nil
                         (mapconcat 'identity wtype-args " ")))))
                  ,@(if emacs-embark
                        `((with-eval-after-load 'password-store
