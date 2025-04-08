@@ -8,5 +8,7 @@
    (name "conses"))
   ("3B1D 7F19 E36B B60C 0F5B  2CA9 A52A A2B4 77B6 DD35"
    (name "jgart"))
+  ("5D54 CF25 57B2 38E8 8DC1  80A2 2D22 3241 0AB7 4043"
+   (name "noe"))
   ("0158 61E3 2C8A E7E4 84CA  4233 ACF5 0999 A2FB 5C79"
    (name "yoctocell"))))
