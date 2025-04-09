@@ -446,18 +446,19 @@ can be later used to extend original service with additional configuration."
 
 (define (override-rde-config-with-values config value-pairs)
   "Override an <rde-config> with a list of value pairs."
-  ;; Updates the values hash table
-  (fold
-   (lambda (x acc)
-     (match x
-       ((name . value) (hash-set! acc name value)))
-     acc)
-   (rde-config-values config)
-   values-pairs)
-  ;; Returns an updated config
-  (rde-config
+  (let ((values-hash-table (rde-config-values config)))
+    ;; Updates the values hash table
+    (fold
+     (lambda (x acc)
+       (match x
+         ((name . value) (hash-set! acc name value)))
+       acc)
+     values-hash-table
+     value-pairs)
+    ;; Returns an updated config
+    (rde-config
      (inherit config)
-     (values values-hash-table)))
+     (values values-hash-table))))
 
 (define (merge-features features)
   "Combine a few features into one."
