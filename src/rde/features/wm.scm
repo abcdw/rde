@@ -28,6 +28,7 @@
   #:use-module (gnu system keyboard)
   #:use-module (rde packages)
   #:use-module (rde packages wm)
+  #:use-module (gnu packages)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages base)
   #:use-module (gnu packages emacs-xyz)
@@ -45,10 +46,9 @@
   #:use-module (gnu packages wm)
   #:use-module (gnu packages xdisorg)
   #:use-module (gnu services)
-  #:use-module (gnu services xorg)
   #:use-module (gnu services shepherd)
+  #:use-module (gnu services xorg)
   #:use-module (gnu home services)
-  #:use-module (gnu home services shepherd)
   #:use-module (gnu home services pm)
   #:use-module (rde home services wm)
   #:use-module (rde home services shells)
@@ -113,7 +113,7 @@
           (dconf dconf)
           (bemenu bemenu)
           (qtwayland qtwayland)
-          (shepherd shepherd)
+          (shepherd #f)
           (xdg-desktop-portal xdg-desktop-portal)
           (xdg-desktop-portal-gtk xdg-desktop-portal-gtk)
           (xdg-desktop-portal-wlr xdg-desktop-portal-wlr)
@@ -129,10 +129,14 @@
   (ensure-pred file-like? foot)
   (ensure-pred file-like? bemenu)
   (ensure-pred file-like? qtwayland)
-  (ensure-pred file-like? shepherd)
   (ensure-pred file-like? xdg-desktop-portal)
   (ensure-pred file-like? xdg-desktop-portal-gtk)
   (ensure-pred file-like? xdg-desktop-portal-wlr)
+
+  (when shepherd
+    (warning
+     (G_ "'~a' in feature-wm is deprecated and ignored, use '~a' in feature-shepherd instead~%")
+     'shepherd 'shepherd))
 
   (define (sway-home-services config)
     "Returns home services related to sway."
@@ -152,29 +156,13 @@
                         (file-append foot "/bin/foot")))
            (default-application-launcher
              (get-value-eval 'default-application-launcher-fn config
-                             (file-append bemenu "/bin/bemenu-run -l 20 -p run:")))
-
-           (shepherd-configuration (home-shepherd-configuration
-                                    (shepherd shepherd)
-                                    (auto-start? #f)
-                                    (daemonize? #f))))
+                             (file-append bemenu "/bin/bemenu-run -l 20 -p run:"))))
       (list
-       (service home-shepherd-service-type shepherd-configuration)
        (simple-service
         'sway-launch-shepherd
         home-sway-service-type
         `((,#~"\n\n# Launch shepherd:")
-          (exec ,(program-file
-                  "launch-shepherd"
-                  #~(let* ((state-dir (or (getenv "XDG_STATE_HOME")
-                                          (format #f "~a/.local/state"
-                                                  (getenv "HOME"))))
-                           (log-dir (string-append state-dir "/log")))
-                      ((@ (guix build utils) mkdir-p) log-dir)
-                      (system*
-                       #$(file-append shepherd "/bin/shepherd")
-                       "--logfile"
-                       (string-append log-dir "/shepherd.log")))))))
+          (exec ,(get-value 'shepherd-launch config))))
 
        (service
         home-sway-service-type
@@ -345,7 +333,6 @@ frame-title-format."
   (feature
    (name 'sway)
    (values `((sway . ,sway)
-             (shepherd . ,shepherd)
              (wl-clipboard . ,wl-clipboard)
              (wayland . #t)
              (xwayland? . ,xwayland?)))

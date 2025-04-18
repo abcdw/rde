@@ -59,7 +59,8 @@
 
    (feature-pipewire)
    (feature-backlight #:step 10)
-   (feature-networking)))
+   (feature-networking)
+   (feature-shepherd)))
 
 (define-public rde-desktop
   (list

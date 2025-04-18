@@ -30,6 +30,7 @@
   #:use-module (gnu system shadow)
   #:use-module (gnu system nss)
   #:use-module (gnu services guix)
+  #:use-module (gnu services shepherd)
   #:use-module (rde system bare-bone)
   #:use-module (rde system services accounts)
   #:use-module (rde system services admin)
@@ -312,6 +313,10 @@ can be later used to extend original service with additional configuration."
   (home-environment-packages (get-home-environment config)))
 
 (define (get-operating-system config)
+
+  (when (rde-config-integrate-he-in-os? config)
+    (require-value 'user-name config))
+
   (let* ((initial-os (rde-config-initial-os config))
 
          (host-name        (get-value
@@ -388,46 +393,54 @@ can be later used to extend original service with additional configuration."
          (name-service-switch
                            (get-value
                             'name-service config
-                            %default-nss)))
+                            %default-nss))
 
-    (when (rde-config-integrate-he-in-os? config)
-      (require-value 'user-name config))
-
+         (computed-os
+          (operating-system
+            (inherit initial-os)
+            (host-name host-name)
+            (timezone timezone)
+            (locale locale)
+            (issue issue)
+            (bootloader bootloader)
+            (mapped-devices mapped-devices)
+            (swap-devices swap-devices)
+            (file-systems file-systems)
+            (keyboard-layout keyboard-layout)
+            (kernel kernel)
+            (kernel-arguments kernel-arguments)
+            (kernel-loadable-modules kernel-modules)
+            (initrd initrd)
+            (initrd-modules initrd-modules)
+            (firmware firmware)
+            (services (append
+                       services
+                       (if (rde-config-integrate-he-in-os? config)
+                           (list (service guix-home-service-type
+                                          ;; TODO: [Andrew Tropin, 2024-05-27]
+                                          ;; Temporary fix, remove it, when
+                                          ;; https://issues.guix.gnu.org/71111 is
+                                          ;; merged
+                                          `(,(list
+                                              user-name
+                                              (get-home-environment config)))))
+                           '())
+                       (list (service sudoers-service-type))
+                       (if user-name
+                           (list (service rde-account-service-type user))
+                           '())))
+            (sudoers-file #f)
+            (name-service-switch name-service-switch))))
+    ;; Only apply transformations on thunked fields here.
     (operating-system
-      (inherit initial-os)
-      (host-name host-name)
-      (timezone timezone)
-      (locale locale)
-      (issue issue)
-      (bootloader bootloader)
-      (mapped-devices mapped-devices)
-      (swap-devices swap-devices)
-      (file-systems file-systems)
-      (keyboard-layout keyboard-layout)
-      (kernel kernel)
-      (kernel-arguments kernel-arguments)
-      (kernel-loadable-modules kernel-modules)
-      (initrd initrd)
-      (initrd-modules initrd-modules)
-      (firmware firmware)
-      (services (append
-                 services
-                 (if (rde-config-integrate-he-in-os? config)
-                     (list (service guix-home-service-type
-                                    ;; TODO: [Andrew Tropin, 2024-05-27]
-                                    ;; Temporary fix, remove it, when
-                                    ;; https://issues.guix.gnu.org/71111 is
-                                    ;; merged
-                                    `(,(list
-                                        user-name
-                                        (get-home-environment config)))))
-                     '())
-                 (list (service sudoers-service-type))
-                 (if user-name
-                     (list (service rde-account-service-type user))
-                     '())))
-      (sudoers-file #f)
-      (name-service-switch name-service-switch))))
+      (inherit computed-os)
+      (essential-services
+       (modify-services (operating-system-essential-services computed-os)
+         (shepherd-root-service-type
+          this-config =>
+          (shepherd-configuration
+           (inherit this-config)
+           (shepherd (get-value 'shepherd config)))))))))
 
 (define (pretty-print-rde-config config)
   (use-modules (gnu services)
