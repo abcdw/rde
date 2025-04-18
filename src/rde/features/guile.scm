@@ -21,17 +21,20 @@
   #:use-module (rde features)
   #:use-module (rde features emacs)
   #:use-module (rde features predicates)
+  #:use-module (rde packages)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages guile)
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
+  #:use-module (gnu packages)
   #:use-module (gnu services configuration)
   #:use-module (gnu services shepherd)
   #:use-module (rde packages emacs-xyz)
   #:use-module (rde packages guile-xyz)
   #:use-module (guix gexp)
   #:use-module (guix packages)
+  #:use-module ((guix utils) #:select (substitute-keyword-arguments))
   #:export (feature-guile
             feature-shepherd))
 
@@ -83,9 +86,26 @@ Provide interactive and functional programming environment for Guile.")))
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+(define (rde-patch-shepherd shepherd)
+  (package
+    (inherit shepherd)
+    (source
+     (origin
+       (inherit (package-source shepherd))
+       (patches
+        (parameterize
+            ((%patch-path %rde-patch-path))
+          (search-patches
+           "shepherd-set-user-log-dir-to-XDG_STATE_HOME-log.patch")))))
+    ;; See #77795 guix upstream bug.
+    (arguments
+     (substitute-keyword-arguments (package-arguments shepherd)
+       ((#:tests? enabled? #f)
+        #f)))))
+
 (define* (feature-shepherd
           #:key
-          (shepherd shepherd-1.0))
+          (shepherd (rde-patch-shepherd shepherd-1.0)))
   "Configure tooling and environment for GNU Shepherd."
   (ensure-pred file-like? shepherd)
 

@@ -1,0 +1,12 @@
+diff a/modules/shepherd/support.scm b/modules/shepherd/support.scm
+--- a/modules/shepherd/support.scm
++++ b/modules/shepherd/support.scm
+@@ -412,7 +412,7 @@ turned into user error messages."
+   ;; Default log directory if shepherd is run as a normal user.
+   (string-append (or (getenv "XDG_STATE_HOME")
+                      (string-append user-homedir "/.local/state"))
+-                 "/shepherd"))
++                 "/log"))
+ 
+ (define %user-runtime-dir
+   ;; Default runtime directory if shepherd is run as a normal user.
