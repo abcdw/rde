@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment.
 ;;;
 ;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2024, 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -35,6 +36,7 @@
   #:use-module (gnu services avahi)
   #:use-module (gnu services dbus)
   #:use-module (gnu home services)
+  #:use-module (gnu home services admin)
   #:use-module (gnu home services desktop)
   #:use-module (gnu home services shepherd)
 
@@ -171,7 +173,7 @@ be a symbol, which will be used to construct feature name."
    (service guix-service-type)
    (service nscd-service-type)
 
-   (service rottlog-service-type)
+   (service log-rotation-service-type)
    (service log-cleanup-service-type
             (log-cleanup-configuration
              (directory "/var/log/guix/drvs")))
@@ -187,6 +189,11 @@ be a symbol, which will be used to construct feature name."
 
 (define %rde-default-substitute-urls %default-substitute-urls)
 (define %rde-default-authorized-guix-keys %default-authorized-guix-keys)
+(define %rde-base-home-services
+  ;; Non-essential but useful services to have by default.
+  (list (service home-log-rotation-service-type)
+        (service home-shepherd-timer-service-type)
+        (service home-shepherd-transient-service-type)))
 
 (define* (feature-base-services
           #:key
@@ -198,7 +205,8 @@ be a symbol, which will be used to construct feature name."
            (list "--gc-keep-derivations=yes" "--gc-keep-outputs=yes"))
           (udev-rules '())
           (guix-http-proxy #f)
-          (base-system-services %rde-base-system-services))
+          (base-system-services %rde-base-system-services)
+          (base-home-services %rde-base-home-services))
   "Provides base system services."
   (ensure-pred list-of-services? base-system-services)
   (ensure-pred list-of-strings? guix-substitute-urls)
@@ -206,6 +214,8 @@ be a symbol, which will be used to construct feature name."
   (ensure-pred list-of-strings? guix-daemon-extra-options)
   (ensure-pred list-of-file-likes? udev-rules)
   (ensure-pred maybe-string? guix-http-proxy)
+  (ensure-pred list-of-services? base-system-services)
+  (ensure-pred list-of-services? base-home-services)
 
   (define (get-base-system-services cfg)
     (append
@@ -257,7 +267,8 @@ Defaults:%wheel env_keep+=TERMINFO")))))
    (name 'base-services)
    (values `((base-services . #t)
              (number-of-ttys . ,%number-of-ttys)))
-   (system-services-getter get-base-system-services)))
+   (system-services-getter get-base-system-services)
+   (home-services-getter (const base-home-services))))
 
 (define %rde-desktop-system-services
   (list
