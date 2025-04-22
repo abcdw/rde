@@ -368,3 +368,33 @@ programming language, powered by the tree-sitter-clojure tree-sitter grammar."))
  from a url and save it into a bibtex file. It also provides a way to obtain a
  list of attachments (e.g. PDF files) associated with a url. This is done
  using Zotero translators, but without using the Zotero client."))))
+
+(define-public emacs-arei-shepherd
+  (package
+    (name "emacs-arei-shepherd")
+    (version "0.1")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://codeberg.org/cons-town/guile-debugger")
+                    (commit (string-append "arei-shepherd-" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "1id5lpvqlpmm3q933smq3byc8g7xq8algg0pimbcgay44g335m67"))))
+    (build-system emacs-build-system)
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'discover-package
+            (lambda _
+              (symlink "shepherd-nrepl/src/elisp/arei-shepherd.el"
+                       "arei-shepherd.el"))))))
+    (inputs (list emacs-arei
+                  emacs-embark))
+    (home-page "https://codeberg.org/cons-town/guile-debugger")
+    (synopsis "Shepherd interface for Arei")
+    (description "arei-shepherd is an extension for Arei that allows to interract with
+the shepherd via the ares-shepherd extension for the nREPL.")
+    (license license:gpl3+)))
