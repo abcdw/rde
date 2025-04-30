@@ -50,6 +50,7 @@
   #:use-module (gnu services xorg)
   #:use-module (gnu home services)
   #:use-module (gnu home services pm)
+  #:use-module (gnu home services shepherd)
   #:use-module (rde home services wm)
   #:use-module (rde home services shells)
 
