@@ -1519,6 +1519,8 @@ notmuch config and can be used anywhere in search via @code{query:query-name}."
 
           (with-eval-after-load
            'notmuch
+           (setopt notmuch-message-headers
+                   '("Subject" "To" "Cc" "Reply-To" "Date"))
            (setq notmuch-fcc-dirs ',fcc-dirs)
            (setq notmuch-identities ',emails)
            (setq notmuch-address-use-company nil)
