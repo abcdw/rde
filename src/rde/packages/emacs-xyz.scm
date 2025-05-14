@@ -372,7 +372,7 @@ programming language, powered by the tree-sitter-clojure tree-sitter grammar."))
 (define-public emacs-arei-shepherd
   (package
     (name "emacs-arei-shepherd")
-    (version "0.1")
+    (version "0.3")
     (source (origin
               (method git-fetch)
               (uri (git-reference
@@ -381,7 +381,7 @@ programming language, powered by the tree-sitter-clojure tree-sitter grammar."))
               (file-name (git-file-name name version))
               (sha256
                (base32
-                "1id5lpvqlpmm3q933smq3byc8g7xq8algg0pimbcgay44g335m67"))))
+                "0f32ymabyhz0bczsic4z35l36vharlfjrsm0hdsj4hd1c836qacy"))))
     (build-system emacs-build-system)
     (arguments
      (list
