@@ -41,8 +41,8 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-arei-latest
-  (let* ((commit "cec17d88f452f740ac007a07b10de403e76b0ccb")
-         (revision "1"))
+  (let* ((commit "1e5a64c7df13f5392e935485a134857644cde6fe")
+         (revision "2"))
     (package
       (inherit emacs-arei)
       (name "emacs-arei")
@@ -56,7 +56,7 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "1k68247p8sx6mzagbic0wn671ilax51hbra3p38g8vq5b4yx54bn"))))
+           "1r14z9ghs86w8b22p6lr7wnr4ynjraqakqjy71rxkpwfw3lllmsn"))))
       (build-system emacs-build-system))))
 
 (define-public emacs-justify-kp
@@ -391,7 +391,7 @@ programming language, powered by the tree-sitter-clojure tree-sitter grammar."))
             (lambda _
               (symlink "shepherd-nrepl/src/elisp/arei-shepherd.el"
                        "arei-shepherd.el"))))))
-    (inputs (list emacs-arei
+    (inputs (list emacs-arei-latest
                   emacs-embark))
     (home-page "https://codeberg.org/cons-town/guile-debugger")
     (synopsis "Shepherd interface for Arei")
