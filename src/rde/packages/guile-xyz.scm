@@ -27,8 +27,8 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public guile-ares-rs-latest
-  (let* ((commit "24d0832251fbb1b44fb3adf4fa1a085e0c396e77")
-         (revision "3"))
+  (let* ((commit "e9b899f986587fbd4cecc2bae5b1b7f8e5351551")
+         (revision "5"))
     (package
       (inherit guile-ares-rs)
       (name "guile-ares-rs")
@@ -42,7 +42,7 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "01wa8l9piwjmq2xhpgblfp8h0yq45hqa4ys9ddfia3d5rp081n45")))))))
+           "0hbf1di0cigqxalbh1g76673jyn1n28ig6jalzbv72575il57yrz")))))))
 
 (define-public guile-ares-shepherd
   (package
