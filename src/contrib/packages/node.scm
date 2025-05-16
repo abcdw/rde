@@ -193,6 +193,7 @@ source files.")
                                        libuv "/lib:"
                                        zlib "/lib"
                                        "'],"))))))
+               (delete 'patch-additional-hardcoded-program-references)
                (replace 'delete-problematic-tests
                  (lambda* (#:key inputs #:allow-other-keys)
                    ;; FIXME: These tests fail in the build container, but they don't
