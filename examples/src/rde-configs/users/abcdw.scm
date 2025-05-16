@@ -96,6 +96,7 @@
          (define-key geiser-mode-map (kbd "C-c M-j") 'abcdw-geiser-connect))
 
        (with-eval-after-load 'simple
+         (global-page-break-lines-mode 1)
          (setq-default display-fill-column-indicator-column 80)
          (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
 
