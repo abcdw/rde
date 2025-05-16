@@ -258,8 +258,7 @@ do with the file, and whether to add the file to the current PLAYLIST."
      (home-services-getter get-home-services)))
 
 (define rde-yt-dlp-config
-  `(("--format" . "247+251") ; 720p webm
-    ("--output" . "%(title)s [%(id)s].%(ext)s")))
+  `(("--output" . "%(title)s [%(id)s].%(ext)s")))
 
 (define* (feature-yt-dlp
           #:key
