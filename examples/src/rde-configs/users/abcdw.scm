@@ -559,6 +559,9 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
                        :coderepo "~/work/gnu/guix/")))
     ;; TODO: move feature to general, move extra configuration to service.
     (feature-notmuch
+     #:notmuch-queries
+     '((rde-all . "to:\"rde-devel\" or to:\"rde-discuss\" or tag:rde")
+       (rde-inbox . "query:rde-all and tag:inbox"))
      #:extra-tag-updates-post
      '("notmuch tag +guix-home +inbox -- 'thread:\"\
 {((subject:guix and subject:home) or (subject:service and subject:home) or \
@@ -572,12 +575,23 @@ subject:/home:/) and tag:new}\"'"
          :key "t")
         (:name "Drafts" :query "tag:draft" :key "d")
         (:name "Watching" :query "thread:{tag:watch} and tag:unread" :key "w")
+        (:name "RDE Inbox"
+         :query "query:rde-inbox" :key "ir")
+        (:name "RDE All"
+         :query "query:rde-all" :key "pr")
+        (:name "Project Debugger: RDE Internship 2025"
+         :query "rde internship or tag:guile-debugger" :key "pd")
+        (:name "Project Suitbl"
+         :query "to: 2024-10-272@NLnet.nl or tag:suitbl" :key "ps")
+        (:name "Work Inbox (Unsorted)"
+         :query "(tag:work and tag:inbox) and not query:rde-all"
+         :key "iu")
         (:name "Work Inbox"
          :query "tag:work and tag:inbox"
-         :key "W")
+         :key "iw")
         (:name "Personal Inbox"
          :query "tag:personal and tag:inbox"
-         :key "P")
+         :key "ip")
         (:name "Guix Home Inbox" :key "H" :query "tag:guix-home and tag:unread"))
       ;; %rde-notmuch-saved-searches
       '()))
