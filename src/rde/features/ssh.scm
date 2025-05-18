@@ -42,20 +42,49 @@
           (ssh openssh)
           (mosh mosh)
           (ssh-configuration (home-ssh-configuration))
-          (ssh-agent? #f))
+          (ssh-agent? #f)
+          (ssh-add-keys '()))
   "Setup and configure ssh and ssh-agent."
   (ensure-pred file-like? ssh)
   (ensure-pred file-like? mosh)
   (ensure-pred home-ssh-configuration? ssh-configuration)
   (ensure-pred boolean? ssh-agent?)
+  (ensure-pred list-of-strings? ssh-add-keys)
 
   (define (ssh-home-services config)
     "Returns home services related to SSH."
     (append
      (if ssh-agent?
-         (service home-ssh-agent-service-type
-                  (home-ssh-agent-configuration
-                   (openssh ssh)))
+         (let* ((ssh-agent-configuration (home-ssh-agent-configuration
+                                          (openssh ssh)))
+                (ssh-agent-service (service home-ssh-agent-service-type
+                                            ssh-agent-configuration)))
+           (if (null? ssh-add-keys)
+               (list ssh-agent-service)
+               (let* ((ssh-add (file-append ssh "/bin/ssh-add"))
+                      (socket-file #~(string-append
+                                      #$(home-ssh-agent-socket-directory
+                                         ssh-agent-configuration)
+                                      "/socket")))
+                 (list
+                  ssh-agent-service
+                  (simple-service
+                   'ssh-add-keys
+                   home-shepherd-service-type
+                   (list
+                    (shepherd-service
+                     (documentation "Add keys after ssh-agent start.")
+                     (provision '(ssh-add-keys))
+                     (requirement '(ssh-agent))
+                     (modules '((shepherd support)))
+                     (one-shot? #t)
+                     (start
+                      #~(lambda _
+                          (apply
+                           system*
+                           "env" (string-append "SSH_AUTH_SOCK=" #$socket-file)
+                           #$ssh-add '#$ssh-add-keys)))
+                     (stop #~(make-kill-destructor)))))))))
          '())
      (list
       (simple-service
