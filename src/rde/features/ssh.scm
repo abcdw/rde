@@ -23,6 +23,7 @@
   #:use-module (rde predicates)
   #:use-module (gnu home-services ssh)
   #:use-module (gnu home services)
+  #:use-module (gnu home services ssh)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu services)
   #:use-module (gnu packages)
@@ -52,31 +53,9 @@
     "Returns home services related to SSH."
     (append
      (if ssh-agent?
-         (let* ((sock "ssh-agent.sock"))
-           (list
-            (simple-service
-             'start-ssh-agent-at-startup
-             home-shepherd-service-type
-             (list
-              (shepherd-service
-               (documentation "Run the ssh-agent at startup.")
-               (provision '(ssh-agent))
-               (requirement '())
-               (start
-                #~(make-forkexec-constructor
-                   (list (string-append
-                          #$(get-value 'ssh config)
-                          "/bin/ssh-agent")
-                         "-d" "-a"
-                         (string-append (getenv "XDG_RUNTIME_DIR") "/" #$sock))
-                   #:log-file (string-append
-                               (getenv "XDG_STATE_HOME") "/log"
-                               "/ssh-agent.log")))
-               (stop #~(make-kill-destructor)))))
-            (simple-service
-             'ssh-auth-socket-env-export
-             home-environment-variables-service-type
-             `(("SSH_AUTH_SOCK" . ,(string-append "$XDG_RUNTIME_DIR/" sock))))))
+         (service home-ssh-agent-service-type
+                  (home-ssh-agent-configuration
+                   (openssh ssh)))
          '())
      (list
       (simple-service
