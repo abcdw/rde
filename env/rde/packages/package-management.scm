@@ -28,6 +28,9 @@
   #:use-module (guix utils)
   #:use-module (guix download)
   #:use-module (guix git-download)
+  #:use-module (guix build-system guile)
+  #:use-module ((guix licenses) #:prefix license:)
+  #:use-module (srfi srfi-1)
   #:use-module (rde lib file)
   #:export (guix-from-channels-lock
             make-guix-package
@@ -131,7 +134,7 @@
                           (false-if-exception (make-file-writable f)))
                         (find-files ".")))))))
     (inputs `(("guile" ,guile-next)
-              ("guix" ,(guix-from-channels channels))))
+              ("guix" ,(make-guix-package channels))))
     (home-page "https://git.sr.ht/~abcdw/rde")
     (synopsis "Combined package for channel source and bytecode files")
     (description "Combined package for channel source and bytecode files.")
