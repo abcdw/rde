@@ -38,9 +38,6 @@
   (car
    (filter (lambda (x) (equal? (channel-name x) 'guix)) channels)))
 
-(define my-channels
-  (load (canonicalize-path (find-file-in-load-path "channels-lock.scm"))))
-
 (define (make-guix-package channels)
   (let ((commit (channel-commit (get-guix-channel channels))))
     (package
@@ -66,9 +63,6 @@
 
       (inputs (modify-inputs (package-inputs guix)
                 (replace "guile" guile-next))))))
-
-(define guix-from-channels-lock
-  (make-guix-package my-channels))
 
 (define (channel->git-checkout channel)
   (git-checkout
@@ -142,3 +136,11 @@
     (synopsis "Combined package for channel source and bytecode files")
     (description "Combined package for channel source and bytecode files.")
     (license license:gpl3+)))
+
+
+
+(define my-channels
+  (load (canonicalize-path (find-file-in-load-path "channels-lock.scm"))))
+
+(define guix-from-channels-lock
+  (make-guix-package my-channels))
