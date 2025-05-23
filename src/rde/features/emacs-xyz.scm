@@ -2707,14 +2707,12 @@ features use `home-emacs-tempel-service-type'."
       `((eval-when-compile (require 'tempel))
         (with-eval-after-load
          'tempel
-         (require 'tempel-collection)
          (setq tempel-trigger-prefix ,tempel-trigger-prefix)
          (defun rde-tempel-setup-capf ()
            "Prepends `tempel-complete' to `completion-at-point-functions'."
            (setq-local completion-at-point-functions
                        (cons 'tempel-complete
                              completion-at-point-functions)))
-
          (mapcar
           (lambda (mode)
             (add-hook mode 'rde-tempel-setup-capf))
@@ -2726,7 +2724,10 @@ features use `home-emacs-tempel-service-type'."
         (if after-init-time
              (global-tempel-abbrev-mode 1)
              (add-hook 'after-init-hook 'global-tempel-abbrev-mode)))
-      #:elisp-packages (list emacs-tempel emacs-tempel-collection)
+      #:elisp-packages (append (list emacs-tempel)
+                               (if default-templates?
+                                   (list emacs-tempel-collection)
+                                   '()))
       #:summary "\
 Simple templates based on tempo syntax."
       #:commentary "\
