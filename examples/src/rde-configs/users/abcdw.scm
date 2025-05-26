@@ -192,23 +192,32 @@
   (simple-service
    'sway-extra-config
    home-sway-service-type
-   `((output DP-2 scale 2)
+   `((output HDMI-A-1 scale 2)
+     (output DP-2 scale 2)
+     ;; (gaps bottom 90)
      ;; (output * bg ,wallpaper-ai-art center)
      ;; (output eDP-1 disable)
      ,@(map (lambda (x) `(workspace ,x output DP-2)) (iota 8 1))
 
+     ,@(append-map
+        (lambda (x)
+          `(;; (bindsym --to-code ,(format #f "$mod+~a" (modulo x 10))
+            ;;          workspace number ,x)
+            (bindsym --to-code ,(format #f "$mod+Control+~a" (modulo x 10))
+                     move container to workspace number ,x)))
+        (iota 10 1))
      ;; (workspace 9 output DP-2)
      ;; (workspace 10 output DP-2)
 
      ;; (bindswitch --reload --locked lid:on exec /run/setuid-programs/swaylock)
 
      (bindsym
-      --locked $mod+Shift+t exec
+      --locked Pause exec
       ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
       play-pause)
 
      (bindsym
-      --locked $mod+Shift+n exec
+      --locked $mod+Alt+n exec
       ,(file-append (@ (gnu packages music) playerctl) "/bin/playerctl")
       next)
 
