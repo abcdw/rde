@@ -227,7 +227,7 @@
      (bindsym $mod+Ctrl+o focus output left)
      (input type:touchpad
             ;; TODO: Move it to feature-sway or feature-mouse?
-            (;; (natural_scroll enabled)
+            ((natural_scroll enabled)
              (tap enabled)))
 
      ;; (xwayland disable)
