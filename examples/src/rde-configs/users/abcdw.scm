@@ -265,6 +265,12 @@
            (iota 4))
       (list
        (ssh-host
+        (host "*.cons.town")
+        (options
+         '((user . "root")
+           (port . 22)
+           (compression . #t))))
+       (ssh-host
         (host "pinky-ygg")
         (options
          '((host-name . "200:554d:3eb1:5bc5:6d7b:42f4:8792:efb8")
