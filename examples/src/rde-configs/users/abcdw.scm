@@ -37,6 +37,8 @@
   #:use-module (rde features gtk)
   #:use-module (rde features sourcehut)
   #:use-module (rde features)
+  #:use-module (rde features llm)
+  #:use-module (rde features uml)
   #:use-module (rde home services emacs)
   #:use-module (rde home services i2p)
   #:use-module (rde home services shells)
@@ -613,6 +615,8 @@ subject:/home:/) and tag:new}\"'"
      #:user-name-fn (const "abcdw"))
     (feature-yt-dlp)
 
+    (feature-plantuml)
+    (feature-clojure)
     (feature-libreoffice)
 
     ;; TODO: Remove auctex dependency, which interjects in texinfo-mode.
@@ -620,6 +624,7 @@ subject:/home:/) and tag:new}\"'"
      #:global-bibliography
      (list "/data/abcdw/work/abcdw/notes/bibliography.bib"))
 
+    (feature-ellama)
     (feature-keyboard
      ;; To get all available options, layouts and variants run:
      ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
