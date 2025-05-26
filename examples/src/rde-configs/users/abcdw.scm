@@ -112,13 +112,13 @@
        ;; "emacs-dirvish"
        "emacs-elixir-mode"
        "emacs-company-posframe"
-       "emacs-eat"
        "emacs-wgrep"
        "emacs-ox-haunt"
        "emacs-haskell-mode"
        "emacs-rainbow-mode"
        "emacs-hl-todo"
        "emacs-yasnippet"
+       ;; "emacs-xkb-mode"
        ;; "emacs-consult-dir"
        "emacs-kind-icon"
        "emacs-nginx-mode" "emacs-yaml-mode"
@@ -168,7 +168,7 @@
      "kdenlive"
      ;; "glib:bin"
 
-     "ffmpeg"
+     ;; "ffmpeg"
      "ripgrep" "curl"))))
 
 (define (wallpaper url hash)
@@ -623,6 +623,8 @@ subject:/home:/) and tag:new}\"'"
     (feature-keyboard
      ;; To get all available options, layouts and variants run:
      ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
+     ;; To get a list of symbols and actions:
+     ;; cat `guix build xorgproto`/include/X11/keysymdef.h
      #:keyboard-layout
      (keyboard-layout
       "us,ru" "dvorak,"
