@@ -625,6 +625,7 @@ subject:/home:/) and tag:new}\"'"
      (list "/data/abcdw/work/abcdw/notes/bibliography.bib"))
 
     (feature-ellama)
+    (feature-emacs-cua)
     (feature-keyboard
      ;; To get all available options, layouts and variants run:
      ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
