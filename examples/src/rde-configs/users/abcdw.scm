@@ -462,10 +462,6 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
                       (nick "abcdw"))))
 
     (feature-ssh-proxy #:host "pinky-ygg" #:auto-start? #f)
-    (feature-ssh-proxy #:host "pinky-ygg" #:name "hundredrps"
-                       #:proxy-string "50080:localhost:8080"
-                       #:reverse? #t
-                       #:auto-start? #f)
 
     (feature-foot)
     (feature-yggdrasil)
