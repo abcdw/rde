@@ -461,7 +461,9 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
                       (network "irc.oftc.net")
                       (nick "abcdw"))))
 
-    (feature-ssh-proxy #:host "pinky-ygg" #:auto-start? #f)
+    (feature-ssh-proxy  #:host "pinky-ygg" #:auto-start? #f)
+    (feature-ssh-tunnel #:host "pinky-ygg" #:name "pinky-web-server"
+                        #:auto-start? #t)
 
     (feature-foot)
     (feature-yggdrasil)
