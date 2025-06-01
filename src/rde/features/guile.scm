@@ -53,7 +53,8 @@
      (simple-service
       'add-guile-package
       home-profile-service-type
-      (list guile guile-ares-rs))
+      (list (get-value 'guile config)
+            (get-value 'guile-ares-rs config)))
      (simple-service
       'guile-xdg-base-dirs-specification
       home-environment-variables-service-type
@@ -75,7 +76,7 @@
           (setopt minions-prominent-modes '(arei-mode)))
         (require 'arei))
 
-      #:elisp-packages (list emacs-arei)
+      #:elisp-packages (list (get-value 'emacs-arei config))
       #:keywords '(guile)
       #:summary "Configure Guile-related packages"
       #:commentary "\
@@ -83,7 +84,9 @@ Provide interactive and functional programming environment for Guile.")))
 
   (feature
    (name f-name)
-   (values `((,f-name . #t)))
+   (values `((guile . ,guile)
+             (guile-ares-rs . ,guile-ares-rs)
+             (emacs-arei . ,emacs-arei)))
    (home-services-getter get-home-services)))
 
 (define (rde-patch-shepherd shepherd)
