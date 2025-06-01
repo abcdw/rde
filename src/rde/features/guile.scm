@@ -119,7 +119,10 @@ Provide interactive and functional programming environment for Guile.")))
     (list
      (service home-shepherd-service-type
               (home-shepherd-configuration
-               (shepherd (get-value 'shepherd config))
+               (shepherd
+                ((package-input-rewriting/spec
+                  `(("guile" . ,(const (get-value 'guile config guile-3.0)))))
+                 (get-value 'shepherd config)))
                (auto-start? #f)
                (daemonize? #f)))
 
