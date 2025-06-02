@@ -203,6 +203,7 @@ be a symbol, which will be used to construct feature name."
           (guix-authorized-keys '())
           (guix-daemon-extra-options
            (list "--gc-keep-derivations=yes" "--gc-keep-outputs=yes"))
+          (guix-daemon-privileged? #t)
           (udev-rules '())
           (guix-http-proxy #f)
           (base-system-services %rde-base-system-services)
@@ -212,6 +213,7 @@ be a symbol, which will be used to construct feature name."
   (ensure-pred list-of-strings? guix-substitute-urls)
   (ensure-pred list-of-file-likes? guix-authorized-keys)
   (ensure-pred list-of-strings? guix-daemon-extra-options)
+  (ensure-pred boolean? guix-daemon-privileged?)
   (ensure-pred list-of-file-likes? udev-rules)
   (ensure-pred maybe-string? guix-http-proxy)
   (ensure-pred list-of-services? base-system-services)
@@ -237,6 +239,7 @@ be a symbol, which will be used to construct feature name."
          (authorized-keys (append
                            guix-authorized-keys
                            default-authorized-guix-keys))
+         (privileged? guix-daemon-privileged?)
          (extra-options guix-daemon-extra-options)
          (http-proxy guix-http-proxy)))
        (greetd-service-type
