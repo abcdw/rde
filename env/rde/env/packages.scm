@@ -17,7 +17,7 @@
 ;;; You should have received a copy of the GNU General Public License
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
-(define-module (rde packages package-management)
+(define-module (rde env packages)
   #:use-module (rde lib file)
   #:use-module (rde env channels)
   #:use-module (rde packages guix)

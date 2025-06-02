@@ -19,7 +19,7 @@ repl: ares
 
 ares:
 	${GUIX} shell guile-next guile-ares-rs \
-	-e '(@ (rde packages package-management) guix-from-channels-lock)' \
+	-e '(@ (rde env packages) guix-from-channels-lock)' \
 	-- guile \
 	-L ../src \
 	-L ../env \
