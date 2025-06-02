@@ -5,6 +5,8 @@
   #:use-module (gnu home services)
   #:use-module (gnu home-services ssh)
   #:use-module (gnu packages)
+  #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages guile-xyz)
   #:use-module (gnu services)
   #:use-module (guix channels)
   #:use-module (guix download)
@@ -18,6 +20,7 @@
   #:use-module (rde features emacs-xyz)
   #:use-module (rde features gnupg)
   #:use-module (rde features gtk)
+  #:use-module (rde features guile)
   #:use-module (rde features irc)
   #:use-module (rde features keyboard)
   #:use-module (rde features libreoffice)
@@ -130,6 +133,20 @@
        "emacs-restart-emacs"
        "emacs-org-present"))))))
 
+(define-public emacs-arei-local
+  (package
+    (inherit emacs-arei)
+    (version "0.9.99999")
+    (source
+     (local-file "/data/abcdw/work/abcdw/emacs-arei" #:recursive? #t))))
+
+(define-public guile-ares-rs-local
+  (package
+    (inherit guile-ares-rs)
+    (version "0.9.99999")
+    (source
+     (local-file "/data/abcdw/work/abcdw/guile-ares-rs" #:recursive? #t))))
+
 (define home-extra-packages-service
   (simple-service
    'home-profile-extra-packages
@@ -137,8 +154,7 @@
    (append
     (list
      (@ (gnu packages tree-sitter) tree-sitter-clojure)
-     (@ (gnu packages tree-sitter) tree-sitter-html)
-     (@ (gnu packages guile) guile-next))
+     (@ (gnu packages tree-sitter) tree-sitter-html))
     (strings->packages
      "figlet" ;; TODO: Move to emacs-artist-mode
      ;; "calibre"
@@ -187,8 +203,6 @@
 (define wallpaper-dark-rider
   (wallpaper "https://w.wallhaven.cc/full/lm/wallhaven-lmlzwl.jpg"
              "01j5z3al8zvzqpig8ygvf7pxihsj2grsazg9yjiqyjgsmp00hpaf"))
-
-
 
 (define sway-extra-config-service
   (simple-service
@@ -381,10 +395,14 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
                 kernel
                 swaylock
                 xdg
+                guile
                 git)))
            %all-features)
    (list
     (feature-git)
+    (feature-guile
+     #:guile-ares-rs guile-ares-rs-local
+     #:emacs-arei emacs-arei-local)
     (feature-kernel
      #:kernel-arguments '("snd_hda_intel.dmic_detect=0")
      #:firmware (list example-firmware))
