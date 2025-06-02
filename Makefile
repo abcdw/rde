@@ -1,6 +1,6 @@
 # pipefail is not POSIX complaint
 
-GUIXTM=guix time-machine -C ./examples/rde/channels-lock.scm
+GUIXTM=guix time-machine -C ./env/rde/env/channels.scm
 GUIX=$(GUIXTM) --
 EMACS=$(GUIX) shell emacs emacs-ox-html-stable-ids -- emacs
 HUT=$(GUIX) shell hut -- hut
