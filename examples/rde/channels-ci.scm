@@ -1,9 +1,9 @@
 (use-modules (guix ci)
              (guix channels)
+             (rde env channels)
              (srfi srfi-1))
 
-(define channels
-  (load "channels-lock.scm"))
+(define channels core-channels)
 
 (define channels-with-local-rde
   (cons
