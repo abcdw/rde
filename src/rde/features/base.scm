@@ -55,6 +55,8 @@
 
   #:use-module (srfi srfi-1)
   #:use-module (guix gexp)
+  #:use-module (guix diagnostics)
+  #:use-module (guix i18n)
 
   #:export (feature-user-info
             feature-base-packages
@@ -187,8 +189,6 @@ be a symbol, which will be used to construct feature name."
             `(("/bin/sh" ,(file-append bash "/bin/sh"))
               ("/usr/bin/env" ,(file-append coreutils "/bin/env"))))))
 
-(define %rde-default-substitute-urls %default-substitute-urls)
-(define %rde-default-authorized-guix-keys %default-authorized-guix-keys)
 (define %rde-base-home-services
   ;; Non-essential but useful services to have by default.
   (list (service home-log-rotation-service-type)
@@ -197,10 +197,10 @@ be a symbol, which will be used to construct feature name."
 
 (define* (feature-base-services
           #:key
-          (default-substitute-urls %rde-default-substitute-urls)
-          (default-authorized-guix-keys %rde-default-authorized-guix-keys)
-          (guix-substitute-urls '())
-          (guix-authorized-keys '())
+          (default-substitute-urls #f)
+          (default-authorized-guix-keys #f)
+          (guix-substitute-urls #f)
+          (guix-authorized-keys #f)
           (guix-daemon-extra-options
            (list "--gc-keep-derivations=yes" "--gc-keep-outputs=yes"))
           (guix-daemon-privileged? #t)
@@ -209,15 +209,29 @@ be a symbol, which will be used to construct feature name."
           (base-system-services %rde-base-system-services)
           (base-home-services %rde-base-home-services))
   "Provides base system services."
-  (ensure-pred list-of-services? base-system-services)
-  (ensure-pred list-of-strings? guix-substitute-urls)
-  (ensure-pred list-of-file-likes? guix-authorized-keys)
   (ensure-pred list-of-strings? guix-daemon-extra-options)
   (ensure-pred boolean? guix-daemon-privileged?)
   (ensure-pred list-of-file-likes? udev-rules)
   (ensure-pred maybe-string? guix-http-proxy)
   (ensure-pred list-of-services? base-system-services)
   (ensure-pred list-of-services? base-home-services)
+
+  (when default-substitute-urls
+    (warning
+     (G_ "'~a' in feature-base-services is deprecated and ignored, use '~a' instead~%")
+     'default-substitute-urls 'guix-extensions))
+  (when default-authorized-guix-keys
+    (warning
+     (G_ "'~a' in feature-base-services is deprecated and ignored, use '~a' instead~%")
+     'default-authorized-guix-keys 'guix-extensions))
+  (when guix-substitute-urls
+    (warning
+     (G_ "'~a' in feature-base-services is deprecated and ignored, use '~a' instead~%")
+     'guix-substitute-urls 'guix-extensions))
+  (when guix-authorized-keys
+    (warning
+     (G_ "'~a' in feature-base-services is deprecated and ignored, use '~a' instead~%")
+     'guix-authorized-keys 'guix-extensions))
 
   (define (get-base-system-services cfg)
     (append
@@ -233,12 +247,6 @@ be a symbol, which will be used to construct feature name."
         config =>
         (guix-configuration
          (inherit config)
-         (substitute-urls (append
-                           guix-substitute-urls
-                           default-substitute-urls))
-         (authorized-keys (append
-                           guix-authorized-keys
-                           default-authorized-guix-keys))
          (privileged? guix-daemon-privileged?)
          (extra-options guix-daemon-extra-options)
          (http-proxy guix-http-proxy)))
