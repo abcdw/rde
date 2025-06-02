@@ -21,7 +21,7 @@
   #:use-module (rde lib file)
   #:use-module (rde env channels)
   #:use-module (rde packages guix)
-  #:export (guix-from-channels-lock))
+  #:export (guix-package))
 
-(define guix-from-channels-lock
+(define guix-package
   (make-guix-package core-channels))
