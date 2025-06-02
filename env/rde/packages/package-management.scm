@@ -19,12 +19,9 @@
 
 (define-module (rde packages package-management)
   #:use-module (rde lib file)
+  #:use-module (rde env channels)
   #:use-module (rde packages guix)
-  #:export (guix-from-channels-lock)
-  #:declarative? #f)
-
-(define my-channels
-  (load (canonicalize-path (find-file-in-load-path "channels-lock.scm"))))
+  #:export (guix-from-channels-lock))
 
 (define guix-from-channels-lock
-  (make-guix-package my-channels))
+  (make-guix-package core-channels))
