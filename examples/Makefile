@@ -33,7 +33,7 @@ env/rde-configs/env/channels.scm: ../env/rde/env/channels.scm
 	sed 's/rde env/rde-configs env/' \
 	../env/rde/env/channels.scm > env/rde-configs/env/channels.scm
 
-env/sync: env/rde-configs/env/channels.scm
+env/sync: # env/rde-configs/env/channels.scm
 
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
@@ -89,11 +89,13 @@ minimal/home/build: guix
 	${GUIX} home build ./src/rde-configs/minimal.scm
 
 minimal/home/build/ci:
-	guix time-machine -L ../env -C ../env/rde/env/channels-ci.scm -- \
+	guix time-machine \
+	-L ../env/guix -C ../env/guix/rde/env/guix/channels-ci.scm -- \
 	home build ./src/rde-configs/minimal.scm
 
 minimal/home/build/ci-no-auth:
-	guix time-machine -L ../env -C ../env/rde/env/channels-ci.scm \
+	guix time-machine \
+	-L ../env/guix -C ../env/guix/rde/env/guix/channels-ci.scm \
 	--disable-authentication -- \
 	home build ./src/rde-configs/minimal.scm
 

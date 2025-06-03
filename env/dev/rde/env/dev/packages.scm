@@ -5,9 +5,9 @@
 ;;; SPDX-FileCopyrightText: 2024, 2025 Andrew Tropin <andrew@trop.in>
 
 
-(define-module (rde env packages)
+(define-module (rde env dev packages)
   #:use-module (rde lib file)
-  #:use-module (rde env channels)
+  #:use-module (rde env guix channels)
   #:use-module (rde packages guix)
   #:export (guix-package))
 
