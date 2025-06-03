@@ -463,8 +463,9 @@ different level headings will have different size."
         (load-theme ',theme t (not (display-graphic-p)))
         ,@(if (get-value 'emacs-server-mode? config #f)
               `((add-hook 'server-after-make-frame-hook
-                             (lambda ()
-                               (enable-theme ',theme))))
+                          (lambda ()
+                            (when (null custom-enabled-themes)
+                              (enable-theme ',theme)))))
               '()))
       #:elisp-packages (list emacs-modus-themes)
       #:summary "Modus Themes extensions"
