@@ -25,7 +25,16 @@ guix:
 	make -C examples guix
 
 ares:
-	make -C examples ares
+	${GUIX} shell -L ./env/guix -L ./env/dev -L ./src \
+	guile-next guile-ares-rs \
+	-e '(@ (rde env dev packages) guix-package)' \
+	-- guile \
+	-L ./src \
+	-L ./examples/src \
+	-L ./env/guix -L ./env/dev \
+	-c \
+"(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
+((@ (ares server) run-nrepl-server)))"
 
 repl: ares
 
