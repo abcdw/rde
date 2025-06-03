@@ -6,16 +6,16 @@ EMACS=$(GUIX) shell emacs emacs-ox-html-stable-ids -- emacs
 HUT=$(GUIX) shell hut -- hut
 
 QEMU_BASE_ARGS= \
--m 4096 -smp 1 -enable-kvm \
--vga none -device virtio-gpu-pci
-# -vga qxl
+-m 8192 -smp 1 -enable-kvm \
+-display gtk,zoom-to-fit=on \
+-vga qxl
+# -vga none -device virtio-gpu-pci
+# -vga vmware
+# -vga none -device qxl-vga,vgamem_mb=32
 
 
 all: ares
 	@echo default target
-
-install:
-	@echo some installation will happen here
 
 check:
 	guile -L ./src -L ./tests -L ./files/emacs/gider/src -c \
@@ -27,8 +27,7 @@ guix:
 ares:
 	make -C examples ares
 
-repl: ares-rs
-
+repl: ares
 
 examples/ixy/home/reconfigure:
 	make -C examples ixy/home/reconfigure
@@ -36,7 +35,6 @@ examples/ixy/home/reconfigure:
 examples/ixy/home/build:
 	make -C examples ixy/home/build
 
-.PHONY: examples/target/rde-live.iso
 
 examples/target/rde-live.iso:
 	make -C examples target/rde-live.iso
@@ -67,6 +65,7 @@ doc/rde.info: doc/rde.texi
 	makeinfo -o doc/rde.info doc/rde.texi
 
 doc/rde.html: doc/rde.texi
+	${GUIX} shell texinfo -- \
 	makeinfo --html --no-split \
 	--css-ref=/assets/manual.css \
 	-c "EXTRA_HEAD=<meta name=\"viewport\" \
