@@ -30,6 +30,12 @@ ares:
 "(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
 ((@ (ares server) run-nrepl-server) #:nrepl-port-path \"../.nrepl-port\"))"
 
+env/sync:
+	mkdir -p env/rde-configs/env/
+	touch env/rde-configs/env/channels.scm
+	sed 's/rde env/rde-configs env/' \
+	../env/rde/env/channels.scm > env/rde-configs/env/channels.scm
+
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
 	build ${CONFIGS}
