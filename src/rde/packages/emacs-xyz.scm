@@ -23,6 +23,7 @@
 (define-module (rde packages emacs-xyz)
   #:use-module (rde packages messaging)
   #:use-module (gnu packages emacs)
+  #:use-module (gnu packages emacs-build)
   #:use-module (gnu packages emacs-xyz)
   #:use-module (gnu packages mail)
   #:use-module (gnu packages texinfo)
