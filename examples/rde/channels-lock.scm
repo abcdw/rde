@@ -1,4 +1,4 @@
 (use-modules (guix channels)
-             (rde env channels))
+             (rde-configs env channels))
 
 core-channels

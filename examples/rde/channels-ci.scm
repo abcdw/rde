@@ -1,6 +1,6 @@
 (use-modules (guix ci)
              (guix channels)
-             (rde env channels)
+             (rde-config env channels)
              (srfi srfi-1))
 
 (define channels core-channels)

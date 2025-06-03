@@ -1,10 +1,8 @@
-# profiles.mk provides guix version specified by rde/channels-lock.scm
-# To rebuild channels-lock.scm use `make -B rde/channels-lock.scm`
 include profiles.mk
 
 # Also defined in .envrc to make proper guix version available project-wide
 GUIX_PROFILE=target/profiles/guix
-GUIX=GUILE_LOAD_PATH="../src:../env:../tests:./src:./rde" GUILE_LOAD_COMPILED_PATH="" ${GUIX_PROFILE}/bin/guix
+GUIX=GUILE_LOAD_PATH="../src:../tests:./src:./env" GUILE_LOAD_COMPILED_PATH="" ${GUIX_PROFILE}/bin/guix
 
 SRC_DIR=./src
 CONFIGS=${SRC_DIR}/rde-configs/configs.scm
@@ -17,24 +15,25 @@ VERSION=latest
 
 repl: ares
 
-ares:
+ares: env/sync
 	${GUIX} shell guile-next guile-ares-rs \
-	-e '(@ (rde env packages) guix-package)' \
+	-e '(@ (rde-configs env packages) guix-package)' \
 	-- guile \
 	-L ../src \
-	-L ../env \
-	-L ./rde \
+	-L ./env \
 	-L ./src \
 	-L /data/abcdw/work/abcdw/guile-ares-rs/src/guile \
 	-c \
 "(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
 ((@ (ares server) run-nrepl-server) #:nrepl-port-path \"../.nrepl-port\"))"
 
-env/sync:
+env/rde-configs/env/channels.scm: ../env/rde/env/channels.scm
 	mkdir -p env/rde-configs/env/
 	touch env/rde-configs/env/channels.scm
 	sed 's/rde env/rde-configs env/' \
 	../env/rde/env/channels.scm > env/rde-configs/env/channels.scm
+
+env/sync: env/rde-configs/env/channels.scm
 
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
