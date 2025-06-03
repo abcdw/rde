@@ -11,7 +11,7 @@
 (define core-channels
   (list (channel
          (name 'guix)
-         (url "https://codeberg.org/guix/guix-mirror")
+         (url "https://git.guix.gnu.org/guix.git")
          (branch "master")
          (commit
           "e124661486ec722b5c09a94b416f0104b9dde5a4")
