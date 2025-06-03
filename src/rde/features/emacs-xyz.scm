@@ -3932,14 +3932,14 @@ built-in help that provides much more contextual information."
 
   (define (get-home-services config)
     "Return home services related to Info."
-    (define theme (get-value 'emacs-light-theme config))
-    (define emacs-modus-themes (get-value 'emacs-modus-themes config))
+    (define theme (get-value 'emacs-light-theme config #f))
+    (define emacs-modus-themes (get-value 'emacs-modus-themes config #f))
 
     (list
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `(,@(if emacs-modus-themes
+      `(,@(if (and theme emacs-modus-themes)
               `((eval-when-compile
                  (require 'modus-themes)
                  (require 'cl-seq))
