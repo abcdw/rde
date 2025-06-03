@@ -397,9 +397,7 @@ different level headings will have different size."
                     :after 'rde-modus-themes-run-after-enable-theme-hook)
         ,@(map (lambda (hook)
                  `(add-hook 'rde-modus-themes-after-enable-theme-hook ',hook))
-               (append
-                '(rde-modus-themes-set-custom-faces)
-                 extra-after-enable-theme-hooks))
+               extra-after-enable-theme-hooks)
 
         (with-eval-after-load 'rde-keymaps
           (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle))
