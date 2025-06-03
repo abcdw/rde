@@ -166,14 +166,14 @@ parser.")
   (package
     (inherit emacs-minions)
     (arguments
-     `(#:phases
-       (modify-phases %standard-phases
-         (add-after 'unpack 'make-it-update-header-line
-           (lambda* (#:key outputs #:allow-other-keys)
-             (substitute* "minions.el"
-	       (("mode-line-format")
-                "header-line-format"))
-             #t)))))))
+     (substitute-keyword-arguments (package-arguments emacs-minions)
+       ((#:phases phases #~%standard-phases)
+        #~(modify-phases #$phases
+            (add-after 'unpack 'make-it-update-header-line
+              (lambda* (#:key outputs #:allow-other-keys)
+                (substitute* "minions.el"
+	          (("mode-line-format")
+                   "header-line-format"))))))))))
 
 (define-public emacs-git-email-sans-mu4e
   (package
