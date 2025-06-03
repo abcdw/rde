@@ -1,11 +1,15 @@
-(use-modules (guix ci)
-             (guix channels)
-             (rde env channels)
-             (srfi srfi-1))
+;;; rde --- Reproducible development environment.
+;;;
+;;; SPDX-FileCopyrightText: 2024, 2025 Andrew Tropin <andrew@trop.in>
+;;;
+;;; SPDX-License-Identifier: GPL-3.0-or-later
 
-(define channels core-channels)
+(define-module (rde env channels-ci)
+  #:use-module (guix channels)
+  #:use-module (rde env channels)
+  #:use-module (srfi srfi-1))
 
-(define channels-with-local-rde
+(define core-channels-with-local-rde
   (cons
    (channel
     (name 'rde)
@@ -18,6 +22,6 @@
        "2841 9AC6 5038 7440 C7E9  2FFA 2208 D209 58C1 DEB0"))))
    (remove
     (lambda (c) (equal? (channel-name c) 'rde))
-    channels)))
+    core-channels)))
 
-channels-with-local-rde
+core-channels-with-local-rde

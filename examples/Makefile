@@ -89,11 +89,11 @@ minimal/home/build: guix
 	${GUIX} home build ./src/rde-configs/minimal.scm
 
 minimal/home/build/ci:
-	guix time-machine -L ../env -C rde/channels-ci.scm -- \
+	guix time-machine -L ../env -C ../env/rde/env/channels-ci.scm -- \
 	home build ./src/rde-configs/minimal.scm
 
 minimal/home/build/ci-no-auth:
-	guix time-machine -L ../env -C rde/channels-ci.scm \
+	guix time-machine -L ../env -C ../env/rde/env/channels-ci.scm \
 	--disable-authentication -- \
 	home build ./src/rde-configs/minimal.scm
 
