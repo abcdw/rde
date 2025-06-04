@@ -9,13 +9,13 @@ EXAMPLES_SRC_DIR=./examples/src
 CONFIGS=${EXAMPLES_SRC_DIR}/rde-configs/configs.scm
 
 DEV_ENV_LOAD_PATH=-L ./env/guix -L ./env/dev -L ./src
-RDE_SRC_LOAD_PATH=-L ./env/guix -L ./env/dev \
--L ./src \
--L ./tests \
--L ./files/emacs/gider/src
+RDE_SRC_LOAD_PATH=-L ./env/guix -L ./env/dev -L ./src
+EXAMPLES_LOAD_PATH=-L ${EXAMPLES_SRC_DIR}
 
-ALL_SRC_LOAD_PATH=${RDE_SRC_LOAD_PATH} \
--L ${EXAMPLES_SRC_DIR}
+DEV_SRC_LOAD_PATH=${DEV_SRC_LOAD_PATH} \
+${EXAMPLES_LOAD_PATH} \
+-L ./tests \
+-L ./files/emacs/gider/src \
 
 QEMU_BASE_ARGS= \
 -m 8192 -smp 1 -enable-kvm \
@@ -41,7 +41,7 @@ ares:
 	guile-next guile-ares-rs \
 	-e '(@ (rde env dev packages) guix-package)' \
 	-- guile \
-	${ALL_SRC_LOAD_PATH} \
+	${DEV_SRC_LOAD_PATH} \
 	-c \
 "(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
 ((@ (ares server) run-nrepl-server)))"
@@ -49,11 +49,13 @@ ares:
 repl: ares
 
 examples/ixy/home/reconfigure:
-	RDE_TARGET=ixy-home ${GUIX} home ${ALL_SRC_LOAD_PATH} \
+	RDE_TARGET=ixy-home ${GUIX} home \
+	${RDE_SRC_LOAD_PATH} ${EXAMPLES_LOAD_PATH} \
 	reconfigure ${CONFIGS}
 
 examples/ixy/home/build:
-	RDE_TARGET=ixy-home ${GUIX} home ${ALL_SRC_LOAD_PATH} \
+	RDE_TARGET=ixy-home ${GUIX} home \
+	${RDE_SRC_LOAD_PATH} ${EXAMPLES_LOAD_PATH} \
 	build ${CONFIGS}
 
 examples/target/rde-live.iso:
