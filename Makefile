@@ -49,11 +49,12 @@ ares:
 repl: ares
 
 examples/ixy/home/reconfigure:
-	make -C examples ixy/home/reconfigure
+	RDE_TARGET=ixy-home ${GUIX} home ${ALL_SRC_LOAD_PATH} \
+	reconfigure ${CONFIGS}
 
 examples/ixy/home/build:
-	make -C examples ixy/home/build
-
+	RDE_TARGET=ixy-home ${GUIX} home ${ALL_SRC_LOAD_PATH} \
+	build ${CONFIGS}
 
 examples/target/rde-live.iso:
 	make -C examples target/rde-live.iso
