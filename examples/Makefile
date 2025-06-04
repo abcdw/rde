@@ -1,8 +1,6 @@
-include profiles.mk
-
-# Also defined in .envrc to make proper guix version available project-wide
-GUIX_PROFILE=target/profiles/guix
-GUIX=GUILE_LOAD_PATH="../src:../tests:./src:./env" GUILE_LOAD_COMPILED_PATH="" ${GUIX_PROFILE}/bin/guix
+CHANNELS_FILE=./env/guix/rde-configs/env/guix/channels.scm
+GUIXTM=guix time-machine -L ./env/guix -C ${CHANNELS_FILE}
+GUIX=$(GUIXTM) --
 
 SRC_DIR=./src
 CONFIGS=${SRC_DIR}/rde-configs/configs.scm
@@ -16,24 +14,25 @@ VERSION=latest
 repl: ares
 
 ares: env/sync
-	${GUIX} shell guile-next guile-ares-rs \
-	-e '(@ (rde-configs env packages) guix-package)' \
+	${GUIX} shell -L ./env/guix -L ./env/dev guile-next guile-ares-rs \
+	-e '(@ (rde-configs env dev packages) guix-package)' \
+	-e '(@ (rde-configs env dev packages) channels-package)' \
 	-- guile \
-	-L ../src \
-	-L ./env \
+	-L ./env/guix \
+	-L ./env/dev \
 	-L ./src \
-	-L /data/abcdw/work/abcdw/guile-ares-rs/src/guile \
 	-c \
 "(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
-((@ (ares server) run-nrepl-server) #:nrepl-port-path \"../.nrepl-port\"))"
+((@ (ares server) run-nrepl-server)))"
 
-env/rde-configs/env/channels.scm: ../env/rde/env/channels.scm
-	mkdir -p env/rde-configs/env/
-	touch env/rde-configs/env/channels.scm
-	sed 's/rde env/rde-configs env/' \
-	../env/rde/env/channels.scm > env/rde-configs/env/channels.scm
+env/guix/rde/env/guix/channels.scm: ../env/guix/rde/env/guix/channels.scm
+	mkdir -p $(@D)
+	cat $< > $@
+	echo -e "\n;;; This is an automatic copy of RDE's channels.scm" >> $@
+	echo -e ";;; Do not edit it manually" >> $@
 
-env/sync: # env/rde-configs/env/channels.scm
+env/sync: env/guix/rde/env/guix/channels.scm
+guix: env/sync
 
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
