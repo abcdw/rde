@@ -5,6 +5,18 @@ GUIX=$(GUIXTM) --
 EMACS=$(GUIX) shell emacs emacs-ox-html-stable-ids -- emacs
 HUT=$(GUIX) shell hut -- hut
 
+EXAMPLES_SRC_DIR=./examples/src
+CONFIGS=${EXAMPLES_SRC_DIR}/rde-configs/configs.scm
+
+DEV_ENV_LOAD_PATH=-L ./env/guix -L ./env/dev -L ./src
+RDE_SRC_LOAD_PATH=-L ./env/guix -L ./env/dev \
+-L ./src \
+-L ./tests \
+-L ./files/emacs/gider/src
+
+ALL_SRC_LOAD_PATH=${RDE_SRC_LOAD_PATH} \
+-L ${EXAMPLES_SRC_DIR}
+
 QEMU_BASE_ARGS= \
 -m 8192 -smp 1 -enable-kvm \
 -display gtk,zoom-to-fit=on \
@@ -25,13 +37,11 @@ guix:
 	make -C examples guix
 
 ares:
-	${GUIX} shell -L ./env/guix -L ./env/dev -L ./src \
+	${GUIX} shell ${DEV_ENV_LOAD_PATH} \
 	guile-next guile-ares-rs \
 	-e '(@ (rde env dev packages) guix-package)' \
 	-- guile \
-	-L ./src \
-	-L ./examples/src \
-	-L ./env/guix -L ./env/dev \
+	${ALL_SRC_LOAD_PATH} \
 	-c \
 "(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
 ((@ (ares server) run-nrepl-server)))"
