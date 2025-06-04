@@ -194,6 +194,7 @@ source files.")
                                        zlib "/lib"
                                        "'],"))))))
                (delete 'patch-additional-hardcoded-program-references)
+               (delete 'patch-problematic-tests)
                (replace 'delete-problematic-tests
                  (lambda* (#:key inputs #:allow-other-keys)
                    ;; FIXME: These tests fail in the build container, but they don't
@@ -266,7 +267,7 @@ source files.")
       perl
       pkg-config
       procps
-      python
+      python-3.10
       util-linux))
     (inputs
      (list bash-minimal
