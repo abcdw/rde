@@ -427,9 +427,7 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
       (templates "$HOME")))
 
 
-    (feature-base-services
-     #:default-substitute-urls (list "https://bordeaux.guix.gnu.org"
-                                     "https://ci.guix.gnu.org")))))
+    (feature-base-services))))
 
 (define-public %abcdw-features
   (append
