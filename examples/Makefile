@@ -1,5 +1,8 @@
 CHANNELS_FILE=./env/guix/rde-configs/env/guix/channels.scm
+CHANNELS_FILE_LOCAL_RDE=./env/guix/rde-configs/env/guix/channels.scm
 GUIXTM=guix time-machine -L ./env/guix -C ${CHANNELS_FILE}
+GUIXTM_LOCAL_RDE=guix time-machine -L ./env/guix -C ${CHANNELS_FILE_LOCAL_RDE}
+
 GUIX=$(GUIXTM) --
 
 SRC_DIR=./src
@@ -88,13 +91,11 @@ minimal/home/build: guix
 	${GUIX} home build ./src/rde-configs/minimal.scm
 
 minimal/home/build/ci:
-	guix time-machine \
-	-L ../env/guix -C ../env/guix/rde/env/guix/channels-ci.scm -- \
+	${GUIXTM_LOCAL_RDE} -- \
 	home build ./src/rde-configs/minimal.scm
 
 minimal/home/build/ci-no-auth:
-	guix time-machine \
-	-L ../env/guix -C ../env/guix/rde/env/guix/channels-ci.scm \
+	${GUIXTM_LOCAL_RDE} \
 	--disable-authentication -- \
 	home build ./src/rde-configs/minimal.scm
 
