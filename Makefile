@@ -12,7 +12,7 @@ DEV_ENV_LOAD_PATH=-L ./env/guix -L ./env/dev -L ./src
 RDE_SRC_LOAD_PATH=-L ./env/guix -L ./env/dev -L ./src
 EXAMPLES_LOAD_PATH=-L ${EXAMPLES_SRC_DIR}
 
-DEV_SRC_LOAD_PATH=${DEV_SRC_LOAD_PATH} \
+DEV_SRC_LOAD_PATH=${RDE_SRC_LOAD_PATH} \
 ${EXAMPLES_LOAD_PATH} \
 -L ./tests \
 -L ./files/emacs/gider/src \
