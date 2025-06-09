@@ -27,7 +27,7 @@
   #:use-module (guix gexp)
   #:use-module (srfi srfi-26)
 
-  #:export (feature-ellama feature-emacs-gptel))
+  #:export (feature-emacs-ellama feature-emacs-gptel))
 
 ;; https://github.com/armindarvish/consult-web
 ;; https://github.com/karthink/gptel
@@ -35,7 +35,7 @@
 ;; https://tabby.tabbyml.com/docs/welcome/
 ;; https://github.com/TabbyML/tabby ; local copilot
 
-(define* (feature-ellama
+(define* (feature-emacs-ellama
           #:key
           (emacs-ellama emacs-ellama))
   "Maps keys randomly"
