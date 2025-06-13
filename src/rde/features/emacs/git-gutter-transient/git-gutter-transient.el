@@ -1,6 +1,6 @@
 ;;; git-gutter-transient.el --- Transient additions for git-gutter
 
-;; Copyright © 2021 Andrew Tropin <andrew@trop.in>
+;; Copyright © 2021, 2025 Andrew Tropin <andrew@trop.in>
 
 ;; Author: Andrew Tropin <andrew@trop.in>
 ;;
@@ -105,7 +105,7 @@
    [("M-<" "First" git-gutter-transient:first-hunk)]
    [("M->" "Last" git-gutter-transient:last-hunk)]
    [("s" "Stage" git-gutter-transient:stage-hunk)]
-   [("r" "Revert" git-gutter:revert-hunk)]]
+   [("k" "Discard" git-gutter:revert-hunk)]]
   [[("g" "Magit file dispatch" git-gutter-transient:magit-dispatch
      :transient transient--do-replace)]
    [("q" "Quit" git-gutter-transient:quit :transient transient--do-exit)]
