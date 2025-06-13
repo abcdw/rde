@@ -18,6 +18,7 @@
   #:use-module (rde features clojure)
   #:use-module (rde features containers)
   #:use-module (rde features emacs-xyz)
+  #:use-module (rde features fontutils)
   #:use-module (rde features gnupg)
   #:use-module (rde features gtk)
   #:use-module (rde features guile)
@@ -640,7 +641,9 @@ subject:/home:/) and tag:new}\"'"
      #:global-bibliography
      (list "/data/abcdw/work/abcdw/notes/bibliography.bib"))
 
-    (feature-ellama)
+    (feature-font-japanese)
+    (feature-emacs-gptel)
+    (feature-emacs-ellama)
     (feature-emacs-cua)
     (feature-keyboard
      ;; To get all available options, layouts and variants run:
