@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2024 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2024, 2025 Nicolas Graves <ngraves@ngraves.fr>
@@ -398,3 +398,31 @@ programming language, powered by the tree-sitter-clojure tree-sitter grammar."))
     (description "arei-shepherd is an extension for Arei that allows to interract with
 the shepherd via the ares-shepherd extension for the nREPL.")
     (license license:gpl3+)))
+
+(define-public emacs-gptel-latest
+  (package
+    (inherit emacs-gptel)
+    (name "emacs-gptel")
+    (version "0.9.8.5")
+    (source (origin
+              (method git-fetch)
+              (uri (git-reference
+                    (url "https://github.com/karthink/gptel")
+                    (commit (string-append "v" version))))
+              (file-name (git-file-name name version))
+              (sha256
+               (base32
+                "0ix0k9dv91mbibwih1s5wzx9hj5nkr3cz799m6gb52vpwf9gixg7"))))
+    (arguments
+     (list
+      #:phases
+      #~(modify-phases %standard-phases
+          (add-after 'unpack 'use-appropriate-curl
+            (lambda* (#:key inputs #:allow-other-keys)
+              (emacs-substitute-variables "gptel.el"
+                ("gptel-use-curl" (search-input-file inputs "/bin/curl"))))))))))
+
+(define-public emacs-gptel-quick-latest
+  ((package-input-rewriting/spec
+    `(("emacs-gptel" . ,(const emacs-gptel-latest))))
+   emacs-gptel-quick))
