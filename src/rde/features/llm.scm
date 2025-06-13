@@ -109,7 +109,7 @@ the password-store."
       emacs-f-name
       config
       `((with-eval-after-load 'gptel
-          ,@(if (get-value 'emacs-embark config)
+          ,@(if (get-value 'emacs-embark config #f)
                 '((with-eval-after-load 'embark
                     (keymap-set embark-general-map "?" 'gptel-quick)))
                 '())
