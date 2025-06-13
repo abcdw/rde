@@ -3670,6 +3670,11 @@ and references in your programs."
       config
       `((autoload 'pdf-view-mode "pdf-view" "")
 
+        (with-eval-after-load 'tex
+          (setopt TeX-view-program-selection '((output-pdf "PDF Tools")))
+          (setopt TeX-source-correlate-start-server t)
+          (add-hook 'TeX-mode-hook 'TeX-source-correlate-mode))
+
         (defun rde-pdf-tools--list-buffers ()
           "List all currently-opened `pdf-view' mode buffers."
           (cl-remove-if-not
