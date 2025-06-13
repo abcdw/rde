@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2025 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
 ;;;
@@ -36,6 +36,7 @@
   #:use-module (srfi srfi-9)
 
   #:export (feature-fonts
+            feature-font-japanese
 
             font
             font-size
@@ -231,4 +232,37 @@ font-monospace default value, and it will be ignored if
        (emacs-faces . #t))
      (make-feature-values font-sans font-monospace
                           font-serif font-unicode)))
+   (home-services-getter get-home-services)))
+
+(define* (feature-font-japanese
+          #:key
+          (font-japanese
+           (font
+            (name "Koruri")
+            (size 11)
+            (package font-koruri))))
+  "Configure Japanese font.  Sets font families for Kana and Han characters to
+FONT-JAPANESE, for proper rendering of Japanese text in Emacs."
+
+  (ensure-pred font? font-japanese)
+
+  (define (get-home-services config)
+    "Return home services for Japanese font configuration."
+    (list
+     (simple-service
+      'add-japanese-font
+      home-profile-service-type
+      (list (font-package font-japanese)))
+     (rde-elisp-configuration-service
+      'fonts-japanese
+      config
+      `((with-eval-after-load 'fontset
+          (set-fontset-font
+           t 'kana (font-spec :family ,(font-name font-japanese)))
+          (set-fontset-font
+           t 'han (font-spec :family ,(font-name font-japanese))))))))
+
+  (feature
+   (name 'fonts-japanese)
+   (values `((font-japanese . ,font-japanese)))
    (home-services-getter get-home-services)))
