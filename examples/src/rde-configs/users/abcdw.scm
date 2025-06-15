@@ -17,6 +17,7 @@
   #:use-module (rde features base)
   #:use-module (rde features clojure)
   #:use-module (rde features containers)
+  #:use-module (rde features emacs)
   #:use-module (rde features emacs-xyz)
   #:use-module (rde features fontutils)
   #:use-module (rde features gnupg)
@@ -74,65 +75,74 @@
 
 ;;; Service extensions
 
-(define emacs-extra-packages-service
-  (simple-service
-   'emacs-extra-packages
-   home-emacs-service-type
-   (home-emacs-extension
-    (init-el
-     `((with-eval-after-load 'org
-         (setq org-use-speed-commands t)
-         (setq org-enforce-todo-dependencies t)
-         ;; (setq org-enforce-todo-checkbox-dependencies t)
-         (setq org-log-reschedule 'time)
-         (defun rde-org-goto-end-of-heading ()
-           (interactive)
-           (org-end-of-meta-data t)
-           (end-of-line)
-           (unless (bolp)
-             (newline)))
-         (define-key org-mode-map (kbd "M-o") 'rde-org-goto-end-of-heading))
+(define* (feature-personal-emacs-config)
+  "Personal Emacs configuration with extra packages and settings."
+  (define f-name 'personal-emacs-config)
 
-       (with-eval-after-load 'geiser-mode
-         (setq geiser-mode-auto-p nil)
-         (defun abcdw-geiser-connect ()
-           (interactive)
-           (geiser-connect 'guile "localhost" "37146"))
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      f-name
+      config
+      `((with-eval-after-load 'org
+          (setq org-use-speed-commands t)
+          (setq org-enforce-todo-dependencies t)
+          ;; (setq org-enforce-todo-checkbox-dependencies t)
+          (setq org-log-reschedule 'time)
+          (defun rde-org-goto-end-of-heading ()
+            (interactive)
+            (org-end-of-meta-data t)
+            (left-char)
+            (unless (string-blank-p (buffer-substring (line-beginning-position)
+                                                      (line-end-position)))
+              (newline)))
+          (define-key org-mode-map (kbd "M-o") 'rde-org-goto-end-of-heading))
 
-         (define-key geiser-mode-map (kbd "C-c M-j") 'abcdw-geiser-connect))
+        (with-eval-after-load 'geiser-mode
+          (setq geiser-mode-auto-p nil)
+          (defun abcdw-geiser-connect ()
+            (interactive)
+            (geiser-connect 'guile "localhost" "37146"))
 
-       (with-eval-after-load 'simple
-         (global-page-break-lines-mode 1)
-         (setq-default display-fill-column-indicator-column 80)
-         (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+          (define-key geiser-mode-map (kbd "C-c M-j") 'abcdw-geiser-connect))
 
-       (setq copyright-names-regexp
-             (format "%s <%s>" user-full-name user-mail-address))
-       (add-hook 'after-save-hook (lambda () (copyright-update nil nil)))))
-    (elisp-packages
-     (append
-      (list
-       ;; (@ (rde packages emacs-xyz) emacs-corfu-candidate-overlay)
-       )
-      (strings->packages
-       ;; "emacs-dirvish"
-       "emacs-elixir-mode"
-       "emacs-company-posframe"
-       "emacs-wgrep"
-       "emacs-ox-haunt"
-       "emacs-haskell-mode"
-       "emacs-rainbow-mode"
-       "emacs-hl-todo"
-       "emacs-yasnippet"
-       ;; "emacs-xkb-mode"
-       ;; "emacs-consult-dir"
-       "emacs-kind-icon"
-       "emacs-nginx-mode" "emacs-yaml-mode"
-       "emacs-multitran"
-       "emacs-minimap"
-       "emacs-ement"
-       "emacs-restart-emacs"
-       "emacs-org-present"))))))
+        (with-eval-after-load 'page-break-lines
+          (global-page-break-lines-mode 1))
+        (with-eval-after-load 'simple
+          (setq-default display-fill-column-indicator-column 80)
+          (add-hook 'prog-mode-hook 'display-fill-column-indicator-mode))
+
+        (setq copyright-names-regexp
+              (format "%s <%s>" user-full-name user-mail-address))
+        (add-hook 'after-save-hook (lambda () (copyright-update nil nil))))
+      #:elisp-packages
+      (append
+       (list
+        ;; (@ (rde packages emacs-xyz) emacs-corfu-candidate-overlay)
+        )
+       (strings->packages
+        ;; "emacs-dirvish"
+        "emacs-elixir-mode"
+        "emacs-company-posframe"
+        "emacs-wgrep"
+        "emacs-ox-haunt"
+        "emacs-haskell-mode"
+        "emacs-rainbow-mode"
+        "emacs-hl-todo"
+        "emacs-yasnippet"
+        ;; "emacs-xkb-mode"
+        ;; "emacs-consult-dir"
+        "emacs-kind-icon"
+        "emacs-nginx-mode" "emacs-yaml-mode"
+        "emacs-multitran"
+        "emacs-minimap"
+        "emacs-ement"
+        "emacs-restart-emacs"
+        "emacs-org-present")))))
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define-public emacs-arei-local
   (package
@@ -334,7 +344,6 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
    #:feature-name-prefix 'abcdw
    #:home-services
    (list
-    emacs-extra-packages-service
     home-extra-packages-service
     sway-extra-config-service
     ssh-extra-config-service
@@ -506,6 +515,7 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
      ;; 'purokishi.i2p
      #:less-anonymous? #t)
 
+    (feature-personal-emacs-config)
     (feature-emacs-keycast #:turn-on? #t)
 
     (feature-emacs-tempel
