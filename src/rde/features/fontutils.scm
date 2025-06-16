@@ -253,8 +253,14 @@ FONT-JAPANESE, for proper rendering of Japanese text in Emacs."
       'add-japanese-font
       home-profile-service-type
       (list (font-package font-japanese)))
+     (simple-service
+      'fontconfig-add-japanese-font
+      home-fontconfig-service-type
+      (list
+       `(match (edit (@ (mode "append") (name "family"))
+                     (string ,(font-name font-japanese))))))
      (rde-elisp-configuration-service
-      'fonts-japanese
+      'font-japanese
       config
       `((with-eval-after-load 'fontset
           (set-fontset-font
@@ -266,3 +272,4 @@ FONT-JAPANESE, for proper rendering of Japanese text in Emacs."
    (name 'fonts-japanese)
    (values `((font-japanese . ,font-japanese)))
    (home-services-getter get-home-services)))
+
