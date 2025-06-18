@@ -3671,7 +3671,6 @@ and references in your programs."
 
         (with-eval-after-load 'tex
           (setopt TeX-view-program-selection '((output-pdf "PDF Tools")))
-          (setopt TeX-source-correlate-start-server t)
           (add-hook 'TeX-mode-hook 'TeX-source-correlate-mode))
 
         (defun rde-pdf-tools--list-buffers ()
