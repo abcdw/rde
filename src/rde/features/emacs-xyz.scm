@@ -2689,7 +2689,7 @@ just start typing `tempel-trigger-prefix' (default is \"<\") and use
 
 (define* (feature-emacs-monocle
           #:key
-          (olivetti-body-width 85))
+          (olivetti-body-width 'nil))
   "Configure olivetti and helper functions for focused editing/reading."
   (define emacs-f-name 'monocle)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -4476,7 +4476,9 @@ result is longer than LEN."
           (setq org-agenda-custom-commands ,org-agenda-custom-commands)
           (setq org-agenda-tags-column
                 ;; TODO: Name this value better
-                ,(- (get-value 'olivetti-body-width config 85)))
+                ,(if (number? (get-value 'olivetti-body-width config 'nil))
+                     (- (get-value 'olivetti-body-width config 'nil))
+                     'auto))
           (setq org-agenda-window-setup 'current-window)
           ,@(if org-agenda-files
                 `((setq org-agenda-files ',org-agenda-files))
