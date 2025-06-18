@@ -86,8 +86,8 @@ discussions, prettifying and spelling correction."
 
 (define* (feature-emacs-gptel
           #:key
-          (emacs-gptel emacs-gptel-latest)
-          (emacs-gptel-quick emacs-gptel-quick-latest)
+          (emacs-gptel emacs-gptel)
+          (emacs-gptel-quick emacs-gptel-quick)
           (emacs-gptel-default-mode 'org-mode))
   "Configure Gptel, a simple and unintrusive LLM client for Emacs.
 EMACS-GPTEL-API-KEY is a list of program and arguments that are called by
