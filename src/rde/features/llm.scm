@@ -109,6 +109,8 @@ the password-store."
       emacs-f-name
       config
       `((with-eval-after-load 'gptel
+          (setopt gptel-use-tools t)
+          (setopt gptel-confirm-tool-calls t)
           ,@(if (get-value 'emacs-embark config #f)
                 '((with-eval-after-load 'embark
                     (keymap-set embark-general-map "?" 'gptel-quick)))
