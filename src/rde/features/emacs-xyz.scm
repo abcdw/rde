@@ -4477,7 +4477,7 @@ result is longer than LEN."
                 ;; TODO: Name this value better
                 ,(if (number? (get-value 'olivetti-body-width config 'nil))
                      (- (get-value 'olivetti-body-width config 'nil))
-                     'auto))
+                     ''auto))
           (setq org-agenda-window-setup 'current-window)
           ,@(if org-agenda-files
                 `((setq org-agenda-files ',org-agenda-files))
