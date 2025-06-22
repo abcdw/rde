@@ -37,6 +37,9 @@ env/guix/rde/env/guix/channels.scm: ../env/guix/rde/env/guix/channels.scm
 env/sync: env/guix/rde/env/guix/channels.scm
 guix: env/sync
 
+guix-pull:
+	guix pull -L ./env/guix -C ${CHANNELS_FILE}
+
 ixy/home/build: guix
 	RDE_TARGET=ixy-home ${GUIX} home \
 	build ${CONFIGS}

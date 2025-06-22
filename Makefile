@@ -33,8 +33,8 @@ check:
 	guile -L ./src -L ./tests -L ./files/emacs/gider/src -c \
 	'((@ (rde test-runners) run-project-tests-cli))'
 
-guix:
-	make -C examples guix
+guix-pull:
+	make -C examples guix-pull
 
 ares:
 	${GUIX} shell ${DEV_ENV_LOAD_PATH} \
