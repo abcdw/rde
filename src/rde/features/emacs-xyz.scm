@@ -1290,6 +1290,13 @@ Small tweaks, xdg entry for openning directories in emacs client."
          ;;; <https://www.emacswiki.org/emacs/AnsiColor#h5o-2>
          (add-hook 'eshell-preoutput-filter-functions 'ansi-color-filter-apply)
 
+         (with-eval-after-load 'em-hist
+           (let ((dir (file-name-directory eshell-history-file-name)))
+             (unless (file-exists-p dir)
+               (make-directory dir t)))
+           (setopt eshell-history-size 1024)
+           (setopt eshell-history-append t))
+
          (with-eval-after-load 'em-prompt
           (autoload 'epe-theme-lambda "eshell-prompt-extras")
           (setq eshell-prompt-function 'epe-theme-lambda)
