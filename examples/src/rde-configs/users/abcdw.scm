@@ -581,7 +581,7 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
      #:elfeed-org-files '("/data/abcdw/work/abcdw/private/rss.org"))
 
     (feature-android)
-    (feature-javascript)
+    ;; (feature-javascript)
     (feature-ocaml #:opam? #t)
 
     (feature-emacs-piem
