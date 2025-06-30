@@ -105,7 +105,6 @@ system."
 
           (autoload 'save-buffer "files")
           (keymap-set cua-global-keymap "C-s" 'save-buffer)
-          (keymap-set cua-global-keymap "C-w" 'kill-current-buffer)
           (keymap-set cua-global-keymap "C-f" 'isearch-forward)
           (keymap-set isearch-mode-map "C-f" 'isearch-repeat-forward)
           (defun rde-cua-comment-dwim ()
