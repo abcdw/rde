@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022, 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022, 2023, 2025 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -60,15 +60,17 @@
 (define-public font-noto-emoji
   (package
     (name "font-noto-emoji")
-    (version "0.1")
+    (version "1.1.0")
     (source
      (origin
-       (method url-fetch/zipbomb)
-       ;; Everytime zip archive is downloaded from fonts.google.com it have a
-       ;; different hash, so I mirrored it.
-       (uri "http://files.trop.in/fonts/Noto_Emoji.zip")
+       (method git-fetch)
+       (uri (git-reference
+             (url "https://github.com/zjaco13/Noto-Emoji-Monochrome")
+             (commit "b80db438fe644bd25e0032661ab66fa72f2af0e2")))
+       (file-name (git-file-name name version))
        (sha256
-        (base32 "14y936dw1l6h2v7ygfwyzjf0bg5f8ii42s34n1xaf7sczv3g15cv"))))
+        (base32
+         "1yanf66n00hjgy78czh51px86q5fihgwbd5w3lvsk1g7qmabls9n"))))
     (build-system font-build-system)
     (home-page "https://fonts.google.com/noto/specimen/Noto+Emoji")
     (synopsis "Noto Emoji fonts")
