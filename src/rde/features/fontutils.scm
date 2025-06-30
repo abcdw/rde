@@ -131,23 +131,22 @@ font-monospace default value, and it will be ignored if
      (simple-service
       'add-fontconfig-font-families
       home-fontconfig-service-type
-      (list
-       `(alias
-         (family "sans-serif")
-         (prefer
-          (family ,(font-name font-sans))))
-       `(alias
-         (family "serif")
-         (prefer
-          (family ,(font-name font-serif))))
-       `(alias
-         (family "monospace")
-         (prefer
-          (family ,(font-name font-monospace))))
-       `(alias
-         (family "emoji")
-         (prefer
-          (family ,(font-name font-unicode))))))
+      `((match (test (@ (name "family") (compare "contains"))
+                     (string "sans-serif"))
+          (edit (@ (name "family") (mode "prepend") (binding "strong"))
+                (string ,(font-name font-sans))))
+        (match (test (@ (name "family") (compare "contains"))
+                     (string "serif"))
+          (edit (@ (name "family") (mode "prepend") (binding "strong"))
+                (string ,(font-name font-serif))))
+        (match (test (@ (name "family") (compare "contains"))
+                     (string "monospace"))
+          (edit (@ (name "family") (mode "prepend") (binding "strong"))
+                (string ,(font-name font-monospace))))
+        (match (test (@ (name "family") (compare "contains"))
+                     (string "emoji"))
+          (edit (@ (name "family") (mode "prepend") (binding "strong"))
+                (string ,(font-name font-unicode))))))
 
      (rde-elisp-configuration-service
       f-name
