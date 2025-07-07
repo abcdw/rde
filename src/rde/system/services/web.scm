@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2023 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023, 2025 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -50,6 +50,9 @@
   (run-directory
    (string "/var/run/nginx")
    "Nginx run directory")
+  (log-directory
+   (string "/var/log/nginx")
+   "Nginx log directory")
   (initial-conf
    (nginx-config
     `((user nginx nginx)
@@ -103,11 +106,12 @@
 
 (define (nginx-activation config)
   (match-record config <nginx-configuration>
-    (nginx run-directory)
+    (nginx log-directory run-directory)
    #~(begin
        (use-modules (guix build utils))
-
-       (format #t "creating nginx run and logs directory '~a'~%"
+       (format #t "creating nginx log directory '~a'~%" #$log-directory)
+       (mkdir-p #$log-directory)
+       (format #t "creating nginx run and initial logs directory '~a'~%"
                #$run-directory)
        (mkdir-p #$run-directory)
        (mkdir-p #$(string-append run-directory "/logs"))
