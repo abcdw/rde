@@ -3147,7 +3147,15 @@ and pair management."
           (require 'smartparens-config)
           (define-key smartparens-mode-map (kbd "M-s") nil)
           (setq sp-highlight-pair-overlay nil)
-          (define-key smartparens-mode-map (kbd "M-S") 'sp-forward-slurp-sexp)))
+          (define-key smartparens-mode-map (kbd "M-S") 'sp-forward-slurp-sexp)
+
+          (keymap-unset smartparens-mode-map "C-<right>")
+          (keymap-unset smartparens-mode-map "M-<right>")
+          (keymap-unset smartparens-mode-map "C-M-<right>")
+
+          (keymap-unset smartparens-mode-map "C-<left>")
+          (keymap-unset smartparens-mode-map "M-<left>")
+          (keymap-unset smartparens-mode-map "C-M-<left>")))
       #:summary "\
 Structured editing and navigation, automatic string escaping and pair management"
       #:commentary "\
