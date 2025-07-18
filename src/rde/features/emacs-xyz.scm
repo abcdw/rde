@@ -933,6 +933,8 @@ accordingly set its appearance with DISPLAY-TIME-24HR? and DISPLAY-TIME-DATE?."
    (values `((,f-name . #t)))
    (home-services-getter get-home-services)))
 
+;; TODO: [Andrew Tropin, 2025-07-18] Incorporate TRAMP tweaks
+;; https://coredumped.dev/2025/06/18/making-tramp-go-brrrr./
 (define* (feature-emacs-tramp
           #:key
           (default-method "ssh")
