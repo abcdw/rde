@@ -42,6 +42,7 @@
             font-size
             font-name
             font-weight
+            font-package
             font-specification
             make-font
             font?))
@@ -276,4 +277,3 @@ FONT-JAPANESE, for proper rendering of Japanese text in Emacs."
    (name 'fonts-japanese)
    (values `((font-japanese . ,font-japanese)))
    (home-services-getter get-home-services)))
-
