@@ -51,7 +51,7 @@
   (package
     (inherit pkg)
     (name "libreoffice")
-    (source (origin (inherit (package-source pkg))))
+    (source #f)
     (build-system trivial-build-system)
     (arguments
      (list
