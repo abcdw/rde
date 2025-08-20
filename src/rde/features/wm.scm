@@ -870,7 +870,7 @@ to return a valid json object."
 
 (define* (feature-waybar
           #:key
-          (waybar (@ (rde packages wm) waybar-stable))
+          (waybar waybar)
           (waybar-modules
            (list
             (waybar-sway-workspaces)
