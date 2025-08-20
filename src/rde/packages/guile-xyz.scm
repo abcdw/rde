@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -27,22 +27,7 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public guile-ares-rs-latest
-  (let* ((commit "6ccca2e21457c47917846e07c449d48c66b9420b")
-         (revision "6"))
-    (package
-      (inherit guile-ares-rs)
-      (name "guile-ares-rs")
-      (version (git-version "0.9.5" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://git.sr.ht/~abcdw/guile-ares-rs")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32
-           "04n42wn6jblhmcx5l43nl7nsy3s0qlsn09l4k9xwgw5hg9nkkmg7")))))))
+  guile-ares-rs)
 
 (define-public guile-ares-shepherd
   (package
