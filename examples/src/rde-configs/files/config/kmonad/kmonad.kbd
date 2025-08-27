@@ -49,7 +49,7 @@
   @mta _    _    pgup _    _    _    _    home up   end  _    _
   _    _    @cst pgdn @cta tab  _    @cde left down rght _    _         _
   _    _    _    _    _    _    _    _    ret  _    _    _    _
-  _    _    _    _    _    del  _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    _    _    _    _    _    _    _
                                                          _    _    _)
 
 (deflayer num-layer
