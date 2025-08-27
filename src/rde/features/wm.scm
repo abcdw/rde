@@ -917,6 +917,7 @@ for the main bar."
          (waybar waybar)
          (config `#(((position . top)
                      (name . main)
+                     (layer . top)
                      ,@(if height `((height . ,height)) '())
                      ,@(if output `((output . ,output)) '()))
                     ,@extra-config))
