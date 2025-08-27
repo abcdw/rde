@@ -315,7 +315,7 @@ chooser_type=simple"
           config
           `((eval-when-compile (require 'sway))
             (autoload 'sway--x-focus-frame "sway")
-            (defalias 'x-focus-frame 'sway--x-focus-frame)
+            ;; (defalias 'x-focus-frame 'sway--x-focus-frame)
             (setq frame-title-format
                   '(multiple-frames ("" "%b — GNU Emacs at " system-name
                                      " [" (:eval (frame-parameter (selected-frame) 'window-id)) "]")
