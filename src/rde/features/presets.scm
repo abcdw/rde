@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -87,7 +87,7 @@
    (feature-imv)
    (feature-mpv)
    (feature-librewolf)
-   (feature-ungoogled-chromium)
+   ;; (feature-ungoogled-chromium)
   (feature-transmission #:auto-start? #f)
   (feature-ledger)))
 
