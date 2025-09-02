@@ -94,28 +94,35 @@
         "0rcyi4jj09yxj56hlr0v1z70qb4bidf9g4zzq4y4rxl4wdimh2qr"))
       (file-name (string-append "rde-" version "-checkout"))))
     (build-system guile-build-system)
-    (outputs (list "out" "doc"))
-    (native-inputs
-     (list gnu-make guile-3.0 texinfo))
-    (inputs
-     (list guix))
     (arguments
      (list
-      #:source-directory "src"
-      #:phases
-      #~(modify-phases %standard-phases
-          (add-after 'build 'build-info
-            (lambda _
-              (invoke "make" "doc/rde.info")))
-          (replace 'install-documentation
-            (lambda _
-              (install-file "doc/rde.info"
-                            (string-append #$output:doc "/share/info")))))))
+      #:source-directory "src"))
+    (native-inputs (list guile-3.0))
+    ;; FIXME: Guix should probably be pinned here.
+    (inputs (list guix))
     (synopsis "Developers and power user friendly GNU/Linux distribution")
     (description "The GNU/Linux distribution, a set of tools for managing
 development environments, home environments, and operating systems, a set of
 predefined configurations, practices and workflows.")
     (license license:gpl3+)))
+
+(define-public rde-doc
+  (package/inherit rde
+    (name "rde-doc")
+    (build-system gnu-build-system)
+    (native-inputs (list gnu-make texinfo))
+    (inputs '())
+    (arguments
+     (list
+      #:make-flags ''("doc/rde.info")
+      #:phases
+      #~(modify-phases %standard-phases
+          (delete 'configure)
+          (delete 'check)
+          (add-after 'install 'install-info
+            (lambda _
+              (install-file "doc/rde.info"
+                            (string-append #$output "/share/info")))))))))
 
 ;; (define-public rde-latest
 ;;   (package
