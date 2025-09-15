@@ -6198,7 +6198,9 @@ WTTR-LOCATIONS you will get a weather report based on your IP address."
         (setq display-wttr-locations ',wttr-locations)
         (setq display-wttr-interval ,wttr-interval)
         (autoload 'display-wttr-mode "display-wttr")
-        (display-wttr-mode))
+        (if after-init-time
+            (display-wttr-mode)
+            (add-hook 'after-init-hook 'display-wttr-mode)))
       #:elisp-packages (list emacs-display-wttr))))
 
   (feature
