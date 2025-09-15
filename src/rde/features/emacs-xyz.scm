@@ -5010,7 +5010,8 @@ citar-org-roam-subdir if org-roam is enabled."
    (name f-name)
    (values `((,f-name . #t)
              (bibtex-dialect . ,bibtex-dialect)
-             (global-bibliography . ,global-bibliography)))
+             (global-bibliography . ,global-bibliography)
+             (citar-library-paths . ,citar-library-paths)))
    (home-services-getter get-home-services)))
 
 (define* (feature-emacs-zotra
