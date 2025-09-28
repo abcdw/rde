@@ -24,14 +24,14 @@
   #:use-module (rde packages)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages guile)
+  #:use-module (gnu packages emacs-xyz)
+  #:use-module (gnu packages guile-xyz)
   #:use-module (gnu services)
   #:use-module (gnu home services)
   #:use-module (gnu home services shepherd)
   #:use-module (gnu packages)
   #:use-module (gnu services configuration)
   #:use-module (gnu services shepherd)
-  #:use-module (rde packages emacs-xyz)
-  #:use-module (rde packages guile-xyz)
   #:use-module (guix gexp)
   #:use-module (guix packages)
   #:use-module ((guix utils) #:select (substitute-keyword-arguments))
@@ -40,9 +40,9 @@
 
 (define* (feature-guile
           #:key
-          (guile guile-next)
-          (emacs-arei emacs-arei-latest)
-          (guile-ares-rs guile-ares-rs-latest))
+          (guile guile-3.0)
+          (emacs-arei emacs-arei)
+          (guile-ares-rs guile-ares-rs))
   "Configure tooling and environment for GNU Guile."
 
   (define f-name 'guile)
