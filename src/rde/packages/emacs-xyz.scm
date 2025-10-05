@@ -42,12 +42,12 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-arei-latest
-  (let* ((commit "1e5a64c7df13f5392e935485a134857644cde6fe")
-         (revision "2"))
+  (let* ((commit "172741e6939a2682a75682bd11f2d45d78331836")
+         (revision "1"))
     (package
       (inherit emacs-arei)
       (name "emacs-arei")
-      (version (git-version "0.9.5" revision commit))
+      (version (git-version "0.9.6" revision commit))
       (source
        (origin
          (method git-fetch)
@@ -57,7 +57,10 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "1r14z9ghs86w8b22p6lr7wnr4ynjraqakqjy71rxkpwfw3lllmsn"))))
+           "13cgma8rmfdbbpfpk01hy9mbjr0rrcrcmcrq26lq2xyffx2rhffn"))))
+      (propagated-inputs (append
+                          (package-propagated-inputs emacs-arei)
+                          (list (list "emacs-consult" emacs-consult))))
       (build-system emacs-build-system))))
 
 (define-public emacs-justify-kp
