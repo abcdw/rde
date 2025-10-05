@@ -22,12 +22,34 @@
   #:use-module (gnu packages guile)
   #:use-module (gnu packages guile-xyz)
   #:use-module (guix packages)
+  #:use-module (guix gexp)
   #:use-module (guix git-download)
   #:use-module (guix build-system guile)
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public guile-ares-rs-latest
-  guile-ares-rs)
+  (let* ((commit "ce839bc8e74fbc5a625a148ab806277b24715d8c")
+         (revision "1"))
+    (package
+      (inherit guile-ares-rs)
+      (name "guile-ares-rs")
+      (version (git-version "0.9.6" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://git.sr.ht/~abcdw/guile-ares-rs")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "08zypn9wfddbpzcvm6h04jikj1bv0ixdy4r4x5sw7824m7v4a7i1"))))
+      (arguments
+       (list
+        #:source-directory "src/guile"
+        #:phases
+        #~(modify-phases %standard-phases
+            (delete 'install-script)))))))
 
 (define-public guile-ares-shepherd
   (package
