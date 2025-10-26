@@ -22,6 +22,8 @@
   #:use-module (rde features emacs)
   #:use-module (rde predicates)
   #:use-module (rde packages)
+  #:use-module (rde packages emacs-xyz)
+  #:use-module (rde packages guile-xyz)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages guile)
   #:use-module (gnu packages emacs-xyz)
@@ -41,8 +43,8 @@
 (define* (feature-guile
           #:key
           (guile guile-3.0)
-          (emacs-arei emacs-arei)
-          (guile-ares-rs guile-ares-rs))
+          (emacs-arei emacs-arei-latest)
+          (guile-ares-rs guile-ares-rs-latest))
   "Configure tooling and environment for GNU Guile."
 
   (define f-name 'guile)
