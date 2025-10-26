@@ -47,10 +47,7 @@
           #~(append
              #$flags
              (list
-              #$(string-append "--with-channel-commit=" commit))))))
-
-      (inputs (modify-inputs (package-inputs guix)
-                (replace "guile" guile-next))))))
+              #$(string-append "--with-channel-commit=" commit)))))))))
 
 (define (channel->git-checkout channel)
   (git-checkout
@@ -118,8 +115,7 @@
               (for-each (lambda (f)
                           (false-if-exception (make-file-writable f)))
                         (find-files ".")))))))
-    (inputs `(("guile" ,guile-next)
-              ("guix" ,(make-guix-package channels))))
+    (inputs `(("guix" ,(make-guix-package channels))))
     (home-page "https://git.sr.ht/~abcdw/rde")
     (synopsis "Combined package for channel source and bytecode files")
     (description "Combined package for channel source and bytecode files.")
