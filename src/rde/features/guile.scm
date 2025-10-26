@@ -76,7 +76,10 @@
                       ("(Guix)Programming Index" nil nil nil))))
         (with-eval-after-load 'minions
           (setopt minions-prominent-modes '(arei-mode)))
-        (require 'arei))
+        (autoload 'global-arei-mode "arei")
+        (if after-init-time
+            (global-arei-mode)
+            (add-hook 'after-init-hook 'global-arei-mode)))
 
       #:elisp-packages (list (get-value 'emacs-arei config))
       #:keywords '(guile)
