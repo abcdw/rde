@@ -41,8 +41,8 @@
   #:use-module ((guix licenses) #:prefix license:))
 
 (define-public emacs-arei-latest
-  (let* ((commit "c867d92cb340057a1fc7088d3e0bdcf3bc91f418")
-         (revision "2"))
+  (let* ((commit "6741d93ebee0a3c9755b1b6722126d9e1145d310")
+         (revision "3"))
     (package
       (inherit emacs-arei)
       (name "emacs-arei")
@@ -56,7 +56,11 @@
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "1lgp3iq89rg785kkg61y62kghi0fisvb07b4cdsjzkpv46947inv"))))
+           "1c2yx4wn04ns9igk6pw02ir68hwpb2wk0nqvm6hfx7zliy079h69"))))
+      (arguments
+       (list
+        #:lisp-directory "lisp"
+        #:tests? #f))
       (propagated-inputs (append
                           (package-propagated-inputs emacs-arei)
                           (list (list "emacs-consult" emacs-consult))))
