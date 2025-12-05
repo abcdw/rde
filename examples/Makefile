@@ -1,6 +1,6 @@
 CHANNELS_FILE=./env/guix/rde-configs/env/guix/channels.scm
 CHANNELS_FILE_LOCAL_RDE=./env/guix/rde-configs/env/guix/channels.scm
-GUIXTM=guix time-machine -L ./env/guix -C ${CHANNELS_FILE}
+GUIXTM=GUILE_LOAD_PATH="../src:../tests:./src" guix time-machine -L ./env/guix -C ${CHANNELS_FILE}
 GUIXTM_LOCAL_RDE=guix time-machine -L ./env/guix -C ${CHANNELS_FILE_LOCAL_RDE}
 
 GUIX=$(GUIXTM) --
@@ -23,7 +23,6 @@ ares: env/sync
 	-- guile \
 	-L ./env/guix \
 	-L ./env/dev \
-	-L ./src \
 	-c \
 "(begin (use-modules (guix gexp)) #;(load gexp reader macro globally) \
 ((@ (ares server) run-nrepl-server)))"
