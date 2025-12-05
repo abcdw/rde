@@ -1,5 +1,5 @@
 CHANNELS_FILE=./env/guix/rde-configs/env/guix/channels.scm
-CHANNELS_FILE_LOCAL_RDE=./env/guix/rde-configs/env/guix/channels.scm
+CHANNELS_FILE_LOCAL_RDE=./env/guix/rde-configs/env/guix/channels-ci.scm
 GUIXTM=GUILE_LOAD_PATH="../src:../tests:./src" guix time-machine -L ./env/guix -C ${CHANNELS_FILE}
 GUIXTM_LOCAL_RDE=guix time-machine -L ./env/guix -C ${CHANNELS_FILE_LOCAL_RDE}
 
