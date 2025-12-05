@@ -17,7 +17,7 @@ VERSION=latest
 repl: ares
 
 ares: env/sync
-	${GUIX} shell -L ./env/guix -L ./env/dev guile-next guile-ares-rs \
+	${GUIX} shell -L ./env/guix -L ./env/dev guile guile-ares-rs \
 	-e '(@ (rde-configs env dev packages) guix-package)' \
 	-e '(@ (rde-configs env dev packages) channels-package)' \
 	-- guile \
