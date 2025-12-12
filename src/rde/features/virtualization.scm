@@ -26,17 +26,24 @@
   #:use-module (gnu services virtualization)
   #:use-module (gnu home services)
   #:use-module (rde system services accounts)
+  #:use-module (srfi srfi-26)
 
   #:export (feature-qemu))
 
 (define* (feature-qemu
           #:key
           (qemu qemu)
-          (virt-manager virt-manager))
-  "Configure qemu, a machine emulator and virtualizer."
+          (virt-manager virt-manager)
+          (emulate-other-archs '()))
+  "Configure qemu, a machine emulator and virtualizer.
+
+EMULATE-OTHER-ARCHS is a list of valid architectures for the
+@code{qemu-binfmt-service-type}, as recommended in (guix) Submitting Patches."
 
   (ensure-pred file-like? qemu)
   (ensure-pred file-like? virt-manager)
+  (let ((platform-names (map qemu-platform-name %qemu-platforms)))
+    (ensure-pred (list-of (cut member <> platform-names)) emulate-other-archs))
 
   (define f-name 'qemu)
   (define (get-home-services config)
@@ -47,13 +54,21 @@
       (list qemu virt-manager))))
 
   (define (get-system-services config)
-    (list
-     (service libvirt-service-type)
-     (service virtlog-service-type)
-     (simple-service
-      'qemu-add-kvm-group-to-user
-      rde-account-service-type
-      (list "kvm" "libvirt"))))
+    (append
+     (list
+      (service libvirt-service-type)
+      (service virtlog-service-type)
+      (simple-service
+       'qemu-add-kvm-group-to-user
+       rde-account-service-type
+       (list "kvm" "libvirt")))
+     (if (not (null? emulate-other-archs))
+         (list
+          (service qemu-binfmt-service-type
+                   (qemu-binfmt-configuration
+                    (platforms
+                     (apply lookup-qemu-platforms emulate-other-archs)))))
+         '())))
 
   (feature
    (name f-name)
