@@ -32,6 +32,7 @@
   #:use-module (rde packages)
   #:use-module (rde packages emacs)
   #:use-module (rde packages emacs-xyz)
+  #:use-module (rde packages guile-xyz)
   #:use-module (gnu packages admin)
   #:use-module (gnu packages base)
   #:use-module (gnu packages emacs)
@@ -559,14 +560,15 @@ It can contain settings not yet moved to separate features."
   (define* (emacs-minibuffer-program
             config #:key
             (alternate
-             (program-file
-              "emacs-client-alternate-fail"
-              #~(system*
-                 #$(file-append (get-value 'libnotify config libnotify)
-                                "/bin/notify-send")
-                 "Emacs error"
-                 "Minibuffer programs require a running server."
-                 "--icon=emacs"))))
+             (with-extensions (list guile-libnotify-latest)
+               (program-file
+                "emacs-client-alternate-fail"
+                #~(begin
+                    (use-modules (notify))
+                    (notify-send
+                     "Emacs Error" "Emacs Error"
+                     #:body "Minibuffer programs require a running server."
+                     #:icon "emacs"))))))
     (lambda* (file-name-suffix title command
                                #:key (client emacs-client)
                                (height 10))
