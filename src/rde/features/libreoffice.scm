@@ -77,12 +77,6 @@
               (("UserInstallation=.*")
                (string-append "UserInstallation=$SYSUSERHOME"
                               #$data-home-suffix "/libreoffice")))
-            (substitute* (string-append
-                          #$output "/lib/libreoffice/program/soffice")
-              (("\"\\$\\@\"[[:space:]]$")
-               (string-append "\"-env:UserInstallation=file://"
-                              #$home #$data-home-suffix
-                              "/libreoffice\" \"$@\"\n")))
             ;; Add other flags to applications desktop files.
             (substitute*
                 (find-files (string-append #$output "/share/applications"))
