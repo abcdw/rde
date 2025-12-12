@@ -76,3 +76,18 @@
     (description "ares-shepherd is an extension for Ares that adds the ability to
 connect and interact to a shepherd via its nREPL service.")
     (license license:gpl3+)))
+
+(define-public guile-libnotify-latest
+  (let ((commit "f255d78d7b246aefc6223f770df19c48a942d209")
+        (revision "0"))
+    (package/inherit guile-libnotify
+      (name "guile-libnotify")
+      (version (git-version "0.1.0" revision commit))
+      (source (origin
+                (method git-fetch)
+                (uri (git-reference
+                      (url "https://github.com/ekaitz-zarraga/guile-libnotify")
+                      (commit commit)))
+                (file-name (git-file-name name version))
+                (sha256
+                 (base32 "08k11bpqpxkj0gjnp48dc9jdpvwvqv2yvjwbki02aa6f3h06qljs")))))))
