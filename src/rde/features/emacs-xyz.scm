@@ -324,9 +324,8 @@ different level headings will have different size."
       `((eval-when-compile
           (require 'modus-themes)
           (require 'cl-seq))
-        (require ',(symbol-append theme '-theme))
         (eval-when-compile
-         (enable-theme ',theme))
+         (load-theme ',theme :no-confirm))
         (defgroup rde-modus-themes nil
           "Configuration related to `modus-themes'."
           :group 'rde)
