@@ -39,7 +39,7 @@
 
 (define* (feature-ssh
           #:key
-          (ssh openssh)
+          (ssh openssh-sans-x)
           (mosh mosh)
           (ssh-configuration (home-ssh-configuration))
           (ssh-agent? #f)
