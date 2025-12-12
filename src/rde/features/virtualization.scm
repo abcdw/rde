@@ -1,6 +1,7 @@
 ;;; rde --- Reproducible development environment
 ;;;
 ;;; Copyright © 2022, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -32,6 +33,10 @@
           #:key
           (qemu qemu)
           (virt-manager virt-manager))
+  "Configure qemu, a machine emulator and virtualizer."
+
+  (ensure-pred file-like? qemu)
+  (ensure-pred file-like? virt-manager)
 
   (define f-name 'qemu)
   (define (get-home-services config)
