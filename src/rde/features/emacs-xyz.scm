@@ -3959,9 +3959,8 @@ built-in help that provides much more contextual information."
               `((eval-when-compile
                  (require 'modus-themes)
                  (require 'cl-seq))
-                (require ',(symbol-append theme '-theme))
                 (eval-when-compile
-                 (enable-theme ',theme))
+                 (load-theme ',theme :no-confirm))
                 (defun rde-info-set-custom-faces ()
                   "Apply more pleasant faces to `Info-mode' and `Info+-mode'."
                   (interactive)
