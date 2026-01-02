@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; SPDX-FileCopyrightText: 2024, 2025 Andrew Tropin <andrew@trop.in>
+;;; SPDX-FileCopyrightText: 2024, 2025, 2026 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -116,6 +116,7 @@
                           (false-if-exception (make-file-writable f)))
                         (find-files ".")))))))
     (inputs `(("guix" ,(make-guix-package channels))))
+    (native-inputs (list guile-3.0-latest))
     (home-page "https://git.sr.ht/~abcdw/rde")
     (synopsis "Combined package for channel source and bytecode files")
     (description "Combined package for channel source and bytecode files.")
