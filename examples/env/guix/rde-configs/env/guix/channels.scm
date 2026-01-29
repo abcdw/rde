@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; SPDX-FileCopyrightText: 2024, 2025 Andrew Tropin <andrew@trop.in>
+;;; SPDX-FileCopyrightText: 2024, 2025, 2026 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
@@ -16,7 +16,7 @@
     (url "https://git.sr.ht/~abcdw/rde")
     (branch "master")
     (commit
-     "f801b5f6a3df2aac8099c991f29277044317db68")
+     "31e1ddee0be4347146763d70da8656ae1867d82a")
     (introduction
      (make-channel-introduction
       "257cebd587b66e4d865b3537a9a88cccd7107c95"
