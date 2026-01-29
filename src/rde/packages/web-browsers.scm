@@ -31,62 +31,8 @@
   #:use-module (guix utils))
 
 (define-public nyxt-next
-  (let ((commit "44c60496773a944a193ed6a1f79fa116cbfe1ef8")
-        (revision "0"))
-    (package
-      (inherit nyxt)
-      (name "nyxt-next")
-      (version (git-version "3.4" revision commit))
-      (source
-       (origin
-         (inherit (package-source nyxt))
-         (uri (git-reference
-               (url "https://github.com/atlas-engineer/nyxt")
-               (commit commit)))
-         (file-name (git-file-name "nyxt" version))
-         (sha256
-          (base32
-           "1a9zxcswi9k4mw8nidbr8dff3avc6z3p0nx092nq751j4xbcgxxa"))))
-      (arguments
-       (substitute-keyword-arguments (package-arguments nyxt)
-         ((#:phases phases)
-          #~(modify-phases #$phases
-              (replace 'configure-tests
-                (lambda _
-                  (setenv "NASDF_TESTS_NO_NETWORK" "1")
-                  (setenv "NASDF_TESTS_QUIT_ON_FAIL" "1")))))))
-      (native-inputs
-       (modify-inputs (package-native-inputs nyxt)
-         (delete sbcl-prove)
-         (prepend sbcl-lisp-unit2)))
-      (propagated-inputs
-       (list
-        gst-libav
-        gst-plugins-bad
-        gst-plugins-base
-        gst-plugins-good
-        gst-plugins-ugly
-        aspell
-        aspell-dict-en))
-      (inputs
-       (modify-inputs (package-inputs nyxt)
-         (delete sbcl-cl-css)
-         (prepend sbcl-cl-gopher
-                  sbcl-nhooks
-                  sbcl-nkeymaps
-                  sbcl-phos
-                  sbcl-dissect
-                  sbcl-ndebug
-                  sbcl-cl-tld
-                  sbcl-history-tree
-                  sbcl-montezuma
-                  sbcl-nfiles
-                  sbcl-ospm
-                  sbcl-lass
-                  sbcl-njson
-                  sbcl-py-configparser
-                  sbcl-cl-webkit
-                  cl-nsymbols
-                  sbcl-slynk
-                  pkg-config
-                  gcc-toolchain))))))
+  ;; nyxt package was removed from upstream, as we were inheriting from it,
+  ;; the channels build on recent guix revison got broken.  We keep this file
+  ;; to have easier access to the commit history in case we need to recover
+  ;; previous nyxt-next package definition.
+  #f)
