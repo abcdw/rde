@@ -18,6 +18,7 @@
 ;;; along with rde.  If not, see <http://www.gnu.org/licenses/>.
 
 (define-module (rde home services web-browsers)
+  #:use-module (rde predicates)
   #:use-module (rde serializers lisp)
   #:use-module (gnu services)
   #:use-module (gnu services shepherd)
@@ -35,14 +36,16 @@
             home-nyxt-lisp-extension
             make-nyxt-service-type))
 
-(define file-likes? (list-of file-like?))
 (define serialize-packages empty-serializer)
 (define serialize-file-likes empty-serializer)
 (define serialize-list empty-serializer)
+(define serialize-maybe-file-like empty-serializer)
 
 (define-configuration home-nyxt-configuration
   (nyxt
-   (file-like nyxt)
+   ;; XXX: Switched to maybe-file-like? to allow channel compilation
+   ;; despite upstream Nyxt removal.
+   (maybe-file-like #f)
    "The nyxt package to use.")
   (lisp-packages
    (list '())

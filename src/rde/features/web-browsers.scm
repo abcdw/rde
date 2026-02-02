@@ -257,7 +257,7 @@ and Firefox."
 
 (define* (feature-nyxt
           #:key
-          (nyxt nyxt)
+          (nyxt #f)
           (default-browser? #f)
           (startup-flags '())
           (default-cookie-policy ':no-third-party)
