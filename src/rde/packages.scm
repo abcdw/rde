@@ -35,14 +35,11 @@
 
   #:use-module (srfi srfi-1)
 
-  #:use-module (guix diagnostics)
-  #:use-module (guix i18n)
   #:use-module (guix packages)
   #:use-module (guix gexp)
   #:use-module (guix utils)
   #:use-module (guix download)
   #:use-module (guix git-download)
-  #:use-module (guix build-system meson)
   #:use-module (guix build-system gnu)
   #:use-module (guix build-system guile)
   #:use-module ((guix licenses) #:prefix license:)
