@@ -2,7 +2,7 @@
 ;;;
 ;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
-;;; Copyright © 2022, 2024 Nicolas Graves <ngraves@ngraves.fr>
+;;; Copyright © 2022, 2024, 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -348,13 +348,13 @@ frame-title-format."
           #:key
           (sway-tty-number 2)
           (logfile "${XDG_STATE_HOME}/log/sway.log")
-          (launch-arguments ""))
+          (launch-arguments '()))
   "Launch Sway on specified tty upon user login.  Also, automatically switch
 to SWAY-TTY-NUMBER on boot.  Log errors into LOGFILE. Sway is launched with
-additional LAUNCH-ARGUMENTS."
+additional list of strings LAUNCH-ARGUMENTS."
   (ensure-pred tty-number? sway-tty-number)
   (ensure-pred string? logfile)
-  (ensure-pred string? launch-arguments)
+  (ensure-pred list-of-strings? launch-arguments)
 
   (define (sway-run-on-tty-home-services config)
     (require-value 'sway config)
@@ -396,7 +396,8 @@ exec ~a ~a"
           #$(file-append (get-value 'coreutils config coreutils) "/bin/dirname")
           #$logfile
           #$sway-with-env-vars
-          #$(string-join (list launch-arguments "2>>" logfile) " "))))))
+          #$(string-join
+             (append launch-arguments (list "2>>" logfile)) " "))))))
 
   (define (sway-run-on-tty-system-services _)
     (list
