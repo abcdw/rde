@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2024-2025 jgart <jgart@dismail.de>
+;;; Copyright © 2024-2026 jgart <jgart@dismail.de>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -39,10 +39,11 @@
 
 (define* (feature-prolog
           #:key
-          (prolog trealla)
+          (prolog scryer-prolog)
           (binary-name
            (match (package-name prolog)
-             ("trealla" "tpl")))
+             ("scryer-prolog" "scryer-prolog"
+              "trealla" "tpl")))
           (emacs-ediprolog emacs-ediprolog)
           (dwim-key "C-c C-c"))
   "Configure Prolog for Emacs."
@@ -63,6 +64,8 @@
       'add-prolog-startup-file
       home-files-service-type
       (match (package-name prolog)
+        ("scryer-prolog"
+         `((".scryerrc" ,(prolog-startup-file "scryerrc"))))
         ("trealla"
          `((".tplrc" ,(prolog-startup-file "tplrc"))))
         (_ '())))
