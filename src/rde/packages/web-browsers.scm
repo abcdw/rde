@@ -30,10 +30,6 @@
   #:use-module (guix packages)
   #:use-module (guix utils))
 
-(define-public nyxt-test
-  (package
-    (inherit nyxt)))
-
 (define-public nyxt-next
   ;; nyxt package was removed from upstream, as we were inheriting from it,
   ;; the channels build on recent guix revison got broken.  We keep this file
