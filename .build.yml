@@ -21,6 +21,17 @@ tasks:
       else
         make minimal/home/build/ci
       fi
+  - build-minimal-example-home-latest-guix: |
+      cd rde
+      git switch keyring
+      git switch --detach -
+      cd examples
+
+      if [[ "$BUILD_REASON" == "patchset" ]]; then
+        make minimal/home/build/ci-latest-guix-no-auth || true
+      else
+        make minimal/home/build/ci-latest-guix || true
+      fi
   - readme: |
       cd rde
 
