@@ -2081,6 +2081,50 @@ parses its input."
          (setq completion-category-defaults nil)
          (setq enable-recursive-minibuffers t)
 
+         ,#~"\n;; Works around an Emacs bug where completion boundary handling
+;; doubles the directory prefix (e.g. examples/ -> examples/examples/...)
+;; when using `completion-at-point' in the minibuffer."
+
+         ;; TODO: [Andrew Tropin, 2026-02-27] Report the problem upstream and
+         ;; put ticket number for tracking here.
+         (defun rde-minibuffer-completion-at-point ()
+           "Variant of `completion-at-point' for minibuffers.
+Works around an Emacs bug where completion boundary handling
+doubles the directory prefix."
+           (interactive)
+           (let* ((res (run-hook-wrapped
+                        'completion-at-point-functions
+                        (function completion--capf-wrapper) 'all))
+                  (data (and (consp res) (consp (cdr res)) (cdr res)))
+                  (start (nth 0 data))
+                  (end (nth 1 data))
+                  (collection (nth 2 data))
+                  (plist (nthcdr 3 data))
+                  (pred (plist-get plist :predicate))
+                  (initial (and start end
+                                (buffer-substring-no-properties start end)))
+                  (md (and initial
+                           (completion-metadata initial collection pred)))
+                  (candidates
+                   (and initial
+                        (completion-all-completions
+                         initial collection pred (length initial) md))))
+             (when candidates
+               (setcdr (last candidates) nil)
+               (let ((result (completing-read
+                              "Complete: " candidates nil nil initial)))
+                 (when (and result (not (string-empty-p result)))
+                   (delete-region start end)
+                   (goto-char start)
+                   (insert result))))))
+
+         (define-key minibuffer-local-map
+                     (vector 'remap 'completion-at-point)
+                     'rde-minibuffer-completion-at-point)
+         (define-key minibuffer-local-map
+                     (vector 'remap 'complete-symbol)
+                     'rde-minibuffer-completion-at-point)
+
          ;; (setq resize-mini-windows nil)
 
          ;; MAYBE: Make transient use child-frame:
