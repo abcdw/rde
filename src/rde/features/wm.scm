@@ -388,7 +388,7 @@ additional LAUNCH-ARGUMENTS."
       (list
        #~(format
           #f
-          "[ $(tty) = /dev/tty~a ] && \\
+          "[ \"$(tty)\" = /dev/tty~a ] && \\
 ~a -p \"$(~a ~a)\" && \\
 exec ~a ~a"
           #$sway-tty-number
