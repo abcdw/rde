@@ -4512,6 +4512,29 @@ result is longer than LEN."
                 (s-truncate len (s-pad-right len " " result))
                 result)))
 
+        (defun rde-org-agenda-reschedule-count ()
+          "Return the number of times the entry at point was rescheduled.
+Counts Rescheduled entries in the LOGBOOK drawer.  Intended for use
+in `org-agenda-prefix-format' via %(rde-org-agenda-reschedule-count)."
+          (save-excursion
+            (let ((count 0)
+                  (bound (org-entry-end-position)))
+              (when (re-search-forward
+                     "^[ \t]*:LOGBOOK:[ \t]*$" bound t)
+                (let ((drawer-end
+                       (save-excursion
+                         (if (re-search-forward
+                              "^[ \t]*:END:[ \t]*$" bound t)
+                             (point)
+                           bound))))
+                  (while (re-search-forward
+                          "^[ \t]*-[ \t]+Rescheduled" drawer-end t)
+                    (setq count (+ count 1)))))
+              (cond
+               ((> count 9) "R:∞ ")
+               ((> count 0) (format "R:%d  " count))
+               (t "     ")))))
+
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
         (add-hook 'org-agenda-mode-hook
                   'hack-dir-local-variables-non-file-buffer)
