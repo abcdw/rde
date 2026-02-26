@@ -4444,7 +4444,8 @@ Indentation and refile configurations, visual adjustment."
           (org-agenda-files #f)
           (org-agenda-custom-commands %rde-org-agenda-custom-commands)
           (org-agenda-prefix-format #f)
-          (org-agenda-appt? #f))
+          (org-agenda-appt? #f)
+          (org-agenda-highlight-items-with-body? #t))
   "Configure org-agenda for GNU Emacs."
   (define (maybe-path-or-list? elt)
     (or (maybe-path? elt) (maybe-list? elt)))
@@ -4454,6 +4455,7 @@ Indentation and refile configurations, visual adjustment."
   (ensure-pred list? org-agenda-custom-commands)
   (ensure-pred maybe-list? org-agenda-prefix-format)
   (ensure-pred boolean? org-agenda-appt?)
+  (ensure-pred boolean? org-agenda-highlight-items-with-body?)
 
   (define emacs-f-name 'org-agenda)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -4473,6 +4475,11 @@ Indentation and refile configurations, visual adjustment."
         (defgroup rde-org-agenda nil
           "Custom enhancements to the Org Agenda."
           :group 'rde)
+
+        (defface rde-org-agenda-has-body
+          '((t :inherit menu))
+          "Face for agenda items that have body content."
+          :group 'rde-org-agenda)
 
         ,@(if org-agenda-appt?
               (org-agenda-appt config)
@@ -4535,6 +4542,52 @@ in `org-agenda-prefix-format' via %(rde-org-agenda-reschedule-count)."
                ((> count 0) (format "R:%d  " count))
                (t "     ")))))
 
+        (defun rde-org-agenda-entry-has-body-p (marker)
+          "Return non-nil if the org entry at MARKER has meaningful body content.
+Body content is text that is not a planning line, drawer, or blank line."
+          (with-current-buffer (marker-buffer marker)
+            (save-excursion
+              (goto-char (marker-position marker))
+              (let ((entry-end (org-entry-end-position))
+                    (has-body nil))
+                ;; Move past the heading line
+                (forward-line 1)
+                (while (and (not has-body) (< (point) entry-end))
+                  (let ((line (buffer-substring-no-properties
+                               (line-beginning-position) (line-end-position))))
+                    (cond
+                     ;; Skip planning lines
+                     ((string-match-p
+                       "^[ \t]*\\(SCHEDULED\\|DEADLINE\\|CLOSED\\):" line))
+                     ;; Skip drawers: jump from :DRAWER: to :END:
+                     ((string-match-p "^[ \t]*:[A-Z_]+:[ \t]*$" line)
+                      (when (re-search-forward
+                             "^[ \t]*:END:[ \t]*$" entry-end t)
+                        (forward-line 0)))
+                     ;; Skip blank lines
+                     ((string-match-p "^[ \t]*$" line))
+                     ;; Anything else is body content
+                     (t (setq has-body t))))
+                  (forward-line 1))
+                has-body))))
+
+        (defun rde-org-agenda-highlight-items-with-body ()
+          "Apply `rde-org-agenda-has-body' face to agenda items with body content."
+          (save-excursion
+            (goto-char (point-min))
+            (while (not (eobp))
+              (let ((marker (get-text-property (point) 'org-marker)))
+                (when (and marker (rde-org-agenda-entry-has-body-p marker))
+                  (let ((txt-start
+                         (text-property-any
+                          (line-beginning-position) (line-end-position)
+                          'org-heading t)))
+                    (when txt-start
+                      (add-face-text-property
+                       txt-start (line-end-position)
+                       'rde-org-agenda-has-body t)))))
+              (forward-line 1))))
+
         (define-key global-map (kbd "C-x C-a") 'org-agenda)
         (add-hook 'org-agenda-mode-hook
                   'hack-dir-local-variables-non-file-buffer)
@@ -4592,6 +4645,10 @@ in `org-agenda-prefix-format' via %(rde-org-agenda-reschedule-count)."
                    `(quote ,org-agenda-prefix-format))
                   (else
                    ''())))
+          ,@(if org-agenda-highlight-items-with-body?
+                '((add-hook 'org-agenda-finalize-hook
+                            'rde-org-agenda-highlight-items-with-body))
+                '())
           (autoload 'org-super-agenda-mode "org-super-agenda")
           (org-super-agenda-mode)))
       #:elisp-packages (list emacs-org-wild-notifier emacs-org-super-agenda)
