@@ -14,23 +14,27 @@
           #:key
           (difftastic difftastic)
           (emacs-difftastic emacs-difftastic)
+          (display "inline")
           (parse-error-limit #f))
   "Setup and configure Difftastic, a structural diff tool."
   (ensure-pred file-like? difftastic)
   (ensure-pred file-like? emacs-difftastic)
+  (ensure-pred string? display)
   (ensure-pred maybe-integer? parse-error-limit)
 
   (define f-name 'difftastic)
 
   (define difft-cmd
     (let ((difft (file-append difftastic "/bin/difft")))
-      (if parse-error-limit
-          (program-file "difft-wrapper"
-            #~(apply execl #$difft "difft"
-                     "--parse-error-limit"
-                     #$(number->string parse-error-limit)
-                     (cdr (command-line))))
-          difft)))
+      (program-file
+       "difft-wrapper"
+       #~(apply execl #$difft "difft"
+                "--display" #$display
+                #$@(if parse-error-limit
+                       (list "--parse-error-limit"
+                             (number->string parse-error-limit))
+                       '())
+                (cdr (command-line))))))
 
   (define (get-home-services config)
     (list
