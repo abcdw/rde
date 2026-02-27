@@ -15,12 +15,14 @@
           (difftastic difftastic)
           (emacs-difftastic emacs-difftastic)
           (display "inline")
-          (parse-error-limit #f))
+          (parse-error-limit #f)
+          (git-integration? #f))
   "Setup and configure Difftastic, a structural diff tool."
   (ensure-pred file-like? difftastic)
   (ensure-pred file-like? emacs-difftastic)
   (ensure-pred string? display)
   (ensure-pred maybe-integer? parse-error-limit)
+  (ensure-pred boolean? git-integration?)
 
   (define f-name 'difftastic)
 
@@ -37,29 +39,32 @@
                 (cdr (command-line))))))
 
   (define (get-home-services config)
-    (list
-     (simple-service
-      'add-difftastic-home-package
-      home-profile-service-type
-      (list difftastic))
-     (simple-service
-      'difftastic-git-config
-      home-git-service-type
-      (home-git-extension
-       (config
-        `((diff
-           ((external . ,difft-cmd)))))))
-
-     (rde-elisp-configuration-service
-      'difftastic
-      config
-      `((setopt difftastic-executable ,difft-cmd)
-        (with-eval-after-load 'magit
-          (difftastic-bindings-mode)))
-      #:summary "Difftastic structural diff integration"
-      #:commentary "Set executable path and enable magit keybindings."
-      #:keywords '(convenience)
-      #:elisp-packages (list emacs-difftastic))))
+    (append
+     (if git-integration?
+         (list
+          (simple-service
+           'difftastic-git-config
+           home-git-service-type
+           (home-git-extension
+            (config
+             `((diff
+                ((external . ,difft-cmd))))))))
+         '())
+     (list
+      (simple-service
+       'add-difftastic-home-package
+       home-profile-service-type
+       (list difftastic))
+      (rde-elisp-configuration-service
+       'difftastic
+       config
+       `((setopt difftastic-executable ,difft-cmd)
+         (with-eval-after-load 'magit
+           (difftastic-bindings-mode)))
+       #:summary "Difftastic structural diff integration"
+       #:commentary "Set executable path and enable magit keybindings."
+       #:keywords '(convenience)
+       #:elisp-packages (list emacs-difftastic)))))
 
   (feature
    (name f-name)
