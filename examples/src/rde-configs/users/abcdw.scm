@@ -17,6 +17,7 @@
   #:use-module (rde features base)
   #:use-module (rde features clojure)
   #:use-module (rde features containers)
+  #:use-module (rde features difftastic)
   #:use-module (rde features emacs)
   #:use-module (rde features emacs-xyz)
   #:use-module (rde features fontutils)
@@ -654,6 +655,8 @@ subject:/home:/) and tag:new}\"'"
     (feature-emacs-gptel)
     (feature-emacs-ellama)
     (feature-emacs-cua)
+    (feature-difftastic
+     #:parse-error-limit 1000)
     (feature-keyboard
      ;; To get all available options, layouts and variants run:
      ;; cat `guix build xkeyboard-config`/share/X11/xkb/rules/evdev.lst
