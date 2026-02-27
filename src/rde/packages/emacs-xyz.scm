@@ -434,6 +434,33 @@ programming language, powered by the tree-sitter-clojure tree-sitter grammar."))
  list of attachments (e.g. PDF files) associated with a url. This is done
  using Zotero translators, but without using the Zotero client."))))
 
+(define-public emacs-difftastic
+  (let ((commit "b33554a22c637f147d07c15fa9539c72bcfcfca0")
+        (revision "0"))
+    (package
+      (name "emacs-difftastic")
+      (version (git-version "0.0.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/pkryger/difftastic.el")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1rc5gnb1hdlh7gjpg8igrrzcvxk53h76mcbnbhmfdhxfixb2xh8r"))))
+      (build-system emacs-build-system)
+      (arguments (list #:tests? #f)) ;tests require cask
+      (propagated-inputs (list emacs-compat emacs-magit emacs-transient))
+      (home-page "https://github.com/pkryger/difftastic.el")
+      (synopsis "Structural diff tool integration for Emacs")
+      (description
+       "This package provides Emacs integration for difftastic, a structural
+diff tool that understands syntax.  It integrates with Magit to show
+structural diffs in place of regular diffs.")
+      (license license:gpl3+))))
+
 (define-public emacs-arei-shepherd
   (package
     (name "emacs-arei-shepherd")
