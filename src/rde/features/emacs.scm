@@ -599,8 +599,8 @@ It can contain settings not yet moved to separate features."
 
   (define (emacs-application-launcher config)
     ((emacs-minibuffer-program config)
-     "application-launcher" "Application Launcher"
-     'app-launcher-run-app #:height standalone-minibuffer-height))
+     "xdg-application-launcher" "XDG Application Launcher"
+     'xdg-launcher-run-app #:height standalone-minibuffer-height))
 
   (define (emacs-home-services config)
     "Returns home services related to GNU Emacs."
@@ -627,7 +627,7 @@ It can contain settings not yet moved to separate features."
        (elisp-packages
         (append
          additional-elisp-packages
-         (if default-application-launcher? (list emacs-app-launcher) '())))
+         (if default-application-launcher? (list emacs-xdg-launcher) '())))
        (emacs-servers (if emacs-server-mode? '(server) '()))
        (xdg-flavor? #t)
        (early-init-el
