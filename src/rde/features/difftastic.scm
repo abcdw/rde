@@ -10,6 +10,34 @@
   #:use-module (guix gexp)
   #:export (feature-difftastic))
 
+
+;;; Notes
+;; [Andrew Tropin, 2026-03-01]
+
+;; - difftastic can't be extended with new tree-sitter grammars without
+;; rebuilding the binary.
+
+;; If grammar fails to parse (gexp in scheme code for example), you can still
+;; get the diff by ignoring errors with parse-error-limit, however the diff
+;; will likely be wrong.
+
+;; The display is not very flexible, you can't disable line numbers or adjust
+;; other things.
+
+;; The highlighting of elements of the line, feels unusual and a bit
+;; stylistically questionable.  Not sure, what are better diff representation
+;; options here.
+
+;; The integration with magit is bare bone, you can get structural diff for
+;; staged changes or a particular commit, but not in magit-status.
+
+;; Summary and overall experience: parsing of builting scheme grammar is not
+;; very reliable, customization of grammars requires rebuilt of the package.
+;; Can be used for reviewing large edits, removes noise well (if parsed
+;; correctly).  Requeires more work and improvements (scheme grammar, more
+;; flexible display format, better emacs integration) to become a goto daily
+;; driver.
+
 (define* (feature-difftastic
           #:key
           (difftastic difftastic)
