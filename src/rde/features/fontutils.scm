@@ -149,79 +149,80 @@ font-monospace default value, and it will be ignored if
           (edit (@ (name "family") (mode "prepend") (binding "strong"))
                 (string ,(font-name font-unicode))))))
 
-     (rde-elisp-configuration-service
-      f-name
-      config
-      `((eval-when-compile
-         (require 'cl-macs)
-         (require 'subr-x))
-        (defvar rde-fonts-emoji-list nil
-          "Cached list of emojis.")
+     (when (get-value 'emacs config #f)
+       (rde-elisp-configuration-service
+        f-name
+        config
+        `((eval-when-compile
+           (require 'cl-macs)
+           (require 'subr-x))
+          (defvar rde-fonts-emoji-list nil
+            "Cached list of emojis.")
 
-        (defun rde-fonts--build-emojis ()
-          "Create an emoji list by looping over the total range of characters."
-          (delete
-           nil
-           (cl-loop with range = '(#x1f000 . #x1f9ff)
-                    for i upto (- (cdr range) (car range))
-                    collect (when-let* ((codepoint (+ (car range) i))
-                                        (name (get-char-code-property
-                                               codepoint 'name)))
-                                       (thread-last
-                                        (replace-regexp-in-string
-                                         " " "-" (downcase name))
-                                        (format ":%s:")
-                                        (format
-                                         "%s %s"
-                                         (char-to-string (char-from-name name))))))))
+          (defun rde-fonts--build-emojis ()
+            "Create an emoji list by looping over the total range of characters."
+            (delete
+             nil
+             (cl-loop with range = '(#x1f000 . #x1f9ff)
+                      for i upto (- (cdr range) (car range))
+                      collect (when-let* ((codepoint (+ (car range) i))
+                                          (name (get-char-code-property
+                                                 codepoint 'name)))
+                                         (thread-last
+                                          (replace-regexp-in-string
+                                           " " "-" (downcase name))
+                                          (format ":%s:")
+                                          (format
+                                           "%s %s"
+                                           (char-to-string (char-from-name name))))))))
 
-        (defun rde-fonts-insert-emoji ()
-          "Insert an emoji character to the current buffer."
-          (interactive)
-          (thread-first
-           (completing-read
-            "Select emoji: "
-            (or rde-fonts-emoji-list
-                (setq rde-fonts-emoji-list (rde-fonts--build-emojis))))
-           (substring 0 1)
-           (insert)))
+          (defun rde-fonts-insert-emoji ()
+            "Insert an emoji character to the current buffer."
+            (interactive)
+            (thread-first
+             (completing-read
+              "Select emoji: "
+              (or rde-fonts-emoji-list
+                  (setq rde-fonts-emoji-list (rde-fonts--build-emojis))))
+             (substring 0 1)
+             (insert)))
 
-        (define-key search-map "e" 'rde-fonts-insert-emoji)
-        (define-key minibuffer-mode-map (kbd "C-c C-e") 'rde-fonts-insert-emoji)
-        (with-eval-after-load 'fontset
-          (set-fontset-font t 'symbol ,(font-name font-unicode) nil 'append)
-          (set-fontset-font t 'unicode ,(font-name font-unicode) nil 'append)
-          (set-fontset-font "fontset-default" nil
-                            (font-spec :name ,(font-name font-unicode))))
-        (setq use-default-font-for-symbols nil)
-        (require 'fontaine)
-        (setq fontaine-current-preset t)
-        (setq fontaine-presets
-              '((t
-                 :default-family ,(font-name font-monospace)
-                 :default-height ,default-font-height
-                 :fixed-pitch-family ,(font-name font-monospace)
-                 :fixed-pitch-height 1.0
-                 :variable-pitch-family ,(font-name font-variable)
-                 :variable-pitch-height 1.0
-                 :variable-pitch-weight ,(font-weight font-variable))
-                (regular)
-                (large :default-weight semilight
-                       :default-height ,(+ default-font-height 40)
-                       :bold-weight extrabold)
-                ,@extra-fontaine-presets))
-        (require 'xdg)
-        (setq fontaine-latest-state-file
-              (expand-file-name "emacs/fontaine-latest.state.eld"
-                                (xdg-cache-home)))
+          (define-key search-map "e" 'rde-fonts-insert-emoji)
+          (define-key minibuffer-mode-map (kbd "C-c C-e") 'rde-fonts-insert-emoji)
+          (with-eval-after-load 'fontset
+            (set-fontset-font t 'symbol ,(font-name font-unicode) nil 'append)
+            (set-fontset-font t 'unicode ,(font-name font-unicode) nil 'append)
+            (set-fontset-font "fontset-default" nil
+                              (font-spec :name ,(font-name font-unicode))))
+          (setq use-default-font-for-symbols nil)
+          (require 'fontaine)
+          (setq fontaine-current-preset t)
+          (setq fontaine-presets
+                '((t
+                   :default-family ,(font-name font-monospace)
+                   :default-height ,default-font-height
+                   :fixed-pitch-family ,(font-name font-monospace)
+                   :fixed-pitch-height 1.0
+                   :variable-pitch-family ,(font-name font-variable)
+                   :variable-pitch-height 1.0
+                   :variable-pitch-weight ,(font-weight font-variable))
+                  (regular)
+                  (large :default-weight semilight
+                         :default-height ,(+ default-font-height 40)
+                         :bold-weight extrabold)
+                  ,@extra-fontaine-presets))
+          (require 'xdg)
+          (setq fontaine-latest-state-file
+                (expand-file-name "emacs/fontaine-latest.state.eld"
+                                  (xdg-cache-home)))
 
-        (defun rde-font--set-default-fonts ()
-          (fontaine-set-preset t))
+          (defun rde-font--set-default-fonts ()
+            (fontaine-set-preset t))
 
-        (if after-init-time
-            (when (display-graphic-p) (rde-font--set-default-fonts))
-            (add-hook 'after-init-hook 'rde-font--set-default-fonts)))
-      #:elisp-packages (list emacs-fontaine))))
+          (if after-init-time
+              (when (display-graphic-p) (rde-font--set-default-fonts))
+              (add-hook 'after-init-hook 'rde-font--set-default-fonts)))
+        #:elisp-packages (list emacs-fontaine)))))
 
   (feature
    (name f-name)
