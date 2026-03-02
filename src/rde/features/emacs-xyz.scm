@@ -321,7 +321,9 @@ different level headings will have different size."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((defgroup rde-modus-themes nil
+      `((autoload 'modus-themes-with-colors "modus-themes" nil nil 'macro)
+
+        (defgroup rde-modus-themes nil
           "Configuration related to `modus-themes'."
           :group 'rde)
         (defcustom rde-modus-themes-mode-line-padding 1
@@ -348,7 +350,7 @@ different level headings will have different size."
         (defun rde-modus-themes-set-custom-faces (&optional _theme)
           "Set faces based on the current theme."
           (interactive)
-          (when (modus-themes--current-theme)
+          (when (modus-themes-get-current-theme)
             (modus-themes-with-colors
               (custom-set-faces
                `(window-divider ((,c :foreground ,bg-main)))
@@ -391,7 +393,9 @@ different level headings will have different size."
                     :after 'rde-modus-themes-run-after-enable-theme-hook)
         ,@(map (lambda (hook)
                  `(add-hook 'rde-modus-themes-after-enable-theme-hook ',hook))
-               extra-after-enable-theme-hooks)
+               (append
+                '(rde-modus-themes-set-custom-faces)
+                extra-after-enable-theme-hooks))
 
         (with-eval-after-load 'rde-keymaps
           (define-key rde-toggle-map (kbd "t") 'modus-themes-toggle))
