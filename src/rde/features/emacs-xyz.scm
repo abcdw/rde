@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2022-2026 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022-2025 Nicolas Graves <ngraves@ngraves.fr>
@@ -321,12 +321,7 @@ different level headings will have different size."
      (rde-elisp-configuration-service
       emacs-f-name
       config
-      `((eval-when-compile
-          (require 'modus-themes)
-          (require 'cl-seq))
-        (eval-when-compile
-         (load-theme ',theme :no-confirm))
-        (defgroup rde-modus-themes nil
+      `((defgroup rde-modus-themes nil
           "Configuration related to `modus-themes'."
           :group 'rde)
         (defcustom rde-modus-themes-mode-line-padding 1
@@ -459,13 +454,10 @@ different level headings will have different size."
                                                       (7 . (0.9))
                                                       (8 . (0.9))))))
                 '()))
-        (load-theme ',theme t (not (display-graphic-p)))
-        ,@(if (get-value 'emacs-server-mode? config #f)
-              `((add-hook 'server-after-make-frame-hook
-                          (lambda ()
-                            (when (null custom-enabled-themes)
-                              (enable-theme ',theme)))))
-              '()))
+        (if after-init-time
+            (load-theme ',theme t (not (display-graphic-p)))
+            (add-hook 'after-init-hook
+                      (lambda () (load-theme ',theme t)))))
       #:elisp-packages (list emacs-modus-themes)
       #:summary "Modus Themes extensions"
       #:commentary "Customizations to Modus Themes, the elegant,
