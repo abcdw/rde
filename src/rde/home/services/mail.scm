@@ -37,7 +37,7 @@
 
 (define-configuration/no-serialization home-goimapnotify-configuration
   (goimapnotify
-    (file-like go-gitlab.com-shackra-goimapnotify)
+    (file-like goimapnotify)
     "The @code{goimapnotify} package to use.")
   (config
    (json-config '())

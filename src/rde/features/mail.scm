@@ -934,7 +934,7 @@ to offset block quotes."
 (define* (feature-goimapnotify
           #:key
           (mail-account-ids #f)
-          (goimapnotify go-gitlab.com-shackra-goimapnotify-next)
+          (goimapnotify goimapnotify)
           (notify? #f))
   "Set up and configure goimapnotify to listen on IMAP mailbox changes.  If
 MAIL-ACCOUNT-IDS is not provided, use all the mail accounts.  You can also
