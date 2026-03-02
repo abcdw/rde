@@ -382,9 +382,13 @@ different level headings will have different size."
 
         (defun rde-modus-themes--dark-theme-p (&optional theme)
           "Indicate if there is a curently-active dark THEME."
-          (if theme
-              (eq theme ',light-theme)
-              (eq (car custom-enabled-themes) ',dark-theme)))
+          (let ((th (or theme (modus-themes-get-current-theme))))
+            (if (member
+                 th
+                 (modus-themes-filter-by-background-mode
+                  (modus-themes-get-themes) 'dark))
+                t
+                nil)))
 
         (setq rde-modus-themes-header-line-padding ,header-line-padding)
         (setq rde-modus-themes-tab-bar-padding ,tab-bar-padding)
