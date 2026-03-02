@@ -4445,7 +4445,8 @@ Indentation and refile configurations, visual adjustment."
           (org-agenda-custom-commands %rde-org-agenda-custom-commands)
           (org-agenda-prefix-format #f)
           (org-agenda-appt? #f)
-          (org-agenda-highlight-items-with-body? #t))
+          (org-agenda-highlight-items-with-body? #t)
+          (org-agenda-swap-g-r? #t))
   "Configure org-agenda for GNU Emacs."
   (define (maybe-path-or-list? elt)
     (or (maybe-path? elt) (maybe-list? elt)))
@@ -4456,6 +4457,7 @@ Indentation and refile configurations, visual adjustment."
   (ensure-pred maybe-list? org-agenda-prefix-format)
   (ensure-pred boolean? org-agenda-appt?)
   (ensure-pred boolean? org-agenda-highlight-items-with-body?)
+  (ensure-pred boolean? org-agenda-swap-g-r?)
 
   (define emacs-f-name 'org-agenda)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -4648,6 +4650,10 @@ Body content is text that is not a planning line, drawer, or blank line."
           ,@(if org-agenda-highlight-items-with-body?
                 '((add-hook 'org-agenda-finalize-hook
                             'rde-org-agenda-highlight-items-with-body))
+                '())
+          ,@(if org-agenda-swap-g-r?
+                '((define-key org-agenda-mode-map (kbd "g") 'org-agenda-redo)
+                  (define-key org-agenda-mode-map (kbd "r") 'org-agenda-redo-all))
                 '())
           (autoload 'org-super-agenda-mode "org-super-agenda")
           (org-super-agenda-mode)))
