@@ -510,7 +510,7 @@ in @var{config}, are available.  The result should be used in place of
                 (cons (kbd "s-x") 'rde-exwm-change-resolution)
                 (cons (kbd "s-t") 'exwm-floating-toggle-floating)
                 (cons (kbd "s-i") 'exwm-input-toggle-keyboard)
-                (cons (kbd "s-q") 'kill-this-buffer)
+                (cons (kbd "s-q") 'kill-current-buffer)
                 (cons (kbd "s-<return>") 'split-window-horizontally)
                 (cons (kbd "s-m") 'exwm-workspace-move-window)
                 (cons (kbd "s-w") 'exwm-workspace-switch)
