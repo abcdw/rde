@@ -5663,7 +5663,7 @@ with a floating-point value between 0 and 1."
           (setq ebdb-completion-display-record nil)
           (setq ebdb-complete-mail-allow-cycling nil)
           (setq ebdb-save-on-exit t)
-          (define-key ebdb-mode-map "q" 'kill-this-buffer)))
+          (define-key ebdb-mode-map "q" 'kill-current-buffer)))
       #:elisp-packages (list emacs-ebdb))))
 
   (feature
