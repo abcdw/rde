@@ -4037,7 +4037,7 @@ built-in help that provides much more contextual information."
                 (add-hook 'Info-mode-hook 'rde-info-set-custom-faces))
               '())
         (with-eval-after-load 'info
-          (define-key Info-mode-map "q" 'kill-this-buffer)
+          (define-key Info-mode-map "q" 'kill-current-buffer)
           (setq Info-use-header-line nil)
           (require 'info+)
           (add-hook 'Info-mode-hook 'visual-line-mode)
