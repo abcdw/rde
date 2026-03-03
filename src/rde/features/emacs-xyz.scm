@@ -3985,9 +3985,9 @@ built-in help that provides much more contextual information."
               '())
         (add-hook 'helpful-mode-hook 'visual-line-mode)
         (with-eval-after-load 'helpful
-          (define-key helpful-mode-map "q" 'kill-this-buffer))
+          (define-key helpful-mode-map "q" 'kill-current-buffer))
         (with-eval-after-load 'help-mode
-          (define-key help-mode-map "q" 'kill-this-buffer)
+          (define-key help-mode-map "q" 'kill-current-buffer)
           (setq help-window-select t)))
       #:elisp-packages (list emacs-helpful))))
 
