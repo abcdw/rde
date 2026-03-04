@@ -4489,7 +4489,7 @@ Indentation and refile configurations, visual adjustment."
           :group 'rde)
 
         (defface rde-org-agenda-has-body
-          '((t :inherit menu))
+          '((t :inherit message-separator))
           "Face for agenda items that have body content."
           :group 'rde-org-agenda)
 
