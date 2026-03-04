@@ -21,7 +21,7 @@
 
 (define* (feature-rofi
           #:key
-          (rofi rofi-wayland)
+          (rofi rofi)
           (theme "Arc")
           (show-icons? #t)
           (show-actions? #t)
