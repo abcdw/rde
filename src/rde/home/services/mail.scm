@@ -44,10 +44,12 @@
    "Alist of pairs that make up the @code{goimapnotify} configuration."))
 
 (define (add-home-goimapnotify-file config)
-  `(("goimapnotify/goimapnotify.conf"
-     ,(apply mixed-text-file "goimapnotify.conf"
+  `(("goimapnotify/goimapnotify.yaml"
+     ,(apply mixed-text-file "goimapnotify.yaml"
              (serialize-json-config
-              (home-goimapnotify-configuration-config config))))))
+              `((configurations
+                 .
+                 ,(home-goimapnotify-configuration-config config))))))))
 
 (define (home-goimapnotify-shepherd-service config)
   (list
