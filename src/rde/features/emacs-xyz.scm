@@ -284,6 +284,7 @@ Almost all visual elements are disabled.")))
 (define* (feature-emacs-modus-themes
           #:key
           (emacs-modus-themes emacs-modus-themes)
+          (emacs-ef-themes emacs-ef-themes)
           (extra-after-enable-theme-hooks '())
           (dark? #f)
           (deuteranopia? #t)
@@ -296,6 +297,7 @@ which helps people with color blindness.  If DEUTERANOPIA-RED-BLUE-DIFFS?  is
 set, red/blue colors will be used instead.  If HEADINGS-SCALING? is set,
 different level headings will have different size."
   (ensure-pred file-like? emacs-modus-themes)
+  (ensure-pred file-like? emacs-ef-themes)
   (ensure-pred list? extra-after-enable-theme-hooks)
   (ensure-pred boolean? dark?)
   (ensure-pred boolean? deuteranopia?)
@@ -461,12 +463,20 @@ different level headings will have different size."
                                                       (6 . (1.0))
                                                       (7 . (0.9))
                                                       (8 . (0.9))))))
-                '()))
+                '())
+
+          ;; A small hack to defer execution of
+          ;; `modus-themes-include-derivatives-mode' and avoid recursive
+          ;; infinite loading of modus-themes.
+          (run-at-time 0 nil (lambda ()
+                               (require 'ef-themes)
+                               (modus-themes-include-derivatives-mode))))
+
         (if after-init-time
             (load-theme ',theme t (not (display-graphic-p)))
             (add-hook 'after-init-hook
                       (lambda () (load-theme ',theme t)))))
-      #:elisp-packages (list emacs-modus-themes)
+      #:elisp-packages (list emacs-modus-themes emacs-ef-themes)
       #:summary "Modus Themes extensions"
       #:commentary "Customizations to Modus Themes, the elegant,
 highly legible Emacs themes.\
