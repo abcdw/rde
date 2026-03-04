@@ -962,15 +962,20 @@ control whether to NOTIFY? when new emails arrive."
        (config
         `#(,@(map
               (lambda (acc)
-                `((host . ,(assoc-ref
-                            (assoc-ref
-                             (assoc-ref
-                              (get-value 'mail-providers-settings config)
-                              (mail-account-type acc))
-                             'smtp)
-                            'host))
-                  (port . 143)
-                  (tls . #f)
+                (let* ((provider-settings
+                        (assoc-ref
+                         (get-value 'mail-providers-settings config)
+                         (mail-account-type acc)))
+                       (imap-settings
+                        (assoc-ref provider-settings 'imap))
+                       (host (assoc-ref imap-settings 'host))
+                       (starttls?
+                        (assoc-ref imap-settings 'starttls?))
+                       (port (or (assoc-ref imap-settings 'port)
+                                 (if starttls? 143 993))))
+                `((host . ,host)
+                  (port . ,port)
+                  (tls . ,(not starttls?))
                   (tlsOptions . ((rejectUnauthorized . #t)))
                   (username . ,(mail-account-fqda acc))
                   (passwordCmd . ,(mail-account-get-pass-cmd acc))
@@ -1013,7 +1018,7 @@ control whether to NOTIFY? when new emails arrive."
                                              :title "New email received"
                                              :timeout 5000))))))))
                              (else '()))
-                            '()))))))
+                            '())))))))
               mail-accounts)))))))
 
   (feature
