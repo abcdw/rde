@@ -176,11 +176,16 @@ If folder-mapping is not specified the generic-folder-mapping one is used."
         smtp
         (acons 'starttls? #f smtp)))
 
+  (define (ensure-imap-starttls imap)
+    (if (assoc-ref imap 'starttls?)
+        imap
+        (acons 'starttls? #f imap)))
+
   (define (enrich-settings settings)
     (let ((smtp (assoc-ref settings 'smtp))
           (imap (assoc-ref settings 'imap)))
       `((smtp . ,(ensure-starttls smtp))
-        (imap . ,(ensure-folder-mapping imap)))))
+        (imap . ,(ensure-imap-starttls (ensure-folder-mapping imap))))))
 
   (let ((provider (car provider-mail-settings))
                (settings (cdr provider-mail-settings)))
