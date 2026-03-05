@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023, 2024, 2026 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -25,8 +25,13 @@
   #:use-module (guix store)
   #:use-module (guix status)
   #:use-module (guix derivations)
+  #:use-module (guix deprecation)
   #:export (build-with-store
-            eval-with-store))
+            build
+            build-derivation
+            eval-with-store
+            evaluate-gexp-local
+            evaluate-gexp))
 
 (define %build-verbosity 10)
 
@@ -81,8 +86,53 @@ BODY..., and restore them."
      (set! %load-compiled-path (lowered-gexp-load-compiled-path lowered))
      (return (primitive-eval (lowered-gexp-sexp lowered))))))
 
-(define (build-with-store obj)
+(define (build obj)
+  "Build a lowerable object OBJ."
   (evaluate-with-store (lower-object obj) #:build? #t))
 
-(define (eval-with-store gexp)
+(define-deprecated/alias build-with-store build)
+
+(define (evaluate-gexp-local gexp)
+  "Evaluate GEXP G-Expression locally on the caller side."
   (car (evaluate-with-store (local-eval gexp))))
+
+(define (evaluate-gexp gexp)
+  "Evaluate GEXP on the daemon side as a derivation build.
+Display and return the build's stdout as a string."
+  (with-store store
+    (set-build-options store
+                       #:print-build-trace #t
+                       #:print-extended-build-trace? #t
+                       #:multiplexed-build-output? #t)
+    (let* ((guile (or (%guile-for-build)
+                      (default-guile-derivation store)))
+           (collect-event
+            (lambda (event old-status status)
+              (match event
+                (('build-log pid line)
+                 (display line))
+                (_ #t)))))
+      (parameterize
+          ((current-build-output-port
+            (build-event-output-port
+             (build-status-updater collect-event))))
+        (run-with-store store
+          (mlet %store-monad ((drv (gexp->derivation "evaluate-gexp" gexp)))
+            (mbegin %store-monad
+              (built-derivations (list drv))
+              (return
+               (match (derivation->output-paths drv)
+                 (((_ . files) ...) files)))))
+          #:guile-for-build guile)))))
+
+(define-deprecated/alias eval-with-store evaluate-gexp)
+
+(define (build-derivation monadic-drv)
+  (with-store store
+    (run-with-store store
+      (mlet* %store-monad ((drv monadic-drv))
+        (mbegin %store-monad
+          (built-derivations (list drv))
+          (return (derivation-output-path
+                   (assoc-ref (derivation-outputs drv) "out"))))))))
+
