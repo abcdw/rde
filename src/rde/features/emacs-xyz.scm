@@ -293,8 +293,7 @@ Almost all visual elements are disabled.")))
           (extra-modus-themes-overrides '()))
   "Configure modus-themes, a set of elegant and highly accessible
 themes for Emacs.  DEUTERANOPIA? replaces red/green tones with yellow/blue,
-which helps people with color blindness.  If DEUTERANOPIA-RED-BLUE-DIFFS?  is
-set, red/blue colors will be used instead.  If HEADINGS-SCALING? is set,
+which helps people with color blindness.  If HEADINGS-SCALING? is set,
 different level headings will have different size."
   (ensure-pred file-like? emacs-modus-themes)
   (ensure-pred file-like? emacs-ef-themes)
@@ -303,6 +302,11 @@ different level headings will have different size."
   (ensure-pred boolean? deuteranopia?)
   (ensure-pred boolean? headings-scaling?)
   (ensure-pred elisp-config? extra-modus-themes-overrides)
+
+  (when deuteranopia-red-blue-diffs?
+    (warning
+     (G_ "'~a' in feature-emacs-modus-themes is deprecated and ignored~%")
+     'deuteranopia-red-blue-diffs?))
 
   (define emacs-f-name 'modus-themes)
   (define f-name (symbol-append 'emacs- emacs-f-name))
@@ -418,37 +422,7 @@ different level headings will have different size."
                   (bg-region bg-ochre)
                   (fg-region unspecified)
                   ,@extra-modus-themes-overrides))
-          ,@(if deuteranopia-red-blue-diffs?
-                `((setq modus-operandi-deuteranopia-palette-overrides
-                        '((bg-changed         "#ffdfa9")
-                          (bg-changed-faint   "#ffefbf")
-                          (bg-changed-refine  "#fac090")
-                          (bg-changed-fringe  "#d7c20a")
-                          (fg-changed         "#553d00")
-                          (fg-changed-intense "#655000")
 
-                          (bg-removed         "#ffd8d5")
-                          (bg-removed-faint   "#ffe9e9")
-                          (bg-removed-refine  "#f3b5af")
-                          (bg-removed-fringe  "#d84a4f")
-                          (fg-removed         "#8f1313")
-                          (fg-removed-intense "#aa2222")))
-
-                  (setq modus-vivendi-deuteranopia-palette-overrides
-                        '((bg-changed         "#363300")
-                          (bg-changed-faint   "#2a1f00")
-                          (bg-changed-refine  "#4a4a00")
-                          (bg-changed-fringe  "#8a7a00")
-                          (fg-changed         "#efef80")
-                          (fg-changed-intense "#c0b05f")
-
-                          (bg-removed         "#4f1119")
-                          (bg-removed-faint   "#380a0f")
-                          (bg-removed-refine  "#781a1f")
-                          (bg-removed-fringe  "#b81a1f")
-                          (fg-removed         "#ffbfbf")
-                          (fg-removed-intense "#ff9095"))))
-                '())
           (setq modus-themes-to-toggle '(,light-theme ,dark-theme))
           (setq modus-themes-italic-constructs t)
           (setq modus-themes-bold-constructs t)
