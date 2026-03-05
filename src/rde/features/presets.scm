@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2023, 2024, 2025, 2026 Andrew Tropin <andrew@trop.in>
 ;;;
 ;;; This file is part of rde.
 ;;;
@@ -124,8 +124,7 @@
    (feature-emacs-completion
     #:mini-frame? #f
     #:marginalia-align 'right)
-   (feature-emacs-corfu
-    #:corfu-doc-auto #f)
+   (feature-emacs-completion-preview)
    (feature-emacs-vertico)
 
    (feature-emacs-tramp)
