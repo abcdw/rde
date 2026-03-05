@@ -515,11 +515,8 @@ unlikely you ever need this)."
      ;; https://lists.sr.ht/~abcdw/rde-devel/<20221118013128.6520-1-shilling.jake@gmail.com>
      (service home-mcron-service-type
               (home-mcron-configuration
-               (jobs (list #~(job '(next-hour)
-                                  (lambda ()
-                                    (setenv "DISPLAY" ":0")
-                                    (system* "mbsync" "-a")
-                                    (system* "l2md")))))))
+               (jobs
+                (list #~(job '(next-hour) (lambda () (system* "l2md" "-v")))))))
      (service
       home-l2md-service-type
       (home-l2md-configuration
