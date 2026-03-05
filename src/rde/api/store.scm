@@ -98,12 +98,14 @@ BODY..., and restore them."
 
 (define (evaluate-gexp gexp)
   "Evaluate GEXP on the daemon side as a derivation build.
-Display and return the build's stdout as a string."
+Display and return the build's stdout as a string.  Always rebuild."
   (with-store store
     (set-build-options store
                        #:print-build-trace #t
                        #:print-extended-build-trace? #t
-                       #:multiplexed-build-output? #t)
+                       #:multiplexed-build-output? #t
+                       ;; #:rounds 1
+                       #:use-substitutes? #f)
     (let* ((guile (or (%guile-for-build)
                       (default-guile-derivation store)))
            (collect-event
@@ -119,7 +121,7 @@ Display and return the build's stdout as a string."
         (run-with-store store
           (mlet %store-monad ((drv (gexp->derivation "evaluate-gexp" gexp)))
             (mbegin %store-monad
-              (built-derivations (list drv))
+              (built-derivations (list drv) (build-mode check))
               (return
                (match (derivation->output-paths drv)
                  (((_ . files) ...) files)))))
