@@ -721,7 +721,13 @@ utilizing reverse-im package."
          (add-hook 'post-command-hook
                    '(lambda ()
                       (set-cursor-color
-                       (if current-input-method "DarkOrange1" "black"))))
+                       (if current-input-method
+                           (if (fboundp 'modus-themes-get-color-value)
+                               (modus-themes-get-color-value 'accent-0)
+                               "DarkOrange1")
+                         (if (fboundp 'modus-themes-get-color-value)
+                             (modus-themes-get-color-value 'cursor)
+                             "black")))))
 
          ,@(map (lambda (x) `(require ',(strip-emacs-name x)))
                 input-method-packages)
