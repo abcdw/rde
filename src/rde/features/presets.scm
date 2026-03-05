@@ -93,8 +93,9 @@
 
 (define-public rde-mail
   (list
-   (feature-isync #:isync-verbose #t)
+   (feature-isync)
    (feature-l2md)
+   (feature-goimapnotify)
    (feature-msmtp)))
 
 (define-public rde-cli
