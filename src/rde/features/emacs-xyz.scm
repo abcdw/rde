@@ -4642,10 +4642,20 @@ Body content is text that is not a planning line, drawer, or blank line."
                    `(quote ,org-agenda-prefix-format))
                   (else
                    ''())))
+
+          (defun rde-org-agenda-preserve-truncate-lines (orig-fun &rest r)
+            "Preserve `truncate-lines' state across `org-agenda-redo'."
+            (let ((truncate-p truncate-lines))
+              (apply orig-fun r)
+              (setq truncate-lines truncate-p)))
+          (advice-add 'org-agenda-redo :around
+                      'rde-org-agenda-preserve-truncate-lines)
+
           ,@(if org-agenda-highlight-items-with-body?
                 '((add-hook 'org-agenda-finalize-hook
                             'rde-org-agenda-highlight-items-with-body))
                 '())
+
           ,@(if org-agenda-swap-g-r?
                 '((define-key org-agenda-mode-map (kbd "g") 'org-agenda-redo)
                   (define-key org-agenda-mode-map (kbd "r") 'org-agenda-redo-all))
