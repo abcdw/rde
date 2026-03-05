@@ -81,6 +81,7 @@
             feature-emacs-mct
             feature-emacs-corfu
             feature-emacs-tempel
+            feature-emacs-completion-preview
 
             ;; Focus
             feature-emacs-monocle
@@ -2269,6 +2270,87 @@ Annotations for completion candidates using marginalia."
              (emacs-mini-frame? . ,mini-frame?)))
    (home-services-getter get-home-services)))
 
+(define* (feature-emacs-completion-preview
+          #:key
+          (minimum-symbol-length 2))
+  "Enable completion-preview-mode, a built-in Emacs 30+ feature that
+shows inline completion suggestions as you type.  The keybindings should be
+intuitive, just use the same motion actions like <forward-sentence> to
+complete the candidate appeared in preview overlay.  There is an option to go
+through multiple candidates, either one by one (with <backward-paragraph> and
+<forward-paragraph>) or with minibuffer completion interface (just tap C-M-i
+or call `completion-at-point')."
+
+  (define emacs-f-name 'completion-preview)
+  (define f-name (symbol-append 'emacs- emacs-f-name))
+
+  (define (get-home-services config)
+    (list
+     (rde-elisp-configuration-service
+      emacs-f-name
+      config
+      `((add-hook 'after-init-hook 'global-completion-preview-mode)
+        (define-key global-map (kbd "M-i") 'completion-preview-complete)
+        (with-eval-after-load 'completion-preview
+          (setopt completion-preview-minimum-symbol-length
+                  ,minimum-symbol-length)
+          (defun rde-disable-compeltion-preview-during-capf
+            (orig-fun &rest args)
+            "Disable completion preview overlay, when capf triggered."
+            (let ((preview-overlay
+                   (and (bound-and-true-p completion-preview--overlay)
+                        completion-preview--overlay)))
+              (when (bound-and-true-p completion-preview-active-mode)
+                (completion-preview-active-mode))
+              (apply orig-fun args)
+              (completion-preview-active-mode)))
+
+          (advice-add 'consult-completion-in-region
+                      :around 'rde-disable-compeltion-preview-during-capf)
+
+          (defun rde-minibuffer-completion-preview-mode ()
+            "Set message format to nil for completion-preview mode in
+minibuffer."
+            (setq-local completion-preview-message-format nil)
+            (completion-preview-mode))
+
+          (with-eval-after-load 'vertico
+            (setopt completion-preview-sort-function
+                    (vertico--sort-function)))
+
+          (add-hook 'minibuffer-mode-hook
+                    'rde-minibuffer-completion-preview-mode)
+
+          (let ((map completion-preview-active-mode-map))
+            (keymap-set map "<remap> <forward-word>"
+                        'completion-preview-complete)
+            (keymap-set map "<remap> <forward-sentence>"
+                        'completion-preview-insert)
+            (keymap-set map "<remap> <forward-sexp>"
+                        'completion-preview-insert)
+            (keymap-set map "<remap> <sp-forward-sexp>"
+                        'completion-preview-insert)
+
+            ;; For modes like org mode, where M-e bound to other function
+            (define-key map (kbd "M-e") 'completion-preview-insert)
+
+            ;; Usually C-<up>/<down>
+            (define-key map "<remap> <backward-paragraph>"
+              'completion-preview-next-candidate)
+            (define-key map "<remap> <forward-paragraph>"
+              'completion-preview-prev-candidate))))
+      #:summary "\
+Inline completion preview"
+      #:commentary "\
+Enable `global-completion-preview-mode' and configure keybindings for
+inline completion suggestions.  Integrates with consult, vertico, and
+minibuffer completion."
+      #:keywords '(convenience completion))))
+
+  (feature
+   (name f-name)
+   (values `((,f-name . #t)))
+   (home-services-getter get-home-services)))
 
 (define* (feature-emacs-vertico
           #:key
