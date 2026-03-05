@@ -99,6 +99,8 @@
               (newline)))
           (define-key org-mode-map (kbd "M-o") 'rde-org-goto-end-of-heading))
 
+        ,@(@ (rde-configs users abcdw emacs) telega-config)
+
         (with-eval-after-load 'geiser-mode
           (setq geiser-mode-auto-p nil)
           (defun abcdw-geiser-connect ()
