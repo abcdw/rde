@@ -270,6 +270,8 @@ Prefix keymap for binding various minor modes for toggling functionalitty.")
                 "/emacs/auto-save-list"))
 
        ,#~""
+       ;; TODO: [Andrew Tropin, 2026-03-05] Try ultra-scroll
+       ;; https://github.com/jdtsmith/ultra-scroll
        (pixel-scroll-precision-mode 1)
        (column-number-mode 1)
        (save-place-mode 1)
