@@ -31,7 +31,8 @@
             build-derivation
             eval-with-store
             evaluate-gexp-local
-            evaluate-gexp))
+            evaluate-gexp
+            run))
 
 (define %build-verbosity 10)
 
@@ -137,4 +138,8 @@ Display and return the build's stdout as a string.  Always rebuild."
           (built-derivations (list drv))
           (return (derivation-output-path
                    (assoc-ref (derivation-outputs drv) "out"))))))))
+
+(define-public (run obj)
+  (with-store %store
+    (run-with-store %store obj)))
 
