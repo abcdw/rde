@@ -28,8 +28,6 @@
   (global-olivetti-mode 1)
   (fontaine-set-preset 'large)))
 
-;; TODO: [Andrew Tropin, 2026-03-02] Use eval to comment for demo
-
 (define (rde-get-config-file config file-name)
   "Build and return the store path for FILE-NAME from CONFIG's
 home xdg configuration files."
@@ -53,121 +51,141 @@ home xdg configuration files."
 
 
 ;;;
-;;; 1. Simple packages
+;;; 1. Simple Packages
 ;;;
 
+;; TODO: [Andrew Tropin, 2026-03-02] Use eval to comment for demo
 
-(define (comment)
-  (store:build htop)
-  (store:build foot)
 
-  (system*
-   (string-append (car (store:build foot)) "/bin/foot")
-   (string-append (car (store:build htop)) "/bin/htop"))
+(comment
+ (store:build htop)
+ (store:build foot)
 
-  ;; 1.5 gexps evaluated in isolated environment
+ (system*
+  (string-append (car (store:build foot)) "/bin/foot")
+  (string-append (car (store:build htop)) "/bin/htop")))
 
-  ;; Explain the build daemon, store will be later
 
-  (store:evaluate-gexp
+
+;;;
+;;; 1.5 G-Exps Evaluated in Isolated Environment
+;;;
+
+;; Explain the build daemon, store will be later
+
+(comment
+ (store:evaluate-gexp
+  #~(begin
+      (use-modules (ice-9 ftw))
+      (display (getcwd))
+      (newline)
+      (for-each
+       (lambda (f) (display f) (display " \n"))
+       (scandir (getcwd)))
+      (newline)))
+
+ (begin
+   (use-modules (ice-9 ftw))
+   (display (getcwd))
+   (newline)
+   (for-each
+    (lambda (f) (display f) (display " \n"))
+    (scandir (getcwd)))
+   (newline))
+
+ (store:evaluate-gexp
+  #~(system* "ls"))
+
+ (define ls-gexp-with-deps
    #~(begin
-       (use-modules (ice-9 ftw))
-       (display (getcwd))
-       (newline)
-       (for-each
-        (lambda (f) (display f) (display " \n"))
-        (scandir (getcwd)))
-       (newline)))
+       ;; (system* "touch" "output.txt")
+       (symlink #$(file-append htop "/bin/htop") #$output)
 
-  (begin
-    (use-modules (ice-9 ftw))
-    (display (getcwd))
-    (newline)
-    (for-each
-     (lambda (f) (display f) (display " \n"))
-     (scandir (getcwd)))
-    (newline))
+       (system* #$(file-append coreutils "/bin/pwd"))
+       (system* #$(file-append coreutils "/bin/ls") "-lia")
+       (system* #$(file-append coreutils "/bin/ls") "/")
+       ;; (exit 1)
+       #$output))
 
-  (store:evaluate-gexp
-   #~(system* "ls"))
+ (store:run (gexp->derivation "ls-gexp" ls-gexp-with-deps))
 
-  (define ls-gexp-with-deps
-    #~(begin
-        ;; (system* "touch" "output.txt")
-        (symlink #$(file-append htop "/bin/htop") #$output)
+ (store:evaluate-gexp ls-gexp-with-deps))
 
-        (system* #$(file-append coreutils "/bin/pwd"))
-        (system* #$(file-append coreutils "/bin/ls") "-lia")
-        (system* #$(file-append coreutils "/bin/ls") "/")
-        ;; (exit 1)
-        #$output))
+
 
-  (store:run (gexp->derivation "ls-gexp" ls-gexp-with-deps))
+;;;
+;;; 2. Customizing packages
+;;;
 
-  (store:evaluate-gexp ls-gexp-with-deps)
+(comment
+ (define foot-gcc-14
+   (package
+     (inherit foot)
+     (native-inputs
+      (modify-inputs (package-native-inputs foot)
+        (prepend gcc-14)))))
 
+ foot
+ foot-gcc-14
 
-  ;; 2. Customizing packages
-  (define foot-gcc-14
-    (package
-      (inherit foot)
-      (native-inputs
-       (modify-inputs (package-native-inputs foot)
-         (prepend gcc-14)))))
+ (store:build foot)
+ (store:build foot-gcc-14)
 
-  foot
-  foot-gcc-14
+ ;; multiple versions of the same library
+ ;; /usr/lib/library-a.so
 
-  (store:build foot)
-  (store:build foot-gcc-14)
+ (define dev-profile
+   (store:build-derivation
+    (profile-derivation
+     (packages->manifest (list foot htop python python-pyfiglet)))))
+ dev-profile
+ ;; => "/gnu/store/hxinsrkg2r6hh4i6qzn0688wjg7rlvzr-profile"
 
-  ;; multiple versions of the same library
-  ;; /usr/lib/library-a.so
+ (system*
+  "bash" "-c"
+  (string-append "source " dev-profile "/etc/profile && exec "
+                 dev-profile "/bin/foot"))
 
-  (define dev-profile
-    (store:build-derivation
-     (profile-derivation
-      (packages->manifest (list foot htop python python-pyfiglet)))))
-  dev-profile
-  ;; => "/gnu/store/hxinsrkg2r6hh4i6qzn0688wjg7rlvzr-profile"
+ ;; python3 -c "from pyfiglet import figlet_format; print(figlet_format('Guix'))"
+ )
 
-  (system*
-   "bash" "-c"
-   (string-append "source " dev-profile "/etc/profile && exec "
-                  dev-profile "/bin/foot"))
+
 
-  ;; python3 -c "from pyfiglet import figlet_format; print(figlet_format('Guix'))"
+;;;
+;;; 3. Reproducible Development Environments
+;;;
 
-  ;; Polylang, Reproducible Development Environments
+;; Polylang, Reproducible Development Environments
 
-  (define features
-    (list
-     (feature-base-packages #:home-packages (list htop))
-     (feature-foot #:theme "onedark")
-     (feature-fonts #:default-font-size 16)))
+(comment
+ (define features
+   (list
+    (feature-base-packages #:home-packages (list htop))
+    (feature-foot #:theme "onedark")
+    (feature-fonts #:default-font-size 16)))
 
-  (define config
-    (rde-config
-     (features features)))
+ (define config
+   (rde-config
+    (features features)))
 
-  (pretty-print-rde-config config)
+ (pretty-print-rde-config config)
 
-  (define demo-profile
-    (rde-get-profile config))
+ (define demo-profile
+   (rde-get-profile config))
 
-  (store:build foot)
+ (store:build foot)
 
-  (define foot-config
-    (rde-get-config-file config "foot/foot.ini"))
+ (define foot-config
+   (rde-get-config-file config "foot/foot.ini"))
 
-  (system*
-   "bash" "-c"
-   (string-append
-    "source " (rde-get-profile config) "/etc/profile && exec "
-    "foot" " --config " (rde-get-config-file config "foot/foot.ini")))
+ (system*
+  "bash" "-c"
+  (string-append
+   "source " (rde-get-profile config) "/etc/profile && exec "
+   "foot" " --config " (rde-get-config-file config "foot/foot.ini")))
 
-  ;; Make alacritty and foot use the same colorscheme
+ ;; Make alacritty and foot use the same colorscheme
+ )
 
 
-  ;; TODO: [Andrew Tropin, 2026-03-06] Mobile internet + guix deploy
-  )
+;; TODO: [Andrew Tropin, 2026-03-06] Mobile internet + guix deploy
