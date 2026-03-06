@@ -5,6 +5,7 @@
 ;;; SPDX-License-Identifier: GPL-3.0-or-later
 
 (define-module (guix-arei-demo)
+  #:use-module (ares guile prelude)
   #:use-module (guix gexp)
   #:use-module (guix profiles)
   #:use-module (gnu packages admin)
@@ -21,6 +22,11 @@
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages base)
   #:use-module (rde api store))
+
+(comment
+ (progn
+  (global-olivetti-mode 1)
+  (fontaine-set-preset 'large)))
 
 ;; TODO: [Andrew Tropin, 2026-03-02] Use eval to comment for demo
 
