@@ -21,7 +21,7 @@
   #:use-module (guix packages)
   #:use-module (gnu packages gcc)
   #:use-module (gnu packages base)
-  #:use-module (rde api store))
+  #:use-module ((rde api store) #:prefix store:))
 
 (comment
  (progn
@@ -34,7 +34,7 @@
   "Build and return the store path for FILE-NAME from CONFIG's
 home xdg configuration files."
   (car
-   (build
+   (store:build
     (car
      (assoc-ref
       (service-value
@@ -47,7 +47,7 @@ home xdg configuration files."
       file-name)))))
 
 (define (rde-get-profile config)
-  (build-derivation
+  (store:build-derivation
    (profile-derivation
     (packages->manifest (rde-config-home-packages config)))))
 
@@ -58,18 +58,18 @@ home xdg configuration files."
 
 
 (define (comment)
-  (build htop)
-  (build foot)
+  (store:build htop)
+  (store:build foot)
 
   (system*
-   (string-append (car (build foot)) "/bin/foot")
-   (string-append (car (build htop)) "/bin/htop"))
+   (string-append (car (store:build foot)) "/bin/foot")
+   (string-append (car (store:build htop)) "/bin/htop"))
 
   ;; 1.5 gexps evaluated in isolated environment
 
   ;; Explain the build daemon, store will be later
 
-  (evaluate-gexp
+  (store:evaluate-gexp
    #~(begin
        (use-modules (ice-9 ftw))
        (display (getcwd))
@@ -88,7 +88,7 @@ home xdg configuration files."
      (scandir (getcwd)))
     (newline))
 
-  (evaluate-gexp
+  (store:evaluate-gexp
    #~(system* "ls"))
 
   (define ls-gexp-with-deps
@@ -102,9 +102,9 @@ home xdg configuration files."
         ;; (exit 1)
         #$output))
 
-  (run (gexp->derivation "ls-gexp" ls-gexp-with-deps))
+  (store:run (gexp->derivation "ls-gexp" ls-gexp-with-deps))
 
-  (evaluate-gexp ls-gexp-with-deps)
+  (store:evaluate-gexp ls-gexp-with-deps)
 
 
   ;; 2. Customizing packages
@@ -118,14 +118,14 @@ home xdg configuration files."
   foot
   foot-gcc-14
 
-  (build foot)
-  (build foot-gcc-14)
+  (store:build foot)
+  (store:build foot-gcc-14)
 
   ;; multiple versions of the same library
   ;; /usr/lib/library-a.so
 
   (define dev-profile
-    (build-derivation
+    (store:build-derivation
      (profile-derivation
       (packages->manifest (list foot htop python python-pyfiglet)))))
   dev-profile
@@ -155,7 +155,7 @@ home xdg configuration files."
   (define demo-profile
     (rde-get-profile config))
 
-  (build foot)
+  (store:build foot)
 
   (define foot-config
     (rde-get-config-file config "foot/foot.ini"))
