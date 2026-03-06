@@ -51,8 +51,13 @@ home xdg configuration files."
    (profile-derivation
     (packages->manifest (rde-config-home-packages config)))))
 
+
+;;;
+;;; 1. Simple packages
+;;;
+
+
 (define (comment)
-  ;; 1. Simple packages
   (build htop)
   (build foot)
 
@@ -62,6 +67,8 @@ home xdg configuration files."
 
   ;; 1.5 gexps evaluated in isolated environment
 
+  ;; Explain the build daemon, store will be later
+
   (evaluate-gexp
    #~(begin
        (use-modules (ice-9 ftw))
@@ -70,21 +77,34 @@ home xdg configuration files."
        (for-each
         (lambda (f) (display f) (display " \n"))
         (scandir (getcwd)))
-       (newline)
-       ;; (system* #$(file-append coreutils "/bin/touch") #$output)
-       ;; (exit 10)
-       ))
+       (newline)))
+
+  (begin
+    (use-modules (ice-9 ftw))
+    (display (getcwd))
+    (newline)
+    (for-each
+     (lambda (f) (display f) (display " \n"))
+     (scandir (getcwd)))
+    (newline))
 
   (evaluate-gexp
-   #~(begin
-       ;; (system* "touch" "output.txt")
-       (symlink #$(file-append htop "/bin/htop") #$output)
+   #~(system* "ls"))
 
-       (system* #$(file-append coreutils "/bin/pwd"))
-       (system* #$(file-append coreutils "/bin/ls") "-lia")
-       (system* #$(file-append coreutils "/bin/ls") "/")
-       ;; (exit 1)
-       #$output))
+  (define ls-gexp-with-deps
+    #~(begin
+        ;; (system* "touch" "output.txt")
+        (symlink #$(file-append htop "/bin/htop") #$output)
+
+        (system* #$(file-append coreutils "/bin/pwd"))
+        (system* #$(file-append coreutils "/bin/ls") "-lia")
+        (system* #$(file-append coreutils "/bin/ls") "/")
+        ;; (exit 1)
+        #$output))
+
+  (run (gexp->derivation "ls-gexp" ls-gexp-with-deps))
+
+  (evaluate-gexp ls-gexp-with-deps)
 
 
   ;; 2. Customizing packages
@@ -136,9 +156,8 @@ home xdg configuration files."
     (rde-get-profile config))
 
   (build foot)
-  ;; => ("/gnu/store/8fhrfk1y4whkvi34qvn76c3grx48zhw0-foot-1.25.0")
+
   (define foot-config
-          ;; => "/gnu/store/jn9di4iw048v0xmvxc1v7yjmhlb05rrz-foot.ini"
     (rde-get-config-file config "foot/foot.ini"))
 
   (system*
@@ -149,4 +168,6 @@ home xdg configuration files."
 
   ;; Make alacritty and foot use the same colorscheme
 
+
+  ;; TODO: [Andrew Tropin, 2026-03-06] Mobile internet + guix deploy
   )
