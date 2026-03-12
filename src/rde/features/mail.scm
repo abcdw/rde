@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2025, 2026 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2021 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2022, 2024 Nicolas Graves <ngraves@ngraves.fr>
 ;;; Copyright © 2023 Miguel Ángel Moreno <me@mianmoreno.com>
@@ -309,7 +309,36 @@ is among `rde-notmuch-patch-control-codes'."
              `((setq mml-secure-openpgp-signers '(,gpg-primary-key))
                (setq mml-secure-openpgp-encrypt-to-self t)
                ;; (setq mml-secure-openpgp-sign-with-sender t)
-               (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime))
+               (add-hook 'message-setup-hook 'mml-secure-message-sign-pgpmime)
+
+               (defun rde-message-forward-make-body-preserve-secure
+                 (fn &rest args)
+                 "Ensure forwarded content is inserted after any <#secure> tag.
+Temporarily removes the secure tag before FN inserts forwarded
+content, then re-inserts it at the top of the body."
+                 (let (secure-tag)
+                   (save-excursion
+                     (goto-char (point-min))
+                     (when (re-search-forward
+                            (concat "^"
+                                    (regexp-quote mail-header-separator)
+                                    "\n")
+                            nil t)
+                       (when (looking-at "<#secure.+>\n")
+                         (setq secure-tag (match-string 0))
+                         (delete-region (match-beginning 0) (match-end 0)))))
+                   (apply fn args)
+                   (when secure-tag
+                     (save-excursion
+                       (goto-char (point-min))
+                       (when (re-search-forward
+                              (concat "^"
+                                      (regexp-quote mail-header-separator)
+                                      "\n")
+                              nil t)
+                         (insert secure-tag))))))
+               (advice-add 'message-forward-make-body :around
+                           'rde-message-forward-make-body-preserve-secure))
              '())
 
          (setq message-citation-line-function
