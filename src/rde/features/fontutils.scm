@@ -69,9 +69,9 @@
           (default-font-size 11)
           (font-monospace
            (font
-            (name "Iosevka")
+            (name "Iosevka Term")
             (size default-font-size)
-            (package font-iosevka)))
+            (package font-iosevka-term)))
           (font-serif
            (font
             (name "Iosevka Etoile")
