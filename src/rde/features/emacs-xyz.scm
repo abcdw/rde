@@ -3663,7 +3663,7 @@ Geiser is configured for the Guile scheme implementation.")))
 
 (define* (feature-emacs-guix
           #:key
-          (emacs-guix emacs-guix-latest)
+          (emacs-guix emacs-guix)
           (guix-key "s-G")
           (guix-directory "~/work/gnu/guix"))
   "Configure emacs for guix usage and development."
