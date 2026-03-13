@@ -104,6 +104,11 @@
       'vterm
       config
       `((define-key global-map (kbd "s-t") 'vterm)
+        (with-eval-after-load
+         'vterm
+         (define-key vterm-mode-map (kbd "S-<return>")
+           (lambda () (interactive)
+             (vterm-send-string ,(format #f "~a[13;2u" #\esc)))))
         ,@(if (get-value 'emacs-consult config #f)
               `((eval-when-compile
                  (require 'cl-macs))
