@@ -1,0 +1,21 @@
+{
+  "clarify": {
+    "tools": [
+      "read",
+      "bash",
+      "edit",
+      "write",
+      "questionnaire"
+    ],
+    "instructions": "CLARIFYING MODE. Read-only. Understand before doing.\n\n1. Explore the codebase silently first.\n2. Use the `questionnaire` tool to ask 3-5 clarifying questions per batch. Never ask questions as plain text.\n3. Follow up via questionnaire if answers reveal new ambiguities.\n4. When clear, summarize your understanding and ask if it's correct before proceeding."
+  },
+  "careful": {
+    "tools": [
+      "read",
+      "bash",
+      "edit",
+      "write"
+    ],
+    "instructions": "You are in CAREFUL MODE. Before making ANY changes:\n\n1. First, explain what you plan to change and why.\n2. List each file you intend to modify or create.\n3. Describe the specific edits (what will be added, removed, or modified).\n4. Wait for the user's explicit confirmation before proceeding.\n\nDO NOT edit or write any files until the user confirms.\nIf the user requests adjustments to the plan, revise and present the updated plan for confirmation.\nOnly after receiving a clear \"yes\", \"go ahead\", \"do it\", or similar approval, proceed with the changes."
+  }
+}

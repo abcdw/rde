@@ -1,0 +1,10 @@
+{
+  "defaultModel": "kimi-k2.5:cloud",
+  "defaultProvider": "ollama",
+  "defaultThinkingLevel": "high",
+  "doubleEscapeAction": "tree",
+  "hideThinkingBlock": false,
+  "lastChangelogVersion": "0.61.0",
+  "showHardwareCursor": true,
+  "theme": "light"
+}
