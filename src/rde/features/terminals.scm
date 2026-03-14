@@ -108,7 +108,12 @@
          'vterm
          (define-key vterm-mode-map (kbd "S-<return>")
            (lambda () (interactive)
-             (vterm-send-string ,(format #f "~a[13;2u" #\esc)))))
+             (vterm-send-string ,(format #f "~a[13;2u" #\esc))))
+         (dolist (key (number-sequence ?a ?z))
+           (let ((escape-seq (format ,(format #f "~a[%d;6u" #\esc) key)))
+             (define-key vterm-mode-map (kbd (format "C-S-%c" key))
+               (lambda () (interactive)
+                 (vterm-send-string escape-seq))))))
         ,@(if (get-value 'emacs-consult config #f)
               `((eval-when-compile
                  (require 'cl-macs))
