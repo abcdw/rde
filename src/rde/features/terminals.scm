@@ -114,6 +114,40 @@
              (define-key vterm-mode-map (kbd (format "C-S-%c" key))
                (lambda () (interactive)
                  (vterm-send-string escape-seq))))))
+
+        (defvar rde-vterm-osc-777-re
+          (concat (string 27) "\\]777;notify;"
+                  "\\([^;]*\\);"
+                  "\\([^" (string 7 27) "]*\\)"
+                  "\\(?:" (string 7) "\\|" (string 27) "\\\\\\)"))
+
+        (defun rde-vterm--notification-on-action (id key)
+          "Focus Emacs frame on notification action."
+          (select-frame-set-input-focus (selected-frame)))
+
+        (defun rde-vterm--handle-osc-777 (process input)
+          "Intercept OSC 777 notify sequences and send desktop notifications."
+          (let ((start 0))
+            (while (string-match rde-vterm-osc-777-re input start)
+              (let ((title (match-string 1 input))
+                    (body (match-string 2 input)))
+                (when (not
+                       (and (equal t (frame-focus-state (selected-frame)))
+                            (get-buffer-window (process-buffer process))))
+                  (require 'notifications)
+                  (notifications-notify
+                   :title title
+                   :body body
+                   :actions '("focus" "Focus Frame")
+                   :timeout 5000
+                   :on-action 'rde-vterm--notification-on-action)))
+              (setq start (match-end 0)))))
+
+        (with-eval-after-load
+         'vterm
+         (advice-add 'vterm--filter :before
+                     'rde-vterm--handle-osc-777))
+
         ,@(if (get-value 'emacs-consult config #f)
               `((eval-when-compile
                  (require 'cl-macs))
