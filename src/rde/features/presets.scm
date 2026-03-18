@@ -74,8 +74,7 @@
    ;; https://github.com/natpen/awesome-wayland
    (feature-sway)
    (feature-emacs-power-menu)
-   (feature-sway-run-on-tty
-    #:sway-tty-number 2)
+   (feature-wayland-compositor-run-on-tty)
    (feature-sway-screenshot)
    ;; (feature-sway-statusbar
    ;;  #:use-global-fonts? #f)

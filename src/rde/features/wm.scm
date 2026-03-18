@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2025, 2026 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2022, 2024, 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
@@ -54,12 +54,15 @@
   #:use-module (rde home services wm)
   #:use-module (rde home services shells)
 
+  #:use-module (guix diagnostics)
+  #:use-module (guix i18n)
   #:use-module (guix gexp)
   #:use-module (guix packages)
 
   #:use-module (srfi srfi-1)
 
   #:export (feature-sway
+            feature-wayland-compositor-run-on-tty
             feature-sway-run-on-tty
             feature-sway-screenshot
 
@@ -121,8 +124,12 @@
           ;; Logo key. Use Mod1 for Alt.
           (sway-mod 'Mod4)
           (add-keyboard-layout-to-config? #t)
-          (xwayland? #f))
-  "Setup and configure sway."
+          (xwayland? #f)
+          (primary-wayland-compositor? #t))
+  "Setup and configure sway.  When PRIMARY-WAYLAND-COMPOSITOR? is @code{#t},
+set the @code{primary-wayland-compositor} rde value to @code{sway}, which is
+used by @code{feature-wayland-compositor-run-on-tty} to determine the
+compositor to launch."
   (ensure-pred sway-config? extra-config)
   (ensure-pred boolean? add-keyboard-layout-to-config?)
   (ensure-pred boolean? xwayland?)
@@ -334,6 +341,9 @@ frame-title-format."
   (feature
    (name 'sway)
    (values `((sway . ,sway)
+             ,@(if primary-wayland-compositor?
+                   '((primary-wayland-compositor . sway))
+                   '())
              (wl-clipboard . ,wl-clipboard)
              (wayland . #t)
              (xwayland? . ,xwayland?)))
@@ -341,26 +351,37 @@ frame-title-format."
 
 
 ;;;
-;;; sway-run-on-tty.
+;;; wayland-compositor-run-on-tty.
 ;;;
 
-(define* (feature-sway-run-on-tty
+(define* (feature-wayland-compositor-run-on-tty
           #:key
-          (sway-tty-number 2)
-          (logfile "${XDG_STATE_HOME}/log/sway.log")
+          (tty-number 2)
           (launch-arguments '()))
-  "Launch Sway on specified tty upon user login.  Also, automatically switch
-to SWAY-TTY-NUMBER on boot.  Log errors into LOGFILE. Sway is launched with
-additional list of strings LAUNCH-ARGUMENTS."
-  (ensure-pred tty-number? sway-tty-number)
-  (ensure-pred string? logfile)
+  "Launch the primary Wayland compositor on specified tty upon user login.
+Also, automatically switch to TTY-NUMBER on boot.  The compositor is
+determined by the @code{primary-wayland-compositor} rde value, which should be
+a symbol (e.g. @code{sway}, @code{niri}).  The corresponding rde value with
+that symbol as key should contain a file-like package object.  The compositor
+is launched with additional list of strings LAUNCH-ARGUMENTS.  The log file is
+written to @file{$XDG_STATE_HOME/log/<compositor-name>.log}."
+  (ensure-pred tty-number? tty-number)
   (ensure-pred list-of-strings? launch-arguments)
 
-  (define (sway-run-on-tty-home-services config)
-    (require-value 'sway config)
+  (define (wayland-compositor-run-on-tty-home-services config)
+    (require-value 'primary-wayland-compositor config)
+
+    (define compositor-name (get-value 'primary-wayland-compositor config))
+    (define compositor-pkg (get-value compositor-name config))
+    (define compositor-cmd
+      (file-append compositor-pkg
+                   (format #f "/bin/~a" compositor-name)))
+    (define desktop-name (symbol->string compositor-name))
+    (define logfile
+      (format #f "${XDG_STATE_HOME}/log/~a.log" compositor-name))
 
     (define env-vars
-      '(("XDG_CURRENT_DESKTOP" . "sway")
+      `(("XDG_CURRENT_DESKTOP" . ,desktop-name)
         ("XDG_SESSION_TYPE" . "wayland")
         ;; FIXME: Should be in feature-pipewire
         ("RTC_USE_PIPEWIRE" . "true")
@@ -372,18 +393,19 @@ additional list of strings LAUNCH-ARGUMENTS."
         ("QT_QPA_PLATFORM" . "wayland-egl")
         ("_JAVA_AWT_WM_NONREPARENTING" . "1")))
 
-    (define sway-with-env-vars
+    (define compositor-with-env-vars
       (program-file
-       "sway-with-env-vars"
+       (format #f "~a-with-env-vars" compositor-name)
        #~(begin
            (for-each (lambda (x)
                        (setenv (car x) (cdr x)))
                      '#$env-vars)
-           (apply system* #$(file-append (get-value 'sway config) "/bin/sway")
+           (apply system*
+                  #$compositor-cmd
                   (cdr (command-line))))))
     (list
      (simple-service
-      'sway-run-sway-on-login-to-sway-tty
+      'wayland-compositor-run-on-login-tty
       home-shell-profile-service-type
       (list
        #~(format
@@ -391,32 +413,44 @@ additional list of strings LAUNCH-ARGUMENTS."
           "[ \"$(tty)\" = /dev/tty~a ] && \\
 ~a -p \"$(~a ~a)\" && \\
 exec ~a ~a"
-          #$sway-tty-number
+          #$tty-number
           #$(file-append (get-value 'coreutils config coreutils) "/bin/mkdir")
           #$(file-append (get-value 'coreutils config coreutils) "/bin/dirname")
           #$logfile
-          #$sway-with-env-vars
+          #$compositor-with-env-vars
           #$(string-join
              (append launch-arguments (list "2>>" logfile)) " "))))))
 
-  (define (sway-run-on-tty-system-services _)
+  (define (wayland-compositor-run-on-tty-system-services _)
     (list
      (simple-service
-      'sway-switch-to-sway-tty-after-boot
+      'wayland-compositor-switch-to-tty-after-boot
       shepherd-root-service-type
       (list (shepherd-service
-             (provision '(switch-to-sway-tty))
+             (provision '(switch-to-wayland-compositor-tty))
              (requirement '(term-tty1))
              (start #~(lambda ()
                         (invoke #$(file-append kbd "/bin/chvt")
-                                #$(format #f "~a" sway-tty-number))))
+                                #$(format #f "~a" tty-number))))
              (one-shot? #t))))))
 
   (feature
-   (name 'sway-run-on-tty)
-   (values (make-feature-values sway-tty-number))
-   (home-services-getter sway-run-on-tty-home-services)
-   (system-services-getter sway-run-on-tty-system-services)))
+   (name 'wayland-compositor-run-on-tty)
+   (values `((wayland-compositor-tty-number . ,tty-number)))
+   (home-services-getter wayland-compositor-run-on-tty-home-services)
+   (system-services-getter wayland-compositor-run-on-tty-system-services)))
+
+;; Deprecated, use feature-wayland-compositor-run-on-tty instead.
+(define* (feature-sway-run-on-tty
+          #:key
+          (sway-tty-number 2)
+          (launch-arguments '()))
+  (warning (G_ "'~a' is deprecated, use '~a' instead~%")
+           'feature-sway-run-on-tty
+           'feature-wayland-compositor-run-on-tty)
+  (feature-wayland-compositor-run-on-tty
+   #:tty-number sway-tty-number
+   #:launch-arguments launch-arguments))
 
 
 ;;;
