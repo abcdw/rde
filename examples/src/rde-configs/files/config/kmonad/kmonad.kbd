@@ -32,6 +32,7 @@
   lng S-rsft
   ssf (sticky-key 300 lsft)
   cte (tap-hold-next 200 esc lctl)
+  stb (tap-hold-next 200 bspc lsft)
   tct (tap-hold-next 200 tab @nal))
 
 (deflayer base
@@ -40,7 +41,7 @@
   _    _    _    _    _    _    ]    y    u    i    o    p    [
   @cte _    _    _    _    _    \    h    j    k    l    ;    '         ret
   @nul _    _    _    _    _    b    n    m    ,    .    /    _
-  _    _    lmet lalt lsft bspc @nal spc  lalt _    _    _    up   _
+  _    _    lmet lalt @stb bspc @nal spc  lalt _    _    _    up   _
                                                          _    _    _)
 
 (deflayer space-layer
@@ -54,11 +55,11 @@
 
 (deflayer num-layer
   _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _    _   _
+  _    _    _    _    _    _    _    _    S-7  S-8  S-9  _    _    _    _   _
   _    _    _    _    _    _    _    S-9  S-4  S-5  S-6  S-7  _
   _    _    _    _    _    _    _    S-0  S-1  S-2  S-3  S-8  _         _
-  _    _    _    _    _    _    _    _    S-0  _    _    _    _
-  _    _    _    _    _    _    _    _    _    _    _    _    _    _
+  _    _    _    _    _    _    _    S-0  S-0  _    _    _    _
+  _    _    _    _    _    _    S-0  _    _    _    _    _    _    _
                                                          _    _    _)
 
 
