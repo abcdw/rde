@@ -86,7 +86,7 @@
    (feature-imv)
    (feature-mpv)
    (feature-librewolf)
-   ;; (feature-ungoogled-chromium)
+   (feature-ungoogled-chromium)
   (feature-transmission #:auto-start? #f)
   (feature-ledger)))
 
