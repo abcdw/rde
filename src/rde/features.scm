@@ -319,78 +319,86 @@ can be later used to extend original service with additional configuration."
 
   (let* ((initial-os (rde-config-initial-os config))
 
-         (host-name        (get-value
+         (rde-host-name    (get-value
                             'host-name config
                             (operating-system-host-name initial-os)))
-         (timezone         (get-value
+         (rde-timezone     (get-value
                             'timezone config
                             (operating-system-timezone initial-os)))
-         (locale           (get-value
+         (rde-locale       (get-value
                             'locale config
                             (operating-system-locale initial-os)))
-         (issue            (get-value
+         (rde-issue        (get-value
                             'issue config
                             (operating-system-locale initial-os)))
-         (keyboard-layout  (get-value
+         (rde-keyboard-layout
+                           (get-value
                             'keyboard-layout config
                             (operating-system-keyboard-layout initial-os)))
-         (bootloader-cfg   (get-value
+         (rde-bootloader-cfg
+                           (get-value
                             'bootloader-configuration config
                             (operating-system-bootloader initial-os)))
-         (bootloader       (bootloader-configuration
-                            (inherit bootloader-cfg)
-                            (keyboard-layout keyboard-layout)))
-         (mapped-devices   (get-value
+         (rde-bootloader   (bootloader-configuration
+                            (inherit rde-bootloader-cfg)
+                            (keyboard-layout rde-keyboard-layout)))
+         (rde-mapped-devices
+                           (get-value
                             'mapped-devices config
                             (operating-system-mapped-devices initial-os)))
-         (swap-devices     (get-value
+         (rde-swap-devices (get-value
                             'swap-devices config
                             (operating-system-swap-devices initial-os)))
-         (file-systems     (get-value
+         (rde-file-systems (get-value
                             'file-systems config
                             (operating-system-file-systems initial-os)))
 
-         (user-name        (get-value 'user-name config #f))
-         (full-name        (get-value 'full-name config ""))
-         (user-groups      (get-value 'user-groups config '()))
-         (home-directory   (get-value
+         (rde-user-name    (get-value 'user-name config #f))
+         (rde-full-name    (get-value 'full-name config ""))
+         (rde-user-groups  (get-value 'user-groups config '()))
+         (rde-home-directory
+                           (get-value
                             'home-directory config
-                            (string-append "/home/" (or user-name "user"))))
-         (login-shell      (get-value 'login-shell config (default-shell)))
-         (user-password    (get-value 'user-initial-password-hash config #f))
+                            (string-append "/home/" (or rde-user-name "user"))))
+         (rde-login-shell  (get-value 'login-shell config (default-shell)))
+         (rde-user-password
+                           (get-value 'user-initial-password-hash config #f))
 
-         (user             (if user-name
+         (rde-user         (if rde-user-name
                                (user-account
-                                (name user-name)
-                                (comment full-name)
-                                (password user-password)
-                                (home-directory home-directory)
-                                (shell login-shell)
+                                (name rde-user-name)
+                                (comment rde-full-name)
+                                (password rde-user-password)
+                                (home-directory rde-home-directory)
+                                (shell rde-login-shell)
                                 (group "users")
-                                (supplementary-groups user-groups))
+                                (supplementary-groups rde-user-groups))
                                #f))
 
-         (services         (rde-config-system-services config))
+         (rde-services     (rde-config-system-services config))
 
-         (kernel           (get-value
+         (rde-kernel       (get-value
                             'kernel config
                             (operating-system-kernel initial-os)))
-         (kernel-arguments (get-value
+         (rde-kernel-arguments
+                           (get-value
                             'kernel-arguments config
                             (operating-system-user-kernel-arguments initial-os)))
-         (kernel-modules   (get-value
+         (rde-kernel-modules
+                           (get-value
                             'kernel-loadable-modules config
                             (operating-system-kernel-loadable-modules initial-os)))
-         (initrd           (get-value
+         (rde-initrd       (get-value
                             'initrd config
                             (operating-system-initrd initial-os)))
-         (initrd-modules   (get-value
+         (rde-initrd-modules
+                           (get-value
                             'initrd-modules config
                             (operating-system-initrd-modules initial-os)))
-         (firmware         (get-value
+         (rde-firmware     (get-value
                             'firmware config
                             (operating-system-firmware initial-os)))
-         (name-service-switch
+         (rde-name-service-switch
                            (get-value
                             'name-service config
                             %default-nss))
@@ -398,23 +406,23 @@ can be later used to extend original service with additional configuration."
          (computed-os
           (operating-system
             (inherit initial-os)
-            (host-name host-name)
-            (timezone timezone)
-            (locale locale)
-            (issue issue)
-            (bootloader bootloader)
-            (mapped-devices mapped-devices)
-            (swap-devices swap-devices)
-            (file-systems file-systems)
-            (keyboard-layout keyboard-layout)
-            (kernel kernel)
-            (kernel-arguments kernel-arguments)
-            (kernel-loadable-modules kernel-modules)
-            (initrd initrd)
-            (initrd-modules initrd-modules)
-            (firmware firmware)
+            (host-name rde-host-name)
+            (timezone rde-timezone)
+            (locale rde-locale)
+            (issue rde-issue)
+            (bootloader rde-bootloader)
+            (mapped-devices rde-mapped-devices)
+            (swap-devices rde-swap-devices)
+            (file-systems rde-file-systems)
+            (keyboard-layout rde-keyboard-layout)
+            (kernel rde-kernel)
+            (kernel-arguments rde-kernel-arguments)
+            (kernel-loadable-modules rde-kernel-modules)
+            (initrd rde-initrd)
+            (initrd-modules rde-initrd-modules)
+            (firmware rde-firmware)
             (services (append
-                       services
+                       rde-services
                        (if (rde-config-integrate-he-in-os? config)
                            (list (service guix-home-service-type
                                           ;; TODO: [Andrew Tropin, 2024-05-27]
@@ -422,15 +430,15 @@ can be later used to extend original service with additional configuration."
                                           ;; https://issues.guix.gnu.org/71111 is
                                           ;; merged
                                           `(,(list
-                                              user-name
+                                              rde-user-name
                                               (get-home-environment config)))))
                            '())
                        (list (service sudoers-service-type))
-                       (if user-name
-                           (list (service rde-account-service-type user))
+                       (if rde-user-name
+                           (list (service rde-account-service-type rde-user))
                            '())))
             (sudoers-file #f)
-            (name-service-switch name-service-switch))))
+            (name-service-switch rde-name-service-switch))))
     ;; Only apply transformations on thunked fields here.
     (operating-system
       (inherit computed-os)
