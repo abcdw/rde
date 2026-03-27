@@ -25,7 +25,7 @@
   #:use-module (ice-9 match))
 
 (define (serialize-config config)
-  (eval-with-store (nginx-serialize config)))
+  (evaluate-gexp-local (nginx-serialize config)))
 
 (define-test nginx-terms
   (test-group "nginx terms"

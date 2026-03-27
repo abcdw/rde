@@ -25,7 +25,7 @@
   #:use-module (ice-9 match))
 
 (define (serialize-yaml config)
-  (eval-with-store (yaml-serialize config)))
+  (evaluate-gexp-local (yaml-serialize config)))
 
 (define-test yaml-terms
   (test-group "YAML basic values"

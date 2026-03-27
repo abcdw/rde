@@ -33,7 +33,7 @@
   #:use-module (ice-9 regex))
 
 (define (serialize-config config)
-  (eval-with-store (nginx-serialize config)))
+  (evaluate-gexp-local (nginx-serialize config)))
 
 (define (hardening-settings host)
   `((harden ,host please)

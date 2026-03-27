@@ -33,7 +33,7 @@
 
 (define (serialize-config config)
   "Returns a string representing serialized config."
-  (eval-with-store (serialize-sexp-config #f config)))
+  (evaluate-gexp-local (serialize-sexp-config #f config)))
 
 (define (serialize-and-read-config config)
   "Returns a list of forms read from serialized config."
