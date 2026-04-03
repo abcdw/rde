@@ -1,4 +1,5 @@
 {
+  "_default": "careful",
   "clarify": {
     "tools": [
       "read",

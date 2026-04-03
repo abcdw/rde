@@ -66,8 +66,9 @@ interface PresetsConfig {
 /**
  * Load presets from config files.
  * Project-local presets override global presets with the same name.
+ * Supports a "_default" key to specify which preset to activate on startup.
  */
-function loadPresets(cwd: string): PresetsConfig {
+function loadPresets(cwd: string): { presets: PresetsConfig; defaultPreset?: string } {
 	const globalPath = join(homedir(), ".pi", "agent", "presets.json");
 	const projectPath = join(cwd, ".pi", "presets.json");
 
@@ -95,11 +96,18 @@ function loadPresets(cwd: string): PresetsConfig {
 	}
 
 	// Merge (project overrides global)
-	return { ...globalPresets, ...projectPresets };
+	const merged = { ...globalPresets, ...projectPresets };
+
+	// Extract _default meta-key
+	const defaultPreset = (merged as Record<string, unknown>)._default as string | undefined;
+	delete (merged as Record<string, unknown>)._default;
+
+	return { presets: merged, defaultPreset };
 }
 
 export default function presetExtension(pi: ExtensionAPI) {
 	let presets: PresetsConfig = {};
+	let defaultPresetName: string | undefined;
 	let activePresetName: string | undefined;
 	let activePreset: Preset | undefined;
 
@@ -363,7 +371,9 @@ export default function presetExtension(pi: ExtensionAPI) {
 	// Initialize on session start
 	pi.on("session_start", async (_event, ctx) => {
 		// Load presets from config files
-		presets = loadPresets(ctx.cwd);
+		const loaded = loadPresets(ctx.cwd);
+		presets = loaded.presets;
+		defaultPresetName = loaded.defaultPreset;
 
 		// Check for --preset flag
 		const presetFlag = pi.getFlag("preset");
@@ -390,6 +400,15 @@ export default function presetExtension(pi: ExtensionAPI) {
 				activePresetName = presetEntry.data.name;
 				activePreset = preset;
 				// Don't re-apply model/tools on restore, just keep the name for instructions
+			}
+		}
+
+		// Apply default preset if nothing else activated one
+		if (!activePresetName && !presetFlag && defaultPresetName) {
+			const preset = presets[defaultPresetName];
+			if (preset) {
+				await applyPreset(defaultPresetName, preset, ctx);
+				ctx.ui.notify(`Default preset "${defaultPresetName}" activated`, "info");
 			}
 		}
 
