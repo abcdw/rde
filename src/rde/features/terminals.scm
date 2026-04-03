@@ -113,7 +113,10 @@
            (let ((escape-seq (format ,(format #f "~a[%d;6u" #\esc) key)))
              (define-key vterm-mode-map (kbd (format "C-S-%c" key))
                (lambda () (interactive)
-                 (vterm-send-string escape-seq))))))
+                 (vterm-send-string escape-seq)))))
+         (define-key vterm-mode-map (kbd "C-<iso-lefttab>")
+           (lambda () (interactive)
+             (vterm-send-string ,(format #f "~a[9;6u" #\esc)))))
 
         (defvar rde-vterm-osc-777-re
           (concat (string 27) "\\]777;notify;"
