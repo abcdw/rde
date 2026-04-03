@@ -381,8 +381,11 @@ written to @file{$XDG_STATE_HOME/log/<compositor-name>.log}."
       (format #f "${XDG_STATE_HOME}/log/~a.log" compositor-name))
 
     (define env-vars
-      `(("XDG_CURRENT_DESKTOP" . ,desktop-name)
-        ("XDG_SESSION_TYPE" . "wayland")
+      `(("XDG_SESSION_TYPE" . "wayland")
+        ;; Hardcode sway for now to make portal for selecting screen to share
+        ;; work in bare-bone niri setup
+        ;; ("XDG_CURRENT_DESKTOP" . ,desktop-name)
+        ("XDG_CURRENT_DESKTOP" . "sway")
         ;; FIXME: Should be in feature-pipewire
         ("RTC_USE_PIPEWIRE" . "true")
         ("SDL_VIDEODRIVER" . "wayland")
