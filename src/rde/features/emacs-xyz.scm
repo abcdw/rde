@@ -4416,14 +4416,39 @@ Indentation and refile configurations, visual adjustment."
         :log t
         :order 100)
        (:name none
-        :todo ("IDEA")
-        :order 1)
+        :time-grid t
+        :order 6)
        (:name none
         :todo ("PROJ")
-        :order 2)
+        :order 8)
+       (:name none
+        :todo ("IDEA")
+        :order 9)
        (:name none
         :todo ,org-done-keywords-for-agenda
         :order 10)))))
+
+(define %rde-org-super-agenda-daily-config
+  `((org-super-agenda-unmatched-name 'none)
+    (org-super-agenda-unmatched-order 5)
+    (org-super-agenda-header-separator "\n")
+    (org-super-agenda-final-group-separator "\n")
+    (org-super-agenda-hide-empty-groups nil)
+    (org-super-agenda-groups
+     `((:name "Clocked today"
+        :log t
+        :order 100)
+       (:discard (:todo ,org-done-keywords-for-agenda))
+       (:name none
+        :time-grid t
+        :order 6)
+       (:name "To Do"
+        :todo ("TODO")
+        :order 1)
+
+       (:name "To Plan"
+        :todo ("PROJ" "IDEA")
+        :order 8)))))
 
 (define %rde-org-agenda-custom-commands
   `(list
@@ -4433,9 +4458,9 @@ Indentation and refile configurations, visual adjustment."
         ""
         ((org-agenda-span 1)
          (org-agenda-scheduled-leaders '("" "Sched.%2dx: "))
-         (org-agenda-block-separator nil)
+         (org-agenda-block-separator "-")
          (org-scheduled-past-days 0)
-         ,@%rde-org-super-agenda-config
+         ,@%rde-org-super-agenda-daily-config
          ;; We don't need the `org-agenda-date-today'
          ;; highlight because that only has a practical
          ;; utility in multi-day views.
