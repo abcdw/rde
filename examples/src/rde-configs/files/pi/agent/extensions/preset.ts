@@ -281,7 +281,7 @@ export default function presetExtension(pi: ExtensionAPI) {
 		return Object.keys(presets);
 	}
 
-	async function cyclePreset(ctx: ExtensionContext): Promise<void> {
+	async function cyclePreset(ctx: ExtensionContext, direction: 1 | -1 = 1): Promise<void> {
 		const presetNames = getPresetOrder();
 		if (presetNames.length === 0) {
 			ctx.ui.notify("No presets defined. Add presets to ~/.pi/agent/presets.json or .pi/presets.json", "warning");
@@ -291,7 +291,7 @@ export default function presetExtension(pi: ExtensionAPI) {
 		const cycleList = ["(none)", ...presetNames];
 		const currentName = activePresetName ?? "(none)";
 		const currentIndex = cycleList.indexOf(currentName);
-		const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % cycleList.length;
+		const nextIndex = currentIndex === -1 ? 0 : (currentIndex + direction + cycleList.length) % cycleList.length;
 		const nextName = cycleList[nextIndex];
 
 		if (nextName === "(none)") {
@@ -312,9 +312,16 @@ export default function presetExtension(pi: ExtensionAPI) {
 	}
 
 	pi.registerShortcut("shift+tab", {
-		description: "Cycle presets",
+		description: "Cycle presets forward",
 		handler: async (ctx) => {
-			await cyclePreset(ctx);
+			await cyclePreset(ctx, 1);
+		},
+	});
+
+	pi.registerShortcut("ctrl+shift+tab", {
+		description: "Cycle presets backward",
+		handler: async (ctx) => {
+			await cyclePreset(ctx, -1);
 		},
 	});
 
