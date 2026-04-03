@@ -3606,13 +3606,11 @@ Almost all other operations are covered by magit."
 
 (define* (feature-emacs-geiser
           #:key
-          (emacs-geiser emacs-geiser-latest)
-          (emacs-gider emacs-gider-latest)
-          (emacs-geiser-guile emacs-geiser-guile-latest)
-          (emacs-geiser-eros emacs-geiser-eros-latest))
+          (emacs-geiser emacs-geiser)
+          (emacs-geiser-guile emacs-geiser-guile)
+          (emacs-geiser-eros emacs-geiser-eros))
   "Configure geiser for emacs."
   (ensure-pred file-like? emacs-geiser)
-  (ensure-pred file-like? emacs-gider)
   (ensure-pred file-like? emacs-geiser-guile)
   (ensure-pred file-like? emacs-geiser-eros)
 
@@ -3632,8 +3630,7 @@ Almost all other operations are covered by magit."
                                   (xdg-cache-home)))
           (setq geiser-repl-add-project-paths nil))
         (with-eval-after-load 'geiser-mode
-          (geiser-eros-mode)
-          (gider-mode))
+          (geiser-eros-mode))
         (with-eval-after-load 'geiser-impl
           (setq geiser-default-implementation 'guile)
           (setq geiser-active-implementations '(guile))
@@ -3650,7 +3647,7 @@ Almost all other operations are covered by magit."
                         '((:results . "scalar")))))
               '()))
       #:elisp-packages
-      (list emacs-geiser emacs-geiser-guile emacs-geiser-eros emacs-gider)
+      (list emacs-geiser emacs-geiser-guile emacs-geiser-eros)
       #:summary "\
 Scheme interpreter, giving access to a REPL and live metadata."
       #:commentary "\
