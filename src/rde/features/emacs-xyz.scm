@@ -4614,7 +4614,7 @@ in `org-agenda-prefix-format' via %(rde-org-agenda-reschedule-count)."
                           "^[ \t]*-[ \t]+Rescheduled" drawer-end t)
                     (setq count (+ count 1)))))
               (cond
-               ((> count 9) "R:∞ ")
+               ((> count 9) "R:∞  ")
                ((> count 0) (format "R:%d  " count))
                (t "     ")))))
 
