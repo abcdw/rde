@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024, 2025 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2025, 2026 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2022 Samuel Culpepper <samuel@samuelculpepper.com>
 ;;; Copyright © 2024 Demis Balbach <db@minikn.xyz>
 ;;; Copyright © 2024, 2025 Nicolas Graves <ngraves@ngraves.fr>
@@ -217,41 +217,6 @@ parser.")
    (description "This package provides transient interface for git-gutter function
 to manipulate and navigate hunks.")))
 
-(define-public emacs-gider
-  (package
-    (name "emacs-gider")
-    (version "0.1.0")
-    (source
-     (local-file "../../../files/emacs/gider" #:recursive? #t))
-    (arguments
-     (list
-      #:exclude #~(list "^\\.dir-locals\\.el$" "^test/")
-      #:include #~(cons "^src/" %default-include)))
-    (build-system emacs-build-system)
-    (propagated-inputs
-     (list emacs-geiser emacs-geiser-guile))
-    (license license:gpl3+)
-    (home-page "https://sr.ht/~abcdw/rde")
-    (synopsis "Guile Interactive Development Enviroment")
-    (description "Right now it's just a few helpers on top of geiser.")))
-
-(define-public emacs-geiser-latest
-  (let ((commit "bd12f2dc6c5949e260f094fb60737498cd0ae9a5")
-        (revision "1"))
-    (package
-      (inherit emacs-geiser)
-      (name "emacs-geiser")
-      (version (git-version "0.28.2" revision commit))
-      (source
-       (origin
-         (method git-fetch)
-         (uri (git-reference
-               (url "https://gitlab.com/emacs-geiser/geiser")
-               (commit commit)))
-         (file-name (git-file-name name version))
-         (sha256
-          (base32 "16qi3vk1yps4f5v98ipdl5kq0jq5qlnlpx8c598csj9yk86p1hsw")))))))
-
 (define-public emacs-srht-latest
   (let ((commit "d9a8f6a43671d67a86622507136d4195c2dcd149")
         (revision "1"))
@@ -268,27 +233,6 @@ to manipulate and navigate hunks.")))
                 (sha256
                  (base32
                   "08ysidwlz4z6baih2810fpr1679217lnsb0jhwyvvj05g25ysy5b")))))))
-
-(define-public emacs-geiser-guile-latest
-  ((package-input-rewriting/spec
-    `(("emacs-geiser" . ,(const emacs-geiser-latest))))
-   emacs-geiser-guile))
-
-(define-public emacs-geiser-eros-latest
-  ((package-input-rewriting/spec
-    `(("emacs-geiser" . ,(const emacs-geiser-latest))))
-   emacs-geiser-eros))
-
-(define-public emacs-gider-latest
-  ((package-input-rewriting/spec
-    `(("emacs-geiser" . ,(const emacs-geiser-latest))
-      ("emacs-geiser-guile" . ,(const emacs-geiser-guile-latest))))
-   emacs-gider))
-
-(define-public emacs-guix-latest
-  ((package-input-rewriting/spec
-    `(("emacs-geiser" . ,(const emacs-geiser-latest))))
-   emacs-guix))
 
 (define-public emacs-guix-minimal
   (package
