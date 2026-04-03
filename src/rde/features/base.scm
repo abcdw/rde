@@ -1,6 +1,6 @@
 ;;; rde --- Reproducible development environment.
 ;;;
-;;; Copyright © 2021, 2022, 2023, 2024 Andrew Tropin <andrew@trop.in>
+;;; Copyright © 2021, 2022, 2023, 2024, 2026 Andrew Tropin <andrew@trop.in>
 ;;; Copyright © 2024, 2025 Nicolas Graves <ngraves@ngraves.fr>
 ;;;
 ;;; This file is part of rde.
@@ -29,6 +29,7 @@
   #:use-module (gnu services base)
   #:use-module (gnu services desktop)
   #:use-module (gnu services sound)
+  #:use-module (gnu services shepherd)
   #:use-module (gnu services xorg)
   #:use-module (gnu services admin)
   #:use-module (gnu services sysctl)
@@ -168,12 +169,17 @@ be a symbol, which will be used to construct feature name."
    (service greetd-service-type)
    (service virtual-terminal-service-type)
    (service console-font-service-type '())
-   (service syslog-service-type (syslog-configuration))
+
    (service static-networking-service-type
             (list %loopback-static-networking))
    (service urandom-seed-service-type)
    (service guix-service-type)
    (service nscd-service-type)
+
+   (service shepherd-system-log-service-type)
+
+   (service shepherd-timer-service-type)
+   (service shepherd-transient-service-type)
 
    (service log-rotation-service-type)
    (service log-cleanup-service-type
