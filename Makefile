@@ -38,7 +38,7 @@ guix-pull:
 
 ares:
 	${GUIX} shell ${DEV_ENV_LOAD_PATH} \
-	guile-next guile-ares-rs \
+	guile guile-ares-rs \
 	-e '(@ (rde env dev packages) guix-package)' \
 	-- guile \
 	${DEV_SRC_LOAD_PATH} \
