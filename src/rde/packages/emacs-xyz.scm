@@ -405,6 +405,33 @@ diff tool that understands syntax.  It integrates with Magit to show
 structural diffs in place of regular diffs.")
       (license license:gpl3+))))
 
+(define-public emacs-majutsu
+  (let ((commit "c329beb4a959efe2ad07007dc9c983a0dfbf34a3")
+        (revision "0"))
+    (package
+      (name "emacs-majutsu")
+      (version (git-version "0.6.0" revision commit))
+      (source
+       (origin
+         (method git-fetch)
+         (uri (git-reference
+               (url "https://github.com/0WD0/majutsu")
+               (commit commit)))
+         (file-name (git-file-name name version))
+         (sha256
+          (base32
+           "1y0ij2dxvq0xv10dk4gb7yn7jjgsgss416wx4av7ndnyhzxkywfi"))))
+      (build-system emacs-build-system)
+      (propagated-inputs (list emacs-magit emacs-transient))
+      (home-page "https://github.com/0WD0/majutsu")
+      (synopsis "Magit-style interface for the Jujutsu version control system")
+      (description
+       "Majutsu provides a Magit-inspired Emacs interface for the Jujutsu (jj)
+version control system.  It offers an interactive log viewer and commands for
+manipulating revision history.")
+      (license license:gpl3+))))
+
+
 (define-public emacs-arei-shepherd
   (package
     (name "emacs-arei-shepherd")
