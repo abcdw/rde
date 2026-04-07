@@ -73,7 +73,9 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
           (email . ,email)))
         ,@(if sign-commits?
               `((signing
-                 ((behavior . "force")
+                 ;; Signing automatically makes everything feel sluggish, so
+                 ;; sign manually, when the work is ready for push.
+                 ((behavior . "keep")
                   (key . ,sign-key)
                   (backend . ,(if use-ssh? "ssh" "gpg")))))
               '())
