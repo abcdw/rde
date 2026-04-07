@@ -30,16 +30,76 @@
           (sign-commits? #t)
           (git-sign-key #f)
           (git-send-email? #t)
+          (require-signed-commits-on-push? #t)
           (extra-config '()))
-  "Setup and configure Git."
+  "Setup and configure Git.
+
+When @code{require-signed-commits-on-push?} is @code{#t} (the default),
+a pre-push hook is installed that rejects pushes containing unsigned
+commits.  To opt out for a specific repository run:
+
+  git config rde.requireSignedCommitsOnPush false"
   (ensure-pred file-like? git)
   (ensure-pred maybe-string? git-sign-key)
   (ensure-pred boolean? sign-commits?)
   (ensure-pred boolean? git-send-email?)
+  (ensure-pred boolean? require-signed-commits-on-push?)
   (ensure-pred list? extra-config)
 
   (define (git-home-services config)
     "Returns home services related to Git."
+
+    (define pre-push-hook-text
+      (plain-file
+       "pre-push-text"
+       "\
+#!/bin/sh
+# Verify all pushed commits are GPG-signed.
+# Disable per-repository with:
+#   git config rde.requireSignedCommitsOnPush false
+
+if git config --bool rde.requireSignedCommitsOnPush 2>/dev/null \
+   | grep -q false; then
+  exit 0
+fi
+
+zero=$(git hash-object --stdin </dev/null | tr '[0-9a-f]' '0')
+rc=0
+
+while read local_ref local_oid remote_ref remote_oid; do
+  if test \"$local_oid\" = \"$zero\"; then
+    continue
+  fi
+  if test \"$remote_oid\" = \"$zero\"; then
+    range=\"$local_oid\"
+  else
+    range=\"$remote_oid..$local_oid\"
+  fi
+  for commit in $(git rev-list \"$range\"); do
+    if ! git verify-commit \"$commit\" >/dev/null 2>&1; then
+      echo >&2 \"error: unsigned commit $commit (branch $local_ref)\"
+      rc=1
+    fi
+  done
+done
+
+if test \"$rc\" -ne 0; then
+  echo >&2 \"\"
+  echo >&2 \"tip: to disable this check for this repository run:\"
+  echo >&2 \"  git config rde.requireSignedCommitsOnPush false\"
+fi
+
+exit $rc
+"))
+
+    (define pre-push-hook
+      (computed-file
+       "pre-push"
+       (with-imported-modules '((guix build utils))
+         #~(begin
+             (use-modules (guix build utils))
+             (copy-file #$pre-push-hook-text #$output)
+             (chmod #$output #o755)))))
 
     (let* ((gpg-primary-key (get-value 'gpg-primary-key config #f))
            (git-sign-key (or git-sign-key gpg-primary-key))
@@ -73,7 +133,8 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
                     `((editor . ,(file-append
                                   (get-value 'emacs-client config)
                                   " --reuse-frame")))
-                    '())))
+                    '())
+              (hooksPath . "~/.config/git/hooks")))
             (user
              ((name . ,(get-value 'full-name config))
               (email . ,(get-value 'email config))
@@ -114,7 +175,13 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
                   `((gpg ((format . ssh))))
                   '())
 
-            ,@extra-config)))))))
+            ,@extra-config))))
+
+       (when require-signed-commits-on-push?
+         (simple-service
+          'git-require-signed-commits-on-push
+          home-xdg-configuration-files-service-type
+          `(("git/hooks/pre-push" ,pre-push-hook)))))))
 
   (feature
    (name 'git)
