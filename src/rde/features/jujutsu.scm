@@ -101,7 +101,8 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
       `((autoload 'majutsu "majutsu" nil t)
         (with-eval-after-load 'majutsu-jj
           (setopt majutsu-jj-executable
-                  ,(file-append jujutsu "/bin/jj"))))
+                  ,(file-append jujutsu "/bin/jj"))
+          (setopt majutsu-no-confirm t)))
       #:summary "Jujutsu version control integration"
       #:commentary "Set jj executable path and autoload majutsu entry point."
       #:keywords '(convenience tools)
