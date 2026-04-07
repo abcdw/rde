@@ -99,6 +99,7 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
       f-name
       config
       `((autoload 'majutsu "majutsu" nil t)
+        (global-set-key (kbd "C-x j") 'majutsu)
         (with-eval-after-load 'majutsu-jj
           (setopt majutsu-jj-executable
                   ,(file-append jujutsu "/bin/jj"))
