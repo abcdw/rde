@@ -3519,8 +3519,14 @@ git-link, git-timemachine."
         (define-key global-map (kbd ,git-gutter-transient-key)
           'git-gutter-transient)
 
-        (with-eval-after-load
-         'transient
+        (with-eval-after-load 'transient
+          ;; Jumping around options in transient menu doesn't make much sense,
+          ;; but sometimes occupied bindings for arrow get in the
+          ;; way. e.g. rebase in majutsu
+          (keymap-unset transient-map "<left>")
+          (keymap-unset transient-map "<right>")
+          (keymap-unset transient-map "<up>")
+          (keymap-unset transient-map "<down>")
           (setq transient-history-file
                 (concat (or (getenv "XDG_CACHE_HOME") "~/.cache")
                         "/emacs/transient/history.el")))
