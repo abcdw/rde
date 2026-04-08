@@ -77,8 +77,12 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
                  ;; sign manually, when the work is ready for push.
                  ((behavior . "keep")
                   (key . ,sign-key)
-                  (backend . ,(if use-ssh? "ssh" "gpg")))))
+                  (backend . ,(if use-ssh? "ssh" "gpg"))))
+                (git
+                 ((sign-on-push . #t))))
               '())
+        (ui
+         ((show-cryptographic-signatures . #t)))
         ,@extra-config))
 
     (list
