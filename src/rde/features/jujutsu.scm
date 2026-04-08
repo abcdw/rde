@@ -107,7 +107,20 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
         (with-eval-after-load 'majutsu-jj
           (setopt majutsu-jj-executable
                   ,(file-append jujutsu "/bin/jj"))
-          (setopt majutsu-no-confirm t)))
+          (setopt majutsu-no-confirm t))
+        (with-eval-after-load 'majutsu-log
+          (unless (cl-find 'signature majutsu-log-commit-columns
+                           :key (lambda (c) (plist-get c :field)))
+            (setopt majutsu-log-commit-columns
+                    (let* ((cols majutsu-log-commit-columns)
+                           (pos (cl-position-if
+                                 (lambda (c) (eq (plist-get c :field) 'description))
+                                 cols)))
+                      (append (seq-take cols pos)
+                              '((:field signature :align left))
+                              (seq-drop cols pos)))))
+          (majutsu-log--invalidate-template-cache)))
+
       #:summary "Jujutsu version control integration"
       #:commentary "Set jj executable path and autoload majutsu entry point."
       #:keywords '(convenience tools)
