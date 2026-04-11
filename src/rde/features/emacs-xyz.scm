@@ -4451,10 +4451,12 @@ Indentation and refile configurations, visual adjustment."
        (:name "To Do"
         :todo ("TODO")
         :order 1)
-
+       (:name none
+        :todo ("PROJ")
+        :order 8)
        (:name "To Plan"
-        :todo ("PROJ" "IDEA")
-        :order 8)))))
+        :todo ("IDEA")
+        :order 9)))))
 
 (define %rde-org-agenda-custom-commands
   `(list
