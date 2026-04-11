@@ -134,6 +134,12 @@ system."
 
           (keymap-set cua-global-keymap "C-S-j" 'rde-cua-join-lines))
 
+        (with-eval-after-load 'majutsu-log
+          (keymap-set majutsu-log-mode-map
+                      "<remap> <undo-fu-only-undo>" 'majutsu-undo)
+          (keymap-set majutsu-log-mode-map
+                      "<remap> <undo-fu-only-redo>" 'majutsu-redo))
+
         (if after-init-time
             (cua-mode)
             (add-hook 'after-init-hook 'cua-mode)))
