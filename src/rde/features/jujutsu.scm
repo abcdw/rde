@@ -79,7 +79,11 @@ is provided or disable `sign-commits?' Current sign-key value is ~a")
                   (key . ,sign-key)
                   (backend . ,(if use-ssh? "ssh" "gpg"))))
                 (git
-                 ((sign-on-push . #t))))
+                 ((sign-on-push . #t)
+                  (private-commits . "description('wip:*') | \
+description('priv:*') | description('\\[PRIV\\]*') | \
+description('\\[TODO\\]*') | description('\\[WIP\\]*') | ~signed()")
+                  )))
               '())
         (ui
          ((show-cryptographic-signatures . #t)))
