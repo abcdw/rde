@@ -406,8 +406,8 @@ structural diffs in place of regular diffs.")
       (license license:gpl3+))))
 
 (define-public emacs-majutsu
-  (let ((commit "c329beb4a959efe2ad07007dc9c983a0dfbf34a3")
-        (revision "0"))
+  (let ((commit "2ab2adb7db8d379bdf2177901db7bcadfc9677d1")
+        (revision "1"))
     (package
       (name "emacs-majutsu")
       (version (git-version "0.6.0" revision commit))
@@ -420,7 +420,7 @@ structural diffs in place of regular diffs.")
          (file-name (git-file-name name version))
          (sha256
           (base32
-           "1y0ij2dxvq0xv10dk4gb7yn7jjgsgss416wx4av7ndnyhzxkywfi"))))
+           "0hhil3j9a8p9q7wivkd5vac6kwn1w6brw1zairfqa4r1nm23kx94"))))
       (build-system emacs-build-system)
       (propagated-inputs (list emacs-magit emacs-transient))
       (home-page "https://github.com/0WD0/majutsu")
