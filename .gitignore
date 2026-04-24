@@ -1,2 +1,3 @@
 stale/**
 .nrepl-port
+tmp/
