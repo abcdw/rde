@@ -559,7 +559,11 @@ if [ -f $GUIX_PROFILE/etc/profile ]; then source $GUIX_PROFILE/etc/profile; fi
         "* TODO %:subject %?\nSCHEDULED: %t\n%U\n%a\n"
         :immediate-finish t)
        ("t" "Todo" entry (file+headline "" "Tasks") ;; org-default-notes-file
+        "* IDEA %?\nSCHEDULED: %t\n%a\n")
+       ("s" "Subtask" entry (function rde-org-find-subtask-location)
         "* TODO %?\nSCHEDULED: %t\n%a\n")
+       ;; ("s" "Subtask" entry (function org-capture-target-under-point)
+       ;;  "* TODO %?\n  %i\n  %a")
        ("p" "PhD Todo" entry
         (file+headline "/data/abcdw/work/abcdw/private/phd.org" "Tasks")
         "* TODO %?\nSCHEDULED: %t\n%a\n")))
