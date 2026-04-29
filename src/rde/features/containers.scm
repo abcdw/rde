@@ -22,6 +22,8 @@
   #:use-module (rde lib file)
   #:use-module (gnu packages containers)
   #:use-module (gnu services)
+  #:use-module (gnu system accounts)
+  #:use-module (gnu system shadow)
   #:use-module (guix gexp)
   #:use-module (gnu home services)
   #:use-module (rde home services shells)
@@ -73,20 +75,18 @@ configuration relies on btrfs."
 
   (define (get-system-services config)
     (define user-name (get-value 'user-name config))
+    (define podman-subid-range
+      (subid-range
+       (name user-name)
+       (start 100000)
+       (count 65536)))
     (list
      (simple-service
       'podman-subuid-subgid
-      ;; If subuid/subgid will be needed somewhere else, the service must be
-      ;; created to handle it.
-      etc-service-type
-      `(("subuid"
-         ,(plain-file
-           "subuid"
-           (string-append user-name ":100000:65536\n")))
-        ("subgid"
-         ,(plain-file
-           "subgid"
-           (string-append user-name ":100000:65536\n")))))))
+      subids-service-type
+      (subids-extension
+       (subuids (list podman-subid-range))
+       (subgids (list podman-subid-range))))))
 
   (feature
    (name f-name)
